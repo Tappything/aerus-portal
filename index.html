@@ -1,21 +1,70 @@
-const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/q6s4cfv1g27xnxx8mn9m1dn889w23vt7';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aerus Staff Intake Portal</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f6f8; }
+        .container { max-width: 500px; background: #ffffff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h2 { margin-top: 0; color: #333; }
+        input, textarea, button { width: 100%; margin-bottom: 15px; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { background-color: #0073ea; color: white; border: none; font-weight: bold; cursor: pointer; }
+        button:hover { background-color: #005bb5; }
+    </style>
+</head>
+<body>
 
-async function submitIntakeToMonday(customerData) {
-  try {
-    const response = await fetch(MAKE_WEBHOOK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: customerData.name,
-        phone: customerData.phone,
-        machine: customerData.machine,
-        desc: customerData.desc
-        
-      })
-    });
-    return response.ok;
-  } catch (error) {
-    console.error("Webhook submission failed:", error);
-    return false;
-  }
-}
+<div class="container">
+    <h2>Aerus Service Intake</h2>
+    <form id="intakeForm" onsubmit="handleFormSubmit(event)">
+        <input type="text" id="name" placeholder="Customer Name" required>
+        <input type="tel" id="phone" placeholder="Phone Number" required>
+        <input type="text" id="machine" placeholder="Machine Model" required>
+        <textarea id="desc" placeholder="Issue / Service Description" rows="4" required></textarea>
+        <button type="submit">Submit Intake to Monday.com</button>
+    </form>
+</div>
+
+<script>
+    const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/q6s4cfv1g27xnxx8mn9m1dn889w23vt7';
+
+    async function handleFormSubmit(event) {
+        event.preventDefault();
+
+        const submitBtn = event.target.querySelector('button');
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Submitting...";
+
+        const payload = {
+            name: document.getElementById('name').value,
+            phone: document.getElementById('phone').value,
+            machine: document.getElementById('machine').value,
+            desc: document.getElementById('desc').value
+        };
+
+        try {
+            const response = await fetch(MAKE_WEBHOOK_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                alert("Intake Submitted Successfully!");
+                document.getElementById('intakeForm').reset();
+            } else {
+                alert("Submission failed. Check Make.com webhook configuration.");
+            }
+        } catch (error) {
+            console.error("Submission error:", error);
+            alert("Network error. Could not send payload.");
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Submit Intake to Monday.com";
+        }
+    }
+</script>
+
+</body>
+</html>
