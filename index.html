@@ -1,1 +1,21 @@
+const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/q6s4cfv1g27xnxx8mn9m1dn889w23vt7";
 
+async function submitIntakeToMonday(customerData) {
+  try {
+    const response = await fetch(MAKE_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: customerData.name,
+        phone: customerData.phone,
+        machine: customerData.machine,
+        desc: customerData.desc,
+        boardEmail: "towsonhealthyhomes_board_18424728273_2fac5a086e9a68faa692__112199298@use1.mx.monday.com"
+      })
+    });
+    return response.ok;
+  } catch (error) {
+    console.error("Webhook submission failed:", error);
+    return false;
+  }
+}
