@@ -2,7 +2,7 @@
 <html>
 <body>
   <h3>Staff Intake Form</h3>
-  <form id="f" onsubmit="event.preventDefault(); fetch('https://hook.us2.make.com/q6s4cfv1g27xnxx8mn9m1dn889w23vt7', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:f.name.value,phone:f.phone.value,machine:f.machine.value,desc:f.desc.value})}).then(()=>{msg.innerText='✅ Submitted!'; f.reset();});">
+  <form id="intakeForm" onsubmit="event.preventDefault(); sendToWebhook();">
     <input name="name" placeholder="Name" required><br><br>
     <input name="phone" placeholder="Phone" required><br><br>
     <input name="machine" placeholder="Machine" required><br><br>
@@ -10,5 +10,34 @@
     <button type="submit">Submit Intake</button>
   </form>
   <p id="msg" style="color:green; font-weight:bold;"></p>
+
+  <script>
+    async function sendToWebhook() {
+      const form = document.getElementById('intakeForm');
+      const msg = document.getElementById('msg');
+      
+      const payload = {
+        name: form.name.value,
+        phone: form.phone.value,
+        machine: form.machine.value,
+        desc: form.desc.value
+      };
+
+      try {
+        const response = await fetch('https://hook.us2.make.com/q6s4cfv1g27xnxx8mn9m1dn889w23vt7', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+          msg.innerText = '✅ Submitted!';
+          form.reset();
+        }
+      } catch (err) {
+        msg.innerText = '✕ Error: ' + err.message;
+      }
+    }
+  </script>
 </body>
 </html>
