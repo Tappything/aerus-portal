@@ -19,7 +19,7 @@
 
 <div class="card">
     <h2>Aerus Intake Form</h2>
-    <form id="intakeForm" onsubmit="handleIntakeSubmit(event); return false;">
+    <form id="intakeForm" onsubmit="event.preventDefault(); sendToWebhook();">
         <div class="form-group">
             <label for="name">Customer Name</label>
             <input type="text" id="name" name="name" required>
@@ -42,8 +42,7 @@
 </div>
 
 <script>
-async function handleIntakeSubmit(event) {
-    if (event) event.preventDefault();
+async function sendToWebhook() {
     const submitBtn = document.getElementById('submitBtn');
     const messageDiv = document.getElementById('submitMessage');
     
