@@ -1,84 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aerus Home Wellness Portal</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #1a1d20; color: #fff; padding: 20px; }
-        .card { background: #2a2e33; padding: 20px; border-radius: 8px; max-width: 500px; margin: auto; }
-        .form-group { margin-bottom: 12px; }
-        label { display: block; margin-bottom: 4px; color: #ccc; }
-        input, select, textarea { width: 100%; padding: 8px; box-sizing: border-box; background: #1a1d20; color: #fff; border: 1px solid #444; border-radius: 4px; }
-        button { background: #d4af37; color: #000; padding: 10px; border: none; font-weight: bold; width: 100%; cursor: pointer; border-radius: 4px; margin-top: 10px; }
-        .success { color: #4caf50; font-weight: bold; text-align: center; margin-top: 10px; }
-        .error { color: #f44336; font-weight: bold; text-align: center; margin-top: 10px; }
-    </style>
-</head>
+<html>
 <body>
-
-<div class="card">
-    <h2>Aerus Intake Form</h2>
-    <form id="intakeForm" onsubmit="event.preventDefault(); sendToWebhook();">
-        <div class="form-group">
-            <label for="name">Customer Name</label>
-            <input type="text" id="name" name="name" required>
-        </div>
-        <div class="form-group">
-            <label for="phone">Phone Number</label>
-            <input type="tel" id="phone" name="phone" required>
-        </div>
-        <div class="form-group">
-            <label for="machine">Machine Model / Serial</label>
-            <input type="text" id="machine" name="machine" required>
-        </div>
-        <div class="form-group">
-            <label for="desc">Issue / Operational Note</label>
-            <textarea id="desc" name="desc" rows="4" required></textarea>
-        </div>
-        <button type="submit" id="submitBtn">Submit Intake</button>
-    </form>
-    <div id="submitMessage"></div>
-</div>
-
-<script>
-async function sendToWebhook() {
-    const submitBtn = document.getElementById('submitBtn');
-    const messageDiv = document.getElementById('submitMessage');
-    
-    submitBtn.disabled = true;
-    messageDiv.innerHTML = '';
-
-    const payload = {
-        name: document.getElementById('name').value,
-        phone: document.getElementById('phone').value,
-        machine: document.getElementById('machine').value,
-        desc: document.getElementById('desc').value,
-        group: "Staff Intake — Pending Review",
-        boardId: "18424728273",
-        timestamp: new Date().toISOString()
-    };
-
-    try {
-        const response = await fetch('https://hook.us2.make.com/q6s4cfv1g27xnxx8mn9m1dn889w23vt7', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-
-        if (response.ok) {
-            messageDiv.innerHTML = '<p class="success">✅ Intake Submitted!</p>';
-            document.getElementById('intakeForm').reset();
-        } else {
-            messageDiv.innerHTML = '<p class="error">✕ Submission failed. Try again.</p>';
-        }
-    } catch (err) {
-        messageDiv.innerHTML = '<p class="error">✕ Error: ' + err.message + '</p>';
-    } finally {
-        submitBtn.disabled = false;
-    }
-}
-</script>
-
+  <h3>Staff Intake Form</h3>
+  <form id="f" onsubmit="event.preventDefault(); fetch('https://hook.us2.make.com/q6s4cfv1g27xnxx8mn9m1dn889w23vt7', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:f.name.value,phone:f.phone.value,machine:f.machine.value,desc:f.desc.value})}).then(()=>{msg.innerText='✅ Submitted!'; f.reset();});">
+    <input name="name" placeholder="Name" required><br><br>
+    <input name="phone" placeholder="Phone" required><br><br>
+    <input name="machine" placeholder="Machine" required><br><br>
+    <textarea name="desc" placeholder="Issue Description" required></textarea><br><br>
+    <button type="submit">Submit Intake</button>
+  </form>
+  <p id="msg" style="color:green; font-weight:bold;"></p>
 </body>
 </html>
