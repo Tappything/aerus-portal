@@ -1,129 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TappyThing - Aerus Portal</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #1a1a1a;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
-    .header {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      right: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .logo-left { font-weight: bold; font-size: 1.2rem; color: #d4af37; }
-    .logo-right { font-weight: bold; font-size: 1rem; opacity: 0.8; }
-    .container {
-      background: #2a2a2a;
-      padding: 40px;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-      width: 90%;
-      max-width: 500px;
-      text-align: center;
-      border: 1px solid #333;
-    }
-    h1 { margin-bottom: 20px; font-size: 1.8rem; color: #f0f0f0; }
-    input[type="text"] {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      border: 1px solid #444;
-      background: #111;
-      color: #fff;
-      font-size: 1rem;
-      box-sizing: border-box;
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      border-radius: 8px;
-      border: none;
-      background: #d4af37;
-      color: #000;
-      font-size: 1.1rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    button:hover { background: #e5be48; }
-    button:disabled { background: #666; cursor: not-allowed; }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Tappything - Aerus Portal</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1A1A1A;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo-left { font-weight: bold; font-size: 1.2rem; color: #4CAF50; }
+        .logo-right { font-weight: bold; font-size: 1rem; opacity: 0.8; }
+        .container {
+            background: #2A2A2A;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            width: 90%;
+            max-width: 500px;
+            box-sizing: border-box;
+        }
+        h2 { margin-top: 0; color: #4CAF50; text-align: center; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; }
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background: #333;
+            color: #fff;
+            font-size: 1rem;
+            box-sizing: border-box;
+            resize: vertical;
+            margin-bottom: 20px;
+        }
+        textarea:focus { outline: none; border-color: #4CAF50; }
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-submit:hover { background: #45a049; }
+    </style>
 </head>
 <body>
+    <div class="header">
+        <div class="logo-left">Tappything</div>
+        <div class="logo-right">Aerus Portal</div>
+    </div>
+    <div class="container">
+        <h2>Digital Butler Intake</h2>
+        <form action="https://hook.us2.make.com/YOUR_WEBHOOK_URL_HERE" method="POST">
+            <label for="transcript">Intake Details / Voice Note</label>
+            <textarea 
+                id="transcript" 
+                name="transcript" 
+                rows="4" 
+                placeholder="e.g. Jack Smith - Beyond Air - Needs filter, bulb, cell repair..."
+                required></textarea>
 
-  <div class="header">
-    <div class="logo-left">Aerus Home Wellness</div>
-    <div class="logo-right">TappyThing | Digital Butler</div>
-  </div>
-
-  <div class="container">
-    <h1>Digital Butler Intake</h1>
-    <form id="tappyIntakeForm">
-      <input type="text" id="userInput" name="transcript" placeholder="Tap and talk or type here..." required />
-      <button type="submit" id="submitBtn">Send to Butler</button>
-    </form>
-  </div>
-
-  <script>
-    const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/q6s4cfv1g27xnxx8mn9m1dn889w23vt7";
-
-    document.getElementById("tappyIntakeForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      
-      const submitBtn = document.getElementById("submitBtn");
-      const userInput = document.getElementById("userInput");
-      
-      const payload = {
-        transcript: userInput.value,
-        timestamp: new Date().toISOString(),
-        source: "TappyThing Front Door Shell",
-        user_id: "William_Aerus_MD"
-      };
-
-      try {
-        submitBtn.disabled = true;
-        submitBtn.innerText = "Routing...";
-
-        const response = await fetch(MAKE_WEBHOOK_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
-        });
-
-        if (response.ok) {
-          userInput.value = "";
-          alert("Sent to Digital Butler!");
-        } else {
-          alert("Webhook delivery failed. Check Make.com scenario.");
-        }
-      } catch (error) {
-        console.error("Submission Error:", error);
-        alert("Connection error sending payload.");
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = "Send to Butler";
-      }
-    });
-  </script>
-
+            <button type="submit" class="btn-submit">
+                Send to Digital Butler 🚀
+            </button>
+        </form>
+    </div>
 </body>
 </html>
