@@ -46,11 +46,17 @@
         <div id="intake-form-card" class="drawer">
             <div class="intake-form">
                 <form id="intakeForm" onsubmit="handleIntakeSubmit(event)">
-                    <label for="staff">Staff Name:</label>
-                    <input type="text" id="staff" name="staff" required>
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
                     
-                    <label for="note">Note:</label>
-                    <textarea id="note" name="note" rows="4" required></textarea>
+                    <label for="phone">Phone:</label>
+                    <input type="tel" id="phone" name="phone" required>
+                    
+                    <label for="machine">Machine:</label>
+                    <input type="text" id="machine" name="machine" required>
+                    
+                    <label for="desc">Description:</label>
+                    <textarea id="desc" name="desc" rows="4" required></textarea>
                     
                     <button type="submit">Submit</button>
                     <div id="submitMessage"></div>
@@ -108,9 +114,10 @@ async function fetchMondayData(boardId, containerId) {
 async function handleIntakeSubmit(event) {
     event.preventDefault();
     
-    const staff = document.getElementById('staff').value;
-    const note = document.getElementById('note').value;
-    const timestamp = new Date().toISOString();
+    const name = document.getElementById('name').value;
+    const phone = document.getElementById('phone').value;
+    const machine = document.getElementById('machine').value;
+    const desc = document.getElementById('desc').value;
     const boardId = '18424728273';
     
     const messageDiv = document.getElementById('submitMessage');
@@ -118,9 +125,11 @@ async function handleIntakeSubmit(event) {
     
     try {
         const payload = {
-            staff: staff,
-            note: note,
-            timestamp: timestamp,
+            name: name,
+            phone: phone,
+            machine: machine,
+            desc: desc,
+            group: 'Staff Intake — Pending Review',
             boardId: boardId
         };
         
@@ -144,5 +153,3 @@ async function handleIntakeSubmit(event) {
 
 </body>
 </html>
-
- 
