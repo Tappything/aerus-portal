@@ -3,90 +3,278 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Tappything - Aerus Portal</title>
+    <title>TappyThing - Digital Butler Portal</title>
     <style>
-        body {
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
+        }
+        body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1A1A1A;
-            color: #fff;
+            background: #111111;
+            color: #f0f0f0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
+            padding: 20px;
         }
-        .header {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
+        .header-brand {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .header-brand h1 {
+            font-size: 1.8rem;
+            color: #d4af37;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .header-brand p {
+            font-size: 0.9rem;
+            color: #888;
+            font-style: italic;
+        }
+
+        /* Mahogany Cabinet Structure */
+        .cabinet {
+            background: linear-gradient(145deg, #2c1609, #4a2511, #1e0e05);
+            border: 8px solid #160a04;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 15px rgba(0,0,0,0.8);
+            width: 100%;
+            max-width: 520px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Base Drawer Styling */
+        .drawer {
+            background: linear-gradient(180deg, #5c2e15 0%, #3d1e0d 100%);
+            border: 2px solid #2a1307;
+            border-radius: 10px;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.1), 0 4px 10px rgba(0,0,0,0.6);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        /* Metallic Bronze Handle */
+        .handle {
+            width: 100px;
+            height: 14px;
+            background: linear-gradient(180deg, #d4af37 0%, #aa820a 50%, #664d03 100%);
+            border-radius: 7px;
+            margin: 12px auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.7), inset 0 1px 2px rgba(255,255,255,0.5);
+            border: 1px solid #4a3802;
+        }
+
+        /* Drawer 1: Open & Active */
+        .drawer-open {
+            background: linear-gradient(180deg, #42200e 0%, #2b1408 100%);
+            border: 2px solid #d4af37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3), inset 0 2px 6px rgba(0,0,0,0.8);
+            padding: 20px;
+        }
+        .drawer-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
         }
-        .logo-left { font-weight: bold; font-size: 1.2rem; color: #4CAF50; }
-        .logo-right { font-weight: bold; font-size: 1rem; opacity: 0.8; }
-        .container {
-            background: #2A2A2A;
-            padding: 30px;
+        .drawer-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #d4af37;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .status-badge {
+            background: #4CAF50;
+            color: #fff;
+            font-size: 0.75rem;
+            padding: 3px 8px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            width: 90%;
-            max-width: 500px;
-            box-sizing: border-box;
+            font-weight: bold;
         }
-        h2 { margin-top: 0; color: #4CAF50; text-align: center; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; }
+
+        /* Form Controls */
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #ccc;
+            font-weight: 600;
+        }
         textarea {
             width: 100%;
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px solid #444;
-            background: #333;
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid #553019;
+            background: #180b05;
             color: #fff;
             font-size: 1rem;
-            box-sizing: border-box;
             resize: vertical;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
+            font-family: inherit;
         }
-        textarea:focus { outline: none; border-color: #4CAF50; }
+        textarea:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+        }
         .btn-submit {
             width: 100%;
             padding: 14px;
-            background: #4CAF50;
+            background: linear-gradient(180deg, #4CAF50 0%, #2e7d32 100%);
             color: white;
-            border: none;
-            border-radius: 6px;
+            border: 1px solid #1b5e20;
+            border-radius: 8px;
             font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
-            transition: background 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transition: transform 0.1s, background 0.2s;
         }
-        .btn-submit:hover { background: #45a049; }
+        .btn-submit:hover {
+            background: linear-gradient(180deg, #66bb6a 0%, #388e3c 100%);
+        }
+        .btn-submit:active {
+            transform: translateY(2px);
+        }
+
+        /* Confirmation Toast Overlay */
+        .toast {
+            display: none;
+            background: #2e7d32;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        /* Closed Drawers (Drawers 2, 3, 4) */
+        .drawer-closed {
+            height: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.85;
+            cursor: pointer;
+        }
+        .drawer-closed:hover {
+            opacity: 1;
+            border-color: #8c4720;
+        }
+        .drawer-closed-label {
+            font-size: 0.8rem;
+            color: #a67c52;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            margin-top: -4px;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo-left">Tappything</div>
-        <div class="logo-right">Aerus Portal</div>
-    </div>
-    <div class="container">
-        <h2>Digital Butler Intake</h2>
-        <form action="https://hook.us2.make.com/YOUR_WEBHOOK_URL_HERE" method="POST">
-            <label for="transcript">Intake Details / Voice Note</label>
-            <textarea 
-                id="transcript" 
-                name="transcript" 
-                rows="4" 
-                placeholder="e.g. Jack Smith - Beyond Air - Needs filter, bulb, cell repair..."
-                required></textarea>
 
-            <button type="submit" class="btn-submit">
-                Send to Digital Butler 🚀
-            </button>
-        </form>
+    <div class="header-brand">
+        <h1>TappyThing</h1>
+        <p>Same cabinet. Your world inside.</p>
     </div>
+
+    <div class="cabinet">
+        <!-- DRAWER 1: OPERATIONS / READY WALL (ACTIVE) -->
+        <div class="drawer drawer-open">
+            <div class="drawer-header">
+                <span class="drawer-title">Drawer 1 — Operations</span>
+                <span class="status-badge">ACTIVE</span>
+            </div>
+            
+            <form id="intakeForm">
+                <label for="transcript">Digital Butler Voice & Intake Note</label>
+                <textarea 
+                    id="transcript" 
+                    name="transcript" 
+                    rows="4" 
+                    placeholder="e.g. Jack Smith - Beyond Air - Needs filter, bulb, cell repair..."
+                    required></textarea>
+
+                <button type="submit" id="submitBtn" class="btn-submit">
+                    Send to Digital Butler 🚀
+                </button>
+            </form>
+
+            <div id="toastMessage" class="toast">
+                Sent to Digital Butler! 🚀
+            </div>
+        </div>
+
+        <!-- DRAWER 2: PERSONAL (CLOSED) -->
+        <div class="drawer drawer-closed">
+            <div class="handle"></div>
+            <div class="drawer-closed-label">Drawer 2 — Personal</div>
+        </div>
+
+        <!-- DRAWER 3: FUTURE EXPANSION (CLOSED) -->
+        <div class="drawer drawer-closed">
+            <div class="handle"></div>
+            <div class="drawer-closed-label">Drawer 3 — Future Expansion</div>
+        </div>
+
+        <!-- DRAWER 4: REFERRAL & SANDBOX (CLOSED) -->
+        <div class="drawer drawer-closed">
+            <div class="handle"></div>
+            <div class="drawer-closed-label">Drawer 4 — Referral Engine</div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('intakeForm');
+        const toast = document.getElementById('toastMessage');
+        const submitBtn = document.getElementById('submitBtn');
+        const WEBHOOK_URL = 'https://hook.us2.make.com/q6s4cfv1g27xnxx8mn9m1dn889w23vt7';
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Sending...';
+
+            const formData = new FormData(form);
+
+            try {
+                await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                form.reset();
+                toast.style.display = 'block';
+                submitBtn.innerText = 'Send to Digital Butler 🚀';
+                submitBtn.disabled = false;
+
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 4000);
+
+            } catch (error) {
+                console.error('Error submitting intake:', error);
+                alert('Submission failed. Please check connection and try again.');
+                submitBtn.innerText = 'Send to Digital Butler 🚀';
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+
 </body>
 </html>
