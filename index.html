@@ -3,250 +3,469 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>TappyThing - Digital Butler Portal</title>
+    <title>TappyThing — Aerus Home Wellness Executive Portal</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #111111;
+            background: #0f0a06 url('https://images.unsplash.com/photo-1546484475-7f7bd55792da?q=80&w=2000&auto=format&fit=crop') center/cover fixed;
             color: #f0f0f0;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            min-height: 100vh;
             padding: 20px;
         }
-        .header-brand {
-            margin-bottom: 20px;
-            text-align: center;
+        
+        .top-nav {
+            width: 100%;
+            max-width: 1400px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: rgba(15, 8, 4, 0.9);
+            border: 2px solid #3d1e0d;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
-        .header-brand h1 {
-            font-size: 1.8rem;
+        .brand-left {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #00a8ff;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .brand-right {
+            font-size: 1.4rem;
+            font-weight: bold;
             color: #d4af37;
             letter-spacing: 2px;
             text-transform: uppercase;
         }
-        .header-brand p {
-            font-size: 0.9rem;
-            color: #888;
-            font-style: italic;
-        }
 
-        /* Mahogany Cabinet Structure */
-        .cabinet {
-            background: linear-gradient(145deg, #2c1609, #4a2511, #1e0e05);
-            border: 8px solid #160a04;
-            border-radius: 16px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 15px rgba(0,0,0,0.8);
-            width: 100%;
-            max-width: 520px;
-            padding: 24px;
+        .butler-hero {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            align-items: center;
+            margin-bottom: 25px;
+            cursor: pointer;
+            transition: transform 0.2s;
         }
-
-        /* Base Drawer Styling */
-        .drawer {
-            background: linear-gradient(180deg, #5c2e15 0%, #3d1e0d 100%);
-            border: 2px solid #2a1307;
-            border-radius: 10px;
-            box-shadow: inset 0 2px 4px rgba(255,255,255,0.1), 0 4px 10px rgba(0,0,0,0.6);
-            position: relative;
+        .butler-hero:hover {
+            transform: scale(1.05);
+        }
+        .butler-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid #d4af37;
+            background: #1e0e05 url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop') center/cover;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
             transition: all 0.3s ease;
         }
-
-        /* Metallic Bronze Handle */
-        .handle {
-            width: 100px;
-            height: 14px;
-            background: linear-gradient(180deg, #d4af37 0%, #aa820a 50%, #664d03 100%);
-            border-radius: 7px;
-            margin: 12px auto;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.7), inset 0 1px 2px rgba(255,255,255,0.5);
-            border: 1px solid #4a3802;
+        .butler-hero.bowing .butler-avatar {
+            transform: rotate(-10px) translateY(5px);
+            box-shadow: 0 0 35px rgba(76, 175, 80, 0.8);
+            border-color: #4CAF50;
+        }
+        .butler-label {
+            margin-top: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #d4af37;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            background: rgba(15, 8, 4, 0.85);
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid #3d1e0d;
         }
 
-        /* Drawer 1: Open & Active */
-        .drawer-open {
-            background: linear-gradient(180deg, #42200e 0%, #2b1408 100%);
-            border: 2px solid #d4af37;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3), inset 0 2px 6px rgba(0,0,0,0.8);
-            padding: 20px;
+        .cabinets-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 1400px;
         }
-        .drawer-header {
+
+        .cabinet {
+            background: linear-gradient(145deg, #2c1609, #4a2511, #1e0e05);
+            border: 6px solid #160a04;
+            border-radius: 14px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.9), inset 0 0 15px rgba(0,0,0,0.8);
+            padding: 16px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            flex-direction: column;
+            gap: 12px;
         }
-        .drawer-title {
+        .cabinet-header {
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #5c2e15;
+        }
+        .cabinet-title {
             font-size: 1.1rem;
             font-weight: bold;
             color: #d4af37;
             text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .drawer {
+            background: linear-gradient(180deg, #5c2e15 0%, #3d1e0d 100%);
+            border: 2px solid #2a1307;
+            border-radius: 8px;
+            box-shadow: inset 0 1px 3px rgba(255,255,255,0.1), 0 4px 8px rgba(0,0,0,0.6);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .drawer-header {
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+        .drawer-header:hover {
+            background: rgba(212, 175, 55, 0.1);
+        }
+        .drawer-label {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #e0e0e0;
+            text-transform: uppercase;
             letter-spacing: 1px;
         }
-        .status-badge {
-            background: #4CAF50;
-            color: #fff;
-            font-size: 0.75rem;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-weight: bold;
+
+        .handle {
+            width: 60px;
+            height: 10px;
+            background: linear-gradient(180deg, #d4af37 0%, #aa820a 50%, #664d03 100%);
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.7), inset 0 1px 1px rgba(255,255,255,0.5);
+            border: 1px solid #4a3802;
         }
 
-        /* Form Controls */
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            color: #ccc;
-            font-weight: 600;
+        .drawer-content {
+            display: none;
+            padding: 14px;
+            background: #140904;
+            border-top: 1px solid #3d1e0d;
         }
+        .drawer.open .drawer-content {
+            display: block;
+        }
+
+        .ready-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            color: #ddd;
+        }
+        .ready-table th, .ready-table td {
+            padding: 6px 8px;
+            border: 1px solid #3d1e0d;
+            text-align: left;
+        }
+        .ready-table th {
+            background: #2c1609;
+            color: #d4af37;
+            text-transform: uppercase;
+        }
+
+        label { display: block; margin-bottom: 6px; font-size: 0.8rem; color: #ccc; font-weight: 600; }
         textarea {
             width: 100%;
-            padding: 14px;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 6px;
             border: 1px solid #553019;
-            background: #180b05;
+            background: #090402;
             color: #fff;
-            font-size: 1rem;
+            font-size: 0.85rem;
             resize: vertical;
-            margin-bottom: 16px;
+            margin-bottom: 10px;
             font-family: inherit;
         }
-        textarea:focus {
-            outline: none;
-            border-color: #d4af37;
-            box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
-        }
+        textarea:focus { outline: none; border-color: #d4af37; }
         .btn-submit {
             width: 100%;
-            padding: 14px;
+            padding: 10px;
             background: linear-gradient(180deg, #4CAF50 0%, #2e7d32 100%);
             color: white;
-            border: 1px solid #1b5e20;
-            border-radius: 8px;
-            font-size: 1.1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            transition: transform 0.1s, background 0.2s;
         }
-        .btn-submit:hover {
-            background: linear-gradient(180deg, #66bb6a 0%, #388e3c 100%);
-        }
-        .btn-submit:active {
-            transform: translateY(2px);
-        }
-
-        /* Confirmation Toast Overlay */
         .toast {
             display: none;
             background: #2e7d32;
             color: white;
-            padding: 12px;
-            border-radius: 6px;
+            padding: 8px;
+            border-radius: 4px;
             text-align: center;
+            font-size: 0.8rem;
             font-weight: bold;
-            margin-top: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            margin-top: 8px;
         }
 
-        /* Closed Drawers (Drawers 2, 3, 4) */
-        .drawer-closed {
-            height: 70px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            opacity: 0.85;
-            cursor: pointer;
-        }
-        .drawer-closed:hover {
-            opacity: 1;
-            border-color: #8c4720;
-        }
-        .drawer-closed-label {
-            font-size: 0.8rem;
-            color: #a67c52;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-weight: 600;
-            margin-top: -4px;
+        @media (max-width: 1024px) {
+            .cabinets-container {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="header-brand">
-        <h1>TappyThing</h1>
-        <p>Same cabinet. Your world inside.</p>
+    <div class="top-nav">
+        <div class="brand-left">
+            <span>💧</span> Aerus Home Wellness
+        </div>
+        <div class="brand-right">
+            TappyThing
+        </div>
     </div>
 
-    <div class="cabinet">
-        <!-- DRAWER 1: OPERATIONS / READY WALL (ACTIVE) -->
-        <div class="drawer drawer-open">
-            <div class="drawer-header">
-                <span class="drawer-title">Drawer 1 — Operations</span>
-                <span class="status-badge">ACTIVE</span>
+    <div class="butler-hero" id="butlerHero" onclick="openButlerIntake()">
+        <div class="butler-avatar" id="butlerAvatar"></div>
+        <div class="butler-label">🎩 Tap Fresh to Speak</div>
+    </div>
+
+    <div class="cabinets-container">
+
+        <!-- CABINET 1: OPERATIONS -->
+        <div class="cabinet">
+            <div class="cabinet-header">
+                <div class="cabinet-title">1. Operations 🔧</div>
             </div>
-            
-            <form id="intakeForm">
-                <label for="transcript">Digital Butler Voice & Intake Note</label>
-                <textarea 
-                    id="transcript" 
-                    name="transcript" 
-                    rows="4" 
-                    placeholder="e.g. Jack Smith - Beyond Air - Needs filter, bulb, cell repair..."
-                    required></textarea>
 
-                <button type="submit" id="submitBtn" class="btn-submit">
-                    Send to Digital Butler 🚀
-                </button>
-            </form>
+            <!-- Drawer 1A: Ready Wall -->
+            <div class="drawer open">
+                <div class="drawer-header" onclick="toggleDrawer(this)">
+                    <span class="drawer-label">Ready Wall</span>
+                    <div class="handle"></div>
+                </div>
+                <div class="drawer-content">
+                    <table class="ready-table">
+                        <thead>
+                            <tr>
+                                <th>Customer</th>
+                                <th>Machine</th>
+                                <th>Status</th>
+                                <th>Loc</th>
+                            </tr>
+                        </thead>
+                        <tbody id="readyWallBody">
+                            <tr><td colspan="4" style="text-align:center;">Loading board...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-            <div id="toastMessage" class="toast">
-                Sent to Digital Butler! 🚀
+            <!-- Drawer 1B: Digital Butler Intake -->
+            <div class="drawer" id="intakeDrawer">
+                <div class="drawer-header" onclick="toggleDrawer(this)">
+                    <span class="drawer-label">Digital Butler Intake</span>
+                    <div class="handle"></div>
+                </div>
+                <div class="drawer-content">
+                    <form id="intakeForm">
+                        <label for="transcript">Digital Butler Voice & Intake Note</label>
+                        <textarea id="transcript" name="transcript" rows="3" placeholder="e.g. Jack Smith - Beyond Air - Needs filter, bulb, cell repair..." required></textarea>
+                        <button type="submit" id="submitBtn" class="btn-submit">Send to Digital Butler 🚀</button>
+                    </form>
+                    <div id="toastMessage" class="toast">Sent to Digital Butler! 🚀</div>
+                </div>
+            </div>
+
+            <!-- Drawer 1C: AI Holding Pile -->
+            <div class="drawer">
+                <div class="drawer-header" onclick="toggleDrawer(this)">
+                    <span class="drawer-label">🤖 AI Holding Pile</span>
+                    <div class="handle"></div>
+                </div>
+                <div class="drawer-content" id="aiHoldingContent">
+                    <p style="font-size:0.8rem; color:#aaa;">Loading routing queue...</p>
+                </div>
             </div>
         </div>
 
-        <!-- DRAWER 2: PERSONAL (CLOSED) -->
-        <div class="drawer drawer-closed">
-            <div class="handle"></div>
-            <div class="drawer-closed-label">Drawer 2 — Personal</div>
+        <!-- CABINET 2: MY WORLD -->
+        <div class="cabinet">
+            <div class="cabinet-header">
+                <div class="cabinet-title">2. My World 👤</div>
+            </div>
+
+            <div class="drawer">
+                <div class="drawer-header" onclick="toggleDrawer(this)">
+                    <span class="drawer-label">William's View</span>
+                    <div class="handle"></div>
+                </div>
+                <div class="drawer-content" id="williamView">
+                    <p style="font-size:0.8rem; color:#aaa;">Pending approvals & financial checkpoints.</p>
+                </div>
+            </div>
+
+            <div class="drawer">
+                <div class="drawer-header" onclick="toggleDrawer(this)">
+                    <span class="drawer-label">Chris's Bench Queue</span>
+                    <div class="handle"></div>
+                </div>
+                <div class="drawer-content" id="chrisQueue">
+                    <p style="font-size:0.8rem; color:#aaa;">Bench repairs & Workiz execution.</p>
+                </div>
+            </div>
+
+            <div class="drawer">
+                <div class="drawer-header" onclick="toggleDrawer(this)">
+                    <span class="drawer-label">Mona's Intake Log</span>
+                    <div class="handle"></div>
+                </div>
+                <div class="drawer-content" id="monaLog">
+                    <p style="font-size:0.8rem; color:#aaa;">Counter walk-ins & incoming calls.</p>
+                </div>
+            </div>
+
+            <div class="drawer">
+                <div class="drawer-header" onclick="toggleDrawer(this)">
+                    <span class="drawer-label">Norby's FOAS List</span>
+                    <div class="handle"></div>
+                </div>
+                <div class="drawer-content" id="norbyList">
+                    <p style="font-size:0.8rem; color:#aaa;">Outreach & prospecting list.</p>
+                </div>
+            </div>
         </div>
 
-        <!-- DRAWER 3: FUTURE EXPANSION (CLOSED) -->
-        <div class="drawer drawer-closed">
-            <div class="handle"></div>
-            <div class="drawer-closed-label">Drawer 3 — Future Expansion</div>
+        <!-- CABINET 3: PERSONAL -->
+        <div class="cabinet">
+            <div class="cabinet-header">
+                <div class="cabinet-title">3. Personal 🌱</div>
+            </div>
+
+            <div class="drawer">
+                <div class="drawer-header" onclick="toggleDrawer(this)">
+                    <span class="drawer-label">Goals</span>
+                    <div class="handle"></div>
+                </div>
+                <div class="drawer-content">
+                    <p style="font-size:0.8rem; color:#aaa;">Private personal goals drawer.</p>
+                </div>
+            </div>
+
+            <div class="drawer">
+                <div class="drawer-header" onclick="toggleDrawer(this)">
+                    <span class="drawer-label">Habits</span>
+                    <div class="handle"></div>
+                </div>
+                <div class="drawer-content">
+                    <p style="font-size:0.8rem; color:#aaa;">Private habits drawer.</p>
+                </div>
+            </div>
+
+            <div class="drawer">
+                <div class="drawer-header" onclick="toggleDrawer(this)">
+                    <span class="drawer-label">Notes</span>
+                    <div class="handle"></div>
+                </div>
+                <div class="drawer-content">
+                    <p style="font-size:0.8rem; color:#aaa;">Private notes drawer.</p>
+                </div>
+            </div>
+
+            <div class="drawer">
+                <div class="drawer-header" onclick="toggleDrawer(this)">
+                    <span class="drawer-label">Ideas</span>
+                    <div class="handle"></div>
+                </div>
+                <div class="drawer-content">
+                    <p style="font-size:0.8rem; color:#aaa;">Private ideas drawer.</p>
+                </div>
+            </div>
         </div>
 
-        <!-- DRAWER 4: REFERRAL & SANDBOX (CLOSED) -->
-        <div class="drawer drawer-closed">
-            <div class="handle"></div>
-            <div class="drawer-closed-label">Drawer 4 — Referral Engine</div>
+        <!-- CABINET 4: REFERRAL ENGINE -->
+        <div class="cabinet">
+            <div class="cabinet-header">
+                <div class="cabinet-title">4. Referral Engine 💰</div>
+            </div>
+
+            <div class="drawer">
+                <div class="drawer-header" onclick="toggleDrawer(this)">
+                    <span class="drawer-label">Live Sandbox Demo</span>
+                    <div class="handle"></div>
+                </div>
+                <div class="drawer-content">
+                    <p style="font-size:0.8rem; color:#aaa;">Instant 30-second prospect demo environment.</p>
+                </div>
+            </div>
+
+            <div class="drawer">
+                <div class="drawer-header" onclick="toggleDrawer(this)">
+                    <span class="drawer-label">Commission Tracker</span>
+                    <div class="handle"></div>
+                </div>
+                <div class="drawer-content">
+                    <p style="font-size:0.8rem; color:#aaa;">$100 payout per $95/mo subscriber (45-day delay).</p>
+                </div>
+            </div>
+
+            <div class="drawer">
+                <div class="drawer-header" onclick="toggleDrawer(this)">
+                    <span class="drawer-label">Training</span>
+                    <div class="handle"></div>
+                </div>
+                <div class="drawer-content">
+                    <p style="font-size:0.8rem; color:#aaa;">Self-guided affiliate modules.</p>
+                </div>
+            </div>
+
+            <div class="drawer">
+                <div class="drawer-header" onclick="toggleDrawer(this)">
+                    <span class="drawer-label">Paperwork</span>
+                    <div class="handle"></div>
+                </div>
+                <div class="drawer-content">
+                    <p style="font-size:0.8rem; color:#aaa;">Tax forms & Stripe Connect payouts setup.</p>
+                </div>
+            </div>
         </div>
+
     </div>
 
     <script>
+        const MONDAY_API_KEY = 'PASTE_YOUR_KEY_HERE';
+        const BOARD_ID = '18424728273';
+        const WEBHOOK_URL = 'https://hook.us2.make.com/q6s4cfv1g27xnxx8mn9m1dn889w23vt7';
+
+        function openButlerIntake() {
+            const intakeDrawer = document.getElementById('intakeDrawer');
+            if (!intakeDrawer.classList.contains('open')) {
+                intakeDrawer.classList.add('open');
+            }
+            document.getElementById('transcript').focus();
+        }
+
+        function toggleDrawer(headerElement) {
+            const drawer = headerElement.parentElement;
+            drawer.classList.toggle('open');
+        }
+
         const form = document.getElementById('intakeForm');
         const toast = document.getElementById('toastMessage');
         const submitBtn = document.getElementById('submitBtn');
-        const WEBHOOK_URL = 'https://hook.us2.make.com/q6s4cfv1g27xnxx8mn9m1dn889w23vt7';
+        const butlerHero = document.getElementById('butlerHero');
 
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
-            
             submitBtn.disabled = true;
             submitBtn.innerText = 'Sending...';
 
@@ -263,18 +482,89 @@
                 submitBtn.innerText = 'Send to Digital Butler 🚀';
                 submitBtn.disabled = false;
 
-                setTimeout(() => {
-                    toast.style.display = 'none';
-                }, 4000);
+                butlerHero.classList.add('bowing');
+                setTimeout(() => { butlerHero.classList.remove('bowing'); }, 2000);
 
+                setTimeout(() => { toast.style.display = 'none'; }, 4000);
+                fetchMondayData();
             } catch (error) {
-                console.error('Error submitting intake:', error);
-                alert('Submission failed. Please check connection and try again.');
+                console.error('Submission error:', error);
+                alert('Submission failed. Check network connection.');
                 submitBtn.innerText = 'Send to Digital Butler 🚀';
                 submitBtn.disabled = false;
             }
         });
-    </script>
 
+        async function fetchMondayData() {
+            if (MONDAY_API_KEY === 'PASTE_YOUR_KEY_HERE') {
+                document.getElementById('readyWallBody').innerHTML = `<tr><td colspan="4" style="text-align:center; color:#e74c3c;">Add Monday.com API Key</td></tr>`;
+                return;
+            }
+
+            const query = `query {
+                boards(ids: ${BOARD_ID}) {
+                    groups(ids: ["group_mm6s961c", "group_mm6b77as"]) {
+                        title
+                        items_page(limit: 15) {
+                            items {
+                                name
+                                column_values {
+                                    column { title }
+                                    text
+                                }
+                            }
+                        }
+                    }
+                }
+            }`;
+
+            try {
+                const response = await fetch('https://api.monday.com/v2', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': MONDAY_API_KEY
+                    },
+                    body: JSON.stringify({ query })
+                });
+
+                const result = await response.json();
+                if (result.data && result.data.boards[0]) {
+                    renderReadyWall(result.data.boards[0].groups);
+                }
+            } catch (err) {
+                console.error('Monday API Fetch Error:', err);
+            }
+        }
+
+        function renderReadyWall(groups) {
+            const tbody = document.getElementById('readyWallBody');
+            tbody.innerHTML = '';
+
+            const readyGroup = groups.find(g => g.title.includes('Ready Wall')) || groups[0];
+            if (!readyGroup || readyGroup.items_page.items.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No active bench units</td></tr>`;
+                return;
+            }
+
+            readyGroup.items_page.items.forEach(item => {
+                const row = document.createElement('tr');
+                const machine = item.column_values.find(c => c.column.title.includes('Machine'))?.text || 'Beyond Air';
+                const status = item.column_values.find(c => c.column.title.includes('Status'))?.text || 'Bench Diagnostic';
+                const location = item.column_values.find(c => c.column.title.includes('Location'))?.text || 'Bench 1';
+
+                row.innerHTML = `
+                    <td><strong>${item.name}</strong></td>
+                    <td>${machine}</td>
+                    <td>${status}</td>
+                    <td>${location}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        fetchMondayData();
+        setInterval(fetchMondayData, 60000);
+    </script>
 </body>
 </html>
