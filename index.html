@@ -5,148 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aerus Home Wellness Portal</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f6f8; margin: 0; padding: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 1000px; margin: auto; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; }
-        .drawer { display: none; background: #fff; padding: 20px; margin-top: 15px; border-left: 4px solid #d4af37; }
-        .drawer.open { display: block; }
-        .butler-icon { width: 40px; height: 40px; vertical-align: middle; margin-right: 10px; }
-        .intake-form { background: #f9f9f9; padding: 15px; border-radius: 5px; margin-top: 10px; }
-        .intake-form input, .intake-form textarea { width: 100%; padding: 8px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
-        .intake-form button { background: #d4af37; color: #000; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .intake-form button:hover { background: #c9a527; }
-        .success-message { color: green; margin-top: 10px; }
-        .error-message { color: red; margin-top: 10px; }
+        body { font-family: Arial, sans-serif; background: #1a1d20; color: #fff; padding: 20px; }
+        .card { background: #2a2e33; padding: 20px; border-radius: 8px; max-width: 500px; margin: auto; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 4px; color: #ccc; }
+        input, select, textarea { width: 100%; padding: 8px; box-sizing: border-box; background: #1a1d20; color: #fff; border: 1px solid #444; border-radius: 4px; }
+        button { background: #d4af37; color: #000; padding: 10px; border: none; font-weight: bold; width: 100%; cursor: pointer; border-radius: 4px; margin-top: 10px; }
+        .success { color: #4caf50; font-weight: bold; text-align: center; margin-top: 10px; }
+        .error { color: #f44336; font-weight: bold; text-align: center; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-<h1 style="text-align:center;">
-    <svg class="butler-icon" viewBox="0 0 24 24" fill="#d4af37">
-        <path d="M12 2a5 5 0 0 0-5 5v3H5v2h14v-2h-2V7a5 5 0 0 0-5-5zm-3 5a3 3 0 0 1 6 0v3H9V7zm-4 7v8h14v-8H5zm2 2h10v4H7v-4z"/>
-    </svg>
-    Aerus Home Wellness Executive Portal
-</h1>
-
-<div class="grid">
-    <div class="card" onclick="openDrawer('ready-wall', '18424728273')">
-        <h2>Ready Wall 📋</h2>
-        <div id="ready-wall" class="drawer">
-            <div id="ready-wall-content">Loading live board data...</div>
+<div class="card">
+    <h2>Aerus Intake Form</h2>
+    <form id="intakeForm" onsubmit="handleIntakeSubmit(event); return false;">
+        <div class="form-group">
+            <label for="name">Customer Name</label>
+            <input type="text" id="name" name="name" required>
         </div>
-    </div>
-    <div class="card" onclick="openDrawer('williams-view', '18424728273')">
-        <h2>William's View 👁️</h2>
-        <div id="williams-view" class="drawer">
-            <div id="williams-view-content">Loading live board data...</div>
+        <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" required>
         </div>
-    </div>
-    <div class="card" onclick="openDrawer('intake-form-card', '18424728273')">
-        <h2>Intake Form 📝</h2>
-        <div id="intake-form-card" class="drawer">
-            <div class="intake-form">
-                <form id="intakeForm" onsubmit="handleIntakeSubmit(event); return false;">
-                    <label for="name">Name:</label>
-                    <input type="text" id="name" name="name" required>
-                    
-                    <label for="phone">Phone:</label>
-                    <input type="tel" id="phone" name="phone" required>
-                    
-                    <label for="machine">Machine:</label>
-                    <input type="text" id="machine" name="machine" required>
-                    
-                    <label for="desc">Description:</label>
-                    <textarea id="desc" name="desc" rows="4" required></textarea>
-                    
-                    <button type="submit">Submit</button>
-                    <div id="submitMessage"></div>
-                </form>
-            </div>
+        <div class="form-group">
+            <label for="machine">Machine Model / Serial</label>
+            <input type="text" id="machine" name="machine" required>
         </div>
-    </div>
+        <div class="form-group">
+            <label for="desc">Issue / Operational Note</label>
+            <textarea id="desc" name="desc" rows="4" required></textarea>
+        </div>
+        <button type="submit" id="submitBtn">Submit Intake</button>
+    </form>
+    <div id="submitMessage"></div>
 </div>
 
 <script>
-function openDrawer(drawerId, boardId) {
-    const drawer = document.getElementById(drawerId);
-    if (drawer) {
-        drawer.classList.toggle('open');
-        if (drawer.classList.contains('open')) {
-            if (drawerId !== 'intake-form-card') {
-                fetchMondayData(boardId, drawerId);
-            }
-        }
-    }
-}
-
-async function fetchMondayData(boardId, containerId) {
-    const container = document.getElementById(containerId + '-content');
-    if (container) container.innerHTML = '<p>Loading live data...</p>';
-
-    try {
-        const response = await fetch('/.netlify/functions/monday', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ boardId: boardId || '18424728273' })
-        });
-        const result = await response.json();
-        
-        if (result.error) {
-            container.innerHTML = '<p>Error loading board data.</p>';
-            return;
-        }
-
-        const items = result?.data?.boards?.[0]?.items_page?.items || [];
-        if (items.length === 0) {
-            container.innerHTML = '<p>No active items on board.</p>';
-            return;
-        }
-
-        let html = '<ul>';
-        items.forEach(item => { html += `<li><strong>${item.name}</strong></li>`; });
-        html += '</ul>';
-        container.innerHTML = html;
-    } catch (err) {
-        if (container) container.innerHTML = '<p>Error fetching board data.</p>';
-    }
-}
-
 async function handleIntakeSubmit(event) {
-    event.preventDefault();
-    
-    const name = document.getElementById('name').value;
-    const phone = document.getElementById('phone').value;
-    const machine = document.getElementById('machine').value;
-    const desc = document.getElementById('desc').value;
-    const boardId = '18424728273';
-    
+    if (event) event.preventDefault();
+    const submitBtn = document.getElementById('submitBtn');
     const messageDiv = document.getElementById('submitMessage');
-    messageDiv.innerHTML = '';
     
+    submitBtn.disabled = true;
+    messageDiv.innerHTML = '';
+
+    const payload = {
+        name: document.getElementById('name').value,
+        phone: document.getElementById('phone').value,
+        machine: document.getElementById('machine').value,
+        desc: document.getElementById('desc').value,
+        group: "Staff Intake — Pending Review",
+        boardId: "18424728273",
+        timestamp: new Date().toISOString()
+    };
+
     try {
-        const payload = {
-            name: name,
-            phone: phone,
-            machine: machine,
-            desc: desc,
-            group: 'Staff Intake — Pending Review',
-            boardId: boardId
-        };
-        
         const response = await fetch('https://hook.us2.make.com/q6s4cfv1g27xnxx8mn9m1dn889w23vt7', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        
+
         if (response.ok) {
-            messageDiv.innerHTML = '<p class="success-message">✓ Intake submitted successfully!</p>';
+            messageDiv.innerHTML = '<p class="success">✅ Intake Submitted!</p>';
             document.getElementById('intakeForm').reset();
         } else {
-            messageDiv.innerHTML = '<p class="error-message">✗ Failed to submit intake. Please try again.</p>';
+            messageDiv.innerHTML = '<p class="error">✕ Submission failed. Try again.</p>';
         }
     } catch (err) {
-        messageDiv.innerHTML = '<p class="error-message">✗ Error submitting intake: ' + err.message + '</p>';
+        messageDiv.innerHTML = '<p class="error">✕ Error: ' + err.message + '</p>';
+    } finally {
+        submitBtn.disabled = false;
     }
 }
 </script>
