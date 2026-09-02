@@ -23,7 +23,7 @@ exports.handler = async function(event, context) {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Headers': 'Content-Type'
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify({ items: data?.data?.boards?.[0]?.items_page?.items || [] })
         };
     } catch (error) {
         return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
