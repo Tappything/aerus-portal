@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+
 
 exports.handler = async function(event, context) {
     const API_KEY = process.env.MONDAY_API_KEY;
