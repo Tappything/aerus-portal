@@ -123,7 +123,7 @@
   <!-- Digital Coordinator SVG Intake Trigger -->
   <div class="intake-container" id="intakeTrigger">
     <svg class="coordinator-svg" viewBox="0 0 24 24">
-      <path d="M12 1a9 9 0 0 0-9 9v7a3 3 0 0 0 3 3h3v-8H5v-2a7 7 0 0 1 14 0v2h-4v8h3a3 3 0 0 0 3-3v-7a9 9 0 0 0-9-9zm-4 18H6a1 1 0 0 1-1-1v-3h3v4zm11-1a1 1 0 0 1-1 1h-2v-4h3v3zM12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+      <path d="M12 1a9 9 0 0 0-9 9v7a3 3 0 0 0 3 3h3v-8H5v-2a7 7 0 0 1 14 0v2h-4v8h3a3 3 0 0 0 3-3v-7a9 9 0 0 0-9-9zm-4 18H6a1 1 0 0 1-1-1v-3h3v4zm11-1a1 1 0 0 1-1 1h-2v-4h3v3zM12 14a2 2 0 1 0 0-[...]
     </svg>
     <div class="intake-label">TAP TO SPEAK</div>
   </div>
@@ -178,20 +178,27 @@
       }
     });
 
-    // 2. fetchCardData Function (POST Request with Board Payload)
+    // 2. fetchCardData Function (POST Request with Monday.com GraphQL)
     function fetchCardData(cardType) {
       const contentElement = document.getElementById(`content-${cardType}`);
       contentElement.innerText = "Loading latest updates...";
 
-      fetch('/.netlify/functions/monday', {
+      fetch('https://api.monday.com/v2', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ boardId: '18424728273' })
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'YOUR_MONDAY_API_KEY_HERE'
+        },
+        body: JSON.stringify({
+          query: `query { boards(ids: 18424728273) { items_page { items { name } } } }`
+        })
       })
         .then(response => response.json())
         .then(data => {
-          if (data && data.message) {
-            contentElement.innerText = data.message;
+          const items = data?.data?.boards?.[0]?.items_page?.items || [];
+          if (items.length > 0) {
+            const itemList = items.map(item => `• ${item.name}`).join('\n');
+            contentElement.innerText = itemList;
           } else {
             contentElement.innerText = "No active items in queue.";
           }
