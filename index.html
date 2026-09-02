@@ -1,26 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TappyThing Portal</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 500px; margin: auto; }
+    input, textarea, button { width: 100%; margin-bottom: 15px; padding: 12px; box-sizing: border-box; font-size: 16px; }
+    button { background-color: #007bff; color: white; border: none; font-weight: bold; cursor: pointer; }
+  </style>
+</head>
 <body>
-  <h3>Staff Intake Form</h3>
-  <form id="intakeForm" onsubmit="event.preventDefault(); sendToWebhook();">
-    <input name="name" placeholder="Name" required><br><br>
-    <input name="phone" placeholder="Phone" required><br><br>
-    <input name="machine" placeholder="Machine" required><br><br>
-    <textarea name="desc" placeholder="Issue Description" required></textarea><br><br>
+
+  <h2>TappyThing Intake</h2>
+
+  <form id="intakeForm" onsubmit="handleFormSubmit(event)">
+    <input type="text" id="customerName" name="customerName" placeholder="Customer Name" required>
+    <input type="text" id="machineType" name="machineType" placeholder="Machine / Model">
+    <textarea id="transcript" name="transcript" placeholder="Voice transcript or intake notes" rows="5"></textarea>
     <button type="submit">Submit Intake</button>
   </form>
-  <p id="msg" style="color:green; font-weight:bold;"></p>
 
   <script>
-    async function sendToWebhook() {
-      const form = document.getElementById('intakeForm');
-      const msg = document.getElementById('msg');
-      
+    async function handleFormSubmit(event) {
+      event.preventDefault();
+
       const payload = {
-        name: form.name.value,
-        phone: form.phone.value,
-        machine: form.machine.value,
-        desc: form.desc.value
+        customerName: document.getElementById('customerName')?.value || "Unknown Name",
+        machineType: document.getElementById('machineType')?.value || "Unknown Machine",
+        transcript: document.getElementById('transcript')?.value || "",
+        targetGroup: "Staff Intake — Pending Review"
       };
 
       try {
@@ -31,13 +40,17 @@
         });
 
         if (response.ok) {
-          msg.innerText = '✅ Submitted!';
-          form.reset();
+          alert('Intake submitted successfully!');
+          document.getElementById('intakeForm').reset();
+        } else {
+          alert('Submission error. Please try again.');
         }
       } catch (err) {
-        msg.innerText = '✕ Error: ' + err.message;
+        console.error('Submission error:', err);
+        alert('Failed to connect to intake server.');
       }
     }
   </script>
+
 </body>
 </html>
