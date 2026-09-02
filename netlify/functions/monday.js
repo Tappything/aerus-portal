@@ -21,7 +21,7 @@ exports.handler = async function (event, context) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.MONDAY_API_KEY}`
+        'Authorization': `apikey ${process.env.MONDAY_API_KEY}`
       },
       body: JSON.stringify({ query })
     });
