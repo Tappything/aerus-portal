@@ -325,7 +325,7 @@
         });
     }
 
-    // Fetch My World data - simple list of all items
+    // Fetch My World data with grouped buckets
     function fetchMyWorldData(contentElement, boardId) {
       fetch('/.netlify/functions/monday', {
         method: 'POST',
@@ -334,18 +334,65 @@
           'Authorization': `apikey MONDAY_API_KEY_PLACEHOLDER`
         },
         body: JSON.stringify({
-          query: `query { boards(ids: 18424728273) { items_page(limit: 50) { items { id name } } } }`
+          query: `query { boards(ids: ${boardId}) { items_page(limit: 50) { items { id name column_values { id text } } } } }`
         })
       })
         .then(response => response.json())
         .then(data => {
           const items = data?.data?.boards?.[0]?.items_page?.items || [];
-          if (items.length > 0) {
-            const itemList = items.map(item => `• ${item.name}`).join('\n');
-            contentElement.innerText = itemList;
-          } else {
-            contentElement.innerText = 'No items found in My World.';
+          
+          // Group items by bucket
+          const buckets = {
+            '🔥 Hot Leads': [],
+            '📞 Follow Up': [],
+            '💰 Money Pending': [],
+            '📋 On My Radar': []
+          };
+
+          items.forEach(item => {
+            // Get the color_mm6mc5qp column (urgency)
+            const colorCol = item.column_values.find(col => col.id === 'color_mm6mc5qp');
+            const color = colorCol ? (colorCol.text || '').trim() : '';
+
+            // Get the numeric_mm5vg0cg column (money value)
+            const numericCol = item.column_values.find(col => col.id === 'numeric_mm5vg0cg');
+            const numericValue = numericCol ? parseFloat(numericCol.text) : 0;
+
+            // Determine bucket
+            let bucket = '📋 On My Radar'; // Default
+
+            if (color === 'Urgent') {
+              bucket = '🔥 Hot Leads';
+            } else if (color === 'Standard') {
+              bucket = '📞 Follow Up';
+            } else if (numericValue > 0) {
+              bucket = '💰 Money Pending';
+            }
+
+            if (buckets.hasOwnProperty(bucket)) {
+              buckets[bucket].push(item.name);
+            }
+          });
+
+          // Build HTML for bucket sections
+          let html = '';
+          for (const [bucket, items] of Object.entries(buckets)) {
+            html += `<div class="status-section">
+              <div class="status-label">${bucket}</div>
+              <div class="status-items">`;
+            
+            if (items.length > 0) {
+              items.forEach(itemName => {
+                html += `<div class="status-item">• ${itemName}</div>`;
+              });
+            } else {
+              html += `<div class="status-empty">(none)</div>`;
+            }
+            
+            html += `</div></div>`;
           }
+
+          contentElement.innerHTML = html;
         })
         .catch(error => {
           console.error(`Error fetching My World data:`, error);
