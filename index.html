@@ -254,7 +254,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${MONDAY_API_TOKEN}`
+          'Authorization': 'apikey MONDAY_API_KEY_PLACEHOLDER'
         },
         body: JSON.stringify({
           query: `query { boards(ids: ${boardId}) { items_page(limit: 50) { items { id name column_values { id text } } } } }`
@@ -319,7 +319,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${MONDAY_API_TOKEN}`
+          'Authorization': 'apikey MONDAY_API_KEY_PLACEHOLDER'
         },
         body: JSON.stringify({
           query: `query { boards(ids: ${boardId}) { items_page(limit: 10) { items { id name } } } }`
