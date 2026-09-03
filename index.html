@@ -199,6 +199,9 @@
 
   <!-- JavaScript Operations -->
   <script>
+    // 0. Monday.com API token (do NOT commit real tokens publicly). Replace the placeholder in deployment or set window.MONDAY_API_TOKEN in the browser console.
+    const MONDAY_API_TOKEN = (window.MONDAY_API_TOKEN || '<REDACTED - set your Monday.com API token here>');
+
     // 1. Intake Form Submission (Transcript Mapped to Make.com Webhook)
     document.getElementById('intakeTrigger').addEventListener('click', function() {
       const userInput = prompt("Speak or type your request for the Digital Coordinator:");
@@ -251,7 +254,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY5OTE3NzI5MSwiYWFpIjoxMSwidWlkIjoxMTIxOTkyOTgsImlhZCI6IjIwMjYtMDktMDFUMTQ6NTA6MDcuMDAwWiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM2Mjk5NzMyLC[...]'
+          'Authorization': `Bearer ${MONDAY_API_TOKEN}`
         },
         body: JSON.stringify({
           query: `query { boards(ids: ${boardId}) { items_page(limit: 50) { items { id name column_values { id text } } } } }`
@@ -316,7 +319,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY5OTE3NzI5MSwiYWFpIjoxMSwidWlkIjoxMTIxOTkyOTgsImlhZCI6IjIwMjYtMDktMDFUMTQ6NTA6MDcuMDAwWiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM2Mjk5NzMyLC[...]'
+          'Authorization': `Bearer ${MONDAY_API_TOKEN}`
         },
         body: JSON.stringify({
           query: `query { boards(ids: ${boardId}) { items_page(limit: 10) { items { id name } } } }`
