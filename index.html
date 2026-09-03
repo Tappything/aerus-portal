@@ -273,12 +273,31 @@
           };
 
           items.forEach(item => {
-            // Try to find status from column values
+            // Determine status by checking all column values with .includes()
             let status = 'Needs Action'; // Default status
+            
             if (item.column_values && Array.isArray(item.column_values)) {
-              const statusColumn = item.column_values.find(col => col.text && statuses.hasOwnProperty(col.text));
-              if (statusColumn) {
-                status = statusColumn.text;
+              // Loop through ALL column values to find matching status indicators
+              for (const col of item.column_values) {
+                if (!col.text) continue;
+                
+                // Ready to Bill: contains 'Ready Wall'
+                if (col.text.includes('Ready Wall')) {
+                  status = 'Ready to Bill';
+                  break;
+                }
+                
+                // Waiting: contains 'Holding', 'Waiting', or 'Stock'
+                if (col.text.includes('Holding') || col.text.includes('Waiting') || col.text.includes('Stock')) {
+                  status = 'Waiting on Customer or Parts';
+                  break;
+                }
+                
+                // In Progress: contains '2. Workbench' or 'Chris'
+                if (col.text.includes('2. Workbench') || col.text.includes('Chris')) {
+                  status = 'In Progress';
+                  break;
+                }
               }
             }
             
