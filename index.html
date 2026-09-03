@@ -176,7 +176,7 @@
   <!-- Digital Coordinator SVG Intake Trigger -->
   <div class="intake-container" id="intakeTrigger">
     <svg class="coordinator-svg" viewBox="0 0 24 24">
-      <path d="M12 1a9 9 0 0 0-9 9v7a3 3 0 0 0 3 3h3v-8H5v-2a7 7 0 0 1 14 0v2h-4v8h3a3 3 0 0 0 3-3v-7a9 9 0 0 0-9-9zm-4 18H6a1 1 0 0 1-1-1v-3h3v4zm11-1a1 1 0 0 1-1 1h-2v-4h3v3zM12 14a2 2 0 1 0 0-[...]
+      <path d="M12 1a9 9 0 0 0-9 9v7a3 3 0 0 0 3 3h3v-8H5v-2a7 7 0 0 1 14 0v2h-4v8h3a3 3 0 0 0 3-3v-7a9 9 0 0 0-9-9zm-4 18H6a1 1 0 0 1-1-1v-3h3v4zm11-1a1 1 0 0 1-1 1h-2v-4h3v3zM12 14a2 2 0 1 0 0-[...]"/>
     </svg>
     <div class="intake-label">TAP TO SPEAK</div>
   </div>
@@ -267,7 +267,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY5OTE3NzI5MSwiYWFpIjoxMSwidWlkIjoxMTIxOTkyOTgsImlhZCI6IjIwMjYtMDktMDFUMTQ6NTA6MDcuMDAwWiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM2Mjk5NzMyLCJyZ24iOiJ1c2UxIn0.TOSzcR7LePuXVgQUNQDR2KALgEnyKuEYvCanyl8c58U'
+          'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY5OTE3NzI5MSwiYWFpIjoxMSwidWlkIjoxMTIxOTkyOTgsImlhZCI6IjIwMjYtMDktMDFUMTQ6NTA6MDcuMDAwWiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM2Mjk5NzMyLC[...]'
         },
         body: JSON.stringify({
           query: `query { boards(ids: ${boardId}) { items_page(limit: 50) { items { id name column_values { id text } } } } }`
@@ -277,6 +277,14 @@
         .then(data => {
           const items = data?.data?.boards?.[0]?.items_page?.items || [];
           
+          const filteredItems = (items || []).filter(item => {
+  const status = (item.status ?? '').toString().trim();
+  if (!status) return false;
+  if (status === '5. Completed / Paid') return false;
+  if (status === "Chris's Tasks") return false;
+  return true;
+});
+          
           // Group items by status with exact Monday.com mappings
           const statuses = {
             'Needs Action': [],
@@ -285,7 +293,7 @@
             'Ready to Bill': []
           };
 
-          items.forEach(item => {
+          filteredItems.forEach(item => {
             // Try to find status from column values
             let status = 'Needs Action'; // Default status
             if (item.column_values && Array.isArray(item.column_values)) {
@@ -341,7 +349,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY5OTE3NzI5MSwiYWFpIjoxMSwidWlkIjoxMTIxOTkyOTgsImlhZCI6IjIwMjYtMDktMDFUMTQ6NTA6MDcuMDAwWiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM2Mjk5NzMyLCJyZ24iOiJ1c2UxIn0.TOSzcR7LePuXVgQUNQDR2KALgEnyKuEYvCanyl8c58U'
+          'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY5OTE3NzI5MSwiYWFpIjoxMSwidWlkIjoxMTIxOTkyOTgsImlhZCI6IjIwMjYtMDktMDFUMTQ6NTA6MDcuMDAwWiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM2Mjk5NzMyLC[...]'
         },
         body: JSON.stringify({
           query: `query { boards(ids: ${boardId}) { items_page(limit: 10) { items { id name } } } }`
