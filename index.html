@@ -27,12 +27,12 @@
       width: 100%;
       max-width: 1200px;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       padding: 10px 0;
       margin-bottom: 30px;
     }
-    .brand-left, .brand-right {
+    .brand {
       color: #d4af37; /* Metallic Gold */
       font-weight: 700;
       font-size: 1.2rem;
@@ -81,9 +81,13 @@
       padding: 20px;
       cursor: pointer;
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
     }
     .card:hover {
       box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+      border-color: #ffffff;
     }
     .card-title {
       color: #d4af37;
@@ -97,6 +101,9 @@
       color: #e0e0e0;
       font-size: 0.95rem;
       line-height: 1.4;
+      flex-grow: 1;
+      word-break: break-word;
+      white-space: pre-wrap;
     }
 
     /* Responsive Mobile Stacking */
@@ -119,8 +126,7 @@
 
   <!-- Header -->
   <header>
-    <div class="brand-left">TappyThing</div>
-    <div class="brand-right">TappyThing</div>
+    <div class="brand">TappyThing</div>
   </header>
 
   <!-- Digital Coordinator SVG Intake Trigger -->
@@ -136,22 +142,22 @@
     
     <div class="card" onclick="fetchCardData('operations')">
       <div class="card-title">Operations</div>
-      <div class="card-content" id="content-operations">Active tasks & dispatch queue</div>
+      <div class="card-content" id="content-operations">Click to load active tasks & dispatch queue</div>
     </div>
 
     <div class="card" onclick="fetchCardData('myworld')">
       <div class="card-title">My World</div>
-      <div class="card-content" id="content-myworld">Dashboard & quick notes</div>
+      <div class="card-content" id="content-myworld">Click to load dashboard & quick notes</div>
     </div>
 
     <div class="card" onclick="fetchCardData('personal')">
       <div class="card-title">Personal</div>
-      <div class="card-content" id="content-personal">Private tracking & schedule</div>
+      <div class="card-content" id="content-personal">Click to load private tracking & schedule</div>
     </div>
 
     <div class="card" onclick="fetchCardData('referral')">
       <div class="card-title">Referral Engine</div>
-      <div class="card-content" id="content-referral">Leads, tracking & rewards</div>
+      <div class="card-content" id="content-referral">Click to load leads, tracking & rewards</div>
     </div>
 
   </div>
@@ -186,14 +192,24 @@
       const contentElement = document.getElementById(`content-${cardType}`);
       contentElement.innerText = "Loading latest updates...";
 
+      // Map card types to Monday.com board IDs
+      const boardMap = {
+        'operations': 1234567890,  // Replace with actual board ID
+        'myworld': 1234567891,     // Replace with actual board ID
+        'personal': 1234567892,    // Replace with actual board ID
+        'referral': 1234567893     // Replace with actual board ID
+      };
+
+      const boardId = boardMap[cardType] || 18424728273;
+
       fetch('https://api.monday.com/v2', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY5OTE3NzI5MSwiYWFpIjoxMSwidWlkIjoxMTIxOTkyOTgsImlhZCI6IjIwMjYtMDktMDFUMTQ6NTA6MDcuNzc2WiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM2Mjk5NzMyLC[...]
+          'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY5OTE3NzI5MSwiYWFpIjoxMSwidWlkIjoxMTIxOTkyOTgsImlhZCI6IjIwMjYtMDktMDFUMTQ6NTA6MDcuNzc2WiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM2Mjk5NzMyLC[...]'
         },
         body: JSON.stringify({
-          query: `query { boards(ids: 18424728273) { items_page { items { name } } } }`
+          query: `query { boards(ids: ${boardId}) { items_page(limit: 10) { items { id name } } } }`
         })
       })
         .then(response => response.json())
@@ -203,12 +219,12 @@
             const itemList = items.map(item => `• ${item.name}`).join('\n');
             contentElement.innerText = itemList;
           } else {
-            contentElement.innerText = "No active items in queue.";
+            contentElement.innerText = `No items found in ${cardType} queue.`;
           }
         })
         .catch(error => {
           console.error(`Error fetching ${cardType} data:`, error);
-          contentElement.innerText = "Unable to load data at this time.";
+          contentElement.innerText = `Unable to load ${cardType} data. Check console for details.`;
         });
     }
   </script>
