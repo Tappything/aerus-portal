@@ -141,6 +141,15 @@
       margin-left: 10px;
     }
 
+    /* Coming Soon Message */
+    .coming-soon {
+      color: #d4af37;
+      font-size: 1rem;
+      text-align: center;
+      padding: 20px 10px;
+      line-height: 1.6;
+    }
+
     /* Responsive Mobile Stacking */
     @media (max-width: 768px) {
       .card-grid {
@@ -237,12 +246,19 @@
 
       const boardId = boardMap[cardType] || 18424728273;
 
-      // Special handling for Operations tile with status grouping
+      // Special handling for different tile types
       if (cardType === 'operations') {
         fetchOperationsData(contentElement, boardId);
-      } else {
+      } else if (cardType === 'myworld') {
         fetchCardDataGeneric(contentElement, cardType, boardId);
+      } else if (cardType === 'personal' || cardType === 'referral') {
+        displayComingSoon(contentElement);
       }
+    }
+
+    // Display "Coming Soon" message
+    function displayComingSoon(contentElement) {
+      contentElement.innerHTML = '<div class="coming-soon">Coming soon — your personal dashboard is being built!</div>';
     }
 
     // Fetch Operations data with status grouping
@@ -261,7 +277,7 @@
         .then(data => {
           const items = data?.data?.boards?.[0]?.items_page?.items || [];
           
-          // Group items by status
+          // Group items by status with exact Monday.com mappings
           const statuses = {
             'Needs Action': [],
             'In Progress': [],
@@ -273,15 +289,24 @@
             // Try to find status from column values
             let status = 'Needs Action'; // Default status
             if (item.column_values && Array.isArray(item.column_values)) {
-              const statusColumn = item.column_values.find(col => col.text && statuses.hasOwnProperty(col.text));
-              if (statusColumn) {
-                status = statusColumn.text;
+              const statusColumn = item.column_values.find(col => col.text);
+              if (statusColumn && statusColumn.text) {
+                const statusValue = statusColumn.text;
+                
+                // Map exact Monday.com status labels to display categories
+                if (statusValue === '1. Intake / William Review') {
+                  status = 'Needs Action';
+                } else if (statusValue === '2. Workbench' || statusValue === 'Chris\'s Tasks') {
+                  status = 'In Progress';
+                } else if (statusValue === '🤖 AI Holding Pile' || statusValue === '4. Store Stock / Logged') {
+                  status = 'Waiting on Customer or Parts';
+                } else if (statusValue === '3. Ready Wall') {
+                  status = 'Ready to Bill';
+                }
               }
             }
             
-            if (statuses.hasOwnProperty(status)) {
-              statuses[status].push(item.name);
-            }
+            statuses[status].push(item.name);
           });
 
           // Build HTML for status sections
