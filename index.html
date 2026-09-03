@@ -240,9 +240,13 @@
 
       const boardId = boardMap[cardType] || 18424728273;
 
-      // Special handling for Operations tile with status grouping
+      // Special handling for different tile types
       if (cardType === 'operations') {
         fetchOperationsData(contentElement, boardId);
+      } else if (cardType === 'myworld') {
+        fetchMyWorldData(contentElement, boardId);
+      } else if (cardType === 'personal' || cardType === 'referral') {
+        contentElement.innerText = 'Coming soon';
       } else {
         fetchCardDataGeneric(contentElement, cardType, boardId);
       }
@@ -263,6 +267,11 @@
         .then(response => response.json())
         .then(data => {
           const items = data?.data?.boards?.[0]?.items_page?.items || [];
+          
+          // Debug: log first item's column_values to see data structure
+          if (items.length > 0) {
+            console.log('First item column_values:', items[0].column_values);
+          }
           
           // Group items by status
           const statuses = {
@@ -329,6 +338,34 @@
         .catch(error => {
           console.error(`Error fetching operations data:`, error);
           contentElement.innerText = `Unable to load operations data. Check console for details.`;
+        });
+    }
+
+    // Fetch My World data - simple list of all items
+    function fetchMyWorldData(contentElement, boardId) {
+      fetch('/.netlify/functions/monday', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `apikey MONDAY_API_KEY_PLACEHOLDER`
+        },
+        body: JSON.stringify({
+          query: `query { boards(ids: ${boardId}) { items_page(limit: 50) { items { id name } } } }`
+        })
+      })
+        .then(response => response.json())
+        .then(data => {
+          const items = data?.data?.boards?.[0]?.items_page?.items || [];
+          if (items.length > 0) {
+            const itemList = items.map(item => `• ${item.name}`).join('\n');
+            contentElement.innerText = itemList;
+          } else {
+            contentElement.innerText = 'No items found in My World.';
+          }
+        })
+        .catch(error => {
+          console.error(`Error fetching My World data:`, error);
+          contentElement.innerText = `Unable to load My World data. Check console for details.`;
         });
     }
 
