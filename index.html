@@ -263,11 +263,6 @@
         .then(data => {
           const items = data?.data?.boards?.[0]?.items_page?.items || [];
           
-          // Debug: log first item's column_values to see data structure
-          if (items.length > 0) {
-            console.log('First item column_values:', items[0].column_values);
-          }
-          
           // Group items by status
           const statuses = {
             'Needs Action': [],
