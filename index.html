@@ -277,13 +277,15 @@
         .then(data => {
           const items = data?.data?.boards?.[0]?.items_page?.items || [];
           
+          // Safely derive status from column_values and filter completed/Chris's tasks
           const filteredItems = (items || []).filter(item => {
-  const status = (item.status ?? '').toString().trim();
-  if (!status) return false;
-  if (status === '5. Completed / Paid') return false;
-  if (status === "Chris's Tasks") return false;
-  return true;
-});
+            const statusColumn = (item.column_values && Array.isArray(item.column_values)) ? item.column_values.find(col => col.text) : null;
+            const status = (statusColumn?.text ?? '').toString().trim();
+            if (!status) return false;
+            if (status === '5. Completed / Paid') return false;
+            if (status === "Chris's Tasks") return false;
+            return true;
+          });
           
           // Group items by status with exact Monday.com mappings
           const statuses = {
