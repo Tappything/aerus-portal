@@ -37,17 +37,27 @@ exports.handler = async function (event, context) {
       };
     }
 
+    // Log the authorization header for debugging
+    const authHeader = 'apikey ' + process.env.MONDAY_API_KEY;
+    console.log('Authorization header set with length:', authHeader.length);
+
     // Forward the request to Monday.com
     const response = await fetch(MONDAY_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `apikey ${process.env.MONDAY_API_KEY}`
+        'Authorization': authHeader
       },
       body: JSON.stringify(requestBody)
     });
 
     const payload = await response.json();
+
+    // Log response status for debugging
+    console.log('Monday.com API response status:', response.status);
+    if (response.status !== 200) {
+      console.log('Monday.com API error payload:', JSON.stringify(payload));
+    }
 
     // Return the Monday.com response (status code, headers, body)
     return {
