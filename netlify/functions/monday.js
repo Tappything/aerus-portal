@@ -37,16 +37,17 @@ exports.handler = async function (event, context) {
       };
     }
 
-    // Log the authorization header for debugging
-    const authHeader = 'apikey ' + process.env.MONDAY_API_KEY;
-    console.log('Authorization header set with length:', authHeader.length);
+    // Trim the token to remove any whitespace
+    const token = process.env.MONDAY_API_KEY ? process.env.MONDAY_API_KEY.trim() : '';
+    console.log('Authorization token set with length:', token.length);
 
     // Forward the request to Monday.com
     const response = await fetch(MONDAY_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': authHeader
+        'Authorization': token,
+        'API-Version': '2023-10'
       },
       body: JSON.stringify(requestBody)
     });
