@@ -39,7 +39,7 @@
       letter-spacing: 1px;
     }
 
-    /* Digital Coordinator SVG Intake Trigger */
+    /* Digital Coordinator Icon Intake Trigger */
     .intake-container {
       text-align: center;
       margin-bottom: 40px;
@@ -277,36 +277,30 @@
           };
 
           items.forEach(item => {
-            // Determine status by checking all column values with .includes()
-            let status = 'Needs Action'; // Default status
-            
-            if (item.column_values && Array.isArray(item.column_values)) {
-              // Loop through ALL column values to find matching status indicators
-              for (const col of item.column_values) {
-                if (!col.text) continue;
-                
-                // Ready to Bill: contains 'Ready Wall'
-                if (col.text.includes('Ready Wall')) {
-                  status = 'Ready to Bill';
-                  break;
-                }
-                
-                // Waiting: contains 'Holding', 'Waiting', or 'Stock'
-                if (col.text.includes('Holding') || col.text.includes('Waiting') || col.text.includes('Stock')) {
-                  status = 'Waiting on Customer or Parts';
-                  break;
-                }
-                
-                // In Progress: contains '2. Workbench' or 'Chris'
-                if (col.text.includes('2. Workbench') || col.text.includes('Chris')) {
-                  status = 'In Progress';
-                  break;
-                }
-              }
+            // Get the project_status column
+            const statusCol = item.column_values.find(col => col.id === 'project_status');
+            const status = statusCol ? (statusCol.text || '').trim() : '';
+
+            // Skip completed items
+            if (status === '5. Completed / Paid') {
+              return;
             }
-            
-            if (statuses.hasOwnProperty(status)) {
-              statuses[status].push(item.name);
+
+            // Map status to bucket
+            let bucket = 'Needs Action'; // Default
+
+            if (status === '3. Ready Wall') {
+              bucket = 'Ready to Bill';
+            } else if (status === '🤖 AI Holding Pile' || status === '4. Store Stock / Logged') {
+              bucket = 'Waiting on Customer or Parts';
+            } else if (status === '2. Workbench' || status === 'Chris\'s Tasks') {
+              bucket = 'In Progress';
+            } else if (status === '1. Intake / William Review' || status === '') {
+              bucket = 'Needs Action';
+            }
+
+            if (statuses.hasOwnProperty(bucket)) {
+              statuses[bucket].push(item.name);
             }
           });
 
