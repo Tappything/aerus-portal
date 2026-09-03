@@ -1,0 +1,3 @@
+[build]
+  command = '''escaped_key=$(printf '%s' "$MONDAY_API_KEY" | sed 's/[&|]/\\&/g') && sed -i "s|MONDAY_API_KEY_PLACEHOLDER|$escaped_key|g" index.html'''
+  publish = "."
