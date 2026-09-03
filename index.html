@@ -194,10 +194,10 @@
 
       // Map card types to Monday.com board IDs
       const boardMap = {
-        'operations': 1234567890,  // Replace with actual board ID
-        'myworld': 1234567891,     // Replace with actual board ID
-        'personal': 1234567892,    // Replace with actual board ID
-        'referral': 1234567893     // Replace with actual board ID
+        'operations': 18424728273,
+        'myworld': 18424787463,
+        'personal': 18424728273,
+        'referral': 18424728273
       };
 
       const boardId = boardMap[cardType] || 18424728273;
@@ -206,7 +206,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY5OTE3NzI5MSwiYWFpIjoxMSwidWlkIjoxMTIxOTkyOTgsImlhZCI6IjIwMjYtMDktMDFUMTQ6NTA6MDcuNzc2WiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM2Mjk5NzMyLC[...]'
+          'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY5OTE3NzI5MSwiYWFpIjoxMSwidWlkIjoxMTIxOTkyOTgsImlhZCI6IjIwMjYtMDktMDFUMTQ6NTA6MDcuMDAwWiIsInBlciI6Im1lOndyaXRlIiwiYWN0aWQiOjM2Mjk5NzMyLCJyZ24iOiJ1c2UxIn0.TOSzcR7LePuXVgQUNQDR2KALgEnyKuEYvCanyl8c58U'
         },
         body: JSON.stringify({
           query: `query { boards(ids: ${boardId}) { items_page(limit: 10) { items { id name } } } }`
