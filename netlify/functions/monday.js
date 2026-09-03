@@ -1,56 +1,65 @@
-// Netlify serverless function to fetch item names from a Monday.com board
-// Assumes Node 18+ on Netlify so global.fetch is available and MONDAY_API_KEY is set in env.
+// Netlify serverless function to proxy Monday.com API requests
+// Forwards GraphQL queries from the frontend with proper authorization
 const fetch = global.fetch;
 
 const MONDAY_API_URL = 'https://api.monday.com/v2';
-const BOARD_ID = 18424728273;
 
 exports.handler = async function (event, context) {
-  const query = `
-    query {
-      boards(ids: ${BOARD_ID}) {
-        items {
-          name
-        }
-      }
-    }
-  `;
+  // Only allow POST requests
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Method not allowed' })
+    };
+  }
 
   try {
-    const res = await fetch(MONDAY_API_URL, {
+    // Parse the incoming request body
+    let requestBody;
+    try {
+      requestBody = JSON.parse(event.body);
+    } catch (e) {
+      return {
+        statusCode: 400,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Invalid JSON in request body' })
+      };
+    }
+
+    // Check that MONDAY_API_KEY is set
+    if (!process.env.MONDAY_API_KEY) {
+      console.error('MONDAY_API_KEY environment variable is not set');
+      return {
+        statusCode: 500,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'API key not configured on server' })
+      };
+    }
+
+    // Forward the request to Monday.com
+    const response = await fetch(MONDAY_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `apikey ${process.env.MONDAY_API_KEY}`
       },
-      body: JSON.stringify({ query })
+      body: JSON.stringify(requestBody)
     });
 
-    const payload = await res.json();
+    const payload = await response.json();
 
-    if (!res.ok || payload.errors) {
-      const msg = payload.errors ? JSON.stringify(payload.errors) : `HTTP ${res.status}`;
-      throw new Error(`Failed to fetch Monday board items: ${msg}`);
-    }
-
-    const items =
-      (payload.data &&
-        payload.data.boards &&
-        payload.data.boards[0] &&
-        Array.isArray(payload.data.boards[0].items)
-        ? payload.data.boards[0].items
-        : []
-      ).map(item => ({ name: item.name }));
-
+    // Return the Monday.com response (status code, headers, body)
     return {
-      statusCode: 200,
+      statusCode: response.status,
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*' // allow browser requests; adjust for production
       },
-      body: JSON.stringify({ items })
+      body: JSON.stringify(payload)
     };
   } catch (err) {
+    console.error('Error in Monday.com proxy function:', err);
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
