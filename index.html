@@ -228,7 +228,7 @@
       // Map card types to Monday.com board IDs
       const boardMap = {
         'operations': 18424728273,
-        'myworld': 18424787463,
+        'myworld': 18424728273,
         'personal': 18424728273,
         'referral': 18424728273
       };
@@ -334,7 +334,7 @@
           'Authorization': `apikey MONDAY_API_KEY_PLACEHOLDER`
         },
         body: JSON.stringify({
-          query: `query { boards(ids: ${boardId}) { items_page(limit: 50) { items { id name } } } }`
+          query: `query { boards(ids: 18424728273) { items_page(limit: 50) { items { id name } } } }`
         })
       })
         .then(response => response.json())
