@@ -47,11 +47,24 @@
     .coordinator-icon {
       font-size: 4rem;
       margin-bottom: 10px;
-      transition: transform 0.2s ease;
+      transition: transform 0.2s ease, filter 0.2s ease;
       cursor: pointer;
     }
     .coordinator-icon:hover {
       transform: scale(1.05);
+    }
+    .coordinator-icon.listening {
+      animation: pulse-glow 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse-glow {
+      0%, 100% {
+        filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.5));
+        transform: scale(1);
+      }
+      50% {
+        filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.8));
+        transform: scale(1.05);
+      }
     }
     .intake-label {
       color: #d4af37;
@@ -61,6 +74,11 @@
       font-weight: 700;
       margin-bottom: 20px;
       display: block;
+      min-height: 20px;
+      transition: opacity 0.3s ease;
+    }
+    .intake-label.listening-text {
+      opacity: 0.7;
     }
     
     /* Intake Form Styling */
@@ -93,6 +111,10 @@
     .intake-input::placeholder {
       color: #888;
     }
+    .intake-input.auto-filled {
+      border-color: #90EE90;
+      box-shadow: 0 0 10px rgba(144, 238, 144, 0.2);
+    }
     .intake-button-group {
       display: flex;
       gap: 10px;
@@ -113,8 +135,12 @@
       background-color: #d4af37;
       color: #1a1a1a;
     }
-    .intake-button.submit:hover {
+    .intake-button.submit:hover:not(:disabled) {
       background-color: #e8c547;
+    }
+    .intake-button.submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
     .intake-button.cancel {
       background-color: transparent;
@@ -242,7 +268,7 @@
         autocomplete="off"
       />
       <div class="intake-button-group">
-        <button type="submit" class="intake-button submit">Submit</button>
+        <button type="submit" class="intake-button submit" id="submitButton">Submit</button>
         <button type="button" class="intake-button cancel" id="cancelButton">Cancel</button>
       </div>
     </form>
@@ -278,22 +304,89 @@
     // 0. Monday.com API token (do NOT commit real tokens publicly). Replace the placeholder in deployment or set window.MONDAY_API_TOKEN in the browser console.
     const MONDAY_API_TOKEN = (window.MONDAY_API_TOKEN || '<REDACTED - set your Monday.com API token here>');
 
-    // 1. Intake Form Toggle and Submission (Mapped to Make.com Webhook)
+    // 1. Web Speech API Setup
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+    let isListening = false;
+
+    if (recognition) {
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+    }
+
+    // 2. Intake Form Elements
     const coordinatorIcon = document.getElementById('coordinatorIcon');
     const intakeLabel = document.getElementById('intakeLabel');
     const intakeForm = document.getElementById('intakeForm');
     const intakeInput = document.getElementById('intakeInput');
     const cancelButton = document.getElementById('cancelButton');
+    const submitButton = document.getElementById('submitButton');
 
+    // 3. Speech Recognition Event Handlers
+    if (recognition) {
+      recognition.onstart = function() {
+        isListening = true;
+        coordinatorIcon.classList.add('listening');
+        intakeLabel.classList.add('listening-text');
+        intakeLabel.textContent = '🎙️ Listening...';
+        intakeForm.classList.add('active');
+      };
+
+      recognition.onresult = function(event) {
+        let interimTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            intakeInput.value = transcript.trim();
+            intakeInput.classList.add('auto-filled');
+            // Auto-submit after successful speech recognition
+            setTimeout(submitForm, 500);
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+      };
+
+      recognition.onerror = function(event) {
+        console.error('Speech recognition error:', event.error);
+        intakeLabel.textContent = 'Error: ' + event.error;
+        intakeLabel.classList.remove('listening-text');
+        setTimeout(() => {
+          intakeLabel.textContent = 'TAP TO SPEAK';
+          coordinatorIcon.classList.remove('listening');
+          isListening = false;
+        }, 2000);
+      };
+
+      recognition.onend = function() {
+        isListening = false;
+        coordinatorIcon.classList.remove('listening');
+        intakeLabel.classList.remove('listening-text');
+        intakeLabel.textContent = 'TAP TO SPEAK';
+      };
+    }
+
+    // 4. Icon Click Handler - Start Speech Recognition
     coordinatorIcon.addEventListener('click', function() {
-      intakeForm.classList.add('active');
-      intakeInput.focus();
+      if (recognition) {
+        if (!isListening) {
+          intakeInput.value = '';
+          intakeInput.classList.remove('auto-filled');
+          recognition.start();
+        }
+      } else {
+        // Fallback if Speech API not supported
+        intakeForm.classList.add('active');
+        intakeInput.focus();
+      }
     });
 
-    intakeForm.addEventListener('submit', function(e) {
-      e.preventDefault();
+    // 5. Form Submission Handler
+    function submitForm() {
       const userInput = intakeInput.value.trim();
       if (userInput) {
+        submitButton.disabled = true;
         fetch('https://hook.us2.make.com/fyt2tlyenhdx3igqo42wqh1ypr569pej', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -303,22 +396,38 @@
         })
         .then(response => {
           intakeInput.value = '';
+          intakeInput.classList.remove('auto-filled');
           intakeForm.classList.remove('active');
+          submitButton.disabled = false;
           alert('On it! Your tap is my command!');
         })
         .catch(error => {
           console.error('Error submitting intake:', error);
+          submitButton.disabled = false;
           alert('Submission error. Please try again.');
         });
       }
+    }
+
+    intakeForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      submitForm();
     });
 
+    // 6. Cancel Button Handler
     cancelButton.addEventListener('click', function() {
+      if (isListening && recognition) {
+        recognition.stop();
+      }
       intakeInput.value = '';
+      intakeInput.classList.remove('auto-filled');
       intakeForm.classList.remove('active');
+      coordinatorIcon.classList.remove('listening');
+      intakeLabel.classList.remove('listening-text');
+      intakeLabel.textContent = 'TAP TO SPEAK';
     });
 
-    // 2. fetchCardData Function (POST Request with Monday.com GraphQL)
+    // 7. fetchCardData Function (POST Request with Monday.com GraphQL)
     function fetchCardData(cardType) {
       const contentElement = document.getElementById(`content-${cardType}`);
       contentElement.innerText = "Loading latest updates...";
