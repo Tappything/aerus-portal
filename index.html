@@ -295,23 +295,27 @@
       e.preventDefault();
       const userMessage = intakeInput.value.trim();
       if (userMessage) {
-        fetch('https://hook.us2.make.com/fyt2tlyenhdx3igqo42wqh1ypr569pej', {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            body: userMessage
+        try {
+          fetch('https://hook.us2.make.com/fyt2tlyenhdx3igqo42wqh1ypr569pej', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              body: userMessage
+            })
           })
-        })
-        .then(response => {
-          intakeInput.value = '';
-          intakeForm.classList.remove('active');
-          alert('On it! Your tap is my command!');
-        })
-        .catch(error => {
-          console.error('Error submitting intake:', error);
+          .then(response => {
+            intakeInput.value = '';
+            intakeForm.classList.remove('active');
+            alert('On it! Your tap is my command!');
+          })
+          .catch(error => {
+            console.log('Fetch error:', error);
+            alert('Submission error. Please try again.');
+          });
+        } catch (error) {
+          console.log('Try/catch error:', error);
           alert('Submission error. Please try again.');
-        });
+        }
       }
     });
 
