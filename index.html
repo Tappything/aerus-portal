@@ -296,15 +296,15 @@
       const userMessage = intakeInput.value.trim();
       if (userMessage) {
         try {
-          fetch('https://hook.us2.make.com/fyt2tlyenhdx3igqo42wqh1ypr569pej', {
+          fetch('/.netlify/functions/intake', {
             method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain' },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               body: userMessage
             })
           })
-          .then(response => {
+          .then(response => response.json())
+          .then(data => {
             intakeInput.value = '';
             intakeForm.classList.remove('active');
             alert('On it! Your tap is my command!');
