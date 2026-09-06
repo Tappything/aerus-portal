@@ -81,22 +81,13 @@
             <div class="tap-label">TAP TO SPEAK</div>
         </div>
 
-        <div class="status" id="statusText">Your TAP is my command</div>
+        <div class="status" id="statusText">your TAP is my command</div>
     </div>
 
     <script>
-        async function handleTap() {
+        async function sendToWebhook(text) {
             const statusEl = document.getElementById('statusText');
-            
-            // Check speech recognition support or use text prompt
-            const userInput = prompt("Speak or type your request for the Digital Coordinator:");
-            
-            if (!userInput || userInput.trim() === "") {
-                statusEl.innerText = "Operation canceled.";
-                return;
-            }
-
-            statusEl.innerText = "Sending to AERUS OPS BOARD...";
+            statusEl.innerText = "Processing...";
 
             try {
                 const response = await fetch('https://hook.us2.make.com/q6s4cfv1g27xnxx8mn9m1dn889w23vt7', {
@@ -105,18 +96,56 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        transcript: userInput
+                        transcript: text
                     })
                 });
 
                 if (response.ok) {
-                    statusEl.innerText = "✅ Sent directly to Monday.com!";
+                    statusEl.innerText = "your TAP is my command";
                 } else {
-                    statusEl.innerText = "⚠️ Delivery failed. Retrying...";
+                    statusEl.innerText = "your TAP is my command";
                 }
             } catch (error) {
-                statusEl.innerText = "❌ Network error. Check connection.";
-                console.error("Error sending transcript:", error);
+                statusEl.innerText = "your TAP is my command";
+                console.error("Webhook error:", error);
+            }
+        }
+
+        function handleTap() {
+            const statusEl = document.getElementById('statusText');
+
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+
+                statusEl.innerText = "Listening...";
+
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    sendToWebhook(transcript);
+                };
+
+                recognition.onerror = function(event) {
+                    const userInput = prompt("Speak or type your request:");
+                    if (userInput && userInput.trim() !== "") {
+                        sendToWebhook(userInput);
+                    } else {
+                        statusEl.innerText = "your TAP is my command";
+                    }
+                };
+
+                recognition.start();
+            } else {
+                const userInput = prompt("Speak or type your request:");
+                if (userInput && userInput.trim() !== "") {
+                    sendToWebhook(userInput);
+                } else {
+                    statusEl.innerText = "your TAP is my command";
+                }
             }
         }
     </script>
