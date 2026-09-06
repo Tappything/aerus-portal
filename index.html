@@ -1,171 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TappyThing — Digital Coordinator</title>
-    <style>
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .container {
-            text-align: center;
-            max-width: 600px;
-            width: 100%;
-        }
-        .logo-section {
-            margin-bottom: 20px;
-        }
-        .logo-img {
-            max-width: 120px;
-            height: auto;
-            margin-bottom: 10px;
-        }
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: #ffd700;
-        }
-        .tagline {
-            color: #aaa;
-            font-size: 14px;
-            margin-top: 4px;
-        }
-        .tap-button {
-            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
-            border: 3px solid #ffd700;
-            border-radius: 50%;
-            width: 180px;
-            height: 180px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 30px auto 20px auto;
-            cursor: pointer;
-            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.2);
-            transition: transform 0.1s ease, box-shadow 0.1s ease;
-        }
-        .tap-button:active {
-            transform: scale(0.95);
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
-        }
-        .mic-icon {
-            font-size: 48px;
-            margin-bottom: 8px;
-        }
-        .tap-label {
-            font-size: 13px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            color: #ffd700;
-        }
-        .status {
-            font-size: 14px;
-            color: #00ff88;
-            min-height: 24px;
-            margin-bottom: 40px;
-        }
-        .cards-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
-            width: 100%;
-        }
-        .card {
-            background: #1e1e1e;
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 15px;
-            text-align: left;
-            box-sizing: border-box;
-        }
-        .card-title {
-            color: #ffd700;
-            font-weight: bold;
-            font-size: 16px;
-            margin-bottom: 6px;
-        }
-        .card-desc {
-            color: #888;
-            font-size: 12px;
-            line-height: 1.4;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="logo-section">
-            <div class="logo">TappyThing</div>
-            <div class="tagline">Calm the chaos.</div>
-        </div>
+THAT'S THE ANSWER!! THIS IS GREAT NEWS!! 🎉
 
-        <div class="tap-button" id="mainButton" onclick="handleTap()">
-            <div class="mic-icon">🎙️</div>
-            <div class="tap-label">TAP TO SPEAK</div>
-        </div>
+The pipeline was never broken. We were just knocking on the wrong door the whole time!
 
-        <div class="status" id="statusText">your TAP is my command</div>
+🔑 Two Things Were Wrong
+Issue	Wrong	Correct
+Webhook URL	q6s4cfv1g27xnxx8mn9m1dn889w23vt7	fyt2tlyenhdx3igqo42wqh1ypr569pej
+Field name	transcript	body
 
-        <div class="cards-grid">
-            <div class="card">
-                <div class="card-title">Operations</div>
-                <div class="card-desc">Click to load active tasks & dispatch</div>
-            </div>
-            <div class="card">
-                <div class="card-title">My World</div>
-                <div class="card-desc">Click to load dashboard & quick notes</div>
-            </div>
-            <div class="card">
-                <div class="card-title">Personal</div>
-                <div class="card-desc">Click to load private tracking & schedule</div>
-            </div>
-            <div class="card">
-                <div class="card-title">Referral Engine</div>
-                <div class="card-desc">Click to load leads, tracking & rewards</div>
-            </div>
-        </div>
-    </div>
+That's it. Two things. Nothing else is broken.
 
-    <script>
-        async function handleTap() {
-            const statusEl = document.getElementById('statusText');
-            const userInput = prompt("Speak or type your request for the Digital Coordinator:");
-            
-            if (!userInput || userInput.trim() === "") {
-                statusEl.innerText = "your TAP is my command";
-                return;
-            }
+Send This to Fresh RIGHT NOW:
 
-            statusEl.innerText = "Processing...";
+"Fresh — Sissy and Make.com just cracked the case. The portal has been posting to the WRONG webhook URL this whole time. Here is the fix — two changes only, do not touch anything else:
 
-            try {
-                await fetch('https://hook.us2.make.com/q6s4cfv1g27xnxx8mn9m1dn889w23vt7', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        transcript: userInput
-                    })
-                });
-            } catch (error) {
-                console.error("Webhook error:", error);
-            } finally {
-                statusEl.innerText = "your TAP is my command";
-            }
-        }
-    </script>
-</body>
-</html>
+1. Replace the webhook URL with: https://hook.us2.make.com/fyt2tlyenhdx3igqo42wqh1ypr569pej 2. Change the field name from transcript to body
+
+Give me the complete full replacement index.html with ONLY these two changes. Nothing else moves. Full file ready to paste."
+
+Go paste it, commit it, and come right back. Say "Sissy — fire the test" and I'll watch the board live. We are DONE after this one. 🎯🎩
