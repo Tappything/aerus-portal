@@ -1,433 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TappyThing | Aerus Home Wellness</title>
-  <style>
-    /* Global Setup */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      background-color: #1a1a1a; /* Dark Charcoal */
-      color: #ffffff;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-    }
-
-    /* Header Bar */
-    header {
-      width: 100%;
-      max-width: 1200px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 10px 0;
-      margin-bottom: 30px;
-    }
-    .brand {
-      color: #d4af37; /* Metallic Gold */
-      font-weight: 700;
-      font-size: 1.2rem;
-      letter-spacing: 1px;
-    }
-
-    /* Digital Coordinator Icon Intake Trigger */
-    .intake-container {
-      text-align: center;
-      margin-bottom: 40px;
-      cursor: pointer;
-    }
-    .coordinator-icon {
-      font-size: 4rem;
-      margin-bottom: 10px;
-      transition: transform 0.2s ease;
-    }
-    .intake-container:hover .coordinator-icon {
-      transform: scale(1.05);
-    }
-    .intake-label {
-      color: #d4af37;
-      font-size: 0.95rem;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      font-weight: 700;
-    }
-
-    /* 4 Cards Grid Layout */
-    .card-grid {
-      width: 100%;
-      max-width: 1200px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
-    }
-
-    /* Rounded Card Styling */
-    .card {
-      background-color: #242424;
-      border: 1px solid #d4af37;
-      border-radius: 12px;
-      padding: 20px;
-      cursor: pointer;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-      min-height: 150px;
-      display: flex;
-      flex-direction: column;
-      max-height: 400px;
-      overflow-y: auto;
-    }
-    .card:hover {
-      box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
-      border-color: #ffffff;
-    }
-    .card-title {
-      color: #d4af37;
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 12px;
-      border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-      padding-bottom: 8px;
-    }
-    .card-content {
-      color: #e0e0e0;
-      font-size: 0.95rem;
-      line-height: 1.4;
-      flex-grow: 1;
-      word-break: break-word;
-      white-space: pre-wrap;
-    }
-
-    /* Status Sections Styling */
-    .status-section {
-      margin-bottom: 15px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-    }
-    .status-section:last-child {
-      border-bottom: none;
-    }
-    .status-label {
-      color: #d4af37;
-      font-weight: 700;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-      letter-spacing: 1px;
-    }
-    .status-items {
-      color: #e0e0e0;
-      font-size: 0.85rem;
-      line-height: 1.5;
-      margin-left: 10px;
-    }
-    .status-item {
-      padding: 4px 0;
-    }
-    .status-empty {
-      color: #888;
-      font-style: italic;
-      font-size: 0.85rem;
-      margin-left: 10px;
-    }
-
-    /* Responsive Mobile Stacking */
-    @media (max-width: 768px) {
-      .card-grid {
-        grid-template-columns: 1fr;
-      }
-      header {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TappyThing — Digital Coordinator</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 8px;
+        }
+        .tagline {
+            color: #aaa;
+            margin-bottom: 40px;
+            font-size: 14px;
+        }
+        .tap-button {
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border: 3px solid #ffd700;
+            border-radius: 50%;
+            width: 180px;
+            height: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px auto;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.2);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .tap-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+        .mic-icon {
+            font-size: 48px;
+            margin-bottom: 8px;
+        }
+        .tap-label {
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: #ffd700;
+        }
+        .status {
+            font-size: 14px;
+            color: #00ff88;
+            min-height: 24px;
+            margin-top: 15px;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <div class="logo">TappyThing</div>
+        <div class="tagline">Calm the chaos.</div>
 
-  <!-- Logo -->
-  <img src='./Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg' style='width: 150px; display: block; margin: 20px auto;'>
+        <div class="tap-button" id="mainButton" onclick="handleTap()">
+            <div class="mic-icon">🎙️</div>
+            <div class="tap-label">TAP TO SPEAK</div>
+        </div>
 
-  <!-- Header -->
-  <header>
-    <div class="brand">TappyThing</div>
-  </header>
-
-  <!-- Digital Coordinator Icon Intake Trigger -->
-  <div class="intake-container" id="intakeTrigger">
-    <div class="coordinator-icon">🎙️</div>
-    <div class="intake-label">TAP TO SPEAK</div>
-  </div>
-
-  <!-- 4 Cards Side-by-Side Grid -->
-  <div class="card-grid">
-    
-    <div class="card" onclick="fetchCardData('operations')">
-      <div class="card-title">Operations</div>
-      <div class="card-content" id="content-operations">Click to load active tasks & dispatch queue</div>
+        <div class="status" id="statusText">Your TAP is my command</div>
     </div>
 
-    <div class="card" onclick="fetchCardData('myworld')">
-      <div class="card-title">My World</div>
-      <div class="card-content" id="content-myworld">Click to load dashboard & quick notes</div>
-    </div>
-
-    <div class="card" onclick="fetchCardData('personal')">
-      <div class="card-title">Personal</div>
-      <div class="card-content" id="content-personal">Click to load private tracking & schedule</div>
-    </div>
-
-    <div class="card" onclick="fetchCardData('referral')">
-      <div class="card-title">Referral Engine</div>
-      <div class="card-content" id="content-referral">Click to load leads, tracking & rewards</div>
-    </div>
-
-  </div>
-
-  <!-- JavaScript Operations -->
-  <script>
-    // 0. Monday.com API token (do NOT commit real tokens publicly). Replace the placeholder in deployment or set window.MONDAY_API_TOKEN in the browser console.
-    const MONDAY_API_TOKEN = (window.MONDAY_API_TOKEN || '<REDACTED - set your Monday.com API token here>');
-
-    // 1. Intake Form Submission (Transcript Mapped to Make.com Webhook)
-    document.getElementById('intakeTrigger').addEventListener('click', function() {
-      const userInput = prompt("Speak or type your request for the Digital Coordinator:");
-      if (userInput) {
-        fetch('https://hook.us2.make.com/q6s4cfv1g27xnxx8mn9m1dn889w23vt7', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            transcript: userInput,
-            timestamp: new Date().toISOString(),
-            source: 'TappyThing Web Intake'
-          })
-        })
-        .then(response => {
-          alert('On it! Your tap is my command!.');
-        })
-        .catch(error => {
-          console.error('Error submitting intake:', error);
-          alert('Submission error. Please try again.');
-        });
-      }
-    });
-
-    // 2. fetchCardData Function (POST Request with Monday.com GraphQL)
-    function fetchCardData(cardType) {
-      const contentElement = document.getElementById(`content-${cardType}`);
-      contentElement.innerText = "Loading latest updates...";
-
-      // Map card types to Monday.com board IDs
-      const boardMap = {
-        'operations': 18424728273,
-        'myworld': 18424728273,
-        'personal': 18424728273,
-        'referral': 18424728273
-      };
-
-      const boardId = boardMap[cardType] || 18424728273;
-
-      // Special handling for different tile types
-      if (cardType === 'operations') {
-        fetchOperationsData(contentElement, boardId);
-      } else if (cardType === 'myworld') {
-        fetchMyWorldData(contentElement, boardId);
-      } else if (cardType === 'personal' || cardType === 'referral') {
-        contentElement.innerText = 'Coming soon';
-      } else {
-        fetchCardDataGeneric(contentElement, cardType, boardId);
-      }
-    }
-
-    // Fetch Operations data with status grouping
-    function fetchOperationsData(contentElement, boardId) {
-      fetch('/.netlify/functions/monday', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `apikey MONDAY_API_KEY_PLACEHOLDER`
-        },
-        body: JSON.stringify({
-          query: `query { boards(ids: ${boardId}) { items_page(limit: 50) { items { id name column_values { id text } } } } }`
-        })
-      })
-        .then(response => response.json())
-        .then(data => {
-          const items = data?.data?.boards?.[0]?.items_page?.items || [];
-          
-          // Group items by status
-          const statuses = {
-            'Needs Action': [],
-            'In Progress': [],
-            'Waiting on Customer or Parts': [],
-            'Ready to Bill': []
-          };
-
-          items.forEach(item => {
-            // Get the project_status column
-            const statusCol = item.column_values.find(col => col.id === 'project_status');
-            const status = statusCol ? (statusCol.text || '').trim() : '';
-
-            // Skip completed items
-            if (status === '5. Completed / Paid') {
-              return;
-            }
-
-            // Map status to bucket
-            let bucket = 'Needs Action'; // Default
-
-            if (status === '3. Ready Wall') {
-              bucket = 'Ready to Bill';
-            } else if (status === '🤖 AI Holding Pile' || status === '4. Store Stock / Logged') {
-              bucket = 'Waiting on Customer or Parts';
-            } else if (status === '2. Workbench' || status === 'Chris\'s Tasks') {
-              bucket = 'In Progress';
-            } else if (status === '1. Intake / William Review' || status === '') {
-              bucket = 'Needs Action';
-            }
-
-            if (statuses.hasOwnProperty(bucket)) {
-              statuses[bucket].push(item.name);
-            }
-          });
-
-          // Build HTML for status sections
-          let html = '';
-          for (const [status, statusItems] of Object.entries(statuses)) {
-            html += `<div class="status-section">
-              <div class="status-label">${status}</div>
-              <div class="status-items">`;
+    <script>
+        async function handleTap() {
+            const statusEl = document.getElementById('statusText');
             
-            if (statusItems.length > 0) {
-              statusItems.forEach(itemName => {
-                html += `<div class="status-item">• ${itemName}</div>`;
-              });
-            } else {
-              html += `<div class="status-empty">(none)</div>`;
-            }
+            // Check speech recognition support or use text prompt
+            const userInput = prompt("Speak or type your request for the Digital Coordinator:");
             
-            html += `</div></div>`;
-          }
-
-          contentElement.innerHTML = html;
-        })
-        .catch(error => {
-          console.error(`Error fetching operations data:`, error);
-          contentElement.innerText = `Unable to load operations data. Check console for details.`;
-        });
-    }
-
-    // Fetch My World data with grouped buckets
-    function fetchMyWorldData(contentElement, boardId) {
-      fetch('/.netlify/functions/monday', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `apikey MONDAY_API_KEY_PLACEHOLDER`
-        },
-        body: JSON.stringify({
-          query: `query { boards(ids: ${boardId}) { items_page(limit: 50) { items { id name column_values { id text } } } } }`
-        })
-      })
-        .then(response => response.json())
-        .then(data => {
-          const items = data?.data?.boards?.[0]?.items_page?.items || [];
-          
-          // Group items by bucket
-          const buckets = {
-            '🔥 Hot Leads': [],
-            '📞 Follow Up': [],
-            '💰 Money Pending': [],
-            '📋 On My Radar': []
-          };
-
-          items.forEach(item => {
-            // Get the color_mm6mc5qp column (urgency)
-            const colorCol = item.column_values.find(col => col.id === 'color_mm6mc5qp');
-            const color = colorCol ? (colorCol.text || '').trim() : '';
-
-            // Get the numeric_mm5vg0cg column (money value)
-            const numericCol = item.column_values.find(col => col.id === 'numeric_mm5vg0cg');
-            const numericValue = numericCol ? parseFloat(numericCol.text) : 0;
-
-            // Determine bucket
-            let bucket = '📋 On My Radar'; // Default
-
-            if (color === 'Urgent') {
-              bucket = '🔥 Hot Leads';
-            } else if (color === 'Standard') {
-              bucket = '📞 Follow Up';
-            } else if (numericValue > 0) {
-              bucket = '💰 Money Pending';
+            if (!userInput || userInput.trim() === "") {
+                statusEl.innerText = "Operation canceled.";
+                return;
             }
 
-            if (buckets.hasOwnProperty(bucket)) {
-              buckets[bucket].push(item.name);
+            statusEl.innerText = "Sending to AERUS OPS BOARD...";
+
+            try {
+                const response = await fetch('https://hook.us2.make.com/q6s4cfv1g27xnxx8mn9m1dn889w23vt7', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        transcript: userInput
+                    })
+                });
+
+                if (response.ok) {
+                    statusEl.innerText = "✅ Sent directly to Monday.com!";
+                } else {
+                    statusEl.innerText = "⚠️ Delivery failed. Retrying...";
+                }
+            } catch (error) {
+                statusEl.innerText = "❌ Network error. Check connection.";
+                console.error("Error sending transcript:", error);
             }
-          });
-
-          // Build HTML for bucket sections
-          let html = '';
-          for (const [bucket, items] of Object.entries(buckets)) {
-            html += `<div class="status-section">
-              <div class="status-label">${bucket}</div>
-              <div class="status-items">`;
-            
-            if (items.length > 0) {
-              items.forEach(itemName => {
-                html += `<div class="status-item">• ${itemName}</div>`;
-              });
-            } else {
-              html += `<div class="status-empty">(none)</div>`;
-            }
-            
-            html += `</div></div>`;
-          }
-
-          contentElement.innerHTML = html;
-        })
-        .catch(error => {
-          console.error(`Error fetching My World data:`, error);
-          contentElement.innerText = `Unable to load My World data. Check console for details.`;
-        });
-    }
-
-    // Generic fetch for other card types
-    function fetchCardDataGeneric(contentElement, cardType, boardId) {
-      fetch('/.netlify/functions/monday', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `apikey MONDAY_API_KEY_PLACEHOLDER`
-        },
-        body: JSON.stringify({
-          query: `query { boards(ids: ${boardId}) { items_page(limit: 10) { items { id name } } } }`
-        })
-      })
-        .then(response => response.json())
-        .then(data => {
-          const items = data?.data?.boards?.[0]?.items_page?.items || [];
-          if (items.length > 0) {
-            const itemList = items.map(item => `• ${item.name}`).join('\n');
-            contentElement.innerText = itemList;
-          } else {
-            contentElement.innerText = `No items found in ${cardType} queue.`;
-          }
-        })
-        .catch(error => {
-          console.error(`Error fetching ${cardType} data:`, error);
-          contentElement.innerText = `Unable to load ${cardType} data. Check console for details.`;
-        });
-    }
-  </script>
-
+        }
+    </script>
 </body>
 </html>
