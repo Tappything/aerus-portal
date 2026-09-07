@@ -241,7 +241,7 @@
         placeholder="Speak or type your request for the Digital Coordinator..."
         autocomplete="off"
       />
-      <div id="speechStatus" aria-live="polite" tabindex="-1" style="min-height:16px;font-size:12px;color:#666;"></div>
+      <div id="speechStatus" role="status" aria-live="polite" tabindex="-1" style="min-height:16px;font-size:12px;color:#666;"></div>
       <div class="intake-button-group">
         <button type="submit" class="intake-button submit">Submit</button>
         <button type="button" class="intake-button cancel" id="cancelButton">Cancel</button>
@@ -288,6 +288,7 @@
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let speechRecognition = null;
     let isListening = false;
+    let receivedResultForCurrentAttempt = false;
     let fallbackMessageShown = false;
     function setSpeechStatus(message) {
       speechStatus.textContent = message;
@@ -304,8 +305,11 @@
       speechRecognition.maxAlternatives = 1;
 
       speechRecognition.addEventListener('result', function(event) {
-        const transcript = event.results[0] && event.results[0][0] ? event.results[0][0].transcript.trim() : '';
+        const firstResult = event.results[0];
+        const firstAlternative = firstResult && firstResult[0];
+        const transcript = firstAlternative ? firstAlternative.transcript.trim() : '';
         if (transcript) {
+          receivedResultForCurrentAttempt = true;
           setSpeechStatus('');
           intakeInput.value = transcript;
           if (typeof intakeForm.requestSubmit === 'function') {
@@ -330,6 +334,9 @@
       });
 
       speechRecognition.addEventListener('end', function() {
+        if (isListening && !receivedResultForCurrentAttempt && !fallbackMessageShown) {
+          showVoiceFallbackMessage();
+        }
         isListening = false;
       });
     }
@@ -345,6 +352,7 @@
       }
       if (isListening) return;
       try {
+        receivedResultForCurrentAttempt = false;
         fallbackMessageShown = false;
         setSpeechStatus('');
         isListening = true;
@@ -390,6 +398,8 @@
     // 4. Cancel Button Handler
     cancelButton.addEventListener('click', function() {
       if (speechRecognition && isListening) {
+        receivedResultForCurrentAttempt = false;
+        fallbackMessageShown = false;
         isListening = false;
         try {
           speechRecognition.abort();
