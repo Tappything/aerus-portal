@@ -302,15 +302,15 @@
             headers: { 'Content-Type': 'text/plain' },
             body: userMessage
           })
-          .then(() => {
-            intakeInput.value = '';
-            intakeForm.classList.remove('active');
-            alert('On it! Your tap has been sent!');
-          })
           .catch(error => {
             console.log('Fetch error:', error);
+            intakeInput.value = userMessage;
+            intakeForm.classList.add('active');
             alert('Submission error. Please try again.');
           });
+          intakeInput.value = '';
+          intakeForm.classList.remove('active');
+          alert('On it! Your tap is on its way!');
         } catch (error) {
           console.log('Try/catch error:', error);
           alert('Submission error. Please try again.');
