@@ -309,9 +309,7 @@
       speechRecognition.addEventListener('error', function(errorEvent) {
         isListening = false;
         console.log('Speech recognition error:', errorEvent.error);
-        if (errorEvent.error === 'not-allowed' || errorEvent.error === 'service-not-allowed') {
-          alert('Microphone access is unavailable. Please type your request and submit.');
-        }
+        alert('Voice input is unavailable right now. Please type your request and submit.');
       });
 
       speechRecognition.addEventListener('end', function() {
@@ -325,13 +323,14 @@
       intakeInput.focus();
 
       if (speechRecognition && !isListening) {
-        if (!window.confirm('Start voice intake now?')) return;
-        try {
-          isListening = true;
-          speechRecognition.start();
-        } catch (error) {
-          isListening = false;
-          console.log('Speech recognition start error:', error);
+        if (window.confirm('Start voice intake now?')) {
+          try {
+            isListening = true;
+            speechRecognition.start();
+          } catch (error) {
+            isListening = false;
+            console.log('Speech recognition start error:', error);
+          }
         }
       }
     });
