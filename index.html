@@ -306,7 +306,10 @@
         if (typeof intakeForm.requestSubmit === 'function') {
           intakeForm.requestSubmit();
         } else {
-          intakeForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+          const submitButton = intakeForm.querySelector('button[type="submit"]');
+          if (submitButton) {
+            submitButton.click();
+          }
         }
       });
 
