@@ -275,31 +275,25 @@
 
   <!-- JavaScript Operations -->
   <script>
-    // 0. Monday.com API token (do NOT commit real tokens publicly). Replace the placeholder in deployment or set window.MONDAY_API_TOKEN in the browser console.
     const MONDAY_API_TOKEN = (window.MONDAY_API_TOKEN || '<REDACTED - set your Monday.com API token here>');
-
-    // 1. Intake Form Elements
     const coordinatorIcon = document.getElementById('coordinatorIcon');
     const intakeForm = document.getElementById('intakeForm');
     const intakeInput = document.getElementById('intakeInput');
     const cancelButton = document.getElementById('cancelButton');
 
-    // 2. Icon Click Handler - Show Form
     coordinatorIcon.addEventListener('click', function() {
       intakeForm.classList.add('active');
       intakeInput.focus();
     });
 
-    // 3. Form Submission Handler - POST to Netlify serverless function
     intakeForm.addEventListener('submit', function(e) {
       e.preventDefault();
       const userMessage = intakeInput.value.trim();
       if (userMessage) {
         try {
           fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei', {
-  method: 'POST',
-  mode: 'no-cors',
-  headers: { 'Content-Type': 'text/plain' },
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               body: userMessage
             })
@@ -321,18 +315,15 @@
       }
     });
 
-    // 4. Cancel Button Handler
     cancelButton.addEventListener('click', function() {
       intakeInput.value = '';
       intakeForm.classList.remove('active');
     });
 
-    // 5. fetchCardData Function (POST Request with Monday.com GraphQL)
     function fetchCardData(cardType) {
       const contentElement = document.getElementById(`content-${cardType}`);
       contentElement.innerText = "Loading latest updates...";
 
-      // Map card types to Monday.com board IDs
       const boardMap = {
         'operations': 18424728273,
         'myworld': 18424728273,
@@ -342,7 +333,6 @@
 
       const boardId = boardMap[cardType] || 18424728273;
 
-      // Special handling for different tile types
       if (cardType === 'operations') {
         fetchOperationsData(contentElement, boardId);
       } else if (cardType === 'myworld') {
@@ -354,7 +344,6 @@
       }
     }
 
-    // Fetch Operations data with status grouping
     function fetchOperationsData(contentElement, boardId) {
       fetch('/.netlify/functions/monday', {
         method: 'POST',
@@ -369,8 +358,6 @@
         .then(response => response.json())
         .then(data => {
           const items = data?.data?.boards?.[0]?.items_page?.items || [];
-          
-          // Group items by status
           const statuses = {
             'Needs Action': [],
             'In Progress': [],
@@ -379,17 +366,14 @@
           };
 
           items.forEach(item => {
-            // Get the project_status column
             const statusCol = item.column_values.find(col => col.id === 'project_status');
             const status = statusCol ? (statusCol.text || '').trim() : '';
 
-            // Skip completed items
             if (status === '5. Completed / Paid') {
               return;
             }
 
-            // Map status to bucket
-            let bucket = 'Needs Action'; // Default
+            let bucket = 'Needs Action';
 
             if (status === '3. Ready Wall') {
               bucket = 'Ready to Bill';
@@ -406,7 +390,6 @@
             }
           });
 
-          // Build HTML for status sections
           let html = '';
           for (const [status, statusItems] of Object.entries(statuses)) {
             html += `<div class="status-section">
@@ -432,7 +415,6 @@
         });
     }
 
-    // Fetch My World data with grouped buckets
     function fetchMyWorldData(contentElement, boardId) {
       fetch('/.netlify/functions/monday', {
         method: 'POST',
@@ -447,8 +429,6 @@
         .then(response => response.json())
         .then(data => {
           const items = data?.data?.boards?.[0]?.items_page?.items || [];
-          
-          // Group items by bucket
           const buckets = {
             '🔥 Hot Leads': [],
             '📞 Follow Up': [],
@@ -457,16 +437,13 @@
           };
 
           items.forEach(item => {
-            // Get the color_mm6mc5qp column (urgency)
             const colorCol = item.column_values.find(col => col.id === 'color_mm6mc5qp');
             const color = colorCol ? (colorCol.text || '').trim() : '';
 
-            // Get the numeric_mm5vg0cg column (money value)
             const numericCol = item.column_values.find(col => col.id === 'numeric_mm5vg0cg');
             const numericValue = numericCol ? parseFloat(numericCol.text) : 0;
 
-            // Determine bucket
-            let bucket = '📋 On My Radar'; // Default
+            let bucket = '📋 On My Radar';
 
             if (color === 'Urgent') {
               bucket = '🔥 Hot Leads';
@@ -481,7 +458,6 @@
             }
           });
 
-          // Build HTML for bucket sections
           let html = '';
           for (const [bucket, items] of Object.entries(buckets)) {
             html += `<div class="status-section">
@@ -507,7 +483,6 @@
         });
     }
 
-    // Generic fetch for other card types
     function fetchCardDataGeneric(contentElement, cardType, boardId) {
       fetch('/.netlify/functions/monday', {
         method: 'POST',
