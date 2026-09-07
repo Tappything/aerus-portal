@@ -288,7 +288,7 @@
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let speechRecognition = null;
     let isListening = false;
-    let receivedResultForCurrentAttempt = false;
+    let receivedResultForCurrentAttempt = true;
     let fallbackMessageShown = false;
     function setSpeechStatus(message) {
       speechStatus.textContent = message;
@@ -324,6 +324,8 @@
         isListening = false;
         console.log('Speech recognition error:', errorEvent.error);
         if (errorEvent.error === 'aborted') {
+          receivedResultForCurrentAttempt = true;
+          fallbackMessageShown = true;
           return;
         }
         if (!fallbackMessageShown) {
@@ -333,7 +335,7 @@
       });
 
       speechRecognition.addEventListener('end', function() {
-        if (isListening && !receivedResultForCurrentAttempt && !fallbackMessageShown) {
+        if (!receivedResultForCurrentAttempt && !fallbackMessageShown) {
           showVoiceFallbackMessage();
         }
         isListening = false;
@@ -353,7 +355,7 @@
       try {
         receivedResultForCurrentAttempt = false;
         fallbackMessageShown = false;
-        setSpeechStatus('');
+        setSpeechStatus('Listening…');
         isListening = true;
         speechRecognition.start();
       } catch (error) {
@@ -397,8 +399,8 @@
     // 4. Cancel Button Handler
     cancelButton.addEventListener('click', function() {
       if (speechRecognition && isListening) {
-        receivedResultForCurrentAttempt = false;
-        fallbackMessageShown = false;
+        receivedResultForCurrentAttempt = true;
+        fallbackMessageShown = true;
         isListening = false;
         try {
           speechRecognition.abort();
