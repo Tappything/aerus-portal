@@ -290,21 +290,21 @@
       intakeInput.focus();
     });
 
-    // 3. Form Submission Handler - POST to Netlify serverless function
+    // 3. Form Submission Handler - POST to intake webhook
     intakeForm.addEventListener('submit', function(e) {
       e.preventDefault();
       const userMessage = intakeInput.value.trim();
       if (userMessage) {
         try {
-          fetch('/.netlify/functions/intake', {
+          fetch('https://hook.us2.make.com/fyt2tlyenhdx3igqo42wqh1ypr569pej', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify({
               body: userMessage
             })
           })
-          .then(response => response.json())
-          .then(data => {
+          .then(() => {
             intakeInput.value = '';
             intakeForm.classList.remove('active');
             alert('On it! Your tap is my command!');
