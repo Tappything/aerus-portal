@@ -49,6 +49,11 @@
       margin-bottom: 10px;
       transition: transform 0.2s ease;
       cursor: pointer;
+      background: none;
+      border: none;
+      color: inherit;
+      line-height: 1;
+      padding: 0;
     }
     .coordinator-icon:hover {
       transform: scale(1.05);
@@ -236,7 +241,7 @@
 
   <!-- Digital Coordinator Icon Intake Trigger -->
   <div class="intake-container">
-    <div class="coordinator-icon" id="coordinatorIcon" role="button" tabindex="0">🎙️</div>
+    <button type="button" class="coordinator-icon" id="coordinatorIcon">🎙️</button>
     <div class="intake-label">TAP TO SPEAK</div>
     
     <form class="intake-form" id="intakeForm">
@@ -308,6 +313,10 @@
     }
 
     setListeningState(false);
+    if (!SpeechRecognition) {
+      coordinatorIcon.setAttribute('title', 'Voice input unavailable. Tap to type your request.');
+      coordinatorIcon.setAttribute('aria-label', 'Voice input unavailable. Tap to type your request.');
+    }
 
     if (SpeechRecognition) {
       recognition = new SpeechRecognition();
@@ -345,18 +354,15 @@
 
       recognition.addEventListener('end', function() {
         setListeningState(false);
-        if (shouldShowEndHint && !receivedTranscript && intakeStatus.textContent === 'Listening...') {
-          setIntakeStatus('Please type your request and submit, or tap to try voice again.');
+        if (intakeStatus.textContent === 'Listening...') {
+          if (shouldShowEndHint && !receivedTranscript) {
+            setIntakeStatus('Please type your request and submit, or tap to try voice again.');
+          } else {
+            setIntakeStatus('');
+          }
         }
       });
     }
-
-    coordinatorIcon.addEventListener('keydown', function(event) {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        coordinatorIcon.click();
-      }
-    });
 
     // 2. Icon Click Handler - Show Form
     coordinatorIcon.addEventListener('click', function() {
@@ -368,6 +374,7 @@
       }
       if (isListening) {
         shouldShowEndHint = false;
+        setIntakeStatus('');
         recognition.stop();
         return;
       }
