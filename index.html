@@ -241,7 +241,7 @@
         placeholder="Speak or type your request for the Digital Coordinator..."
         autocomplete="off"
       />
-      <div id="speechStatus" role="status" aria-live="polite" tabindex="-1" style="min-height:16px;font-size:12px;color:#666;"></div>
+      <div id="speechStatus" role="status" aria-live="polite" style="min-height:16px;font-size:12px;color:#666;"></div>
       <div class="intake-button-group">
         <button type="submit" class="intake-button submit">Submit</button>
         <button type="button" class="intake-button cancel" id="cancelButton">Cancel</button>
@@ -295,7 +295,6 @@
     }
     function showVoiceFallbackMessage() {
       setSpeechStatus('Voice input is unavailable right now. Please type your request and submit.');
-      speechStatus.focus();
     }
 
     if (SpeechRecognition) {
@@ -311,12 +310,12 @@
         if (transcript) {
           receivedResultForCurrentAttempt = true;
           setSpeechStatus('');
-          intakeInput.value = transcript;
+          const existingValue = intakeInput.value.trim();
+          intakeInput.value = existingValue ? `${existingValue} ${transcript}` : transcript;
           if (typeof intakeForm.requestSubmit === 'function') {
             intakeForm.requestSubmit();
           } else {
-            const submitButton = intakeForm.querySelector('button[type="submit"]');
-            if (submitButton) submitButton.click();
+            intakeForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
           }
         }
       });
