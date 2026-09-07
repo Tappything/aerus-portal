@@ -49,6 +49,11 @@
       margin-bottom: 10px;
       transition: transform 0.2s ease;
       cursor: pointer;
+      background: none;
+      border: none;
+      color: inherit;
+      line-height: 1;
+      padding: 0;
     }
     .coordinator-icon:hover {
       transform: scale(1.05);
@@ -123,6 +128,12 @@
     .intake-button.cancel:hover {
       background-color: rgba(212, 175, 55, 0.1);
       border-color: #ffffff;
+    }
+    .intake-status {
+      color: #d4af37;
+      font-size: 0.85rem;
+      min-height: 1.2em;
+      margin-top: 8px;
     }
 
     /* 4 Cards Grid Layout */
@@ -230,7 +241,7 @@
 
   <!-- Digital Coordinator Icon Intake Trigger -->
   <div class="intake-container">
-    <div class="coordinator-icon" id="coordinatorIcon">🎙️</div>
+    <button type="button" class="coordinator-icon" id="coordinatorIcon" aria-label="Tap to speak">🎙️</button>
     <div class="intake-label">TAP TO SPEAK</div>
     
     <form class="intake-form" id="intakeForm">
@@ -246,6 +257,7 @@
         <button type="button" class="intake-button cancel" id="cancelButton">Cancel</button>
       </div>
     </form>
+    <div class="intake-status" id="intakeStatus" role="status" aria-live="polite"></div>
   </div>
 
   <!-- 4 Cards Side-by-Side Grid -->
@@ -283,11 +295,116 @@
     const intakeForm = document.getElementById('intakeForm');
     const intakeInput = document.getElementById('intakeInput');
     const cancelButton = document.getElementById('cancelButton');
+    const intakeStatus = document.getElementById('intakeStatus');
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let isListening = false;
+    let receivedTranscript = false;
+    let recognitionStopReason = 'idle';
+    let speechSessionActive = false;
+
+    function setIntakeStatus(message) {
+      intakeStatus.textContent = message || '';
+    }
+
+    function setListeningState(listening) {
+      isListening = listening;
+      coordinatorIcon.setAttribute('title', listening ? 'Listening...' : 'Tap to speak');
+      coordinatorIcon.setAttribute('aria-label', listening ? 'Listening for your request' : 'Tap to speak');
+    }
+
+    setListeningState(false);
+    if (!SpeechRecognition) {
+      coordinatorIcon.setAttribute('title', 'Voice input unavailable. Tap to type your request.');
+      coordinatorIcon.setAttribute('aria-label', 'Voice input unavailable. Tap to type your request.');
+    }
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.addEventListener('result', function(event) {
+        if (!speechSessionActive || !intakeForm.classList.contains('active')) {
+          return;
+        }
+        const transcript = event.results?.[0]?.[0]?.transcript?.trim();
+        if (!transcript) return;
+        receivedTranscript = true;
+        recognitionStopReason = 'result';
+        speechSessionActive = false;
+        setIntakeStatus('');
+        const existingText = intakeInput.value.trim();
+        intakeInput.value = existingText ? `${existingText} ${transcript}` : transcript;
+        if (typeof intakeForm.requestSubmit === 'function') {
+          intakeForm.requestSubmit();
+        } else {
+          const submitButton = intakeForm.querySelector('button[type="submit"]');
+          if (submitButton) {
+            submitButton.click();
+          }
+        }
+      });
+
+      recognition.addEventListener('error', function(event) {
+        setListeningState(false);
+        recognitionStopReason = 'error';
+        speechSessionActive = false;
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          setIntakeStatus('Microphone access was denied. Please type your request and submit.');
+        } else {
+          setIntakeStatus('Voice input failed. Please type your request and submit, or tap to try again.');
+        }
+      });
+
+      recognition.addEventListener('end', function() {
+        setListeningState(false);
+        speechSessionActive = false;
+        if (recognitionStopReason === 'error') {
+          recognitionStopReason = 'idle';
+          return;
+        }
+        if (recognitionStopReason === 'listening' && !receivedTranscript) {
+          setIntakeStatus('Please type your request and submit, or tap to try voice again.');
+        } else if (recognitionStopReason === 'cancelled') {
+          setIntakeStatus('');
+        }
+        recognitionStopReason = 'idle';
+      });
+    }
 
     // 2. Icon Click Handler - Show Form
     coordinatorIcon.addEventListener('click', function() {
+      if (!recognition) {
+        intakeForm.classList.add('active');
+        setIntakeStatus('Voice input is unavailable in this browser. Please type your request and submit.');
+        return;
+      }
       intakeForm.classList.add('active');
-      intakeInput.focus();
+      if (isListening) {
+        recognitionStopReason = 'cancelled';
+        speechSessionActive = false;
+        setIntakeStatus('');
+        recognition.stop();
+        return;
+      }
+      try {
+        receivedTranscript = false;
+        recognitionStopReason = 'listening';
+        speechSessionActive = true;
+        recognition.start();
+        setListeningState(true);
+        setIntakeStatus('Listening...');
+        intakeInput.focus();
+      } catch (error) {
+        recognitionStopReason = 'error';
+        speechSessionActive = false;
+        setIntakeStatus('Unable to start voice input. Please type your request and submit.');
+        setListeningState(false);
+        intakeInput.focus();
+      }
     });
 
     // 3. Form Submission Handler - POST to Netlify serverless function
@@ -322,6 +439,12 @@
 
     // 4. Cancel Button Handler
     cancelButton.addEventListener('click', function() {
+      speechSessionActive = false;
+      if (isListening && recognition) {
+        recognitionStopReason = 'cancelled';
+        recognition.stop();
+      }
+      setIntakeStatus('');
       intakeInput.value = '';
       intakeForm.classList.remove('active');
     });
