@@ -286,6 +286,8 @@
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let speechRecognition = null;
     let isListening = false;
+    let speechAttemptInProgress = false;
+    let hasTranscriptResult = false;
     function showVoiceFallbackMessage() {
       alert('Voice input is unavailable right now. Please type your request and submit.');
     }
@@ -299,6 +301,7 @@
       speechRecognition.addEventListener('result', function(event) {
         const transcript = event.results[0] && event.results[0][0] ? event.results[0][0].transcript.trim() : '';
         if (transcript) {
+          hasTranscriptResult = true;
           intakeInput.value = transcript;
           if (typeof intakeForm.requestSubmit === 'function') {
             intakeForm.requestSubmit();
@@ -313,10 +316,16 @@
         isListening = false;
         console.log('Speech recognition error:', errorEvent.error);
         if (errorEvent.error === 'aborted' || errorEvent.error === 'no-speech') return;
+        speechAttemptInProgress = false;
         showVoiceFallbackMessage();
       });
 
       speechRecognition.addEventListener('end', function() {
+        if (speechAttemptInProgress && !hasTranscriptResult) {
+          showVoiceFallbackMessage();
+        }
+        speechAttemptInProgress = false;
+        hasTranscriptResult = false;
         isListening = false;
       });
     }
@@ -326,13 +335,22 @@
       intakeForm.classList.add('active');
       intakeInput.focus();
 
-      if (speechRecognition && !isListening) {
+      if (speechRecognition) {
         if (window.confirm('Start voice intake now?')) {
           try {
+            if (isListening) {
+              speechAttemptInProgress = false;
+              hasTranscriptResult = false;
+              speechRecognition.abort();
+              isListening = false;
+            }
+            hasTranscriptResult = false;
+            speechAttemptInProgress = true;
             isListening = true;
             speechRecognition.start();
           } catch (error) {
             isListening = false;
+            speechAttemptInProgress = false;
             console.log('Speech recognition start error:', error);
             showVoiceFallbackMessage();
           }
