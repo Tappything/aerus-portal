@@ -361,6 +361,7 @@
 
       recognition.addEventListener('end', function() {
         setListeningState(false);
+        speechSessionActive = false;
         if (recognitionStopReason === 'error') {
           recognitionStopReason = 'idle';
           return;
