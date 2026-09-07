@@ -283,11 +283,50 @@
     const intakeForm = document.getElementById('intakeForm');
     const intakeInput = document.getElementById('intakeInput');
     const cancelButton = document.getElementById('cancelButton');
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let speechRecognition = null;
+    let isListening = false;
+
+    if (SpeechRecognition) {
+      speechRecognition = new SpeechRecognition();
+      speechRecognition.lang = 'en-US';
+      speechRecognition.interimResults = false;
+      speechRecognition.maxAlternatives = 1;
+
+      speechRecognition.addEventListener('result', function(event) {
+        const transcript = event.results[0] && event.results[0][0] ? event.results[0][0].transcript.trim() : '';
+        if (transcript) {
+          intakeInput.value = transcript;
+          if (typeof intakeForm.requestSubmit === 'function') {
+            intakeForm.requestSubmit();
+          } else {
+            intakeForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+          }
+        }
+      });
+
+      speechRecognition.addEventListener('error', function(errorEvent) {
+        console.log('Speech recognition error:', errorEvent.error);
+      });
+
+      speechRecognition.addEventListener('end', function() {
+        isListening = false;
+      });
+    }
 
     // 2. Icon Click Handler - Show Form
     coordinatorIcon.addEventListener('click', function() {
       intakeForm.classList.add('active');
       intakeInput.focus();
+
+      if (!speechRecognition || isListening) return;
+      try {
+        isListening = true;
+        speechRecognition.start();
+      } catch (error) {
+        isListening = false;
+        console.log('Speech recognition start error:', error);
+      }
     });
 
     // 3. Form Submission Handler - POST to Netlify serverless function
