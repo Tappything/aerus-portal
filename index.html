@@ -290,7 +290,11 @@
     function setListeningState(listening) {
       isListening = listening;
       coordinatorIcon.setAttribute('title', listening ? 'Listening...' : 'Tap to speak');
+      coordinatorIcon.setAttribute('aria-label', listening ? 'Listening for your request' : 'Tap to speak');
+      coordinatorIcon.setAttribute('aria-pressed', listening ? 'true' : 'false');
     }
+
+    setListeningState(false);
 
     if (SpeechRecognition) {
       recognition = new SpeechRecognition();
@@ -314,6 +318,7 @@
       });
 
       recognition.addEventListener('error', function(event) {
+        setListeningState(false);
         if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
           alert('Microphone access was denied. Please type your request and submit.');
         }
