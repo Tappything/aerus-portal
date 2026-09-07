@@ -315,7 +315,10 @@
       speechRecognition.addEventListener('error', function(errorEvent) {
         isListening = false;
         console.log('Speech recognition error:', errorEvent.error);
-        if (errorEvent.error === 'aborted' || errorEvent.error === 'no-speech') return;
+        if (errorEvent.error === 'aborted') {
+          speechAttemptInProgress = false;
+          return;
+        }
         speechAttemptInProgress = false;
         showVoiceFallbackMessage();
       });
@@ -335,26 +338,17 @@
       intakeForm.classList.add('active');
       intakeInput.focus();
 
-      if (speechRecognition) {
-        if (window.confirm('Start voice intake now?')) {
-          try {
-            if (isListening) {
-              speechAttemptInProgress = false;
-              hasTranscriptResult = false;
-              speechRecognition.abort();
-              isListening = false;
-            }
-            hasTranscriptResult = false;
-            speechAttemptInProgress = true;
-            isListening = true;
-            speechRecognition.start();
-          } catch (error) {
-            isListening = false;
-            speechAttemptInProgress = false;
-            console.log('Speech recognition start error:', error);
-            showVoiceFallbackMessage();
-          }
-        }
+      if (!speechRecognition || isListening) return;
+      try {
+        hasTranscriptResult = false;
+        speechAttemptInProgress = true;
+        isListening = true;
+        speechRecognition.start();
+      } catch (error) {
+        isListening = false;
+        speechAttemptInProgress = false;
+        console.log('Speech recognition start error:', error);
+        showVoiceFallbackMessage();
       }
     });
 
