@@ -241,6 +241,7 @@
         placeholder="Speak or type your request for the Digital Coordinator..."
         autocomplete="off"
       />
+      <div id="speechStatus" aria-live="polite" style="min-height:16px;font-size:12px;color:#666;"></div>
       <div class="intake-button-group">
         <button type="submit" class="intake-button submit">Submit</button>
         <button type="button" class="intake-button cancel" id="cancelButton">Cancel</button>
@@ -283,14 +284,19 @@
     const intakeForm = document.getElementById('intakeForm');
     const intakeInput = document.getElementById('intakeInput');
     const cancelButton = document.getElementById('cancelButton');
+    const speechStatus = document.getElementById('speechStatus');
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let speechRecognition = null;
     let isListening = false;
     let speechAttemptInProgress = false;
     let transcriptReceived = false;
     let fallbackMessageShown = false;
+    let recognitionStarted = false;
+    function setSpeechStatus(message) {
+      speechStatus.textContent = message;
+    }
     function showVoiceFallbackMessage() {
-      alert('Voice input is unavailable right now. Please type your request and submit.');
+      setSpeechStatus('Voice input is unavailable right now. Please type your request and submit.');
     }
 
     if (SpeechRecognition) {
@@ -298,11 +304,15 @@
       speechRecognition.lang = 'en-US';
       speechRecognition.interimResults = false;
       speechRecognition.maxAlternatives = 1;
+      speechRecognition.addEventListener('start', function() {
+        recognitionStarted = true;
+      });
 
       speechRecognition.addEventListener('result', function(event) {
         const transcript = event.results[0] && event.results[0][0] ? event.results[0][0].transcript.trim() : '';
         if (transcript) {
           transcriptReceived = true;
+          setSpeechStatus('');
           intakeInput.value = transcript;
           if (typeof intakeForm.requestSubmit === 'function') {
             intakeForm.requestSubmit();
@@ -327,12 +337,13 @@
       });
 
       speechRecognition.addEventListener('end', function() {
-        if (speechAttemptInProgress && !transcriptReceived && !fallbackMessageShown) {
+        if (speechAttemptInProgress && recognitionStarted && !transcriptReceived && !fallbackMessageShown) {
           showVoiceFallbackMessage();
         }
         speechAttemptInProgress = false;
         transcriptReceived = false;
         fallbackMessageShown = false;
+        recognitionStarted = false;
         isListening = false;
       });
     }
@@ -351,6 +362,8 @@
         speechAttemptInProgress = true;
         transcriptReceived = false;
         fallbackMessageShown = false;
+        recognitionStarted = false;
+        setSpeechStatus('');
         isListening = true;
         speechRecognition.start();
       } catch (error) {
@@ -366,6 +379,7 @@
       e.preventDefault();
       const userMessage = intakeInput.value.trim();
       if (userMessage) {
+        setSpeechStatus('');
         try {
           fetch('/.netlify/functions/intake', {
             method: 'POST',
@@ -394,6 +408,7 @@
     // 4. Cancel Button Handler
     cancelButton.addEventListener('click', function() {
       intakeInput.value = '';
+      setSpeechStatus('');
       intakeForm.classList.remove('active');
     });
 
