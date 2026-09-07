@@ -286,6 +286,9 @@
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let speechRecognition = null;
     let isListening = false;
+    function showVoiceFallbackMessage() {
+      alert('Voice input is unavailable right now. Please type your request and submit.');
+    }
 
     if (SpeechRecognition) {
       speechRecognition = new SpeechRecognition();
@@ -309,7 +312,8 @@
       speechRecognition.addEventListener('error', function(errorEvent) {
         isListening = false;
         console.log('Speech recognition error:', errorEvent.error);
-        alert('Voice input is unavailable right now. Please type your request and submit.');
+        if (errorEvent.error === 'aborted' || errorEvent.error === 'no-speech') return;
+        showVoiceFallbackMessage();
       });
 
       speechRecognition.addEventListener('end', function() {
@@ -330,6 +334,7 @@
           } catch (error) {
             isListening = false;
             console.log('Speech recognition start error:', error);
+            showVoiceFallbackMessage();
           }
         }
       }
