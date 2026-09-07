@@ -290,19 +290,21 @@
       intakeInput.focus();
     });
 
-    // 3. Form Submission Handler - POST directly to Make.com with no-cors
+    // 3. Form Submission Handler - POST to Netlify serverless function
     intakeForm.addEventListener('submit', function(e) {
       e.preventDefault();
       const userMessage = intakeInput.value.trim();
       if (userMessage) {
         try {
-          fetch('https://hook.us2.make.com/fyt2tlyenhdx3igqo42wqh1ypr569pej', {
+          fetch('/.netlify/functions/intake', {
             method: 'POST',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify({ body: userMessage }),
-            mode: 'no-cors'
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              body: userMessage
+            })
           })
-          .then(() => {
+          .then(response => response.json())
+          .then(data => {
             intakeInput.value = '';
             intakeForm.classList.remove('active');
             alert('On it! Your tap is my command!');
