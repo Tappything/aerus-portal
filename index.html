@@ -241,7 +241,7 @@
         placeholder="Speak or type your request for the Digital Coordinator..."
         autocomplete="off"
       />
-      <div id="speechStatus" role="status" aria-live="polite" style="min-height:16px;font-size:12px;color:#666;"></div>
+      <div id="speechStatus" role="status" aria-live="polite" style="min-height:16px;font-size:12px;color:#333;"></div>
       <div class="intake-button-group">
         <button type="submit" class="intake-button submit">Submit</button>
         <button type="button" class="intake-button cancel" id="cancelButton">Cancel</button>
@@ -293,8 +293,8 @@
     function setSpeechStatus(message) {
       speechStatus.textContent = message;
     }
-    function showVoiceFallbackMessage() {
-      setSpeechStatus('Voice input is unavailable right now. Please type your request and submit.');
+    function showVoiceFallbackMessage(message) {
+      setSpeechStatus(message || 'Voice input is unavailable right now. Please type your request and submit.');
     }
 
     if (SpeechRecognition) {
@@ -329,7 +329,11 @@
           return;
         }
         if (!fallbackMessageShown) {
-          showVoiceFallbackMessage();
+          if (errorEvent.error === 'not-allowed' || errorEvent.error === 'service-not-allowed') {
+            showVoiceFallbackMessage('Microphone access was blocked. Please type your request and submit.');
+          } else {
+            showVoiceFallbackMessage();
+          }
           fallbackMessageShown = true;
         }
         receivedResultForCurrentAttempt = true;
