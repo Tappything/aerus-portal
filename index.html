@@ -124,6 +124,12 @@
       background-color: rgba(212, 175, 55, 0.1);
       border-color: #ffffff;
     }
+    .intake-status {
+      color: #d4af37;
+      font-size: 0.85rem;
+      min-height: 1.2em;
+      margin-top: 8px;
+    }
 
     /* 4 Cards Grid Layout */
     .card-grid {
@@ -246,6 +252,7 @@
         <button type="button" class="intake-button cancel" id="cancelButton">Cancel</button>
       </div>
     </form>
+    <div class="intake-status" id="intakeStatus" role="status" aria-live="polite"></div>
   </div>
 
   <!-- 4 Cards Side-by-Side Grid -->
@@ -283,9 +290,14 @@
     const intakeForm = document.getElementById('intakeForm');
     const intakeInput = document.getElementById('intakeInput');
     const cancelButton = document.getElementById('cancelButton');
+    const intakeStatus = document.getElementById('intakeStatus');
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
     let isListening = false;
+
+    function setIntakeStatus(message) {
+      intakeStatus.textContent = message || '';
+    }
 
     function setListeningState(listening) {
       isListening = listening;
@@ -306,6 +318,7 @@
       recognition.addEventListener('result', function(event) {
         const transcript = event.results?.[0]?.[0]?.transcript?.trim();
         if (!transcript) return;
+        setIntakeStatus('');
         intakeInput.value = transcript;
         if (typeof intakeForm.requestSubmit === 'function') {
           intakeForm.requestSubmit();
@@ -320,7 +333,7 @@
       recognition.addEventListener('error', function(event) {
         setListeningState(false);
         if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-          alert('Microphone access was denied. Please type your request and submit.');
+          setIntakeStatus('Microphone access was denied. Please type your request and submit.');
         }
       });
 
@@ -333,15 +346,20 @@
     coordinatorIcon.addEventListener('click', function() {
       intakeForm.classList.add('active');
       intakeInput.focus();
-      if (!recognition) return;
+      if (!recognition) {
+        setIntakeStatus('Voice input is unavailable in this browser. Please type your request and submit.');
+        return;
+      }
       if (isListening) {
         recognition.stop();
         return;
       }
       try {
+        setIntakeStatus('Listening...');
         setListeningState(true);
         recognition.start();
       } catch (error) {
+        setIntakeStatus('Unable to start voice input. Please type your request and submit.');
         setListeningState(false);
       }
     });
@@ -381,6 +399,7 @@
       if (isListening && recognition) {
         recognition.stop();
       }
+      setIntakeStatus('');
       intakeInput.value = '';
       intakeForm.classList.remove('active');
     });
