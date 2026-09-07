@@ -301,6 +301,7 @@
     let isListening = false;
     let receivedTranscript = false;
     let recognitionStopReason = 'idle';
+    let speechSessionActive = false;
 
     function setIntakeStatus(message) {
       intakeStatus.textContent = message || '';
@@ -326,10 +327,14 @@
       recognition.maxAlternatives = 1;
 
       recognition.addEventListener('result', function(event) {
+        if (!speechSessionActive || !intakeForm.classList.contains('active')) {
+          return;
+        }
         const transcript = event.results?.[0]?.[0]?.transcript?.trim();
         if (!transcript) return;
         receivedTranscript = true;
         recognitionStopReason = 'result';
+        speechSessionActive = false;
         setIntakeStatus('');
         const existingText = intakeInput.value.trim();
         intakeInput.value = existingText ? `${existingText} ${transcript}` : transcript;
@@ -346,6 +351,7 @@
       recognition.addEventListener('error', function(event) {
         setListeningState(false);
         recognitionStopReason = 'error';
+        speechSessionActive = false;
         if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
           setIntakeStatus('Microphone access was denied. Please type your request and submit.');
         } else {
@@ -376,9 +382,9 @@
         return;
       }
       intakeForm.classList.add('active');
-      intakeInput.focus();
       if (isListening) {
         recognitionStopReason = 'cancelled';
+        speechSessionActive = false;
         setIntakeStatus('');
         recognition.stop();
         return;
@@ -386,13 +392,17 @@
       try {
         receivedTranscript = false;
         recognitionStopReason = 'listening';
+        speechSessionActive = true;
         recognition.start();
         setListeningState(true);
         setIntakeStatus('Listening...');
+        intakeInput.focus();
       } catch (error) {
         recognitionStopReason = 'error';
+        speechSessionActive = false;
         setIntakeStatus('Unable to start voice input. Please type your request and submit.');
         setListeningState(false);
+        intakeInput.focus();
       }
     });
 
@@ -428,6 +438,7 @@
 
     // 4. Cancel Button Handler
     cancelButton.addEventListener('click', function() {
+      speechSessionActive = false;
       if (isListening && recognition) {
         recognitionStopReason = 'cancelled';
         recognition.stop();
