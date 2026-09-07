@@ -236,7 +236,7 @@
 
   <!-- Digital Coordinator Icon Intake Trigger -->
   <div class="intake-container">
-    <div class="coordinator-icon" id="coordinatorIcon">🎙️</div>
+    <div class="coordinator-icon" id="coordinatorIcon" role="button" tabindex="0">🎙️</div>
     <div class="intake-label">TAP TO SPEAK</div>
     
     <form class="intake-form" id="intakeForm">
@@ -294,6 +294,7 @@
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
     let isListening = false;
+    let receivedTranscript = false;
 
     function setIntakeStatus(message) {
       intakeStatus.textContent = message || '';
@@ -318,6 +319,7 @@
       recognition.addEventListener('result', function(event) {
         const transcript = event.results?.[0]?.[0]?.transcript?.trim();
         if (!transcript) return;
+        receivedTranscript = true;
         setIntakeStatus('');
         intakeInput.value = transcript;
         if (typeof intakeForm.requestSubmit === 'function') {
@@ -334,13 +336,25 @@
         setListeningState(false);
         if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
           setIntakeStatus('Microphone access was denied. Please type your request and submit.');
+        } else {
+          setIntakeStatus('Voice input failed. Please type your request and submit, or tap to try again.');
         }
       });
 
       recognition.addEventListener('end', function() {
         setListeningState(false);
+        if (!receivedTranscript && intakeStatus.textContent === 'Listening...') {
+          setIntakeStatus('Please type your request and submit, or tap to try voice again.');
+        }
       });
     }
+
+    coordinatorIcon.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        coordinatorIcon.click();
+      }
+    });
 
     // 2. Icon Click Handler - Show Form
     coordinatorIcon.addEventListener('click', function() {
@@ -355,6 +369,7 @@
         return;
       }
       try {
+        receivedTranscript = false;
         setIntakeStatus('Listening...');
         setListeningState(true);
         recognition.start();
