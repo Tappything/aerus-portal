@@ -331,7 +331,8 @@
         receivedTranscript = true;
         recognitionStopReason = 'result';
         setIntakeStatus('');
-        intakeInput.value = transcript;
+        const existingText = intakeInput.value.trim();
+        intakeInput.value = existingText ? `${existingText} ${transcript}` : transcript;
         if (typeof intakeForm.requestSubmit === 'function') {
           intakeForm.requestSubmit();
         } else {
@@ -354,6 +355,10 @@
 
       recognition.addEventListener('end', function() {
         setListeningState(false);
+        if (recognitionStopReason === 'error') {
+          recognitionStopReason = 'idle';
+          return;
+        }
         if (recognitionStopReason === 'listening' && !receivedTranscript) {
           setIntakeStatus('Please type your request and submit, or tap to try voice again.');
         } else if (recognitionStopReason === 'cancelled') {
@@ -365,12 +370,13 @@
 
     // 2. Icon Click Handler - Show Form
     coordinatorIcon.addEventListener('click', function() {
-      intakeForm.classList.add('active');
-      intakeInput.focus();
       if (!recognition) {
+        intakeForm.classList.add('active');
         setIntakeStatus('Voice input is unavailable in this browser. Please type your request and submit.');
         return;
       }
+      intakeForm.classList.add('active');
+      intakeInput.focus();
       if (isListening) {
         recognitionStopReason = 'cancelled';
         setIntakeStatus('');
