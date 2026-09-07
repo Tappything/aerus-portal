@@ -287,7 +287,6 @@
     let speechRecognition = null;
     let isListening = false;
     let speechAttemptInProgress = false;
-    let hasTranscriptResult = false;
     function showVoiceFallbackMessage() {
       alert('Voice input is unavailable right now. Please type your request and submit.');
     }
@@ -301,7 +300,6 @@
       speechRecognition.addEventListener('result', function(event) {
         const transcript = event.results[0] && event.results[0][0] ? event.results[0][0].transcript.trim() : '';
         if (transcript) {
-          hasTranscriptResult = true;
           intakeInput.value = transcript;
           if (typeof intakeForm.requestSubmit === 'function') {
             intakeForm.requestSubmit();
@@ -325,7 +323,6 @@
 
       speechRecognition.addEventListener('end', function() {
         speechAttemptInProgress = false;
-        hasTranscriptResult = false;
         isListening = false;
       });
     }
@@ -341,7 +338,6 @@
       }
       if (isListening) return;
       try {
-        hasTranscriptResult = false;
         speechAttemptInProgress = true;
         isListening = true;
         speechRecognition.start();
