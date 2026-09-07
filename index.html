@@ -324,9 +324,6 @@
       });
 
       speechRecognition.addEventListener('end', function() {
-        if (speechAttemptInProgress && !hasTranscriptResult) {
-          showVoiceFallbackMessage();
-        }
         speechAttemptInProgress = false;
         hasTranscriptResult = false;
         isListening = false;
@@ -338,7 +335,11 @@
       intakeForm.classList.add('active');
       intakeInput.focus();
 
-      if (!speechRecognition || isListening) return;
+      if (!speechRecognition) {
+        showVoiceFallbackMessage();
+        return;
+      }
+      if (isListening) return;
       try {
         hasTranscriptResult = false;
         speechAttemptInProgress = true;
