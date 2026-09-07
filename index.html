@@ -295,6 +295,7 @@
     let recognition = null;
     let isListening = false;
     let receivedTranscript = false;
+    let shouldShowEndHint = false;
 
     function setIntakeStatus(message) {
       intakeStatus.textContent = message || '';
@@ -304,7 +305,6 @@
       isListening = listening;
       coordinatorIcon.setAttribute('title', listening ? 'Listening...' : 'Tap to speak');
       coordinatorIcon.setAttribute('aria-label', listening ? 'Listening for your request' : 'Tap to speak');
-      coordinatorIcon.setAttribute('aria-pressed', listening ? 'true' : 'false');
     }
 
     setListeningState(false);
@@ -320,6 +320,7 @@
         const transcript = event.results?.[0]?.[0]?.transcript?.trim();
         if (!transcript) return;
         receivedTranscript = true;
+        shouldShowEndHint = false;
         setIntakeStatus('');
         intakeInput.value = transcript;
         if (typeof intakeForm.requestSubmit === 'function') {
@@ -334,6 +335,7 @@
 
       recognition.addEventListener('error', function(event) {
         setListeningState(false);
+        shouldShowEndHint = false;
         if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
           setIntakeStatus('Microphone access was denied. Please type your request and submit.');
         } else {
@@ -343,7 +345,7 @@
 
       recognition.addEventListener('end', function() {
         setListeningState(false);
-        if (!receivedTranscript && intakeStatus.textContent === 'Listening...') {
+        if (shouldShowEndHint && !receivedTranscript && intakeStatus.textContent === 'Listening...') {
           setIntakeStatus('Please type your request and submit, or tap to try voice again.');
         }
       });
@@ -365,15 +367,18 @@
         return;
       }
       if (isListening) {
+        shouldShowEndHint = false;
         recognition.stop();
         return;
       }
       try {
         receivedTranscript = false;
+        shouldShowEndHint = true;
         setIntakeStatus('Listening...');
         setListeningState(true);
         recognition.start();
       } catch (error) {
+        shouldShowEndHint = false;
         setIntakeStatus('Unable to start voice input. Please type your request and submit.');
         setListeningState(false);
       }
@@ -412,6 +417,7 @@
     // 4. Cancel Button Handler
     cancelButton.addEventListener('click', function() {
       if (isListening && recognition) {
+        shouldShowEndHint = false;
         recognition.stop();
       }
       setIntakeStatus('');
