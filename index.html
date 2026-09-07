@@ -354,6 +354,9 @@
 
       recognition.addEventListener('end', function() {
         setListeningState(false);
+        if (receivedTranscript) {
+          return;
+        }
         if (intakeStatus.textContent === 'Listening...') {
           if (shouldShowEndHint && !receivedTranscript) {
             setIntakeStatus('Please type your request and submit, or tap to try voice again.');
