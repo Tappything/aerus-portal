@@ -286,7 +286,6 @@
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let speechRecognition = null;
     let isListening = false;
-    let hasSpeechConsent = false;
 
     if (SpeechRecognition) {
       speechRecognition = new SpeechRecognition();
@@ -326,10 +325,7 @@
       intakeInput.focus();
 
       if (speechRecognition && !isListening) {
-        if (!hasSpeechConsent) {
-          hasSpeechConsent = window.confirm('Start voice intake now?');
-          if (!hasSpeechConsent) return;
-        }
+        if (!window.confirm('Start voice intake now?')) return;
         try {
           isListening = true;
           speechRecognition.start();
