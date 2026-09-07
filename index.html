@@ -300,12 +300,14 @@
           if (typeof intakeForm.requestSubmit === 'function') {
             intakeForm.requestSubmit();
           } else {
-            intakeForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+            const submitButton = intakeForm.querySelector('button[type="submit"]');
+            if (submitButton) submitButton.click();
           }
         }
       });
 
       speechRecognition.addEventListener('error', function(errorEvent) {
+        isListening = false;
         console.log('Speech recognition error:', errorEvent.error);
       });
 
