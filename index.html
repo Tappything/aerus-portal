@@ -241,7 +241,7 @@
         placeholder="Speak or type your request for the Digital Coordinator..."
         autocomplete="off"
       />
-      <div id="speechStatus" aria-live="polite" style="min-height:16px;font-size:12px;color:#666;"></div>
+      <div id="speechStatus" aria-live="polite" tabindex="-1" style="min-height:16px;font-size:12px;color:#666;"></div>
       <div class="intake-button-group">
         <button type="submit" class="intake-button submit">Submit</button>
         <button type="button" class="intake-button cancel" id="cancelButton">Cancel</button>
@@ -297,6 +297,7 @@
     }
     function showVoiceFallbackMessage() {
       setSpeechStatus('Voice input is unavailable right now. Please type your request and submit.');
+      speechStatus.focus();
     }
 
     if (SpeechRecognition) {
@@ -406,6 +407,17 @@
 
     // 4. Cancel Button Handler
     cancelButton.addEventListener('click', function() {
+      if (speechRecognition && isListening) {
+        speechAttemptInProgress = false;
+        transcriptReceived = false;
+        recognitionStarted = false;
+        isListening = false;
+        try {
+          speechRecognition.abort();
+        } catch (error) {
+          console.log('Speech recognition abort error:', error);
+        }
+      }
       intakeInput.value = '';
       setSpeechStatus('');
       intakeForm.classList.remove('active');
