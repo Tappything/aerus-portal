@@ -269,6 +269,15 @@
     </form>
   </div>
 
+  <!-- Fresh Response Area -->
+  <div class="response-container" id="responseContainer" style="display:none;">
+    <div class="response-bubble" id="responseBubble"></div>
+    <div class="response-controls">
+      <button type="button" id="muteToggle" class="mute-button">🔊 Mute</button>
+    </div>
+    <audio id="responseAudio" autoplay></audio>
+  </div>
+
   <!-- 4 Cards Side-by-Side Grid -->
   <div class="card-grid">
     
@@ -376,8 +385,20 @@
           .then(response => response.json())
           .then(data => {
             setMicStatus('');
-            showSuccessPopup('On it! Your tap is my command!');
             intakeForm.classList.remove('active');
+            if (data.reply) {
+              const container = document.getElementById('responseContainer');
+              const bubble = document.getElementById('responseBubble');
+              const audio = document.getElementById('responseAudio');
+              bubble.textContent = data.reply;
+              container.style.display = 'block';
+              if (!window.muteActive && data.audioUrl) {
+                audio.src = data.audioUrl;
+                audio.play();
+              }
+            } else {
+              showSuccessPopup('On it! Your tap is my command!');
+            }
           })
           .catch(error => {
             console.log('Fetch error:', error);
@@ -390,6 +411,13 @@
           alert('Submission error. Please try again.');
         }
       }
+    });
+
+    document.getElementById('muteToggle').addEventListener('click', function() {
+      window.muteActive = !window.muteActive;
+      this.textContent = window.muteActive ? '🔇 Unmute' : '🔊 Mute';
+      const audio = document.getElementById('responseAudio');
+      if (window.muteActive) audio.pause();
     });
 
     cancelButton.addEventListener('click', function() {
