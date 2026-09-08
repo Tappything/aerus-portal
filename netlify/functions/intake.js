@@ -26,15 +26,17 @@ exports.handler = async (event) => {
     try {
       const makeBody = JSON.stringify({ body: userMessage });
       console.log('Posting to Make.com for Monday item creation:', makeBody);
-      fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: makeBody
-      }).catch(error => {
-        console.error('Non-blocking Make.com request failed:', error);
-      });
+      if (typeof fetch === 'function') {
+        void fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: makeBody
+        }).catch(error => {
+          console.error('Non-blocking Make.com request failed:', error);
+        });
+      } else {
+        console.error('Global fetch is not available in this runtime');
+      }
     } catch (makeError) {
       console.error('Error preparing Make.com request:', makeError);
     }
@@ -51,7 +53,7 @@ exports.handler = async (event) => {
       };
     }
 
-    const prompt = `You are Fresh, a warm and professional digital coordinator. You help small business owners stay organized by logging their notes, tasks, and customer information. Keep every response to 1-2 sentences maximum. Be friendly, confident, and always confirm what you just noted. User message: ${userMessage}`;
+    const prompt = `You are Fresh, a warm and professional digital coordinator. You help small business owners stay organized by logging their notes, tasks, and customer information. Keep every response under 90 words. Confirm receipt clearly, and when possible suggest one practical next step. User message: ${userMessage}`;
 
     try {
       const geminiResponse = await fetch(
@@ -73,9 +75,15 @@ exports.handler = async (event) => {
       );
 
       if (!geminiResponse.ok) {
-        const errorText = await geminiResponse.text();
-        console.error('Gemini API error:', errorText);
-        throw new Error(`Gemini API request failed: ${errorText}`);
+        const errorText = await geminiResponse.text().catch(() => '');
+        console.error('Gemini API error:', geminiResponse.status, errorText);
+        const reply = 'Fresh here, I got your message!';
+        console.log('Returning from intake.js:', JSON.stringify({ reply }));
+        return {
+          statusCode: 200,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reply })
+        };
       }
 
       const geminiData = await geminiResponse.json();
