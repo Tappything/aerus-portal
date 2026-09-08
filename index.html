@@ -69,6 +69,13 @@
       margin-top: 8px;
       margin-bottom: 4px;
     }
+    .assistant-response {
+      min-height: 1.5em;
+      color: #ffffff;
+      font-size: 0.95rem;
+      margin-top: 6px;
+      white-space: pre-wrap;
+    }
     .success-popup {
       position: fixed;
       top: 20px;
@@ -253,6 +260,7 @@
     <div class="coordinator-icon" id="coordinatorIcon">🎙️</div>
     <div class="intake-label">TAP TO SPEAK</div>
     <div class="mic-status" id="micStatus"></div>
+    <div class="assistant-response" id="assistantResponse"></div>
     
     <form class="intake-form" id="intakeForm">
       <input 
@@ -267,15 +275,6 @@
         <button type="button" class="intake-button cancel" id="cancelButton">Cancel</button>
       </div>
     </form>
-  </div>
-
-  <!-- Fresh Response Area -->
-  <div class="response-container" id="responseContainer" style="display:none;">
-    <div class="response-bubble" id="responseBubble"></div>
-    <div class="response-controls">
-      <button type="button" id="muteToggle" class="mute-button">🔊 Mute</button>
-    </div>
-    <audio id="responseAudio" autoplay></audio>
   </div>
 
   <!-- 4 Cards Side-by-Side Grid -->
@@ -311,9 +310,18 @@
     const intakeInput = document.getElementById('intakeInput');
     const cancelButton = document.getElementById('cancelButton');
     const micStatus = document.getElementById('micStatus');
+    const assistantResponse = document.getElementById('assistantResponse');
 
     function setMicStatus(message) {
       micStatus.textContent = message || '';
+    }
+
+    function speakResponse(text) {
+      if (!window.speechSynthesis || !text) return;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
     }
 
     function showSuccessPopup(message) {
@@ -384,21 +392,12 @@
           })
           .then(response => response.json())
           .then(data => {
+            const reply = data?.reply || '';
             setMicStatus('');
+            assistantResponse.textContent = reply;
+            showSuccessPopup(reply || 'On it! Your tap is my command!');
+            if (reply) speakResponse(reply);
             intakeForm.classList.remove('active');
-            if (data.reply) {
-              const container = document.getElementById('responseContainer');
-              const bubble = document.getElementById('responseBubble');
-              const audio = document.getElementById('responseAudio');
-              bubble.textContent = data.reply;
-              container.style.display = 'block';
-              if (!window.muteActive && data.audioUrl) {
-                audio.src = data.audioUrl;
-                audio.play();
-              }
-            } else {
-              showSuccessPopup('On it! Your tap is my command!');
-            }
           })
           .catch(error => {
             console.log('Fetch error:', error);
@@ -411,13 +410,6 @@
           alert('Submission error. Please try again.');
         }
       }
-    });
-
-    document.getElementById('muteToggle').addEventListener('click', function() {
-      window.muteActive = !window.muteActive;
-      this.textContent = window.muteActive ? '🔇 Unmute' : '🔊 Mute';
-      const audio = document.getElementById('responseAudio');
-      if (window.muteActive) audio.pause();
     });
 
     cancelButton.addEventListener('click', function() {

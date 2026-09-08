@@ -24,12 +24,20 @@ exports.handler = async (event) => {
         body: makeBody
       });
 
-      const text = await response.text();
+      const contentType = response.headers.get('content-type') || '';
+      let reply = '';
+
+      if (contentType.includes('application/json')) {
+        const data = await response.json();
+        reply = data.reply || data.text || data.message || '';
+      } else {
+        reply = await response.text();
+      }
 
       return {
         statusCode: response.status,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ok: response.ok, response: text })
+        body: JSON.stringify({ reply })
       };
     } catch (fetchError) {
       console.error('Error calling Make.com:', fetchError);
