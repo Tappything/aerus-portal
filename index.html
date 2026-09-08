@@ -69,6 +69,19 @@
       margin-top: 8px;
       margin-bottom: 4px;
     }
+    .success-popup {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #242424;
+      color: #ffffff;
+      border: 1px solid #d4af37;
+      border-radius: 10px;
+      padding: 12px 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+      z-index: 9999;
+      max-width: 320px;
+    }
     
     /* Intake Form Styling */
     .intake-form {
@@ -294,6 +307,18 @@
       micStatus.textContent = message || '';
     }
 
+    function showSuccessPopup(message) {
+      const popup = document.createElement('div');
+      popup.className = 'success-popup';
+      popup.textContent = message;
+      document.body.appendChild(popup);
+
+      setTimeout(() => {
+        intakeInput.value = '';
+        popup.remove();
+      }, 2000);
+    }
+
     coordinatorIcon.addEventListener('click', function() {
       intakeForm.classList.add('active');
       intakeInput.focus();
@@ -348,10 +373,9 @@
           })
           .then(response => response.json())
           .then(data => {
-            intakeInput.value = '';
-            intakeForm.classList.remove('active');
             setMicStatus('');
-            alert('On it! Your tap is my command!');
+            showSuccessPopup('On it! Your tap is my command!');
+            intakeForm.classList.remove('active');
           })
           .catch(error => {
             console.log('Fetch error:', error);
