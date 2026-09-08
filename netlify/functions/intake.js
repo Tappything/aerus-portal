@@ -41,12 +41,13 @@ exports.handler = async (event) => {
 
     const geminiApiKey = process.env.GEMINI_API_KEY;
     if (!geminiApiKey) {
-      const error = 'Missing GEMINI_API_KEY environment variable';
-      console.error(error);
+      const reply = 'Fresh is online but missing API key';
+      console.error('Missing GEMINI_API_KEY environment variable');
+      console.log('Returning from intake.js:', JSON.stringify({ reply }));
       return {
-        statusCode: 500,
+        statusCode: 200,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error })
+        body: JSON.stringify({ reply })
       };
     }
 
