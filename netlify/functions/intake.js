@@ -41,7 +41,7 @@ exports.handler = async (event) => {
 
     const geminiApiKey = process.env.GEMINI_API_KEY;
     if (!geminiApiKey) {
-      const reply = 'Fresh here — I got your message!';
+      const reply = 'Fresh here, I got your message!';
       console.error('Missing GEMINI_API_KEY environment variable');
       console.log('Returning from intake.js:', JSON.stringify({ reply }));
       return {
@@ -79,7 +79,7 @@ exports.handler = async (event) => {
       }
 
       const geminiData = await geminiResponse.json();
-      const reply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || 'Fresh here — I got your message!';
+      const reply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || 'Fresh here, I got your message!';
 
       console.log('Returning from intake.js:', JSON.stringify({ reply }));
 
@@ -90,7 +90,7 @@ exports.handler = async (event) => {
       };
     } catch (geminiError) {
       console.error('Gemini API call failed, returning fallback reply:', geminiError);
-      const reply = 'Fresh here — I got your message!';
+      const reply = 'Fresh here, I got your message!';
       console.log('Returning from intake.js:', JSON.stringify({ reply }));
       return {
         statusCode: 200,
