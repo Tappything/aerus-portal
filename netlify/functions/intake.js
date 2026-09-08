@@ -41,7 +41,7 @@ exports.handler = async (event) => {
 
     const geminiApiKey = process.env.GEMINI_API_KEY;
     if (!geminiApiKey) {
-      const reply = 'Fresh is online but missing API key';
+      const reply = 'Fresh here — I got your message!';
       console.error('Missing GEMINI_API_KEY environment variable');
       console.log('Returning from intake.js:', JSON.stringify({ reply }));
       return {
@@ -53,44 +53,51 @@ exports.handler = async (event) => {
 
     const prompt = `You are Fresh, a warm and professional digital coordinator. You help small business owners stay organized by logging their notes, tasks, and customer information. Keep every response to 1-2 sentences maximum. Be friendly, confident, and always confirm what you just noted. User message: ${userMessage}`;
 
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: 'user',
-              parts: [{ text: prompt }]
-            }
-          ]
-        })
-      }
-    );
+    try {
+      const geminiResponse = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: 'user',
+                parts: [{ text: prompt }]
+              }
+            ]
+          })
+        }
+      );
 
-    if (!geminiResponse.ok) {
-      const errorText = await geminiResponse.text();
-      console.error('Gemini API error:', errorText);
+      if (!geminiResponse.ok) {
+        const errorText = await geminiResponse.text();
+        console.error('Gemini API error:', errorText);
+        throw new Error(`Gemini API request failed: ${errorText}`);
+      }
+
+      const geminiData = await geminiResponse.json();
+      const reply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || 'Fresh here — I got your message!';
+
+      console.log('Returning from intake.js:', JSON.stringify({ reply }));
+
       return {
-        statusCode: 502,
+        statusCode: 200,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Gemini API request failed', details: errorText })
+        body: JSON.stringify({ reply })
+      };
+    } catch (geminiError) {
+      console.error('Gemini API call failed, returning fallback reply:', geminiError);
+      const reply = 'Fresh here — I got your message!';
+      console.log('Returning from intake.js:', JSON.stringify({ reply }));
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reply })
       };
     }
-
-    const geminiData = await geminiResponse.json();
-    const reply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-    console.log('Returning from intake.js:', JSON.stringify({ reply }));
-
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reply })
-    };
   } catch (error) {
     console.error('Intake function error:', error);
     return {
