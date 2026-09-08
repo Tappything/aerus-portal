@@ -319,7 +319,7 @@
       }, 2000);
     }
 
-    coordinatorIcon.addEventListener('click', function() {
+    function startVoiceInput() {
       intakeForm.classList.add('active');
       intakeInput.focus();
 
@@ -359,7 +359,9 @@
         console.log('Speech recognition start error:', error);
         setMicStatus('Could not start microphone. Please type your request.');
       }
-    });
+    }
+
+    coordinatorIcon.addEventListener('click', startVoiceInput);
 
     intakeForm.addEventListener('submit', function(e) {
       e.preventDefault();
