@@ -9,6 +9,8 @@ exports.handler = async (event) => {
 
   try {
     const payload = event.body ? JSON.parse(event.body) : {};
+    console.log('Received payload:', JSON.stringify(payload));
+    console.log('Body field:', payload.body);
 
     const response = await fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei', {
       method: 'POST',
