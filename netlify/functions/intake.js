@@ -12,6 +12,7 @@ exports.handler = async (event) => {
     const userMessage = payload.body || '';
     console.log('Received payload:', JSON.stringify(payload));
     console.log('Body field:', userMessage);
+    console.log('API key present:', !!process.env.GEMINI_API_KEY);
 
     if (!userMessage.trim()) {
       return {
