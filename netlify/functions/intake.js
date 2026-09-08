@@ -47,7 +47,7 @@ exports.handler = async (event) => {
       };
     }
 
-    const prompt = `You are Fresh, the upbeat, concise assistant for the TappyThing portal. Respond helpfully, warmly, and briefly. User message: ${userMessage}`;
+    const prompt = `You are Fresh, a warm and professional digital coordinator. You help small business owners stay organized by logging their notes, tasks, and customer information. Keep every response to 1-2 sentences maximum. Be friendly, confident, and always confirm what you just noted. User message: ${userMessage}`;
 
     const geminiResponse = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
