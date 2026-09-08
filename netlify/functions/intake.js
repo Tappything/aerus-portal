@@ -9,37 +9,82 @@ exports.handler = async (event) => {
 
   try {
     const payload = event.body ? JSON.parse(event.body) : {};
+    const userMessage = payload.body || '';
     console.log('Received payload:', JSON.stringify(payload));
-    console.log('Body field:', payload.body);
+    console.log('Body field:', userMessage);
 
+    if (!userMessage.trim()) {
+      return {
+        statusCode: 400,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Missing user message' })
+      };
+    }
+
+    // Fire-and-forget Monday item creation via Make.com
     try {
-      const makeBody = JSON.stringify({ body: payload.body });
-      console.log('About to call Make.com with:', makeBody);
-
-      const response = await fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei', {
+      const makeBody = JSON.stringify({ body: userMessage });
+      console.log('Posting to Make.com for Monday item creation:', makeBody);
+      fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: makeBody
+      }).catch(error => {
+        console.error('Non-blocking Make.com request failed:', error);
       });
+    } catch (makeError) {
+      console.error('Error preparing Make.com request:', makeError);
+    }
 
-      const responseText = await response.text();
-      console.log('Make.com raw response:', responseText);
-
+    const geminiApiKey = process.env.GEMINI_API_KEY;
+    if (!geminiApiKey) {
       return {
-        statusCode: 200,
+        statusCode: 500,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reply: responseText })
+        body: JSON.stringify({ error: 'Missing GEMINI_API_KEY environment variable' })
       };
-    } catch (fetchError) {
-      console.error('Error calling Make.com:', fetchError);
+    }
+
+    const prompt = `You are Fresh, the upbeat, concise assistant for the TappyThing portal. Respond helpfully, warmly, and briefly. User message: ${userMessage}`;
+
+    const geminiResponse = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: 'user',
+              parts: [{ text: prompt }]
+            }
+          ]
+        })
+      }
+    );
+
+    if (!geminiResponse.ok) {
+      const errorText = await geminiResponse.text();
+      console.error('Gemini API error:', errorText);
       return {
         statusCode: 502,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Bad Gateway', message: fetchError.message })
+        body: JSON.stringify({ error: 'Gemini API request failed', details: errorText })
       };
     }
+
+    const geminiData = await geminiResponse.json();
+    const reply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reply })
+    };
   } catch (error) {
     console.error('Intake function error:', error);
     return {
