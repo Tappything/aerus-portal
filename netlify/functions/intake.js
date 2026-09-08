@@ -40,10 +40,12 @@ exports.handler = async (event) => {
 
     const geminiApiKey = process.env.GEMINI_API_KEY;
     if (!geminiApiKey) {
+      const error = 'Missing GEMINI_API_KEY environment variable';
+      console.error(error);
       return {
         statusCode: 500,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Missing GEMINI_API_KEY environment variable' })
+        body: JSON.stringify({ error })
       };
     }
 
@@ -79,6 +81,8 @@ exports.handler = async (event) => {
 
     const geminiData = await geminiResponse.json();
     const reply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    console.log('Returning from intake.js:', JSON.stringify({ reply }));
 
     return {
       statusCode: 200,
