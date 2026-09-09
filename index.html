@@ -1,36 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>TappyThing</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#2d0057;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:system-ui,sans-serif;color:white;}
-h1{font-size:2rem;font-weight:900;letter-spacing:0.1em;margin-bottom:40px;}
-.mic{width:160px;height:160px;border-radius:50%;background:#8b00ff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px #8b00ff88;}
-.mic svg{width:60px;height:60px;fill:white;}
-.label{margin-top:16px;font-size:1rem;letter-spacing:0.3em;font-weight:700;}
-.bubble{margin-top:24px;background:#5a0099;padding:16px 24px;border-radius:20px;max-width:320px;text-align:center;display:none;}
-.world{margin-top:32px;background:transparent;border:1px solid rgba(255,255,255,0.3);color:white;padding:10px 24px;border-radius:999px;cursor:pointer;font-size:0.9rem;}
-</style>
-</head>
-<body>
-<h1>TappyThing</h1>
-<button class="mic" id="micButton" aria-label="Tap to speak">
-<svg viewBox="0 0 24 24"><path d="M12 15.5a3.5 3.5 0 0 0 3.5-3.5V7a3.5 3.5 0 1 0-7 0v5a3.5 3.5 0 0 0 3.5 3.5Zm6-3.5a1 1 0 1 0-2 0 4 4 0 0 1-8 0 1 1 0 1 0-2 0 6 6 0 0 0 5 5.91V21H8.5a1 1 0 1 0 0 2h7a1 1 0 1 0 0-2H13v-3.09A6 6 0 0 0 18 12Z"/></svg>
-</button>
-<div class="label">TAP TO SPEAK</div>
-<div class="bubble" id="freshBubble"></div>
-<button class="world">🌎 My World</button>
+<!-- 📹 VIDEO INTAKE BUTTON -->
+<div style="text-align:center; margin: 30px auto;">
+  <p style="color:#c084fc; font-size:0.85rem; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:12px;">📹 Video Intake</p>
+  <button id="vidBtn" onclick="startVid()" style="width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#9333ea);border:3px solid #c084fc;color:white;font-size:2.5rem;cursor:pointer;display:block;margin:0 auto 10px;">📹</button>
+  <p style="color:#a78bfa;font-size:0.78rem;">Point at unit • Say customer name & issue • Tap stop</p>
+  <div id="vidPreview" style="display:none;max-width:360px;margin:16px auto 0;">
+    <video id="liveVid" autoplay muted playsinline style="width:100%;border-radius:12px;border:2px solid #7c3aed;"></video>
+    <div id="liveTxt" style="color:#c4b5fd;font-size:0.85rem;margin:8px 0;min-height:40px;">🎙️ Listening…</div>
+    <button onclick="stopVid()" style="width:100%;padding:12px;background:rgba(239,68,68,0.2);border:2px solid #ef4444;color:#fca5a5;border-radius:12px;font-size:0.9rem;cursor:pointer;">✅ Done — Send to Sissy</button>
+  </div>
+  <div id="vidStatus" style="color:#4ade80;font-size:0.85rem;margin-top:12px;"></div>
+</div>
+
 <script>
-const micButton=document.getElementById('micButton');
-const freshBubble=document.getElementById('freshBubble');
-const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-let recognition=null;
-if(SR){recognition=new SR();recognition.lang='en-US';recognition.continuous=false;recognition.interimResults=false;}
-micButton.addEventListener('click',()=>{if(recognition)recognition.start();});
-if(recognition){recognition.addEventListener('result',async(e)=>{const msg=e.results[0][0].transcript;const r=await fetch('/.netlify/functions/intake',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:msg})});const d=await r.json();const reply=d.reply||'';freshBubble.textContent=reply;freshBubble.style.display='block';if(reply&&window.speechSynthesis){const u=new SpeechSynthesisUtterance(reply);window.speechSynthesis.speak(u);}});}
+const WEBHOOK='https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei';
+let mr,chunks=[],str,rec,txt='',ti,sec=0;
+function startVid(){
+  txt='';sec=0;document.getElementById('vidStatus').textContent='';
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:true})
+  .catch(()=>navigator.mediaDevices.getUserMedia({video:true,audio:true}))
+  .then(s=>{
+    str=s;
+    document.getElementById('liveVid').srcObject=s;
+    document.getElementById('vidPreview').style.display='block';
+    document.getElementById('vidBtn').textContent='🔴';
+    chunks=[];
+    mr=new MediaRecorder(s);
+    mr.ondataavailable=e=>chunks.push(e.data);
+    mr.onstop=sendVid;
+    mr.start(500);
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(SR){rec=new SR();rec.continuous=true;rec.interimResults=true;
+      rec.onresult=e=>{txt=Array.from(e.results).map(r=>r[0].transcript).join(' ');
+      document.getElementById('liveTxt').textContent='🎙️ '+txt;}
+      rec.start();}
+    ti=setInterval(()=>{sec++;if(sec>=30)stopVid();},1000);
+  }).catch(()=>document.getElementById('vidStatus').textContent='❌ Camera blocked');
+}
+function stopVid(){
+  clearInterval(ti);
+  if(rec)try{rec.stop();}catch(e){}
+  if(mr&&mr.state==='recording')mr.stop();
+  if(str)str.getTracks().forEach(t=>t.stop());
+  document.getElementById('vidPreview').style.display='none';
+  document.getElementById('vidBtn').textContent='📹';
+}
+async function sendVid(){
+  document.getElementById('vidStatus').textContent='⏳ Sending to Sissy…';
+  const name=txt.match(/(?:for|it'?s|customer)\s+([A-Z][a-z]+ [A-Z][a-z]+)/i);
+  await fetch(WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({type:'video_intake',transcript:txt||'(none)',
+    customer_name:name?name[1]:'Unknown',duration_sec:sec,timestamp:new Date().toISOString()})});
+  document.getElementById('vidStatus').textContent='✅ Sent! Card creating on the board…';
+}
 </script>
-</body>
-</html>
+<!-- END VIDEO INTAKE -->
