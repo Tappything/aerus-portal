@@ -400,6 +400,12 @@
       transcriptOutput.classList.toggle('placeholder', !value);
     }
 
+    function speakResponse(text) {
+      if (!text || !('speechSynthesis' in window) || typeof window.SpeechSynthesisUtterance !== 'function') return;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+    }
+
     function mapRecognitionError(error) {
       switch (error) {
         case 'aborted':
@@ -445,6 +451,8 @@
 
         const reply = data?.reply || 'Fresh here, I got your message!';
         assistantResponse.textContent = reply;
+        speakResponse(reply);
+        setTranscript('');
         setStatus('Fresh replied below. Tap again whenever you are ready.', 'success');
       } catch (error) {
         assistantResponse.textContent = error.message;
