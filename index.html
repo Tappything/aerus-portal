@@ -56,7 +56,33 @@
   <div id="vidStatus" style="color:#4ade80;font-size:0.85rem;margin-top:12px;"></div>
 </div>
 
-<script>
+<
+<div style="text-align:center; margin:0 16px; background:#0f0f1a; border-radius:16px; padding:16px; border:1px solid #333;">
+  <p style="color:#c084fc; font-size:0.85rem; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:12px;">📹 Video Intake</p>
+  <button id="vidBtn" onclick="startVid()" style="width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#9333ea);border:3px solid #c084fc;color:white;font-size:2.5rem;cursor:pointer;box-shadow:0 0 24px rgba(147,51,234,0.45);">📹</button>
+  <p style="color:#a78bfa;font-size:0.78rem;">Point at unit • Say customer name & issue • Tap stop</p>
+  <div id="vidPreview" style="display:none;max-width:360px;margin:16px auto 0;">
+    <video id="liveVid" autoplay muted playsinline style="width:100%;border-radius:12px;border:2px solid #7c3aed;"></video>
+    <div id="liveTxt" style="color:#c4b5fd;font-size:0.85rem;margin:8px 0;min-height:40px;">🎙️ Listening…</div>
+    <button onclick="stopVid()" style="width:100%;padding:12px;background:rgba(239,68,68,0.2);border:2px solid #ef4444;color:#fca5a5;border-radius:12px;font-size:0.9rem;cursor:pointer;">✅ Done Recording</button>
+  </div>
+  <div id="vidStatus" style="color:#4ade80;font-size:0.85rem;margin-top:12px;"></div>
+</div>
+
+let myWorldLoaded=false;
+async function toggleMyWorld(){const panel=document.getElementById('myWorldPanel');if(panel.style.display==='none'||!panel.style.display){panel.style.display='block';if(!myWorldLoaded){panel.innerHTML='<div style="color:#a78bfa;">Loading your world…</div>';await loadMyWorld();myWorldLoaded=true;}}else{panel.style.display='none';}}
+function statusPillStyle(status){const s=(status||'').toLowerCase();if(s.includes('workbench'))return 'background:#f59e0b;color:#1f1300;';if(s.includes('ready'))return 'background:#22c55e;color:#052e16;';if(s.includes('complet'))return 'background:#9ca3af;color:#111827;';return 'background:#6b7280;color:#f9fafb;';}
+async function loadMyWorld(){const panel=document.getElementById('myWorldPanel');try{const res=await fetch('/.netlify/functions/myworld');const data=await res.json();const items=Array.isArray(data.items)?data.items:[];if(!items.length){panel.innerHTML='<div style="color:#a78bfa;">No items found.</div>';return;}panel.innerHTML='';items.forEach(item=>{const card=document.createElement('div');card.style.cssText='background:#0f0f1a;border-radius:12px;padding:12px 12px 12px 14px;margin:0 0 10px 0;border-left:4px solid #ffd700;border:1px solid #2a2a3d;';const name=document.createElement('div');name.style.cssText='font-weight:700;color:#ffffff;font-size:0.95rem;margin-bottom:8px;';name.textContent=item.name||'Untitled';const pill=document.createElement('span');pill.style.cssText='display:inline-block;padding:4px 10px;border-radius:999px;font-size:0.75rem;font-weight:700;'+statusPillStyle(item.status);pill.textContent=item.status||'Unknown';card.appendChild(name);card.appendChild(pill);panel.appendChild(card);});}catch(e){panel.innerHTML='<div style="color:#fca5a5;">Could not load My World.</div>';}}<script>
+const WEBHOOK='https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei';
+let mr,chunks=[],str,rec,txt='',ti,sec=0;
+function startVid(){
+  txt='';sec=0;document.getElementById('vidStatus').textContent='';
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:true})
+  .catch(()=>navigator.mediaDevices.getUserMedia({video:true,audio:true}))
+  .then(s=>{
+    str=s;
+    document.getElementById('liveVid').srcObject=s;
+    document.getElementById('vidPreview').style.display='block';script>
 const WEBHOOK='https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei';
 let mr,chunks=[],str,rec,txt='',ti,sec=0;
 function startVid(){
@@ -156,4 +182,9 @@ async function sendTyped() {
 </script>
 <!-- END VIDEO INTAKE -->
 
+</div>
+<!-- 🌍 MY WORLD -->
+<div style="margin:16px;">
+  <button id="myWorldBtn" onclick="toggleMyWorld()" style="width:100%;padding:14px 16px;background:linear-gradient(135deg,#7c3aed,#9333ea);border:2px solid #c084fc;color:#fff;font-size:1.05rem;font-weight:bold;border-radius:14px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.35);">🌍 My World</button>
+  <div id="myWorldPanel" style="display:none;margin-top:12px;"></div>
 </div>
