@@ -1,12 +1,51 @@
+<!-- TAP TO TALK / TAP TO TYPE -->
+<div id="tapSection" style="display:flex;gap:16px;justify-content:center;
+     margin:24px 0;">
+
+  <button id="talkBtn" onclick="startTalk()"
+    style="flex:1;max-width:160px;padding:20px 12px;font-size:1.1rem;
+           font-weight:bold;border-radius:12px;border:none;
+           background:#fdab3d;color:#000;cursor:pointer;">
+    🎙️ Tap to Talk
+  </button>
+
+  <button id="typeBtn" onclick="showTypeBox()"
+    style="flex:1;max-width:160px;padding:20px 12px;font-size:1.1rem;
+           font-weight:bold;border-radius:12px;border:none;
+           background:#579bfc;color:#fff;cursor:pointer;">
+    ⌨️ Tap to Type
+  </button>
+
+</div>
+
+<!-- TYPE INPUT (hidden until typeBtn tapped) -->
+<div id="typeSection" style="display:none;margin:0 16px 16px;">
+  <textarea id="typeInput" rows="3" placeholder="Type your message here…"
+    style="width:100%;padding:12px;font-size:1rem;border-radius:8px;
+           border:1px solid #ccc;box-sizing:border-box;"></textarea>
+  <button onclick="sendTyped()"
+    style="margin-top:8px;width:100%;padding:14px;font-size:1rem;
+           font-weight:bold;border-radius:8px;border:none;
+           background:#00c875;color:#fff;cursor:pointer;">
+    Send to Fresh ✉️
+  </button>
+</div>
+
+<!-- FRESH RESPONSE -->
+<div id="fresh-response"
+  style="margin:16px;padding:14px;background:#1e1e1e;color:#ffd700;
+         font-style:italic;border-radius:8px;display:none;">
+</div>
+
 <!-- 📹 VIDEO INTAKE BUTTON -->
 <div style="text-align:center; margin: 30px auto;">
   <p style="color:#c084fc; font-size:0.85rem; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:12px;">📹 Video Intake</p>
-  <button id="vidBtn" onclick="startVid()" style="width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#9333ea);border:3px solid #c084fc;color:white;font-size:2.5rem;cursor:pointer;display:block;margin:0 auto 10px;">📹</button>
+  <button id="vidBtn" onclick="startVid()" style="width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#9333ea);border:3px solid #c084fc;color:white;font-size:2.5rem;cursor:pointer;box-shadow:0 0 25px rgba(124,58,237,.45);">📹</button>
   <p style="color:#a78bfa;font-size:0.78rem;">Point at unit • Say customer name & issue • Tap stop</p>
   <div id="vidPreview" style="display:none;max-width:360px;margin:16px auto 0;">
     <video id="liveVid" autoplay muted playsinline style="width:100%;border-radius:12px;border:2px solid #7c3aed;"></video>
     <div id="liveTxt" style="color:#c4b5fd;font-size:0.85rem;margin:8px 0;min-height:40px;">🎙️ Listening…</div>
-    <button onclick="stopVid()" style="width:100%;padding:12px;background:rgba(239,68,68,0.2);border:2px solid #ef4444;color:#fca5a5;border-radius:12px;font-size:0.9rem;cursor:pointer;">✅ Done — Send to Sissy</button>
+    <button onclick="stopVid()" style="width:100%;padding:12px;background:rgba(239,68,68,0.2);border:2px solid #ef4444;color:#fca5a5;border-radius:12px;font-size:0.9rem;cursor:pointer;">✅ Done Recording</button>
   </div>
   <div id="vidStatus" style="color:#4ade80;font-size:0.85rem;margin-top:12px;"></div>
 </div>
@@ -32,7 +71,7 @@ function startVid(){
     if(SR){rec=new SR();rec.continuous=true;rec.interimResults=true;
       rec.onresult=e=>{txt=Array.from(e.results).map(r=>r[0].transcript).join(' ');
       document.getElementById('liveTxt').textContent='🎙️ '+txt;}
-      rec.start();}
+      }
     ti=setInterval(()=>{sec++;if(sec>=30)stopVid();},1000);
   }).catch(()=>document.getElementById('vidStatus').textContent='❌ Camera blocked');
 }
@@ -51,6 +90,62 @@ async function sendVid(){
     body:JSON.stringify({type:'video_intake',transcript:txt||'(none)',
     customer_name:name?name[1]:'Unknown',duration_sec:sec,timestamp:new Date().toISOString()})});
   document.getElementById('vidStatus').textContent='✅ Sent! Card creating on the board…';
+}
+
+// ── Shared: send to Fresh and speak the reply ──────────────────
+async function sendToFresh(userMessage) {
+  try {
+    const res = await fetch('/.netlify/functions/intake', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ body: userMessage })
+    });
+    const data = await res.json();
+    const reply = data.reply || "Got it — I'll take care of that.";
+
+    // Display
+    const box = document.getElementById('fresh-response');
+    box.textContent = '🤵 ' + reply;
+    box.style.display = 'block';
+
+    // Speak
+    const utter = new SpeechSynthesisUtterance(reply);
+    utter.rate = 0.95;
+    utter.pitch = 1.05;
+    window.speechSynthesis.speak(utter);
+  } catch(e) {
+    console.error('sendToFresh error:', e);
+  }
+}
+
+// ── Tap to Talk ────────────────────────────────────────────────
+function startTalk() {
+  if (!rec) return alert('Voice not supported on this device.');
+  document.getElementById('talkBtn').textContent = '🔴 Listening…';
+  rec.onend = async () => {
+    document.getElementById('talkBtn').textContent = '🎙️ Tap to Talk';
+    rec.continuous = true;  // restore for video flow
+    if (txt && txt.trim()) await sendToFresh(txt.trim());
+    txt = '';
+  };
+  rec.continuous = false;  // ← ADD THIS
+  rec.start();
+}
+
+// ── Tap to Type ────────────────────────────────────────────────
+function showTypeBox() {
+  const s = document.getElementById('typeSection');
+  s.style.display = s.style.display === 'none' ? 'block' : 'none';
+  document.getElementById('typeInput').focus();
+}
+
+async function sendTyped() {
+  const input = document.getElementById('typeInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  document.getElementById('typeSection').style.display = 'none';
+  await sendToFresh(msg);
 }
 </script>
 <!-- END VIDEO INTAKE -->

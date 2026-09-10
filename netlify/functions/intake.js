@@ -1,116 +1,108 @@
 exports.handler = async (event) => {
+  const corsHeaders = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*'
+  };
+
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 204,
+      headers: {
+        ...corsHeaders,
+        'Access-Control-Allow-Methods': 'POST,OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      },
+      body: ''
+    };
+  }
+
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
-      headers: { 'Content-Type': 'application/json' },
+      headers: corsHeaders,
       body: JSON.stringify({ error: 'Method Not Allowed' })
     };
   }
 
   try {
     const payload = event.body ? JSON.parse(event.body) : {};
-    const userMessage = payload.body || '';
+    const userMessage = (payload.body || payload.transcript || '').trim();
     console.log('Received payload:', JSON.stringify(payload));
-    console.log('Body field:', userMessage);
+    console.log('Body/transcript field:', userMessage);
     console.log('API key present:', !!process.env.GEMINI_API_KEY);
 
-    if (!userMessage.trim()) {
+    if (!userMessage) {
       return {
         statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
+        headers: corsHeaders,
         body: JSON.stringify({ error: 'Missing user message' })
       };
     }
 
-    // Fire-and-forget Monday item creation via Make.com
+    const geminiApiKey = process.env.GEMINI_API_KEY;
+    const fallbackReply = "Got it — I'll take care of that right away.";
+    let reply = fallbackReply;
+
+    if (geminiApiKey) {
+      const systemPrompt = "You are Fresh 🤵, the Digital Coordinator for TappyThing. You are warm, sharp, confident, and brief. Acknowledge the customer's request in 1-2 sentences max. Never mention Monday.com, Make.com, or any backend systems. Speak like a trusted concierge — always calm, always in control. After acknowledging, let them know it's been logged and someone will follow up.";
+      try {
+        const geminiResponse = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [
+                {
+                  role: 'user',
+                  parts: [{ text: `System: ${systemPrompt}\n\nCustomer message: ${userMessage}` }]
+                }
+              ]
+            })
+          }
+        );
+
+        if (geminiResponse.ok) {
+          const geminiData = await geminiResponse.json();
+          reply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || fallbackReply;
+        } else {
+          const errorText = await geminiResponse.text().catch(() => '');
+          console.error('Gemini API error:', geminiResponse.status, errorText);
+        }
+      } catch (geminiError) {
+        console.error('Gemini API call failed, using fallback reply:', geminiError);
+      }
+    } else {
+      console.error('Missing GEMINI_API_KEY environment variable');
+    }
+
+    // Forward original payload + Fresh reply to Make.com for Monday item creation
     try {
-      const makeBody = JSON.stringify({ body: userMessage });
-      console.log('Posting to Make.com for Monday item creation:', makeBody);
-      if (typeof fetch === 'function') {
-        void fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei', {
+      const makeWebhookUrl = process.env.MAKE_WEBHOOK_URL;
+      if (makeWebhookUrl && typeof fetch === 'function') {
+        const makePayload = { ...payload, reply };
+        await fetch(makeWebhookUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: makeBody
-        }).catch(error => {
-          console.error('Non-blocking Make.com request failed:', error);
+          body: JSON.stringify(makePayload)
         });
       } else {
-        console.error('Global fetch is not available in this runtime');
+        console.error('Missing MAKE_WEBHOOK_URL or fetch unavailable');
       }
     } catch (makeError) {
-      console.error('Error preparing Make.com request:', makeError);
+      console.error('Make.com forward failed:', makeError);
     }
 
-    const geminiApiKey = process.env.GEMINI_API_KEY;
-    if (!geminiApiKey) {
-      const reply = 'Fresh here, I got your message!';
-      console.error('Missing GEMINI_API_KEY environment variable');
-      console.log('Returning from intake.js:', JSON.stringify({ reply }));
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reply })
-      };
-    }
-
-    const prompt = `You are Fresh, a warm and professional digital coordinator. You help small business owners stay organized by logging their notes, tasks, and customer information. Keep every response under 90 words. Confirm receipt clearly, and when possible suggest one practical next step. User message: ${userMessage}`;
-
-    try {
-      const geminiResponse = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${geminiApiKey}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                role: 'user',
-                parts: [{ text: prompt }]
-              }
-            ]
-          })
-        }
-      );
-
-      if (!geminiResponse.ok) {
-        const errorText = await geminiResponse.text().catch(() => '');
-        console.error('Gemini API error:', geminiResponse.status, errorText);
-        const reply = 'Fresh here, I got your message!';
-        console.log('Returning from intake.js:', JSON.stringify({ reply }));
-        return {
-          statusCode: 200,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reply })
-        };
-      }
-
-      const geminiData = await geminiResponse.json();
-      const reply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || 'Fresh here, I got your message!';
-
-      console.log('Returning from intake.js:', JSON.stringify({ reply }));
-
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reply })
-      };
-    } catch (geminiError) {
-      console.error('Gemini API call failed, returning fallback reply:', geminiError);
-      const reply = 'Fresh here, I got your message!';
-      console.log('Returning from intake.js:', JSON.stringify({ reply }));
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reply })
-      };
-    }
+    return {
+      statusCode: 200,
+      headers: corsHeaders,
+      body: JSON.stringify({ reply })
+    };
   } catch (error) {
     console.error('Intake function error:', error);
     return {
       statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: corsHeaders,
       body: JSON.stringify({ error: 'Internal Server Error', message: error.message })
     };
   }
