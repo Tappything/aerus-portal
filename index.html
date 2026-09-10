@@ -1,17 +1,22 @@
+<div style="background:#1a1a2e;color:#ffffff;font-family:'Segoe UI',sans-serif;max-width:480px;margin:0 auto;min-height:100vh;padding:0 0 40px 0;">
 <!-- TAP TO TALK / TAP TO TYPE -->
+<div style="background:#0f0f1a; padding:20px 16px 16px; text-align:center; border-bottom:2px solid #ffd700;">
+  <div style="font-size:1.8rem; font-weight:bold; color:#ffd700;">TappyThing</div>
+  <div style="font-size:0.85rem; color:#aaa; margin-top:4px;">Your Digital Coordinator</div>
+</div>
 <div id="tapSection" style="display:flex;gap:16px;justify-content:center;
      margin:24px 0;">
 
   <button id="talkBtn" onclick="startTalk()"
-    style="flex:1;max-width:160px;padding:20px 12px;font-size:1.1rem;
-           font-weight:bold;border-radius:12px;border:none;
+    style="flex:1;max-width:160px;padding:20px 12px;font-size:1.2rem; min-height:90px;
+           font-weight:bold;border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3);border:none;
            background:#fdab3d;color:#000;cursor:pointer;">
     🎙️ Tap to Talk
   </button>
 
   <button id="typeBtn" onclick="showTypeBox()"
-    style="flex:1;max-width:160px;padding:20px 12px;font-size:1.1rem;
-           font-weight:bold;border-radius:12px;border:none;
+    style="flex:1;max-width:160px;padding:20px 12px;font-size:1.2rem; min-height:90px;
+           font-weight:bold;border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3);border:none;
            background:#579bfc;color:#fff;cursor:pointer;">
     ⌨️ Tap to Type
   </button>
@@ -34,13 +39,14 @@
 <!-- FRESH RESPONSE -->
 <div id="fresh-response"
   style="margin:16px;padding:14px;background:#1e1e1e;color:#ffd700;
-         font-style:italic;border-radius:8px;display:none;">
+         font-style:italic;border-radius:8px;display:none;border-left:4px solid #ffd700; font-size:1rem; line-height:1.5;">
 </div>
 
+<hr style="border:none; border-top:1px solid #333; margin:24px 16px;">
 <!-- 📹 VIDEO INTAKE BUTTON -->
-<div style="text-align:center; margin: 30px auto;">
+<div style="text-align:center; margin:0 16px; background:#0f0f1a; border-radius:16px; padding:16px; border:1px solid #333;">
   <p style="color:#c084fc; font-size:0.85rem; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:12px;">📹 Video Intake</p>
-  <button id="vidBtn" onclick="startVid()" style="width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#9333ea);border:3px solid #c084fc;color:white;font-size:2.5rem;cursor:pointer;box-shadow:0 0 25px rgba(124,58,237,.45);">📹</button>
+  <button id="vidBtn" onclick="startVid()" style="width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#9333ea);border:3px solid #c084fc;color:white;font-size:2.5rem;cursor:pointer;box-shadow:0 0 24px rgba(147,51,234,0.45);">📹</button>
   <p style="color:#a78bfa;font-size:0.78rem;">Point at unit • Say customer name & issue • Tap stop</p>
   <div id="vidPreview" style="display:none;max-width:360px;margin:16px auto 0;">
     <video id="liveVid" autoplay muted playsinline style="width:100%;border-radius:12px;border:2px solid #7c3aed;"></video>
@@ -149,3 +155,5 @@ async function sendTyped() {
 }
 </script>
 <!-- END VIDEO INTAKE -->
+
+</div>
