@@ -1,31 +1,31 @@
 <div style="background:#1a1a2e;color:#ffffff;font-family:'Segoe UI',sans-serif;max-width:480px;margin:0 auto;min-height:100vh;padding:0 0 40px 0;">
-<div style="background:#0f0f1a;padding:20px 16px 16px;text-align:center;border-bottom:2px solid #ffd700;">
-  <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="TappyThing" style="width:160px;border-radius:12px;margin-bottom:8px;">
-  <div style="font-size:0.78rem;color:#aaa;letter-spacing:0.08em;text-transform:uppercase;">Digital Coordinator Command Center</div>
+<div style="background:#0f0f1a;padding:16px;text-align:center;border-bottom:2px solid #ffd700;">
+  <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="TappyThing" style="width:90px;border-radius:50%;margin-bottom:6px;border:2px solid #ffd700;">
+  <div style="font-size:0.72rem;color:#aaa;letter-spacing:0.08em;text-transform:uppercase;margin-top:2px;">Digital Coordinator Command Center</div>
 </div>
 <div id="tapSection" style="display:flex;gap:16px;justify-content:center;margin:24px 0;">
-  <button id="talkBtn" onclick="startTalk()" style="flex:1;max-width:160px;padding:20px 12px;font-size:1.2rem;min-height:90px;font-weight:bold;border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,0.3);[...]
-  <button id="typeBtn" onclick="showTypeBox()" style="flex:1;max-width:160px;padding:20px 12px;font-size:1.2rem;min-height:90px;font-weight:bold;border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,0.3[...] 
+  <button id="talkBtn" onclick="startTalk()" style="flex:1;max-width:160px;padding:20px 12px;font-size:1.2rem;min-height:90px;font-weight:bold;border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,0.3);border:none;background:#fdab3d;color:#000;cursor:pointer;">🎙️ Tap to Talk</button>
+  <button id="typeBtn" onclick="showTypeBox()" style="flex:1;max-width:160px;padding:20px 12px;font-size:1.2rem;min-height:90px;font-weight:bold;border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,0.3);border:none;background:#579bfc;color:#fff;cursor:pointer;">⌨️ Tap to Type</button>
 </div>
 <div id="typeSection" style="display:none;margin:0 16px 16px;">
   <textarea id="typeInput" rows="3" placeholder="Type your message here…" style="width:100%;padding:12px;font-size:1rem;border-radius:8px;border:1px solid #ccc;box-sizing:border-box;"></textarea>
-  <button onclick="sendTyped()" style="margin-top:8px;width:100%;padding:14px;font-size:1rem;font-weight:bold;border-radius:8px;border:none;background:#00c875;color:#fff;cursor:pointer;">Send to Fresh[...] 
+  <button onclick="sendTyped()" style="margin-top:8px;width:100%;padding:14px;font-size:1rem;font-weight:bold;border-radius:8px;border:none;background:#00c875;color:#fff;cursor:pointer;">Send to Fresh ✉️</button>
 </div>
-<div id="fresh-response" style="margin:16px;padding:14px;background:#1e1e1e;color:#ffd700;font-style:italic;border-radius:8px;display:none;border-left:4px solid #ffd700;font-size:1rem;line-height:1.5;[...] 
+<div id="fresh-response" style="margin:16px;padding:14px;background:#1e1e1e;color:#ffd700;font-style:italic;border-radius:8px;display:none;border-left:4px solid #ffd700;font-size:1rem;line-height:1.5;"></div>
 <hr style="border:none;border-top:1px solid #333;margin:24px 16px;">
 <div style="text-align:center;margin:0 16px;background:#0f0f1a;border-radius:16px;padding:16px;border:1px solid #333;">
   <p style="color:#c084fc;font-size:0.85rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;">📹 Video Intake</p>
-  <button id="vidBtn" onclick="startVid()" style="width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#9333ea);border:3px solid #c084fc;color:white;font-size:2.5rem;cu[...] 
+  <button id="vidBtn" onclick="startVid()" style="width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#9333ea);border:3px solid #c084fc;color:white;font-size:2.5rem;cursor:pointer;">📹</button>
   <p style="color:#a78bfa;font-size:0.78rem;">Point at unit • Say customer name & issue • Tap stop</p>
   <div id="vidPreview" style="display:none;max-width:360px;margin:16px auto 0;">
     <video id="liveVid" autoplay muted playsinline style="width:100%;border-radius:12px;border:2px solid #7c3aed;"></video>
     <div id="liveTxt" style="color:#c4b5fd;font-size:0.85rem;margin:8px 0;min-height:40px;">🎙️ Listening…</div>
-    <button onclick="stopVid()" style="width:100%;padding:12px;background:rgba(239,68,68,0.2);border:2px solid #ef4444;color:#fca5a5;border-radius:12px;font-size:0.9rem;cursor:pointer;">✅ Done Recor[...] 
+    <button onclick="stopVid()" style="width:100%;padding:12px;background:rgba(239,68,68,0.2);border:2px solid #ef4444;color:#fca5a5;border-radius:12px;font-size:0.9rem;cursor:pointer;">✅ Done Recording</button>
   </div>
   <div id="vidStatus" style="color:#4ade80;font-size:0.85rem;margin-top:12px;"></div>
 </div>
 <div style="margin:16px;">
-  <button id="myWorldBtn" onclick="toggleMyWorld()" style="width:100%;padding:14px 16px;background:linear-gradient(135deg,#7c3aed,#9333ea);border:2px solid #c084fc;color:#fff;font-size:1.05rem;font-we[...] 
+  <button id="myWorldBtn" onclick="toggleMyWorld()" style="width:100%;padding:14px 16px;background:linear-gradient(135deg,#7c3aed,#9333ea);border:2px solid #c084fc;color:#fff;font-size:1.05rem;font-weight:bold;border-radius:12px;cursor:pointer;">🌍 My World ▼</button>
   <div id="myWorldPanel" style="display:none;margin-top:12px;"></div>
 </div>
 <script>
@@ -105,7 +105,7 @@ async function sendVid(){
   document.getElementById('vidStatus').textContent='⏳ Sending to Sissy…';
   const name=txt.match(/(?:for|it'?s|customer)\s+([A-Z][a-z]+ [A-Z][a-z]+)/i);
   await fetch(WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({type:'video_intake',body:txt || '(Video intake) ' + (name ? name[1] : 'Unknown customer'),transcript:txt||'(none)',
+    body:JSON.stringify({type:'video_intake',transcript:txt||'(none)',
     customer_name:name?name[1]:'Unknown',duration_sec:sec,timestamp:new Date().toISOString()})});
   document.getElementById('vidStatus').textContent='✅ Sent! Card creating on the board…';
 }
