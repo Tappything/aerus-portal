@@ -20,6 +20,8 @@ exports.handler = async (event) => {
     const history = body.history || [];
 
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+    console.log("GEMINI KEY EXISTS:", !!GEMINI_API_KEY);
+    console.log("USER MESSAGE:", userMessage);
 
     if (!GEMINI_API_KEY) {
       return {
