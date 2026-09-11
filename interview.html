@@ -72,9 +72,8 @@
 </div>
 
 <script>
-const INTAKE = '/.netlify/functions/intake';
+const INTAKE = '/.netlify/functions/chat';
 let chatHistory = [];
-let interviewStarted = false;
 
 const qualifications = {
   salon: ["Track appointments and follow up with no-shows automatically","Send confirmations and reminders without lifting a finger","Keep a running list of who needs a callback","Log walk-ins and new client notes on the spot","Never lose a lead from a missed call again"],
@@ -88,7 +87,7 @@ function getQuals(input) {
   const s = input.toLowerCase();
   if(s.includes('salon')||s.includes('hair')||s.includes('nail')||s.includes('spa')) return qualifications.salon;
   if(s.includes('restaurant')||s.includes('food')||s.includes('cafe')||s.includes('bar')) return qualifications.restaurant;
-  if(s.includes('mom')||s.includes('mother')||s.includes('family')||s.includes('home owner')||s.includes('homeowner')) return qualifications.mom;
+  if(s.includes('mom')||s.includes('mother')||s.includes('family')||s.includes('homeowner')||s.includes('home owner')) return qualifications.mom;
   if(s.includes('home')||s.includes('house')||s.includes('property')) return qualifications.home;
   return qualifications.default;
 }
@@ -119,7 +118,6 @@ function openInterview(input) {
   appendMsg('fresh', opener);
   speak(opener);
   chatHistory.push({role:'model', parts:[{text: opener}]});
-  interviewStarted = true;
 }
 
 async function sendChat() {
@@ -137,14 +135,14 @@ async function sendChat() {
 
 async function askFresh(msg) {
   try {
-    const systemPrompt = `You are Fresh, a Digital Coordinator applying for a job. You are warm, confident, and humble. You were named after the founder's oldest son. There is a story behind your name but you only share it if asked. You help businesses and individuals stay organized. You never hard sell. You mention the price ($95/month) naturally only once, when it fits. After a few exchanges offer to build them a real system — not a demo, their actual system. After 3 days you will ask if you got the job. Keep responses short — 2 to 4 sentences max. This is a conversation, not a speech.`;
+    const systemPrompt = `You are Fresh, a Digital Coordinator applying for a job. You are warm, confident, and humble. You were named after the founder's oldest son. There is a story behind your name but you only share it if asked directly. You help businesses and individuals stay organized. You never hard sell. You mention the price ($95/month) naturally only once, when it fits. After a few exchanges offer to build them a real system — not a demo, their actual system. After 3 days you will ask if you got the job. Keep responses short — 2 to 4 sentences max. This is a conversation, not a speech.`;
     const res = await fetch(INTAKE, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({body: msg, system: systemPrompt, history: chatHistory})
     });
     const data = await res.json();
-    return data.reply || "That's a great question. Tell me more about what you need and I'll show you exactly how I can help.";
+    return data.reply || "That's a great question — tell me more about what you need and I'll show you exactly how I can help.";
   } catch(e) {
     return "I'm here — tell me more about what you need.";
   }
