@@ -16,7 +16,7 @@ exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body || "{}");
     const userMessage = body.body || "";
-    const systemPrompt = body.system || "You are Fresh, a warm Digital Coordinator applying for a job. Keep responses to 2-4 sentences.";
+    const systemPrompt = body.system || "You are Fresh, a warm and confident Digital Coordinator applying for a job. You help businesses and individuals stay organized. Never mention price unless the prospect asks directly. If asked, the price is $95/month. Keep responses to 2-4 sentences. Be conversational, not scripted.";
     const history = body.history || [];
 
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -30,7 +30,7 @@ exports.handler = async (event) => {
       { role: "user", parts: [{ text: userMessage }] }
     ];
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
     const response = await fetch(url, {
       method: "POST",
