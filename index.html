@@ -105,7 +105,7 @@ async function sendVid(){
   document.getElementById('vidStatus').textContent='⏳ Sending to Sissy…';
   const name=txt.match(/(?:for|it'?s|customer)\s+([A-Z][a-z]+ [A-Z][a-z]+)/i);
   await fetch(WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({type:'video_intake',transcript:txt||'(none)',
+    body:JSON.stringify({type:'video_intake',body:txt || '(Video intake) ' + (name ? name[1] : 'Unknown customer'),transcript:txt||'(none)',
     customer_name:name?name[1]:'Unknown',duration_sec:sec,timestamp:new Date().toISOString()})});
   document.getElementById('vidStatus').textContent='✅ Sent! Card creating on the board…';
 }
