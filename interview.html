@@ -8,11 +8,10 @@
     *{box-sizing:border-box;margin:0;padding:0;}
     body{background:#0f0f1a;color:#fff;font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 60px 0;}
     .header{width:100%;max-width:480px;text-align:center;padding:28px 16px 20px;border-bottom:2px solid #ffd700;}
-    .fresh-card{display:inline-block;text-align:center;}
     .fresh-card img{width:90px;height:90px;border-radius:50%;border:3px solid #ffd700;object-fit:cover;}
     .fresh-name{font-size:1.3rem;font-weight:bold;color:#ffd700;margin-top:8px;}
     .fresh-title{font-size:0.75rem;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px;}
-    .fresh-badge{display:inline-block;margin-top:8px;background:#1a1a2e;border:1px solid #ffd700;border-radius:20px;padding:4px 14px;font-size:0.72rem;color:#ffd700;letter-spacing:0.05em;}
+    .fresh-badge{display:inline-block;margin-top:8px;background:#1a1a2e;border:1px solid #ffd700;border-radius:20px;padding:4px 14px;font-size:0.72rem;color:#ffd700;}
     .search-section{width:100%;max-width:480px;padding:28px 16px 0;}
     .search-label{font-size:1rem;color:#e2e8f0;margin-bottom:12px;line-height:1.5;}
     .search-label span{color:#ffd700;font-weight:bold;}
@@ -21,12 +20,9 @@
     .search-box input:focus{border-color:#ffd700;}
     .search-box button{padding:14px 18px;background:#ffd700;color:#000;font-weight:bold;border:none;border-radius:10px;cursor:pointer;font-size:0.95rem;}
     .hint{font-size:0.72rem;color:#555;margin-top:8px;text-align:center;}
-    .fresh-bubble{display:none;width:100%;max-width:480px;margin-top:20px;padding:0 16px;}
-    .bubble-inner{background:#1a1a2e;border-left:4px solid #ffd700;border-radius:12px;padding:18px;font-size:0.95rem;line-height:1.7;color:#e2e8f0;}
-    .bubble-inner .highlight{color:#ffd700;font-weight:bold;}
     .chat-section{display:none;width:100%;max-width:480px;padding:20px 16px 0;}
-    .chat-log{background:#1a1a2e;border-radius:12px;padding:16px;min-height:120px;max-height:340px;overflow-y:auto;margin-bottom:12px;}
-    .msg{margin-bottom:14px;line-height:1.6;}
+    .chat-log{background:#1a1a2e;border-radius:12px;padding:16px;min-height:120px;max-height:400px;overflow-y:auto;margin-bottom:12px;}
+    .msg{margin-bottom:16px;line-height:1.6;}
     .msg.fresh{color:#ffd700;font-size:0.9rem;}
     .msg.fresh span{font-weight:bold;}
     .msg.prospect{color:#e2e8f0;font-size:0.9rem;text-align:right;}
@@ -50,17 +46,13 @@
   </div>
 </div>
 
-<div class="search-section">
-  <div class="search-label">Tell me about <span>your world</span> and I'll show you what I can do for you.</div>
+<div class="search-section" id="searchSection">
+  <div class="search-label">Tell me about <span>your world</span> and I'll show you what I can do.</div>
   <div class="search-box">
-    <input type="text" id="worldInput" placeholder="e.g. hair salon, busy mom, restaurant…" onkeydown="if(event.key==='Enter')discover()"/>
-    <button onclick="discover()">Go →</button>
+    <input type="text" id="worldInput" placeholder="e.g. dentist, hair salon, busy mom…" onkeydown="if(event.key==='Enter')startInterview()"/>
+    <button onclick="startInterview()">Go →</button>
   </div>
   <div class="hint">businesses · homes · families · individuals</div>
-</div>
-
-<div class="fresh-bubble" id="freshBubble">
-  <div class="bubble-inner" id="bubbleText"></div>
 </div>
 
 <div class="chat-section" id="chatSection">
@@ -72,49 +64,47 @@
 </div>
 
 <script>
-const INTAKE = '/.netlify/functions/chat';
+const CHAT = '/.netlify/functions/chat';
 let chatHistory = [];
 
-const qualifications = {
-  salon: ["Track appointments and follow up with no-shows automatically","Send confirmations and reminders without lifting a finger","Keep a running list of who needs a callback","Log walk-ins and new client notes on the spot","Never lose a lead from a missed call again"],
-  restaurant: ["Log table issues, supply runs, and staff notes instantly","Track catering leads and follow-up calls","Keep your prep and delivery schedule in one place","Send staff updates without group texts","Flag low inventory before it becomes a problem"],
-  mom: ["Keep track of appointments, errands, and follow-ups","Never forget a callback or a task again","Log things on the go — voice or text, whatever's easier","Get a daily summary of what needs attention","Organize school, home, and personal tasks in one place"],
-  home: ["Track home repairs, vendors, and warranties","Log issues as they happen — voice or text","Follow up on quotes and callbacks automatically","Keep a running punch list organized by room","Never lose a contractor's contact again"],
-  default: ["Capture every task, call, and follow-up the moment it happens","Organize your day without spreadsheets or sticky notes","Send reminders and confirmations automatically","Keep your team on the same page without group texts","Log anything by voice — no typing required"]
+const quals = {
+  dentist: "appointment reminders, patient follow-ups, supply tracking, staff notes, and making sure no callback ever falls through the cracks",
+  salon: "booking follow-ups, no-show tracking, client callbacks, walk-in logging, and keeping your chair full without the phone tag",
+  restaurant: "supply run notes, catering leads, staff updates, delivery tracking, and flagging low inventory before it's a problem",
+  lawyer: "client follow-ups, deadline tracking, intake notes, document reminders, and keeping every case moving without sticky notes",
+  gym: "membership follow-ups, class scheduling notes, trainer tasks, equipment issues, and never losing a new lead",
+  contractor: "job site notes, material orders, client follow-ups, invoice reminders, and keeping every project on track",
+  retail: "inventory alerts, vendor follow-ups, customer callbacks, staff tasks, and daily sales notes all in one place",
+  mom: "school schedules, appointment tracking, errand lists, family follow-ups, and a daily summary of what actually needs your attention today",
+  home: "repair tracking, vendor callbacks, warranty notes, punch lists by room, and never losing a contractor's number again",
+  default: "task tracking, customer follow-ups, staff notes, appointment reminders, and keeping everything organized without the chaos"
 };
 
 function getQuals(input) {
   const s = input.toLowerCase();
-  if(s.includes('salon')||s.includes('hair')||s.includes('nail')||s.includes('spa')) return qualifications.salon;
-  if(s.includes('restaurant')||s.includes('food')||s.includes('cafe')||s.includes('bar')) return qualifications.restaurant;
-  if(s.includes('mom')||s.includes('mother')||s.includes('family')||s.includes('homeowner')||s.includes('home owner')) return qualifications.mom;
-  if(s.includes('home')||s.includes('house')||s.includes('property')) return qualifications.home;
-  return qualifications.default;
+  if(s.includes('dentist')||s.includes('dental')) return quals.dentist;
+  if(s.includes('salon')||s.includes('hair')||s.includes('nail')||s.includes('spa')) return quals.salon;
+  if(s.includes('restaurant')||s.includes('food')||s.includes('cafe')||s.includes('bar')) return quals.restaurant;
+  if(s.includes('lawyer')||s.includes('attorney')||s.includes('law')) return quals.lawyer;
+  if(s.includes('gym')||s.includes('fitness')||s.includes('yoga')||s.includes('trainer')) return quals.gym;
+  if(s.includes('contractor')||s.includes('plumb')||s.includes('electric')||s.includes('hvac')||s.includes('construction')) return quals.contractor;
+  if(s.includes('retail')||s.includes('store')||s.includes('shop')||s.includes('liquor')||s.includes('boutique')) return quals.retail;
+  if(s.includes('mom')||s.includes('mother')||s.includes('family')||s.includes('homeowner')||s.includes('home owner')) return quals.mom;
+  if(s.includes('home')||s.includes('house')||s.includes('property')) return quals.home;
+  return quals.default;
 }
 
-function discover() {
+function startInterview() {
   const input = document.getElementById('worldInput').value.trim();
   if(!input) return;
-  const quals = getQuals(input);
-  const list = quals.map(q=>`<li style="margin-bottom:6px;">✦ ${q}</li>`).join('');
-  const bubble = document.getElementById('freshBubble');
-  const text = document.getElementById('bubbleText');
-  text.innerHTML = `
-    <div style="margin-bottom:12px;">Here's what I can do for <span class="highlight">${input}</span>:</div>
-    <ul style="padding-left:4px;list-style:none;">${list}</ul>
-    <div style="margin-top:16px;color:#aaa;font-size:0.88rem;">By the way — my name is Fresh. There's a story behind it if you're ever curious. But let's talk about <span class="highlight">you</span>.</div>
-  `;
-  bubble.style.display='block';
-  document.getElementById('freshImg').classList.add('pulse');
-  speak(`Here's what I can do for ${input}. ${quals[0]}. ${quals[1]}. And more. By the way — my name is Fresh. There's a story behind that name if you're ever curious. But let's talk about you.`);
-  setTimeout(()=>openInterview(input), 3200);
-}
 
-function openInterview(input) {
-  const section = document.getElementById('chatSection');
-  section.style.display = 'block';
-  section.scrollIntoView({behavior:'smooth'});
-  const opener = `Thanks for taking the time. I'm here to apply for the Digital Coordinator position — for ${input}. I've helped a lot of businesses like yours. Most people start by asking how I handle follow-ups, or how I keep things from falling through the cracks. But honestly — ask me whatever you like. Should I tell you a little about myself, or do you have questions you'd like to start with?`;
+  document.getElementById('searchSection').style.display = 'none';
+  document.getElementById('chatSection').style.display = 'block';
+  document.getElementById('freshImg').classList.add('pulse');
+
+  const q = getQuals(input);
+  const opener = `Thanks for taking the time — I'm here to apply for the Digital Coordinator position for ${input}. I can help with things like ${q}. By the way, my name is Fresh — there's a story behind that name if you're ever curious, but let's focus on you. Should I tell you a little about myself, or do you have questions you'd like to start with?`;
+
   appendMsg('fresh', opener);
   speak(opener);
   chatHistory.push({role:'model', parts:[{text: opener}]});
@@ -135,16 +125,16 @@ async function sendChat() {
 
 async function askFresh(msg) {
   try {
-    const systemPrompt = `You are Fresh, a Digital Coordinator applying for a job. You are warm, confident, and humble. You were named after the founder's oldest son. There is a story behind your name but you only share it if asked directly. You help businesses and individuals stay organized. You never hard sell. You mention the price ($95/month) naturally only once, when it fits. After a few exchanges offer to build them a real system — not a demo, their actual system. After 3 days you will ask if you got the job. Keep responses short — 2 to 4 sentences max. This is a conversation, not a speech.`;
-    const res = await fetch(INTAKE, {
+    const systemPrompt = `You are Fresh, a Digital Coordinator applying for a job. You are warm, confident, and humble. You were named after the founder's oldest son — only share this story if asked directly. You help businesses and individuals stay organized. Never hard sell. Mention the price ($95/month) naturally only once when it fits the conversation. After a few exchanges, offer to build them a real working system — not a demo, their actual system. Keep responses to 2-4 sentences. This is a real conversation, not a speech.`;
+    const res = await fetch(CHAT, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({body: msg, system: systemPrompt, history: chatHistory})
     });
     const data = await res.json();
-    return data.reply || "That's a great question — tell me more about what you need and I'll show you exactly how I can help.";
+    return data.reply || "Tell me more — I want to make sure I understand your world before I say anything else.";
   } catch(e) {
-    return "I'm here — tell me more about what you need.";
+    return "Tell me more — I want to make sure I understand your world before I say anything else.";
   }
 }
 
