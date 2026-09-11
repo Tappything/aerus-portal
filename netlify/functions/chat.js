@@ -1,4 +1,4 @@
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const https = require('https');
 
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
@@ -18,9 +18,8 @@ exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body || "{}");
     const userMessage = body.body || "";
-    const systemPrompt = body.system || "You are Fresh, a warm and confident Digital Coordinator applying for a job. You help businesses and individuals stay organized. Never mention price unless [...]
+    const systemPrompt = body.system || "You are Fresh, a warm confident Digital Coordinator applying for a job. Keep responses to 2-4 sentences. Never mention price unless asked.";
     const history = body.history || [];
-
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
     if (!GEMINI_API_KEY) {
@@ -32,27 +31,42 @@ exports.handler = async (event) => {
       { role: "user", parts: [{ text: userMessage }] }
     ];
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents
-      })
+    const payload = JSON.stringify({
+      system_instruction: { parts: [{ text: systemPrompt }] },
+      contents
     });
 
-    const text = await response.text();
-    let data;
-    try { data = JSON.parse(text); } catch(e) { return { statusCode: 200, headers, body: JSON.stringify({ reply: text.slice(0, 200) }) }; }
+    const reply = await new Promise((resolve, reject) => {
+      const options = {
+        hostname: 'generativelanguage.googleapis.com',
+        path: `/v1beta/models/gemini-1.5-pro:generateContent?key=${GEMINI_API_KEY}`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(payload)
+        }
+      };
 
-    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (reply) {
-      return { statusCode: 200, headers, body: JSON.stringify({ reply }) };
-    }
+      const req = https.request(options, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          try {
+            const parsed = JSON.parse(data);
+            const text = parsed?.candidates?.[0]?.content?.parts?.[0]?.text;
+            resolve(text || JSON.stringify(parsed).slice(0, 300));
+          } catch(e) {
+            resolve(data.slice(0, 300));
+          }
+        });
+      });
 
-    return { statusCode: 200, headers, body: JSON.stringify({ reply: JSON.stringify(data).slice(0, 300) }) };
+      req.on('error', reject);
+      req.write(payload);
+      req.end();
+    });
+
+    return { statusCode: 200, headers, body: JSON.stringify({ reply }) };
 
   } catch (err) {
     return { statusCode: 200, headers, body: JSON.stringify({ reply: "ERROR: " + err.message }) };
