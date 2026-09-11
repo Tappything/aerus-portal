@@ -31,6 +31,7 @@
     .chat-input input{flex:1;padding:12px;font-size:0.95rem;border-radius:10px;border:1px solid #333;background:#0f0f1a;color:#fff;outline:none;}
     .chat-input input:focus{border-color:#ffd700;}
     .chat-input button{padding:12px 16px;background:#00c875;color:#fff;font-weight:bold;border:none;border-radius:10px;cursor:pointer;}
+    .thinking{color:#aaa;font-style:italic;font-size:0.85rem;padding:8px 0;}
     .pulse{animation:pulse 2s infinite;}
     @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.4);}50%{box-shadow:0 0 0 8px rgba(255,215,0,0);}}
   </style>
@@ -47,9 +48,9 @@
 </div>
 
 <div class="search-section" id="searchSection">
-  <div class="search-label">Tell me about <span>your world</span> and I'll show you what I can do.</div>
+  <div class="search-label">Tell me about <span>your world</span> and Fresh will show you what he can do.</div>
   <div class="search-box">
-    <input type="text" id="worldInput" placeholder="e.g. dentist, hair salon, busy mom…" onkeydown="if(event.key==='Enter')startInterview()"/>
+    <input type="text" id="worldInput" placeholder="e.g. barber shop, dentist, busy mom…" onkeydown="if(event.key==='Enter')startInterview()"/>
     <button onclick="startInterview()">Go →</button>
   </div>
   <div class="hint">businesses · homes · families · individuals</div>
@@ -66,45 +67,26 @@
 <script>
 const CHAT = '/.netlify/functions/chat';
 let chatHistory = [];
+let businessType = '';
 
-const quals = {
-  dentist: "appointment reminders, patient follow-ups, supply tracking, staff notes, and making sure no callback ever falls through the cracks",
-  salon: "booking follow-ups, no-show tracking, client callbacks, walk-in logging, and keeping your chair full without the phone tag",
-  restaurant: "supply run notes, catering leads, staff updates, delivery tracking, and flagging low inventory before it's a problem",
-  lawyer: "client follow-ups, deadline tracking, intake notes, document reminders, and keeping every case moving without sticky notes",
-  gym: "membership follow-ups, class scheduling notes, trainer tasks, equipment issues, and never losing a new lead",
-  contractor: "job site notes, material orders, client follow-ups, invoice reminders, and keeping every project on track",
-  retail: "inventory alerts, vendor follow-ups, customer callbacks, staff tasks, and daily sales notes all in one place",
-  mom: "school schedules, appointment tracking, errand lists, family follow-ups, and a daily summary of what actually needs your attention today",
-  home: "repair tracking, vendor callbacks, warranty notes, punch lists by room, and never losing a contractor's number again",
-  default: "task tracking, customer follow-ups, staff notes, appointment reminders, and keeping everything organized without the chaos"
-};
+const SYSTEM = `You are Fresh, a Digital Coordinator applying for a job. You are warm, confident, and humble. You were named after the founder's oldest son — only share this story if the prospect asks directly. You help businesses and individuals stay organized, never miss a follow-up, and keep their day running smoothly. When someone tells you their business type, respond with a natural, specific, conversational opening — like a job candidate introducing themselves. Mention 3-4 specific ways you can help THEIR type of business. Then ask if they want to hear more about you or if they have questions. Never mention price unless the prospect asks directly. If asked, the price is $95/month. After a few exchanges offer to build them a real working system — not a demo, their actual system. Keep every response to 2-4 sentences. This is a real conversation, not a script.`;
 
-function getQuals(input) {
-  const s = input.toLowerCase();
-  if(s.includes('dentist')||s.includes('dental')) return quals.dentist;
-  if(s.includes('salon')||s.includes('hair')||s.includes('nail')||s.includes('spa')) return quals.salon;
-  if(s.includes('restaurant')||s.includes('food')||s.includes('cafe')||s.includes('bar')) return quals.restaurant;
-  if(s.includes('lawyer')||s.includes('attorney')||s.includes('law')) return quals.lawyer;
-  if(s.includes('gym')||s.includes('fitness')||s.includes('yoga')||s.includes('trainer')) return quals.gym;
-  if(s.includes('contractor')||s.includes('plumb')||s.includes('electric')||s.includes('hvac')||s.includes('construction')) return quals.contractor;
-  if(s.includes('retail')||s.includes('store')||s.includes('shop')||s.includes('liquor')||s.includes('boutique')) return quals.retail;
-  if(s.includes('mom')||s.includes('mother')||s.includes('family')||s.includes('homeowner')||s.includes('home owner')) return quals.mom;
-  if(s.includes('home')||s.includes('house')||s.includes('property')) return quals.home;
-  return quals.default;
-}
-
-function startInterview() {
-  const input = document.getElementById('worldInput').value.trim();
-  if(!input) return;
+async function startInterview() {
+  businessType = document.getElementById('worldInput').value.trim();
+  if(!businessType) return;
 
   document.getElementById('searchSection').style.display = 'none';
   document.getElementById('chatSection').style.display = 'block';
   document.getElementById('freshImg').classList.add('pulse');
 
-  const q = getQuals(input);
-  const opener = `Thanks for taking the time — I'm here to apply for the Digital Coordinator position for ${input}. I can help with things like ${q}. By the way, my name is Fresh — there's a story behind that name if you're ever curious, but let's focus on you. Should I tell you a little about myself, or do you have questions you'd like to start with?`;
+  const log = document.getElementById('chatLog');
+  const thinking = document.createElement('div');
+  thinking.className = 'thinking';
+  thinking.textContent = 'Fresh is preparing…';
+  log.appendChild(thinking);
 
+  const opener = await askFresh(`I run a ${businessType}. Tell me how you can help me.`);
+  log.removeChild(thinking);
   appendMsg('fresh', opener);
   speak(opener);
   chatHistory.push({role:'model', parts:[{text: opener}]});
@@ -117,7 +99,16 @@ async function sendChat() {
   input.value = '';
   appendMsg('prospect', msg);
   chatHistory.push({role:'user', parts:[{text: msg}]});
+
+  const log = document.getElementById('chatLog');
+  const thinking = document.createElement('div');
+  thinking.className = 'thinking';
+  thinking.textContent = 'Fresh is thinking…';
+  log.appendChild(thinking);
+  log.scrollTop = log.scrollHeight;
+
   const reply = await askFresh(msg);
+  log.removeChild(thinking);
   appendMsg('fresh', reply);
   speak(reply);
   chatHistory.push({role:'model', parts:[{text: reply}]});
@@ -125,16 +116,15 @@ async function sendChat() {
 
 async function askFresh(msg) {
   try {
-    const systemPrompt = `You are Fresh, a Digital Coordinator applying for a job. You are warm, confident, and humble. You were named after the founder's oldest son — only share this story if asked directly. You help businesses and individuals stay organized. Never hard sell. Mention the price ($95/month) naturally only once when it fits the conversation. After a few exchanges, offer to build them a real working system — not a demo, their actual system. Keep responses to 2-4 sentences. This is a real conversation, not a speech.`;
     const res = await fetch(CHAT, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({body: msg, system: systemPrompt, history: chatHistory})
+      body: JSON.stringify({body: msg, system: SYSTEM, history: chatHistory})
     });
     const data = await res.json();
     return data.reply || "Tell me more — I want to make sure I understand your world before I say anything else.";
   } catch(e) {
-    return "Tell me more — I want to make sure I understand your world before I say anything else.";
+    return "Tell me more — I want to make sure I understand your world.";
   }
 }
 
