@@ -49,8 +49,7 @@ exports.handler = async (event) => {
     );
 
     const data = await res.json();
-    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text
-      || "That's a great question — tell me more and I'll show you exactly how I can help.";
+    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || JSON.stringify(data).slice(0,200);
 
     return {
       statusCode: 200,
