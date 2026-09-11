@@ -1,51 +1,20 @@
 <div style="background:#1a1a2e;color:#ffffff;font-family:'Segoe UI',sans-serif;max-width:480px;margin:0 auto;min-height:100vh;padding:0 0 40px 0;">
-<!-- TAP TO TALK / TAP TO TYPE -->
-<div style="background:#0f0f1a; padding:20px 16px 16px; text-align:center; border-bottom:2px solid #ffd700;">
-  <div style="font-size:1.8rem; font-weight:bold; color:#ffd700;">TappyThing</div>
-  <div style="font-size:0.85rem; color:#aaa; margin-top:4px;">Your Digital Coordinator</div>
+<div style="background:#0f0f1a;padding:20px 16px 16px;text-align:center;border-bottom:2px solid #ffd700;">
+  <div style="font-size:1.8rem;font-weight:bold;color:#ffd700;">TappyThing</div>
+  <div style="font-size:0.85rem;color:#aaa;margin-top:4px;">Your Digital Coordinator</div>
 </div>
-<div id="tapSection" style="display:flex;gap:16px;justify-content:center;
-     margin:24px 0;">
-
-  <button id="talkBtn" onclick="startTalk()"
-    style="flex:1;max-width:160px;padding:20px 12px;font-size:1.2rem; min-height:90px;
-           font-weight:bold;border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3);border:none;
-           background:#fdab3d;color:#000;cursor:pointer;">
-    🎙️ Tap to Talk
-  </button>
-
-  <button id="typeBtn" onclick="showTypeBox()"
-    style="flex:1;max-width:160px;padding:20px 12px;font-size:1.2rem; min-height:90px;
-           font-weight:bold;border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3);border:none;
-           background:#579bfc;color:#fff;cursor:pointer;">
-    ⌨️ Tap to Type
-  </button>
-
+<div id="tapSection" style="display:flex;gap:16px;justify-content:center;margin:24px 0;">
+  <button id="talkBtn" onclick="startTalk()" style="flex:1;max-width:160px;padding:20px 12px;font-size:1.2rem;min-height:90px;font-weight:bold;border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,0.3);border:none;background:#fdab3d;color:#000;cursor:pointer;">🎙️ Tap to Talk</button>
+  <button id="typeBtn" onclick="showTypeBox()" style="flex:1;max-width:160px;padding:20px 12px;font-size:1.2rem;min-height:90px;font-weight:bold;border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,0.3);border:none;background:#579bfc;color:#fff;cursor:pointer;">⌨️ Tap to Type</button>
 </div>
-
-<!-- TYPE INPUT (hidden until typeBtn tapped) -->
 <div id="typeSection" style="display:none;margin:0 16px 16px;">
-  <textarea id="typeInput" rows="3" placeholder="Type your message here…"
-    style="width:100%;padding:12px;font-size:1rem;border-radius:8px;
-           border:1px solid #ccc;box-sizing:border-box;"></textarea>
-  <button onclick="sendTyped()"
-    style="margin-top:8px;width:100%;padding:14px;font-size:1rem;
-           font-weight:bold;border-radius:8px;border:none;
-           background:#00c875;color:#fff;cursor:pointer;">
-    Send to Fresh ✉️
-  </button>
+  <textarea id="typeInput" rows="3" placeholder="Type your message here…" style="width:100%;padding:12px;font-size:1rem;border-radius:8px;border:1px solid #ccc;box-sizing:border-box;"></textarea>
+  <button onclick="sendTyped()" style="margin-top:8px;width:100%;padding:14px;font-size:1rem;font-weight:bold;border-radius:8px;border:none;background:#00c875;color:#fff;cursor:pointer;">Send to Fresh ✉️</button>
 </div>
-
-<!-- FRESH RESPONSE -->
-<div id="fresh-response"
-  style="margin:16px;padding:14px;background:#1e1e1e;color:#ffd700;
-         font-style:italic;border-radius:8px;display:none;border-left:4px solid #ffd700; font-size:1rem; line-height:1.5;">
-</div>
-
-<hr style="border:none; border-top:1px solid #333; margin:24px 16px;">
-<!-- 📹 VIDEO INTAKE BUTTON -->
-<div style="text-align:center; margin:0 16px; background:#0f0f1a; border-radius:16px; padding:16px; border:1px solid #333;">
-  <p style="color:#c084fc; font-size:0.85rem; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:12px;">📹 Video Intake</p>
+<div id="fresh-response" style="margin:16px;padding:14px;background:#1e1e1e;color:#ffd700;font-style:italic;border-radius:8px;display:none;border-left:4px solid #ffd700;font-size:1rem;line-height:1.5;"></div>
+<hr style="border:none;border-top:1px solid #333;margin:24px 16px;">
+<div style="text-align:center;margin:0 16px;background:#0f0f1a;border-radius:16px;padding:16px;border:1px solid #333;">
+  <p style="color:#c084fc;font-size:0.85rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;">📹 Video Intake</p>
   <button id="vidBtn" onclick="startVid()" style="width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#9333ea);border:3px solid #c084fc;color:white;font-size:2.5rem;cursor:pointer;">📹</button>
   <p style="color:#a78bfa;font-size:0.78rem;">Point at unit • Say customer name & issue • Tap stop</p>
   <div id="vidPreview" style="display:none;max-width:360px;margin:16px auto 0;">
@@ -55,42 +24,74 @@
   </div>
   <div id="vidStatus" style="color:#4ade80;font-size:0.85rem;margin-top:12px;"></div>
 </div>
-
-<!-- 🌍 MY WORLD -->
 <div style="margin:16px;">
-  <button id="myWorldBtn" onclick="toggleMyWorld()" style="width:100%;padding:14px 16px;background:linear-gradient(135deg,#7c3aed,#9333ea);border:2px solid #c084fc;color:#fff;font-size:1.05rem;font-weight:700;border-radius:14px;cursor:pointer;">🌍 My World</button>
+  <button id="myWorldBtn" onclick="toggleMyWorld()" style="width:100%;padding:14px 16px;background:linear-gradient(135deg,#7c3aed,#9333ea);border:2px solid #c084fc;color:#fff;font-size:1.05rem;font-weight:bold;border-radius:12px;cursor:pointer;">🌍 My World ▼</button>
   <div id="myWorldPanel" style="display:none;margin-top:12px;"></div>
 </div>
-
 <script>
 const WEBHOOK='https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei';
 let myWorldLoaded=false;
-async function toggleMyWorld(){const panel=document.getElementById('myWorldPanel');if(panel.style.display==='none'||!panel.style.display){panel.style.display='block';if(!myWorldLoaded){panel.innerHTML='Loading...';await loadMyWorld();myWorldLoaded=true;}}else{panel.style.display='none';}}
-function statusPillStyle(status){const s=(status||'').toLowerCase();if(s.includes('workbench'))return 'background:#f59e0b;color:#1f1300;';if(s.includes('ready'))return 'background:#22c55e;color:#0b1f12;';if(s.includes('waiting'))return 'background:#60a5fa;color:#0b1220;';if(s.includes('done'))return 'background:#a3a3a3;color:#171717;';return 'background:#e879f9;color:#240b2c;';}
-async function loadMyWorld(){const panel=document.getElementById('myWorldPanel');try{const res=await fetch('/.netlify/functions/myworld');const data=await res.json();const items=Array.isArray(data.items)?data.items:[];panel.innerHTML=items.length?items.map(item=>`<div style="margin-bottom:10px;padding:10px;border-radius:10px;background:#111827;border:1px solid #374151;"><div style="font-weight:700;color:#fff;">${item.name||'Untitled'}</div><div style="display:inline-block;margin-top:6px;padding:4px 8px;border-radius:999px;font-size:0.75rem;${statusPillStyle(item.status)}">${item.status||'Unknown'}</div></div>`).join(''):'<div style="color:#c4b5fd;">No items found.</div>';}catch(e){panel.innerHTML='<div style="color:#fca5a5;">Failed to load My World.</div>';console.error(e);}}
+
+async function toggleMyWorld(){
+  const panel=document.getElementById('myWorldPanel');
+  const btn=document.getElementById('myWorldBtn');
+  if(panel.style.display==='none'||!panel.style.display){
+    panel.style.display='block';
+    btn.textContent='🌍 My World ▲';
+    if(!myWorldLoaded){await loadMyWorld();myWorldLoaded=true;}
+  }else{
+    panel.style.display='none';
+    btn.textContent='🌍 My World ▼';
+  }
+}
+
+function statusPillStyle(status){
+  const s=(status||'').toLowerCase();
+  if(s.includes('workbench'))return 'background:#f59e0b;color:#1f1300;';
+  if(s.includes('ready'))return 'background:#22c55e;color:#0b1f1b;';
+  if(s.includes('pending'))return 'background:#579bfc;color:#fff;';
+  if(s.includes('intake'))return 'background:#c084fc;color:#1a0030;';
+  return 'background:#555;color:#fff;';
+}
+
+async function loadMyWorld(){
+  const panel=document.getElementById('myWorldPanel');
+  panel.innerHTML='<p style="color:#aaa;text-align:center;">Loading…</p>';
+  try{
+    const res=await fetch('/.netlify/functions/myworld');
+    const data=await res.json();
+    const items=Array.isArray(data.items)?data.items:[];
+    if(items.length===0){panel.innerHTML='<p style="color:#aaa;text-align:center;">No items found.</p>';return;}
+    panel.innerHTML=items.map(item=>`
+      <div style="background:#2a2a3e;border-radius:10px;padding:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="color:#fff;font-weight:bold;font-size:0.95rem;">${item.name}</span>
+        <span style="padding:4px 10px;border-radius:20px;font-size:0.78rem;font-weight:bold;${statusPillStyle(item.status)}">${item.status}</span>
+      </div>`).join('');
+  }catch(err){
+    panel.innerHTML='<p style="color:#f87171;text-align:center;">❌ Could not load items.</p>';
+  }
+}
+
 let mr,chunks=[],str,rec,txt='',ti,sec=0;
+
 function startVid(){
   txt='';sec=0;document.getElementById('vidStatus').textContent='';
   navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:true})
-  .catch(()=>navigator.mediaDevices.getUserMedia({video:true,audio:true}))
-  .then(s=>{
-    str=s;
-    document.getElementById('liveVid').srcObject=s;
-    document.getElementById('vidPreview').style.display='block';
-    document.getElementById('vidBtn').textContent='🔴';
-    chunks=[];
-    mr=new MediaRecorder(s);
-    mr.ondataavailable=e=>chunks.push(e.data);
-    mr.onstop=sendVid;
-    mr.start(500);
-    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    if(SR){rec=new SR();rec.continuous=true;rec.interimResults=true;
-      rec.onresult=e=>{txt=Array.from(e.results).map(r=>r[0].transcript).join(' ');
-      document.getElementById('liveTxt').textContent='🎙️ '+txt;}
-      }
-    ti=setInterval(()=>{sec++;if(sec>=30)stopVid();},1000);
-  }).catch(()=>document.getElementById('vidStatus').textContent='❌ Camera blocked');
+    .catch(()=>navigator.mediaDevices.getUserMedia({video:true,audio:true}))
+    .then(s=>{
+      str=s;document.getElementById('liveVid').srcObject=s;
+      document.getElementById('vidPreview').style.display='block';
+      document.getElementById('vidBtn').textContent='🔴';
+      chunks=[];mr=new MediaRecorder(s);mr.ondataavailable=e=>chunks.push(e.data);mr.onstop=sendVid;mr.start(500);
+      const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+      if(SR){rec=new SR();rec.continuous=true;rec.interimResults=true;
+        rec.onresult=e=>{txt=Array.from(e.results).map(r=>r[0].transcript).join(' ');
+        document.getElementById('liveTxt').textContent='🎙️ '+txt;}
+        rec.start();}
+      ti=setInterval(()=>{sec++;if(sec>=30)stopVid();},1000);
+    }).catch(()=>document.getElementById('vidStatus').textContent='❌ Camera blocked');
 }
+
 function stopVid(){
   clearInterval(ti);
   if(rec)try{rec.stop();}catch(e){}
@@ -99,6 +100,7 @@ function stopVid(){
   document.getElementById('vidPreview').style.display='none';
   document.getElementById('vidBtn').textContent='📹';
 }
+
 async function sendVid(){
   document.getElementById('vidStatus').textContent='⏳ Sending to Sissy…';
   const name=txt.match(/(?:for|it'?s|customer)\s+([A-Z][a-z]+ [A-Z][a-z]+)/i);
@@ -108,62 +110,39 @@ async function sendVid(){
   document.getElementById('vidStatus').textContent='✅ Sent! Card creating on the board…';
 }
 
-// ── Shared: send to Fresh and speak the reply ──────────────────
-async function sendToFresh(userMessage) {
-  try {
-    const res = await fetch('/.netlify/functions/intake', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ body: userMessage })
-    });
-    const data = await res.json();
-    const reply = data.reply || "Got it — I'll take care of that.";
-
-    // Display
-    const box = document.getElementById('fresh-response');
-    box.textContent = '🤵 ' + reply;
-    box.style.display = 'block';
-
-    // Speak
-    const utter = new SpeechSynthesisUtterance(reply);
-    utter.rate = 0.95;
-    utter.pitch = 1.05;
+async function sendToFresh(userMessage){
+  try{
+    const res=await fetch('/.netlify/functions/intake',{method:'POST',
+      headers:{'Content-Type':'application/json'},body:JSON.stringify({body:userMessage})});
+    const data=await res.json();
+    const reply=data.reply||"Got it — I'll take care of that.";
+    const box=document.getElementById('fresh-response');
+    box.textContent='🤵 '+reply;box.style.display='block';
+    const utter=new SpeechSynthesisUtterance(reply);utter.rate=0.95;utter.pitch=1.05;
     window.speechSynthesis.speak(utter);
-  } catch(e) {
-    console.error('sendToFresh error:', e);
-  }
+  }catch(e){console.error('sendToFresh error:',e);}
 }
 
-// ── Tap to Talk ────────────────────────────────────────────────
-function startTalk() {
-  if (!rec) return alert('Voice not supported on this device.');
-  document.getElementById('talkBtn').textContent = '🔴 Listening…';
-  rec.onend = async () => {
-    document.getElementById('talkBtn').textContent = '🎙️ Tap to Talk';
-    rec.continuous = true;  // restore for video flow
-    if (txt && txt.trim()) await sendToFresh(txt.trim());
-    txt = '';
-  };
-  rec.continuous = false;  // ← ADD THIS
-  rec.start();
+function startTalk(){
+  if(!rec)return alert('Voice not supported on this device.');
+  document.getElementById('talkBtn').textContent='🔴 Listening…';
+  rec.onend=async()=>{
+    document.getElementById('talkBtn').textContent='🎙️ Tap to Talk';
+    rec.continuous=true;if(txt&&txt.trim())await sendToFresh(txt.trim());txt='';};
+  rec.continuous=false;rec.start();
 }
 
-// ── Tap to Type ────────────────────────────────────────────────
-function showTypeBox() {
-  const s = document.getElementById('typeSection');
-  s.style.display = s.style.display === 'none' ? 'block' : 'none';
+function showTypeBox(){
+  const s=document.getElementById('typeSection');
+  s.style.display=s.style.display==='none'?'block':'none';
   document.getElementById('typeInput').focus();
 }
 
-async function sendTyped() {
-  const input = document.getElementById('typeInput');
-  const msg = input.value.trim();
-  if (!msg) return;
-  input.value = '';
-  document.getElementById('typeSection').style.display = 'none';
+async function sendTyped(){
+  const input=document.getElementById('typeInput');
+  const msg=input.value.trim();if(!msg)return;
+  input.value='';document.getElementById('typeSection').style.display='none';
   await sendToFresh(msg);
 }
 </script>
-<!-- END VIDEO INTAKE -->
-
 </div>
