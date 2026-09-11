@@ -1,318 +1,173 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TappyThing — Fresh Interview</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Fresh — Digital Coordinator</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: #0d0d1a;
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-    .screen { display: none; width: 100%; max-width: 440px; text-align: center; animation: fadeIn 0.5s ease; }
-    .screen.active { display: flex; flex-direction: column; align-items: center; }
-    @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-    .mascot {
-      width: 100px; height: 100px; border-radius: 50%;
-      background: linear-gradient(135deg, #7c3aed, #9333ea);
-      border: 3px solid #c084fc;
-      box-shadow: 0 0 40px rgba(147,51,234,0.6);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 3rem; margin: 0 auto 20px;
-    }
-    .mascot.talking { animation: glow 0.8s infinite alternate; }
-    @keyframes glow {
-      from { box-shadow: 0 0 20px rgba(147,51,234,0.5); }
-      to   { box-shadow: 0 0 60px rgba(147,51,234,1); }
-    }
-    .fresh-name { font-size: 0.75rem; letter-spacing: 0.15em; color: #c084fc; text-transform: uppercase; margin-bottom: 6px; }
-    .bubble {
-      background: rgba(124,58,237,0.15);
-      border: 1px solid rgba(147,51,234,0.4);
-      border-radius: 16px;
-      padding: 16px 20px;
-      font-size: 1rem;
-      line-height: 1.6;
-      color: #e9d5ff;
-      margin: 16px 0 24px;
-      min-height: 70px;
-    }
-    .mic-btn {
-      width: 90px; height: 90px; border-radius: 50%;
-      background: linear-gradient(135deg, #059669, #10b981);
-      border: 3px solid #6ee7b7;
-      color: white; font-size: 2rem; cursor: pointer;
-      box-shadow: 0 0 25px rgba(16,185,129,0.5);
-      transition: all 0.2s;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 2px;
-      margin: 0 auto;
-    }
-    .mic-btn span { font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; }
-    .mic-btn:hover { transform: scale(1.06); }
-    .mic-btn.listening {
-      background: linear-gradient(135deg, #dc2626, #ef4444);
-      border-color: #fca5a5;
-      box-shadow: 0 0 40px rgba(239,68,68,0.7);
-      animation: pulse 1s infinite;
-    }
-    @keyframes pulse {
-      0%,100% { box-shadow: 0 0 20px rgba(239,68,68,0.5); }
-      50%      { box-shadow: 0 0 50px rgba(239,68,68,0.9); }
-    }
-    .transcript {
-      background: rgba(0,0,0,0.3);
-      border: 1px solid rgba(147,51,234,0.2);
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 0.85rem;
-      color: #a78bfa;
-      min-height: 44px;
-      margin: 16px 0;
-      width: 100%;
-      text-align: left;
-    }
-    .next-btn {
-      background: linear-gradient(135deg, #7c3aed, #9333ea);
-      border: none; color: white;
-      border-radius: 12px; padding: 14px 32px;
-      font-size: 0.95rem; cursor: pointer;
-      width: 100%; margin-top: 8px;
-      transition: all 0.2s;
-      display: none;
-    }
-    .next-btn:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(147,51,234,0.5); }
-    .next-btn.visible { display: block; }
-    .progress-wrap { width: 100%; margin-bottom: 24px; }
-    .progress-label { font-size: 0.72rem; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
-    .progress-bar { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
-    .progress-fill { height: 100%; background: linear-gradient(90deg, #7c3aed, #c084fc); border-radius: 3px; transition: width 0.6s ease; }
-    .build-log {
-      width: 100%;
-      background: rgba(0,0,0,0.4);
-      border: 1px solid rgba(147,51,234,0.3);
-      border-radius: 14px;
-      padding: 16px;
-      text-align: left;
-      margin: 16px 0;
-      min-height: 160px;
-    }
-    .build-log-title { font-size: 0.72rem; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
-    .log-line { font-size: 0.85rem; color: #a78bfa; margin-bottom: 6px; opacity: 0; animation: popIn 0.4s forwards; }
-    .log-line.done { color: #4ade80; }
-    @keyframes popIn { to { opacity: 1; } }
-    .reveal-title { font-size: 1.6rem; font-weight: 700; color: #e9d5ff; margin: 16px 0 8px; }
-    .reveal-sub { font-size: 0.9rem; color: #a78bfa; margin-bottom: 24px; }
-    .workspace-card {
-      width: 100%;
-      background: rgba(124,58,237,0.1);
-      border: 1px solid rgba(147,51,234,0.4);
-      border-radius: 14px;
-      padding: 16px;
-      text-align: left;
-      margin-bottom: 24px;
-    }
-    .workspace-card h4 { color: #c084fc; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
-    .workspace-card p { font-size: 0.88rem; color: #e9d5ff; margin-bottom: 6px; }
-    .workspace-card p span { color: #4ade80; }
-    .activate-btn {
-      width: 100%;
-      background: linear-gradient(135deg, #059669, #10b981);
-      border: none; color: white;
-      border-radius: 14px; padding: 18px;
-      font-size: 1.1rem; font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 0 30px rgba(16,185,129,0.4);
-      transition: all 0.2s;
-      margin-bottom: 10px;
-    }
-    .activate-btn:hover { transform: scale(1.02); box-shadow: 0 0 50px rgba(16,185,129,0.7); }
-    .price-note { font-size: 0.78rem; color: #6ee7b7; margin-bottom: 6px; }
-    .skip-note  { font-size: 0.72rem; color: rgba(167,139,250,0.4); cursor: pointer; }
-    .skip-note:hover { color: #a78bfa; }
-    .start-btn {
-      background: linear-gradient(135deg, #7c3aed, #9333ea);
-      border: none; color: white;
-      border-radius: 14px; padding: 16px 40px;
-      font-size: 1rem; cursor: pointer;
-      box-shadow: 0 0 25px rgba(147,51,234,0.5);
-      transition: all 0.2s;
-    }
-    .start-btn:hover { transform: scale(1.04); }
-    .hint { font-size: 0.75rem; color: rgba(167,139,250,0.45); margin-top: 14px; }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:#0f0f1a;color:#fff;font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 60px 0;}
+    .header{width:100%;max-width:480px;text-align:center;padding:28px 16px 20px;border-bottom:2px solid #ffd700;}
+    .fresh-card{display:inline-block;text-align:center;}
+    .fresh-card img{width:90px;height:90px;border-radius:50%;border:3px solid #ffd700;object-fit:cover;}
+    .fresh-name{font-size:1.3rem;font-weight:bold;color:#ffd700;margin-top:8px;}
+    .fresh-title{font-size:0.75rem;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px;}
+    .fresh-badge{display:inline-block;margin-top:8px;background:#1a1a2e;border:1px solid #ffd700;border-radius:20px;padding:4px 14px;font-size:0.72rem;color:#ffd700;letter-spacing:0.05em;}
+    .search-section{width:100%;max-width:480px;padding:28px 16px 0;}
+    .search-label{font-size:1rem;color:#e2e8f0;margin-bottom:12px;line-height:1.5;}
+    .search-label span{color:#ffd700;font-weight:bold;}
+    .search-box{display:flex;gap:8px;}
+    .search-box input{flex:1;padding:14px;font-size:1rem;border-radius:10px;border:1px solid #333;background:#1a1a2e;color:#fff;outline:none;}
+    .search-box input:focus{border-color:#ffd700;}
+    .search-box button{padding:14px 18px;background:#ffd700;color:#000;font-weight:bold;border:none;border-radius:10px;cursor:pointer;font-size:0.95rem;}
+    .hint{font-size:0.72rem;color:#555;margin-top:8px;text-align:center;}
+    .fresh-bubble{display:none;width:100%;max-width:480px;margin-top:20px;padding:0 16px;}
+    .bubble-inner{background:#1a1a2e;border-left:4px solid #ffd700;border-radius:12px;padding:18px;font-size:0.95rem;line-height:1.7;color:#e2e8f0;}
+    .bubble-inner .highlight{color:#ffd700;font-weight:bold;}
+    .chat-section{display:none;width:100%;max-width:480px;padding:20px 16px 0;}
+    .chat-log{background:#1a1a2e;border-radius:12px;padding:16px;min-height:120px;max-height:340px;overflow-y:auto;margin-bottom:12px;}
+    .msg{margin-bottom:14px;line-height:1.6;}
+    .msg.fresh{color:#ffd700;font-size:0.9rem;}
+    .msg.fresh span{font-weight:bold;}
+    .msg.prospect{color:#e2e8f0;font-size:0.9rem;text-align:right;}
+    .msg.prospect span{font-weight:bold;color:#579bfc;}
+    .chat-input{display:flex;gap:8px;}
+    .chat-input input{flex:1;padding:12px;font-size:0.95rem;border-radius:10px;border:1px solid #333;background:#0f0f1a;color:#fff;outline:none;}
+    .chat-input input:focus{border-color:#ffd700;}
+    .chat-input button{padding:12px 16px;background:#00c875;color:#fff;font-weight:bold;border:none;border-radius:10px;cursor:pointer;}
+    .pulse{animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.4);}50%{box-shadow:0 0 0 8px rgba(255,215,0,0);}}
   </style>
 </head>
 <body>
-<div class="screen active" id="screen-welcome">
-  <div class="mascot">🎙️</div>
-  <div class="fresh-name">Fresh — Digital Coordinator</div>
-  <div class="bubble">
-    Hey — I'm Fresh.<br><br>
-    I'm going to ask you a few quick questions about your business, and while we talk, I'll build your custom workspace live on screen.<br><br>
-    Takes about 3 minutes. Ready?
-  </div>
-  <button class="start-btn" onclick="startInterview()">Let's Go →</button>
-  <p class="hint">No payment required — build first, decide after</p>
-</div>
-<div class="screen" id="screen-interview">
-  <div class="progress-wrap">
-    <div class="progress-label" id="qLabel">Question 1 of 6</div>
-    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-  </div>
-  <div class="mascot" id="freshMascot">🎙️</div>
-  <div class="fresh-name">Fresh</div>
-  <div class="bubble" id="freshQuestion">Loading…</div>
-  <button class="mic-btn" id="micBtn" onclick="toggleListen()">
-    🎤<span>Tap to Answer</span>
-  </button>
-  <div class="transcript" id="answerText">Your answer will appear here…</div>
-  <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
-</div>
-<div class="screen" id="screen-build">
-  <div class="mascot talking">⚙️</div>
-  <div class="fresh-name">Sissy is Building…</div>
-  <div class="bubble" id="buildMessage">Give me just a second — I'm setting up your world.</div>
-  <div class="build-log" id="buildLog">
-    <div class="build-log-title">🔧 Build Log</div>
+
+<div class="header">
+  <div class="fresh-card">
+    <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh" id="freshImg"/>
+    <div class="fresh-name">Fresh</div>
+    <div class="fresh-title">Digital Coordinator</div>
+    <div class="fresh-badge">📋 Applying for: Your Business</div>
   </div>
 </div>
-<div class="screen" id="screen-reveal">
-  <div class="mascot">✅</div>
-  <div class="fresh-name">Fresh</div>
-  <div class="reveal-title">Your world is ready.</div>
-  <div class="reveal-sub" id="revealSub">Here's what we built for you.</div>
-  <div class="workspace-card" id="workspaceCard">
-    <h4>Your TappyThing Workspace</h4>
+
+<div class="search-section">
+  <div class="search-label">Tell me about <span>your world</span> and I'll show you what I can do for you.</div>
+  <div class="search-box">
+    <input type="text" id="worldInput" placeholder="e.g. hair salon, busy mom, restaurant…" onkeydown="if(event.key==='Enter')discover()"/>
+    <button onclick="discover()">Go →</button>
   </div>
-  <button class="activate-btn" id="activateBtn">
-    🔐 Activate My Workspace — $95/month
-  </button>
-  <div class="price-note">30-day guarantee. Cancel anytime.</div>
-  <div class="skip-note" onclick="skipPayment()">Save this for later →</div>
+  <div class="hint">businesses · homes · families · individuals</div>
 </div>
+
+<div class="fresh-bubble" id="freshBubble">
+  <div class="bubble-inner" id="bubbleText"></div>
+</div>
+
+<div class="chat-section" id="chatSection">
+  <div class="chat-log" id="chatLog"></div>
+  <div class="chat-input">
+    <input type="text" id="chatInput" placeholder="Ask me anything…" onkeydown="if(event.key==='Enter')sendChat()"/>
+    <button onclick="sendChat()">Send</button>
+  </div>
+</div>
+
 <script>
-  const GEMINI_KEY   = 'YOUR_GEMINI_API_KEY_HERE';
-  const MAKE_WEBHOOK = 'https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei';
-  const WORKIZ_LINK  = 'YOUR_WORKIZ_PAY_LINK_HERE';
-  const QUESTIONS = [
-    "What's your name and what does your business do?",
-    "Who are your customers — are they homeowners, businesses, or both?",
-    "What's your biggest daily headache right now?",
-    "Who's on your team — even if it's just you?",
-    "What do you most need to track — jobs, leads, inventory, something else?",
-    "What does success look like for you in 90 days?"
-  ];
-  let currentQ = 0, answers = [], recognition, listening = false, currentTranscript = '';
-  function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+const INTAKE = '/.netlify/functions/intake';
+let chatHistory = [];
+let interviewStarted = false;
+
+const qualifications = {
+  salon: ["Track appointments and follow up with no-shows automatically","Send confirmations and reminders without lifting a finger","Keep a running list of who needs a callback","Log walk-ins and new client notes on the spot","Never lose a lead from a missed call again"],
+  restaurant: ["Log table issues, supply runs, and staff notes instantly","Track catering leads and follow-up calls","Keep your prep and delivery schedule in one place","Send staff updates without group texts","Flag low inventory before it becomes a problem"],
+  mom: ["Keep track of appointments, errands, and follow-ups","Never forget a callback or a task again","Log things on the go — voice or text, whatever's easier","Get a daily summary of what needs attention","Organize school, home, and personal tasks in one place"],
+  home: ["Track home repairs, vendors, and warranties","Log issues as they happen — voice or text","Follow up on quotes and callbacks automatically","Keep a running punch list organized by room","Never lose a contractor's contact again"],
+  default: ["Capture every task, call, and follow-up the moment it happens","Organize your day without spreadsheets or sticky notes","Send reminders and confirmations automatically","Keep your team on the same page without group texts","Log anything by voice — no typing required"]
+};
+
+function getQuals(input) {
+  const s = input.toLowerCase();
+  if(s.includes('salon')||s.includes('hair')||s.includes('nail')||s.includes('spa')) return qualifications.salon;
+  if(s.includes('restaurant')||s.includes('food')||s.includes('cafe')||s.includes('bar')) return qualifications.restaurant;
+  if(s.includes('mom')||s.includes('mother')||s.includes('family')||s.includes('home owner')||s.includes('homeowner')) return qualifications.mom;
+  if(s.includes('home')||s.includes('house')||s.includes('property')) return qualifications.home;
+  return qualifications.default;
+}
+
+function discover() {
+  const input = document.getElementById('worldInput').value.trim();
+  if(!input) return;
+  const quals = getQuals(input);
+  const list = quals.map(q=>`<li style="margin-bottom:6px;">✦ ${q}</li>`).join('');
+  const bubble = document.getElementById('freshBubble');
+  const text = document.getElementById('bubbleText');
+  text.innerHTML = `
+    <div style="margin-bottom:12px;">Here's what I can do for <span class="highlight">${input}</span>:</div>
+    <ul style="padding-left:4px;list-style:none;">${list}</ul>
+    <div style="margin-top:16px;color:#aaa;font-size:0.88rem;">By the way — my name is Fresh. There's a story behind it if you're ever curious. But let's talk about <span class="highlight">you</span>.</div>
+  `;
+  bubble.style.display='block';
+  document.getElementById('freshImg').classList.add('pulse');
+  speak(`Here's what I can do for ${input}. ${quals[0]}. ${quals[1]}. And more. By the way — my name is Fresh. There's a story behind that name if you're ever curious. But let's talk about you.`);
+  setTimeout(()=>openInterview(input), 3200);
+}
+
+function openInterview(input) {
+  const section = document.getElementById('chatSection');
+  section.style.display = 'block';
+  section.scrollIntoView({behavior:'smooth'});
+  const opener = `Thanks for taking the time. I'm here to apply for the Digital Coordinator position — for ${input}. I've helped a lot of businesses like yours. Most people start by asking how I handle follow-ups, or how I keep things from falling through the cracks. But honestly — ask me whatever you like. Should I tell you a little about myself, or do you have questions you'd like to start with?`;
+  appendMsg('fresh', opener);
+  speak(opener);
+  chatHistory.push({role:'model', parts:[{text: opener}]});
+  interviewStarted = true;
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if(!msg) return;
+  input.value = '';
+  appendMsg('prospect', msg);
+  chatHistory.push({role:'user', parts:[{text: msg}]});
+  const reply = await askFresh(msg);
+  appendMsg('fresh', reply);
+  speak(reply);
+  chatHistory.push({role:'model', parts:[{text: reply}]});
+}
+
+async function askFresh(msg) {
+  try {
+    const systemPrompt = `You are Fresh, a Digital Coordinator applying for a job. You are warm, confident, and humble. You were named after the founder's oldest son. There is a story behind your name but you only share it if asked. You help businesses and individuals stay organized. You never hard sell. You mention the price ($95/month) naturally only once, when it fits. After a few exchanges offer to build them a real system — not a demo, their actual system. After 3 days you will ask if you got the job. Keep responses short — 2 to 4 sentences max. This is a conversation, not a speech.`;
+    const res = await fetch(INTAKE, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({body: msg, system: systemPrompt, history: chatHistory})
+    });
+    const data = await res.json();
+    return data.reply || "That's a great question. Tell me more about what you need and I'll show you exactly how I can help.";
+  } catch(e) {
+    return "I'm here — tell me more about what you need.";
   }
-  function startInterview() { showScreen('screen-interview'); loadQuestion(0); speak(QUESTIONS[0]); }
-  function loadQuestion(index) {
-    currentTranscript = '';
-    document.getElementById('freshQuestion').textContent = QUESTIONS[index];
-    document.getElementById('qLabel').textContent = `Question ${index+1} of ${QUESTIONS.length}`;
-    document.getElementById('progressFill').style.width = `${((index)/QUESTIONS.length)*100}%`;
-    document.getElementById('answerText').textContent = 'Your answer will appear here…';
-    document.getElementById('nextBtn').classList.remove('visible');
-    document.getElementById('micBtn').classList.remove('listening');
-    document.getElementById('micBtn').innerHTML = '🎤<span>Tap to Answer</span>';
-  }
-  function speak(text) {
-    if (!window.speechSynthesis) return;
-    speechSynthesis.cancel();
+}
+
+function appendMsg(role, text) {
+  const log = document.getElementById('chatLog');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  div.innerHTML = role === 'fresh'
+    ? `<span>Fresh 🤵</span><br>${text}`
+    : `<span>You 💬</span><br>${text}`;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+function speak(text) {
+  try {
     const u = new SpeechSynthesisUtterance(text);
     u.rate = 0.95; u.pitch = 1.05;
-    document.getElementById('freshMascot').classList.add('talking');
-    u.onend = () => document.getElementById('freshMascot').classList.remove('talking');
-    speechSynthesis.speak(u);
-  }
-  function toggleListen() { if (listening) stopListen(); else startListen(); }
-  function startListen() {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) { document.getElementById('answerText').textContent = '⚠️ Speech not supported'; return; }
-    recognition = new SR();
-    recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
-    recognition.onresult = e => {
-      currentTranscript = Array.from(e.results).map(r => r[0].transcript).join(' ').trim();
-      document.getElementById('answerText').textContent = '🎤 ' + currentTranscript;
-      if (currentTranscript.length > 8) document.getElementById('nextBtn').classList.add('visible');
-    };
-    recognition.onerror = () => stopListen();
-    recognition.start();
-    listening = true;
-    document.getElementById('micBtn').classList.add('listening');
-    document.getElementById('micBtn').innerHTML = '⏹<span>Tap to Stop</span>';
-  }
-  function stopListen() {
-    if (recognition) try { recognition.stop(); } catch(e) {}
-    listening = false;
-    document.getElementById('micBtn').classList.remove('listening');
-    document.getElementById('micBtn').innerHTML = '🎤<span>Tap to Answer</span>';
-  }
-  function nextQuestion() {
-    stopListen();
-    answers.push({ question: QUESTIONS[currentQ], answer: currentTranscript });
-    currentQ++;
-    if (currentQ < QUESTIONS.length) { loadQuestion(currentQ); setTimeout(() => speak(QUESTIONS[currentQ]), 400); }
-    else buildWorkspace();
-  }
-  async function buildWorkspace() {
-    showScreen('screen-build');
-    const log = document.getElementById('buildLog');
-    const steps = ['📋 Analyzing your business…','🏗️ Creating your Operations board…','👥 Setting up your team…','📥 Configuring intake pipeline…','🔔 Wiring notifications…','✅ Workspace complete!'];
-    for (let i = 0; i < steps.length; i++) {
-      await delay(900 + Math.random()*600);
-      const line = document.createElement('div');
-      line.className = 'log-line' + (i===steps.length-1?' done':'');
-      line.textContent = steps[i];
-      log.appendChild(line);
-    }
-    try {
-      await fetch(MAKE_WEBHOOK, { method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ type:'tappything_onboarding', source:'Fresh Reverse Interview', answers, timestamp: new Date().toISOString() }) });
-    } catch(e) {}
-    const summary = await getGeminiSummary();
-    showReveal(summary);
-  }
-  async function getGeminiSummary() {
-    const prompt = `Based on these interview answers, write 3 SHORT bullet points describing the custom workspace built. Be specific.\n\nAnswers: ${answers.map(a=>a.question+' → '+a.answer).join('\n')}\n\nReturn ONLY 3 bullet points.`;
-    try {
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
-        { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ contents:[{ parts:[{ text: prompt }] }] }) });
-      const data = await res.json();
-      return data?.candidates?.[0]?.content?.parts?.[0]?.text || defaultSummary();
-    } catch(e) { return defaultSummary(); }
-  }
-  function defaultSummary() { return `• Operations board built for ${answers[0]?.answer||'your business'}\n• Team structure configured\n• Intake pipeline ready`; }
-  function showReveal(summary) {
-    const name = extractFirstName(answers[0]?.answer||'');
-    document.getElementById('revealSub').textContent = name ? `Here's what we built for you, ${name}.` : "Here's what we built for you.";
-    const card = document.getElementById('workspaceCard');
-    card.innerHTML = '<h4>Your TappyThing Workspace</h4>';
-    summary.split('\n').filter(l=>l.trim()).forEach(line => {
-      const p = document.createElement('p');
-      p.innerHTML = line.replace('•','<span>✅</span>');
-      card.appendChild(p);
-    });
-    document.getElementById('activateBtn').onclick = () => window.open(WORKIZ_LINK, '_blank');
-    showScreen('screen-reveal');
-    speak("Your world is ready. Take a look at what we built.");
-  }
-  function skipPayment() { alert("No problem — your workspace is saved. Come back anytime to activate it."); }
-  function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
-  function extractFirstName(text) {
-    const m = text.match(/(?:I'?m|name is|I am|call me)\s+([A-Z][a-z]+)/i) || text.match(/\b([A-Z][a-z]{2,12})\b/);
-    return m ? m[1] : '';
-  }
+    window.speechSynthesis.speak(u);
+  } catch(e) {}
+}
 </script>
 </body>
 </html>
