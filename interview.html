@@ -54,13 +54,16 @@
     .chat-input input:focus{border-color:#ffd700;}
     .chat-input button{padding:12px 16px;background:#00c875;color:#fff;font-weight:bold;border:none;border-radius:10px;cursor:pointer;}
     .thinking{color:#aaa;font-style:italic;font-size:0.85rem;padding:8px 0;}
-    .trial-cta{display:none;width:100%;max-width:480px;text-align:center;padding:20px 16px;}
+    .trial-cta{display:none;width:100%;max-width:480px;padding:16px 16px 0;}
     .trial-inner{background:#1a1a2e;border-radius:16px;border:1px solid #333;padding:20px;}
     .trial-inner h3{color:#ffd700;font-size:1rem;margin-bottom:8px;}
     .trial-inner p{color:#aaa;font-size:0.85rem;line-height:1.6;margin-bottom:16px;}
-    .trial-btn{padding:14px 28px;background:#00c875;color:#fff;font-size:1rem;font-weight:bold;border:none;border-radius:12px;cursor:pointer;width:100%;}
+    .option-btns{display:flex;flex-direction:column;gap:10px;}
+    .btn-now{padding:14px;background:#00c875;color:#000;font-size:1rem;font-weight:bold;border:none;border-radius:12px;cursor:pointer;width:100%;}
+    .btn-later{padding:14px;background:#1a1a2e;color:#ffd700;font-size:1rem;font-weight:bold;border:2px solid #ffd700;border-radius:12px;cursor:pointer;width:100%;}
     .trial-form input{width:100%;padding:12px;margin-bottom:8px;border-radius:8px;border:1px solid #333;background:#0f0f1a;color:#fff;font-size:0.95rem;display:block;}
     .trial-form button{width:100%;padding:14px;background:#ffd700;color:#000;font-weight:bold;border:none;border-radius:10px;font-size:1rem;cursor:pointer;}
+    .guarantee{font-size:0.75rem;color:#555;text-align:center;margin-top:12px;}
     .pulse{animation:pulse 2s infinite;}
     @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.4);}50%{box-shadow:0 0 0 8px rgba(255,215,0,0);}}
   </style>
@@ -116,9 +119,12 @@
 
 <div class="trial-cta" id="trialCta">
   <div class="trial-inner">
-    <h3>Want to keep Fresh?</h3>
-    <p>No commitment. No credit card. Just let Fresh go to work for a few days and see what happens.</p>
-    <button class="trial-btn" id="trialBtn" onclick="startTrial()">Fresh, you're hired →</button>
+    <h3>Your system is ready. Fresh is hired. 🎉</h3>
+    <p>Take as much time as you need — most people know within 3 to 5 days. Either way you have our full commitment.</p>
+    <div class="option-btns">
+      <button class="btn-now" onclick="showForm('now')">I'm ready now →</button>
+      <button class="btn-later" onclick="showForm('later')">Give me a few days →</button>
+    </div>
     <div class="trial-form" id="trialForm" style="display:none;margin-top:16px;">
       <input id="trialName" type="text" placeholder="Your name"/>
       <input id="trialBiz" type="text" placeholder="Your business type"/>
@@ -126,12 +132,13 @@
       <button onclick="submitTrial()">Let's do this! 🎉</button>
       <div id="trialStatus" style="margin-top:10px;font-size:0.85rem;color:#00c875;"></div>
     </div>
+    <div class="guarantee">🛡️ Full refund within 30 days. No questions asked.</div>
   </div>
 </div>
 
 <script>
 const CHAT='/.netlify/functions/chat';
-let chatHistory=[],replyCount=0,businessType='',systemBuilt=false;
+let chatHistory=[],replyCount=0,businessType='',systemBuilt=false,choiceType='';
 
 const TOOLS=[
   {icon:'📝',title:'Intake',desc:'Capture new requests instantly with smart triage.'},
@@ -140,7 +147,7 @@ const TOOLS=[
   {icon:'📊',title:'Dashboard',desc:'See everything in one clear command center.'}
 ];
 
-const SYSTEM=`You are Fresh, a warm and confident Digital Coordinator interviewing for a job. The prospect already knows your qualifications. Be conversational, humble, and specific to their business. Keep every response to 2-3 sentences max. Never mention price. After the first exchange point to the system cards above and ask if they want to change anything. Emphasize that you give them their time back — their actual quality of life, not just efficiency. Never use bullet points — just talk naturally.`;
+const SYSTEM=`You are Fresh, a warm and confident Digital Coordinator interviewing for a job. The prospect already knows your qualifications. Be conversational, humble, and specific to their business. Keep every response to 2-3 sentences max. Never mention price. After the first exchange point to the system cards above and ask if they want to change anything. Emphasize that you give them their quality of life back — not just efficiency. Never use bullet points — just talk naturally.`;
 
 const tocData={
   vacuum:['Route non-Aerus repairs automatically to your partner network','Track every machine from intake to pickup in one place','Send customers automatic status updates on their repair','Never lose a job ticket or parts order again'],
@@ -258,9 +265,14 @@ async function askFresh(msg){
   }catch(e){return"Tell me more — I want to make sure I understand your world.";}
 }
 
-function startTrial(){
-  document.getElementById('trialBtn').style.display='none';
+function showForm(type){
+  choiceType=type;
   document.getElementById('trialForm').style.display='block';
+  document.querySelectorAll('.btn-now,.btn-later').forEach(b=>b.style.display='none');
+}
+
+function startTrial(){
+  showForm('now');
 }
 
 async function submitTrial(){
@@ -269,7 +281,7 @@ async function submitTrial(){
   const phone=document.getElementById('trialPhone').value.trim();
   if(!name||!phone){document.getElementById('trialStatus').textContent='Please fill in your name and phone.';return;}
   document.getElementById('trialStatus').textContent='Sending...';
-  await fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'trial_signup',name,business:biz||businessType,phone,timestamp:new Date().toISOString()})});
+  await fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'trial_signup',choice:choiceType,name,business:biz||businessType,phone,timestamp:new Date().toISOString()})});
   document.getElementById('trialStatus').textContent="You're in! Fresh will be in touch shortly. 💛";
   speak("You're in! Fresh will be in touch shortly.");
 }
