@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>TappyThing — Demo Library</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:#0f0f1a;color:#fff;font-family:'Segoe UI',sans-serif;min-height:100vh;padding:0 0 60px 0;}
+    .header{text-align:center;padding:28px 16px 20px;border-bottom:2px solid #ffd700;}
+    .header img{width:70px;border-radius:50%;border:2px solid #ffd700;}
+    .header h1{font-size:1.2rem;font-weight:bold;color:#ffd700;margin-top:8px;}
+    .header p{font-size:0.78rem;color:#aaa;margin-top:4px;}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:20px 16px;}
+    .demo-card{background:#1a1a2e;border:1px solid #333;border-radius:14px;padding:18px 12px;text-align:center;cursor:pointer;transition:all 0.2s;}
+    .demo-card:active{transform:scale(0.97);}
+    .demo-card:hover{border-color:#ffd700;}
+    .demo-icon{font-size:2.2rem;margin-bottom:8px;}
+    .demo-name{font-weight:bold;color:#ffd700;font-size:0.9rem;}
+    .demo-desc{color:#aaa;font-size:0.75rem;margin-top:4px;line-height:1.4;}
+    .send-section{margin:0 16px;padding:16px;background:#1a1a2e;border-radius:14px;border:1px solid #333;}
+    .send-section h3{color:#ffd700;font-size:0.9rem;margin-bottom:12px;}
+    .send-box{display:flex;gap:8px;}
+    .send-box input{flex:1;padding:10px;font-size:0.9rem;border-radius:8px;border:1px solid #333;background:#0f0f1a;color:#fff;outline:none;}
+    .send-box button{padding:10px 14px;background:#00c875;color:#fff;font-weight:bold;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;}
+    .send-hint{font-size:0.72rem;color:#555;margin-top:6px;}
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh"/>
+  <h1>Fresh Demo Library</h1>
+  <p>Tap any industry to see Fresh in action</p>
+</div>
+
+<div class="grid">
+  <div class="demo-card" onclick="openDemo('vacuum repair shop')">
+    <div class="demo-icon">🔧</div>
+    <div class="demo-name">Vacuum Repair</div>
+    <div class="demo-desc">Intake, parts, customer updates</div>
+  </div>
+  <div class="demo-card" onclick="openDemo('Das Bierhallie beer hall and restaurant')">
+    <div class="demo-icon">🍺</div>
+    <div class="demo-name">Beer Hall</div>
+    <div class="demo-desc">Reservations, events, staff, inventory</div>
+  </div>
+  <div class="demo-card" onclick="openDemo('hair salon')">
+    <div class="demo-icon">💇</div>
+    <div class="demo-name">Hair Salon</div>
+    <div class="demo-desc">Bookings, no-shows, client notes</div>
+  </div>
+  <div class="demo-card" onclick="openDemo('dental office')">
+    <div class="demo-icon">🦷</div>
+    <div class="demo-name">Dentist</div>
+    <div class="demo-desc">Appointments, follow-ups, supplies</div>
+  </div>
+  <div class="demo-card" onclick="openDemo('barber shop')">
+    <div class="demo-icon">✂️</div>
+    <div class="demo-name">Barber Shop</div>
+    <div class="demo-desc">Walk-ins, reminders, inventory</div>
+  </div>
+  <div class="demo-card" onclick="openDemo('general contractor')">
+    <div class="demo-icon">🏗️</div>
+    <div class="demo-name">Contractor</div>
+    <div class="demo-desc">Job sites, materials, follow-ups</div>
+  </div>
+  <div class="demo-card" onclick="openDemo('gym and fitness center')">
+    <div class="demo-icon">💪</div>
+    <div class="demo-name">Gym</div>
+    <div class="demo-desc">Memberships, leads, check-ins</div>
+  </div>
+  <div class="demo-card" onclick="openDemo('law office')">
+    <div class="demo-icon">⚖️</div>
+    <div class="demo-name">Law Office</div>
+    <div class="demo-desc">Clients, deadlines, case notes</div>
+  </div>
+  <div class="demo-card" onclick="openDemo('retail store')">
+    <div class="demo-icon">🏪</div>
+    <div class="demo-name">Retail Store</div>
+    <div class="demo-desc">Inventory, vendors, callbacks</div>
+  </div>
+  <div class="demo-card" onclick="openDemo('retirement community')">
+    <div class="demo-icon">🏠</div>
+    <div class="demo-name">Retirement Community</div>
+    <div class="demo-desc">Residents, maintenance, events</div>
+  </div>
+  <div class="demo-card" onclick="openDemo('restaurant')">
+    <div class="demo-icon">🍽️</div>
+    <div class="demo-name">Restaurant</div>
+    <div class="demo-desc">Staff, orders, catering leads</div>
+  </div>
+  <div class="demo-card" onclick="openCustom()">
+    <div class="demo-icon">✨</div>
+    <div class="demo-name">Custom</div>
+    <div class="demo-desc">Type any business type</div>
+  </div>
+</div>
+
+<div class="send-section">
+  <h3>📤 Send Interview Link</h3>
+  <div class="send-box">
+    <input type="text" id="sendName" placeholder="Their name or business…"/>
+    <button onclick="copyLink()">Copy Link</button>
+  </div>
+  <div class="send-hint" id="sendHint">Copy and text them the interview link</div>
+</div>
+
+<script>
+function openDemo(business){
+  window.location.href='interview.html?demo='+encodeURIComponent(business);
+}
+
+function openCustom(){
+  const biz=prompt('What kind of business?');
+  if(biz)openDemo(biz);
+}
+
+function copyLink(){
+  const name=document.getElementById('sendName').value.trim();
+  const link='https://zippy-yeot-48bfee.netlify.app/interview.html'+(name?'?ref='+encodeURIComponent(name):'');
+  navigator.clipboard.writeText(link).then(()=>{
+    document.getElementById('sendHint').textContent='✅ Copied! Paste it into a text message.';
+    setTimeout(()=>document.getElementById('sendHint').textContent='Copy and text them the interview link',3000);
+  });
+}
+</script>
+</body>
+</html>
