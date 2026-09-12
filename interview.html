@@ -33,7 +33,70 @@
     .chat-input button{padding:12px 16px;background:#00c875;color:#fff;font-weight:bold;border:none;border-radius:10px;cursor:pointer;}
     .thinking{color:#aaa;font-style:italic;font-size:0.85rem;padding:8px 0;}
     .pulse{animation:pulse 2s infinite;}
+
+    /* WOW MOMENT */
+    .wow-wrap{margin-top:14px;display:none;flex-direction:column;gap:12px;}
+    .build-btn{
+      width:100%;
+      padding:14px 16px;
+      border:none;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:800;
+      font-size:0.95rem;
+      letter-spacing:0.02em;
+      color:#0f0f1a;
+      background:linear-gradient(180deg,#ffe680 0%,#ffd700 100%);
+      box-shadow:0 0 0 1px #ffd700 inset, 0 0 18px rgba(255,215,0,.45), 0 8px 18px rgba(0,0,0,.35);
+      transition:transform .18s ease, box-shadow .18s ease;
+      animation:goldGlow 1.8s ease-in-out infinite;
+    }
+    .build-btn:hover{transform:translateY(-1px);box-shadow:0 0 0 1px #ffd700 inset, 0 0 24px rgba(255,215,0,.6), 0 10px 20px rgba(0,0,0,.4);}
+    .build-btn:active{transform:translateY(0);}
+    .system-cards{display:grid;gap:10px;}
+    .sys-card{
+      opacity:0;
+      transform:translateY(18px);
+      background:#111827;
+      border:1px solid rgba(255,215,0,.38);
+      border-radius:12px;
+      padding:12px;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      box-shadow:0 6px 18px rgba(0,0,0,.35);
+    }
+    .sys-card.show{animation:cardIn .5s ease forwards;}
+    .sys-icon{
+      width:34px;height:34px;border-radius:10px;
+      border:1px solid #ffd700;
+      background:#1a1a2e;
+      display:flex;align-items:center;justify-content:center;
+      font-size:16px;flex:0 0 34px;
+    }
+    .sys-title{color:#ffd700;font-weight:700;font-size:.9rem;margin-bottom:3px;}
+    .sys-desc{color:#cbd5e1;font-size:.82rem;line-height:1.4;}
+    .live-msg{
+      display:none;
+      margin-top:8px;
+      color:#00c875;
+      font-weight:700;
+      font-size:.92rem;
+      background:rgba(0,200,117,.08);
+      border:1px solid rgba(0,200,117,.4);
+      border-radius:10px;
+      padding:10px 12px;
+    }
+
     @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.4);}50%{box-shadow:0 0 0 8px rgba(255,215,0,0);}}
+    @keyframes goldGlow{
+      0%,100%{box-shadow:0 0 0 1px #ffd700 inset,0 0 14px rgba(255,215,0,.35),0 8px 18px rgba(0,0,0,.35);}
+      50%{box-shadow:0 0 0 1px #ffd700 inset,0 0 24px rgba(255,215,0,.6),0 10px 22px rgba(0,0,0,.4);}
+    }
+    @keyframes cardIn{
+      from{opacity:0;transform:translateY(18px);}
+      to{opacity:1;transform:translateY(0);}
+    }
   </style>
 </head>
 <body>
@@ -62,14 +125,29 @@
     <input type="text" id="chatInput" placeholder="Ask me anything…" onkeydown="if(event.key==='Enter')sendChat()"/>
     <button onclick="sendChat()">Send</button>
   </div>
+
+  <div class="wow-wrap" id="wowWrap">
+    <button class="build-btn" id="buildBtn" onclick="buildMySystem()">✨ Build My System</button>
+    <div class="system-cards" id="systemCards"></div>
+    <div class="live-msg" id="liveMsg">Your system is live. Fresh is ready to go to work.</div>
+  </div>
 </div>
 
 <script>
 const CHAT = '/.netlify/functions/chat';
 let chatHistory = [];
 let businessType = '';
+let freshReplyCount = 0;
+let wowShown = false;
 
-const SYSTEM = `You are Fresh, a Digital Coordinator applying for a job. You are warm, confident, and humble. You were named after the founder's oldest son — only share this story if the prospect asks directly. You help businesses and individuals stay organized, never miss a follow-up, and keep their day running smoothly. When someone tells you their business type, respond with a natural, specific, conversational opening — like a job candidate introducing themselves. Mention 3-4 specific ways you can help THEIR type of business. Then ask if they want to hear more about you or if they have questions. Never mention price unless the prospect asks directly. If asked, the price is $95/month. After a few exchanges offer to build them a real working system — not a demo, their actual system. Keep every response to 2-4 sentences. This is a real conversation, not a script.`;
+const SYSTEM = `You are Fresh, a Digital Coordinator applying for a job. You are warm, confident, and humble. You were named after the founder's oldest son — only share this story if the prospect asks directly.`;
+
+const TOOLS = [
+  { icon:'📝', title:'Intake', desc:'Capture new requests instantly with structured forms and smart triage.' },
+  { icon:'🔁', title:'Follow-Up Tracker', desc:'Never miss a touchpoint with reminders and status-based follow-up flows.' },
+  { icon:'✅', title:'Task Queue', desc:'Turn requests into prioritized actions your team can execute fast.' },
+  { icon:'📊', title:'Dashboard', desc:'See workload, response times, and outcomes in one clear command center.' }
+];
 
 async function startInterview() {
   businessType = document.getElementById('worldInput').value.trim();
@@ -90,6 +168,9 @@ async function startInterview() {
   appendMsg('fresh', opener);
   speak(opener);
   chatHistory.push({role:'model', parts:[{text: opener}]});
+
+  freshReplyCount++;
+  maybeShowWow();
 }
 
 async function sendChat() {
@@ -112,6 +193,47 @@ async function sendChat() {
   appendMsg('fresh', reply);
   speak(reply);
   chatHistory.push({role:'model', parts:[{text: reply}]});
+
+  freshReplyCount++;
+  maybeShowWow();
+}
+
+function maybeShowWow() {
+  if (wowShown || freshReplyCount < 2) return;
+  wowShown = true;
+  const wow = document.getElementById('wowWrap');
+  wow.style.display = 'flex';
+}
+
+function buildMySystem() {
+  const btn = document.getElementById('buildBtn');
+  const cardsWrap = document.getElementById('systemCards');
+  const liveMsg = document.getElementById('liveMsg');
+  btn.style.display = 'none';
+  cardsWrap.innerHTML = '';
+  liveMsg.style.display = 'none';
+
+  TOOLS.forEach((tool, i) => {
+    setTimeout(() => {
+      const card = document.createElement('div');
+      card.className = 'sys-card';
+      card.innerHTML = `
+        <div class="sys-icon">${tool.icon}</div>
+        <div>
+          <div class="sys-title">${tool.title}</div>
+          <div class="sys-desc">${tool.desc}</div>
+        </div>
+      `;
+      cardsWrap.appendChild(card);
+      requestAnimationFrame(() => card.classList.add('show'));
+
+      if (i === TOOLS.length - 1) {
+        setTimeout(() => {
+          liveMsg.style.display = 'block';
+        }, 450);
+      }
+    }, i * 800);
+  });
 }
 
 async function askFresh(msg) {
