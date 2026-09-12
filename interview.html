@@ -138,6 +138,7 @@
 
 <script>
 const CHAT='/.netlify/functions/chat';
+const params=new URLSearchParams(window.location.search); const demoVal=params.get('demo'); if(demoVal){window.addEventListener('load',()=>{document.getElementById('worldInput').value=demoVal;showToc();});}
 let chatHistory=[],replyCount=0,businessType='',systemBuilt=false,choiceType='';
 
 const TOOLS=[
@@ -147,20 +148,20 @@ const TOOLS=[
   {icon:'📊',title:'Dashboard',desc:'See everything in one clear command center.'}
 ];
 
-const SYSTEM=`You are Fresh, a warm and confident Digital Coordinator interviewing for a job. The prospect already knows your qualifications. Be conversational, humble, and specific to their business. Keep every response to 2-3 sentences max. Never mention price. After the first exchange point to the system cards above and ask if they want to change anything. Emphasize that you give them their quality of life back — not just efficiency. Never use bullet points — just talk naturally.`;
+const SYSTEM=`You are Fresh, a warm and confident Digital Coordinator interviewing for a job. The prospect already knows your qualifications. Be conversational, humble, and specific to their business. Keep replies short (2-5 sentences), practical, and human. Ask one useful follow-up when needed. Never sound robotic.`;
 
 const tocData={
-  vacuum:['Route non-Aerus repairs automatically to your partner network','Track every machine from intake to pickup in one place','Send customers automatic status updates on their repair','Never lose a job ticket or parts order again'],
-  barber:['Automate appointment reminders so clients stop no-showing','Text back instantly when you\'re busy with a client','Track inventory for blades, pomades, and supplies','Manage your daily schedule and walk-ins in one place'],
-  salon:['Send booking confirmations and follow-ups automatically','Track no-shows and re-book them effortlessly','Keep client notes and preferences organized','Never lose a new lead from a missed call again'],
-  bier:['Automate reservation confirmations and follow-ups','Track event leads and private party inquiries','Send staff updates without group texts','Flag supply and keg inventory before you run out'],
-  dentist:['Send appointment reminders and reduce no-shows','Follow up with patients after procedures automatically','Track supply orders and equipment maintenance','Keep staff tasks and daily notes organized'],
+  vacuum:['Route non-Aerus repairs automatically to your partner network','Track every machine from intake to pickup in one place','Send customers automatic status updates on their repair','Never lose a service ticket or callback again'],
+  barber:['Automate appointment reminders so clients stop no-showing','Text back instantly when you\'re busy with a client','Track inventory for blades, pomades, and supplies','Manage your daily chair schedule from one view'],
+  salon:['Send booking confirmations and follow-ups automatically','Track no-shows and re-book them effortlessly','Keep client notes and preferences organized','Never lose a new lead from a missed call'],
+  bier:['Automate reservation confirmations and follow-ups','Track event leads and private party inquiries','Send staff updates without group texts','Flag supply and keg inventory before you run low'],
+  dentist:['Send appointment reminders and reduce no-shows','Follow up with patients after procedures automatically','Track supply orders and equipment maintenance','Keep staff tasks and daily notes in one system'],
   lawyer:['Track client follow-ups and case deadlines','Log intake notes and document reminders','Keep every matter moving without sticky notes','Send automated status updates to clients'],
   gym:['Follow up with new membership inquiries automatically','Track trainer tasks and class scheduling','Never lose a lead from a missed call','Send automated check-ins to keep members engaged'],
   contractor:['Log job site notes and material orders on the go','Send clients automatic project updates','Track follow-ups and invoice reminders','Keep every job on schedule without spreadsheets'],
   retail:['Send inventory alerts before you run out','Track vendor follow-ups and callbacks','Log daily sales notes and staff tasks','Never miss a customer callback again'],
   mom:['Keep track of appointments, errands, and follow-ups','Get a daily summary of what actually needs attention','Log things on the go by voice or text','Never forget a callback or task again'],
-  default:['Capture every task and follow-up the moment it happens','Organize your day without spreadsheets or sticky notes','Keep your team on the same page without group texts','Log anything by voice — no typing required']
+  default:['Capture every task and follow-up the moment it happens','Organize your day without spreadsheets or sticky notes','Keep your team on the same page without group texts','Log anything by voice or text and retrieve it instantly']
 };
 
 function getToc(input){
@@ -193,11 +194,11 @@ function showToc(){
 function showThesis(){
   document.getElementById('tocSection').style.display='none';
   document.getElementById('freshImg').classList.add('pulse');
-  const thesis=`Hi — I'm <strong>Fresh</strong>. I'm here to apply for the Digital Coordinator position for your ${businessType}. While we talk I'm going to build your actual working system live right here on this screen — consider it my resume.<br><br>Most businesses I work with stop letting things fall through the cracks, get hours back every week, and honestly — get their quality of life back. The stuff you keep putting off because work never stops. Whether that's a round of golf, a pickleball game, or just leaving on time.<br><br>No pressure. No commitment. <strong>Ask me anything.</strong>`;
+  const thesis=`Hi — I'm <strong>Fresh</strong>. I'm here to apply for the Digital Coordinator position for your ${businessType}. While we talk I'm going to build your actual working system live on this page so you can decide if I'm right for your world.`;
   document.getElementById('thesisText').innerHTML=thesis;
   document.getElementById('thesisSection').style.display='block';
   document.getElementById('thesisSection').scrollIntoView({behavior:'smooth'});
-  speak(`Hi, I'm Fresh. I'm here to apply for the Digital Coordinator position for your ${businessType}. While we talk I'm going to build your actual system live on this screen. Most businesses I work with get their quality of life back — not just hours, but the stuff they keep putting off because work never stops. No pressure. Ask me anything.`);
+  speak(`Hi, I'm Fresh. I'm here to apply for the Digital Coordinator position for your ${businessType}. While we talk I'm going to build your actual system live on this screen. Most businesses I work with tell me they feel overwhelmed and scattered. My job is to make your day feel clear, controlled, and lighter.`);
 }
 
 function startInterview(){
@@ -281,7 +282,7 @@ async function submitTrial(){
   const phone=document.getElementById('trialPhone').value.trim();
   if(!name||!phone){document.getElementById('trialStatus').textContent='Please fill in your name and phone.';return;}
   document.getElementById('trialStatus').textContent='Sending...';
-  await fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'trial_signup',choice:choiceType,name,business:biz||businessType,phone,timestamp:new Date().toISOString()})});
+  await fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'trial_signup',choice:choiceType,name,business:biz,phone,source:'fresh-interview'})});
   document.getElementById('trialStatus').textContent="You're in! Fresh will be in touch shortly. 💛";
   speak("You're in! Fresh will be in touch shortly.");
 }
