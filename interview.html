@@ -1,3 +1,9 @@
+Boudie — Copilot is stuck in a loop talking to itself. It's not going to commit anything from this chat.
+
+Let's just do the full file overwrite like we always do. It takes 2 minutes and works every time.
+
+GitHub → interview.html → pencil ✏️ → Ctrl+A → delete → paste this → commit:
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -45,6 +51,8 @@
     .trial-cta h3{color:#ffd700;font-size:1rem;margin-bottom:8px;}
     .trial-cta p{color:#aaa;font-size:0.85rem;line-height:1.6;margin-bottom:16px;}
     .trial-btn{padding:14px 28px;background:#00c875;color:#fff;font-size:1rem;font-weight:bold;border:none;border-radius:12px;cursor:pointer;width:100%;}
+    .trial-form input{width:100%;padding:12px;margin-bottom:8px;border-radius:8px;border:1px solid #333;background:#0f0f1a;color:#fff;font-size:0.95rem;display:block;}
+    .trial-form button{width:100%;padding:14px;background:#ffd700;color:#000;font-weight:bold;border:none;border-radius:10px;font-size:1rem;cursor:pointer;}
     .pulse{animation:pulse 2s infinite;}
     @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.4);}50%{box-shadow:0 0 0 8px rgba(255,215,0,0);}}
   </style>
@@ -84,7 +92,14 @@
   <div class="trial-cta" id="trialCta">
     <h3>Want to put Fresh to work for real?</h3>
     <p>No pressure. No credit card. Just use it for a few days and see if it helps. If you love it, it's $95/month — cancel anytime, full refund within 30 days.</p>
-    <button class="trial-btn" onclick="startTrial()">Let's do it →</button>
+    <button class="trial-btn" id="trialBtn" onclick="startTrial()">Let's do it →</button>
+    <div class="trial-form" id="trialForm" style="display:none;margin-top:16px;">
+      <input id="trialName" type="text" placeholder="Your name"/>
+      <input id="trialBiz" type="text" placeholder="Your business type"/>
+      <input id="trialPhone" type="tel" placeholder="Your phone number"/>
+      <button onclick="submitTrial()">Fresh, you're hired! 🎉</button>
+      <div id="trialStatus" style="margin-top:10px;font-size:0.85rem;color:#00c875;"></div>
+    </div>
   </div>
 </div>
 
@@ -185,7 +200,25 @@ function buildMySystem() {
 }
 
 function startTrial() {
-  window.location.href = 'mailto:william@towsonhealthyhomes.com?subject=TappyThing - I want to try it&body=Hey Fresh — I just saw the demo and I want to give it a real try. Here is my business: ';
+  document.getElementById('trialBtn').style.display = 'none';
+  document.getElementById('trialForm').style.display = 'block';
+}
+
+async function submitTrial() {
+  const name = document.getElementById('trialName').value.trim();
+  const biz = document.getElementById('trialBiz').value.trim();
+  const phone = document.getElementById('trialPhone').value.trim();
+  if(!name || !phone) {
+    document.getElementById('trialStatus').textContent = 'Please fill in your name and phone.';
+    return;
+  }
+  document.getElementById('trialStatus').textContent = 'Sending...';
+  await fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({type:'trial_signup', name, business:biz, phone, timestamp:new Date().toISOString()})
+  });
+  document.getElementById('trialStatus').textContent = "You're in! Fresh will be in touch shortly. 💛";
 }
 
 function appendMsg(role, text) {
@@ -209,6 +242,4 @@ function speak(text) {
 </script>
 </body>
 </html>
-
-
 
