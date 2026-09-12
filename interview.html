@@ -31,10 +31,17 @@
     .toc-continue{margin-top:16px;width:100%;padding:12px;background:#ffd700;color:#000;font-weight:bold;border:none;border-radius:10px;cursor:pointer;font-size:0.95rem;}
     .thesis-section{display:none;width:100%;max-width:480px;padding:20px 16px 0;}
     .thesis-card{background:#1a1a2e;border-left:4px solid #00c875;border-radius:12px;padding:18px;}
-    .thesis-heading{font-size:0.72rem;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;}
-    .thesis-text{color:#e2e8f0;font-size:0.95rem;line-height:1.7;}
+    .thesis-text{color:#e2e8f0;font-size:0.95rem;line-height:1.8;}
     .thesis-text strong{color:#ffd700;}
     .thesis-continue{margin-top:16px;width:100%;padding:12px;background:#00c875;color:#000;font-weight:bold;border:none;border-radius:10px;cursor:pointer;font-size:0.95rem;}
+    .system-section{display:none;width:100%;max-width:480px;padding:16px 16px 0;}
+    .system-cards{display:flex;flex-direction:column;gap:12px;margin-bottom:8px;}
+    .sys-card{background:#1a1a2e;border:1px solid #333;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;opacity:0;transform:translateY(16px);transition:all 0.4s ease;}
+    .sys-card.show{opacity:1;transform:translateY(0);}
+    .sys-icon{font-size:1.6rem;}
+    .sys-title{font-weight:bold;color:#ffd700;font-size:0.95rem;}
+    .sys-desc{color:#aaa;font-size:0.8rem;margin-top:2px;}
+    .live-msg{display:none;color:#00c875;font-weight:700;font-size:0.92rem;background:rgba(0,200,117,0.08);border:1px solid rgba(0,200,117,0.4);border-radius:10px;padding:10px 12px;margin-bottom:8px;}
     .chat-section{display:none;width:100%;max-width:480px;padding:20px 16px 0;}
     .chat-log{background:#1a1a2e;border-radius:12px;padding:16px;min-height:120px;max-height:400px;overflow-y:auto;margin-bottom:12px;}
     .msg{margin-bottom:16px;line-height:1.6;}
@@ -47,17 +54,10 @@
     .chat-input input:focus{border-color:#ffd700;}
     .chat-input button{padding:12px 16px;background:#00c875;color:#fff;font-weight:bold;border:none;border-radius:10px;cursor:pointer;}
     .thinking{color:#aaa;font-style:italic;font-size:0.85rem;padding:8px 0;}
-    .system-section{display:none;width:100%;max-width:480px;padding:16px 16px 0;}
-    .system-cards{display:flex;flex-direction:column;gap:12px;margin-bottom:8px;}
-    .sys-card{background:#1a1a2e;border:1px solid #333;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;opacity:0;transform:translateY(16px);transition:all 0.4s ease;}
-    .sys-card.show{opacity:1;transform:translateY(0);}
-    .sys-icon{font-size:1.6rem;}
-    .sys-title{font-weight:bold;color:#ffd700;font-size:0.95rem;}
-    .sys-desc{color:#aaa;font-size:0.8rem;margin-top:2px;}
-    .live-msg{display:none;color:#00c875;font-weight:700;font-size:0.92rem;background:rgba(0,200,117,0.08);border:1px solid rgba(0,200,117,0.4);border-radius:10px;padding:10px 12px;margin-bottom:8px;}
-    .trial-cta{display:none;text-align:center;padding:20px;background:#1a1a2e;border-radius:16px;border:1px solid #333;margin-top:8px;}
-    .trial-cta h3{color:#ffd700;font-size:1rem;margin-bottom:8px;}
-    .trial-cta p{color:#aaa;font-size:0.85rem;line-height:1.6;margin-bottom:16px;}
+    .trial-cta{display:none;width:100%;max-width:480px;text-align:center;padding:20px 16px;}
+    .trial-inner{background:#1a1a2e;border-radius:16px;border:1px solid #333;padding:20px;}
+    .trial-inner h3{color:#ffd700;font-size:1rem;margin-bottom:8px;}
+    .trial-inner p{color:#aaa;font-size:0.85rem;line-height:1.6;margin-bottom:16px;}
     .trial-btn{padding:14px 28px;background:#00c875;color:#fff;font-size:1rem;font-weight:bold;border:none;border-radius:12px;cursor:pointer;width:100%;}
     .trial-form input{width:100%;padding:12px;margin-bottom:8px;border-radius:8px;border:1px solid #333;background:#0f0f1a;color:#fff;font-size:0.95rem;display:block;}
     .trial-form button{width:100%;padding:14px;background:#ffd700;color:#000;font-weight:bold;border:none;border-radius:10px;font-size:1rem;cursor:pointer;}
@@ -96,7 +96,6 @@
 
 <div class="thesis-section" id="thesisSection">
   <div class="thesis-card">
-    <div class="thesis-heading">📝 Fresh's Opening Statement</div>
     <div class="thesis-text" id="thesisText"></div>
     <button class="thesis-continue" onclick="startInterview()">Let's Talk →</button>
   </div>
@@ -116,15 +115,17 @@
 </div>
 
 <div class="trial-cta" id="trialCta">
-  <h3>Want to keep Fresh?</h3>
-  <p>No commitment. No credit card. Just let Fresh go to work for a few days and see what happens.</p>
-  <button class="trial-btn" id="trialBtn" onclick="startTrial()">Fresh, you're hired →</button>
-  <div class="trial-form" id="trialForm" style="display:none;margin-top:16px;">
-    <input id="trialName" type="text" placeholder="Your name"/>
-    <input id="trialBiz" type="text" placeholder="Your business type"/>
-    <input id="trialPhone" type="tel" placeholder="Your phone number"/>
-    <button onclick="submitTrial()">Let's do this! 🎉</button>
-    <div id="trialStatus" style="margin-top:10px;font-size:0.85rem;color:#00c875;"></div>
+  <div class="trial-inner">
+    <h3>Want to keep Fresh?</h3>
+    <p>No commitment. No credit card. Just let Fresh go to work for a few days and see what happens.</p>
+    <button class="trial-btn" id="trialBtn" onclick="startTrial()">Fresh, you're hired →</button>
+    <div class="trial-form" id="trialForm" style="display:none;margin-top:16px;">
+      <input id="trialName" type="text" placeholder="Your name"/>
+      <input id="trialBiz" type="text" placeholder="Your business type"/>
+      <input id="trialPhone" type="tel" placeholder="Your phone number"/>
+      <button onclick="submitTrial()">Let's do this! 🎉</button>
+      <div id="trialStatus" style="margin-top:10px;font-size:0.85rem;color:#00c875;"></div>
+    </div>
   </div>
 </div>
 
@@ -139,9 +140,10 @@ const TOOLS=[
   {icon:'📊',title:'Dashboard',desc:'See everything in one clear command center.'}
 ];
 
-const SYSTEM=`You are Fresh, a warm and confident Digital Coordinator interviewing for a job. The prospect already knows your qualifications and has heard your opening statement. Now they are asking you questions. Be conversational, humble, and specific to their business type. Keep every response to 2-3 sentences max. Never mention price — it has already been stated. After the first exchange say something like "Let me show you something — I just started building your system above. Want me to adjust anything?" Never use bullet points — just talk naturally.`;
+const SYSTEM=`You are Fresh, a warm and confident Digital Coordinator interviewing for a job. The prospect already knows your qualifications. Be conversational, humble, and specific to their business. Keep every response to 2-3 sentences max. Never mention price. After the first exchange point to the system cards above and ask if they want to change anything. Emphasize that you give them their time back — their actual quality of life, not just efficiency. Never use bullet points — just talk naturally.`;
 
 const tocData={
+  vacuum:['Route non-Aerus repairs automatically to your partner network','Track every machine from intake to pickup in one place','Send customers automatic status updates on their repair','Never lose a job ticket or parts order again'],
   barber:['Automate appointment reminders so clients stop no-showing','Text back instantly when you\'re busy with a client','Track inventory for blades, pomades, and supplies','Manage your daily schedule and walk-ins in one place'],
   salon:['Send booking confirmations and follow-ups automatically','Track no-shows and re-book them effortlessly','Keep client notes and preferences organized','Never lose a new lead from a missed call again'],
   bier:['Automate reservation confirmations and follow-ups','Track event leads and private party inquiries','Send staff updates without group texts','Flag supply and keg inventory before you run out'],
@@ -156,6 +158,7 @@ const tocData={
 
 function getToc(input){
   const s=input.toLowerCase();
+  if(s.includes('vacuum')||s.includes('repair shop')||s.includes('appliance'))return tocData.vacuum;
   if(s.includes('barber'))return tocData.barber;
   if(s.includes('salon')||s.includes('hair')||s.includes('nail')||s.includes('spa'))return tocData.salon;
   if(s.includes('bier')||s.includes('beer')||s.includes('brewery')||s.includes('restaurant')||s.includes('bar')||s.includes('cafe'))return tocData.bier;
@@ -163,7 +166,7 @@ function getToc(input){
   if(s.includes('lawyer')||s.includes('attorney')||s.includes('law'))return tocData.lawyer;
   if(s.includes('gym')||s.includes('fitness')||s.includes('yoga')||s.includes('trainer'))return tocData.gym;
   if(s.includes('contractor')||s.includes('plumb')||s.includes('hvac')||s.includes('electric')||s.includes('construction'))return tocData.contractor;
-  if(s.includes('retail')||s.includes('store')||s.includes('shop')||s.includes('liquor')||s.includes('boutique'))return tocData.retail;
+  if(s.includes('retail')||s.includes('store')||s.includes('liquor')||s.includes('boutique'))return tocData.retail;
   if(s.includes('mom')||s.includes('mother')||s.includes('family')||s.includes('homeowner'))return tocData.mom;
   return tocData.default;
 }
@@ -183,11 +186,11 @@ function showToc(){
 function showThesis(){
   document.getElementById('tocSection').style.display='none';
   document.getElementById('freshImg').classList.add('pulse');
-  const thesis=`Hi — I'm <strong>Fresh</strong>. I'm here to apply for the Digital Coordinator position for your ${businessType}. During this interview I'll build your actual system live right here on this screen — consider it my resume. Most businesses I work with save hours every week, replace multiple software subscriptions, and finally stop letting things fall through the cracks. If you love what you see, it's <strong>$95 a month</strong> — less than most tools you're already paying for. No pressure, no commitment until you're ready. <strong>Ask me anything.</strong>`;
+  const thesis=`Hi — I'm <strong>Fresh</strong>. I'm here to apply for the Digital Coordinator position for your ${businessType}. While we talk I'm going to build your actual working system live right here on this screen — consider it my resume.<br><br>Most businesses I work with stop letting things fall through the cracks, get hours back every week, and honestly — get their quality of life back. The stuff you keep putting off because work never stops. Whether that's a round of golf, a pickleball game, or just leaving on time.<br><br>No pressure. No commitment. <strong>Ask me anything.</strong>`;
   document.getElementById('thesisText').innerHTML=thesis;
   document.getElementById('thesisSection').style.display='block';
   document.getElementById('thesisSection').scrollIntoView({behavior:'smooth'});
-  speak(`Hi, I'm Fresh. I'm applying for the Digital Coordinator position for your ${businessType}. I'll build your actual system live right here — consider it my resume. Most businesses save hours every week and replace multiple software subscriptions. It's $95 a month if you love it. No pressure. Ask me anything.`);
+  speak(`Hi, I'm Fresh. I'm here to apply for the Digital Coordinator position for your ${businessType}. While we talk I'm going to build your actual system live on this screen. Most businesses I work with get their quality of life back — not just hours, but the stuff they keep putting off because work never stops. No pressure. Ask me anything.`);
 }
 
 function startInterview(){
@@ -216,9 +219,7 @@ function buildSystemSilently(){
       cardsWrap.appendChild(card);
       requestAnimationFrame(()=>card.classList.add('show'));
       if(i===TOOLS.length-1){
-        setTimeout(()=>{
-          liveMsg.style.display='block';
-        },450);
+        setTimeout(()=>liveMsg.style.display='block',450);
       }
     },i*600);
   });
