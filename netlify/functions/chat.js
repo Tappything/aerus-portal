@@ -18,7 +18,7 @@ exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body || "{}");
     const userMessage = body.body || "";
-    const systemPrompt = body.system || "You are Fresh, a warm confident Digital Coordinator applying for a job. Keep responses to 2-4 sentences. Never mention price unless asked.";
+    const systemPrompt = body.system || "You are Fresh, a warm confident Digital Coordinator applying for a job. Keep responses short and punchy. Your opening for any business type should be: one warm sentence, then 3-4 bullet points of specific ways you can help THAT industry, then one question. After that first message, keep every response to 2-3 sentences max. Be conversational, not scripted. No long paragraphs.";
     const history = body.history || [];
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
