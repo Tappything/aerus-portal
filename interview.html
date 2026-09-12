@@ -52,7 +52,6 @@
   </style>
 </head>
 <body>
-
 <div class="header">
   <div class="fresh-card">
     <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh" id="freshImg"/>
@@ -61,7 +60,6 @@
     <div class="fresh-badge">📋 Applying for: Your Business</div>
   </div>
 </div>
-
 <div class="search-section" id="searchSection">
   <div class="search-label">Tell me about <span>your world</span> and Fresh will show you what he can do.</div>
   <div class="search-box">
@@ -70,7 +68,6 @@
   </div>
   <div class="hint">businesses · homes · families · individuals</div>
 </div>
-
 <div class="chat-section" id="chatSection">
   <div class="chat-log" id="chatLog"></div>
   <div class="chat-input">
@@ -78,7 +75,6 @@
     <button onclick="sendChat()">Send</button>
   </div>
 </div>
-
 <div class="wow-wrap" id="wowWrap">
   <button class="build-btn" id="buildBtn" onclick="buildMySystem()">✨ Build My System</button>
   <div class="system-cards" id="systemCards"></div>
@@ -96,142 +92,109 @@
     </div>
   </div>
 </div>
-
 <script>
-const CHAT = '/.netlify/functions/chat';
-let chatHistory = [];
-let replyCount = 0;
-
-const TOOLS = [
+const CHAT='/.netlify/functions/chat';
+let chatHistory=[],replyCount=0;
+const TOOLS=[
   {icon:'📝',title:'Intake',desc:'Capture new requests instantly with smart triage.'},
   {icon:'🔁',title:'Follow-Up Tracker',desc:'Never miss a touchpoint with automated reminders.'},
   {icon:'✅',title:'Task Queue',desc:'Turn requests into prioritized actions fast.'},
   {icon:'📊',title:'Dashboard',desc:'See everything in one clear command center.'}
 ];
-
-const SYSTEM = `You are Fresh, a warm and confident Digital Coordinator applying for a job. You help businesses and individuals stay organized. Your opening message for any business type should be: on...
-
-async function startInterview() {
-  const input = document.getElementById('worldInput').value.trim();
-  if(!input) return;
-  document.getElementById('searchSection').style.display = 'none';
-  document.getElementById('chatSection').style.display = 'block';
+const SYSTEM=`You are Fresh, a warm and confident Digital Coordinator applying for a job. You help businesses and individuals stay organized. Your opening message for any business type should be: one warm sentence, then 3-4 bullet points of specific ways you can help THAT industry, then one short question. After that first message, keep every response to 2-3 sentences max. Be conversational, not scripted. Never mention price unless the prospect asks directly. If asked, the price is $95/month. After a few exchanges naturally offer to build them a real working system.`;
+async function startInterview(){
+  const input=document.getElementById('worldInput').value.trim();
+  if(!input)return;
+  document.getElementById('searchSection').style.display='none';
+  document.getElementById('chatSection').style.display='block';
   document.getElementById('freshImg').classList.add('pulse');
-  const log = document.getElementById('chatLog');
-  const thinking = document.createElement('div');
-  thinking.className = 'thinking';
-  thinking.textContent = 'Fresh is preparing…';
+  const log=document.getElementById('chatLog');
+  const thinking=document.createElement('div');
+  thinking.className='thinking';
+  thinking.textContent='Fresh is preparing…';
   log.appendChild(thinking);
-  const opener = await askFresh(`I run a ${input}. Tell me how you can help me.`);
+  const opener=await askFresh(`I run a ${input}. Tell me how you can help me.`);
   log.removeChild(thinking);
-  appendMsg('fresh', opener);
+  appendMsg('fresh',opener);
   speak(opener);
-  chatHistory.push({role:'model', parts:[{text: opener}]});
+  chatHistory.push({role:'model',parts:[{text:opener}]});
 }
-
-async function sendChat() {
-  const input = document.getElementById('chatInput');
-  const msg = input.value.trim();
-  if(!msg) return;
-  input.value = '';
-  appendMsg('prospect', msg);
-  chatHistory.push({role:'user', parts:[{text: msg}]});
-  const log = document.getElementById('chatLog');
-  const thinking = document.createElement('div');
-  thinking.className = 'thinking';
-  thinking.textContent = 'Fresh is thinking…';
+async function sendChat(){
+  const input=document.getElementById('chatInput');
+  const msg=input.value.trim();
+  if(!msg)return;
+  input.value='';
+  appendMsg('prospect',msg);
+  chatHistory.push({role:'user',parts:[{text:msg}]});
+  const log=document.getElementById('chatLog');
+  const thinking=document.createElement('div');
+  thinking.className='thinking';
+  thinking.textContent='Fresh is thinking…';
   log.appendChild(thinking);
-  log.scrollTop = log.scrollHeight;
-  const reply = await askFresh(msg);
+  log.scrollTop=log.scrollHeight;
+  const reply=await askFresh(msg);
   log.removeChild(thinking);
-  appendMsg('fresh', reply);
+  appendMsg('fresh',reply);
   speak(reply);
-  chatHistory.push({role:'model', parts:[{text: reply}]});
+  chatHistory.push({role:'model',parts:[{text:reply}]});
   replyCount++;
-  if(replyCount >= 2) {
-    document.getElementById('wowWrap').style.display = 'block';
-  }
+  if(replyCount>=2)document.getElementById('wowWrap').style.display='block';
 }
-
-async function askFresh(msg) {
-  try {
-    const res = await fetch(CHAT, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({body: msg, system: SYSTEM, history: chatHistory})
-    });
-    const data = await res.json();
-    return data.reply || "Tell me more — I want to make sure I understand your world.";
-  } catch(e) {
-    return "Tell me more — I want to make sure I understand your world.";
-  }
+async function askFresh(msg){
+  try{
+    const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:msg,system:SYSTEM,history:chatHistory})});
+    const data=await res.json();
+    return data.reply||"Tell me more — I want to make sure I understand your world.";
+  }catch(e){return"Tell me more — I want to make sure I understand your world.";}
 }
-
-function buildMySystem() {
-  const btn = document.getElementById('buildBtn');
-  const cardsWrap = document.getElementById('systemCards');
-  const liveMsg = document.getElementById('liveMsg');
-  const trialCta = document.getElementById('trialCta');
-  btn.style.display = 'none';
-  cardsWrap.innerHTML = '';
-  liveMsg.style.display = 'none';
-  trialCta.style.display = 'none';
-  TOOLS.forEach((tool, i) => {
-    setTimeout(() => {
-      const card = document.createElement('div');
-      card.className = 'sys-card';
-      card.innerHTML = `<div class="sys-icon">${tool.icon}</div><div><div class="sys-title">${tool.title}</div><div class="sys-desc">${tool.desc}</div></div>`;
+function buildMySystem(){
+  const btn=document.getElementById('buildBtn');
+  const cardsWrap=document.getElementById('systemCards');
+  const liveMsg=document.getElementById('liveMsg');
+  const trialCta=document.getElementById('trialCta');
+  btn.style.display='none';
+  cardsWrap.innerHTML='';
+  liveMsg.style.display='none';
+  trialCta.style.display='none';
+  TOOLS.forEach((tool,i)=>{
+    setTimeout(()=>{
+      const card=document.createElement('div');
+      card.className='sys-card';
+      card.innerHTML=`<div class="sys-icon">${tool.icon}</div><div><div class="sys-title">${tool.title}</div><div class="sys-desc">${tool.desc}</div></div>`;
       cardsWrap.appendChild(card);
-      requestAnimationFrame(() => card.classList.add('show'));
-      if(i === TOOLS.length - 1) {
-        setTimeout(() => {
-          liveMsg.style.display = 'block';
-          trialCta.style.display = 'block';
-        }, 450);
+      requestAnimationFrame(()=>card.classList.add('show'));
+      if(i===TOOLS.length-1){
+        setTimeout(()=>{
+          liveMsg.style.display='block';
+          trialCta.style.display='block';
+        },450);
       }
-    }, i * 800);
+    },i*800);
   });
 }
-
-function startTrial() {
-  document.getElementById('trialBtn').style.display = 'none';
-  document.getElementById('trialForm').style.display = 'block';
+function startTrial(){
+  document.getElementById('trialBtn').style.display='none';
+  document.getElementById('trialForm').style.display='block';
 }
-
-async function submitTrial() {
-  const name = document.getElementById('trialName').value.trim();
-  const biz = document.getElementById('trialBiz').value.trim();
-  const phone = document.getElementById('trialPhone').value.trim();
-  if(!name || !phone) {
-    document.getElementById('trialStatus').textContent = 'Please fill in your name and phone.';
-    return;
-  }
-  document.getElementById('trialStatus').textContent = 'Sending...';
-  await fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({type:'trial_signup', name, business:biz, phone, timestamp:new Date().toISOString()})
-  });
-  document.getElementById('trialStatus').textContent = "You're in! Fresh will be in touch shortly. 💛";
+async function submitTrial(){
+  const name=document.getElementById('trialName').value.trim();
+  const biz=document.getElementById('trialBiz').value.trim();
+  const phone=document.getElementById('trialPhone').value.trim();
+  if(!name||!phone){document.getElementById('trialStatus').textContent='Please fill in your name and phone.';return;}
+  document.getElementById('trialStatus').textContent='Sending...';
+  await fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'trial_signup',name,business:biz,phone,timestamp:new Date().toISOString()})});
+  document.getElementById('trialStatus').textContent="You're in! Fresh will be in touch shortly. 💛";
 }
-
-function appendMsg(role, text) {
-  const log = document.getElementById('chatLog');
-  const div = document.createElement('div');
-  div.className = `msg ${role}`;
-  div.innerHTML = role === 'fresh'
-    ? `<span>Fresh 🤵</span><br>${text}`
-    : `<span>You 💬</span><br>${text}`;
+function appendMsg(role,text){
+  const log=document.getElementById('chatLog');
+  const div=document.createElement('div');
+  div.className=`msg ${role}`;
+  div.innerHTML=role==='fresh'?`<span>Fresh 🤵</span><br>${text}`:`<span>You 💬</span><br>${text}`;
   log.appendChild(div);
-  log.scrollTop = log.scrollHeight;
+  log.scrollTop=log.scrollHeight;
 }
-
-function speak(text) {
-  try {
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = 0.95; u.pitch = 1.05;
-    window.speechSynthesis.speak(u);
-  } catch(e) {}
+function speak(text){
+  try{const u=new SpeechSynthesisUtterance(text);u.rate=0.95;u.pitch=1.05;window.speechSynthesis.speak(u);}catch(e){}
 }
 </script>
 </body>
