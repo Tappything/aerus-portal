@@ -38,7 +38,7 @@ exports.handler = async () => {
       title: group.title,
       color: group.color,
       items: (group.items_page?.items || []).map(item => {
-        const statusCol = item.column_values.find(c => c.type === 'color') || item.column_values.find(c => /status/i.test(c.id));
+        const statusCol = item.column_values.find(c => c.id === 'project_status');
         return { name: item.name || 'Untitled', status: statusCol?.text || '' };
       })
     }));
