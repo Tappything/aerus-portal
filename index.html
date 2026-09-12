@@ -1,33 +1,83 @@
-<div style="background:#1a1a2e;color:#ffffff;font-family:'Segoe UI',sans-serif;max-width:480px;margin:0 auto;min-height:100vh;padding:0 0 40px 0;">
-<div style="background:#0f0f1a;padding:16px;text-align:center;border-bottom:2px solid #ffd700;">
-  <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="TappyThing" style="width:90px;border-radius:50%;margin-bottom:6px;border:2px solid #ffd700;">
-  <div style="font-size:0.72rem;color:#aaa;letter-spacing:0.08em;text-transform:uppercase;margin-top:2px;">Digital Coordinator Command Center</div>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>TappyThing</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:#1a1a2e;color:#fff;font-family:'Segoe UI',sans-serif;max-width:480px;margin:0 auto;min-height:100vh;padding:0 0 40px 0;}
+    .header{background:#0f0f1a;padding:16px;text-align:center;border-bottom:2px solid #ffd700;}
+    .header img{width:90px;border-radius:50%;margin-bottom:6px;border:2px solid #ffd700;}
+    .header .subtitle{font-size:0.72rem;color:#aaa;letter-spacing:0.08em;text-transform:uppercase;margin-top:2px;}
+    .tap-section{display:flex;gap:16px;justify-content:center;margin:24px 16px;}
+    .tap-btn{flex:1;max-width:160px;padding:20px 12px;font-size:1.2rem;min-height:90px;font-weight:bold;border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,0.3);border:none;cursor:pointer;}
+    .talk-btn{background:#fdab3d;color:#000;}
+    .type-btn{background:#579bfc;color:#fff;}
+    .type-section{display:none;margin:0 16px 16px;}
+    .type-section textarea{width:100%;padding:12px;font-size:1rem;border-radius:8px;border:1px solid #ccc;box-sizing:border-box;background:#1e1e1e;color:#fff;resize:none;}
+    .type-section button{margin-top:8px;width:100%;padding:14px;font-size:1rem;font-weight:bold;border-radius:8px;border:none;background:#00c875;color:#fff;cursor:pointer;}
+    .fresh-response{margin:16px;padding:14px;background:#1e1e1e;color:#ffd700;font-style:italic;border-radius:8px;display:none;border-left:4px solid #ffd700;font-size:1rem;line-height:1.5;}
+    hr{border:none;border-top:1px solid #333;margin:24px 16px;}
+    .video-section{text-align:center;margin:0 16px;background:#0f0f1a;border-radius:16px;padding:16px;border:1px solid #333;}
+    .video-label{color:#c084fc;font-size:0.85rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;}
+    .vid-btn{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#9333ea);border:3px solid #c084fc;color:white;font-size:2.5rem;cursor:pointer;}
+    .video-hint{color:#a78bfa;font-size:0.78rem;margin-top:8px;}
+    .vid-preview{display:none;max-width:360px;margin:16px auto 0;}
+    .vid-preview video{width:100%;border-radius:12px;border:2px solid #7c3aed;}
+    .live-txt{color:#c4b5fd;font-size:0.85rem;margin:8px 0;min-height:40px;}
+    .stop-btn{width:100%;padding:12px;background:rgba(239,68,68,0.2);border:2px solid #ef4444;color:#fca5a5;border-radius:12px;font-size:0.9rem;cursor:pointer;}
+    .vid-status{color:#4ade80;font-size:0.85rem;margin-top:12px;}
+    .myworld-section{margin:16px;}
+    .myworld-btn{width:100%;padding:14px 16px;background:linear-gradient(135deg,#7c3aed,#9333ea);border:2px solid #c084fc;color:#fff;font-size:1.05rem;font-weight:bold;border-radius:12px;cursor:pointer;}
+    .myworld-panel{display:none;margin-top:12px;}
+    .group-card{background:#1a1a2e;border-radius:12px;padding:14px;margin-bottom:12px;}
+    .group-title{font-weight:bold;color:#ffd700;font-size:0.9rem;margin-bottom:8px;}
+    .group-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #2a2a3e;}
+    .group-item:last-child{border-bottom:none;}
+    .item-name{color:#e2e8f0;font-size:0.88rem;}
+    .item-status{padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:bold;}
+    .empty-msg{color:#555;font-size:0.8rem;padding:8px 0;}
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="TappyThing"/>
+  <div class="subtitle">Digital Coordinator Command Center</div>
 </div>
-<div id="tapSection" style="display:flex;gap:16px;justify-content:center;margin:24px 0;">
-  <button id="talkBtn" onclick="startTalk()" style="flex:1;max-width:160px;padding:20px 12px;font-size:1.2rem;min-height:90px;font-weight:bold;border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,0.[...]
-  <button id="typeBtn" onclick="showTypeBox()" style="flex:1;max-width:160px;padding:20px 12px;font-size:1.2rem;min-height:90px;font-weight:bold;border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,[...]
+
+<div class="tap-section">
+  <button class="tap-btn talk-btn" onclick="startTalk()">🎙️ Tap to Talk</button>
+  <button class="tap-btn type-btn" onclick="showTypeBox()">⌨️ Tap to Type</button>
 </div>
-<div id="typeSection" style="display:none;margin:0 16px 16px;">
-  <textarea id="typeInput" rows="3" placeholder="Type your message here…" style="width:100%;padding:12px;font-size:1rem;border-radius:8px;border:1px solid #ccc;box-sizing:border-box;"></textarea[...]
-  <button onclick="sendTyped()" style="margin-top:8px;width:100%;padding:14px;font-size:1rem;font-weight:bold;border-radius:8px;border:none;background:#00c875;color:#fff;cursor:pointer;">Send to F[...]
+
+<div class="type-section" id="typeSection">
+  <textarea id="typeInput" rows="3" placeholder="Type your message here…"></textarea>
+  <button onclick="sendTyped()">Send to Fresh ✉️</button>
 </div>
-<div id="fresh-response" style="margin:16px;padding:14px;background:#1e1e1e;color:#ffd700;font-style:italic;border-radius:8px;display:none;border-left:4px solid #ffd700;font-size:1rem;line-height:[...]
-<hr style="border:none;border-top:1px solid #333;margin:24px 16px;">
-<div style="text-align:center;margin:0 16px;background:#0f0f1a;border-radius:16px;padding:16px;border:1px solid #333;">
-  <p style="color:#c084fc;font-size:0.85rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;">📹 Video Intake</p>
-  <button id="vidBtn" onclick="startVid()" style="width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#9333ea);border:3px solid #c084fc;color:white;font-size:2.5re[...]
-  <p style="color:#a78bfa;font-size:0.78rem;">Point at unit • Say customer name & issue • Tap stop</p>
-  <div id="vidPreview" style="display:none;max-width:360px;margin:16px auto 0;">
-    <video id="liveVid" autoplay muted playsinline style="width:100%;border-radius:12px;border:2px solid #7c3aed;"></video>
-    <div id="liveTxt" style="color:#c4b5fd;font-size:0.85rem;margin:8px 0;min-height:40px;">🎙️ Listening…</div>
-    <button onclick="stopVid()" style="width:100%;padding:12px;background:rgba(239,68,68,0.2);border:2px solid #ef4444;color:#fca5a5;border-radius:12px;font-size:0.9rem;cursor:pointer;">✅ Done R[...]
+
+<div class="fresh-response" id="fresh-response"></div>
+
+<hr/>
+
+<div class="video-section">
+  <div class="video-label">📹 Video Intake</div>
+  <button class="vid-btn" id="vidBtn" onclick="startVid()">📹</button>
+  <div class="video-hint">Point at unit • Say customer name & issue • Tap stop</div>
+  <div class="vid-preview" id="vidPreview">
+    <video id="liveVid" autoplay muted playsinline></video>
+    <div class="live-txt" id="liveTxt">🎙️ Listening…</div>
+    <button class="stop-btn" onclick="stopVid()">✅ Done Recording</button>
   </div>
-  <div id="vidStatus" style="color:#4ade80;font-size:0.85rem;margin-top:12px;"></div>
+  <div class="vid-status" id="vidStatus"></div>
 </div>
-<div style="margin:16px;">
-  <button id="myWorldBtn" onclick="toggleMyWorld()" style="width:100%;padding:14px 16px;background:linear-gradient(135deg,#7c3aed,#9333ea);border:2px solid #c084fc;color:#fff;font-size:1.05rem;fon[...]
-  <div id="myWorldPanel" style="display:none;margin-top:12px;"></div>
+
+<div class="myworld-section">
+  <button class="myworld-btn" id="myWorldBtn" onclick="toggleMyWorld()">🌍 My World ▼</button>
+  <div class="myworld-panel" id="myWorldPanel"></div>
 </div>
+
 <script>
 const WEBHOOK='https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei';
 let myWorldLoaded=false;
@@ -47,38 +97,43 @@ async function toggleMyWorld(){
 
 function statusPillStyle(status){
   const s=(status||'').toLowerCase();
-  if(s.includes('workbench'))return 'background:#f59e0b;color:#1f1300;';
+  if(s.includes('workbench')||s.includes('bench'))return 'background:#f59e0b;color:#1f1300;';
   if(s.includes('ready'))return 'background:#22c55e;color:#0b1f1b;';
-  if(s.includes('pending'))return 'background:#579bfc;color:#fff;';
-  if(s.includes('intake'))return 'background:#c084fc;color:#1a0030;';
+  if(s.includes('pending')||s.includes('intake'))return 'background:#579bfc;color:#fff;';
+  if(s.includes('waiting'))return 'background:#fdab3d;color:#000;';
+  if(s.includes('bagdon'))return 'background:#7c3aed;color:#fff;';
+  if(s.includes('showroom'))return 'background:#9d50dd;color:#fff;';
+  if(s.includes('storage'))return 'background:#7f5347;color:#fff;';
+  if(s.includes('complet')||s.includes('paid'))return 'background:#00c875;color:#000;';
   return 'background:#555;color:#fff;';
 }
 
 async function loadMyWorld(){
   const panel=document.getElementById('myWorldPanel');
-  panel.innerHTML='<p style="color:#aaa;text-align:center;">Loading…</p>';
+  panel.innerHTML='<p style="color:#aaa;text-align:center;padding:16px;">Loading…</p>';
   try{
     const res=await fetch('/.netlify/functions/myworld');
     const data=await res.json();
     const groups=Array.isArray(data.groups)?data.groups:[];
-    if(groups.length===0){panel.innerHTML='<p style="color:#aaa;text-align:center;">No items found.</p>';return;}
+    if(groups.length===0){panel.innerHTML='<p style="color:#aaa;text-align:center;">No groups found.</p>';return;}
     panel.innerHTML=groups.map(group=>{
       const items=group.items||[];
+      const borderColor=group.color||'#ffd700';
       const itemsHtml=items.length===0
-        ?'<p style="color:#555;font-size:0.8rem;padding:8px 0;">Nothing here right now</p>'
+        ?'<div class="empty-msg">Nothing here right now</div>'
         :items.map(item=>`
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #333;">
-            <span style="color:#e2e8f0;font-size:0.88rem;">${item.name}</span>
-            ${item.status?`<span style="padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:bold;${statusPillStyle(item.status)}">${item.status}</span>`:''}
+          <div class="group-item">
+            <span class="item-name">${item.name}</span>
+            ${item.status?`<span class="item-status" style="${statusPillStyle(item.status)}">${item.status}</span>`:''}
           </div>`).join('');
       return `
-        <div style="background:#1a1a2e;border-radius:12px;padding:14px;margin-bottom:12px;border-left:4px solid ${group.color||'#ffd700'};">
-          <div style="font-weight:bold;color:#ffd700;font-size:0.9rem;margin-bottom:8px;">${group.title} <span style="color:#555;font-size:0.75rem;">(${items.length})</span></div>
+        <div class="group-card" style="border-left:4px solid ${borderColor};">
+          <div class="group-title">${group.title} <span style="color:#555;font-size:0.75rem;font-weight:normal;">(${items.length})</span></div>
           ${itemsHtml}
         </div>`;
     }).join('');
   }catch(err){
-    panel.innerHTML='<p style="color:#f87171;text-align:center;">❌ Could not load items.</p>';
+    panel.innerHTML='<p style="color:#f87171;text-align:center;">❌ Could not load. Try again.</p>';
   }
 }
 
@@ -133,26 +188,39 @@ async function sendToFresh(userMessage){
   }catch(e){console.error('sendToFresh error:',e);}
 }
 
+let talkRec;
 function startTalk(){
-  if(!rec)return alert('Voice not supported on this device.');
-  document.getElementById('talkBtn').textContent='🔴 Listening…';
-  rec.onend=async()=>{
-    document.getElementById('talkBtn').textContent='🎙️ Tap to Talk';
-    rec.continuous=true;if(txt&&txt.trim())await sendToFresh(txt.trim());txt='';};
-  rec.continuous=false;rec.start();
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('Voice not supported on this device.');return;}
+  talkRec=new SR();
+  talkRec.continuous=false;
+  talkRec.interimResults=false;
+  document.getElementById('typeSection').style.display='none';
+  const btn=document.querySelector('.talk-btn');
+  btn.textContent='🔴 Listening…';
+  talkRec.onresult=async(e)=>{
+    const said=e.results[0][0].transcript;
+    btn.textContent='🎙️ Tap to Talk';
+    if(said.trim())await sendToFresh(said.trim());
+  };
+  talkRec.onend=()=>{btn.textContent='🎙️ Tap to Talk';};
+  talkRec.start();
 }
 
 function showTypeBox(){
   const s=document.getElementById('typeSection');
-  s.style.display=s.style.display==='none'?'block':'none';
-  document.getElementById('typeInput').focus();
+  s.style.display=s.style.display==='none'||!s.style.display?'block':'none';
+  if(s.style.display==='block')document.getElementById('typeInput').focus();
 }
 
 async function sendTyped(){
   const input=document.getElementById('typeInput');
-  const msg=input.value.trim();if(!msg)return;
-  input.value='';document.getElementById('typeSection').style.display='none';
+  const msg=input.value.trim();
+  if(!msg)return;
+  input.value='';
+  document.getElementById('typeSection').style.display='none';
   await sendToFresh(msg);
 }
 </script>
-</div>
+</body>
+</html>
