@@ -44,7 +44,7 @@
     .buckets-wrap{display:flex;flex-direction:column;gap:10px;margin-bottom:8px;}
     .bucket{background:#1a1a2e;border:1px solid #2a2a3e;border-radius:12px;padding:12px 14px;transition:all 0.3s;opacity:0;transform:translateY(12px);}
     .bucket.show{opacity:1;transform:translateY(0);}
-    .bucket.flash{border-color:#ffd700;background:#1a1a2e;}
+    .bucket.flash{border-color:#ffd700;}
     .bucket-header{display:flex;align-items:center;gap:10px;}
     .bucket-icon{font-size:1.3rem;}
     .bucket-name{font-weight:bold;color:#ffd700;font-size:0.9rem;flex:1;}
@@ -89,7 +89,6 @@
   </style>
 </head>
 <body>
-
 <div class="header">
   <div class="fresh-card">
     <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh" id="freshImg"/>
@@ -98,8 +97,6 @@
     <div class="fresh-badge" id="applyingBadge">📋 Applying for: Your Business</div>
   </div>
 </div>
-
-<!-- COVER -->
 <div class="section" id="coverSection" style="display:block;">
   <div class="card gold">
     <div class="body-text">Tell me about <strong>your world</strong> and I'll show you what I can do.</div>
@@ -110,8 +107,6 @@
     <div class="cover-hint">businesses · homes · families · individuals</div>
   </div>
 </div>
-
-<!-- TOC -->
 <div class="section" id="tocSection">
   <div class="card gold">
     <div class="label">📋 What Fresh Can Do For You</div>
@@ -120,37 +115,29 @@
     <button class="btn btn-gold" onclick="showThesis()">Meet Fresh →</button>
   </div>
 </div>
-
-<!-- THESIS -->
 <div class="section" id="thesisSection">
   <div class="card green">
     <div class="body-text" id="thesisText"></div>
     <button class="btn btn-green" onclick="showDump()">Let's Do It →</button>
   </div>
 </div>
-
-<!-- BRAIN DUMP -->
 <div class="section" id="dumpSection">
   <div class="card blue">
     <div class="label">🧠 Brain Dump</div>
     <div class="title">Just talk — tell me everything</div>
     <div class="body-text" style="margin-bottom:12px;">Don't organize it. Don't think about it. Just tell me about your <span id="dumpBiz"></span> — your customers, your tasks, your headaches, your team. Everything. I'll sort it all out.</div>
-    <button class="mic-big" id="dumpMic" onclick="toggleDumpMic()">🎙️ Hold to Talk — Brain Dump</button>
+    <button class="mic-big" id="dumpMic" onclick="toggleDumpMic()">🎙️ Tap to Talk — Brain Dump</button>
     <div class="dump-hint" id="dumpHint">Tap the button and just talk</div>
     <textarea class="dump-area" id="dumpText" placeholder="Or type your brain dump here…"></textarea>
     <button class="btn btn-blue" onclick="processDump()">Fresh — Sort This Out →</button>
   </div>
 </div>
-
-<!-- SYSTEM -->
 <div class="section" id="systemSection">
   <div class="live-msg" id="liveMsg"></div>
   <div class="buckets-wrap" id="bucketsWrap"></div>
   <div class="chat-log" id="chatLog"></div>
   <div style="height:8px;"></div>
 </div>
-
-<!-- TIME TO TAP -->
 <div class="section" id="tapSection">
   <div class="card gold">
     <div class="label">⚡ Time to Tap</div>
@@ -160,8 +147,6 @@
     <button class="btn btn-outline" onclick="doneTapping()">All done tapping →</button>
   </div>
 </div>
-
-<!-- TRIAL CTA -->
 <div class="section" id="trialSection">
   <div class="trial-inner">
     <h3>You've got things building in your system. Any questions so far?</h3>
@@ -180,13 +165,10 @@
     <div class="guarantee">🛡️ Full refund within 30 days. No questions asked.</div>
   </div>
 </div>
-
 <div class="rob-art" title="In memory of Rob — artist, brother, inspiration">
   <div>🐷</div>
   <span>ROB ART</span>
 </div>
-
-<!-- FIXED INPUT -->
 <div class="input-area" id="inputArea" style="display:none;">
   <div class="input-wrap">
     <div class="input-row">
@@ -197,9 +179,9 @@
     <div class="input-hint">🎙️ Talk &nbsp;|&nbsp; ⌨️ Type &nbsp;|&nbsp; Say "Time to Tap" to knock out your list</div>
   </div>
 </div>
-
 <script>
 const CHAT='/.netlify/functions/chat';
+const REF=new URLSearchParams(window.location.search).get('ref')||'direct';
 let businessType='',bucketData={},replyCount=0,choiceType='';
 let isListening=false,dumpListening=false;
 let recognition=null,dumpRecognition=null;
@@ -228,8 +210,8 @@ function getKey(s){
   return 'default';
 }
 
-function show(id){document.getElementById(id).style.display='block';document.getElementById(id).scrollIntoView({behavior:'smooth'});}
-function hide(id){document.getElementById(id).style.display='none';}
+function show(id){const el=document.getElementById(id);if(el){el.style.display='block';el.scrollIntoView({behavior:'smooth'});}}
+function hide(id){const el=document.getElementById(id);if(el)el.style.display='none';}
 
 function showToc(){
   businessType=document.getElementById('worldInput').value.trim();
@@ -247,10 +229,10 @@ function showToc(){
 function showThesis(){
   hide('tocSection');
   document.getElementById('freshImg').classList.add('pulse');
-  const t=`Hi — I'm <strong>Fresh</strong>. I'm applying to be your Digital Coordinator & Coach for your ${businessType}.<br><br>Here's how this works — I'm going to ask you to do one thing: <strong>Brain Dump.</strong> Just talk. Tell me everything about your world — your customers, your tasks, your team, your headaches. Don't organize it. I will.<br><br>While you talk, I build your system live right here on this screen. Then I show you two things that'll change how you work: <strong>Brain Dumps</strong> for when you're on the go, and <strong>Time to Tap</strong> — a way to knock out your whole task list fast, hardest first, easiest last.<br><br>No app does this. No software does this. <strong>You just talk — and your world gets organized.</strong>`;
+  const t=`Hi — I'm <strong>Fresh</strong>. I'm applying to be your Digital Coordinator & Coach for your ${businessType}.<br><br>Here's how this works — I'm going to ask you to do one thing: <strong>Brain Dump.</strong> Just talk. Tell me everything about your world — your customers, your tasks, your team, your headaches. Don't organize it. I will.<br><br>While you talk, I build your system live right here on this screen. Then I show you two things that'll change how you work forever:<br><br>🧠 <strong>Brain Dumps</strong> — anytime you're driving, walking, busy — just hit record and talk. I sort everything.<br><br>⚡ <strong>Time to Tap</strong> — say it and I'll walk you through your whole list one by one. Hardest first, easiest last. Nothing falls through the cracks.<br><br>No app does this. No software does this. <strong>You just talk — and your world gets organized.</strong>`;
   document.getElementById('thesisText').innerHTML=t;
   show('thesisSection');
-  speak(`Hi, I'm Fresh. Here's how this works. I want you to do one thing — Brain Dump. Just talk. Tell me everything about your world. While you talk I build your system live right here. No app does this. You just talk and your world gets organized.`);
+  speak(`Hi, I'm Fresh. I'm going to ask you to do one thing — Brain Dump. Just talk. Tell me everything about your world. I'll sort it all out and build your system live right here. No app does this. You just talk and your world gets organized.`);
 }
 
 function showDump(){
@@ -290,8 +272,8 @@ function setupDumpMic(){
 function toggleDumpMic(){
   if(!dumpRecognition)setupDumpMic();
   if(!dumpRecognition){alert('Microphone not supported on this device');return;}
-  if(dumpListening){dumpRecognition.stop();}
-  else{dumpRecognition.start();}
+  if(dumpListening)dumpRecognition.stop();
+  else dumpRecognition.start();
 }
 
 async function processDump(){
@@ -301,21 +283,21 @@ async function processDump(){
   show('systemSection');
   document.getElementById('inputArea').style.display='block';
   document.getElementById('liveMsg').textContent='Fresh is sorting your brain dump…';
-  const prompt=`You are Fresh, a Digital Coordinator building a custom system for a ${businessType}. The user just did a Brain Dump: "${dump}". 1) Create 4-6 smart buckets specific to their business based on what they said. 2) Sort every item they mentioned into the right bucket. 3) Reply in JSON only: {"buckets":[{"icon":"emoji","title":"Bucket Name","items":["item1","item2"]}],"reply":"2-3 sentence warm response summarizing what you heard and what you built","tapItems":["hardest task first","second task","easier task","easiest last"]}`;
+  const prompt=`You are Fresh, building a custom system for a ${businessType}. Brain dump: "${dump}". Create 4-6 smart buckets and sort every item mentioned. Reply JSON only: {"buckets":[{"icon":"emoji","title":"Bucket Name","items":["item1","item2"]}],"reply":"2-3 sentence warm response summarizing what you heard and built","tapItems":["hardest task","second","easier","easiest"]}`;
   try{
-    const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:prompt,system:'You are a JSON-only assistant. Always respond with valid JSON. No markdown. No explanation.',history:[]})});
+    const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:prompt,system:'JSON only. No markdown.',history:[]})});
     const data=await res.json();
     const parsed=JSON.parse(data.reply.replace(/```json|```/g,'').trim());
     buildBuckets(parsed.buckets||[]);
     document.getElementById('liveMsg').textContent='Your system is live. Keep talking — Fresh keeps sorting. 💛';
     appendMsg('fresh',parsed.reply||'Got it — your system is built. Take a look above. 💛');
-    speak(parsed.reply||'Your system is built. Take a look.');
+    speak(parsed.reply||'Your system is built.');
     if(parsed.tapItems&&parsed.tapItems.length>0)setupTapItems(parsed.tapItems);
   }catch(e){
     buildBuckets([
       {icon:'📝',title:'Tasks',items:[]},
       {icon:'🔁',title:'Follow-Ups',items:[]},
-      {icon:'✅',title:'Done',items:[]},
+      {icon:'✅',title:'Completed',items:[]},
       {icon:'📊',title:'Notes',items:[]}
     ]);
     document.getElementById('liveMsg').textContent='Your system is live. Keep talking — Fresh keeps sorting. 💛';
@@ -333,9 +315,9 @@ function buildBuckets(buckets){
     const div=document.createElement('div');
     div.className='bucket';
     div.id='bucket-'+i;
-    const itemsHTML=(b.items||[]).map(it=>`<div class="bucket-item">${it}</div>`).join('');
-    const count=(b.items||[]).length;
-    div.innerHTML=`<div class="bucket-header"><div class="bucket-icon">${b.icon}</div><div class="bucket-name">${b.title}</div><div class="bucket-count" id="bcount-${i}">${count>0?count+' item'+(count>1?'s':''):'empty'}</div></div>${count>0?`<div class="bucket-items" id="bitems-${i}">${itemsHTML}</div>`:`<div class="bucket-items" id="bitems-${i}"></div>`}`;
+    const items=b.items||[];
+    const itemsHTML=items.map(it=>`<div class="bucket-item">${it}</div>`).join('');
+    div.innerHTML=`<div class="bucket-header"><div class="bucket-icon">${b.icon}</div><div class="bucket-name">${b.title}</div><div class="bucket-count" id="bcount-${i}">${items.length>0?items.length+' item'+(items.length>1?'s':''):'empty'}</div></div>${items.length>0?`<div class="bucket-items" id="bitems-${i}">${itemsHTML}</div>`:`<div class="bucket-items" id="bitems-${i}"></div>`}`;
     wrap.appendChild(div);
     setTimeout(()=>div.classList.add('show'),i*150);
   });
@@ -360,22 +342,16 @@ function addToBucket(i,item){
 }
 
 function setupTapItems(items){
-  const tapIntro=document.getElementById('tapIntro');
-  tapIntro.textContent='Based on your brain dump — here\'s what Fresh thinks you should knock out. Hardest first, easiest last. Just say the word.';
-  const tapItemsEl=document.getElementById('tapItems');
-  tapItemsEl.innerHTML=items.map((item,i)=>`
-    <div class="tap-item" id="tapitem-${i}">
-      <div class="tap-text">${item}</div>
-      <button class="tap-done" onclick="tapDone(${i})">✅ Done</button>
-      <button class="tap-skip" onclick="tapSkip(${i})">Skip</button>
-    </div>`).join('');
+  document.getElementById('tapIntro').textContent='Based on your brain dump — here\'s what Fresh thinks you should knock out. Hardest first, easiest last.';
+  const el=document.getElementById('tapItems');
+  el.innerHTML=items.map((item,i)=>`<div class="tap-item" id="tapitem-${i}"><div class="tap-text">${item}</div><button class="tap-done" onclick="tapDone(${i})">✅ Done</button><button class="tap-skip" onclick="tapSkip(${i})">Skip</button></div>`).join('');
+  show('tapSection');
 }
 
 function tapDone(i){
   const el=document.getElementById('tapitem-'+i);
-  if(el){el.style.opacity='0.4';el.style.textDecoration='line-through';}
-  replyCount++;
-  checkTrialCta();
+  if(el){el.style.opacity='0.4';el.querySelector('.tap-text').style.textDecoration='line-through';}
+  replyCount++;checkTrialCta();
 }
 
 function tapSkip(i){
@@ -386,7 +362,7 @@ function tapSkip(i){
 function doneTapping(){
   hide('tapSection');
   appendMsg('fresh','Great work tapping through that! Your system is updated. Keep going anytime — just talk. 💛');
-  speak('Great work. Your system is updated. Keep going anytime.');
+  speak('Great work. Your system is updated.');
   checkTrialCta();
 }
 
@@ -415,14 +391,12 @@ async function handleInput(){
   const msg=input.value.trim();
   if(!msg)return;
   input.value='';
-
   if(msg.toLowerCase().includes('time to tap')||msg.toLowerCase().includes('knock out')||msg.toLowerCase().includes('what can we do')){
     show('tapSection');
     appendMsg('fresh','Time to Tap! Here\'s your list — hardest first, easiest last. Let\'s go. 💛');
-    speak('Time to Tap! Here\'s your list. Let\'s knock it out.');
+    speak('Time to Tap! Let\'s knock it out.');
     return;
   }
-
   appendMsg('prospect',msg);
   const log=document.getElementById('chatLog');
   const thinking=document.createElement('div');
@@ -431,9 +405,9 @@ async function handleInput(){
   log.appendChild(thinking);
   log.scrollTop=log.scrollHeight;
   const bucketNames=Object.values(bucketData).map((b,i)=>i+': '+b.title).join(', ');
-  const prompt=`You are Fresh, Digital Coordinator for a ${businessType}. User said: "${msg}". Available buckets: ${bucketNames}. Should a new bucket be created? Reply JSON only: {"bucketIndex":<number or -1 if new bucket needed>,"newBucket":{"icon":"emoji","title":"name"} or null,"itemLabel":"short label","reply":"1-2 sentence response","suggestNewBucket":true or false}`;
+  const prompt=`You are Fresh, Digital Coordinator for a ${businessType}. User said: "${msg}". Buckets: ${bucketNames}. Should a new bucket be created? JSON only: {"bucketIndex":<number or -1>,"newBucket":{"icon":"emoji","title":"name"} or null,"itemLabel":"short label","reply":"1-2 sentence response"}`;
   try{
-    const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:prompt,system:'JSON only assistant. No markdown.',history:[]})});
+    const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:prompt,system:'JSON only. No markdown.',history:[]})});
     const data=await res.json();
     const parsed=JSON.parse(data.reply.replace(/```json|```/g,'').trim());
     if(log.contains(thinking))log.removeChild(thinking);
@@ -464,7 +438,7 @@ async function handleInput(){
 }
 
 function checkTrialCta(){
-  if(replyCount>=10){show('trialSection');}
+  if(replyCount>=10)show('trialSection');
 }
 
 function appendMsg(role,text){
@@ -479,7 +453,7 @@ function appendMsg(role,text){
 function showForm(type){
   choiceType=type;
   document.getElementById('trialForm').style.display='block';
-  document.querySelectorAll('.btn-green,.btn-outline').forEach(b=>{if(b.onclick&&b.onclick.toString().includes('showForm'))b.style.display='none';});
+  document.querySelectorAll('.option-btns .btn').forEach(b=>b.style.display='none');
 }
 
 async function submitTrial(){
@@ -488,7 +462,7 @@ async function submitTrial(){
   const phone=document.getElementById('trialPhone').value.trim();
   if(!name||!phone){document.getElementById('trialStatus').textContent='Please fill in your name and phone.';return;}
   document.getElementById('trialStatus').textContent='Sending...';
-  await fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'trial_signup',choice:choiceType,name,business:biz||businessType,phone,timestamp:new Date().toISOString()})});
+  await fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'trial_signup',choice:choiceType,name,business:biz||businessType,phone,ref:REF,timestamp:new Date().toISOString()})});
   document.getElementById('trialStatus').textContent="You're in! Fresh will be in touch shortly. 💛";
   speak("You're in! Fresh will be in touch shortly.");
 }
