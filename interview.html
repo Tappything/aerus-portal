@@ -21,10 +21,6 @@
     .title{font-size:1rem;font-weight:bold;color:#ffd700;margin-bottom:10px;}
     .body-text{color:#e2e8f0;font-size:0.95rem;line-height:1.8;}
     .body-text strong{color:#ffd700;}
-    .toc-list{list-style:none;padding:0;}
-    .toc-list li{color:#e2e8f0;font-size:0.9rem;padding:5px 0;border-bottom:1px solid #2a2a3e;}
-    .toc-list li:last-child{border-bottom:none;}
-    .toc-list li::before{content:'✦ ';color:#ffd700;}
     .btn{width:100%;padding:13px;font-size:0.95rem;font-weight:bold;border:none;border-radius:10px;cursor:pointer;margin-top:12px;}
     .btn-gold{background:#ffd700;color:#000;}
     .btn-green{background:#00c875;color:#000;}
@@ -41,6 +37,11 @@
     .mic-big.done{background:#00c875;}
     @keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(223,47,74,0.5);}50%{box-shadow:0 0 0 12px rgba(223,47,74,0);}}
     .mic-hint{font-size:0.75rem;color:#555;text-align:center;margin-bottom:8px;}
+    .info-confirm{background:#0f0f1a;border:1px solid #2a2a3e;border-radius:10px;padding:14px;margin-bottom:12px;}
+    .info-row{display:flex;gap:10px;padding:5px 0;border-bottom:1px solid #1a1a2e;}
+    .info-row:last-child{border-bottom:none;}
+    .info-label{font-size:0.72rem;color:#555;width:70px;flex-shrink:0;padding-top:2px;}
+    .info-value{font-size:0.88rem;color:#ffd700;font-weight:bold;}
     .buckets-wrap{display:flex;flex-direction:column;gap:10px;margin-bottom:8px;}
     .bucket{background:#1a1a2e;border:1px solid #2a2a3e;border-radius:12px;padding:12px 14px;transition:all 0.3s;opacity:0;transform:translateY(12px);}
     .bucket.show{opacity:1;transform:translateY(0);}
@@ -53,9 +54,10 @@
     .bucket-item{font-size:0.82rem;color:#e2e8f0;padding:4px 0;display:flex;align-items:center;gap:6px;animation:slideIn 0.3s ease;}
     .bucket-item::before{content:'→';color:#ffd700;font-size:0.7rem;}
     @keyframes slideIn{from{opacity:0;transform:translateX(-8px);}to{opacity:1;transform:translateX(0);}}
-    .reveal-card{background:#1a1a2e;border:1px solid #ffd700;border-radius:12px;padding:16px;margin-bottom:12px;}
-    .reveal-card .reveal-title{color:#ffd700;font-weight:bold;font-size:0.9rem;margin-bottom:6px;}
-    .reveal-card .reveal-body{color:#e2e8f0;font-size:0.88rem;line-height:1.7;}
+    .wow-card{background:#1a1a2e;border:1px solid #ffd700;border-radius:12px;padding:16px;margin-bottom:12px;animation:fadeIn 0.5s ease;}
+    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+    .wow-card .wow-title{color:#ffd700;font-weight:bold;font-size:0.95rem;margin-bottom:8px;}
+    .wow-card .wow-body{color:#e2e8f0;font-size:0.88rem;line-height:1.7;}
     .tap-item{background:#1a1a2e;border:1px solid #2a2a3e;border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
     .tap-text{flex:1;color:#e2e8f0;font-size:0.9rem;}
     .tap-done{padding:8px 14px;background:#00c875;color:#000;font-weight:bold;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;}
@@ -92,6 +94,7 @@
   </style>
 </head>
 <body>
+
 <div class="header">
   <div class="fresh-card">
     <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh" id="freshImg"/>
@@ -100,52 +103,63 @@
     <div class="fresh-badge" id="applyingBadge">📋 Applying for: Your Business</div>
   </div>
 </div>
+
+<!-- COVER -->
 <div class="section" id="coverSection" style="display:block;">
   <div class="card gold">
-    <div class="body-text">What kind of business do you run?</div>
-    <div class="cover-box" style="margin-top:12px;">
-      <input type="text" id="worldInput" placeholder="e.g. restaurant, dentist, vacuum repair…" onkeydown="if(event.key==='Enter')startConvo()"/>
+    <div class="body-text" style="margin-bottom:12px;">What kind of business do you run?</div>
+    <div class="cover-box">
+      <input type="text" id="worldInput" placeholder="e.g. barber shop, dentist, restaurant…" onkeydown="if(event.key==='Enter')startConvo()"/>
       <button class="btn btn-gold" style="width:auto;margin:0;padding:14px 18px;" onclick="startConvo()">Go →</button>
     </div>
     <div class="cover-hint">businesses · homes · families · individuals</div>
   </div>
 </div>
+
+<!-- INTRO TALK -->
 <div class="section" id="convoSection">
   <div class="card green">
     <div class="label">👋 Hi — I'm Fresh</div>
     <div class="body-text" id="freshIntro"></div>
   </div>
   <div class="card blue">
-    <div class="label">🎙️ Tell Me About Your World</div>
-    <div class="title">Just talk — or type. Don't organize it.</div>
+    <div class="label">🎙️ Tell Me About Yourself</div>
+    <div class="title" id="convoTitle">Just talk — your name, your business, what keeps you busy.</div>
     <button class="mic-big" id="convoMic" onclick="toggleConvoMic()">🎙️ Tap to Talk</button>
-    <div class="mic-hint" id="convoHint">Tap and talk — customers, tasks, team, headaches, everything</div>
-    <textarea class="talk-box" id="convoText" placeholder="e.g. I run a vacuum shop, I have 3 bench techs, customers drop off machines, we fix them and call them, I also sell air purifiers, my biggest headache is tracking parts…"></textarea>
-    <button class="btn btn-green" onclick="processConvo()">Fresh — Show Me What You Got →</button>
+    <div class="mic-hint" id="convoHint">Say your name, business, location, and what's on your plate</div>
+    <textarea class="talk-box" id="convoText" placeholder="e.g. Hi I'm Mike, I run Bagdons Vacuum in Timonium, my phone is 410-882-6956, my biggest headache is tracking parts and following up with customers…"></textarea>
+    <button class="btn btn-green" onclick="processConvo()">Go →</button>
   </div>
 </div>
+
+<!-- SYSTEM REVEAL -->
 <div class="section" id="systemSection">
-  <div class="live-msg" id="liveMsg">Fresh is building your system…</div>
+  <div class="live-msg" id="liveMsg">Fresh is working…</div>
+  <div class="info-confirm" id="infoConfirm" style="display:none;"></div>
   <div class="buckets-wrap" id="bucketsWrap"></div>
-  <div class="reveal-card" id="revealCard" style="display:none;">
-    <div class="reveal-title">💡 By the way — what you just did has a name.</div>
-    <div class="reveal-body">That's called a <strong style="color:#ffd700;">Brain Dump</strong> — and it's one of TappyThing's most powerful tools. Anytime you're driving, walking, or in between customers — just hit the mic and talk. Fresh organizes everything automatically. Nothing gets lost. Nothing gets forgotten.<br><br>Most people do it every morning. Some do it every time they get in the car. It takes 60 seconds and clears your head completely.</div>
+  <div class="wow-card" id="wowCard" style="display:none;">
+    <div class="wow-title">💡 Here's what just happened.</div>
+    <div class="wow-body">You just talked for 60 seconds — and I built your entire working system from it. No forms. No setup. No IT person.<br><br>We call that a <strong style="color:#ffd700;">Brain Dump</strong>. It's the fastest way to use TappyThing. You can do it anytime — driving to work, walking between jobs, end of your shift. Just hit the mic and talk. I sort everything automatically.<br><br>And here's the part people love most — <strong style="color:#ffd700;">you can share this with your whole team.</strong> Your bench tech sees his jobs. Your front desk sees intake. You see everything. One system. Everyone connected.</div>
   </div>
   <div class="chat-log" id="chatLog"></div>
 </div>
+
+<!-- TIME TO TAP -->
 <div class="section" id="tapSection">
   <div class="card gold">
     <div class="label">⚡ Time to Tap</div>
-    <div class="title">Let's knock things out</div>
-    <div class="body-text" style="margin-bottom:12px;font-size:0.88rem;">Hardest first, easiest last. Tap done as you go. Say <strong>"Time to Tap"</strong> anytime to pull this up.</div>
+    <div class="title">Let's knock things out — right now</div>
+    <div class="body-text" style="margin-bottom:12px;font-size:0.88rem;">Based on what you told me — here's your list. Hardest first, easiest last. Tap done as you go.<br><br>Say <strong>"Time to Tap"</strong> anytime to pull this up.</div>
     <div id="tapItems"></div>
-    <button class="btn btn-outline" onclick="doneTapping()">All done tapping →</button>
+    <button class="btn btn-outline" onclick="doneTapping()">All done →</button>
   </div>
 </div>
+
+<!-- TRIAL -->
 <div class="section" id="trialSection">
   <div class="trial-inner">
-    <h3>Your system is live. Any questions so far?</h3>
-    <p>Take a day or two and see how it feels. Fresh isn't going anywhere — and everything you built stays with you.</p>
+    <h3>Your system is live. Any questions?</h3>
+    <p>Take a day or two and see how it feels. Everything you built stays with you — Fresh isn't going anywhere.</p>
     <div class="option-btns">
       <button class="btn btn-green" onclick="showForm('now')">I'm ready now →</button>
       <button class="btn btn-outline" onclick="showForm('later')">Give me a few days →</button>
@@ -160,10 +174,12 @@
     <div class="guarantee">🛡️ Full refund within 30 days. No questions asked.</div>
   </div>
 </div>
+
 <div class="rob-art" title="In memory of Rob — artist, brother, inspiration">
   <div>🐷</div>
   <span>ROB ART</span>
 </div>
+
 <div class="input-area" id="inputArea" style="display:none;">
   <div class="input-wrap">
     <div class="input-row">
@@ -174,29 +190,33 @@
     <div class="input-hint">🎙️ Talk &nbsp;|&nbsp; ⌨️ Type &nbsp;|&nbsp; Say "Time to Tap" to knock out your list</div>
   </div>
 </div>
+
 <script>
 const CHAT='/.netlify/functions/chat';
 const REF=new URLSearchParams(window.location.search).get('ref')||'direct';
 let businessType='',bucketData={},replyCount=0,choiceType='';
 let isListening=false,convoListening=false;
 let recognition=null,convoRecognition=null;
-let userInfo={name:'',phone:''};
+let userInfo={name:'',phone:'',location:''};
 
 const freshIntros={
-  vacuum:`I work with a lot of vacuum and appliance repair shops. I know the drill — machines pile up, parts get lost, customers call wondering where their vacuum is. I'm going to show you something in the next 60 seconds that'll change how you run your shop. Just tell me about your world — your customers, your jobs, your team, whatever's on your plate.`,
-  dental:`I work with dental offices. I know your front desk is juggling recalls, no-shows, insurance callbacks, and supply orders — all at once. I'm going to show you something that fixes that. Just tell me about your practice — your team, your patients, your biggest headaches.`,
-  restaurant:`I work with restaurants and bars. I know how it goes — reservations, staff changes, inventory issues, private party inquiries — all hitting at once. Tell me about your place — your setup, your team, what keeps you up at night.`,
-  salon:`I work with salons. No-shows, last-minute cancellations, keeping track of client preferences — I know the pain. Tell me about your salon — your staff, your clients, what you wish was easier.`,
-  default:`I work with businesses like yours. Whatever's keeping you busy, dropping through the cracks, or piling up — I handle it. Tell me about your world — your customers, your team, your tasks, your headaches. Don't organize it. Just talk.`
+  vacuum:`I've worked with vacuum and appliance repair shops before. Machines pile up on the bench, parts go missing, customers call wondering where their vacuum is — it never stops. I just have one question before I show you something: tell me your name, where your shop is, and what's been giving you the most headaches lately.`,
+  dental:`I work with dental offices. Recalls not going out, no-shows killing your schedule, front desk drowning in calls — I know exactly what you're dealing with. Tell me your name, your practice, and what you wish was running smoother.`,
+  restaurant:`I've worked with restaurants and bars of all sizes. Reservations falling through the cracks, staff not knowing the specials, private party leads getting lost — it adds up. Tell me your name, your place, and what keeps you up at night.`,
+  salon:`I work with salons. No-shows, last-minute cancellations, clients whose preferences you can never remember — I've heard it all. Tell me your name, your salon, and what you wish was easier.`,
+  barber:`I work with barber shops. Keeping chairs full, managing walk-ins, remembering which clients want what — it's a lot to juggle. Tell me your name, your shop, and what slows you down most.`,
+  contractor:`I work with contractors and trades. Job site notes that never make it back to the office, parts ordered twice, customers chasing you for updates — I know the drill. Tell me your name, your business, and what's eating most of your time.`,
+  gym:`I work with gyms and fitness studios. New leads falling through, members going quiet, trainers not knowing their schedule — it happens. Tell me your name, your gym, and what you'd fix first if you could.`,
+  default:`I work with all kinds of businesses. Whatever's piling up, falling through the cracks, or just taking too long — that's what I handle. Tell me your name, your business, and what's been keeping you the busiest lately.`
 };
 
 function getKey(s){
   s=(s||'').toLowerCase();
   if(s.includes('vacuum')||s.includes('repair shop')||s.includes('appliance'))return 'vacuum';
   if(s.includes('dentist')||s.includes('dental'))return 'dental';
+  if(s.includes('barber'))return 'barber';
   if(s.includes('restaurant')||s.includes('bier')||s.includes('beer')||s.includes('bar')||s.includes('cafe'))return 'restaurant';
   if(s.includes('salon')||s.includes('hair')||s.includes('nail')||s.includes('spa'))return 'salon';
-  if(s.includes('barber'))return 'barber';
   if(s.includes('contractor')||s.includes('plumb')||s.includes('hvac')||s.includes('electric'))return 'contractor';
   if(s.includes('gym')||s.includes('fitness')||s.includes('yoga'))return 'gym';
   return 'default';
@@ -224,45 +244,96 @@ function setupConvoMic(){
   convoRecognition.continuous=true;
   convoRecognition.interimResults=true;
   convoRecognition.lang='en-US';
-  convoRecognition.onstart=()=>{convoListening=true;document.getElementById('convoMic').classList.add('listening');document.getElementById('convoMic').textContent='🔴 Recording… tap to stop';document.getElementById('convoHint').textContent='Keep going — get it ALL out!';};
-  convoRecognition.onresult=(e)=>{let t='';for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript+' ';document.getElementById('convoText').value=t.trim();};
-  convoRecognition.onend=()=>{convoListening=false;document.getElementById('convoMic').classList.remove('listening');document.getElementById('convoMic').classList.add('done');document.getElementById('convoMic').textContent='✅ Got it — tap "Show Me What You Got"';document.getElementById('convoHint').textContent='Fresh heard everything';};
+  convoRecognition.onstart=()=>{
+    convoListening=true;
+    document.getElementById('convoMic').classList.add('listening');
+    document.getElementById('convoMic').textContent='🔴 Recording… tap to stop';
+    document.getElementById('convoHint').textContent='Keep going — name, business, location, headaches…';
+  };
+  convoRecognition.onresult=(e)=>{
+    let t='';
+    for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript+' ';
+    document.getElementById('convoText').value=t.trim();
+  };
+  convoRecognition.onend=()=>{
+    convoListening=false;
+    document.getElementById('convoMic').classList.remove('listening');
+    document.getElementById('convoMic').classList.add('done');
+    document.getElementById('convoMic').textContent='✅ Got it — tap Go';
+    document.getElementById('convoHint').textContent='Fresh heard everything';
+  };
 }
 
 function toggleConvoMic(){
   if(!convoRecognition)setupConvoMic();
-  if(!convoRecognition){alert('Microphone not available on this device');return;}
+  if(!convoRecognition){alert('Microphone not available');return;}
   if(convoListening)convoRecognition.stop();
   else convoRecognition.start();
 }
 
 async function processConvo(){
   const dump=document.getElementById('convoText').value.trim();
-  if(!dump){speak('Just tell me a little about your world first!');return;}
+  if(!dump){speak('Just tell me a little about yourself first!');return;}
   hide('convoSection');
   document.getElementById('freshImg').classList.add('pulse');
   show('systemSection');
   document.getElementById('inputArea').style.display='block';
-  document.getElementById('liveMsg').textContent='Fresh is building your system…';
-  const prompt=`You are Fresh, a Digital Coordinator building a system for a ${businessType}. The person just talked about their business: "${dump}". 1) Extract their name and phone if mentioned. 2) Create 4-6 smart buckets specific to their business. 3) Sort every item, task, or issue they mentioned into the right bucket. 4) Create a Time to Tap list — hardest/most important tasks first, easiest last. Reply JSON only: {"name":"","phone":"","buckets":[{"icon":"emoji","title":"Bucket Name","items":["item1","item2"]}],"reply":"2-3 sentence warm response using their name if found, summarizing what you heard and built","tapItems":["most important task","second","third","easiest last"]}`;
+  document.getElementById('liveMsg').textContent='Fresh is working…';
+
+  const prompt=`You are Fresh, a Digital Coordinator. Someone who runs a ${businessType} just introduced themselves and talked about their business: "${dump}".
+
+Your job:
+1. Extract: name, phone, location, business name if mentioned.
+2. Build 4-6 smart buckets specific to their business based on what they said.
+3. Sort every task, problem, or item they mentioned into the right bucket.
+4. Create a Time to Tap list — their most important/hardest tasks first, easiest last.
+5. Write a warm 2-3 sentence response using their name, confirming what you built and why — make it feel like you really listened. Do NOT say "brain dump" or "I built this" — just say something like "Based on what you told me, here's what I set up for you."
+
+Reply JSON only:
+{"name":"","phone":"","location":"","buckets":[{"icon":"emoji","title":"Bucket Name","items":["item1","item2"]}],"reply":"warm 2-3 sentence response","tapItems":["most important task","second","third","easiest"]}`;
+
   try{
     const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:prompt,system:'JSON only. No markdown. No explanation.',history:[]})});
     const data=await res.json();
     const parsed=JSON.parse(data.reply.replace(/```json|```/g,'').trim());
     if(parsed.name)userInfo.name=parsed.name;
     if(parsed.phone)userInfo.phone=parsed.phone;
+    if(parsed.location)userInfo.location=parsed.location;
+
+    // Show info confirm
+    const rows=[];
+    if(parsed.name)rows.push(`<div class="info-row"><div class="info-label">Name</div><div class="info-value">${parsed.name}</div></div>`);
+    if(parsed.location)rows.push(`<div class="info-row"><div class="info-label">Location</div><div class="info-value">${parsed.location}</div></div>`);
+    if(parsed.phone)rows.push(`<div class="info-row"><div class="info-label">Phone</div><div class="info-value">${parsed.phone}</div></div>`);
+    if(rows.length>0){
+      document.getElementById('infoConfirm').innerHTML=rows.join('');
+      document.getElementById('infoConfirm').style.display='block';
+    }
+
     buildBuckets(parsed.buckets||[]);
-    document.getElementById('liveMsg').textContent='Your system is live. 💛';
-    setTimeout(()=>{document.getElementById('revealCard').style.display='block';document.getElementById('revealCard').scrollIntoView({behavior:'smooth'});},800);
-    appendMsg('fresh',parsed.reply||'Got it — your system is built from everything you just told me. Take a look above. 💛');
-    speak(parsed.reply||'Your system is built. Take a look above.');
+    document.getElementById('liveMsg').textContent='Done. 💛';
+
+    setTimeout(()=>{
+      document.getElementById('wowCard').style.display='block';
+      document.getElementById('wowCard').scrollIntoView({behavior:'smooth'});
+    },600);
+
+    appendMsg('fresh',parsed.reply||`Based on what you told me, here's what I set up for you. Take a look above. 💛`);
+    speak(parsed.reply||'Based on what you told me, here is what I set up for you.');
+
     if(parsed.tapItems&&parsed.tapItems.length>0)setupTapItems(parsed.tapItems);
+
   }catch(e){
-    buildBuckets([{icon:'📝',title:'Intake',items:[]},{icon:'🔁',title:'Follow-Ups',items:[]},{icon:'✅',title:'Ready',items:[]},{icon:'📊',title:'Notes',items:[]}]);
-    document.getElementById('liveMsg').textContent='Your system is live. 💛';
-    setTimeout(()=>{document.getElementById('revealCard').style.display='block';},800);
-    appendMsg('fresh','Your system is ready — built from what you told me. Keep talking and I\'ll keep sorting. 💛');
-    speak('Your system is ready.');
+    buildBuckets([
+      {icon:'📝',title:'Intake',items:[]},
+      {icon:'🔁',title:'Follow-Ups',items:[]},
+      {icon:'✅',title:'Ready',items:[]},
+      {icon:'📊',title:'Notes',items:[]}
+    ]);
+    document.getElementById('liveMsg').textContent='Done. 💛';
+    setTimeout(()=>{document.getElementById('wowCard').style.display='block';},600);
+    appendMsg('fresh','Based on what you told me, here\'s what I set up for you. Keep talking and I\'ll keep adding to it. 💛');
+    speak('Based on what you told me, here is what I set up for you.');
   }
 }
 
@@ -298,7 +369,7 @@ function addToBucket(i,item){
 function setupTapItems(items){
   const el=document.getElementById('tapItems');
   el.innerHTML=items.map((item,i)=>`<div class="tap-item" id="tapitem-${i}"><div class="tap-text">${item}</div><button class="tap-done" onclick="tapDone(${i})">✅ Done</button><button class="tap-skip" onclick="tapSkip(${i})">Skip</button></div>`).join('');
-  setTimeout(()=>show('tapSection'),1200);
+  setTimeout(()=>show('tapSection'),1000);
 }
 
 function tapDone(i){
@@ -311,7 +382,7 @@ function tapSkip(i){const el=document.getElementById('tapitem-'+i);if(el)el.styl
 
 function doneTapping(){
   hide('tapSection');
-  appendMsg('fresh','Nice work! Everything\'s updated. Say "Time to Tap" anytime to pull up your list again. 💛');
+  appendMsg('fresh','Nice work! Say "Time to Tap" anytime to pull this up again. 💛');
   speak('Nice work. Say Time to Tap anytime.');
   replyCount+=3;checkTrialCta();
 }
@@ -343,7 +414,7 @@ async function handleInput(){
   input.value='';
   if(msg.toLowerCase().includes('time to tap')||msg.toLowerCase().includes('knock out')||msg.toLowerCase().includes('what can we do')){
     show('tapSection');
-    appendMsg('fresh','Time to Tap! Hardest first, easiest last — let\'s go. 💛');
+    appendMsg('fresh','Time to Tap! Hardest first, easiest last. Let\'s go. 💛');
     speak('Time to Tap. Let\'s knock it out.');
     return;
   }
