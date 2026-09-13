@@ -72,7 +72,7 @@
     .rob-art div{font-size:1.6rem;}
     .rob-art span{font-size:0.55rem;color:#555;display:block;letter-spacing:0.08em;}
     .pulse{animation:pulse 2s infinite;}
-    @keyframes pulse{0%,100%{box-sizing:0 0 0 0 rgba(255,215,0,0.4);}50%{box-shadow:0 0 0 8px rgba(255,215,0,0);}}
+    @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.4);}50%{box-shadow:0 0 0 8px rgba(255,215,0,0);}}
   </style>
 </head>
 <body>
@@ -119,8 +119,8 @@
 </div>
 <div class="trial-cta" id="trialCta">
   <div class="trial-inner">
-    <h3>Your system is ready. Fresh is hired. 🎉</h3>
-    <p>Take as much time as you need — most people know within 3 to 5 days. Either way you have our full commitment.</p>
+    <h3>You've got things building in your system. Any questions so far?</h3>
+    <p>Take a day or two and see how it feels. Fresh isn't going anywhere — and everything you've built so far stays with you.</p>
     <div class="option-btns">
       <button class="btn-now" onclick="showForm('now')">I'm ready now →</button>
       <button class="btn-later" onclick="showForm('later')">Give me a few days →</button>
@@ -277,7 +277,7 @@ async function addTask(i,title){
   speak(`Got it. Added to your ${title}.`);
   chatHistory.push({role:'model',parts:[{text:`Added to ${title}: ${val}`}]});
   replyCount++;
-  if(replyCount>=1){document.getElementById('trialCta').style.display='block';setTimeout(()=>document.getElementById('trialCta').scrollIntoView({behavior:'smooth'}),500);}
+  if(replyCount>=10){document.getElementById('trialCta').style.display='block';setTimeout(()=>document.getElementById('trialCta').scrollIntoView({behavior:'smooth'}),500);}
 }
 async function sendChat(){
   const input=document.getElementById('chatInput');
@@ -298,7 +298,7 @@ async function sendChat(){
   speak(reply);
   chatHistory.push({role:'model',parts:[{text:reply}]});
   replyCount++;
-  if(replyCount>=2){document.getElementById('trialCta').style.display='block';setTimeout(()=>document.getElementById('trialCta').scrollIntoView({behavior:'smooth'}),500);}
+  if(replyCount>=10){document.getElementById('trialCta').style.display='block';setTimeout(()=>document.getElementById('trialCta').scrollIntoView({behavior:'smooth'}),500);}
 }
 async function askFresh(msg){
   try{
