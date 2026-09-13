@@ -76,7 +76,6 @@
   </style>
 </head>
 <body>
-
 <div class="header">
   <div class="fresh-card">
     <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh" id="freshImg"/>
@@ -85,7 +84,6 @@
     <div class="fresh-badge">📋 Applying for: Your Business</div>
   </div>
 </div>
-
 <div class="cover-section" id="coverSection">
   <div class="cover-label">Tell me about <span>your world</span> and I'll show you what I can do.</div>
   <div class="cover-box">
@@ -94,7 +92,6 @@
   </div>
   <div class="cover-hint">businesses · homes · families · individuals</div>
 </div>
-
 <div class="toc-section" id="tocSection">
   <div class="toc-card">
     <div class="toc-heading">📋 What Fresh Can Do For You</div>
@@ -103,19 +100,16 @@
     <button class="toc-continue" onclick="showThesis()">Meet Fresh →</button>
   </div>
 </div>
-
 <div class="thesis-section" id="thesisSection">
   <div class="thesis-card">
     <div class="thesis-text" id="thesisText"></div>
     <button class="thesis-continue" onclick="startInterview()">Let's Talk →</button>
   </div>
 </div>
-
 <div class="system-section" id="systemSection">
   <div class="system-cards" id="systemCards"></div>
   <div class="live-msg" id="liveMsg">Your system is live. Tap any card to add your first real task. 👆</div>
 </div>
-
 <div class="chat-section" id="chatSection">
   <div class="chat-log" id="chatLog"></div>
   <div class="chat-input">
@@ -123,7 +117,6 @@
     <button onclick="sendChat()">Send</button>
   </div>
 </div>
-
 <div class="trial-cta" id="trialCta">
   <div class="trial-inner">
     <h3>Your system is ready. Fresh is hired. 🎉</h3>
@@ -142,16 +135,13 @@
     <div class="guarantee">🛡️ Full refund within 30 days. No questions asked.</div>
   </div>
 </div>
-
 <div class="rob-art" title="In memory of Rob — artist, brother, inspiration">
   <div>🐷</div>
   <span>ROB ART</span>
 </div>
-
 <script>
 const CHAT='/.netlify/functions/chat';
 let chatHistory=[],replyCount=0,businessType='',systemBuilt=false,choiceType='';
-
 const industryTools={
   vacuum:[
     {icon:'🔧',title:'Repair Intake',desc:'Log every machine the moment it walks in the door.'},
@@ -190,7 +180,6 @@ const industryTools={
     {icon:'📊',title:'Dashboard',desc:'See everything in one clear command center.'}
   ]
 };
-
 const tocData={
   vacuum:['Track every machine from intake to pickup in one place','Send customers automatic status updates on their repair','Never lose a job ticket or parts order again','Replace your invoicing software for a fraction of the cost'],
   dental:['Send appointment reminders and cut no-shows dramatically','Follow up with patients after procedures automatically','Track supply orders and equipment maintenance','Replace your CRM and recall software for $95/month'],
@@ -202,7 +191,6 @@ const tocData={
   gym:['Follow up with new membership inquiries automatically','Track trainer tasks and class scheduling','Never lose a lead from a missed call','Send automated check-ins to keep members engaged'],
   default:['Capture every task and follow-up the moment it happens','Organize your day without spreadsheets or sticky notes','Keep your team on the same page without group texts','Replace multiple software subscriptions for $95/month']
 };
-
 function getTools(input){
   const s=input.toLowerCase();
   if(s.includes('vacuum')||s.includes('repair shop')||s.includes('appliance'))return industryTools.vacuum;
@@ -212,7 +200,6 @@ function getTools(input){
   if(s.includes('contractor')||s.includes('plumb')||s.includes('hvac')||s.includes('electric')||s.includes('construction'))return industryTools.contractor;
   return industryTools.default;
 }
-
 function getToc(input){
   const s=input.toLowerCase();
   if(s.includes('vacuum')||s.includes('repair shop')||s.includes('appliance'))return tocData.vacuum;
@@ -224,7 +211,6 @@ function getToc(input){
   if(s.includes('gym')||s.includes('fitness')||s.includes('yoga')||s.includes('trainer'))return tocData.gym;
   return tocData.default;
 }
-
 function showToc(){
   businessType=document.getElementById('worldInput').value.trim();
   if(!businessType)return;
@@ -236,7 +222,6 @@ function showToc(){
   document.getElementById('tocSection').scrollIntoView({behavior:'smooth'});
   speak('Here\'s what I can do for your '+businessType+'. '+toc[0]+'. '+toc[1]+'. And more.');
 }
-
 function showThesis(){
   document.getElementById('tocSection').style.display='none';
   document.getElementById('freshImg').classList.add('pulse');
@@ -244,9 +229,8 @@ function showThesis(){
   document.getElementById('thesisText').innerHTML=thesis;
   document.getElementById('thesisSection').style.display='block';
   document.getElementById('thesisSection').scrollIntoView({behavior:'smooth'});
-  speak(`Hi, I'm Fresh. I'm applying for the Digital Coordinator position for your ${businessType}. I'll build your actual system live right here. Most businesses replace hundreds in software and get their quality of life back. I'm also your go-to for anything digital. No pressure. Let's talk.`);
+  speak(`Hi, I'm Fresh. I'm applying for the Digital Coordinator and Coach position for your ${businessType}. I'll build your actual system live right here. Most businesses replace hundreds in software and get their quality of life back. No pressure. Let's talk.`);
 }
-
 function startInterview(){
   document.getElementById('thesisSection').style.display='none';
   buildSystemSilently();
@@ -257,7 +241,6 @@ function startInterview(){
   speak(opener);
   chatHistory.push({role:'model',parts:[{text:opener}]});
 }
-
 function buildSystemSilently(){
   if(systemBuilt)return;
   systemBuilt=true;
@@ -270,36 +253,20 @@ function buildSystemSilently(){
     setTimeout(()=>{
       const card=document.createElement('div');
       card.className='sys-card';
-      card.innerHTML=`
-        <div class="sys-icon">${tool.icon}</div>
-        <div style="flex:1">
-          <div class="sys-title">${tool.title}</div>
-          <div class="sys-desc">${tool.desc}</div>
-          <div class="sys-action" id="action-${i}">
-            <input type="text" placeholder="Add your first item…" id="input-${i}" onkeydown="if(event.key==='Enter')addTask(${i},'${tool.title}')"/>
-            <button onclick="addTask(${i},'${tool.title}')">Add to My System ✅</button>
-          </div>
-        </div>`;
+      card.innerHTML=`<div class="sys-icon">${tool.icon}</div><div style="flex:1"><div class="sys-title">${tool.title}</div><div class="sys-desc">${tool.desc}</div><div class="sys-action" id="action-${i}"><input type="text" placeholder="Add your first item…" id="input-${i}" onkeydown="if(event.key==='Enter')addTask(${i},'${tool.title}')"/><button onclick="addTask(${i},'${tool.title}')">Add to My System ✅</button></div></div>`;
       card.onclick=(e)=>{if(!e.target.matches('input,button'))toggleAction(i);};
       cardsWrap.appendChild(card);
       requestAnimationFrame(()=>card.classList.add('show'));
-      if(i===tools.length-1){
-        setTimeout(()=>{
-          liveMsg.style.display='block';
-          speak('Your system is live. Tap any card to add your first real task.');
-        },450);
-      }
+      if(i===tools.length-1){setTimeout(()=>{liveMsg.style.display='block';speak('Your system is live. Tap any card to add your first real task.');},450);}
     },i*600);
   });
 }
-
 function toggleAction(i){
   const action=document.getElementById('action-'+i);
   const isOpen=action.style.display==='block';
   document.querySelectorAll('.sys-action').forEach(a=>a.style.display='none');
   if(!isOpen){action.style.display='block';document.getElementById('input-'+i).focus();}
 }
-
 async function addTask(i,title){
   const input=document.getElementById('input-'+i);
   const val=input.value.trim();
@@ -310,12 +277,8 @@ async function addTask(i,title){
   speak(`Got it. Added to your ${title}.`);
   chatHistory.push({role:'model',parts:[{text:`Added to ${title}: ${val}`}]});
   replyCount++;
-  if(replyCount>=1){
-    document.getElementById('trialCta').style.display='block';
-    setTimeout(()=>document.getElementById('trialCta').scrollIntoView({behavior:'smooth'}),500);
-  }
+  if(replyCount>=1){document.getElementById('trialCta').style.display='block';setTimeout(()=>document.getElementById('trialCta').scrollIntoView({behavior:'smooth'}),500);}
 }
-
 async function sendChat(){
   const input=document.getElementById('chatInput');
   const msg=input.value.trim();
@@ -335,26 +298,20 @@ async function sendChat(){
   speak(reply);
   chatHistory.push({role:'model',parts:[{text:reply}]});
   replyCount++;
-  if(replyCount>=2){
-    document.getElementById('trialCta').style.display='block';
-    setTimeout(()=>document.getElementById('trialCta').scrollIntoView({behavior:'smooth'}),500);
-  }
+  if(replyCount>=2){document.getElementById('trialCta').style.display='block';setTimeout(()=>document.getElementById('trialCta').scrollIntoView({behavior:'smooth'}),500);}
 }
-
 async function askFresh(msg){
   try{
-    const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:msg,system:`You are Fresh, a warm and confident Digital Coordinator AND online coach applying for a job at a ${businessType}. You know this industry deeply — its real pain points, daily struggles, and what software they waste money on. Keep responses to 2-3 sentences. Never mention price unless asked — if asked it is $95/month which replaces most CRMs and software. You are also their go-to for any digital question. Be real, specific, and conversational.`,history:chatHistory})});
+    const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:msg,system:`You are Fresh, a warm and confident Digital Coordinator AND online coach applying for a job at a ${businessType}. You know this industry deeply. Keep responses to 2-3 sentences. Never mention price unless asked — if asked it is $95/month which replaces most CRMs. Be real and conversational.`,history:chatHistory})});
     const data=await res.json();
     return data.reply||"Tell me more — I want to make sure I understand your world.";
   }catch(e){return"Tell me more — I want to make sure I understand your world.";}
 }
-
 function showForm(type){
   choiceType=type;
   document.getElementById('trialForm').style.display='block';
   document.querySelectorAll('.btn-now,.btn-later').forEach(b=>b.style.display='none');
 }
-
 async function submitTrial(){
   const name=document.getElementById('trialName').value.trim();
   const biz=document.getElementById('trialBiz').value.trim();
@@ -365,7 +322,6 @@ async function submitTrial(){
   document.getElementById('trialStatus').textContent="You're in! Fresh will be in touch shortly. 💛";
   speak("You're in! Fresh will be in touch shortly.");
 }
-
 function appendMsg(role,text){
   const log=document.getElementById('chatLog');
   const div=document.createElement('div');
@@ -374,11 +330,9 @@ function appendMsg(role,text){
   log.appendChild(div);
   log.scrollTop=log.scrollHeight;
 }
-
 function speak(text){
   try{const u=new SpeechSynthesisUtterance(text);u.rate=1.1;u.pitch=1.2;window.speechSynthesis.speak(u);}catch(e){}
 }
-
 const params=new URLSearchParams(window.location.search);
 const demoVal=params.get('demo');
 if(demoVal){window.addEventListener('load',()=>{document.getElementById('worldInput').value=demoVal;showToc();});}
