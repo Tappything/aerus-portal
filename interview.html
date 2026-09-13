@@ -34,30 +34,44 @@
     .thesis-text{color:#e2e8f0;font-size:0.95rem;line-height:1.8;}
     .thesis-text strong{color:#ffd700;}
     .thesis-continue{margin-top:16px;width:100%;padding:12px;background:#00c875;color:#000;font-weight:bold;border:none;border-radius:10px;cursor:pointer;font-size:0.95rem;}
+    .demo-section{display:none;width:100%;max-width:480px;padding:16px 16px 0;}
+    .demo-label{font-size:0.72rem;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;text-align:center;}
+    .demo-board{background:#1a1a2e;border-radius:12px;padding:14px;margin-bottom:12px;border:1px solid #2a2a3e;}
+    .demo-board-title{font-size:0.8rem;font-weight:bold;color:#ffd700;margin-bottom:8px;}
+    .demo-seats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+    .demo-seat{width:32px;height:32px;border-radius:6px;background:#0f0f1a;border:1px solid #333;display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:#aaa;}
+    .demo-seat.occupied{background:#ffd70022;border-color:#ffd700;color:#ffd700;}
+    .demo-tables{display:flex;flex-wrap:wrap;gap:6px;}
+    .demo-table{width:44px;height:44px;border-radius:8px;background:#0f0f1a;border:1px solid #333;display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:#aaa;text-align:center;line-height:1.2;}
+    .demo-table.occupied{background:#00c87522;border-color:#00c875;color:#00c875;}
+    .demo-continue{width:100%;padding:12px;background:#579bfc;color:#fff;font-weight:bold;border:none;border-radius:10px;cursor:pointer;font-size:0.95rem;margin-top:8px;}
     .system-section{display:none;width:100%;max-width:480px;padding:16px 16px 0;}
-    .system-cards{display:flex;flex-direction:column;gap:12px;margin-bottom:8px;}
-    .sys-card{background:#1a1a2e;border:1px solid #333;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;opacity:0;transform:translateY(16px);transition:all 0.4s ease;cursor:pointer;}
-    .sys-card:hover{border-color:#ffd700;}
-    .sys-card.show{opacity:1;transform:translateY(0);}
-    .sys-icon{font-size:1.6rem;}
-    .sys-title{font-weight:bold;color:#ffd700;font-size:0.95rem;}
-    .sys-desc{color:#aaa;font-size:0.8rem;margin-top:2px;}
-    .sys-action{display:none;margin-top:8px;}
-    .sys-action input{width:100%;padding:8px;border-radius:6px;border:1px solid #333;background:#0f0f1a;color:#fff;font-size:0.85rem;}
-    .sys-action button{margin-top:6px;width:100%;padding:8px;background:#00c875;color:#000;font-weight:bold;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;}
-    .live-msg{display:none;color:#00c875;font-weight:700;font-size:0.92rem;background:rgba(0,200,117,0.08);border:1px solid rgba(0,200,117,0.4);border-radius:10px;padding:10px 12px;margin-bottom:8px;}
+    .system-label{font-size:0.72rem;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;text-align:center;}
+    .system-buckets{display:flex;flex-direction:column;gap:10px;margin-bottom:8px;}
+    .bucket{background:#1a1a2e;border:1px solid #2a2a3e;border-radius:12px;padding:12px 14px;transition:border-color 0.3s;}
+    .bucket.active{border-color:#ffd700;}
+    .bucket-header{display:flex;align-items:center;gap:10px;}
+    .bucket-icon{font-size:1.3rem;}
+    .bucket-title{font-weight:bold;color:#ffd700;font-size:0.9rem;}
+    .bucket-count{margin-left:auto;font-size:0.7rem;color:#555;}
+    .bucket-items{margin-top:8px;padding-top:8px;border-top:1px solid #2a2a3e;}
+    .bucket-item{font-size:0.82rem;color:#e2e8f0;padding:4px 0;border-bottom:1px solid #1a1a2e;display:flex;align-items:center;gap:6px;}
+    .bucket-item::before{content:'→';color:#ffd700;font-size:0.7rem;}
+    .live-msg{display:none;color:#00c875;font-weight:700;font-size:0.92rem;background:rgba(0,200,117,0.08);border:1px solid rgba(0,200,117,0.4);border-radius:10px;padding:10px 12px;margin-bottom:8px;text-align:center;}
     .chat-section{display:none;width:100%;max-width:480px;padding:20px 16px 0;}
-    .chat-log{background:#1a1a2e;border-radius:12px;padding:16px;min-height:120px;max-height:400px;overflow-y:auto;margin-bottom:12px;}
-    .msg{margin-bottom:16px;line-height:1.6;}
+    .chat-log{background:#1a1a2e;border-radius:12px;padding:16px;min-height:80px;max-height:300px;overflow-y:auto;margin-bottom:12px;}
+    .msg{margin-bottom:12px;line-height:1.6;}
     .msg.fresh{color:#ffd700;font-size:0.9rem;}
     .msg.fresh span{font-weight:bold;}
     .msg.prospect{color:#e2e8f0;font-size:0.9rem;text-align:right;}
     .msg.prospect span{font-weight:bold;color:#579bfc;}
-    .chat-input{display:flex;gap:8px;}
-    .chat-input input{flex:1;padding:12px;font-size:0.95rem;border-radius:10px;border:1px solid #333;background:#0f0f1a;color:#fff;outline:none;}
-    .chat-input input:focus{border-color:#ffd700;}
-    .chat-input button{padding:12px 16px;background:#00c875;color:#fff;font-weight:bold;border:none;border-radius:10px;cursor:pointer;}
-    .thinking{color:#aaa;font-style:italic;font-size:0.85rem;padding:8px 0;}
+    .thinking{color:#aaa;font-style:italic;font-size:0.85rem;padding:6px 0;}
+    .input-area{width:100%;max-width:480px;padding:0 16px;}
+    .input-box{display:flex;gap:8px;margin-bottom:8px;}
+    .input-box input{flex:1;padding:14px;font-size:1rem;border-radius:10px;border:1px solid #333;background:#1a1a2e;color:#fff;outline:none;}
+    .input-box input:focus{border-color:#ffd700;}
+    .input-box button{padding:14px 18px;background:#ffd700;color:#000;font-weight:bold;border:none;border-radius:10px;cursor:pointer;}
+    .input-hint{font-size:0.72rem;color:#555;text-align:center;}
     .trial-cta{display:none;width:100%;max-width:480px;padding:16px 16px 0;}
     .trial-inner{background:#1a1a2e;border-radius:16px;border:1px solid #333;padding:20px;}
     .trial-inner h3{color:#ffd700;font-size:1rem;margin-bottom:8px;}
@@ -103,19 +117,28 @@
 <div class="thesis-section" id="thesisSection">
   <div class="thesis-card">
     <div class="thesis-text" id="thesisText"></div>
-    <button class="thesis-continue" onclick="startInterview()">Let's Talk →</button>
+    <button class="thesis-continue" onclick="showDemo()">See It In Action →</button>
   </div>
 </div>
+<div class="demo-section" id="demoSection">
+  <div class="demo-label" id="demoLabel">Here's what a typical system looks like</div>
+  <div id="demoBoard"></div>
+  <button class="demo-continue" onclick="startBuild()">Build Mine From Scratch →</button>
+</div>
 <div class="system-section" id="systemSection">
-  <div class="system-cards" id="systemCards"></div>
-  <div class="live-msg" id="liveMsg">Your system is live. Tap any card to add your first real task. 👆</div>
+  <div class="system-label">Your system — just talk to build it 👇</div>
+  <div class="system-buckets" id="systemBuckets"></div>
+  <div class="live-msg" id="liveMsg">Just say anything — Fresh figures out where it goes 💛</div>
 </div>
 <div class="chat-section" id="chatSection">
   <div class="chat-log" id="chatLog"></div>
-  <div class="chat-input">
-    <input type="text" id="chatInput" placeholder="Ask me anything or tell me what to change…" onkeydown="if(event.key==='Enter')sendChat()"/>
-    <button onclick="sendChat()">Send</button>
+</div>
+<div class="input-area" id="inputArea" style="display:none;">
+  <div class="input-box">
+    <input type="text" id="mainInput" placeholder="Say anything — Fresh sorts it…" onkeydown="if(event.key==='Enter')handleInput()"/>
+    <button onclick="handleInput()">→</button>
   </div>
+  <div class="input-hint">Talk · Type · or take a 📷 photo of your notes</div>
 </div>
 <div class="trial-cta" id="trialCta">
   <div class="trial-inner">
@@ -141,76 +164,96 @@
 </div>
 <script>
 const CHAT='/.netlify/functions/chat';
-let chatHistory=[],replyCount=0,businessType='',systemBuilt=false,choiceType='';
-const industryTools={
+let chatHistory=[],replyCount=0,businessType='',choiceType='';
+const bucketData={};
+
+const industryBuckets={
   vacuum:[
-    {icon:'🔧',title:'Repair Intake',desc:'Log every machine the moment it walks in the door.'},
-    {icon:'⏳',title:'Parts Tracker',desc:'Track ordered parts and when they arrive.'},
-    {icon:'✅',title:'Ready for Pickup',desc:'Notify customers automatically when done.'},
-    {icon:'💰',title:'Invoice Queue',desc:'Generate and send invoices in one tap.'}
-  ],
-  dental:[
-    {icon:'🦷',title:'Patient Recall',desc:'Automated reminders so no patient falls through the cracks.'},
-    {icon:'📅',title:'No-Show Follow-Up',desc:'Re-book missed appointments automatically.'},
-    {icon:'💊',title:'Supply Reorder',desc:'Never run out of gloves, bibs, or materials again.'},
-    {icon:'📊',title:'Revenue Dashboard',desc:'See your day, week, and month at a glance.'}
+    {icon:'🔧',title:'Repair Intake',items:[]},
+    {icon:'⏳',title:'Waiting on Parts',items:[]},
+    {icon:'✅',title:'Ready for Pickup',items:[]},
+    {icon:'💰',title:'Invoice Queue',items:[]}
   ],
   restaurant:[
-    {icon:'🍽️',title:'Reservation Tracker',desc:'Manage bookings and party sizes in one place.'},
-    {icon:'👨‍🍳',title:'Staff Updates',desc:'Push daily specials and shift notes instantly.'},
-    {icon:'📦',title:'Inventory Alerts',desc:'Flag low stock before service starts.'},
-    {icon:'🎉',title:'Event Pipeline',desc:'Track private parties and catering leads.'}
+    {icon:'🍽️',title:'Reservations',items:[]},
+    {icon:'👨‍🍳',title:'Staff Notes',items:[]},
+    {icon:'📦',title:'Inventory',items:[]},
+    {icon:'🎉',title:'Events & Leads',items:[]}
+  ],
+  dental:[
+    {icon:'🦷',title:'Patient Recall',items:[]},
+    {icon:'📅',title:'No-Shows',items:[]},
+    {icon:'💊',title:'Supply Orders',items:[]},
+    {icon:'📊',title:'Follow-Ups',items:[]}
   ],
   salon:[
-    {icon:'💇',title:'Booking Manager',desc:'Confirmations and reminders sent automatically.'},
-    {icon:'🔄',title:'No-Show Re-booking',desc:'Fill cancelled slots without picking up the phone.'},
-    {icon:'📋',title:'Client Notes',desc:'Every preference saved, every visit remembered.'},
-    {icon:'💰',title:'Retail Tracker',desc:'Track product sales and reorder alerts.'}
-  ],
-  contractor:[
-    {icon:'🏗️',title:'Job Site Log',desc:'Voice or photo notes from the field instantly.'},
-    {icon:'📦',title:'Materials Tracker',desc:'Order and track supplies per job.'},
-    {icon:'📅',title:'Schedule Board',desc:'Every job, every crew, every deadline.'},
-    {icon:'💰',title:'Invoice & Follow-Up',desc:'Send invoices and chase payments automatically.'}
+    {icon:'💇',title:'Bookings',items:[]},
+    {icon:'🔄',title:'Re-booking',items:[]},
+    {icon:'📋',title:'Client Notes',items:[]},
+    {icon:'💰',title:'Retail',items:[]}
   ],
   default:[
-    {icon:'📝',title:'Intake',desc:'Capture new requests instantly with smart triage.'},
-    {icon:'🔁',title:'Follow-Up Tracker',desc:'Never miss a touchpoint with automated reminders.'},
-    {icon:'✅',title:'Task Queue',desc:'Turn requests into prioritized actions fast.'},
-    {icon:'📊',title:'Dashboard',desc:'See everything in one clear command center.'}
+    {icon:'📝',title:'Intake',items:[]},
+    {icon:'🔁',title:'Follow-Ups',items:[]},
+    {icon:'✅',title:'Tasks',items:[]},
+    {icon:'📊',title:'Notes',items:[]}
   ]
 };
-const tocData={
-  vacuum:['Track every machine from intake to pickup in one place','Send customers automatic status updates on their repair','Never lose a job ticket or parts order again','Replace your invoicing software for a fraction of the cost'],
-  dental:['Send appointment reminders and cut no-shows dramatically','Follow up with patients after procedures automatically','Track supply orders and equipment maintenance','Replace your CRM and recall software for $95/month'],
-  restaurant:['Automate reservation confirmations and follow-ups','Track event leads and private party inquiries','Send staff updates without group texts','Flag supply and inventory before you run out'],
-  salon:['Send booking confirmations and follow-ups automatically','Track no-shows and re-book them effortlessly','Keep client notes and preferences organized','Replace scheduling software for $95/month'],
-  barber:['Automate appointment reminders so clients stop no-showing','Text back instantly when you\'re busy with a client','Track inventory for blades, pomades, and supplies','Manage your daily schedule and walk-ins in one place'],
-  bier:['Automate reservation confirmations and follow-ups','Track event leads and private party inquiries','Send staff updates without group texts','Flag supply and keg inventory before you run out'],
-  contractor:['Log job site notes and material orders on the go','Send clients automatic project updates','Track follow-ups and invoice reminders','Keep every job on schedule without spreadsheets'],
-  gym:['Follow up with new membership inquiries automatically','Track trainer tasks and class scheduling','Never lose a lead from a missed call','Send automated check-ins to keep members engaged'],
-  default:['Capture every task and follow-up the moment it happens','Organize your day without spreadsheets or sticky notes','Keep your team on the same page without group texts','Replace multiple software subscriptions for $95/month']
+
+const demoBoardHTML={
+  restaurant:`
+    <div class="demo-board">
+      <div class="demo-board-title">🍺 Bar — 20 Seats</div>
+      <div class="demo-seats">${Array.from({length:20},(_,i)=>`<div class="demo-seat${[2,5,8,11,14,17].includes(i)?' occupied':''}">${i+1}</div>`).join('')}</div>
+    </div>
+    <div class="demo-board">
+      <div class="demo-board-title">🍽️ Dining Room — 12 Tables</div>
+      <div class="demo-tables">${Array.from({length:12},(_,i)=>`<div class="demo-table${[1,4,7].includes(i)?' occupied':''}">T${i+1}</div>`).join('')}</div>
+    </div>`,
+  vacuum:`
+    <div class="demo-board">
+      <div class="demo-board-title">🔧 Bench — Machines In Shop</div>
+      <div class="demo-seats">${['Shark','Oreck','Dyson','Hoover','Electrolux','Miele'].map(m=>`<div class="demo-seat occupied" style="width:auto;padding:4px 8px;font-size:0.7rem;">${m}</div>`).join('')}</div>
+    </div>
+    <div class="demo-board">
+      <div class="demo-board-title">📦 Parts Shelf</div>
+      <div class="demo-seats">${['Belts','Bags','Filters','Motors','Hoses','Brushes'].map(p=>`<div class="demo-seat" style="width:auto;padding:4px 8px;font-size:0.7rem;">${p}</div>`).join('')}</div>
+    </div>`,
+  default:`
+    <div class="demo-board">
+      <div class="demo-board-title">📋 Task Board</div>
+      <div class="demo-seats">${['Follow up','Send invoice','Call back','Schedule','Order parts','Check in'].map(t=>`<div class="demo-seat" style="width:auto;padding:4px 8px;font-size:0.7rem;">${t}</div>`).join('')}</div>
+    </div>`
 };
-function getTools(input){
+
+const tocData={
+  vacuum:['Track every machine from intake to pickup','Send customers automatic status updates','Never lose a job ticket or parts order','Replace invoicing software for a fraction of the cost'],
+  dental:['Cut no-shows with automatic reminders','Follow up with patients after procedures','Track supply orders automatically','Replace your CRM for $95/month'],
+  restaurant:['Automate reservation confirmations','Track events and private party leads','Push staff updates without group texts','Flag inventory before you run out'],
+  salon:['Send booking confirmations automatically','Re-book no-shows effortlessly','Keep every client note organized','Replace scheduling software for $95/month'],
+  barber:['Stop no-shows with automatic reminders','Text back instantly when you\'re busy','Track blade and supply inventory','Manage walk-ins and schedule in one place'],
+  bier:['Automate reservation confirmations','Track private party and event leads','Push staff updates without group texts','Flag keg and supply inventory early'],
+  contractor:['Log job site notes from the field','Send clients automatic project updates','Track follow-ups and invoice reminders','Keep every job on schedule'],
+  gym:['Follow up with new membership leads','Track trainer tasks and scheduling','Never lose a missed call lead','Send automated member check-ins'],
+  default:['Capture every task the moment it happens','Organize without spreadsheets or sticky notes','Keep your team on the same page','Replace multiple software tools for $95/month']
+};
+
+function getIndustryKey(input){
   const s=input.toLowerCase();
-  if(s.includes('vacuum')||s.includes('repair shop')||s.includes('appliance'))return industryTools.vacuum;
-  if(s.includes('dentist')||s.includes('dental'))return industryTools.dental;
-  if(s.includes('restaurant')||s.includes('bier')||s.includes('beer')||s.includes('bar')||s.includes('cafe'))return industryTools.restaurant;
-  if(s.includes('salon')||s.includes('hair')||s.includes('nail')||s.includes('spa'))return industryTools.salon;
-  if(s.includes('contractor')||s.includes('plumb')||s.includes('hvac')||s.includes('electric')||s.includes('construction'))return industryTools.contractor;
-  return industryTools.default;
+  if(s.includes('vacuum')||s.includes('repair shop')||s.includes('appliance'))return 'vacuum';
+  if(s.includes('dentist')||s.includes('dental'))return 'dental';
+  if(s.includes('restaurant')||s.includes('bier')||s.includes('beer')||s.includes('bar')||s.includes('cafe'))return 'restaurant';
+  if(s.includes('salon')||s.includes('hair')||s.includes('nail')||s.includes('spa'))return 'salon';
+  if(s.includes('barber'))return 'barber';
+  if(s.includes('contractor')||s.includes('plumb')||s.includes('hvac')||s.includes('electric'))return 'contractor';
+  if(s.includes('gym')||s.includes('fitness')||s.includes('yoga'))return 'gym';
+  return 'default';
 }
+
 function getToc(input){
-  const s=input.toLowerCase();
-  if(s.includes('vacuum')||s.includes('repair shop')||s.includes('appliance'))return tocData.vacuum;
-  if(s.includes('dentist')||s.includes('dental'))return tocData.dental;
-  if(s.includes('bier')||s.includes('beer')||s.includes('brewery')||s.includes('restaurant')||s.includes('bar')||s.includes('cafe'))return tocData.bier;
-  if(s.includes('salon')||s.includes('hair')||s.includes('nail')||s.includes('spa'))return tocData.salon;
-  if(s.includes('barber'))return tocData.barber;
-  if(s.includes('contractor')||s.includes('plumb')||s.includes('hvac')||s.includes('electric')||s.includes('construction'))return tocData.contractor;
-  if(s.includes('gym')||s.includes('fitness')||s.includes('yoga')||s.includes('trainer'))return tocData.gym;
-  return tocData.default;
+  return tocData[getIndustryKey(input)]||tocData.default;
 }
+
 function showToc(){
   businessType=document.getElementById('worldInput').value.trim();
   if(!businessType)return;
@@ -222,65 +265,55 @@ function showToc(){
   document.getElementById('tocSection').scrollIntoView({behavior:'smooth'});
   speak('Here\'s what I can do for your '+businessType+'. '+toc[0]+'. '+toc[1]+'. And more.');
 }
+
 function showThesis(){
   document.getElementById('tocSection').style.display='none';
   document.getElementById('freshImg').classList.add('pulse');
-  const thesis=`Hi — I'm <strong>Fresh</strong>. I'm here to apply for the Digital Coordinator & Coach position for your ${businessType}. While we talk I'm going to build your actual working system live right here on this screen — consider it my resume.<br><br>Most businesses I work with replace $300-500 a month in software, stop letting things fall through the cracks, and honestly — get their quality of life back. The stuff you keep putting off because work never stops. Whether that's a round of golf, a game of pickleball, or just leaving on time.<br><br>And I'm not just your coordinator — I'm your go-to for anything digital. Shortcuts, email tips, tech questions — ask me anything.<br><br>No pressure. No commitment. <strong>Let's talk.</strong>`;
+  const thesis=`Hi — I'm <strong>Fresh</strong>. I'm here to apply for the Digital Coordinator & Coach position for your ${businessType}. While we talk I'm going to build your actual working system live right here — consider it my resume.<br><br>Most businesses I work with replace $300-500 a month in software, stop letting things fall through the cracks, and honestly — get their quality of life back.<br><br>And the best part? You don't tap through menus. You don't fill out forms. You just <strong>talk</strong> — or type — or snap a photo of your notes. I figure out the rest.<br><br>No pressure. No commitment. <strong>Let me show you.</strong>`;
   document.getElementById('thesisText').innerHTML=thesis;
   document.getElementById('thesisSection').style.display='block';
   document.getElementById('thesisSection').scrollIntoView({behavior:'smooth'});
-  speak(`Hi, I'm Fresh. I'm applying for the Digital Coordinator and Coach position for your ${businessType}. I'll build your actual system live right here. Most businesses replace hundreds in software and get their quality of life back. No pressure. Let's talk.`);
+  speak(`Hi, I'm Fresh. I'm applying for the Digital Coordinator position for your ${businessType}. The best part? You just talk, type, or snap a photo of your notes — I figure out the rest. Let me show you.`);
 }
-function startInterview(){
+
+function showDemo(){
   document.getElementById('thesisSection').style.display='none';
-  buildSystemSilently();
+  const key=getIndustryKey(businessType);
+  const demoEl=document.getElementById('demoBoard');
+  demoEl.innerHTML=demoBoardHTML[key]||demoBoardHTML.default;
+  document.getElementById('demoLabel').textContent='Here\'s what a typical '+businessType+' system looks like';
+  document.getElementById('demoSection').style.display='block';
+  document.getElementById('demoSection').scrollIntoView({behavior:'smooth'});
+  speak('Here\'s what a typical system looks like for your industry. Now let\'s build yours from scratch.');
+}
+
+function startBuild(){
+  document.getElementById('demoSection').style.display='none';
+  const key=getIndustryKey(businessType);
+  const buckets=industryBuckets[key]||industryBuckets.default;
+  const wrap=document.getElementById('systemBuckets');
+  wrap.innerHTML='';
+  buckets.forEach((b,i)=>{
+    bucketData[i]={title:b.title,icon:b.icon,items:[]};
+    const div=document.createElement('div');
+    div.className='bucket';
+    div.id='bucket-'+i;
+    div.innerHTML=`<div class="bucket-header"><div class="bucket-icon">${b.icon}</div><div class="bucket-title">${b.title}</div><div class="bucket-count" id="bcount-${i}">empty</div></div><div class="bucket-items" id="bitems-${i}"></div>`;
+    wrap.appendChild(div);
+  });
+  document.getElementById('systemSection').style.display='block';
   document.getElementById('chatSection').style.display='block';
-  document.getElementById('chatSection').scrollIntoView({behavior:'smooth'});
-  const opener=`Thanks for taking the time. I know your ${businessType} keeps you busy — I'm already building something above while we talk. Tap any card to add your first real task. What would you like to know about me?`;
+  document.getElementById('inputArea').style.display='block';
+  document.getElementById('liveMsg').style.display='block';
+  document.getElementById('systemSection').scrollIntoView({behavior:'smooth'});
+  const opener=`Your system is ready and waiting. Just tell me anything about your ${businessType} — a customer, a task, a note, anything — and I'll put it where it belongs. Go ahead.`;
   appendMsg('fresh',opener);
   speak(opener);
   chatHistory.push({role:'model',parts:[{text:opener}]});
 }
-function buildSystemSilently(){
-  if(systemBuilt)return;
-  systemBuilt=true;
-  const section=document.getElementById('systemSection');
-  const cardsWrap=document.getElementById('systemCards');
-  const liveMsg=document.getElementById('liveMsg');
-  section.style.display='block';
-  const tools=getTools(businessType);
-  tools.forEach((tool,i)=>{
-    setTimeout(()=>{
-      const card=document.createElement('div');
-      card.className='sys-card';
-      card.innerHTML=`<div class="sys-icon">${tool.icon}</div><div style="flex:1"><div class="sys-title">${tool.title}</div><div class="sys-desc">${tool.desc}</div><div class="sys-action" id="action-${i}"><input type="text" placeholder="Add your first item…" id="input-${i}" onkeydown="if(event.key==='Enter')addTask(${i},'${tool.title}')"/><button onclick="addTask(${i},'${tool.title}')">Add to My System ✅</button></div></div>`;
-      card.onclick=(e)=>{if(!e.target.matches('input,button'))toggleAction(i);};
-      cardsWrap.appendChild(card);
-      requestAnimationFrame(()=>card.classList.add('show'));
-      if(i===tools.length-1){setTimeout(()=>{liveMsg.style.display='block';speak('Your system is live. Tap any card to add your first real task.');},450);}
-    },i*600);
-  });
-}
-function toggleAction(i){
-  const action=document.getElementById('action-'+i);
-  const isOpen=action.style.display==='block';
-  document.querySelectorAll('.sys-action').forEach(a=>a.style.display='none');
-  if(!isOpen){action.style.display='block';document.getElementById('input-'+i).focus();}
-}
-async function addTask(i,title){
-  const input=document.getElementById('input-'+i);
-  const val=input.value.trim();
-  if(!val)return;
-  input.value='';
-  document.getElementById('action-'+i).style.display='none';
-  appendMsg('fresh',`Got it — "${val}" is now in your ${title}. Your system is already working. 💛`);
-  speak(`Got it. Added to your ${title}.`);
-  chatHistory.push({role:'model',parts:[{text:`Added to ${title}: ${val}`}]});
-  replyCount++;
-  if(replyCount>=10){document.getElementById('trialCta').style.display='block';setTimeout(()=>document.getElementById('trialCta').scrollIntoView({behavior:'smooth'}),500);}
-}
-async function sendChat(){
-  const input=document.getElementById('chatInput');
+
+async function handleInput(){
+  const input=document.getElementById('mainInput');
   const msg=input.value.trim();
   if(!msg)return;
   input.value='';
@@ -289,29 +322,56 @@ async function sendChat(){
   const log=document.getElementById('chatLog');
   const thinking=document.createElement('div');
   thinking.className='thinking';
-  thinking.textContent='Fresh is thinking…';
+  thinking.textContent='Fresh is sorting…';
   log.appendChild(thinking);
   log.scrollTop=log.scrollHeight;
-  const reply=await askFresh(msg);
+  const bucketNames=Object.values(bucketData).map((b,i)=>i+': '+b.title).join(', ');
+  const sortPrompt=`You are Fresh, a Digital Coordinator for a ${businessType}. The user just said: "${msg}". Available buckets: ${bucketNames}. Reply in JSON only: {"bucketIndex": <number>, "itemLabel": "<short label>", "reply": "<1-2 sentence friendly response confirming where you put it and why>"}`;
+  let bucketIndex=0,itemLabel=msg,reply='Got it — I\'ll put that where it belongs. 💛';
+  try{
+    const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:sortPrompt,system:'You are a JSON-only routing assistant. Always respond with valid JSON only. No markdown. No explanation.',history:[]})});
+    const data=await res.json();
+    const parsed=JSON.parse(data.reply.replace(/```json|```/g,'').trim());
+    bucketIndex=parsed.bucketIndex||0;
+    itemLabel=parsed.itemLabel||msg;
+    reply=parsed.reply||reply;
+  }catch(e){bucketIndex=0;itemLabel=msg;}
   log.removeChild(thinking);
+  addToBucket(bucketIndex,itemLabel);
   appendMsg('fresh',reply);
   speak(reply);
   chatHistory.push({role:'model',parts:[{text:reply}]});
   replyCount++;
   if(replyCount>=10){document.getElementById('trialCta').style.display='block';setTimeout(()=>document.getElementById('trialCta').scrollIntoView({behavior:'smooth'}),500);}
 }
-async function askFresh(msg){
-  try{
-    const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:msg,system:`You are Fresh, a warm and confident Digital Coordinator AND online coach applying for a job at a ${businessType}. You know this industry deeply. Keep responses to 2-3 sentences. Never mention price unless asked — if asked it is $95/month which replaces most CRMs. Be real and conversational.`,history:chatHistory})});
-    const data=await res.json();
-    return data.reply||"Tell me more — I want to make sure I understand your world.";
-  }catch(e){return"Tell me more — I want to make sure I understand your world.";}
+
+function addToBucket(i,item){
+  if(!bucketData[i])i=0;
+  bucketData[i].items.push(item);
+  const itemsDiv=document.getElementById('bitems-'+i);
+  itemsDiv.innerHTML=bucketData[i].items.map(it=>`<div class="bucket-item">${it}</div>`).join('');
+  const count=bucketData[i].items.length;
+  document.getElementById('bcount-'+i).textContent=count+' item'+(count>1?'s':'');
+  const bucket=document.getElementById('bucket-'+i);
+  bucket.classList.add('active');
+  setTimeout(()=>bucket.classList.remove('active'),1500);
 }
+
+function appendMsg(role,text){
+  const log=document.getElementById('chatLog');
+  const div=document.createElement('div');
+  div.className=`msg ${role}`;
+  div.innerHTML=role==='fresh'?`<span>Fresh 🤵</span><br>${text}`:`<span>You 💬</span><br>${text}`;
+  log.appendChild(div);
+  log.scrollTop=log.scrollHeight;
+}
+
 function showForm(type){
   choiceType=type;
   document.getElementById('trialForm').style.display='block';
   document.querySelectorAll('.btn-now,.btn-later').forEach(b=>b.style.display='none');
 }
+
 async function submitTrial(){
   const name=document.getElementById('trialName').value.trim();
   const biz=document.getElementById('trialBiz').value.trim();
@@ -322,17 +382,11 @@ async function submitTrial(){
   document.getElementById('trialStatus').textContent="You're in! Fresh will be in touch shortly. 💛";
   speak("You're in! Fresh will be in touch shortly.");
 }
-function appendMsg(role,text){
-  const log=document.getElementById('chatLog');
-  const div=document.createElement('div');
-  div.className=`msg ${role}`;
-  div.innerHTML=role==='fresh'?`<span>Fresh 🤵</span><br>${text}`:`<span>You 💬</span><br>${text}`;
-  log.appendChild(div);
-  log.scrollTop=log.scrollHeight;
-}
+
 function speak(text){
   try{const u=new SpeechSynthesisUtterance(text);u.rate=1.1;u.pitch=1.2;window.speechSynthesis.speak(u);}catch(e){}
 }
+
 const params=new URLSearchParams(window.location.search);
 const demoVal=params.get('demo');
 if(demoVal){window.addEventListener('load',()=>{document.getElementById('worldInput').value=demoVal;showToc();});}
