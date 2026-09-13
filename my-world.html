@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Boudie's World — TappyThing</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:#0f0f1a;color:#fff;font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 100px 0;}
+    .header{width:100%;max-width:480px;text-align:center;padding:24px 16px 16px;border-bottom:2px solid #ffd700;}
+    .header-name{font-size:1.3rem;font-weight:bold;color:#ffd700;}
+    .header-sub{font-size:0.75rem;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-top:4px;}
+    .section{width:100%;max-width:480px;padding:16px 16px 0;}
+    .card{background:#1a1a2e;border-radius:12px;padding:16px;margin-bottom:12px;}
+    .card.gold{border-left:4px solid #ffd700;}
+    .card.green{border-left:4px solid #00c875;}
+    .card.blue{border-left:4px solid #579bfc;}
+    .card.red{border-left:4px solid #df2f4a;}
+    .label{font-size:0.72rem;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;}
+    .title{font-size:1rem;font-weight:bold;color:#ffd700;margin-bottom:8px;}
+    .body-text{color:#e2e8f0;font-size:0.9rem;line-height:1.7;}
+    .body-text strong{color:#ffd700;}
+    .mic-big{width:100%;padding:18px;background:#df2f4a;color:#fff;font-size:1.1rem;font-weight:bold;border:none;border-radius:12px;cursor:pointer;margin-bottom:8px;transition:all 0.2s;}
+    .mic-big.listening{background:#c0392b;animation:micpulse 1s infinite;}
+    .mic-big.done{background:#00c875;}
+    @keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(223,47,74,0.5);}50%{box-shadow:0 0 0 12px rgba(223,47,74,0);}}
+    .mic-hint{font-size:0.75rem;color:#555;text-align:center;margin-bottom:8px;}
+    .talk-box{width:100%;padding:12px;border-radius:10px;border:1px solid #333;background:#0f0f1a;color:#fff;font-size:0.9rem;min-height:80px;resize:none;outline:none;margin-bottom:8px;}
+    .talk-box:focus{border-color:#ffd700;}
+    .btn{width:100%;padding:13px;font-size:0.95rem;font-weight:bold;border:none;border-radius:10px;cursor:pointer;margin-top:8px;}
+    .btn-gold{background:#ffd700;color:#000;}
+    .btn-green{background:#00c875;color:#000;}
+    .btn-red{background:#df2f4a;color:#fff;}
+    .btn-outline{background:transparent;color:#ffd700;border:2px solid #ffd700;}
+    .buckets-wrap{display:flex;flex-direction:column;gap:10px;margin-bottom:8px;}
+    .bucket{background:#1a1a2e;border:1px solid #2a2a3e;border-radius:12px;padding:12px 14px;transition:all 0.3s;opacity:0;transform:translateY(12px);}
+    .bucket.show{opacity:1;transform:translateY(0);}
+    .bucket.flash{border-color:#ffd700;}
+    .bucket-header{display:flex;align-items:center;gap:10px;}
+    .bucket-icon{font-size:1.3rem;}
+    .bucket-name{font-weight:bold;color:#ffd700;font-size:0.9rem;flex:1;}
+    .bucket-count{font-size:0.7rem;color:#555;background:#0f0f1a;padding:2px 8px;border-radius:10px;}
+    .bucket-items{margin-top:8px;padding-top:8px;border-top:1px solid #2a2a3e;}
+    .bucket-item{font-size:0.82rem;color:#e2e8f0;padding:4px 0;display:flex;align-items:center;gap:6px;animation:slideIn 0.3s ease;}
+    .bucket-item::before{content:'→';color:#ffd700;font-size:0.7rem;}
+    @keyframes slideIn{from{opacity:0;transform:translateX(-8px);}to{opacity:1;transform:translateX(0);}}
+    .tap-item{background:#1a1a2e;border:1px solid #2a2a3e;border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+    .tap-text{flex:1;color:#e2e8f0;font-size:0.9rem;}
+    .tap-done{padding:8px 14px;background:#00c875;color:#000;font-weight:bold;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;}
+    .tap-skip{padding:8px 14px;background:transparent;color:#aaa;border:1px solid #333;border-radius:8px;cursor:pointer;font-size:0.82rem;}
+    .live-msg{color:#00c875;font-weight:700;font-size:0.88rem;background:rgba(0,200,117,0.08);border:1px solid rgba(0,200,117,0.4);border-radius:10px;padding:10px 12px;margin-bottom:8px;text-align:center;}
+    .chat-log{background:#1a1a2e;border-radius:12px;padding:14px;min-height:60px;max-height:300px;overflow-y:auto;margin-bottom:8px;}
+    .msg{margin-bottom:10px;line-height:1.6;}
+    .msg.fresh{color:#ffd700;font-size:0.88rem;}
+    .msg.fresh span{font-weight:bold;}
+    .msg.boudie{color:#e2e8f0;font-size:0.88rem;text-align:right;}
+    .msg.boudie span{font-weight:bold;color:#579bfc;}
+    .thinking{color:#aaa;font-style:italic;font-size:0.82rem;padding:4px 0;}
+    .input-area{position:fixed;bottom:0;left:0;right:0;background:#0f0f1a;border-top:1px solid #1a1a2e;padding:10px 16px;}
+    .input-wrap{max-width:480px;margin:0 auto;}
+    .input-row{display:flex;gap:8px;margin-bottom:4px;}
+    .input-row input{flex:1;padding:11px 14px;font-size:0.95rem;border-radius:10px;border:1px solid #333;background:#1a1a2e;color:#fff;outline:none;}
+    .input-row input:focus{border-color:#ffd700;}
+    .btn-send{padding:11px 16px;background:#ffd700;color:#000;font-weight:bold;border:none;border-radius:10px;cursor:pointer;}
+    .btn-mic-sm{padding:11px 14px;background:#1a1a2e;color:#fff;border:1px solid #333;border-radius:10px;cursor:pointer;font-size:1rem;transition:all 0.2s;}
+    .btn-mic-sm.listening{background:#df2f4a;border-color:#df2f4a;animation:micpulse 1s infinite;}
+    .input-hint{font-size:0.68rem;color:#444;text-align:center;}
+    .rob-art{position:fixed;bottom:68px;right:12px;text-align:center;opacity:0.6;cursor:pointer;}
+    .rob-art div{font-size:1.3rem;}
+    .rob-art span{font-size:0.48rem;color:#444;display:block;letter-spacing:0.08em;}
+    .quick-btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+    .quick-btn{padding:8px 14px;background:#1a1a2e;border:1px solid #333;border-radius:20px;color:#aaa;font-size:0.78rem;cursor:pointer;transition:all 0.2s;}
+    .quick-btn:hover{border-color:#ffd700;color:#ffd700;}
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-name">👑 Boudie's World</div>
+  <div class="header-sub">Your Personal TappyThing</div>
+</div>
+
+<!-- BRAIN DUMP -->
+<div class="section" id="dumpSection">
+  <div class="card red">
+    <div class="label">🧠 Brain Dump</div>
+    <div class="title">Just talk — get it all out</div>
+    <div class="body-text" style="margin-bottom:12px;">Driving, walking, end of day — just hit the mic and talk. Everything about Aerus, TappyThing, personal stuff, ideas, tasks — dump it all. Fresh sorts it.</div>
+    <button class="mic-big" id="dumpMic" onclick="toggleDumpMic()">🎙️ Tap to Brain Dump</button>
+    <div class="mic-hint" id="dumpHint">Tap and talk — don't stop to organize</div>
+    <textarea class="talk-box" id="dumpText" placeholder="Or type it here…"></textarea>
+    <button class="btn btn-red" onclick="processDump()">Fresh — Sort This Out →</button>
+  </div>
+  <div class="quick-btns">
+    <div class="quick-btn" onclick="quickDump('Time to Tap')">⚡ Time to Tap</div>
+    <div class="quick-btn" onclick="quickDump('What should I focus on today?')">🎯 Focus</div>
+    <div class="quick-btn" onclick="quickDump('What follow ups do I have pending?')">🔁 Follow-Ups</div>
+    <div class="quick-btn" onclick="quickDump('TappyThing ideas')">💡 Ideas</div>
+    <div class="quick-btn" onclick="quickDump('Aerus shop tasks')">🔧 Shop</div>
+    <div class="quick-btn" onclick="quickDump('Personal reminders')">🏠 Personal</div>
+  </div>
+</div>
+
+<!-- SYSTEM -->
+<div class="section" id="systemSection" style="display:none;">
+  <div class="live-msg" id="liveMsg">Fresh is sorting…</div>
+  <div class="buckets-wrap" id="bucketsWrap"></div>
+</div>
+
+<!-- TAP SECTION -->
+<div class="section" id="tapSection" style="display:none;">
+  <div class="card gold">
+    <div class="label">⚡ Time to Tap</div>
+    <div class="title">Let's knock things out</div>
+    <div class="body-text" style="margin-bottom:12px;font-size:0.88rem;">Hardest first, easiest last.</div>
+    <div id="tapItems"></div>
+    <button class="btn btn-outline" onclick="doneTapping()">All done →</button>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div class="section" id="chatSection" style="display:none;">
+  <div class="chat-log" id="chatLog"></div>
+</div>
+
+<div class="rob-art" title="In memory of Rob — artist, brother, inspiration">
+  <div>🐷</div>
+  <span>ROB ART</span>
+</div>
+
+<div class="input-area" id="inputArea" style="display:none;">
+  <div class="input-wrap">
+    <div class="input-row">
+      <input type="text" id="mainInput" placeholder="Talk to Fresh — anything goes…" onkeydown="if(event.key==='Enter')handleInput()"/>
+      <button class="btn-mic-sm" id="micBtn" onclick="toggleMic()">🎙️</button>
+      <button class="btn-send" onclick="handleInput()">→</button>
+    </div>
+    <div class="input-hint">🎙️ Talk &nbsp;|&nbsp; ⌨️ Type &nbsp;|&nbsp; Say "Time to Tap" to knock out your list</div>
+  </div>
+</div>
+
+<script>
+const CHAT='/.netlify/functions/chat';
+const WEBHOOK='https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei';
+let bucketData={},isListening=false,dumpListening=false;
+let recognition=null,dumpRecognition=null;
+
+const SYSTEM_PROMPT=`You are Fresh, personal Digital Coordinator for Boudie (William Sullivan). He owns Aerus of Towson (vacuum/air/water repair shop) AND is building TappyThing ($95/month digital coordinator product). He also manages his personal life — health, family, weight loss goal of 210-215 lbs. His team: Mona (counter), Chris (bench repairs), Mike (field), Norby (virtual/lead gen). When he brain dumps, sort everything into the right buckets. When he asks questions, answer as his smart assistant who knows his whole world. Keep responses warm, short, and direct. Never more than 3 sentences unless he asks for more.`;
+
+function setupDumpMic(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return;
+  dumpRecognition=new SR();
+  dumpRecognition.continuous=true;
+  dumpRecognition.interimResults=true;
+  dumpRecognition.lang='en-US';
+  dumpRecognition.onstart=()=>{dumpListening=true;document.getElementById('dumpMic').classList.add('listening');document.getElementById('dumpMic').textContent='🔴 Recording… tap to stop';document.getElementById('dumpHint').textContent='Keep going — get it ALL out!';};
+  dumpRecognition.onresult=(e)=>{let t='';for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript+' ';document.getElementById('dumpText').value=t.trim();};
+  dumpRecognition.onend=()=>{dumpListening=false;document.getElementById('dumpMic').classList.remove('listening');document.getElementById('dumpMic').classList.add('done');document.getElementById('dumpMic').textContent='✅ Got it — tap "Sort This Out"';document.getElementById('dumpHint').textContent='Fresh is ready';};
+}
+
+function toggleDumpMic(){
+  if(!dumpRecognition)setupDumpMic();
+  if(!dumpRecognition){alert('Microphone not available');return;}
+  if(dumpListening)dumpRecognition.stop();
+  else dumpRecognition.start();
+}
+
+function quickDump(text){
+  document.getElementById('mainInput').value=text;
+  document.getElementById('chatSection').style.display='block';
+  document.getElementById('inputArea').style.display='block';
+  handleInput();
+}
+
+async function processDump(){
+  const dump=document.getElementById('dumpText').value.trim();
+  if(!dump){speak('Just talk first — dump it all out!');return;}
+  document.getElementById('dumpText').value='';
+  document.getElementById('dumpMic').classList.remove('done');
+  document.getElementById('dumpMic').textContent='🎙️ Tap to Brain Dump';
+  document.getElementById('dumpHint').textContent='Tap and talk — don\'t stop to organize';
+  document.getElementById('systemSection').style.display='block';
+  document.getElementById('chatSection').style.display='block';
+  document.getElementById('inputArea').style.display='block';
+  document.getElementById('liveMsg').textContent='Fresh is sorting your dump…';
+
+  const prompt=`Boudie just brain dumped: "${dump}". Sort everything into 4-6 smart buckets. Include Aerus shop items, TappyThing items, personal items, ideas — whatever he mentioned. Create a Time to Tap list from the most urgent/important items. Reply JSON only: {"buckets":[{"icon":"emoji","title":"Bucket Name","items":["item1","item2"]}],"reply":"1-2 warm sentences confirming what you sorted","tapItems":["most urgent","second","third","easiest"]}`;
+
+  try{
+    const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:prompt,system:'JSON only. No markdown.',history:[]})});
+    const data=await res.json();
+    const parsed=JSON.parse(data.reply.replace(/```json|```/g,'').trim());
+    buildBuckets(parsed.buckets||[]);
+    document.getElementById('liveMsg').textContent='Sorted. 💛';
+    appendMsg('fresh',parsed.reply||'Got it Boudie — sorted everything. Take a look above. 💛');
+    speak(parsed.reply||'Got it. Sorted everything.');
+    if(parsed.tapItems&&parsed.tapItems.length>0)setupTapItems(parsed.tapItems);
+    sendToSissy(dump,parsed.buckets||[]);
+  }catch(e){
+    buildBuckets([{icon:'🔧',title:'Aerus Shop',items:[]},{icon:'💡',title:'TappyThing',items:[]},{icon:'🔁',title:'Follow-Ups',items:[]},{icon:'🏠',title:'Personal',items:[]}]);
+    document.getElementById('liveMsg').textContent='Sorted. 💛';
+    appendMsg('fresh','Got it — sorted into your buckets. 💛');
+  }
+}
+
+async function sendToSissy(dump,buckets){
+  try{
+    await fetch(WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'trial_signup',name:'Boudie — Brain Dump',business:'TappyThing / Aerus',phone:'410-882-1027',ref:'boudie',buckets:buckets.map(b=>b.title).join(', '),rawDump:dump,timestamp:new Date().toISOString(),source:'My World Portal'})});
+  }catch(e){}
+}
+
+function buildBuckets(buckets){
+  bucketData={};
+  const wrap=document.getElementById('bucketsWrap');
+  wrap.innerHTML='';
+  buckets.forEach((b,i)=>{
+    bucketData[i]={title:b.title,icon:b.icon,items:b.items||[]};
+    const div=document.createElement('div');
+    div.className='bucket';
+    div.id='bucket-'+i;
+    const items=b.items||[];
+    div.innerHTML=`<div class="bucket-header"><div class="bucket-icon">${b.icon}</div><div class="bucket-name">${b.title}</div><div class="bucket-count" id="bcount-${i}">${items.length>0?items.length+' item'+(items.length>1?'s':''):'empty'}</div></div><div class="bucket-items" id="bitems-${i}">${items.map(it=>`<div class="bucket-item">${it}</div>`).join('')}</div>`;
+    wrap.appendChild(div);
+    setTimeout(()=>div.classList.add('show'),i*150);
+  });
+}
+
+function addToBucket(i,item){
+  if(!bucketData[i])i=0;
+  if(!bucketData[i])return;
+  bucketData[i].items.push(item);
+  const itemsDiv=document.getElementById('bitems-'+i);
+  if(itemsDiv){const row=document.createElement('div');row.className='bucket-item';row.textContent=item;itemsDiv.appendChild(row);}
+  const count=bucketData[i].items.length;
+  const countEl=document.getElementById('bcount-'+i);
+  if(countEl)countEl.textContent=count+' item'+(count>1?'s':'');
+  const bucket=document.getElementById('bucket-'+i);
+  if(bucket){bucket.classList.add('flash');setTimeout(()=>bucket.classList.remove('flash'),1500);}
+}
+
+function setupTapItems(items){
+  const el=document.getElementById('tapItems');
+  el.innerHTML=items.map((item,i)=>`<div class="tap-item" id="tapitem-${i}"><div class="tap-text">${item}</div><button class="tap-done" onclick="tapDone(${i})">✅ Done</button><button class="tap-skip" onclick="tapSkip(${i})">Skip</button></div>`).join('');
+  document.getElementById('tapSection').style.display='block';
+}
+
+function tapDone(i){const el=document.getElementById('tapitem-'+i);if(el){el.style.opacity='0.4';el.querySelector('.tap-text').style.textDecoration='line-through';}}
+function tapSkip(i){const el=document.getElementById('tapitem-'+i);if(el)el.style.opacity='0.3';}
+function doneTapping(){document.getElementById('tapSection').style.display='none';appendMsg('fresh','Nice work Boudie! 💛 Say "Time to Tap" anytime.');speak('Nice work.');}
+
+function setupMic(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){document.getElementById('micBtn').style.display='none';return;}
+  recognition=new SR();
+  recognition.continuous=false;
+  recognition.interimResults=true;
+  recognition.lang='en-US';
+  recognition.onstart=()=>{isListening=true;document.getElementById('micBtn').classList.add('listening');};
+  recognition.onresult=(e)=>{let t='';for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;document.getElementById('mainInput').value=t;};
+  recognition.onend=()=>{isListening=false;document.getElementById('micBtn').classList.remove('listening');const v=document.getElementById('mainInput').value.trim();if(v)handleInput();};
+  recognition.onerror=()=>{isListening=false;document.getElementById('micBtn').classList.remove('listening');};
+}
+
+function toggleMic(){
+  if(!recognition)setupMic();
+  if(!recognition)return;
+  if(isListening)recognition.stop();
+  else recognition.start();
+}
+
+async function handleInput(){
+  const input=document.getElementById('mainInput');
+  const msg=input.value.trim();
+  if(!msg)return;
+  input.value='';
+  document.getElementById('chatSection').style.display='block';
+  document.getElementById('inputArea').style.display='block';
+
+  if(msg.toLowerCase().includes('time to tap')||msg.toLowerCase().includes('knock out')){
+    document.getElementById('tapSection').style.display='block';
+    document.getElementById('tapSection').scrollIntoView({behavior:'smooth'});
+    appendMsg('fresh','Time to Tap Boudie! Let\'s knock it out — hardest first. 💛');
+    speak('Time to Tap. Let\'s go.');
+    return;
+  }
+
+  appendMsg('boudie',msg);
+  const log=document.getElementById('chatLog');
+  const thinking=document.createElement('div');
+  thinking.className='thinking';
+  thinking.textContent='Fresh is thinking…';
+  log.appendChild(thinking);
+  log.scrollTop=log.scrollHeight;
+
+  const bucketNames=Object.keys(bucketData).length>0?Object.values(bucketData).map((b,i)=>i+': '+b.title).join(', '):'none yet';
+  const sortPrompt=`Boudie said: "${msg}". Current buckets: ${bucketNames}. Is this a task/item to sort, or a question/conversation? If task: sort it. If question: answer it. JSON only: {"type":"sort or chat","bucketIndex":<number or -1>,"newBucket":{"icon":"emoji","title":"name"} or null,"itemLabel":"short label if sorting","reply":"response"}`;
+
+  try{
+    const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:sortPrompt,system:SYSTEM_PROMPT+' Reply JSON only. No markdown.',history:[]})});
+    const data=await res.json();
+    const parsed=JSON.parse(data.reply.replace(/```json|```/g,'').trim());
+    if(log.contains(thinking))log.removeChild(thinking);
+
+    if(parsed.type==='sort'){
+      document.getElementById('systemSection').style.display='block';
+      if(parsed.bucketIndex===-1&&parsed.newBucket){
+        const newI=Object.keys(bucketData).length;
+        bucketData[newI]={title:parsed.newBucket.title,icon:parsed.newBucket.icon,items:[]};
+        const wrap=document.getElementById('bucketsWrap');
+        const div=document.createElement('div');
+        div.className='bucket';
+        div.id='bucket-'+newI;
+        div.innerHTML=`<div class="bucket-header"><div class="bucket-icon">${parsed.newBucket.icon}</div><div class="bucket-name">${parsed.newBucket.title}</div><div class="bucket-count" id="bcount-${newI}">empty</div></div><div class="bucket-items" id="bitems-${newI}"></div>`;
+        wrap.appendChild(div);
+        setTimeout(()=>div.classList.add('show'),50);
+        addToBucket(newI,parsed.itemLabel||msg);
+      }else{
+        addToBucket(parsed.bucketIndex||0,parsed.itemLabel||msg);
+      }
+    }
+    appendMsg('fresh',parsed.reply||'Got it. 💛');
+    speak(parsed.reply||'Got it.');
+  }catch(e){
+    if(log.contains(thinking))log.removeChild(thinking);
+    appendMsg('fresh','Got it Boudie. 💛');
+  }
+}
+
+function appendMsg(role,text){
+  const log=document.getElementById('chatLog');
+  const div=document.createElement('div');
+  div.className=`msg ${role}`;
+  div.innerHTML=role==='fresh'?`<span>Fresh 🤵</span><br>${text}`:`<span>Boudie 👑</span><br>${text}`;
+  log.appendChild(div);
+  log.scrollTop=log.scrollHeight;
+}
+
+function speak(text){try{const u=new SpeechSynthesisUtterance(text);u.rate=1.1;u.pitch=1.2;window.speechSynthesis.speak(u);}catch(e){}}
+
+setupMic();
+</script>
+</body>
+</html>
