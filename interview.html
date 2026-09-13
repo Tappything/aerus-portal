@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Fresh — Digital Coordinator</title>
+  <title>TappyThing — Just Talk</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
     body{background:#0f0f1a;color:#fff;font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 100px 0;}
-    .header{width:100%;max-width:480px;text-align:center;padding:28px 16px 20px;border-bottom:2px solid #ffd700;}
+    .header{width:100%;max-width:480px;text-align:center;padding:28px 16px 16px;border-bottom:2px solid #ffd700;}
     .fresh-card img{width:90px;height:90px;border-radius:50%;border:3px solid #ffd700;object-fit:cover;}
     .fresh-name{font-size:1.3rem;font-weight:bold;color:#ffd700;margin-top:8px;}
     .fresh-title{font-size:0.75rem;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px;}
@@ -24,8 +24,11 @@
     .btn{width:100%;padding:13px;font-size:0.95rem;font-weight:bold;border:none;border-radius:10px;cursor:pointer;margin-top:12px;}
     .btn-gold{background:#ffd700;color:#000;}
     .btn-green{background:#00c875;color:#000;}
-    .btn-blue{background:#579bfc;color:#fff;}
     .btn-outline{background:transparent;color:#ffd700;border:2px solid #ffd700;}
+    .cover-hook{background:#1a1a2e;border-radius:12px;padding:20px;margin-bottom:12px;border:1px solid #2a2a3e;text-align:center;}
+    .cover-hook .hook-line{font-size:1.05rem;color:#e2e8f0;line-height:1.7;margin-bottom:12px;}
+    .cover-hook .hook-line strong{color:#ffd700;}
+    .cover-hook .hook-sub{font-size:0.82rem;color:#555;line-height:1.6;}
     .cover-box{display:flex;gap:8px;margin-bottom:8px;}
     .cover-box input{flex:1;padding:14px;font-size:1rem;border-radius:10px;border:1px solid #333;background:#1a1a2e;color:#fff;outline:none;}
     .cover-box input:focus{border-color:#ffd700;}
@@ -56,14 +59,14 @@
     @keyframes slideIn{from{opacity:0;transform:translateX(-8px);}to{opacity:1;transform:translateX(0);}}
     .wow-card{background:#1a1a2e;border:1px solid #ffd700;border-radius:12px;padding:16px;margin-bottom:12px;animation:fadeIn 0.5s ease;}
     @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-    .wow-card .wow-title{color:#ffd700;font-weight:bold;font-size:0.95rem;margin-bottom:8px;}
-    .wow-card .wow-body{color:#e2e8f0;font-size:0.88rem;line-height:1.7;}
+    .wow-title{color:#ffd700;font-weight:bold;font-size:0.95rem;margin-bottom:8px;}
+    .wow-body{color:#e2e8f0;font-size:0.88rem;line-height:1.7;}
     .tap-item{background:#1a1a2e;border:1px solid #2a2a3e;border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
     .tap-text{flex:1;color:#e2e8f0;font-size:0.9rem;}
     .tap-done{padding:8px 14px;background:#00c875;color:#000;font-weight:bold;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;}
     .tap-skip{padding:8px 14px;background:transparent;color:#aaa;border:1px solid #333;border-radius:8px;cursor:pointer;font-size:0.82rem;}
     .live-msg{color:#00c875;font-weight:700;font-size:0.88rem;background:rgba(0,200,117,0.08);border:1px solid rgba(0,200,117,0.4);border-radius:10px;padding:10px 12px;margin-bottom:8px;text-align:center;}
-    .chat-log{background:#1a1a2e;border-radius:12px;padding:14px;min-height:60px;max-height:250px;overflow-y:auto;margin-bottom:8px;}
+    .chat-log{background:#1a1a2e;border-radius:12px;padding:14px;min-height:60px;max-height:280px;overflow-y:auto;margin-bottom:8px;}
     .msg{margin-bottom:10px;line-height:1.6;}
     .msg.fresh{color:#ffd700;font-size:0.88rem;}
     .msg.fresh span{font-weight:bold;}
@@ -94,26 +97,32 @@
   </style>
 </head>
 <body>
+
 <div class="header">
   <div class="fresh-card">
     <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh" id="freshImg"/>
     <div class="fresh-name">Fresh</div>
     <div class="fresh-title">Digital Coordinator & Coach</div>
-    <div class="fresh-badge" id="applyingBadge">📋 Applying for: Your World</div>
+    <div class="fresh-badge" id="applyingBadge">✨ Your TappyThing</div>
   </div>
 </div>
 
+<!-- COVER -->
 <div class="section" id="coverSection" style="display:block;">
+  <div class="cover-hook">
+    <div class="hook-line">Most businesses are drowning in <strong>software, sticky notes, and group texts.</strong><br>TappyThing fixes all of it.<br><strong>Less than $100 a month.</strong> Just talk.</div>
+    <div class="hook-sub">businesses · homes · families · individuals · anyone</div>
+  </div>
   <div class="card gold">
     <div class="body-text" style="margin-bottom:12px;">What kind of business — or world — do you want to organize?</div>
     <div class="cover-box">
       <input type="text" id="worldInput" placeholder="e.g. restaurant, busy mom, barber shop…" onkeydown="if(event.key==='Enter')startConvo()"/>
       <button class="btn btn-gold" style="width:auto;margin:0;padding:14px 18px;" onclick="startConvo()">Go →</button>
     </div>
-    <div class="cover-hint">businesses · homes · families · individuals · anyone</div>
   </div>
 </div>
 
+<!-- FRESH INTRO + TALK -->
 <div class="section" id="convoSection">
   <div class="card green">
     <div class="label">👋 Hi — I'm Fresh</div>
@@ -129,17 +138,19 @@
   </div>
 </div>
 
+<!-- SYSTEM -->
 <div class="section" id="systemSection">
   <div class="live-msg" id="liveMsg">Fresh is working…</div>
   <div class="info-confirm" id="infoConfirm" style="display:none;"></div>
   <div class="buckets-wrap" id="bucketsWrap"></div>
   <div class="wow-card" id="wowCard" style="display:none;">
     <div class="wow-title">💡 Here's what just happened.</div>
-    <div class="wow-body">You talked for 60 seconds — and I built your entire working system from it. No forms. No setup. No IT person.<br><br>We call that a <strong style="color:#ffd700;">Brain Dump</strong>. It's the fastest way to use TappyThing. Anytime you're driving, walking, or just need to clear your head — hit the mic and talk. I sort everything automatically. Nothing gets lost.<br><br>And here's what most people love — <strong style="color:#ffd700;">you can share this with your whole team.</strong> Everyone sees what they need to see. One system. Everyone connected. No group texts. No missed messages.</div>
+    <div class="wow-body">You talked for 60 seconds — and your entire system built itself from it. No forms. No setup. No IT person. You just talked.<br><br>We call that a <strong style="color:#ffd700;">Brain Dump</strong>. It's how TappyThing works every day. Driving to work, walking between jobs, end of your shift — just hit the mic and talk. Fresh sorts everything automatically. Nothing gets lost. Nothing gets forgotten.<br><br><strong style="color:#ffd700;">Share this with your whole team.</strong> Everyone sees what they need. One system. Everyone connected. No group texts. No missed messages.<br><br>And it costs <strong style="color:#ffd700;">less than $100 a month.</strong> Most people replace $400-500 in software they barely use.</div>
   </div>
   <div class="chat-log" id="chatLog"></div>
 </div>
 
+<!-- TIME TO TAP -->
 <div class="section" id="tapSection">
   <div class="card gold">
     <div class="label">⚡ Time to Tap</div>
@@ -150,12 +161,13 @@
   </div>
 </div>
 
+<!-- TRIAL -->
 <div class="section" id="trialSection">
   <div class="trial-inner">
-    <h3>Your system is live. Any questions?</h3>
-    <p>Take a day or two and see how it feels. Everything you built stays with you — Fresh isn't going anywhere.</p>
+    <h3>Your system is live. Want to keep it?</h3>
+    <p>Everything you built stays with you. Fresh keeps sorting. Your team stays connected. Less than $100 a month — no contracts, no setup fees, full refund if it's not for you.</p>
     <div class="option-btns">
-      <button class="btn btn-green" onclick="showForm('now')">I'm ready now →</button>
+      <button class="btn btn-green" onclick="showForm('now')">Yes — let's do this →</button>
       <button class="btn btn-outline" onclick="showForm('later')">Give me a few days →</button>
     </div>
     <div class="trial-form" id="trialForm" style="display:none;margin-top:16px;">
@@ -196,22 +208,22 @@ let userInfo={name:'',phone:'',location:''};
 let sissyNotified=false;
 
 const freshIntros={
-  vacuum:`I've worked with a lot of vacuum and appliance repair shops. Machines pile up on the bench, parts go missing, customers call wondering where their vacuum is — it never stops. Just tell me your name, where your shop is, and what's been giving you the most headaches lately.`,
-  dental:`I work with dental offices all the time. Recalls not going out, no-shows killing your schedule, front desk drowning in calls — I know exactly what you're dealing with. Tell me your name, your practice, and what you wish was running smoother.`,
-  barber:`I work with barber shops. Keeping chairs full, managing walk-ins, remembering regulars, tracking supplies — it's a lot to juggle. Tell me your name, your shop, and what slows you down most.`,
-  restaurant:`I work with restaurants and bars of all sizes. Reservations falling through, staff not knowing the daily specials, private party leads getting lost — it adds up fast. Tell me your name, your place, and what keeps you up at night.`,
-  salon:`I work with salons. No-shows, last-minute cancellations, clients whose preferences you can never quite remember — I've heard it all. Tell me your name, your salon, and what you wish was easier.`,
-  liquor:`I work with liquor stores and beverage retailers. Inventory turnover, vendor orders, staff scheduling, keeping the shelves right — there's always something. Tell me your name, your store, and what's taking up most of your time.`,
-  contractor:`I work with contractors and trades. Job site notes that never make it back to the office, materials ordered twice, customers chasing you for updates — I know the drill. Tell me your name, your business, and what's eating most of your time.`,
-  gym:`I work with gyms and fitness studios. New leads falling through, members going quiet, trainers not knowing their schedule — it happens everywhere. Tell me your name, your gym, and what you'd fix first.`,
-  auto:`I work with auto repair shops and dealerships. Cars pile up, parts get delayed, customers want updates, leads go cold — the phone never stops. Tell me your name, your shop, and what's been the biggest headache lately.`,
-  realestate:`I work with real estate agents and brokers. Leads going cold, follow-ups falling through, paperwork piling up — the hustle is real. Tell me your name, your business, and what's slipping through the cracks.`,
-  retail:`I work with retail stores. Inventory tracking, vendor orders, staff scheduling, customer callbacks — it never slows down. Tell me your name, your store, and what you wish ran smoother.`,
-  law:`I work with law offices. Client follow-ups, deadlines, document collection, billing — there's always something urgent. Tell me your name, your practice, and what's taking the most time.`,
-  pet:`I work with pet businesses — daycares, groomers, vets. Appointments, pet records, customer updates, supply orders — lots of moving parts. Tell me your name, your business, and what keeps you busiest.`,
-  home:`I help homeowners stay organized. Appointments, errands, home repairs, bills, groceries — it all piles up. Think of me as a personal assistant in your pocket. Tell me your name and what's been on your mind lately.`,
-  mom:`I help busy parents stay on top of everything — kids' schedules, appointments, errands, household tasks, personal goals. Tell me your name and what's been hardest to keep track of lately.`,
-  default:`I work with all kinds of businesses and individuals — from busy families to shop owners to solo entrepreneurs. Whatever's piling up, falling through the cracks, or just taking too long — that's what I handle. Tell me your name, what you do, and what's been keeping you the busiest.`
+  vacuum:`I've worked with a lot of vacuum and appliance repair shops. Machines pile up, parts go missing, customers call wondering where their vacuum is — it never stops. Tell me your name, where your shop is, and what's been giving you the most headaches.`,
+  dental:`I work with dental offices. Recalls not going out, no-shows killing your schedule, front desk drowning — I know exactly what you're dealing with. Tell me your name, your practice, and what you wish was running smoother.`,
+  barber:`I work with barber shops. Keeping chairs full, managing walk-ins, remembering regulars — it's a lot to juggle. Tell me your name, your shop, and what slows you down most.`,
+  restaurant:`I work with restaurants and bars. Reservations falling through, staff issues, private party leads getting lost — it adds up. Tell me your name, your place, and what keeps you up at night.`,
+  salon:`I work with salons. No-shows, cancellations, client preferences you can never remember — I've heard it all. Tell me your name, your salon, and what you wish was easier.`,
+  liquor:`I work with liquor stores. Inventory, vendor orders, staff scheduling — there's always something. Tell me your name, your store, and what's taking most of your time.`,
+  contractor:`I work with contractors. Job site notes that never make it back, materials ordered twice, customers chasing updates — I know the drill. Tell me your name, your business, and what's eating your time.`,
+  gym:`I work with gyms. New leads falling through, members going quiet, trainers not knowing their schedule — it happens. Tell me your name, your gym, and what you'd fix first.`,
+  auto:`I work with auto shops and dealerships. Cars pile up, parts get delayed, customers want updates, leads go cold. Tell me your name, your shop, and what's been the biggest headache.`,
+  realestate:`I work with real estate agents. Leads going cold, follow-ups falling through, paperwork piling up — the hustle is real. Tell me your name and what's slipping through the cracks.`,
+  retail:`I work with retail stores. Inventory, vendor orders, staff scheduling — it never slows down. Tell me your name, your store, and what you wish ran smoother.`,
+  law:`I work with law offices. Client follow-ups, deadlines, document collection, billing — always something urgent. Tell me your name and what's taking the most time.`,
+  pet:`I work with pet businesses. Appointments, records, customer updates, supply orders — lots of moving parts. Tell me your name and what keeps you busiest.`,
+  home:`I help homeowners stay organized. Appointments, errands, repairs, bills — it all piles up. Think of me as a personal assistant in your pocket. Tell me your name and what's been on your mind.`,
+  mom:`I help busy parents stay on top of everything — kids, appointments, errands, household tasks. Tell me your name and what's been hardest to keep track of.`,
+  default:`I work with all kinds of businesses and individuals. Whatever's piling up, falling through the cracks, or just taking too long — that's what I handle. Tell me your name, what you do, and what's been keeping you busiest.`
 };
 
 function getKey(s){
@@ -219,11 +231,11 @@ function getKey(s){
   if(s.includes('vacuum')||s.includes('repair shop')||s.includes('appliance'))return 'vacuum';
   if(s.includes('dentist')||s.includes('dental'))return 'dental';
   if(s.includes('barber'))return 'barber';
-  if(s.includes('liquor')||s.includes('beverage')||s.includes('wine shop')||s.includes('beer store'))return 'liquor';
-  if(s.includes('restaurant')||s.includes('bier')||s.includes('beer hall')||s.includes('bar')||s.includes('cafe')||s.includes('diner'))return 'restaurant';
+  if(s.includes('liquor')||s.includes('beverage')||s.includes('wine'))return 'liquor';
+  if(s.includes('restaurant')||s.includes('bier')||s.includes('beer')||s.includes('bar')||s.includes('cafe')||s.includes('diner'))return 'restaurant';
   if(s.includes('salon')||s.includes('hair')||s.includes('nail')||s.includes('spa'))return 'salon';
   if(s.includes('contractor')||s.includes('plumb')||s.includes('hvac')||s.includes('electric')||s.includes('roofer'))return 'contractor';
-  if(s.includes('gym')||s.includes('fitness')||s.includes('yoga')||s.includes('crossfit'))return 'gym';
+  if(s.includes('gym')||s.includes('fitness')||s.includes('yoga'))return 'gym';
   if(s.includes('auto')||s.includes('mechanic')||s.includes('car')||s.includes('dealer')||s.includes('tire'))return 'auto';
   if(s.includes('real estate')||s.includes('realtor')||s.includes('broker'))return 'realestate';
   if(s.includes('retail')||s.includes('store')||s.includes('shop'))return 'retail';
@@ -240,7 +252,7 @@ function hide(id){const el=document.getElementById(id);if(el)el.style.display='n
 function startConvo(){
   businessType=document.getElementById('worldInput').value.trim();
   if(!businessType)return;
-  document.getElementById('applyingBadge').textContent='📋 Applying for: '+businessType;
+  document.getElementById('applyingBadge').textContent='✨ Your TappyThing — '+businessType;
   hide('coverSection');
   const key=getKey(businessType);
   const intro=freshIntros[key]||freshIntros.default;
@@ -272,23 +284,8 @@ async function sendToSissy(name,phone,location,business,buckets,rawDump){
   if(sissyNotified)return;
   sissyNotified=true;
   try{
-    await fetch(WEBHOOK,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        type:'trial_signup',
-        name:name||'Unknown',
-        phone:phone||'',
-        location:location||'',
-        business:business||businessType,
-        ref:REF,
-        buckets:buckets.map(b=>b.title).join(', '),
-        rawDump:rawDump||'',
-        timestamp:new Date().toISOString(),
-        source:'Fresh Interview'
-      })
-    });
-  }catch(e){console.log('Sissy notification failed',e);}
+    await fetch(WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'trial_signup',name:name||'Unknown',phone:phone||'',location:location||'',business:business||businessType,ref:REF,buckets:buckets.map(b=>b.title).join(', '),rawDump:rawDump||'',timestamp:new Date().toISOString(),source:'TappyThing'})});
+  }catch(e){}
 }
 
 async function processConvo(){
@@ -300,17 +297,17 @@ async function processConvo(){
   document.getElementById('inputArea').style.display='block';
   document.getElementById('liveMsg').textContent='Fresh is working…';
 
-  const prompt=`You are Fresh, a Digital Coordinator. Someone who runs a ${businessType} just introduced themselves: "${dump}".
-1. Extract: name, phone, location, business name if mentioned.
-2. Build 4-6 smart buckets specific to their world based on what they said.
-3. Sort every task, problem, or item they mentioned into the right bucket.
-4. Create a Time to Tap list — most important/hardest tasks first, easiest last.
-5. Write a warm 2-3 sentence response using their name, saying "Based on what you told me, here's what I set up for you" — make it feel like you really listened. Do NOT mention "brain dump" or say "I built this."
+  const prompt=`You are Fresh, a Digital Coordinator. Someone who runs a ${businessType} just talked about their world: "${dump}".
+1. Extract name, phone, location if mentioned.
+2. Build 4-6 smart buckets specific to their business.
+3. Sort every task, problem, or item into the right bucket.
+4. Create a Time to Tap list — most important first, easiest last.
+5. Write a warm 2-3 sentence response using their name. Say "Based on what you told me, here's your TappyThing" — make it feel personal. Do NOT say "brain dump" or "I built this." If they ask about price say "less than $100 a month."
 Reply JSON only:
 {"name":"","phone":"","location":"","buckets":[{"icon":"emoji","title":"Bucket Name","items":["item1","item2"]}],"reply":"2-3 warm sentences","tapItems":["most important","second","third","easiest"]}`;
 
   try{
-    const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:prompt,system:'JSON only. No markdown. No explanation.',history:[]})});
+    const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:prompt,system:'JSON only. No markdown.',history:[]})});
     const data=await res.json();
     const parsed=JSON.parse(data.reply.replace(/```json|```/g,'').trim());
     if(parsed.name)userInfo.name=parsed.name;
@@ -324,25 +321,23 @@ Reply JSON only:
     if(rows.length>0){document.getElementById('infoConfirm').innerHTML=rows.join('');document.getElementById('infoConfirm').style.display='block';}
 
     buildBuckets(parsed.buckets||[]);
-    document.getElementById('liveMsg').textContent='Done. 💛';
+    document.getElementById('liveMsg').textContent='Your TappyThing is live. 💛';
 
     setTimeout(()=>{document.getElementById('wowCard').style.display='block';document.getElementById('wowCard').scrollIntoView({behavior:'smooth'});},600);
 
-    appendMsg('fresh',parsed.reply||`Based on what you told me, here's what I set up for you. Take a look above. 💛`);
-    speak(parsed.reply||'Based on what you told me, here is what I set up for you.');
+    appendMsg('fresh',parsed.reply||`Based on what you told me, here's your TappyThing. Take a look above. 💛`);
+    speak(parsed.reply||'Based on what you told me, here is your TappyThing.');
 
     if(parsed.tapItems&&parsed.tapItems.length>0)setupTapItems(parsed.tapItems);
 
-    // 🤝 Fresh → Sissy — send prospect to board automatically
     sendToSissy(parsed.name,parsed.phone,parsed.location,parsed.business||businessType,parsed.buckets||[],dump);
 
   }catch(e){
     buildBuckets([{icon:'📝',title:'Intake',items:[]},{icon:'🔁',title:'Follow-Ups',items:[]},{icon:'✅',title:'Ready',items:[]},{icon:'📊',title:'Notes',items:[]}]);
-    document.getElementById('liveMsg').textContent='Done. 💛';
+    document.getElementById('liveMsg').textContent='Your TappyThing is live. 💛';
     setTimeout(()=>{document.getElementById('wowCard').style.display='block';},600);
-    appendMsg('fresh','Based on what you told me, here\'s what I set up for you. Keep talking and I\'ll keep adding. 💛');
-    speak('Based on what you told me, here is what I set up for you.');
-    sendToSissy('','','','',[],'dump error');
+    appendMsg('fresh','Based on what you told me, here\'s your TappyThing. Keep talking and I\'ll keep sorting. 💛');
+    speak('Here is your TappyThing.');
   }
 }
 
@@ -392,7 +387,7 @@ function tapSkip(i){const el=document.getElementById('tapitem-'+i);if(el)el.styl
 function doneTapping(){
   hide('tapSection');
   appendMsg('fresh','Nice work! Say "Time to Tap" anytime to pull this up again. 💛');
-  speak('Nice work. Say Time to Tap anytime.');
+  speak('Nice work.');
   replyCount+=3;checkTrialCta();
 }
 
@@ -421,12 +416,21 @@ async function handleInput(){
   const msg=input.value.trim();
   if(!msg)return;
   input.value='';
+
+  if(msg.toLowerCase().includes('how much')||msg.toLowerCase().includes('what does it cost')||msg.toLowerCase().includes('price')){
+    appendMsg('fresh','Less than $100 a month — and it replaces most of the software you\'re already paying for. 💛');
+    speak('Less than a hundred bucks a month — and it replaces most of the software you already pay for.');
+    replyCount++;checkTrialCta();
+    return;
+  }
+
   if(msg.toLowerCase().includes('time to tap')||msg.toLowerCase().includes('knock out')||msg.toLowerCase().includes('what can we do')){
     show('tapSection');
     appendMsg('fresh','Time to Tap! Hardest first, easiest last. Let\'s go. 💛');
     speak('Time to Tap. Let\'s knock it out.');
     return;
   }
+
   appendMsg('prospect',msg);
   const log=document.getElementById('chatLog');
   const thinking=document.createElement('div');
@@ -434,8 +438,10 @@ async function handleInput(){
   thinking.textContent='Fresh is sorting…';
   log.appendChild(thinking);
   log.scrollTop=log.scrollHeight;
+
   const bucketNames=Object.values(bucketData).map((b,i)=>i+': '+b.title).join(', ');
-  const prompt=`Fresh, Digital Coordinator for ${businessType}. User said: "${msg}". Buckets: ${bucketNames}. Create new bucket if needed. JSON only: {"bucketIndex":<number or -1>,"newBucket":{"icon":"emoji","title":"name"} or null,"itemLabel":"short label","reply":"1-2 sentences"}`;
+  const prompt=`Fresh, Digital Coordinator for ${businessType}. User said: "${msg}". Buckets: ${bucketNames}. Create new bucket if needed. If they ask about price say less than $100 a month. JSON only: {"bucketIndex":<number or -1>,"newBucket":{"icon":"emoji","title":"name"} or null,"itemLabel":"short label","reply":"1-2 sentences"}`;
+
   try{
     const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:prompt,system:'JSON only. No markdown.',history:[]})});
     const data=await res.json();
@@ -455,12 +461,12 @@ async function handleInput(){
     }else{
       addToBucket(parsed.bucketIndex||0,parsed.itemLabel||msg);
     }
-    appendMsg('fresh',parsed.reply||'Got it — added to your system. 💛');
+    appendMsg('fresh',parsed.reply||'Got it — added to your TappyThing. 💛');
     speak(parsed.reply||'Got it. Added.');
   }catch(e){
     if(log.contains(thinking))log.removeChild(thinking);
     addToBucket(0,msg);
-    appendMsg('fresh','Got it — added to your system. 💛');
+    appendMsg('fresh','Got it — added to your TappyThing. 💛');
   }
   replyCount++;checkTrialCta();
 }
@@ -502,7 +508,7 @@ if(demoVal){
   window.addEventListener('load',()=>{
     businessType=demoVal;
     document.getElementById('worldInput').value=demoVal;
-    document.getElementById('applyingBadge').textContent='📋 Applying for: '+demoVal;
+    document.getElementById('applyingBadge').textContent='✨ Your TappyThing — '+demoVal;
     hide('coverSection');
     const key=getKey(demoVal);
     const intro=freshIntros[key]||freshIntros.default;
