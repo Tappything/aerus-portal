@@ -6,7 +6,7 @@
   <title>Fresh — Digital Coordinator</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{background:#0f0f1a;color:#fff;font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 60px 0;}
+    body{background:#0f0f1a;color:#fff;font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 80px 0;}
     .header{width:100%;max-width:480px;text-align:center;padding:28px 16px 20px;border-bottom:2px solid #ffd700;}
     .fresh-card img{width:90px;height:90px;border-radius:50%;border:3px solid #ffd700;object-fit:cover;}
     .fresh-name{font-size:1.3rem;font-weight:bold;color:#ffd700;margin-top:8px;}
@@ -34,44 +34,38 @@
     .thesis-text{color:#e2e8f0;font-size:0.95rem;line-height:1.8;}
     .thesis-text strong{color:#ffd700;}
     .thesis-continue{margin-top:16px;width:100%;padding:12px;background:#00c875;color:#000;font-weight:bold;border:none;border-radius:10px;cursor:pointer;font-size:0.95rem;}
-    .demo-section{display:none;width:100%;max-width:480px;padding:16px 16px 0;}
-    .demo-label{font-size:0.72rem;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;text-align:center;}
-    .demo-board{background:#1a1a2e;border-radius:12px;padding:14px;margin-bottom:12px;border:1px solid #2a2a3e;}
-    .demo-board-title{font-size:0.8rem;font-weight:bold;color:#ffd700;margin-bottom:8px;}
-    .demo-seats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
-    .demo-seat{width:32px;height:32px;border-radius:6px;background:#0f0f1a;border:1px solid #333;display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:#aaa;}
-    .demo-seat.occupied{background:#ffd70022;border-color:#ffd700;color:#ffd700;}
-    .demo-tables{display:flex;flex-wrap:wrap;gap:6px;}
-    .demo-table{width:44px;height:44px;border-radius:8px;background:#0f0f1a;border:1px solid #333;display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:#aaa;text-align:center;line-height:1.2;}
-    .demo-table.occupied{background:#00c87522;border-color:#00c875;color:#00c875;}
-    .demo-continue{width:100%;padding:12px;background:#579bfc;color:#fff;font-weight:bold;border:none;border-radius:10px;cursor:pointer;font-size:0.95rem;margin-top:8px;}
     .system-section{display:none;width:100%;max-width:480px;padding:16px 16px 0;}
     .system-label{font-size:0.72rem;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;text-align:center;}
     .system-buckets{display:flex;flex-direction:column;gap:10px;margin-bottom:8px;}
-    .bucket{background:#1a1a2e;border:1px solid #2a2a3e;border-radius:12px;padding:12px 14px;transition:border-color 0.3s;}
-    .bucket.active{border-color:#ffd700;}
+    .bucket{background:#1a1a2e;border:1px solid #2a2a3e;border-radius:12px;padding:12px 14px;transition:all 0.3s;}
+    .bucket.active{border-color:#ffd700;background:#1a1a2e;}
     .bucket-header{display:flex;align-items:center;gap:10px;}
     .bucket-icon{font-size:1.3rem;}
     .bucket-title{font-weight:bold;color:#ffd700;font-size:0.9rem;}
-    .bucket-count{margin-left:auto;font-size:0.7rem;color:#555;}
+    .bucket-count{margin-left:auto;font-size:0.7rem;color:#555;background:#0f0f1a;padding:2px 8px;border-radius:10px;}
     .bucket-items{margin-top:8px;padding-top:8px;border-top:1px solid #2a2a3e;}
-    .bucket-item{font-size:0.82rem;color:#e2e8f0;padding:4px 0;border-bottom:1px solid #1a1a2e;display:flex;align-items:center;gap:6px;}
+    .bucket-item{font-size:0.82rem;color:#e2e8f0;padding:4px 0;border-bottom:1px solid #1a1a2e;display:flex;align-items:center;gap:6px;animation:fadeIn 0.3s ease;}
     .bucket-item::before{content:'→';color:#ffd700;font-size:0.7rem;}
+    @keyframes fadeIn{from{opacity:0;transform:translateX(-8px);}to{opacity:1;transform:translateX(0);}}
     .live-msg{display:none;color:#00c875;font-weight:700;font-size:0.92rem;background:rgba(0,200,117,0.08);border:1px solid rgba(0,200,117,0.4);border-radius:10px;padding:10px 12px;margin-bottom:8px;text-align:center;}
-    .chat-section{display:none;width:100%;max-width:480px;padding:20px 16px 0;}
-    .chat-log{background:#1a1a2e;border-radius:12px;padding:16px;min-height:80px;max-height:300px;overflow-y:auto;margin-bottom:12px;}
+    .chat-section{display:none;width:100%;max-width:480px;padding:12px 16px 0;}
+    .chat-log{background:#1a1a2e;border-radius:12px;padding:16px;min-height:60px;max-height:280px;overflow-y:auto;margin-bottom:8px;}
     .msg{margin-bottom:12px;line-height:1.6;}
-    .msg.fresh{color:#ffd700;font-size:0.9rem;}
+    .msg.fresh{color:#ffd700;font-size:0.88rem;}
     .msg.fresh span{font-weight:bold;}
-    .msg.prospect{color:#e2e8f0;font-size:0.9rem;text-align:right;}
+    .msg.prospect{color:#e2e8f0;font-size:0.88rem;text-align:right;}
     .msg.prospect span{font-weight:bold;color:#579bfc;}
-    .thinking{color:#aaa;font-style:italic;font-size:0.85rem;padding:6px 0;}
-    .input-area{width:100%;max-width:480px;padding:0 16px;}
-    .input-box{display:flex;gap:8px;margin-bottom:8px;}
-    .input-box input{flex:1;padding:14px;font-size:1rem;border-radius:10px;border:1px solid #333;background:#1a1a2e;color:#fff;outline:none;}
-    .input-box input:focus{border-color:#ffd700;}
-    .input-box button{padding:14px 18px;background:#ffd700;color:#000;font-weight:bold;border:none;border-radius:10px;cursor:pointer;}
-    .input-hint{font-size:0.72rem;color:#555;text-align:center;}
+    .thinking{color:#aaa;font-style:italic;font-size:0.82rem;padding:4px 0;}
+    .input-area{position:fixed;bottom:0;left:0;right:0;background:#0f0f1a;border-top:1px solid #1a1a2e;padding:12px 16px;display:none;}
+    .input-wrap{max-width:480px;margin:0 auto;}
+    .input-row{display:flex;gap:8px;margin-bottom:6px;}
+    .input-row input{flex:1;padding:12px 14px;font-size:0.95rem;border-radius:10px;border:1px solid #333;background:#1a1a2e;color:#fff;outline:none;}
+    .input-row input:focus{border-color:#ffd700;}
+    .btn-send{padding:12px 16px;background:#ffd700;color:#000;font-weight:bold;border:none;border-radius:10px;cursor:pointer;font-size:0.95rem;}
+    .btn-mic{padding:12px 16px;background:#1a1a2e;color:#fff;border:1px solid #333;border-radius:10px;cursor:pointer;font-size:1.1rem;transition:all 0.2s;}
+    .btn-mic.listening{background:#df2f4a;border-color:#df2f4a;animation:micpulse 1s infinite;}
+    @keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(223,47,74,0.4);}50%{box-shadow:0 0 0 8px rgba(223,47,74,0);}}
+    .input-hint{font-size:0.7rem;color:#555;text-align:center;}
     .trial-cta{display:none;width:100%;max-width:480px;padding:16px 16px 0;}
     .trial-inner{background:#1a1a2e;border-radius:16px;border:1px solid #333;padding:20px;}
     .trial-inner h3{color:#ffd700;font-size:1rem;margin-bottom:8px;}
@@ -82,9 +76,9 @@
     .trial-form input{width:100%;padding:12px;margin-bottom:8px;border-radius:8px;border:1px solid #333;background:#0f0f1a;color:#fff;font-size:0.95rem;display:block;}
     .trial-form button{width:100%;padding:14px;background:#ffd700;color:#000;font-weight:bold;border:none;border-radius:10px;font-size:1rem;cursor:pointer;}
     .guarantee{font-size:0.75rem;color:#555;text-align:center;margin-top:12px;}
-    .rob-art{position:fixed;bottom:12px;right:12px;text-align:center;opacity:0.7;cursor:pointer;}
-    .rob-art div{font-size:1.6rem;}
-    .rob-art span{font-size:0.55rem;color:#555;display:block;letter-spacing:0.08em;}
+    .rob-art{position:fixed;bottom:70px;right:12px;text-align:center;opacity:0.6;cursor:pointer;}
+    .rob-art div{font-size:1.4rem;}
+    .rob-art span{font-size:0.5rem;color:#444;display:block;letter-spacing:0.08em;}
     .pulse{animation:pulse 2s infinite;}
     @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.4);}50%{box-shadow:0 0 0 8px rgba(255,215,0,0);}}
   </style>
@@ -117,28 +111,16 @@
 <div class="thesis-section" id="thesisSection">
   <div class="thesis-card">
     <div class="thesis-text" id="thesisText"></div>
-    <button class="thesis-continue" onclick="showDemo()">See It In Action →</button>
+    <button class="thesis-continue" onclick="startInterview()">Let's Build It →</button>
   </div>
 </div>
-<div class="demo-section" id="demoSection">
-  <div class="demo-label" id="demoLabel">Here's what a typical system looks like</div>
-  <div id="demoBoard"></div>
-  <button class="demo-continue" onclick="startBuild()">Build Mine From Scratch →</button>
-</div>
 <div class="system-section" id="systemSection">
-  <div class="system-label">Your system — just talk to build it 👇</div>
+  <div class="system-label">Your world — building live 👇</div>
   <div class="system-buckets" id="systemBuckets"></div>
-  <div class="live-msg" id="liveMsg">Just say anything — Fresh figures out where it goes 💛</div>
+  <div class="live-msg" id="liveMsg">Talk · Type · or snap a 📷 photo of your notes — Fresh sorts it all</div>
 </div>
 <div class="chat-section" id="chatSection">
   <div class="chat-log" id="chatLog"></div>
-</div>
-<div class="input-area" id="inputArea" style="display:none;">
-  <div class="input-box">
-    <input type="text" id="mainInput" placeholder="Say anything — Fresh sorts it…" onkeydown="if(event.key==='Enter')handleInput()"/>
-    <button onclick="handleInput()">→</button>
-  </div>
-  <div class="input-hint">Talk · Type · or take a 📷 photo of your notes</div>
 </div>
 <div class="trial-cta" id="trialCta">
   <div class="trial-inner">
@@ -162,83 +144,37 @@
   <div>🐷</div>
   <span>ROB ART</span>
 </div>
+<div class="input-area" id="inputArea">
+  <div class="input-wrap">
+    <div class="input-row">
+      <input type="text" id="mainInput" placeholder="Say anything — Fresh sorts it…" onkeydown="if(event.key==='Enter')handleInput()"/>
+      <button class="btn-mic" id="micBtn" onclick="toggleMic()">🎙️</button>
+      <button class="btn-send" onclick="handleInput()">→</button>
+    </div>
+    <div class="input-hint" id="inputHint">🎙️ Tap mic to talk &nbsp;|&nbsp; ⌨️ Type anything &nbsp;|&nbsp; 📷 Snap notes</div>
+  </div>
+</div>
 <script>
 const CHAT='/.netlify/functions/chat';
 let chatHistory=[],replyCount=0,businessType='',choiceType='';
-const bucketData={};
-
-const industryBuckets={
-  vacuum:[
-    {icon:'🔧',title:'Repair Intake',items:[]},
-    {icon:'⏳',title:'Waiting on Parts',items:[]},
-    {icon:'✅',title:'Ready for Pickup',items:[]},
-    {icon:'💰',title:'Invoice Queue',items:[]}
-  ],
-  restaurant:[
-    {icon:'🍽️',title:'Reservations',items:[]},
-    {icon:'👨‍🍳',title:'Staff Notes',items:[]},
-    {icon:'📦',title:'Inventory',items:[]},
-    {icon:'🎉',title:'Events & Leads',items:[]}
-  ],
-  dental:[
-    {icon:'🦷',title:'Patient Recall',items:[]},
-    {icon:'📅',title:'No-Shows',items:[]},
-    {icon:'💊',title:'Supply Orders',items:[]},
-    {icon:'📊',title:'Follow-Ups',items:[]}
-  ],
-  salon:[
-    {icon:'💇',title:'Bookings',items:[]},
-    {icon:'🔄',title:'Re-booking',items:[]},
-    {icon:'📋',title:'Client Notes',items:[]},
-    {icon:'💰',title:'Retail',items:[]}
-  ],
-  default:[
-    {icon:'📝',title:'Intake',items:[]},
-    {icon:'🔁',title:'Follow-Ups',items:[]},
-    {icon:'✅',title:'Tasks',items:[]},
-    {icon:'📊',title:'Notes',items:[]}
-  ]
-};
-
-const demoBoardHTML={
-  restaurant:`
-    <div class="demo-board">
-      <div class="demo-board-title">🍺 Bar — 20 Seats</div>
-      <div class="demo-seats">${Array.from({length:20},(_,i)=>`<div class="demo-seat${[2,5,8,11,14,17].includes(i)?' occupied':''}">${i+1}</div>`).join('')}</div>
-    </div>
-    <div class="demo-board">
-      <div class="demo-board-title">🍽️ Dining Room — 12 Tables</div>
-      <div class="demo-tables">${Array.from({length:12},(_,i)=>`<div class="demo-table${[1,4,7].includes(i)?' occupied':''}">T${i+1}</div>`).join('')}</div>
-    </div>`,
-  vacuum:`
-    <div class="demo-board">
-      <div class="demo-board-title">🔧 Bench — Machines In Shop</div>
-      <div class="demo-seats">${['Shark','Oreck','Dyson','Hoover','Electrolux','Miele'].map(m=>`<div class="demo-seat occupied" style="width:auto;padding:4px 8px;font-size:0.7rem;">${m}</div>`).join('')}</div>
-    </div>
-    <div class="demo-board">
-      <div class="demo-board-title">📦 Parts Shelf</div>
-      <div class="demo-seats">${['Belts','Bags','Filters','Motors','Hoses','Brushes'].map(p=>`<div class="demo-seat" style="width:auto;padding:4px 8px;font-size:0.7rem;">${p}</div>`).join('')}</div>
-    </div>`,
-  default:`
-    <div class="demo-board">
-      <div class="demo-board-title">📋 Task Board</div>
-      <div class="demo-seats">${['Follow up','Send invoice','Call back','Schedule','Order parts','Check in'].map(t=>`<div class="demo-seat" style="width:auto;padding:4px 8px;font-size:0.7rem;">${t}</div>`).join('')}</div>
-    </div>`
-};
+let bucketData={};
+let isListening=false;
+let recognition=null;
+let buildPhase=true;
 
 const tocData={
   vacuum:['Track every machine from intake to pickup','Send customers automatic status updates','Never lose a job ticket or parts order','Replace invoicing software for a fraction of the cost'],
   dental:['Cut no-shows with automatic reminders','Follow up with patients after procedures','Track supply orders automatically','Replace your CRM for $95/month'],
   restaurant:['Automate reservation confirmations','Track events and private party leads','Push staff updates without group texts','Flag inventory before you run out'],
   salon:['Send booking confirmations automatically','Re-book no-shows effortlessly','Keep every client note organized','Replace scheduling software for $95/month'],
-  barber:['Stop no-shows with automatic reminders','Text back instantly when you\'re busy','Track blade and supply inventory','Manage walk-ins and schedule in one place'],
+  barber:['Stop no-shows with automatic reminders','Text back instantly when busy','Track blade and supply inventory','Manage walk-ins and schedule in one place'],
   bier:['Automate reservation confirmations','Track private party and event leads','Push staff updates without group texts','Flag keg and supply inventory early'],
   contractor:['Log job site notes from the field','Send clients automatic project updates','Track follow-ups and invoice reminders','Keep every job on schedule'],
   gym:['Follow up with new membership leads','Track trainer tasks and scheduling','Never lose a missed call lead','Send automated member check-ins'],
   default:['Capture every task the moment it happens','Organize without spreadsheets or sticky notes','Keep your team on the same page','Replace multiple software tools for $95/month']
 };
 
-function getIndustryKey(input){
+function getKey(input){
   const s=input.toLowerCase();
   if(s.includes('vacuum')||s.includes('repair shop')||s.includes('appliance'))return 'vacuum';
   if(s.includes('dentist')||s.includes('dental'))return 'dental';
@@ -250,15 +186,12 @@ function getIndustryKey(input){
   return 'default';
 }
 
-function getToc(input){
-  return tocData[getIndustryKey(input)]||tocData.default;
-}
-
 function showToc(){
   businessType=document.getElementById('worldInput').value.trim();
   if(!businessType)return;
   document.getElementById('coverSection').style.display='none';
-  const toc=getToc(businessType);
+  const key=getKey(businessType);
+  const toc=tocData[key]||tocData.default;
   document.getElementById('tocTitle').textContent='Here\'s what I can do for your '+businessType+':';
   document.getElementById('tocList').innerHTML=toc.map(t=>`<li>${t}</li>`).join('');
   document.getElementById('tocSection').style.display='block';
@@ -269,47 +202,65 @@ function showToc(){
 function showThesis(){
   document.getElementById('tocSection').style.display='none';
   document.getElementById('freshImg').classList.add('pulse');
-  const thesis=`Hi — I'm <strong>Fresh</strong>. I'm here to apply for the Digital Coordinator & Coach position for your ${businessType}. While we talk I'm going to build your actual working system live right here — consider it my resume.<br><br>Most businesses I work with replace $300-500 a month in software, stop letting things fall through the cracks, and honestly — get their quality of life back.<br><br>And the best part? You don't tap through menus. You don't fill out forms. You just <strong>talk</strong> — or type — or snap a photo of your notes. I figure out the rest.<br><br>No pressure. No commitment. <strong>Let me show you.</strong>`;
+  const thesis=`Hi — I'm <strong>Fresh</strong>. I'm here to apply for the Digital Coordinator & Coach position for your ${businessType}.<br><br>Here's what I'm going to do right now — I'm going to ask you a few quick questions about how you work. The more you tell me, the better I build. You can talk, type, or even snap a photo of your notes — I'll figure out the rest.<br><br>By the time we're done talking, you'll have a real working system built around <em>your</em> world — not a template, not a demo. <strong>Yours.</strong><br><br>No pressure. No commitment. Let's build something. 💛`;
   document.getElementById('thesisText').innerHTML=thesis;
   document.getElementById('thesisSection').style.display='block';
   document.getElementById('thesisSection').scrollIntoView({behavior:'smooth'});
-  speak(`Hi, I'm Fresh. I'm applying for the Digital Coordinator position for your ${businessType}. The best part? You just talk, type, or snap a photo of your notes — I figure out the rest. Let me show you.`);
+  speak(`Hi, I'm Fresh. I'm going to ask you a few quick questions and build your actual system right here as we talk. You can talk, type, or snap a photo of your notes. By the time we're done you'll have a real working system built around your world. Let's build something.`);
 }
 
-function showDemo(){
+async function startInterview(){
   document.getElementById('thesisSection').style.display='none';
-  const key=getIndustryKey(businessType);
-  const demoEl=document.getElementById('demoBoard');
-  demoEl.innerHTML=demoBoardHTML[key]||demoBoardHTML.default;
-  document.getElementById('demoLabel').textContent='Here\'s what a typical '+businessType+' system looks like';
-  document.getElementById('demoSection').style.display='block';
-  document.getElementById('demoSection').scrollIntoView({behavior:'smooth'});
-  speak('Here\'s what a typical system looks like for your industry. Now let\'s build yours from scratch.');
-}
-
-function startBuild(){
-  document.getElementById('demoSection').style.display='none';
-  const key=getIndustryKey(businessType);
-  const buckets=industryBuckets[key]||industryBuckets.default;
-  const wrap=document.getElementById('systemBuckets');
-  wrap.innerHTML='';
-  buckets.forEach((b,i)=>{
-    bucketData[i]={title:b.title,icon:b.icon,items:[]};
-    const div=document.createElement('div');
-    div.className='bucket';
-    div.id='bucket-'+i;
-    div.innerHTML=`<div class="bucket-header"><div class="bucket-icon">${b.icon}</div><div class="bucket-title">${b.title}</div><div class="bucket-count" id="bcount-${i}">empty</div></div><div class="bucket-items" id="bitems-${i}"></div>`;
-    wrap.appendChild(div);
-  });
   document.getElementById('systemSection').style.display='block';
   document.getElementById('chatSection').style.display='block';
   document.getElementById('inputArea').style.display='block';
   document.getElementById('liveMsg').style.display='block';
   document.getElementById('systemSection').scrollIntoView({behavior:'smooth'});
-  const opener=`Your system is ready and waiting. Just tell me anything about your ${businessType} — a customer, a task, a note, anything — and I'll put it where it belongs. Go ahead.`;
+  buildPhase=true;
+  const opener=`Perfect — let's build your ${businessType} system right now. Tell me: how does a typical day look for you? What kinds of things do you deal with most? Just talk — the more you tell me the better I build.`;
   appendMsg('fresh',opener);
   speak(opener);
   chatHistory.push({role:'model',parts:[{text:opener}]});
+}
+
+function setupMic(){
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
+    document.getElementById('micBtn').style.display='none';
+    return;
+  }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SR();
+  recognition.continuous=false;
+  recognition.interimResults=true;
+  recognition.lang='en-US';
+  recognition.onstart=()=>{
+    isListening=true;
+    document.getElementById('micBtn').classList.add('listening');
+    document.getElementById('inputHint').textContent='🔴 Listening… tap mic to stop';
+  };
+  recognition.onresult=(e)=>{
+    let transcript='';
+    for(let i=e.resultIndex;i<e.results.length;i++)transcript+=e.results[i][0].transcript;
+    document.getElementById('mainInput').value=transcript;
+  };
+  recognition.onend=()=>{
+    isListening=false;
+    document.getElementById('micBtn').classList.remove('listening');
+    document.getElementById('inputHint').textContent='🎙️ Tap mic to talk | ⌨️ Type anything | 📷 Snap notes';
+    const val=document.getElementById('mainInput').value.trim();
+    if(val)handleInput();
+  };
+  recognition.onerror=()=>{
+    isListening=false;
+    document.getElementById('micBtn').classList.remove('listening');
+  };
+}
+
+function toggleMic(){
+  if(!recognition)setupMic();
+  if(!recognition)return;
+  if(isListening){recognition.stop();}
+  else{recognition.start();}
 }
 
 async function handleInput(){
@@ -325,36 +276,89 @@ async function handleInput(){
   thinking.textContent='Fresh is sorting…';
   log.appendChild(thinking);
   log.scrollTop=log.scrollHeight;
-  const bucketNames=Object.values(bucketData).map((b,i)=>i+': '+b.title).join(', ');
-  const sortPrompt=`You are Fresh, a Digital Coordinator for a ${businessType}. The user just said: "${msg}". Available buckets: ${bucketNames}. Reply in JSON only: {"bucketIndex": <number>, "itemLabel": "<short label>", "reply": "<1-2 sentence friendly response confirming where you put it and why>"}`;
-  let bucketIndex=0,itemLabel=msg,reply='Got it — I\'ll put that where it belongs. 💛';
-  try{
-    const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:sortPrompt,system:'You are a JSON-only routing assistant. Always respond with valid JSON only. No markdown. No explanation.',history:[]})});
-    const data=await res.json();
-    const parsed=JSON.parse(data.reply.replace(/```json|```/g,'').trim());
-    bucketIndex=parsed.bucketIndex||0;
-    itemLabel=parsed.itemLabel||msg;
-    reply=parsed.reply||reply;
-  }catch(e){bucketIndex=0;itemLabel=msg;}
-  log.removeChild(thinking);
-  addToBucket(bucketIndex,itemLabel);
-  appendMsg('fresh',reply);
-  speak(reply);
-  chatHistory.push({role:'model',parts:[{text:reply}]});
+
+  if(buildPhase){
+    const buildPrompt=`You are Fresh, building a custom system for a ${businessType}. The user said: "${msg}". Based on this, create 3-5 smart bucket names for their specific business. Reply in JSON only: {"buckets":[{"icon":"emoji","title":"Bucket Name"}],"reply":"1-2 sentence friendly response that confirms you heard them and you're building their system now","followUp":"one short question to learn more about their world"}`;
+    try{
+      const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:buildPrompt,system:'You are a JSON-only assistant. Always respond with valid JSON only. No markdown.',history:[]})});
+      const data=await res.json();
+      const parsed=JSON.parse(data.reply.replace(/```json|```/g,'').trim());
+      log.removeChild(thinking);
+      buildBuckets(parsed.buckets||[]);
+      const fullReply=(parsed.reply||'Got it.')+' '+( parsed.followUp||'');
+      appendMsg('fresh',fullReply);
+      speak(fullReply);
+      chatHistory.push({role:'model',parts:[{text:fullReply}]});
+      buildPhase=false;
+    }catch(e){
+      log.removeChild(thinking);
+      buildPhase=false;
+      await sortInput(msg,log,thinking);
+    }
+  }else{
+    await sortInput(msg,log,thinking);
+  }
   replyCount++;
   if(replyCount>=10){document.getElementById('trialCta').style.display='block';setTimeout(()=>document.getElementById('trialCta').scrollIntoView({behavior:'smooth'}),500);}
 }
 
+async function sortInput(msg,log,thinking){
+  const bucketNames=Object.values(bucketData).map((b,i)=>i+': '+b.title).join(', ');
+  const sortPrompt=`You are Fresh, Digital Coordinator for a ${businessType}. User said: "${msg}". Buckets: ${bucketNames}. Reply JSON only: {"bucketIndex":<number>,"itemLabel":"<short label>","reply":"<1-2 sentence response confirming where you put it>"}`;
+  try{
+    const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:sortPrompt,system:'JSON only. No markdown.',history:[]})});
+    const data=await res.json();
+    const parsed=JSON.parse(data.reply.replace(/```json|```/g,'').trim());
+    if(log.contains(thinking))log.removeChild(thinking);
+    addToBucket(parsed.bucketIndex||0,parsed.itemLabel||msg);
+    appendMsg('fresh',parsed.reply||'Got it — added to your system. 💛');
+    speak(parsed.reply||'Got it. Added.');
+    chatHistory.push({role:'model',parts:[{text:parsed.reply}]});
+  }catch(e){
+    if(log.contains(thinking))log.removeChild(thinking);
+    addToBucket(0,msg);
+    appendMsg('fresh','Got it — added to your system. 💛');
+    speak('Got it. Added.');
+  }
+}
+
+function buildBuckets(buckets){
+  bucketData={};
+  const wrap=document.getElementById('systemBuckets');
+  wrap.innerHTML='';
+  buckets.forEach((b,i)=>{
+    bucketData[i]={title:b.title,icon:b.icon,items:[]};
+    const div=document.createElement('div');
+    div.className='bucket';
+    div.id='bucket-'+i;
+    div.innerHTML=`<div class="bucket-header"><div class="bucket-icon">${b.icon}</div><div class="bucket-title">${b.title}</div><div class="bucket-count" id="bcount-${i}">empty</div></div><div class="bucket-items" id="bitems-${i}" style="display:none;"></div>`;
+    div.style.opacity='0';
+    div.style.transform='translateY(12px)';
+    wrap.appendChild(div);
+    setTimeout(()=>{div.style.transition='all 0.4s ease';div.style.opacity='1';div.style.transform='translateY(0)';},i*200);
+  });
+}
+
 function addToBucket(i,item){
   if(!bucketData[i])i=0;
+  if(!bucketData[i])return;
   bucketData[i].items.push(item);
   const itemsDiv=document.getElementById('bitems-'+i);
-  itemsDiv.innerHTML=bucketData[i].items.map(it=>`<div class="bucket-item">${it}</div>`).join('');
+  if(itemsDiv){
+    itemsDiv.style.display='block';
+    const row=document.createElement('div');
+    row.className='bucket-item';
+    row.textContent=item;
+    itemsDiv.appendChild(row);
+  }
   const count=bucketData[i].items.length;
-  document.getElementById('bcount-'+i).textContent=count+' item'+(count>1?'s':'');
+  const countEl=document.getElementById('bcount-'+i);
+  if(countEl)countEl.textContent=count+' item'+(count>1?'s':'');
   const bucket=document.getElementById('bucket-'+i);
-  bucket.classList.add('active');
-  setTimeout(()=>bucket.classList.remove('active'),1500);
+  if(bucket){
+    bucket.classList.add('active');
+    setTimeout(()=>bucket.classList.remove('active'),1500);
+  }
 }
 
 function appendMsg(role,text){
@@ -387,6 +391,7 @@ function speak(text){
   try{const u=new SpeechSynthesisUtterance(text);u.rate=1.1;u.pitch=1.2;window.speechSynthesis.speak(u);}catch(e){}
 }
 
+setupMic();
 const params=new URLSearchParams(window.location.search);
 const demoVal=params.get('demo');
 if(demoVal){window.addEventListener('load',()=>{document.getElementById('worldInput').value=demoVal;showToc();});}
