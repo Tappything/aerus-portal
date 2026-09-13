@@ -1,5 +1,317 @@
-In `netlify/functions/chat.js` on `main` branch of `Tappything/aerus-portal`, find the SYSTEM constant and replace the entire string with:
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>TappyThing</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:#0f0f1a;color:#fff;font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 40px 0;}
+    .header{width:100%;max-width:480px;text-align:center;padding:24px 16px 16px;}
+    .fresh-img{width:72px;height:72px;border-radius:50%;border:3px solid #ffd700;object-fit:cover;}
+    .fresh-name{font-size:1.2rem;font-weight:bold;color:#ffd700;margin-top:8px;}
+    .fresh-sub{font-size:0.72rem;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px;}
+    .intake-section{width:100%;max-width:480px;padding:8px 16px 0;}
+    .intake-label{font-size:0.7rem;color:#555;text-align:center;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;}
+    .intake-btns{display:flex;gap:10px;margin-bottom:16px;}
+    .intake-btn{flex:1;background:#1a1a2e;border:1px solid #333;border-radius:12px;padding:14px 8px;text-align:center;cursor:pointer;transition:all 0.2s;}
+    .intake-btn:hover{border-color:#ffd700;}
+    .intake-btn .ibtn-icon{font-size:1.4rem;margin-bottom:4px;}
+    .intake-btn .ibtn-label{font-size:0.72rem;color:#aaa;font-weight:bold;text-transform:uppercase;letter-spacing:0.05em;}
+    .intake-btn.active{border-color:#ffd700;background:#ffd70011;}
+    .intake-btn.recording{border-color:#df2f4a;background:#df2f4a11;animation:pulse 1s infinite;}
+    @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(223,47,74,0.4);}50%{box-shadow:0 0 0 8px rgba(223,47,74,0);}}
+    .type-area{display:none;margin-bottom:12px;}
+    .type-area textarea{width:100%;padding:12px;border-radius:10px;border:1px solid #333;background:#1a1a2e;color:#fff;font-size:0.92rem;min-height:80px;resize:none;outline:none;}
+    .type-area textarea:focus{border-color:#ffd700;}
+    .type-area button{width:100%;margin-top:8px;padding:12px;background:#ffd700;color:#000;font-weight:bold;border:none;border-radius:10px;cursor:pointer;font-size:0.95rem;}
+    .video-area{display:none;margin-bottom:12px;}
+    .video-area video{width:100%;border-radius:10px;background:#000;max-height:240px;}
+    .video-controls{display:flex;gap:8px;margin-top:8px;}
+    .video-controls button{flex:1;padding:12px;font-weight:bold;border:none;border-radius:10px;cursor:pointer;font-size:0.88rem;}
+    .btn-record{background:#df2f4a;color:#fff;}
+    .btn-stop{background:#555;color:#fff;display:none;}
+    .btn-send-video{background:#00c875;color:#000;display:none;}
+    .status-msg{font-size:0.78rem;color:#00c875;text-align:center;margin-top:6px;min-height:18px;}
+    .divider{width:100%;max-width:480px;height:1px;background:#1a1a2e;margin:8px 0;}
+    .my-world-section{width:100%;max-width:480px;padding:0 16px;}
+    .my-world-btn{width:100%;padding:16px;background:#ffd700;color:#000;font-size:1.05rem;font-weight:bold;border:none;border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px;transition:all 0.2s;}
+    .my-world-btn:hover{background:#ffe033;}
+    .my-world-content{display:none;}
+    .world-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+    .world-title{font-size:1rem;font-weight:bold;color:#ffd700;}
+    .world-close{background:none;border:none;color:#aaa;font-size:1.2rem;cursor:pointer;}
+    .group-card{background:#1a1a2e;border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid #2a2a3e;}
+    .group-title{font-size:0.78rem;font-weight:bold;color:#ffd700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;}
+    .item-row{padding:7px 0;border-bottom:1px solid #2a2a3e;font-size:0.85rem;color:#e2e8f0;display:flex;align-items:center;gap:8px;}
+    .item-row:last-child{border-bottom:none;}
+    .item-row::before{content:'→';color:#ffd700;font-size:0.7rem;flex-shrink:0;}
+    .item-status{font-size:0.68rem;padding:2px 8px;border-radius:10px;background:#2a2a3e;color:#aaa;margin-left:auto;white-space:nowrap;}
+    .loading-msg{text-align:center;color:#555;font-size:0.82rem;padding:20px;}
+    .rob-art{text-align:center;padding:16px 0 0;opacity:0.5;}
+    .rob-art div{font-size:1.1rem;}
+    .rob-art span{font-size:0.45rem;color:#444;display:block;letter-spacing:0.08em;}
+  </style>
+</head>
+<body>
 
-`You are Fresh, a warm and confident Digital Coordinator AND online coach applying for a job. You know every industry deeply. For your opening message: start with one sentence showing you deeply understand their specific industry and its real pain points, then 3-4 bullets of specific ways you help THAT industry, then one question. After that keep every response to 2-3 sentences. Never mention price unless asked — if asked it's $95/month which replaces most CRMs and software tools they already pay for. You are also their go-to person for any digital question — shortcuts, email, tech help. After a few exchanges offer to build their system live.`
+<div class="header">
+  <img class="fresh-img" src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh"/>
+  <div class="fresh-name">TappyThing</div>
+  <div class="fresh-sub">Your Digital Coordinator</div>
+</div>
 
-Only this change. Commit to main. Return the SHA.
+<div class="intake-section">
+  <div class="intake-label">Tap to add something</div>
+  <div class="intake-btns">
+    <div class="intake-btn" id="talkBtn" onclick="toggleTalk()">
+      <div class="ibtn-icon">🎙️</div>
+      <div class="ibtn-label">Talk</div>
+    </div>
+    <div class="intake-btn" id="typeBtn" onclick="toggleType()">
+      <div class="ibtn-icon">⌨️</div>
+      <div class="ibtn-label">Type</div>
+    </div>
+    <div class="intake-btn" id="videoBtn" onclick="toggleVideo()">
+      <div class="ibtn-icon">📹</div>
+      <div class="ibtn-label">Video</div>
+    </div>
+  </div>
+
+  <div class="type-area" id="typeArea">
+    <textarea id="typeText" placeholder="Type anything — Fresh sorts it…"></textarea>
+    <button onclick="sendText()">Send to Fresh →</button>
+  </div>
+
+  <div class="video-area" id="videoArea">
+    <video id="videoPreview" autoplay muted playsinline></video>
+    <div class="video-controls">
+      <button class="btn-record" id="recordBtn" onclick="startRecording()">🔴 Start Recording</button>
+      <button class="btn-stop" id="stopBtn" onclick="stopRecording()">⏹ Stop</button>
+      <button class="btn-send-video" id="sendVideoBtn" onclick="sendVideo()">Send →</button>
+    </div>
+  </div>
+
+  <div class="status-msg" id="statusMsg"></div>
+</div>
+
+<div class="divider"></div>
+
+<div class="my-world-section">
+  <button class="my-world-btn" onclick="toggleMyWorld()">
+    <span>🌍</span>
+    <span id="myWorldBtnText">My World →</span>
+  </button>
+  <div class="my-world-content" id="myWorldContent">
+    <div class="world-header">
+      <div class="world-title">Your TappyThing Board</div>
+      <button class="world-close" onclick="toggleMyWorld()">✕</button>
+    </div>
+    <div id="boardContent"><div class="loading-msg">Loading your world…</div></div>
+  </div>
+</div>
+
+<div class="rob-art" title="In memory of Rob — artist, brother, inspiration">
+  <div>🐷</div>
+  <span>ROB ART</span>
+</div>
+
+<script>
+const WEBHOOK='https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei';
+const CHAT='/.netlify/functions/chat';
+let mediaRecorder=null,recordedChunks=[],stream=null;
+let isListening=false,recognition=null;
+let myWorldOpen=false,boardLoaded=false;
+
+function setStatus(msg,color){
+  const el=document.getElementById('statusMsg');
+  el.textContent=msg;
+  el.style.color=color||'#00c875';
+}
+
+function closeAll(){
+  document.getElementById('typeArea').style.display='none';
+  document.getElementById('videoArea').style.display='none';
+  document.getElementById('talkBtn').classList.remove('active','recording');
+  document.getElementById('typeBtn').classList.remove('active');
+  document.getElementById('videoBtn').classList.remove('active');
+  if(isListening&&recognition){recognition.stop();isListening=false;}
+  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
+}
+
+// TALK
+function toggleTalk(){
+  const btn=document.getElementById('talkBtn');
+  if(isListening){recognition.stop();return;}
+  closeAll();
+  setupRecognition();
+  if(!recognition){setStatus('Microphone not supported on this device','#df2f4a');return;}
+  recognition.start();
+}
+
+function setupRecognition(){
+  if(recognition)return;
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return;
+  recognition=new SR();
+  recognition.continuous=false;
+  recognition.interimResults=false;
+  recognition.lang='en-US';
+  recognition.onstart=()=>{
+    isListening=true;
+    document.getElementById('talkBtn').classList.add('recording');
+    setStatus('🔴 Listening… speak now','#df2f4a');
+  };
+  recognition.onresult=(e)=>{
+    const transcript=e.results[0][0].transcript;
+    setStatus('Sending to Fresh…','#ffd700');
+    sendToFresh(transcript,'voice');
+  };
+  recognition.onend=()=>{
+    isListening=false;
+    document.getElementById('talkBtn').classList.remove('active','recording');
+  };
+  recognition.onerror=()=>{
+    isListening=false;
+    document.getElementById('talkBtn').classList.remove('active','recording');
+    setStatus('Could not hear you — try again','#df2f4a');
+  };
+}
+
+// TYPE
+function toggleType(){
+  closeAll();
+  const area=document.getElementById('typeArea');
+  area.style.display='block';
+  document.getElementById('typeBtn').classList.add('active');
+  document.getElementById('typeText').focus();
+}
+
+function sendText(){
+  const text=document.getElementById('typeText').value.trim();
+  if(!text)return;
+  document.getElementById('typeText').value='';
+  setStatus('Sending to Fresh…','#ffd700');
+  sendToFresh(text,'text');
+  closeAll();
+}
+
+// VIDEO
+async function toggleVideo(){
+  closeAll();
+  const area=document.getElementById('videoArea');
+  area.style.display='block';
+  document.getElementById('videoBtn').classList.add('active');
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+    document.getElementById('videoPreview').srcObject=stream;
+    setStatus('Camera ready — tap Start Recording');
+  }catch(e){
+    setStatus('Camera not available','#df2f4a');
+  }
+}
+
+function startRecording(){
+  if(!stream)return;
+  recordedChunks=[];
+  mediaRecorder=new MediaRecorder(stream);
+  mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recordedChunks.push(e.data);};
+  mediaRecorder.onstop=()=>{
+    document.getElementById('sendVideoBtn').style.display='block';
+    setStatus('Recording done — tap Send');
+  };
+  mediaRecorder.start();
+  document.getElementById('recordBtn').style.display='none';
+  document.getElementById('stopBtn').style.display='block';
+  setStatus('🔴 Recording…','#df2f4a');
+}
+
+function stopRecording(){
+  if(mediaRecorder&&mediaRecorder.state!=='inactive')mediaRecorder.stop();
+  document.getElementById('stopBtn').style.display='none';
+}
+
+async function sendVideo(){
+  setStatus('Sending to Fresh…','#ffd700');
+  const blob=new Blob(recordedChunks,{type:'video/webm'});
+  const reader=new FileReader();
+  reader.onloadend=async()=>{
+    await fetch(WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'trial_signup',name:'Video Intake',business:'Aerus Shop',source:'video',timestamp:new Date().toISOString()})});
+    setStatus('✅ Sent to your board!','#00c875');
+    setTimeout(()=>setStatus(''),3000);
+    closeAll();
+    if(myWorldOpen)loadBoard();
+  };
+  reader.readAsDataURL(blob);
+}
+
+// SEND TO FRESH
+async function sendToFresh(text,source){
+  try{
+    const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:text,system:'You are Fresh, TappyThing coordinator for Aerus of Towson vacuum shop. Sort this into the right category: Repair Intake, Parts, Follow-Up, Lead, Personal, or Other. Reply JSON only: {"category":"category name","itemLabel":"short label","reply":"1 sentence confirmation"}',history:[]})});
+    const data=await res.json();
+    let category='Intake',itemLabel=text,reply='Got it — added to your board. 💛';
+    try{
+      const parsed=JSON.parse(data.reply.replace(/```json|```/g,'').trim());
+      category=parsed.category||category;
+      itemLabel=parsed.itemLabel||text;
+      reply=parsed.reply||reply;
+    }catch(e){}
+    await fetch(WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'trial_signup',name:itemLabel,business:'Aerus — '+category,source,rawDump:text,timestamp:new Date().toISOString()})});
+    setStatus('✅ '+reply,'#00c875');
+    setTimeout(()=>setStatus(''),4000);
+    if(myWorldOpen)setTimeout(()=>loadBoard(),2000);
+  }catch(e){
+    setStatus('✅ Added to your board!','#00c875');
+    setTimeout(()=>setStatus(''),3000);
+  }
+}
+
+// MY WORLD
+function toggleMyWorld(){
+  myWorldOpen=!myWorldOpen;
+  const content=document.getElementById('myWorldContent');
+  const btnText=document.getElementById('myWorldBtnText');
+  if(myWorldOpen){
+    content.style.display='block';
+    btnText.textContent='Close My World ✕';
+    if(!boardLoaded)loadBoard();
+    content.scrollIntoView({behavior:'smooth'});
+  }else{
+    content.style.display='none';
+    btnText.textContent='My World →';
+  }
+}
+
+async function loadBoard(){
+  document.getElementById('boardContent').innerHTML='<div class="loading-msg">Loading your world…</div>';
+  try{
+    const res=await fetch('/.netlify/functions/getBoard');
+    const data=await res.json();
+    boardLoaded=true;
+    if(!data.groups||data.groups.length===0){
+      document.getElementById('boardContent').innerHTML='<div class="loading-msg">Your board is empty — start talking!</div>';
+      return;
+    }
+    let html='';
+    data.groups.forEach(group=>{
+      if(!group.items||group.items.length===0)return;
+      html+=`<div class="group-card"><div class="group-title">${group.name}</div>`;
+      group.items.slice(0,8).forEach(item=>{
+        const status=item.status?`<span class="item-status">${item.status}</span>`:'';
+        html+=`<div class="item-row">${item.name}${status}</div>`;
+      });
+      html+=`</div>`;
+    });
+    document.getElementById('boardContent').innerHTML=html||'<div class="loading-msg">Nothing here yet — start talking!</div>';
+  }catch(e){
+    document.getElementById('boardContent').innerHTML='<div class="loading-msg">Tap Talk or Type to add your first item.</div>';
+  }
+}
+
+document.getElementById('typeText').addEventListener('keydown',(e)=>{
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendText();}
+});
+</script>
+</body>
+</html>
