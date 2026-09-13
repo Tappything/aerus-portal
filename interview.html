@@ -124,7 +124,7 @@
     <div class="title">Just talk — your name, your world, what keeps you busy.</div>
     <button class="mic-big" id="convoMic" onclick="toggleConvoMic()">🎙️ Tap to Talk</button>
     <div class="mic-hint" id="convoHint">Say your name, what you do, where you are, and what's on your plate</div>
-    <textarea class="talk-box" id="convoText" placeholder="e.g. Hi I'm Mike, I run a vacuum repair shop in Timonium MD, my phone is 410-882-6956, my biggest headache is tracking repairs and following up with customers…"></textarea>
+    <textarea class="talk-box" id="convoText" placeholder="e.g. Hi I'm Sarah, I run a hair salon in Baltimore, my phone is 410-555-1234, my biggest headaches are no-shows and keeping track of my regulars…"></textarea>
     <button class="btn btn-green" onclick="processConvo()">Go →</button>
   </div>
 </div>
@@ -187,27 +187,29 @@
 
 <script>
 const CHAT='/.netlify/functions/chat';
+const WEBHOOK='https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei';
 const REF=new URLSearchParams(window.location.search).get('ref')||'direct';
 let businessType='',bucketData={},replyCount=0,choiceType='';
 let isListening=false,convoListening=false;
 let recognition=null,convoRecognition=null;
 let userInfo={name:'',phone:'',location:''};
+let sissyNotified=false;
 
 const freshIntros={
   vacuum:`I've worked with a lot of vacuum and appliance repair shops. Machines pile up on the bench, parts go missing, customers call wondering where their vacuum is — it never stops. Just tell me your name, where your shop is, and what's been giving you the most headaches lately.`,
   dental:`I work with dental offices all the time. Recalls not going out, no-shows killing your schedule, front desk drowning in calls — I know exactly what you're dealing with. Tell me your name, your practice, and what you wish was running smoother.`,
-  barber:`I work with barber shops. Keeping chairs full, managing walk-ins, remembering regulars, tracking supplies — it's a lot to juggle for one person. Tell me your name, your shop, and what slows you down most.`,
+  barber:`I work with barber shops. Keeping chairs full, managing walk-ins, remembering regulars, tracking supplies — it's a lot to juggle. Tell me your name, your shop, and what slows you down most.`,
   restaurant:`I work with restaurants and bars of all sizes. Reservations falling through, staff not knowing the daily specials, private party leads getting lost — it adds up fast. Tell me your name, your place, and what keeps you up at night.`,
   salon:`I work with salons. No-shows, last-minute cancellations, clients whose preferences you can never quite remember — I've heard it all. Tell me your name, your salon, and what you wish was easier.`,
   liquor:`I work with liquor stores and beverage retailers. Inventory turnover, vendor orders, staff scheduling, keeping the shelves right — there's always something. Tell me your name, your store, and what's taking up most of your time.`,
   contractor:`I work with contractors and trades. Job site notes that never make it back to the office, materials ordered twice, customers chasing you for updates — I know the drill. Tell me your name, your business, and what's eating most of your time.`,
-  gym:`I work with gyms and fitness studios. New leads falling through the cracks, members going quiet, trainers not knowing their schedule — it happens everywhere. Tell me your name, your gym, and what you'd fix first.`,
-  auto:`I work with auto repair shops. Cars pile up, parts get delayed, customers want updates — the phone never stops. Tell me your name, your shop, and what's been the biggest headache lately.`,
+  gym:`I work with gyms and fitness studios. New leads falling through, members going quiet, trainers not knowing their schedule — it happens everywhere. Tell me your name, your gym, and what you'd fix first.`,
+  auto:`I work with auto repair shops and dealerships. Cars pile up, parts get delayed, customers want updates, leads go cold — the phone never stops. Tell me your name, your shop, and what's been the biggest headache lately.`,
   realestate:`I work with real estate agents and brokers. Leads going cold, follow-ups falling through, paperwork piling up — the hustle is real. Tell me your name, your business, and what's slipping through the cracks.`,
   retail:`I work with retail stores. Inventory tracking, vendor orders, staff scheduling, customer callbacks — it never slows down. Tell me your name, your store, and what you wish ran smoother.`,
   law:`I work with law offices. Client follow-ups, deadlines, document collection, billing — there's always something urgent. Tell me your name, your practice, and what's taking the most time.`,
   pet:`I work with pet businesses — daycares, groomers, vets. Appointments, pet records, customer updates, supply orders — lots of moving parts. Tell me your name, your business, and what keeps you busiest.`,
-  home:`I help homeowners and families stay organized. Appointments, errands, school stuff, home repairs, groceries — it all piles up. I'm like having a personal assistant in your pocket. Tell me your name and what's been on your mind lately.`,
+  home:`I help homeowners stay organized. Appointments, errands, home repairs, bills, groceries — it all piles up. Think of me as a personal assistant in your pocket. Tell me your name and what's been on your mind lately.`,
   mom:`I help busy parents stay on top of everything — kids' schedules, appointments, errands, household tasks, personal goals. Tell me your name and what's been hardest to keep track of lately.`,
   default:`I work with all kinds of businesses and individuals — from busy families to shop owners to solo entrepreneurs. Whatever's piling up, falling through the cracks, or just taking too long — that's what I handle. Tell me your name, what you do, and what's been keeping you the busiest.`
 };
@@ -222,7 +224,7 @@ function getKey(s){
   if(s.includes('salon')||s.includes('hair')||s.includes('nail')||s.includes('spa'))return 'salon';
   if(s.includes('contractor')||s.includes('plumb')||s.includes('hvac')||s.includes('electric')||s.includes('roofer'))return 'contractor';
   if(s.includes('gym')||s.includes('fitness')||s.includes('yoga')||s.includes('crossfit'))return 'gym';
-  if(s.includes('auto')||s.includes('mechanic')||s.includes('car repair')||s.includes('tire'))return 'auto';
+  if(s.includes('auto')||s.includes('mechanic')||s.includes('car')||s.includes('dealer')||s.includes('tire'))return 'auto';
   if(s.includes('real estate')||s.includes('realtor')||s.includes('broker'))return 'realestate';
   if(s.includes('retail')||s.includes('store')||s.includes('shop'))return 'retail';
   if(s.includes('law')||s.includes('attorney')||s.includes('lawyer'))return 'law';
@@ -266,6 +268,29 @@ function toggleConvoMic(){
   else convoRecognition.start();
 }
 
+async function sendToSissy(name,phone,location,business,buckets,rawDump){
+  if(sissyNotified)return;
+  sissyNotified=true;
+  try{
+    await fetch(WEBHOOK,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        type:'prospect_intake',
+        name:name||'Unknown',
+        phone:phone||'',
+        location:location||'',
+        business:business||businessType,
+        ref:REF,
+        buckets:buckets.map(b=>b.title).join(', '),
+        rawDump:rawDump||'',
+        timestamp:new Date().toISOString(),
+        source:'Fresh Interview'
+      })
+    });
+  }catch(e){console.log('Sissy notification failed',e);}
+}
+
 async function processConvo(){
   const dump=document.getElementById('convoText').value.trim();
   if(!dump){speak('Just tell me a little about yourself first!');return;}
@@ -276,13 +301,11 @@ async function processConvo(){
   document.getElementById('liveMsg').textContent='Fresh is working…';
 
   const prompt=`You are Fresh, a Digital Coordinator. Someone who runs a ${businessType} just introduced themselves: "${dump}".
-
 1. Extract: name, phone, location, business name if mentioned.
 2. Build 4-6 smart buckets specific to their world based on what they said.
 3. Sort every task, problem, or item they mentioned into the right bucket.
 4. Create a Time to Tap list — most important/hardest tasks first, easiest last.
-5. Write a warm 2-3 sentence response using their name, saying something like "Based on what you told me, here's what I set up for you" — make it feel like you really listened. Do NOT mention "brain dump" or say "I built this."
-
+5. Write a warm 2-3 sentence response using their name, saying "Based on what you told me, here's what I set up for you" — make it feel like you really listened. Do NOT mention "brain dump" or say "I built this."
 Reply JSON only:
 {"name":"","phone":"","location":"","buckets":[{"icon":"emoji","title":"Bucket Name","items":["item1","item2"]}],"reply":"2-3 warm sentences","tapItems":["most important","second","third","easiest"]}`;
 
@@ -293,23 +316,33 @@ Reply JSON only:
     if(parsed.name)userInfo.name=parsed.name;
     if(parsed.phone)userInfo.phone=parsed.phone;
     if(parsed.location)userInfo.location=parsed.location;
+
     const rows=[];
     if(parsed.name)rows.push(`<div class="info-row"><div class="info-label">Name</div><div class="info-value">${parsed.name}</div></div>`);
     if(parsed.location)rows.push(`<div class="info-row"><div class="info-label">Location</div><div class="info-value">${parsed.location}</div></div>`);
     if(parsed.phone)rows.push(`<div class="info-row"><div class="info-label">Phone</div><div class="info-value">${parsed.phone}</div></div>`);
     if(rows.length>0){document.getElementById('infoConfirm').innerHTML=rows.join('');document.getElementById('infoConfirm').style.display='block';}
+
     buildBuckets(parsed.buckets||[]);
     document.getElementById('liveMsg').textContent='Done. 💛';
+
     setTimeout(()=>{document.getElementById('wowCard').style.display='block';document.getElementById('wowCard').scrollIntoView({behavior:'smooth'});},600);
+
     appendMsg('fresh',parsed.reply||`Based on what you told me, here's what I set up for you. Take a look above. 💛`);
     speak(parsed.reply||'Based on what you told me, here is what I set up for you.');
+
     if(parsed.tapItems&&parsed.tapItems.length>0)setupTapItems(parsed.tapItems);
+
+    // 🤝 Fresh → Sissy — send prospect to board automatically
+    sendToSissy(parsed.name,parsed.phone,parsed.location,parsed.business||businessType,parsed.buckets||[],dump);
+
   }catch(e){
     buildBuckets([{icon:'📝',title:'Intake',items:[]},{icon:'🔁',title:'Follow-Ups',items:[]},{icon:'✅',title:'Ready',items:[]},{icon:'📊',title:'Notes',items:[]}]);
     document.getElementById('liveMsg').textContent='Done. 💛';
     setTimeout(()=>{document.getElementById('wowCard').style.display='block';},600);
     appendMsg('fresh','Based on what you told me, here\'s what I set up for you. Keep talking and I\'ll keep adding. 💛');
     speak('Based on what you told me, here is what I set up for you.');
+    sendToSissy('','','','',[],'dump error');
   }
 }
 
@@ -455,7 +488,7 @@ async function submitTrial(){
   const phone=document.getElementById('trialPhone').value.trim()||userInfo.phone;
   if(!name||!phone){document.getElementById('trialStatus').textContent='Please fill in your name and phone.';return;}
   document.getElementById('trialStatus').textContent='Sending...';
-  await fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'trial_signup',choice:choiceType,name,business:biz,phone,ref:REF,timestamp:new Date().toISOString()})});
+  await fetch(WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'trial_signup',choice:choiceType,name,business:biz,phone,ref:REF,timestamp:new Date().toISOString()})});
   document.getElementById('trialStatus').textContent="You're in! Fresh will be in touch shortly. 💛";
   speak("You're in! Fresh will be in touch shortly.");
 }
