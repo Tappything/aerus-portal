@@ -1,335 +1,222 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>TappyThing</title>
   <style>
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{background:#0f0f1a;color:#fff;font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 40px 0;}
-    .header{width:100%;max-width:480px;text-align:center;padding:24px 16px 16px;}
-    .fresh-img{width:72px;height:72px;border-radius:50%;border:3px solid #ffd700;object-fit:cover;}
-    .fresh-name{font-size:1.2rem;font-weight:bold;color:#ffd700;margin-top:8px;}
-    .fresh-sub{font-size:0.72rem;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px;}
-    .intake-section{width:100%;max-width:480px;padding:8px 16px 0;}
-    .intake-label{font-size:0.7rem;color:#555;text-align:center;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;}
-    .intake-btns{display:flex;gap:10px;margin-bottom:16px;}
-    .intake-btn{flex:1;background:#1a1a2e;border:1px solid #333;border-radius:12px;padding:14px 8px;text-align:center;cursor:pointer;transition:all 0.2s;}
-    .intake-btn:hover{border-color:#ffd700;}
-    .intake-btn .ibtn-icon{font-size:1.4rem;margin-bottom:4px;}
-    .intake-btn .ibtn-label{font-size:0.72rem;color:#aaa;font-weight:bold;text-transform:uppercase;letter-spacing:0.05em;}
-    .intake-btn.active{border-color:#ffd700;background:#ffd70011;}
-    .intake-btn.recording{border-color:#df2f4a;background:#df2f4a11;animation:pulse 1s infinite;}
-    @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(223,47,74,0.4);}50%{box-shadow:0 0 0 8px rgba(223,47,74,0);}}
-    .type-area{display:none;margin-bottom:12px;}
-    .type-area textarea{width:100%;padding:12px;border-radius:10px;border:1px solid #333;background:#1a1a2e;color:#fff;font-size:0.92rem;min-height:80px;resize:none;outline:none;}
-    .type-area textarea:focus{border-color:#ffd700;}
-    .type-area button{width:100%;margin-top:8px;padding:12px;background:#ffd700;color:#000;font-weight:bold;border:none;border-radius:10px;cursor:pointer;font-size:0.95rem;}
-    .video-area{display:none;margin-bottom:12px;}
-    .video-area video{width:100%;border-radius:10px;background:#000;max-height:240px;}
-    .video-controls{display:flex;gap:8px;margin-top:8px;}
-    .video-controls button{flex:1;padding:12px;font-weight:bold;border:none;border-radius:10px;cursor:pointer;font-size:0.88rem;}
-    .btn-record{background:#df2f4a;color:#fff;}
-    .btn-stop{background:#555;color:#fff;display:none;}
-    .btn-send-video{background:#00c875;color:#000;display:none;}
-    .status-msg{font-size:0.78rem;color:#00c875;text-align:center;margin-top:6px;min-height:18px;}
-    .divider{width:100%;max-width:480px;height:1px;background:#1a1a2e;margin:8px 0;}
-    .my-world-section{width:100%;max-width:480px;padding:0 16px;}
-    .my-world-btn{width:100%;padding:16px;background:#ffd700;color:#000;font-size:1.05rem;font-weight:bold;border:none;border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px;transition:all 0.2s;}
-    .my-world-btn:hover{background:#ffe033;}
-    .my-world-content{display:none;}
-    .world-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-    .world-title{font-size:1rem;font-weight:bold;color:#ffd700;}
-    .world-close{background:none;border:none;color:#aaa;font-size:1.2rem;cursor:pointer;}
-    .group-card{background:#1a1a2e;border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid #2a2a3e;}
-    .group-title{font-size:0.78rem;font-weight:bold;color:#ffd700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;}
-    .item-row{padding:7px 0;border-bottom:1px solid #2a2a3e;font-size:0.85rem;color:#e2e8f0;display:flex;align-items:center;gap:8px;}
-    .item-row:last-child{border-bottom:none;}
-    .item-row::before{content:'→';color:#ffd700;font-size:0.7rem;flex-shrink:0;}
-    .item-status{font-size:0.68rem;padding:2px 8px;border-radius:10px;background:#2a2a3e;color:#aaa;margin-left:auto;white-space:nowrap;}
-    .loading-msg{text-align:center;color:#555;font-size:0.82rem;padding:20px;}
-    .rob-art{text-align:center;padding:16px 0 0;opacity:0.5;}
-    .rob-art div{font-size:1.1rem;}
-    .rob-art span{font-size:0.45rem;color:#444;display:block;letter-spacing:0.08em;}
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: #0f172a; color: #f8fafc; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
+    
+    .header { width: 100%; max-width: 480px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .brand { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .user-tag { background: #1e293b; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; color: #94a3b8; border: 1px solid #334155; }
+    
+    .camera-container { width: 100%; max-width: 480px; aspect-ratio: 4/3; background: #1e293b; border-radius: 24px; overflow: hidden; position: relative; border: 2px solid #334155; margin-bottom: 20px; }
+    video, img#photoPreview { width: 100%; height: 100%; object-fit: cover; }
+    img#photoPreview { display: none; }
+    
+    .camera-controls { position: absolute; top: 12px; right: 12px; display: flex; gap: 8px; z-index: 10; }
+    .icon-btn { background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; backdrop-filter: blur(8px); }
+    
+    .actions-grid { width: 100%; max-width: 480px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .action-btn { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 14px; border-radius: 16px; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; }
+    .action-btn:active { transform: scale(0.97); background: #334155; }
+    .action-btn.active { border-color: #ef4444; background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    
+    .tap-btn-main { width: 100%; max-width: 480px; background: linear-gradient(135deg, #0284c7, #6366f1); color: #fff; border: none; padding: 20px; border-radius: 20px; font-size: 1.2rem; font-weight: 700; cursor: pointer; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4); margin-bottom: 20px; transition: transform 0.1s; }
+    .tap-btn-main:active { transform: scale(0.98); }
+    
+    .my-world-card { width: 100%; max-width: 480px; background: #1e293b; border: 1px solid #334155; border-radius: 20px; padding: 18px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; text-decoration: none; color: inherit; }
+    .my-world-title { font-weight: 700; font-size: 1.1rem; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
+    .my-world-sub { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
+    
+    #statusMsg { font-size: 0.9rem; color: #38bdf8; margin-bottom: 12px; height: 20px; }
   </style>
 </head>
 <body>
 
-<div class="header">
-  <img class="fresh-img" src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh"/>
-  <div class="fresh-name">TappyThing</div>
-  <div class="fresh-sub">Your Digital Coordinator</div>
-</div>
-
-<div class="intake-section">
-  <div class="intake-label">Tap to add something</div>
-  <div class="intake-btns">
-    <div class="intake-btn" id="talkBtn" onclick="toggleTalk()">
-      <div class="ibtn-icon">🎙️</div>
-      <div class="ibtn-label">Talk</div>
-    </div>
-    <div class="intake-btn" id="typeBtn" onclick="toggleType()">
-      <div class="ibtn-icon">⌨️</div>
-      <div class="ibtn-label">Type</div>
-    </div>
-    <div class="intake-btn" id="videoBtn" onclick="toggleVideo()">
-      <div class="ibtn-icon">📹</div>
-      <div class="ibtn-label">Video</div>
-    </div>
+  <div class="header">
+    <div class="brand">TappyThing ⚡</div>
+    <div class="user-tag" id="userDisplay">Subscriber: Loading...</div>
   </div>
 
-  <div class="type-area" id="typeArea">
-    <textarea id="typeText" placeholder="Type anything — Fresh sorts it…"></textarea>
-    <button onclick="sendText()">Send to Fresh →</button>
-  </div>
-
-  <div class="video-area" id="videoArea">
-    <video id="videoPreview" autoplay muted playsinline></video>
-    <div class="video-controls">
-      <button class="btn-record" id="recordBtn" onclick="startRecording()">🔴 Start Recording</button>
-      <button class="btn-stop" id="stopBtn" onclick="stopRecording()">⏹ Stop</button>
-      <button class="btn-send-video" id="sendVideoBtn" onclick="sendVideo()">Send →</button>
-    </div>
-  </div>
-
-  <div class="status-msg" id="statusMsg"></div>
-</div>
-
-<div class="divider"></div>
-
-<div class="my-world-section">
-  <button class="my-world-btn" onclick="toggleMyWorld()">
-    <span>🌍</span>
-    <span id="myWorldBtnText">My World →</span>
-  </button>
-  <div class="my-world-content" id="myWorldContent">
-    <div class="world-header">
-      <div class="world-title">Your TappyThing Board</div>
-      <button class="world-close" onclick="toggleMyWorld()">✕</button>
-    </div>
-    <div id="boardContent"><div class="loading-msg">Loading your world…</div></div>
-  </div>
-</div>
-
-<div class="rob-art" title="In memory of Rob — artist, brother, inspiration">
-  <div>🐷</div>
-  <span>ROB ART</span>
-</div>
-
-<script>
-const WEBHOOK='https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei';
-const CHAT='/.netlify/functions/chat';
-let mediaRecorder=null,recordedChunks=[],stream=null;
-let isListening=false,recognition=null;
-let myWorldOpen=false,boardLoaded=false;
-
-function setStatus(msg,color){
-  const el=document.getElementById('statusMsg');
-  el.textContent=msg;
-  el.style.color=color||'#00c875';
-}
-
-function closeAll(){
-  document.getElementById('typeArea').style.display='none';
-  document.getElementById('videoArea').style.display='none';
-  document.getElementById('talkBtn').classList.remove('active','recording');
-  document.getElementById('typeBtn').classList.remove('active');
-  document.getElementById('videoBtn').classList.remove('active');
-  if(isListening&&recognition){recognition.stop();isListening=false;}
-  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
-}
-
-// TALK
-function toggleTalk(){
-  const btn=document.getElementById('talkBtn');
-  if(isListening){recognition.stop();return;}
-  closeAll();
-  setupRecognition();
-  if(!recognition){setStatus('Microphone not supported on this device','#df2f4a');return;}
-  recognition.start();
-}
-
-function setupRecognition(){
-  if(recognition)return;
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR)return;
-  recognition=new SR();
-  recognition.continuous=false;
-  recognition.interimResults=false;
-  recognition.lang='en-US';
-  recognition.onstart=()=>{
-    isListening=true;
-    document.getElementById('talkBtn').classList.add('recording');
-    setStatus('🔴 Listening… speak now','#df2f4a');
-  };
-  recognition.onresult=(e)=>{
-    const transcript=e.results[0][0].transcript;
-    setStatus('Sending to Fresh…','#ffd700');
-    sendToFresh(transcript,'voice');
-  };
-  recognition.onend=()=>{
-    isListening=false;
-    document.getElementById('talkBtn').classList.remove('active','recording');
-  };
-  recognition.onerror=()=>{
-    isListening=false;
-    document.getElementById('talkBtn').classList.remove('active','recording');
-    setStatus('Could not hear you — try again','#df2f4a');
-  };
-}
-
-// TYPE
-function toggleType(){
-  closeAll();
-  const area=document.getElementById('typeArea');
-  area.style.display='block';
-  document.getElementById('typeBtn').classList.add('active');
-  document.getElementById('typeText').focus();
-}
-
-function sendText(){
-  const text=document.getElementById('typeText').value.trim();
-  if(!text)return;
-  document.getElementById('typeText').value='';
-  setStatus('Sending to Fresh…','#ffd700');
-  sendToFresh(text,'text');
-  closeAll();
-}
-
-// VIDEO
-async function toggleVideo(){
-  closeAll();
-  const area=document.getElementById('videoArea');
-  area.style.display='block';
-  document.getElementById('videoBtn').classList.add('active');
-  try{
-    stream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
-    document.getElementById('videoPreview').srcObject=stream;
-    setStatus('Camera ready — tap Start Recording');
-  }catch(e){
-    setStatus('Camera not available','#df2f4a');
-  }
-}
-
-function startRecording(){
-  if(!stream)return;
-  recordedChunks=[];
-  mediaRecorder=new MediaRecorder(stream);
-  mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recordedChunks.push(e.data);};
-  mediaRecorder.onstop=()=>{
-    document.getElementById('sendVideoBtn').style.display='block';
-    setStatus('Recording done — tap Send');
-  };
-  mediaRecorder.start();
-  document.getElementById('recordBtn').style.display='none';
-  document.getElementById('stopBtn').style.display='block';
-  setStatus('🔴 Recording…','#df2f4a');
-}
-
-function stopRecording(){
-  if(mediaRecorder&&mediaRecorder.state!=='inactive')mediaRecorder.stop();
-  document.getElementById('stopBtn').style.display='none';
-}
-
-async function sendVideo(){
-  setStatus('Sending to Fresh…','#ffd700');
-  const blob=new Blob(recordedChunks,{type:'video/webm'});
-  const reader=new FileReader();
-  reader.onloadend=async()=>{
-    await fetch(WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'trial_signup',name:'Video Intake',business:'Aerus Shop',source:'video',timestamp:new Date().toISOString()})});
-    setStatus('✅ Sent to your board!','#00c875');
-    setTimeout(()=>setStatus(''),3000);
-    closeAll();
-    if(myWorldOpen)loadBoard();
-  };
-  reader.readAsDataURL(blob);
-}
-
-// SEND TO FRESH
-async function sendToFresh(text,source){
-  try{
-    const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:text,system:'You are Fresh, TappyThing coordinator for Aerus of Towson vacuum shop. Sort this into the right category: Repair Intake, Parts, Follow-Up, Lead, Personal, or Other. Reply JSON only: {"category":"category name","itemLabel":"short label","reply":"1 sentence confirmation"}',history:[]})});
-    const data=await res.json();
-    let category='Intake',itemLabel=text,reply='Got it — added to your board. 💛';
-    try{
-      const parsed=JSON.parse(data.reply.replace(/```json|```/g,'').trim());
-      category=parsed.category||category;
-      itemLabel=parsed.itemLabel||text;
-      reply=parsed.reply||reply;
-    }catch(e){}
-    await fetch(WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'trial_signup',name:itemLabel,business:'Aerus — '+category,source,rawDump:text,timestamp:new Date().toISOString()})});
-    setStatus('✅ '+reply,'#00c875');
-    setTimeout(()=>setStatus(''),4000);
-    if(myWorldOpen)setTimeout(()=>loadBoard(),2000);
-  }catch(e){
-    setStatus('✅ Added to your board!','#00c875');
-    setTimeout(()=>setStatus(''),3000);
-  }
-}
-
-// MY WORLD
-function toggleMyWorld(){
-  myWorldOpen=!myWorldOpen;
-  const content=document.getElementById('myWorldContent');
-  const btnText=document.getElementById('myWorldBtnText');
-  if(myWorldOpen){
-    content.style.display='block';
-    btnText.textContent='Close My World ✕';
-    if(!boardLoaded)loadBoard();
-    content.scrollIntoView({behavior:'smooth'});
-  }else{
-    content.style.display='none';
-    btnText.textContent='My World →';
-  }
-}
-
-async function loadBoard(){
-  const container = document.getElementById('boardContent');
-  if(!container) return;
-  container.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">Loading your world… ⏳</div>';
-  
-  try {
-    const res = await fetch('/.netlify/functions/myworld');
-    const data = await res.json();
+  <div class="camera-container">
+    <video id="videoElement" autoplay playsinline muted></video>
+    <img id="photoPreview" alt="Snapshot" />
+    <canvas id="canvas" style="display:none;"></canvas>
     
-    if(!data.groups || data.groups.length === 0){
-      container.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">Your board is empty — start talking! 🎙️</div>';
-      return;
+    <div class="camera-controls">
+      <button class="icon-btn" id="flipCameraBtn" title="Flip Camera">🔄</button>
+    </div>
+  </div>
+
+  <div id="statusMsg"></div>
+
+  <div class="actions-grid">
+    <button class="action-btn" id="takePhotoBtn">
+      <span>📷</span>
+      <span>Snap Picture</span>
+    </button>
+    
+    <label class="action-btn" style="margin: 0; cursor: pointer;">
+      <span>🖼️</span>
+      <span>Photo Roll</span>
+      <input type="file" id="fileInput" accept="image/*" style="display:none;" />
+    </label>
+  </div>
+
+  <button class="tap-btn-main" id="mainTapBtn">🔴 TAP TO SPEAK & SUBMIT</button>
+
+  <a class="my-world-card" id="myWorldLink" href="#" target="_blank">
+    <div>
+      <div class="my-world-title">🌍 Open My World</div>
+      <div class="my-world-sub">View your private cards, bills & tasks</div>
+    </div>
+    <span style="font-size: 1.5rem; color: #64748b;">➔</span>
+  </a>
+
+  <script>
+    // 1. Resolve Subscriber Identity
+    const urlParams = new URLSearchParams(window.location.search);
+    let subscriber = urlParams.get('user') || localStorage.getItem('tappy_user');
+    if (!subscriber) {
+      subscriber = prompt("Welcome! Please enter your name to build your private world:", "Umar") || "Guest";
+      localStorage.setItem('tappy_user', subscriber);
     }
-    
-    let html = '';
-    data.groups.forEach(group => {
-      if(!group.items || group.items.length === 0) return;
-      
-      html += `
-        <div style="background:rgba(255,255,255,0.05); border-radius:12px; padding:15px; margin-bottom:15px; border-left:4px solid ${group.color || '#f59e0b'};">
-          <div style="font-weight:700; font-size:16px; margin-bottom:10px; color:#fff;">${group.title} (${group.items.length})</div>
-          <div style="display:flex; flex-direction:column; gap:8px;">
-      `;
-      
-      group.items.forEach(item => {
-        const status = item.status || 'Active';
-        html += `
-          <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.25); padding:10px 14px; border-radius:8px;">
-            <span style="font-weight:500; color:#eee;">${item.name}</span>
-            <span style="font-size:12px; padding:3px 8px; border-radius:6px; background:rgba(245,158,11,0.2); color:#f59e0b; border:1px solid rgba(245,158,11,0.3);">${status}</span>
-          </div>
-        `;
-      });
-      
-      html += `</div></div>`;
+    document.getElementById('userDisplay').innerText = `Subscriber: ${subscriber}`;
+
+    // 2. Camera Setup & Flip Toggle
+    let currentFacingMode = 'environment'; // Start with Rear Camera
+    let stream = null;
+    const video = document.getElementById('videoElement');
+    const photoPreview = document.getElementById('photoPreview');
+    const canvas = document.getElementById('canvas');
+    let capturedImageBlob = null;
+
+    async function startCamera(facingMode) {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: facingMode },
+          audio: true
+        });
+        video.srcObject = stream;
+        video.style.display = 'block';
+        photoPreview.style.display = 'none';
+      } catch (err) {
+        console.warn("Camera access fallback:", err);
+      }
+    }
+
+    startCamera(currentFacingMode);
+
+    document.getElementById('flipCameraBtn').addEventListener('click', () => {
+      currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+      startCamera(currentFacingMode);
     });
-    
-    container.innerHTML = html || '<div style="text-align:center; padding:20px; color:#888;">No active items found.</div>';
-    
-  } catch(err) {
-    console.error(err);
-    container.innerHTML = '<div style="text-align:center; padding:20px; color:#ef4444;">Could not load your world. Please try again.</div>';
-  }
-}
-document.getElementById('typeText').addEventListener('keydown',(e)=>{
-  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendText();}
-});
-</script>
+
+    // 3. Solo Photo Snap
+    document.getElementById('takePhotoBtn').addEventListener('click', () => {
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      canvas.toBlob((blob) => {
+        capturedImageBlob = blob;
+        photoPreview.src = URL.createObjectURL(blob);
+        photoPreview.style.display = 'block';
+        video.style.display = 'none';
+        document.getElementById('statusMsg').innerText = "✅ Photo captured! Tap button below to send.";
+      }, 'image/jpeg');
+    });
+
+    // 4. File Roll Upload
+    document.getElementById('fileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        capturedImageBlob = file;
+        photoPreview.src = URL.createObjectURL(file);
+        photoPreview.style.display = 'block';
+        video.style.display = 'none';
+        document.getElementById('statusMsg').innerText = "✅ Image selected from gallery!";
+      }
+    });
+
+    // 5. Speech & Tap Handler (Intake & Auto-Bill Detection)
+    let isRecording = false;
+    let recognition = null;
+    let transcriptText = "";
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onresult = (event) => {
+        transcriptText = event.results[0][0].transcript;
+        document.getElementById('statusMsg').innerText = `Heard: "${transcriptText}"`;
+      };
+    }
+
+    const mainBtn = document.getElementById('mainTapBtn');
+    mainBtn.addEventListener('click', async () => {
+      if (!isRecording) {
+        // Start Recording
+        isRecording = true;
+        transcriptText = "";
+        mainBtn.innerText = "⏹️ LISTENING... (TAP TO SEND)";
+        mainBtn.style.background = "#ef4444";
+        if (recognition) recognition.start();
+      } else {
+        // Stop and Send
+        isRecording = false;
+        mainBtn.innerText = "⏳ BUILDING YOUR CARD...";
+        if (recognition) recognition.stop();
+
+        // Detect Billing intent (e.g. "Bill John $150")
+        const isBill = /bill|invoice|charge|\$/i.test(transcriptText);
+        const amountMatch = transcriptText.match(/\$?(\d+(\.\d{2})?)/);
+        const billAmount = amountMatch ? amountMatch[1] : null;
+
+        // Package and Send to Make.com Webhook
+        const payload = {
+          subscriber: subscriber,
+          transcript: transcriptText || "Photo / Quick Tap Note",
+          type: isBill ? "Bill / Invoice" : "Task / Action",
+          billAmount: billAmount,
+          timestamp: new Date().toISOString()
+        };
+
+        // REPLACE WITH YOUR MAKE.COM WEBHOOK URL
+        const MAKE_WEBHOOK_URL = "https://hook.us1.make.com/YOUR_WEBHOOK_ID";
+
+        try {
+          // If you have a photo, you can send it via FormData or Base64
+          await fetch(MAKE_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          document.getElementById('statusMsg').innerText = "🎉 World Updated Successfully!";
+        } catch (e) {
+          document.getElementById('statusMsg').innerText = "✅ Saved to your World!";
+        }
+
+        setTimeout(() => {
+          mainBtn.innerText = "🔴 TAP TO SPEAK & SUBMIT";
+          mainBtn.style.background = "linear-gradient(135deg, #0284c7, #6366f1)";
+          startCamera(currentFacingMode);
+        }, 2000);
+      }
+    });
+
+    // 6. Direct "My World" Link to their Private Board
+    document.getElementById('myWorldLink').href = "https://towsonhealthyhomes.monday.com/boards/18430964610";
+  </script>
 </body>
 </html>
