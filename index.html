@@ -286,7 +286,7 @@ function toggleMyWorld(){
 async function loadBoard(){
   document.getElementById('boardContent').innerHTML='<div class="loading-msg">Loading your world…</div>';
   try{
-    const res=await fetch('/.netlify/functions/getBoard');
+    const res = await fetch('/.netlify/functions/myworld');
     const data=await res.json();
     boardLoaded=true;
     if(!data.groups||data.groups.length===0){
