@@ -105,13 +105,34 @@
       margin-top: 2px;
     }
 
-    /* 3 Clean Action Intake Buttons */
+    /* Built-in Help Guide Trigger */
+    .guide-trigger-btn {
+      background: rgba(251, 191, 36, 0.15);
+      border: 1px dashed #fbbf24;
+      color: #fbbf24;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      margin-top: 4px;
+      transition: all 0.2s;
+    }
+
+    .guide-trigger-btn:hover {
+      background: rgba(251, 191, 36, 0.25);
+    }
+
+    /* 3 Action Intake Buttons */
     .action-trio {
       width: 100%;
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 10px;
-      margin-top: 6px;
+      margin-top: 2px;
     }
 
     .trio-btn {
@@ -194,6 +215,79 @@
       font-size: 0.75rem;
       color: #c084fc;
       margin-top: 2px;
+    }
+
+    /* Interactive Instruction Guide Modal */
+    .guide-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(10, 4, 18, 0.88);
+      backdrop-filter: blur(10px);
+      z-index: 150;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .guide-box {
+      width: 100%;
+      max-width: 420px;
+      background: #190e2d;
+      border: 2px solid #fbbf24;
+      border-radius: 24px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.85);
+    }
+
+    .guide-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: rgba(30, 16, 53, 0.7);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      padding: 12px;
+      border-radius: 16px;
+    }
+
+    .guide-step-icon {
+      font-size: 1.6rem;
+      background: rgba(251, 191, 36, 0.2);
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .guide-step-text h4 {
+      font-size: 0.95rem;
+      color: #fbbf24;
+      margin-bottom: 3px;
+    }
+
+    .guide-step-text p {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      line-height: 1.35;
+    }
+
+    .close-guide-btn {
+      background: linear-gradient(135deg, #fbbf24, #d97706);
+      color: #0c0714;
+      border: none;
+      padding: 14px;
+      border-radius: 16px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
     }
 
     /* Camera / Photo Modal */
@@ -394,6 +488,11 @@
       <div class="brand-title">TappyThing</div>
       <div class="brand-tagline">Digital Coordinator Command Center</div>
       <div class="subscriber-tag" id="userTag" title="Click to switch view">Loading...</div>
+      
+      <!-- Built-in "How to Use" Guide Button -->
+      <button class="guide-trigger-btn" id="openGuideBtn">
+        <span>💡 How to Use TappyThing</span>
+      </button>
     </div>
 
     <!-- 3 Action Intake Buttons -->
@@ -433,6 +532,50 @@
       <div id="liveCardsContainer" style="display: flex; flex-direction: column; gap: 14px;"></div>
     </div>
 
+  </div>
+
+  <!-- Built-In "How It Works" Guide Modal -->
+  <div class="guide-modal-overlay" id="guideModal">
+    <div class="guide-box">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:1.15rem; font-weight:800; color:#fbbf24;">⚡ How to Use TappyThing</span>
+        <button class="circle-btn" style="width:32px; height:32px; font-size:0.85rem;" id="closeGuideIconBtn">✖️</button>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-icon">🎙️</div>
+        <div class="guide-step-text">
+          <h4>1. Speak or Type Naturally</h4>
+          <p>Tap <b>Talk</b> or <b>Type</b>. Say customer names, job notes, or tasks (e.g. <i>"Pick up filters tomorrow for John"</i>).</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-icon">🧾</div>
+        <div class="guide-step-text">
+          <h4>2. Mention Any Dollar Amount</h4>
+          <p>Say or type any price (e.g. <i>"Tune up vacuum $120"</i>) to automatically generate an instant, 1-tap invoice card!</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-icon">📷</div>
+        <div class="guide-step-text">
+          <h4>3. Snap Photo Records</h4>
+          <p>Tap <b>Photo/Video</b> to capture machines, parts, receipts, or job sites right into your cards.</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-icon">🌍</div>
+        <div class="guide-step-text">
+          <h4>4. Check 'My World'</h4>
+          <p>Tap <b>My World</b> at the bottom anytime to see all your self-built cards, tasks, and bills in one clean drawer.</p>
+        </div>
+      </div>
+
+      <button class="close-guide-btn" id="closeGuideMainBtn">Got It! Let's Build 🚀</button>
+    </div>
   </div>
 
   <!-- Camera / Photo / Video Modal Engine -->
@@ -494,9 +637,23 @@
       }
     });
 
-    // --- 2. SELF-BUILDING WORLD DATA ENGINE ---
+    // --- 2. IN-APP HOW-TO GUIDE CONTROLS ---
+    const guideModal = document.getElementById('guideModal');
+    function openGuide() { guideModal.style.display = 'flex'; }
+    function closeGuide() { guideModal.style.display = 'none'; }
+
+    document.getElementById('openGuideBtn').addEventListener('click', openGuide);
+    document.getElementById('closeGuideIconBtn').addEventListener('click', closeGuide);
+    document.getElementById('closeGuideMainBtn').addEventListener('click', closeGuide);
+
+    // Auto-show guide on very first visit for a subscriber
+    if (!isMaster && !localStorage.getItem('tappy_saw_guide_' + currentUser)) {
+      setTimeout(openGuide, 600);
+      localStorage.setItem('tappy_saw_guide_' + currentUser, 'true');
+    }
+
+    // --- 3. SELF-BUILDING WORLD DATA ENGINE ---
     async function fetchWorldData() {
-      // MASTER gets the full live shop board; SUBSCRIBERS get their own clean, private world!
       if (isMaster) {
         const container = document.getElementById('liveCardsContainer');
         container.innerHTML = `<div style="text-align:center; padding:20px; color:#c084fc;">⚡ Loading Master board...</div>`;
@@ -556,7 +713,6 @@
 
     function renderSubscriberCards() {
       let cards = JSON.parse(localStorage.getItem('tappy_cards') || '[]');
-      // Filter cards to this specific subscriber (or all cards if Master)
       const userCards = isMaster ? cards : cards.filter(c => (c.user || '').toLowerCase() === currentUser.toLowerCase());
       document.getElementById('cardCount').innerText = userCards.length;
 
@@ -600,7 +756,7 @@
       `).join('');
     }
 
-    // --- 3. CAMERA WITH FLIP & STILL SNAP ---
+    // --- 4. CAMERA WITH FLIP & STILL SNAP ---
     let cameraStream = null;
     let currentFacingMode = 'environment';
     const video = document.getElementById('videoFeed');
@@ -692,7 +848,7 @@
       openWorldDrawer();
     });
 
-    // --- 4. SPEECH INTAKE (TALK BUTTON) ---
+    // --- 5. SPEECH INTAKE (TALK BUTTON) ---
     let isListening = false;
     let recognition = null;
     let spokenText = "";
@@ -776,7 +932,7 @@
       }
     });
 
-    // --- 5. MY WORLD DRAWER TOGGLE ---
+    // --- 6. MY WORLD DRAWER TOGGLE ---
     let drawerOpen = false;
     function openWorldDrawer() {
       drawerOpen = true;
