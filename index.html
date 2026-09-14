@@ -58,8 +58,8 @@
     }
 
     .logo-container {
-      width: 96px;
-      height: 96px;
+      width: 100px;
+      height: 100px;
       border-radius: 50%;
       border: 2.5px solid #fbbf24;
       box-shadow: 0 0 25px rgba(251, 191, 36, 0.5);
@@ -411,10 +411,11 @@
       </div>
     </div>
 
-    <!-- Fresh Bandana Logo Header with Auto-Finder -->
+    <!-- Fresh Bandana Logo Header -->
     <div class="header-box">
       <div class="logo-container">
-        <img id="freshLogoDisplay" src="logo.png" alt="Fresh Logo" />
+        <!-- Searches for logo.png, fresh.png, tappy.png, fresh-logo.png -->
+        <img src="logo.png" onerror="this.onerror=null; this.src='fresh.png'; this.onerror=function(){this.src='fresh-logo.png'; this.onerror=function(){this.src='tappy.png';}};" alt="Fresh Logo" />
       </div>
       <div class="brand-title">TappyThing</div>
       <div class="brand-tagline">Digital Coordinator Command Center</div>
@@ -496,36 +497,6 @@
   </div>
 
   <script>
-    // --- 0. AUTO-FIND FRESH'S BANDANA LOGO ACROSS ALL POSSIBLE FILE NAMES ---
-    const possibleLogos = [
-      "logo.png", "logo.jpg", "fresh-logo.png", "fresh.png", "Tyler.png", "tyler.png",
-      "fresh.jpg", "bandana.png", "silhouette.png", "tappy.png", "tappything.png",
-      "tappie.png", "assets/logo.png", "assets/fresh.png", "images/logo.png"
-    ];
-
-    function autoFindFreshLogo() {
-      const imgTarget = document.getElementById('freshLogoDisplay');
-      let index = 0;
-
-      function tryNext() {
-        if (index >= possibleLogos.length) {
-          // If no image file found, use the crisp bandana SVG
-          imgTarget.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23180d2b' stroke='%23fbbf24' stroke-width='3'/><path d='M30 40 Q50 25 70 40 Q60 65 30 40' fill='%23fbbf24'/><circle cx='42' cy='45' r='6' fill='%23000'/><circle cx='58' cy='45' r='6' fill='%23000'/><path d='M35 70 Q50 82 65 70' stroke='%23f472b6' stroke-width='4' fill='none'/></svg>";
-          return;
-        }
-        const testImg = new Image();
-        const candidate = possibleLogos[index++];
-        testImg.onload = () => {
-          imgTarget.src = candidate;
-        };
-        testImg.onerror = tryNext;
-        testImg.src = candidate;
-      }
-
-      tryNext();
-    }
-    autoFindFreshLogo();
-
     // --- 1. USER IDENTITY & SUBSCRIBER ROUTING ---
     const urlParams = new URLSearchParams(window.location.search);
     let currentUser = urlParams.get('user') || localStorage.getItem('tappy_current_user') || "William";
