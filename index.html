@@ -168,12 +168,35 @@
       font-size: 1.6rem;
     }
 
+    #statusBox {
+      width: 100%;
+      background: rgba(20, 10, 35, 0.85);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      border-radius: 16px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
     #statusText {
-      text-align: center;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       color: #fbbf24;
-      min-height: 22px;
       font-weight: 500;
+      flex: 1;
+    }
+
+    .test-voice-btn {
+      background: rgba(251, 191, 36, 0.2);
+      border: 1px solid #fbbf24;
+      color: #fbbf24;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
     }
 
     /* Prominent 'My World' Button */
@@ -510,7 +533,11 @@
       </button>
     </div>
 
-    <div id="statusText">Tap Talk to speak, Type for notes, or Photo/Video</div>
+    <!-- Status & Voice Feedback Bar -->
+    <div id="statusBox">
+      <div id="statusText">Tap Talk to speak, Type for notes, or Photo/Video</div>
+      <button class="test-voice-btn" id="testVoiceBtn">🔊 Voice</button>
+    </div>
 
     <!-- Prominent "My World" Button -->
     <div class="my-world-trigger" id="myWorldToggle">
@@ -646,21 +673,54 @@
       }
     });
 
-    // --- 2. VOICE SYNTHESIS (TAPPYTHING TALKS BACK) ---
-    function speakOutLoud(text) {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 1.0;
-        utterance.pitch = 1.0;
-        window.speechSynthesis.speak(utterance);
+    // --- 2. BULLETPROOF MOBILE SPEECH SYNTHESIS ENGINE ---
+    let audioUnlocked = false;
+
+    function unlockAudioOnMobile() {
+      if ('speechSynthesis' in window && !audioUnlocked) {
+        window.speechSynthesis.resume();
+        const emptyUtterance = new SpeechSynthesisUtterance('');
+        window.speechSynthesis.speak(emptyUtterance);
+        audioUnlocked = true;
       }
     }
+
+    // Unlock on first tap anywhere
+    document.body.addEventListener('touchstart', unlockAudioOnMobile, { once: true });
+    document.body.addEventListener('click', unlockAudioOnMobile, { once: true });
+
+    function speakOutLoud(text) {
+      if (!('speechSynthesis' in window)) return;
+      try {
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.resume();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+
+        // Try to select high-quality English voice
+        const voices = window.speechSynthesis.getVoices();
+        const enVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Natural') || v.name.includes('Siri') || v.name.includes('Google') || v.name.includes('Samantha')));
+        if (enVoice) utterance.voice = enVoice;
+
+        window.speechSynthesis.speak(utterance);
+      } catch (err) {
+        console.warn("TTS speak error:", err);
+      }
+    }
+
+    document.getElementById('testVoiceBtn').addEventListener('click', () => {
+      unlockAudioOnMobile();
+      speakOutLoud(`Hello ${currentUser}! TappyThing voice is active and ready.`);
+      document.getElementById('statusText').innerText = "🔊 Voice test: Online!";
+    });
 
     // --- 3. IN-APP HOW-TO GUIDE CONTROLS ---
     const guideModal = document.getElementById('guideModal');
     function openGuide() { 
       guideModal.style.display = 'flex';
+      unlockAudioOnMobile();
       speakOutLoud("Welcome to TappyThing! Tap Talk to speak your notes or bills, and check My World below!");
     }
     function closeGuide() { guideModal.style.display = 'none'; }
@@ -677,7 +737,6 @@
 
     // --- 4. LIVE SHOP OPS BOARD & SELF-BUILDING WORLD ENGINE ---
     async function fetchWorldData() {
-      // Both Master (William) AND Shop Staff (Chris, Paul, Brian, Umar, Bobby) connect to the LIVE Shop Ops Board!
       if (isStaff) {
         const container = document.getElementById('liveCardsContainer');
         container.innerHTML = `<div style="text-align:center; padding:20px; color:#c084fc;">⚡ Loading Shop Ops board...</div>`;
@@ -701,8 +760,6 @@
     function renderLiveShopOpsGroups(groups) {
       const container = document.getElementById('liveCardsContainer');
       let totalCount = 0;
-
-      // Also mix in any new instant cards created in this session
       let localCards = JSON.parse(localStorage.getItem('tappy_cards') || '[]');
 
       const html = groups.map(group => {
@@ -876,7 +933,7 @@
       openWorldDrawer();
     });
 
-    // --- 6. CONVERSATIONAL SPEECH INTAKE (TALKS BACK & ANSWERS QUESTIONS) ---
+    // --- 6. CONVERSATIONAL SPEECH INTAKE ---
     let isListening = false;
     let recognition = null;
     let spokenText = "";
@@ -890,6 +947,20 @@
       recognition.onresult = (e) => {
         spokenText = e.results[0][0].transcript;
         document.getElementById('statusText').innerText = `Heard: "${spokenText}"`;
+        handleSpokenInput(spokenText);
+      };
+
+      recognition.onerror = (e) => {
+        console.warn("Speech recognition error:", e);
+        isListening = false;
+        document.getElementById('talkBtnLabel').innerText = "Talk";
+        document.getElementById('talkBtn').classList.remove('recording');
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        document.getElementById('talkBtnLabel').innerText = "Talk";
+        document.getElementById('talkBtn').classList.remove('recording');
       };
     }
 
@@ -898,9 +969,9 @@
 
       const lower = text.toLowerCase();
 
-      // Check if user is asking a question about how it works or what it is
+      // Q&A / Voice Guidance
       if (lower.includes('how do you work') || lower.includes('how does this work') || lower.includes('what are you') || lower.includes('demo') || lower.includes('help') || lower.includes('instructions')) {
-        const reply = `Hi ${currentUser}! I am your Shop Ops Digital Coordinator. You can tell me intake notes, machine issues, or say any price to create a repair estimate. You can also snap photos of equipment. Everything syncs right here in your shop queue!`;
+        const reply = `Hi ${currentUser}! I am your Shop Ops Digital Coordinator. You can tell me intake notes, machine issues, or say any price to create a repair estimate. Everything syncs right here in your shop queue!`;
         speakOutLoud(reply);
         document.getElementById('statusText').innerText = "🤖 " + reply;
         return;
@@ -945,30 +1016,37 @@
     }
 
     function toggleSpeech() {
+      unlockAudioOnMobile();
       const btn = document.getElementById('talkBtn');
       const label = document.getElementById('talkBtnLabel');
+
       if (!isListening) {
         isListening = true;
         spokenText = "";
-        label.innerText = "Stop";
+        label.innerText = "Listening...";
         btn.classList.add('recording');
-        document.getElementById('statusText').innerText = "🎙️ Listening... (Tap Stop when done)";
-        if (recognition) recognition.start();
+        document.getElementById('statusText').innerText = "🎙️ Listening... (Speak now)";
+        if (recognition) {
+          try { recognition.start(); } catch (e) { console.warn(e); }
+        } else {
+          const note = prompt("Speech not supported on this browser. Type your note:");
+          if (note) handleSpokenInput(note);
+          isListening = false;
+          label.innerText = "Talk";
+          btn.classList.remove('recording');
+        }
       } else {
         isListening = false;
         label.innerText = "Talk";
         btn.classList.remove('recording');
         if (recognition) recognition.stop();
-
-        setTimeout(() => {
-          handleSpokenInput(spokenText);
-        }, 400);
       }
     }
 
     document.getElementById('talkBtn').addEventListener('click', toggleSpeech);
 
     document.getElementById('typeBtn').addEventListener('click', () => {
+      unlockAudioOnMobile();
       const typedNote = prompt("Type customer intake, vacuum repair note, or price ($):");
       if (typedNote) {
         handleSpokenInput(typedNote);
