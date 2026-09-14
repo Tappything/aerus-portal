@@ -3,153 +3,204 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>TappyThing</title>
+  <title>TappyThing ⚡</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: #0f172a; color: #f8fafc; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
+    body { background: #0b1120; color: #f8fafc; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 16px; }
     
-    .header { width: 100%; max-width: 480px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-    .brand { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .user-tag { background: #1e293b; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; color: #94a3b8; border: 1px solid #334155; }
+    .container { width: 100%; max-width: 460px; display: flex; flex-direction: column; gap: 16px; }
+
+    /* Top Nav */
+    .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
+    .brand { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .user-badge { background: #1e293b; border: 1px solid #334155; padding: 6px 12px; border-radius: 20px; font-size: 0.82rem; color: #38bdf8; font-weight: 600; cursor: pointer; }
+
+    /* Tabs */
+    .tab-bar { display: grid; grid-template-columns: 1fr 1fr; background: #1e293b; border-radius: 14px; padding: 4px; border: 1px solid #334155; }
+    .tab-btn { background: transparent; border: none; color: #94a3b8; padding: 10px; font-weight: 700; border-radius: 10px; cursor: pointer; font-size: 0.95rem; transition: all 0.2s; }
+    .tab-btn.active { background: #0284c7; color: #fff; box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4); }
+
+    /* Intake Section */
+    .camera-box { width: 100%; aspect-ratio: 4/3; background: #0f172a; border-radius: 20px; overflow: hidden; position: relative; border: 2px solid #334155; }
+    video, img#previewImg { width: 100%; height: 100%; object-fit: cover; }
+    img#previewImg { display: none; }
+    .cam-controls { position: absolute; top: 12px; right: 12px; display: flex; gap: 8px; z-index: 10; }
+    .icon-btn { background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; backdrop-filter: blur(8px); }
+
+    .media-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .sub-btn { background: #1e293b; border: 1px solid #334155; color: #e2e8f0; padding: 12px; border-radius: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; font-size: 0.9rem; }
+    .sub-btn:active { background: #334155; }
+
+    .main-tap-btn { width: 100%; background: linear-gradient(135deg, #0284c7, #6366f1); color: #fff; border: none; padding: 18px; border-radius: 18px; font-size: 1.15rem; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35); transition: transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .main-tap-btn:active { transform: scale(0.98); }
+    .main-tap-btn.recording { background: #ef4444; animation: pulse 1.5s infinite; }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    #statusText { text-align: center; font-size: 0.88rem; color: #38bdf8; min-height: 20px; font-weight: 500; }
+
+    /* "My World" Dashboard View */
+    .world-container { display: none; flex-direction: column; gap: 12px; }
+    .world-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .world-title { font-size: 1.2rem; font-weight: 700; color: #f8fafc; }
     
-    .camera-container { width: 100%; max-width: 480px; aspect-ratio: 4/3; background: #1e293b; border-radius: 24px; overflow: hidden; position: relative; border: 2px solid #334155; margin-bottom: 20px; }
-    video, img#photoPreview { width: 100%; height: 100%; object-fit: cover; }
-    img#photoPreview { display: none; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .card-title { font-weight: 700; font-size: 1.05rem; color: #f1f5f9; }
+    .card-badge { font-size: 0.75rem; font-weight: 700; padding: 4px 8px; border-radius: 8px; }
+    .badge-bill { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
+    .badge-task { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #0284c7; }
+    .badge-note { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid #a855f7; }
+
+    .card-body { font-size: 0.9rem; color: #94a3b8; line-height: 1.4; }
+    .card-img-thumb { width: 100%; max-height: 160px; object-fit: cover; border-radius: 10px; border: 1px solid #334155; }
     
-    .camera-controls { position: absolute; top: 12px; right: 12px; display: flex; gap: 8px; z-index: 10; }
-    .icon-btn { background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; backdrop-filter: blur(8px); }
-    
-    .actions-grid { width: 100%; max-width: 480px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-    .action-btn { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 14px; border-radius: 16px; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; }
-    .action-btn:active { transform: scale(0.97); background: #334155; }
-    .action-btn.active { border-color: #ef4444; background: rgba(239, 68, 68, 0.15); color: #ef4444; }
-    
-    .tap-btn-main { width: 100%; max-width: 480px; background: linear-gradient(135deg, #0284c7, #6366f1); color: #fff; border: none; padding: 20px; border-radius: 20px; font-size: 1.2rem; font-weight: 700; cursor: pointer; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4); margin-bottom: 20px; transition: transform 0.1s; }
-    .tap-btn-main:active { transform: scale(0.98); }
-    
-    .my-world-card { width: 100%; max-width: 480px; background: #1e293b; border: 1px solid #334155; border-radius: 20px; padding: 18px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; text-decoration: none; color: inherit; }
-    .my-world-title { font-weight: 700; font-size: 1.1rem; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
-    .my-world-sub { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
-    
-    #statusMsg { font-size: 0.9rem; color: #38bdf8; margin-bottom: 12px; height: 20px; }
+    .bill-row { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px 14px; border-radius: 10px; border: 1px solid #334155; }
+    .bill-amount { font-size: 1.2rem; font-weight: 800; color: #4ade80; }
+    .send-bill-btn { background: #22c55e; color: #000; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; }
+
+    .empty-state { text-align: center; padding: 40px 20px; color: #64748b; font-size: 0.95rem; }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <div class="brand">TappyThing ⚡</div>
-    <div class="user-tag" id="userDisplay">Subscriber: Loading...</div>
-  </div>
+  <div class="container">
+    <!-- Header -->
+    <div class="top-bar">
+      <div class="brand">TappyThing ⚡</div>
+      <div class="user-badge" id="userBadge" title="Tap to switch user">👤 Loading...</div>
+    </div>
 
-  <div class="camera-container">
-    <video id="videoElement" autoplay playsinline muted></video>
-    <img id="photoPreview" alt="Snapshot" />
-    <canvas id="canvas" style="display:none;"></canvas>
-    
-    <div class="camera-controls">
-      <button class="icon-btn" id="flipCameraBtn" title="Flip Camera">🔄</button>
+    <!-- Mode Selector Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tabIntake" onclick="switchTab('intake')">⚡ Tap & Capture</button>
+      <button class="tab-btn" id="tabWorld" onclick="switchTab('world')">🌍 My World (<span id="cardCount">0</span>)</button>
+    </div>
+
+    <!-- 1. INTAKE SCREEN -->
+    <div id="intakeScreen" style="display: flex; flex-direction: column; gap: 14px;">
+      <div class="camera-box">
+        <video id="videoFeed" autoplay playsinline muted></video>
+        <img id="previewImg" alt="Snapshot" />
+        <canvas id="snapshotCanvas" style="display:none;"></canvas>
+        <div class="cam-controls">
+          <button class="icon-btn" id="flipCamBtn" title="Flip Camera">🔄</button>
+        </div>
+      </div>
+
+      <div id="statusText">Tap the button and speak or snap a photo</div>
+
+      <div class="media-buttons">
+        <button class="sub-btn" id="snapPhotoBtn">📷 <span>Snap Photo</span></button>
+        <label class="sub-btn" style="margin: 0; cursor: pointer;">
+          🖼️ <span>Photo Roll</span>
+          <input type="file" id="fileUploadInput" accept="image/*" style="display:none;" />
+        </label>
+      </div>
+
+      <button class="main-tap-btn" id="tapButton">🔴 TAP TO SPEAK & BUILD</button>
+    </div>
+
+    <!-- 2. NATIVE "MY WORLD" SCREEN (NO MONDAY BRANDING) -->
+    <div id="worldScreen" class="world-container">
+      <div class="world-header">
+        <div class="world-title" id="worldTitleHeader">My World</div>
+      </div>
+      <div id="cardsList" style="display: flex; flex-direction: column; gap: 12px;"></div>
     </div>
   </div>
-
-  <div id="statusMsg"></div>
-
-  <div class="actions-grid">
-    <button class="action-btn" id="takePhotoBtn">
-      <span>📷</span>
-      <span>Snap Picture</span>
-    </button>
-    
-    <label class="action-btn" style="margin: 0; cursor: pointer;">
-      <span>🖼️</span>
-      <span>Photo Roll</span>
-      <input type="file" id="fileInput" accept="image/*" style="display:none;" />
-    </label>
-  </div>
-
-  <button class="tap-btn-main" id="mainTapBtn">🔴 TAP TO SPEAK & SUBMIT</button>
-
-  <a class="my-world-card" id="myWorldLink" href="#" target="_blank">
-    <div>
-      <div class="my-world-title">🌍 Open My World</div>
-      <div class="my-world-sub">View your private cards, bills & tasks</div>
-    </div>
-    <span style="font-size: 1.5rem; color: #64748b;">➔</span>
-  </a>
 
   <script>
-    // 1. Resolve Subscriber Identity
+    // --- 1. USER IDENTITY & SELF-BUILDING ONBOARDING ---
     const urlParams = new URLSearchParams(window.location.search);
-    let subscriber = urlParams.get('user') || localStorage.getItem('tappy_user');
-    if (!subscriber) {
-      subscriber = prompt("Welcome! Please enter your name to build your private world:", "Umar") || "Guest";
-      localStorage.setItem('tappy_user', subscriber);
+    let currentUser = urlParams.get('user') || localStorage.getItem('tappy_current_user');
+
+    if (!currentUser) {
+      currentUser = prompt("Welcome to TappyThing! What is your name or company?", "Umar") || "New User";
+      localStorage.setItem('tappy_current_user', currentUser);
     }
-    document.getElementById('userDisplay').innerText = `Subscriber: ${subscriber}`;
 
-    // 2. Camera Setup & Flip Toggle
-    let currentFacingMode = 'environment'; // Start with Rear Camera
-    let stream = null;
-    const video = document.getElementById('videoElement');
-    const photoPreview = document.getElementById('photoPreview');
-    const canvas = document.getElementById('canvas');
-    let capturedImageBlob = null;
+    const isMaster = currentUser.toLowerCase() === 'william';
+    document.getElementById('userBadge').innerText = isMaster ? `👑 Master: ${currentUser}` : `👤 ${currentUser}`;
+    document.getElementById('worldTitleHeader').innerText = isMaster ? "👑 All Client Worlds (Master View)" : `🌍 ${currentUser}'s World`;
 
-    async function startCamera(facingMode) {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+    document.getElementById('userBadge').addEventListener('click', () => {
+      const newUser = prompt("Switch subscriber world (or 'William' for Master view):", currentUser);
+      if (newUser) {
+        localStorage.setItem('tappy_current_user', newUser);
+        window.location.search = `?user=${encodeURIComponent(newUser)}`;
+      }
+    });
+
+    // --- 2. CAMERA ENGINE (FLIP & SNAP) ---
+    let currentFacingMode = 'environment'; // Defaults to Rear Camera
+    let cameraStream = null;
+    const video = document.getElementById('videoFeed');
+    const previewImg = document.getElementById('previewImg');
+    const canvas = document.getElementById('snapshotCanvas');
+    let capturedPhotoData = null;
+
+    async function initCamera(facingMode) {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(t => t.stop());
       }
       try {
-        stream = await navigator.mediaDevices.getUserMedia({
+        cameraStream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: facingMode },
           audio: true
         });
-        video.srcObject = stream;
+        video.srcObject = cameraStream;
         video.style.display = 'block';
-        photoPreview.style.display = 'none';
+        previewImg.style.display = 'none';
       } catch (err) {
-        console.warn("Camera access fallback:", err);
+        console.warn("Camera fallback:", err);
       }
     }
 
-    startCamera(currentFacingMode);
+    initCamera(currentFacingMode);
 
-    document.getElementById('flipCameraBtn').addEventListener('click', () => {
+    document.getElementById('flipCamBtn').addEventListener('click', () => {
       currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
-      startCamera(currentFacingMode);
+      initCamera(currentFacingMode);
     });
 
-    // 3. Solo Photo Snap
-    document.getElementById('takePhotoBtn').addEventListener('click', () => {
+    // Instant Still Photo
+    document.getElementById('snapPhotoBtn').addEventListener('click', () => {
       canvas.width = video.videoWidth || 640;
       canvas.height = video.videoHeight || 480;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      
-      canvas.toBlob((blob) => {
-        capturedImageBlob = blob;
-        photoPreview.src = URL.createObjectURL(blob);
-        photoPreview.style.display = 'block';
-        video.style.display = 'none';
-        document.getElementById('statusMsg').innerText = "✅ Photo captured! Tap button below to send.";
-      }, 'image/jpeg');
+      capturedPhotoData = canvas.toDataURL('image/jpeg');
+      previewImg.src = capturedPhotoData;
+      previewImg.style.display = 'block';
+      video.style.display = 'none';
+      document.getElementById('statusText').innerText = "📷 Photo captured! Tap button below to save to your World.";
     });
 
-    // 4. File Roll Upload
-    document.getElementById('fileInput').addEventListener('change', (e) => {
+    // Photo Roll Pick
+    document.getElementById('fileUploadInput').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
-        capturedImageBlob = file;
-        photoPreview.src = URL.createObjectURL(file);
-        photoPreview.style.display = 'block';
-        video.style.display = 'none';
-        document.getElementById('statusMsg').innerText = "✅ Image selected from gallery!";
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          capturedPhotoData = event.target.result;
+          previewImg.src = capturedPhotoData;
+          previewImg.style.display = 'block';
+          video.style.display = 'none';
+          document.getElementById('statusText').innerText = "🖼️ Photo selected! Tap button below to save.";
+        };
+        reader.readAsDataURL(file);
       }
     });
 
-    // 5. Speech & Tap Handler (Intake & Auto-Bill Detection)
-    let isRecording = false;
+    // --- 3. SPEECH RECOGNITION & TAP BUILDER ---
+    let isListening = false;
     let recognition = null;
-    let transcriptText = "";
+    let spokenText = "";
 
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -157,66 +208,134 @@
       recognition.continuous = false;
       recognition.interimResults = false;
 
-      recognition.onresult = (event) => {
-        transcriptText = event.results[0][0].transcript;
-        document.getElementById('statusMsg').innerText = `Heard: "${transcriptText}"`;
+      recognition.onresult = (e) => {
+        spokenText = e.results[0][0].transcript;
+        document.getElementById('statusText').innerText = `Heard: "${spokenText}"`;
       };
     }
 
-    const mainBtn = document.getElementById('mainTapBtn');
-    mainBtn.addEventListener('click', async () => {
-      if (!isRecording) {
-        // Start Recording
-        isRecording = true;
-        transcriptText = "";
-        mainBtn.innerText = "⏹️ LISTENING... (TAP TO SEND)";
-        mainBtn.style.background = "#ef4444";
+    const tapBtn = document.getElementById('tapButton');
+    tapBtn.addEventListener('click', async () => {
+      if (!isListening) {
+        isListening = true;
+        spokenText = "";
+        tapBtn.innerText = "⏹️ LISTENING... (TAP TO SEND)";
+        tapBtn.classList.add('recording');
         if (recognition) recognition.start();
       } else {
-        // Stop and Send
-        isRecording = false;
-        mainBtn.innerText = "⏳ BUILDING YOUR CARD...";
+        isListening = false;
+        tapBtn.innerText = "⏳ BUILDING YOUR WORLD...";
+        tapBtn.classList.remove('recording');
         if (recognition) recognition.stop();
 
-        // Detect Billing intent (e.g. "Bill John $150")
-        const isBill = /bill|invoice|charge|\$/i.test(transcriptText);
-        const amountMatch = transcriptText.match(/\$?(\d+(\.\d{2})?)/);
-        const billAmount = amountMatch ? amountMatch[1] : null;
+        // Detect Billing intent (e.g. "Bill John $150 for repair")
+        const isBill = /bill|invoice|charge|\$/i.test(spokenText);
+        const amountMatch = spokenText.match(/\$?(\d+(\.\d{2})?)/);
+        const billAmount = amountMatch ? parseFloat(amountMatch[1]) : null;
 
-        // Package and Send to Make.com Webhook
-        const payload = {
-          subscriber: subscriber,
-          transcript: transcriptText || "Photo / Quick Tap Note",
-          type: isBill ? "Bill / Invoice" : "Task / Action",
+        const newCard = {
+          id: Date.now(),
+          user: currentUser,
+          title: spokenText || (capturedPhotoData ? "Photo Note" : "Quick Tap Note"),
+          type: isBill ? "Bill / Invoice" : (capturedPhotoData ? "Photo Note" : "Task"),
+          details: spokenText || "Captured from mobile TappyThing tap.",
+          photo: capturedPhotoData || null,
           billAmount: billAmount,
-          timestamp: new Date().toISOString()
+          status: isBill ? "Draft" : "New",
+          createdAt: new Date().toLocaleDateString()
         };
 
-        // REPLACE WITH YOUR MAKE.COM WEBHOOK URL
-        const MAKE_WEBHOOK_URL = "https://hook.us1.make.com/YOUR_WEBHOOK_ID";
+        // Save locally for instant live demo
+        let storedCards = JSON.parse(localStorage.getItem('tappy_cards') || '[]');
+        storedCards.unshift(newCard);
+        localStorage.setItem('tappy_cards', JSON.stringify(storedCards));
 
+        // Forward to Make.com Webhook
+        const MAKE_WEBHOOK_URL = "https://hook.us1.make.com/YOUR_WEBHOOK_ID";
         try {
-          // If you have a photo, you can send it via FormData or Base64
-          await fetch(MAKE_WEBHOOK_URL, {
+          fetch(MAKE_WEBHOOK_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(newCard)
           });
-          document.getElementById('statusMsg').innerText = "🎉 World Updated Successfully!";
-        } catch (e) {
-          document.getElementById('statusMsg').innerText = "✅ Saved to your World!";
-        }
+        } catch (e) { }
+
+        document.getElementById('statusText').innerText = "🎉 Added to your World!";
+        capturedPhotoData = null;
+        updateWorldCards();
 
         setTimeout(() => {
-          mainBtn.innerText = "🔴 TAP TO SPEAK & SUBMIT";
-          mainBtn.style.background = "linear-gradient(135deg, #0284c7, #6366f1)";
-          startCamera(currentFacingMode);
-        }, 2000);
+          tapBtn.innerText = "🔴 TAP TO SPEAK & BUILD";
+          initCamera(currentFacingMode);
+        }, 1500);
       }
     });
 
-    // 6. Direct "My World" Link to their Private Board
-    document.getElementById('myWorldLink').href = "https://towsonhealthyhomes.monday.com/boards/18430964610";
+    // --- 4. NATIVE "MY WORLD" RENDERER (NO MONDAY LOGOS) ---
+    function updateWorldCards() {
+      const allCards = JSON.parse(localStorage.getItem('tappy_cards') || '[]');
+      
+      // Filter: Master sees ALL, subscriber only sees THEIRS
+      const visibleCards = isMaster 
+        ? allCards 
+        : allCards.filter(c => (c.user || '').toLowerCase() === currentUser.toLowerCase());
+
+      document.getElementById('cardCount').innerText = visibleCards.length;
+      const listEl = document.getElementById('cardsList');
+
+      if (visibleCards.length === 0) {
+        listEl.innerHTML = `
+          <div class="empty-state">
+            <div style="font-size: 2rem; margin-bottom: 8px;">🌱</div>
+            <b>Your World is ready to build!</b><br>
+            Tap the button above, speak a note, or take a picture to create your first card.
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = visibleCards.map(c => `
+        <div class="card">
+          <div class="card-top">
+            <div>
+              <div class="card-title">${c.title}</div>
+              ${isMaster ? `<div style="font-size:0.75rem; color:#38bdf8; margin-top:2px;">👤 Client: <b>${c.user}</b></div>` : ''}
+            </div>
+            <span class="card-badge ${c.type.includes('Bill') ? 'badge-bill' : (c.type.includes('Photo') ? 'badge-note' : 'badge-task')}">
+              ${c.type}
+            </span>
+          </div>
+
+          ${c.photo ? `<img src="${c.photo}" class="card-img-thumb" alt="Photo Note" />` : ''}
+          
+          <div class="card-body">${c.details}</div>
+
+          ${c.billAmount ? `
+            <div class="bill-row">
+              <div>
+                <div style="font-size:0.75rem; color:#94a3b8;">Total Invoice</div>
+                <div class="bill-amount">${c.billAmount.toFixed(2)}</div>
+              </div>
+              <button class="send-bill-btn" onclick="alert('Invoice for ${c.billAmount} ready to send to client!')">1-Tap Send</button>
+            </div>
+          ` : ''}
+
+          <div style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">Created: ${c.createdAt}</div>
+        </div>
+      `).join('');
+    }
+
+    // Tab switcher
+    function switchTab(tab) {
+      document.getElementById('tabIntake').classList.toggle('active', tab === 'intake');
+      document.getElementById('tabWorld').classList.toggle('active', tab === 'world');
+      document.getElementById('intakeScreen').style.display = tab === 'intake' ? 'flex' : 'none';
+      document.getElementById('worldScreen').style.display = tab === 'world' ? 'flex' : 'none';
+      if (tab === 'world') updateWorldCards();
+    }
+
+    // Initial render
+    updateWorldCards();
   </script>
 </body>
 </html>
