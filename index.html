@@ -429,6 +429,7 @@
 
     .badge-bill { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
     .badge-ops { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+    .badge-intake { background: rgba(99, 102, 241, 0.2); color: #818cf8; border: 1px solid #6366f1; }
 
     .card-body {
       font-size: 0.88rem;
@@ -517,7 +518,7 @@
         <span style="font-size: 1.6rem;">🌍</span>
         <div>
           <div class="my-world-title">My World (<span id="cardCount">0</span>)</div>
-          <div class="my-world-sub">Live self-building cards & bills</div>
+          <div class="my-world-sub" id="worldSubLabel">Live Shop Ops & Workbench queue</div>
         </div>
       </div>
       <span style="font-size: 1.3rem; color: #fbbf24;" id="worldChevron">▼</span>
@@ -566,7 +567,7 @@
         <div class="guide-step-icon">🌍</div>
         <div class="guide-step-text">
           <h4>4. Check 'My World'</h4>
-          <p>Tap <b>My World</b> at the bottom anytime to see all your self-built cards, tasks, and bills in one clean drawer.</p>
+          <p>Tap <b>My World</b> at the bottom anytime to see all your live shop records, workbench tickets, and bills!</p>
         </div>
       </div>
 
@@ -601,20 +602,22 @@
       </div>
 
       <button class="modal-btn" id="savePhotoToWorldBtn" style="background:#22c55e; color:#022c22; border:none; display:none;">
-        ✅ Add to My World
+        ✅ Add to Shop Ops
       </button>
     </div>
   </div>
 
   <script>
-    // --- 1. USER IDENTITY & ONBOARDING ---
+    // --- 1. SHOP OPS STAFF ROSTER & USER IDENTITY ---
+    const SHOP_STAFF = ['william', 'chris', 'paul', 'brian', 'omar', 'umar', 'bobby'];
+
     const urlParams = new URLSearchParams(window.location.search);
     let currentUser = urlParams.get('user');
 
     if (!currentUser) {
       currentUser = localStorage.getItem('tappy_current_user');
       if (!currentUser) {
-        currentUser = prompt("⚡ Welcome to TappyThing! What is your name?") || "Guest";
+        currentUser = prompt("⚡ Welcome to TappyThing! What is your name?") || "Staff";
       }
       localStorage.setItem('tappy_current_user', currentUser);
       window.history.replaceState({}, '', `?user=${encodeURIComponent(currentUser)}`);
@@ -623,7 +626,17 @@
     }
 
     const isMaster = currentUser.toLowerCase() === 'william';
-    document.getElementById('userTag').innerText = isMaster ? `👑 Master: William` : `👤 Subscriber: ${currentUser}`;
+    const isStaff = SHOP_STAFF.includes(currentUser.toLowerCase());
+
+    if (isMaster) {
+      document.getElementById('userTag').innerText = `👑 Master: William`;
+    } else if (isStaff) {
+      document.getElementById('userTag').innerText = `🔧 Shop Staff: ${currentUser}`;
+    } else {
+      document.getElementById('userTag').innerText = `👤 Subscriber: ${currentUser}`;
+    }
+
+    document.getElementById('worldSubLabel').innerText = isStaff ? "Live Shop Ops & Workbench queue" : "Live self-building cards & bills";
 
     document.getElementById('userTag').addEventListener('click', () => {
       const newUser = prompt("Switch user name:", currentUser);
@@ -657,22 +670,23 @@
     document.getElementById('closeGuideMainBtn').addEventListener('click', closeGuide);
 
     // Auto-show guide on very first visit
-    if (!isMaster && !localStorage.getItem('tappy_saw_guide_' + currentUser)) {
+    if (!localStorage.getItem('tappy_saw_guide_' + currentUser)) {
       setTimeout(openGuide, 600);
       localStorage.setItem('tappy_saw_guide_' + currentUser, 'true');
     }
 
-    // --- 4. SELF-BUILDING WORLD DATA ENGINE ---
+    // --- 4. LIVE SHOP OPS BOARD & SELF-BUILDING WORLD ENGINE ---
     async function fetchWorldData() {
-      if (isMaster) {
+      // Both Master (William) AND Shop Staff (Chris, Paul, Brian, Umar, Bobby) connect to the LIVE Shop Ops Board!
+      if (isStaff) {
         const container = document.getElementById('liveCardsContainer');
-        container.innerHTML = `<div style="text-align:center; padding:20px; color:#c084fc;">⚡ Loading Master board...</div>`;
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:#c084fc;">⚡ Loading Shop Ops board...</div>`;
         try {
           const response = await fetch('/.netlify/functions/myworld');
           if (response.ok) {
             const data = await response.json();
             if (data && data.groups && data.groups.length > 0) {
-              renderMasterLiveGroups(data.groups);
+              renderLiveShopOpsGroups(data.groups);
               return;
             }
           }
@@ -684,9 +698,12 @@
       renderSubscriberCards();
     }
 
-    function renderMasterLiveGroups(groups) {
+    function renderLiveShopOpsGroups(groups) {
       const container = document.getElementById('liveCardsContainer');
       let totalCount = 0;
+
+      // Also mix in any new instant cards created in this session
+      let localCards = JSON.parse(localStorage.getItem('tappy_cards') || '[]');
 
       const html = groups.map(group => {
         if (!group.items || group.items.length === 0) return '';
@@ -699,7 +716,7 @@
               <div class="card">
                 <div class="card-top">
                   <div class="card-title">${item.name}</div>
-                  <span class="card-badge badge-ops">${item.status || 'Active'}</span>
+                  <span class="card-badge ${item.status === 'Intake' ? 'badge-intake' : 'badge-ops'}">${item.status || 'Active'}</span>
                 </div>
                 ${item.details ? `<div class="card-body">${item.details}</div>` : ''}
                 ${item.billAmount ? `
@@ -717,8 +734,8 @@
         `;
       }).join('');
 
-      document.getElementById('cardCount').innerText = totalCount;
-      container.innerHTML = html || `<div style="text-align:center; padding:20px; color:#fbbf24;">No items found in your board.</div>`;
+      document.getElementById('cardCount').innerText = totalCount + localCards.length;
+      container.innerHTML = html || `<div style="text-align:center; padding:20px; color:#fbbf24;">No items found in your shop board.</div>`;
     }
 
     function renderSubscriberCards() {
@@ -841,11 +858,11 @@
         id: Date.now(),
         user: currentUser,
         title: `📷 ${noteTitle}`,
-        type: "Photo Note",
-        details: "Photo captured via mobile intake.",
+        type: "Shop Ops Intake",
+        details: `Photo captured by ${currentUser}.`,
         photo: capturedPhotoData,
         billAmount: null,
-        status: "Active",
+        status: "Intake",
         createdAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
       };
 
@@ -854,8 +871,8 @@
       localStorage.setItem('tappy_cards', JSON.stringify(cards));
 
       closeCamera();
-      speakOutLoud(`Got it, ${currentUser}! Photo saved to your World.`);
-      document.getElementById('statusText').innerText = "✅ Photo Card saved to your World!";
+      speakOutLoud(`Got it, ${currentUser}! Photo logged to Shop Ops.`);
+      document.getElementById('statusText').innerText = "✅ Photo Card logged to Shop Ops!";
       openWorldDrawer();
     });
 
@@ -883,14 +900,14 @@
 
       // Check if user is asking a question about how it works or what it is
       if (lower.includes('how do you work') || lower.includes('how does this work') || lower.includes('what are you') || lower.includes('demo') || lower.includes('help') || lower.includes('instructions')) {
-        const reply = `Hi ${currentUser}! I am your TappyThing Digital Coordinator. You can tell me your job notes, customer names, or say any dollar amount like 120 dollars to create an instant invoice. You can also snap photos of your work. Everything self-builds right below in My World!`;
+        const reply = `Hi ${currentUser}! I am your Shop Ops Digital Coordinator. You can tell me intake notes, machine issues, or say any price to create a repair estimate. You can also snap photos of equipment. Everything syncs right here in your shop queue!`;
         speakOutLoud(reply);
         document.getElementById('statusText').innerText = "🤖 " + reply;
         return;
       }
 
       if (lower.includes('what is a card') || lower.includes('what is a bill') || lower.includes('give me examples')) {
-        const reply = `A card is any job note, like 'Tune up for Mrs Smith'. If you mention a price like 85 dollars, I will automatically turn it into an invoice card ready to send!`;
+        const reply = `A card is any vacuum repair or service ticket. If you mention a price like 120 dollars, I will automatically turn it into an invoice card ready to send!`;
         speakOutLoud(reply);
         document.getElementById('statusText').innerText = "🤖 " + reply;
         return;
@@ -905,10 +922,10 @@
         id: Date.now(),
         user: currentUser,
         title: isBill ? `🧾 Bill: ${text}` : text,
-        type: isBill ? "Bill / Invoice" : "Task",
+        type: isBill ? "Shop Bill" : "Shop Intake",
         details: text,
         billAmount: billAmount,
-        status: isBill ? "Ready to Send" : "New",
+        status: isBill ? "Ready to Send" : "Intake",
         createdAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
       };
 
@@ -918,12 +935,12 @@
 
       // Speak back confirmation
       if (isBill && billAmount) {
-        speakOutLoud(`Got it, ${currentUser}! Created an invoice card for ${billAmount}.`);
+        speakOutLoud(`Got it, ${currentUser}! Created repair invoice for ${billAmount}.`);
       } else {
-        speakOutLoud(`Got it, ${currentUser}! Added to your World.`);
+        speakOutLoud(`Got it, ${currentUser}! Added to Shop Ops.`);
       }
 
-      document.getElementById('statusText').innerText = "🎉 Card built in your World!";
+      document.getElementById('statusText').innerText = "🎉 Ticket logged to Shop Ops!";
       openWorldDrawer();
     }
 
@@ -952,7 +969,7 @@
     document.getElementById('talkBtn').addEventListener('click', toggleSpeech);
 
     document.getElementById('typeBtn').addEventListener('click', () => {
-      const typedNote = prompt("Type your task, note, bill ($), or ask a question:");
+      const typedNote = prompt("Type customer intake, vacuum repair note, or price ($):");
       if (typedNote) {
         handleSpokenInput(typedNote);
       }
