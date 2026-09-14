@@ -122,10 +122,6 @@
       transition: all 0.2s;
     }
 
-    .guide-trigger-btn:hover {
-      background: rgba(251, 191, 36, 0.25);
-    }
-
     /* 3 Action Intake Buttons */
     .action-trio {
       width: 100%;
@@ -637,22 +633,36 @@
       }
     });
 
-    // --- 2. IN-APP HOW-TO GUIDE CONTROLS ---
+    // --- 2. VOICE SYNTHESIS (TAPPYTHING TALKS BACK) ---
+    function speakOutLoud(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    // --- 3. IN-APP HOW-TO GUIDE CONTROLS ---
     const guideModal = document.getElementById('guideModal');
-    function openGuide() { guideModal.style.display = 'flex'; }
+    function openGuide() { 
+      guideModal.style.display = 'flex';
+      speakOutLoud("Welcome to TappyThing! Tap Talk to speak your notes or bills, and check My World below!");
+    }
     function closeGuide() { guideModal.style.display = 'none'; }
 
     document.getElementById('openGuideBtn').addEventListener('click', openGuide);
     document.getElementById('closeGuideIconBtn').addEventListener('click', closeGuide);
     document.getElementById('closeGuideMainBtn').addEventListener('click', closeGuide);
 
-    // Auto-show guide on very first visit for a subscriber
+    // Auto-show guide on very first visit
     if (!isMaster && !localStorage.getItem('tappy_saw_guide_' + currentUser)) {
       setTimeout(openGuide, 600);
       localStorage.setItem('tappy_saw_guide_' + currentUser, 'true');
     }
 
-    // --- 3. SELF-BUILDING WORLD DATA ENGINE ---
+    // --- 4. SELF-BUILDING WORLD DATA ENGINE ---
     async function fetchWorldData() {
       if (isMaster) {
         const container = document.getElementById('liveCardsContainer');
@@ -756,7 +766,7 @@
       `).join('');
     }
 
-    // --- 4. CAMERA WITH FLIP & STILL SNAP ---
+    // --- 5. CAMERA WITH FLIP & STILL SNAP ---
     let cameraStream = null;
     let currentFacingMode = 'environment';
     const video = document.getElementById('videoFeed');
@@ -844,11 +854,12 @@
       localStorage.setItem('tappy_cards', JSON.stringify(cards));
 
       closeCamera();
+      speakOutLoud(`Got it, ${currentUser}! Photo saved to your World.`);
       document.getElementById('statusText').innerText = "✅ Photo Card saved to your World!";
       openWorldDrawer();
     });
 
-    // --- 5. SPEECH INTAKE (TALK BUTTON) ---
+    // --- 6. CONVERSATIONAL SPEECH INTAKE (TALKS BACK & ANSWERS QUESTIONS) ---
     let isListening = false;
     let recognition = null;
     let spokenText = "";
@@ -863,6 +874,57 @@
         spokenText = e.results[0][0].transcript;
         document.getElementById('statusText').innerText = `Heard: "${spokenText}"`;
       };
+    }
+
+    function handleSpokenInput(text) {
+      if (!text || text.trim() === '') return;
+
+      const lower = text.toLowerCase();
+
+      // Check if user is asking a question about how it works or what it is
+      if (lower.includes('how do you work') || lower.includes('how does this work') || lower.includes('what are you') || lower.includes('demo') || lower.includes('help') || lower.includes('instructions')) {
+        const reply = `Hi ${currentUser}! I am your TappyThing Digital Coordinator. You can tell me your job notes, customer names, or say any dollar amount like 120 dollars to create an instant invoice. You can also snap photos of your work. Everything self-builds right below in My World!`;
+        speakOutLoud(reply);
+        document.getElementById('statusText').innerText = "🤖 " + reply;
+        return;
+      }
+
+      if (lower.includes('what is a card') || lower.includes('what is a bill') || lower.includes('give me examples')) {
+        const reply = `A card is any job note, like 'Tune up for Mrs Smith'. If you mention a price like 85 dollars, I will automatically turn it into an invoice card ready to send!`;
+        speakOutLoud(reply);
+        document.getElementById('statusText').innerText = "🤖 " + reply;
+        return;
+      }
+
+      // Check if it's a Bill or Task
+      const isBill = /bill|invoice|charge|\$/i.test(text);
+      const amountMatch = text.match(/\$?(\d+(\.\d{2})?)/);
+      const billAmount = amountMatch ? parseFloat(amountMatch[1]) : null;
+
+      const newCard = {
+        id: Date.now(),
+        user: currentUser,
+        title: isBill ? `🧾 Bill: ${text}` : text,
+        type: isBill ? "Bill / Invoice" : "Task",
+        details: text,
+        billAmount: billAmount,
+        status: isBill ? "Ready to Send" : "New",
+        createdAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      };
+
+      let cards = JSON.parse(localStorage.getItem('tappy_cards') || '[]');
+      cards.unshift(newCard);
+      localStorage.setItem('tappy_cards', JSON.stringify(cards));
+
+      // Speak back confirmation
+      if (isBill && billAmount) {
+        speakOutLoud(`Got it, ${currentUser}! Created an invoice card for ${billAmount}.`);
+      } else {
+        speakOutLoud(`Got it, ${currentUser}! Added to your World.`);
+      }
+
+      document.getElementById('statusText').innerText = "🎉 Card built in your World!";
+      openWorldDrawer();
     }
 
     function toggleSpeech() {
@@ -881,58 +943,22 @@
         btn.classList.remove('recording');
         if (recognition) recognition.stop();
 
-        const isBill = /bill|invoice|charge|\$/i.test(spokenText);
-        const amountMatch = spokenText.match(/\$?(\d+(\.\d{2})?)/);
-        const billAmount = amountMatch ? parseFloat(amountMatch[1]) : null;
-
-        const newCard = {
-          id: Date.now(),
-          user: currentUser,
-          title: isBill ? `🧾 Bill: ${spokenText}` : (spokenText || "⚡ Quick Task"),
-          type: isBill ? "Bill / Invoice" : "Task",
-          details: spokenText || "Captured via voice intake.",
-          billAmount: billAmount,
-          status: isBill ? "Ready to Send" : "New",
-          createdAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-        };
-
-        let cards = JSON.parse(localStorage.getItem('tappy_cards') || '[]');
-        cards.unshift(newCard);
-        localStorage.setItem('tappy_cards', JSON.stringify(cards));
-
-        document.getElementById('statusText').innerText = "🎉 Card built in your World!";
-        openWorldDrawer();
+        setTimeout(() => {
+          handleSpokenInput(spokenText);
+        }, 400);
       }
     }
 
     document.getElementById('talkBtn').addEventListener('click', toggleSpeech);
 
     document.getElementById('typeBtn').addEventListener('click', () => {
-      const typedNote = prompt("Type your task, note, or bill ($):");
+      const typedNote = prompt("Type your task, note, bill ($), or ask a question:");
       if (typedNote) {
-        const isBill = /bill|invoice|charge|\$/i.test(typedNote);
-        const amountMatch = typedNote.match(/\$?(\d+(\.\d{2})?)/);
-        const billAmount = amountMatch ? parseFloat(amountMatch[1]) : null;
-
-        const newCard = {
-          id: Date.now(),
-          user: currentUser,
-          title: isBill ? `🧾 Bill: ${typedNote}` : typedNote,
-          type: isBill ? "Bill / Invoice" : "Task",
-          details: typedNote,
-          billAmount: billAmount,
-          status: isBill ? "Ready to Send" : "New",
-          createdAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-        };
-
-        let cards = JSON.parse(localStorage.getItem('tappy_cards') || '[]');
-        cards.unshift(newCard);
-        localStorage.setItem('tappy_cards', JSON.stringify(cards));
-        openWorldDrawer();
+        handleSpokenInput(typedNote);
       }
     });
 
-    // --- 6. MY WORLD DRAWER TOGGLE ---
+    // --- 7. MY WORLD DRAWER TOGGLE ---
     let drawerOpen = false;
     function openWorldDrawer() {
       drawerOpen = true;
