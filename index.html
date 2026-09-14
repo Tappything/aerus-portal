@@ -386,14 +386,14 @@
       </div>
     </div>
 
-    <!-- Fresh Bandana Logo Header (Loads logo.png directly) -->
+    <!-- Fresh Bandana Logo Header -->
     <div class="header-box">
       <div class="logo-container">
         <img src="logo.png" alt="Fresh Bandana Logo" />
       </div>
       <div class="brand-title">TappyThing</div>
       <div class="brand-tagline">Digital Coordinator Command Center</div>
-      <div class="subscriber-tag" id="userTag" title="Click to switch view">👑 Master: William</div>
+      <div class="subscriber-tag" id="userTag" title="Click to switch view">Loading...</div>
     </div>
 
     <!-- 3 Action Intake Buttons -->
@@ -421,8 +421,8 @@
       <div class="my-world-left">
         <span style="font-size: 1.6rem;">🌍</span>
         <div>
-          <div class="my-world-title">My World (<span id="cardCount">30</span>)</div>
-          <div class="my-world-sub">Live synced board cards & bills</div>
+          <div class="my-world-title">My World (<span id="cardCount">0</span>)</div>
+          <div class="my-world-sub">Live self-building cards & bills</div>
         </div>
       </div>
       <span style="font-size: 1.3rem; color: #fbbf24;" id="worldChevron">▼</span>
@@ -468,44 +468,56 @@
   </div>
 
   <script>
-    // --- 1. USER IDENTITY & SUBSCRIBER ROUTING ---
+    // --- 1. USER IDENTITY & ONBOARDING ---
     const urlParams = new URLSearchParams(window.location.search);
-    let currentUser = urlParams.get('user') || localStorage.getItem('tappy_current_user') || "William";
-    localStorage.setItem('tappy_current_user', currentUser);
+    let currentUser = urlParams.get('user');
+
+    if (!currentUser) {
+      currentUser = localStorage.getItem('tappy_current_user');
+      if (!currentUser) {
+        currentUser = prompt("⚡ Welcome to TappyThing! What is your name?") || "Guest";
+      }
+      localStorage.setItem('tappy_current_user', currentUser);
+      window.history.replaceState({}, '', `?user=${encodeURIComponent(currentUser)}`);
+    } else {
+      localStorage.setItem('tappy_current_user', currentUser);
+    }
 
     const isMaster = currentUser.toLowerCase() === 'william';
     document.getElementById('userTag').innerText = isMaster ? `👑 Master: William` : `👤 Subscriber: ${currentUser}`;
 
     document.getElementById('userTag').addEventListener('click', () => {
-      const newUser = prompt("Switch view ('William' for Master or subscriber name like 'Umar'):", currentUser);
+      const newUser = prompt("Switch user name:", currentUser);
       if (newUser) {
         localStorage.setItem('tappy_current_user', newUser);
         window.location.search = `?user=${encodeURIComponent(newUser)}`;
       }
     });
 
-    // --- 2. LIVE BOARD DATA FETCHING ---
-    async function fetchLiveWorldData() {
-      const container = document.getElementById('liveCardsContainer');
-      container.innerHTML = `<div style="text-align:center; padding:20px; color:#c084fc;">⚡ Loading live board data...</div>`;
-
-      try {
-        const response = await fetch('/.netlify/functions/myworld');
-        if (!response.ok) throw new Error('API offline');
-        const data = await response.json();
-
-        if (data && data.groups && data.groups.length > 0) {
-          renderLiveGroups(data.groups);
-          return;
+    // --- 2. SELF-BUILDING WORLD DATA ENGINE ---
+    async function fetchWorldData() {
+      // MASTER gets the full live shop board; SUBSCRIBERS get their own clean, private world!
+      if (isMaster) {
+        const container = document.getElementById('liveCardsContainer');
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:#c084fc;">⚡ Loading Master board...</div>`;
+        try {
+          const response = await fetch('/.netlify/functions/myworld');
+          if (response.ok) {
+            const data = await response.json();
+            if (data && data.groups && data.groups.length > 0) {
+              renderMasterLiveGroups(data.groups);
+              return;
+            }
+          }
+        } catch (err) {
+          console.warn("Using local board store fallback:", err);
         }
-      } catch (err) {
-        console.warn("Using local board store fallback:", err);
       }
 
-      renderStoredBoardCards();
+      renderSubscriberCards();
     }
 
-    function renderLiveGroups(groups) {
+    function renderMasterLiveGroups(groups) {
       const container = document.getElementById('liveCardsContainer');
       let totalCount = 0;
 
@@ -542,23 +554,30 @@
       container.innerHTML = html || `<div style="text-align:center; padding:20px; color:#fbbf24;">No items found in your board.</div>`;
     }
 
-    function renderStoredBoardCards() {
+    function renderSubscriberCards() {
       let cards = JSON.parse(localStorage.getItem('tappy_cards') || '[]');
-      const visible = isMaster ? cards : cards.filter(c => (c.user || '').toLowerCase() === currentUser.toLowerCase());
-      document.getElementById('cardCount').innerText = visible.length;
+      // Filter cards to this specific subscriber (or all cards if Master)
+      const userCards = isMaster ? cards : cards.filter(c => (c.user || '').toLowerCase() === currentUser.toLowerCase());
+      document.getElementById('cardCount').innerText = userCards.length;
 
       const container = document.getElementById('liveCardsContainer');
-      if (visible.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding:20px; color:#fbbf24;">🌱 Your World is ready to build!</div>`;
+      if (userCards.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:30px 15px; color:#fbbf24; background:rgba(30, 16, 53, 0.6); border-radius:18px; border:1px dashed rgba(251, 191, 36, 0.4);">
+            <div style="font-size:2rem; margin-bottom:8px;">🌱</div>
+            <div style="font-weight:800; font-size:1.1rem; color:#fff;">Welcome, ${currentUser}!</div>
+            <div style="font-size:0.85rem; color:#cbd5e1; margin-top:4px;">Your world is empty. Tap <b>Talk</b>, <b>Type</b>, or <b>Photo</b> above to self-build your first card or bill!</div>
+          </div>
+        `;
         return;
       }
 
-      container.innerHTML = visible.map(c => `
+      container.innerHTML = userCards.map(c => `
         <div class="card">
           <div class="card-top">
             <div>
               <div class="card-title">${c.title}</div>
-              ${isMaster ? `<div style="font-size:0.75rem; color:#fbbf24; margin-top:2px;">👤 Client: <b>${c.user}</b></div>` : ''}
+              <div style="font-size:0.75rem; color:#c084fc; margin-top:2px;">Owner: <b>${c.user}</b></div>
             </div>
             <span class="card-badge ${c.type && c.type.includes('Bill') ? 'badge-bill' : 'badge-ops'}">${c.type || 'Task'}</span>
           </div>
@@ -651,12 +670,12 @@
     });
 
     document.getElementById('savePhotoToWorldBtn').addEventListener('click', () => {
-      const noteTitle = prompt("Add a title for this photo note:", "Equipment Photo") || "Photo Card";
+      const noteTitle = prompt("Add a title for this photo note:", "Job Photo") || "Photo Card";
       const newCard = {
         id: Date.now(),
         user: currentUser,
         title: `📷 ${noteTitle}`,
-        type: "Shop Ops",
+        type: "Photo Note",
         details: "Photo captured via mobile intake.",
         photo: capturedPhotoData,
         billAmount: null,
@@ -698,7 +717,7 @@
         spokenText = "";
         label.innerText = "Stop";
         btn.classList.add('recording');
-        document.getElementById('statusText').innerText = "🎙️ Listening... (Tap Talk again when done)";
+        document.getElementById('statusText').innerText = "🎙️ Listening... (Tap Stop when done)";
         if (recognition) recognition.start();
       } else {
         isListening = false;
@@ -713,7 +732,7 @@
         const newCard = {
           id: Date.now(),
           user: currentUser,
-          title: isBill ? `🧾 Bill: ${spokenText}` : (spokenText || "⚡ Quick Note"),
+          title: isBill ? `🧾 Bill: ${spokenText}` : (spokenText || "⚡ Quick Task"),
           type: isBill ? "Bill / Invoice" : "Task",
           details: spokenText || "Captured via voice intake.",
           billAmount: billAmount,
@@ -733,7 +752,7 @@
     document.getElementById('talkBtn').addEventListener('click', toggleSpeech);
 
     document.getElementById('typeBtn').addEventListener('click', () => {
-      const typedNote = prompt("Type your note, task, or bill:");
+      const typedNote = prompt("Type your task, note, or bill ($):");
       if (typedNote) {
         const isBill = /bill|invoice|charge|\$/i.test(typedNote);
         const amountMatch = typedNote.match(/\$?(\d+(\.\d{2})?)/);
@@ -763,18 +782,18 @@
       drawerOpen = true;
       document.getElementById('worldDrawer').style.display = 'flex';
       document.getElementById('worldChevron').innerText = '▲';
-      fetchLiveWorldData();
+      fetchWorldData();
     }
 
     document.getElementById('myWorldToggle').addEventListener('click', () => {
       drawerOpen = !drawerOpen;
       document.getElementById('worldDrawer').style.display = drawerOpen ? 'flex' : 'none';
       document.getElementById('worldChevron').innerText = drawerOpen ? '▲' : '▼';
-      if (drawerOpen) fetchLiveWorldData();
+      if (drawerOpen) fetchWorldData();
     });
 
     // Initial load
-    fetchLiveWorldData();
+    fetchWorldData();
   </script>
 </body>
 </html>
