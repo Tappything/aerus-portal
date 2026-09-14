@@ -284,31 +284,49 @@ function toggleMyWorld(){
 }
 
 async function loadBoard(){
-  document.getElementById('boardContent').innerHTML='<div class="loading-msg">Loading your world…</div>';
-  try{
+  const container = document.getElementById('boardContent');
+  if(!container) return;
+  container.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">Loading your world… ⏳</div>';
+  
+  try {
     const res = await fetch('/.netlify/functions/myworld');
-    const data=await res.json();
-    boardLoaded=true;
-    if(!data.groups||data.groups.length===0){
-      document.getElementById('boardContent').innerHTML='<div class="loading-msg">Your board is empty — start talking!</div>';
+    const data = await res.json();
+    
+    if(!data.groups || data.groups.length === 0){
+      container.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">Your board is empty — start talking! 🎙️</div>';
       return;
     }
-    let html='';
-    data.groups.forEach(group=>{
-      if(!group.items||group.items.length===0)return;
-      html+=`<div class="group-card"><div class="group-title">${group.name}</div>`;
-      group.items.slice(0,8).forEach(item=>{
-        const status=item.status?`<span class="item-status">${item.status}</span>`:'';
-        html+=`<div class="item-row">${item.name}${status}</div>`;
+    
+    let html = '';
+    data.groups.forEach(group => {
+      if(!group.items || group.items.length === 0) return;
+      
+      html += `
+        <div style="background:rgba(255,255,255,0.05); border-radius:12px; padding:15px; margin-bottom:15px; border-left:4px solid ${group.color || '#f59e0b'};">
+          <div style="font-weight:700; font-size:16px; margin-bottom:10px; color:#fff;">${group.title} (${group.items.length})</div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+      `;
+      
+      group.items.forEach(item => {
+        const status = item.status || 'Active';
+        html += `
+          <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.25); padding:10px 14px; border-radius:8px;">
+            <span style="font-weight:500; color:#eee;">${item.name}</span>
+            <span style="font-size:12px; padding:3px 8px; border-radius:6px; background:rgba(245,158,11,0.2); color:#f59e0b; border:1px solid rgba(245,158,11,0.3);">${status}</span>
+          </div>
+        `;
       });
-      html+=`</div>`;
+      
+      html += `</div></div>`;
     });
-    document.getElementById('boardContent').innerHTML=html||'<div class="loading-msg">Nothing here yet — start talking!</div>';
-  }catch(e){
-    document.getElementById('boardContent').innerHTML='<div class="loading-msg">Tap Talk or Type to add your first item.</div>';
+    
+    container.innerHTML = html || '<div style="text-align:center; padding:20px; color:#888;">No active items found.</div>';
+    
+  } catch(err) {
+    console.error(err);
+    container.innerHTML = '<div style="text-align:center; padding:20px; color:#ef4444;">Could not load your world. Please try again.</div>';
   }
 }
-
 document.getElementById('typeText').addEventListener('keydown',(e)=>{
   if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendText();}
 });
