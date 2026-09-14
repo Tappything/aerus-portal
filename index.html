@@ -18,22 +18,27 @@
       position: relative;
     }
 
-    /* Rob Art Tribute in the Corner */
+    /* Rob Art Tribute Badge in the Corner */
     .rob-art-badge {
       position: absolute;
       top: 14px;
       right: 16px;
-      background: rgba(30, 16, 53, 0.7);
-      border: 1px solid rgba(244, 114, 182, 0.4);
+      background: rgba(30, 16, 53, 0.8);
+      border: 1px solid rgba(244, 114, 182, 0.45);
       padding: 4px 10px;
       border-radius: 16px;
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       color: #f472b6;
       font-weight: 700;
       display: flex;
       align-items: center;
-      gap: 5px;
-      backdrop-filter: blur(6px);
+      gap: 6px;
+      backdrop-filter: blur(8px);
+    }
+    .rob-art-badge img {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
     }
 
     .container {
@@ -56,8 +61,8 @@
     }
 
     .logo-container {
-      width: 86px;
-      height: 86px;
+      width: 88px;
+      height: 88px;
       border-radius: 50%;
       border: 2px solid #fbbf24;
       box-shadow: 0 0 25px rgba(251, 191, 36, 0.45);
@@ -102,7 +107,7 @@
       margin-top: 2px;
     }
 
-    /* 3-Button Intake Suite (Talk, Type, Video/Photo) */
+    /* 3-Button Intake Suite */
     .action-trio {
       width: 100%;
       display: grid;
@@ -136,7 +141,7 @@
       font-size: 1.5rem;
     }
 
-    /* Big Central Tappy Button */
+    /* Central Tap Button */
     .big-tappy-btn {
       width: 100%;
       background: linear-gradient(135deg, #d97706, #9333ea, #4f46e5);
@@ -217,7 +222,7 @@
       margin-top: 2px;
     }
 
-    /* Modal / Drawer for Camera & Media Controls */
+    /* Modal for Camera / Photo / Flip */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -301,13 +306,31 @@
       gap: 6px;
     }
 
-    /* Drawer / View for My World Cards */
+    /* My World Live Data Section */
     .world-drawer {
       display: none;
       width: 100%;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
       margin-top: 8px;
+    }
+
+    .group-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .group-header {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #fbbf24;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 6px;
     }
 
     .card {
@@ -380,22 +403,22 @@
 </head>
 <body>
 
-  <!-- Rob Art Sacred Tribute Badge -->
+  <!-- Restored Rob Art Badge -->
   <div class="rob-art-badge">
-    <span>🐷</span>
-    <span>ROB ART</span>
+    <img src="rob-art.png" onerror="this.style.display='none'" alt="Rob Art" />
+    <span>🐷 ROB ART</span>
   </div>
 
   <div class="container">
     
-    <!-- Restored Original Header -->
+    <!-- Restored Logo & Header -->
     <div class="header-box">
       <div class="logo-container">
-        <img src="logo.png" onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed=Fresh&backgroundColor=180d2b'" alt="Fresh TappyThing" />
+        <img src="logo.png" onerror="this.src='fresh-logo.png'; this.onerror=function(){this.src='https://api.dicebear.com/7.x/bottts/svg?seed=Fresh&backgroundColor=180d2b';}" alt="TappyThing Logo" />
       </div>
       <div class="brand-title">TappyThing</div>
       <div class="brand-tagline">Digital Coordinator Command Center</div>
-      <div class="subscriber-tag" id="userTag" title="Click to switch subscriber">👑 Master: William</div>
+      <div class="subscriber-tag" id="userTag" title="Click to switch view">👑 Master: William</div>
     </div>
 
     <!-- 3 Action Intake Buttons -->
@@ -426,16 +449,16 @@
       <div class="my-world-left">
         <span style="font-size: 1.6rem;">🌍</span>
         <div>
-          <div class="my-world-title">My World (<span id="cardCount">0</span>)</div>
-          <div class="my-world-sub">Tap to view your self-building cards & bills</div>
+          <div class="my-world-title">My World (<span id="cardCount">Loading...</span>)</div>
+          <div class="my-world-sub">Live synced board cards & bills</div>
         </div>
       </div>
       <span style="font-size: 1.3rem; color: #fbbf24;" id="worldChevron">▼</span>
     </div>
 
-    <!-- Self-Building "My World" Cards Container -->
+    <!-- Live Data "My World" Drawer -->
     <div class="world-drawer" id="worldDrawer">
-      <div id="cardsList" style="display: flex; flex-direction: column; gap: 12px;"></div>
+      <div id="liveCardsContainer" style="display: flex; flex-direction: column; gap: 14px;"></div>
     </div>
 
   </div>
@@ -473,55 +496,7 @@
   </div>
 
   <script>
-    // --- 1. SYSTEM DATA & IDENTITY ---
-    const REAL_SYSTEM_CARDS = [
-      {
-        id: 401,
-        user: "William",
-        title: "⚡ Aerus Electrolux Guardian Diagnostic",
-        type: "Shop Ops",
-        details: "Guardian canister intake. $40 diagnostic fee applied. Placed in Workbench for motor carbon brush & bearing check.",
-        billAmount: 40.00,
-        status: "Workbench",
-        createdAt: "Sep 14, 2026"
-      },
-      {
-        id: 402,
-        user: "William",
-        title: "🧾 Mike Bagdon (Bagdons Vacuum) - Shop Overhaul",
-        type: "Bill / Invoice",
-        details: "Mike Bagdon (410-882-6956). First live TappyThing B2B subscriber. Complete repair overhaul & 1-tap Workiz invoice ready.",
-        billAmount: 185.00,
-        status: "Ready to Send",
-        createdAt: "Sep 12, 2026"
-      },
-      {
-        id: 403,
-        user: "William",
-        title: "📋 FOASPLUS & Vendor Inventory Reorder",
-        type: "Task",
-        details: "Replenish Aerus bags, HEPA filters, drive belts, and sanitizer supplies. Intake via mobile voice tap.",
-        billAmount: null,
-        status: "Workiz Handoff",
-        createdAt: "Sep 14, 2026"
-      },
-      {
-        id: 404,
-        user: "Umar",
-        title: "🚀 Workflow Automation: Client Follow-up",
-        type: "Task",
-        details: "Automate SMS & email sequences for inbound leads.",
-        billAmount: null,
-        status: "In Progress",
-        createdAt: "Sep 14, 2026"
-      }
-    ];
-
-    let storedCards = JSON.parse(localStorage.getItem('tappy_cards') || '[]');
-    if (storedCards.length === 0 || !storedCards.some(c => c.id === 401)) {
-      localStorage.setItem('tappy_cards', JSON.stringify(REAL_SYSTEM_CARDS));
-    }
-
+    // --- 1. USER IDENTITY & SUBSCRIBER ROUTING ---
     const urlParams = new URLSearchParams(window.location.search);
     let currentUser = urlParams.get('user') || localStorage.getItem('tappy_current_user') || "William";
     localStorage.setItem('tappy_current_user', currentUser);
@@ -530,14 +505,113 @@
     document.getElementById('userTag').innerText = isMaster ? `👑 Master: William` : `👤 Subscriber: ${currentUser}`;
 
     document.getElementById('userTag').addEventListener('click', () => {
-      const newUser = prompt("Switch view ('William' for Master or subscriber name):", currentUser);
+      const newUser = prompt("Switch view ('William' for Master or subscriber name like 'Umar'):", currentUser);
       if (newUser) {
         localStorage.setItem('tappy_current_user', newUser);
         window.location.search = `?user=${encodeURIComponent(newUser)}`;
       }
     });
 
-    // --- 2. CAMERA ENGINE WITH FLIP & STILL PHOTO ---
+    // --- 2. LIVE BOARD DATA FETCHING FOR "MY WORLD" ---
+    async function fetchLiveWorldData() {
+      const container = document.getElementById('liveCardsContainer');
+      container.innerHTML = `<div style="text-align:center; padding:20px; color:#c084fc;">⚡ Loading live board data...</div>`;
+
+      try {
+        // Fetch from your Netlify serverless function proxy
+        const response = await fetch('/.netlify/functions/myworld');
+        if (!response.ok) throw new Error('API offline');
+        const data = await response.json();
+
+        if (data && data.groups && data.groups.length > 0) {
+          renderLiveGroups(data.groups);
+          return;
+        }
+      } catch (err) {
+        console.warn("Using local board store fallback:", err);
+      }
+
+      // Fallback: render stored board items
+      renderStoredBoardCards();
+    }
+
+    function renderLiveGroups(groups) {
+      const container = document.getElementById('liveCardsContainer');
+      let totalCount = 0;
+
+      const html = groups.map(group => {
+        if (!group.items || group.items.length === 0) return '';
+        totalCount += group.items.length;
+
+        return `
+          <div class="group-section">
+            <div class="group-header">📂 ${group.title} (${group.items.length})</div>
+            ${group.items.map(item => `
+              <div class="card">
+                <div class="card-top">
+                  <div class="card-title">${item.name}</div>
+                  <span class="card-badge badge-ops">${item.status || 'Active'}</span>
+                </div>
+                ${item.details ? `<div class="card-body">${item.details}</div>` : ''}
+                ${item.billAmount ? `
+                  <div class="bill-box">
+                    <div>
+                      <div style="font-size:0.75rem; color:#94a3b8;">Invoice Total</div>
+                      <div class="bill-amount">${parseFloat(item.billAmount).toFixed(2)}</div>
+                    </div>
+                    <button class="send-bill-btn" onclick="alert('✅ Invoice ready to send!')">1-Tap Send</button>
+                  </div>
+                ` : ''}
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('cardCount').innerText = totalCount;
+      container.innerHTML = html || `<div style="text-align:center; padding:20px; color:#fbbf24;">No items found in your board.</div>`;
+    }
+
+    function renderStoredBoardCards() {
+      let cards = JSON.parse(localStorage.getItem('tappy_cards') || '[]');
+      const visible = isMaster ? cards : cards.filter(c => (c.user || '').toLowerCase() === currentUser.toLowerCase());
+      document.getElementById('cardCount').innerText = visible.length;
+
+      const container = document.getElementById('liveCardsContainer');
+      if (visible.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:#fbbf24;">🌱 Your World is ready to build!</div>`;
+        return;
+      }
+
+      container.innerHTML = visible.map(c => `
+        <div class="card">
+          <div class="card-top">
+            <div>
+              <div class="card-title">${c.title}</div>
+              ${isMaster ? `<div style="font-size:0.75rem; color:#fbbf24; margin-top:2px;">👤 Client: <b>${c.user}</b></div>` : ''}
+            </div>
+            <span class="card-badge ${c.type && c.type.includes('Bill') ? 'badge-bill' : 'badge-ops'}">${c.type || 'Task'}</span>
+          </div>
+          ${c.photo ? `<img src="${c.photo}" style="width:100%; border-radius:10px; margin-top:4px;" />` : ''}
+          <div class="card-body">${c.details || ''}</div>
+          ${c.billAmount ? `
+            <div class="bill-box">
+              <div>
+                <div style="font-size:0.75rem; color:#94a3b8;">Invoice Total</div>
+                <div class="bill-amount">${parseFloat(c.billAmount).toFixed(2)}</div>
+              </div>
+              <button class="send-bill-btn" onclick="alert('✅ Invoice for ${parseFloat(c.billAmount).toFixed(2)} sent!')">1-Tap Send</button>
+            </div>
+          ` : ''}
+          <div style="display:flex; justify-content:space-between; font-size:0.72rem; color:#a855f7; margin-top:4px;">
+            <span>Status: <b style="color:#f8fafc;">${c.status || 'Active'}</b></span>
+            <span>${c.createdAt || 'Today'}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- 3. CAMERA WITH FLIP & STILL SNAP ---
     let cameraStream = null;
     let currentFacingMode = 'environment';
     const video = document.getElementById('videoFeed');
@@ -578,7 +652,6 @@
       openCamera();
     });
 
-    // Snap Photo
     document.getElementById('snapStillPhotoBtn').addEventListener('click', () => {
       canvas.width = video.videoWidth || 640;
       canvas.height = video.videoHeight || 480;
@@ -592,7 +665,6 @@
       document.getElementById('savePhotoToWorldBtn').style.display = 'block';
     });
 
-    // Pick from Gallery
     document.getElementById('fileUploadInput').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
@@ -608,9 +680,8 @@
       }
     });
 
-    // Save Photo into World
     document.getElementById('savePhotoToWorldBtn').addEventListener('click', () => {
-      const noteTitle = prompt("Add a title for this photo note:", "Equipment Inspection Photo") || "Photo Card";
+      const noteTitle = prompt("Add a title for this photo note:", "Equipment Photo") || "Photo Card";
       const newCard = {
         id: Date.now(),
         user: currentUser,
@@ -629,11 +700,10 @@
 
       closeCamera();
       document.getElementById('statusText').innerText = "✅ Photo Card saved to your World!";
-      updateWorldCards();
       openWorldDrawer();
     });
 
-    // --- 3. SPEECH & TAP BUILDER ---
+    // --- 4. SPEECH INTAKE & AUTO-BILLING ---
     let isListening = false;
     let recognition = null;
     let spokenText = "";
@@ -684,7 +754,6 @@
         localStorage.setItem('tappy_cards', JSON.stringify(cards));
 
         document.getElementById('statusText').innerText = "🎉 Card built in your World!";
-        updateWorldCards();
         openWorldDrawer();
 
         setTimeout(() => {
@@ -717,85 +786,28 @@
         let cards = JSON.parse(localStorage.getItem('tappy_cards') || '[]');
         cards.unshift(newCard);
         localStorage.setItem('tappy_cards', JSON.stringify(cards));
-        updateWorldCards();
         openWorldDrawer();
       }
     });
 
-    // --- 4. MY WORLD DRAWER ---
+    // --- 5. MY WORLD DRAWER TOGGLE ---
     let drawerOpen = false;
     function openWorldDrawer() {
       drawerOpen = true;
       document.getElementById('worldDrawer').style.display = 'flex';
       document.getElementById('worldChevron').innerText = '▲';
-      updateWorldCards();
+      fetchLiveWorldData();
     }
 
     document.getElementById('myWorldToggle').addEventListener('click', () => {
       drawerOpen = !drawerOpen;
       document.getElementById('worldDrawer').style.display = drawerOpen ? 'flex' : 'none';
       document.getElementById('worldChevron').innerText = drawerOpen ? '▲' : '▼';
-      if (drawerOpen) updateWorldCards();
+      if (drawerOpen) fetchLiveWorldData();
     });
 
-    function updateWorldCards() {
-      const allCards = JSON.parse(localStorage.getItem('tappy_cards') || '[]');
-      const visibleCards = isMaster 
-        ? allCards 
-        : allCards.filter(c => (c.user || '').toLowerCase() === currentUser.toLowerCase());
-
-      document.getElementById('cardCount').innerText = visibleCards.length;
-      const listEl = document.getElementById('cardsList');
-
-      if (visibleCards.length === 0) {
-        listEl.innerHTML = `
-          <div style="text-align:center; padding:30px 16px; color:#fbbf24; font-size:0.88rem;">
-            🌱 <b>Your World is ready to build!</b><br>
-            Tap Talk, Type, or Photo above to create your first card.
-          </div>
-        `;
-        return;
-      }
-
-      listEl.innerHTML = visibleCards.map(c => {
-        let badgeClass = 'badge-task';
-        if (c.type.includes('Bill')) badgeClass = 'badge-bill';
-        else if (c.type.includes('Shop')) badgeClass = 'badge-ops';
-
-        return `
-          <div class="card">
-            <div class="card-top">
-              <div>
-                <div class="card-title">${c.title}</div>
-                ${isMaster ? `<div style="font-size:0.75rem; color:#fbbf24; margin-top:2px;">👤 Client: <b>${c.user}</b></div>` : ''}
-              </div>
-              <span class="card-badge ${badgeClass}">${c.type}</span>
-            </div>
-
-            ${c.photo ? `<img src="${c.photo}" style="width:100%; border-radius:10px; margin-top:4px;" />` : ''}
-            
-            <div class="card-body">${c.details}</div>
-
-            ${c.billAmount ? `
-              <div class="bill-box">
-                <div>
-                  <div style="font-size:0.75rem; color:#94a3b8;">Invoice Total</div>
-                  <div class="bill-amount">${c.billAmount.toFixed(2)}</div>
-                </div>
-                <button class="send-bill-btn" onclick="alert('✅ Invoice for ${c.billAmount.toFixed(2)} sent!')">1-Tap Send</button>
-              </div>
-            ` : ''}
-
-            <div style="display:flex; justify-content:space-between; font-size:0.72rem; color:#a855f7; margin-top:4px;">
-              <span>Status: <b style="color:#f8fafc;">${c.status}</b></span>
-              <span>${c.createdAt}</span>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    updateWorldCards();
+    // Initial load
+    fetchLiveWorldData();
   </script>
 </body>
 </html>
