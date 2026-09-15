@@ -1,279 +1,655 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>TappyThing ⚡ Chat with Fresh</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TappyThing — Digital Coordinator</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    :root {
+      --bg-dark: #090d16;
+      --card-bg: #131b2e;
+      --card-border: #1e293b;
+      --accent-blue: #38bdf8;
+      --accent-purple: #a855f7;
+      --accent-amber: #f59e0b;
+      --accent-emerald: #10b981;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --glow-blue: rgba(56, 189, 248, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
     body {
-      background: radial-gradient(circle at top, #1e1035 0%, #0c0714 100%);
-      color: #f8fafc;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 16px;
+      line-height: 1.5;
     }
+
     .container {
       width: 100%;
-      max-width: 480px;
+      max-width: 580px;
       display: flex;
       flex-direction: column;
-      height: 92vh;
-      gap: 12px;
+      gap: 16px;
     }
-    .header-box {
+
+    /* HEADER & LOGO */
+    header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       text-align: center;
-      padding: 4px 0;
+      padding: 18px 12px 10px;
     }
-    .brand-title {
-      font-size: 1.6rem;
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .logo-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #38bdf8 0%, #a855f7 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
       font-weight: 800;
-      background: linear-gradient(135deg, #fbbf24 0%, #f472b6 50%, #c084fc 100%);
+      box-shadow: 0 0 20px var(--glow-blue);
+    }
+
+    .logo-title {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #38bdf8, #f8fafc, #a855f7);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .tagline {
-      font-size: 0.85rem;
-      color: #cbd5e1;
-      margin-top: 2px;
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
-    .chat-box {
-      flex: 1;
-      background: rgba(30, 16, 53, 0.95);
-      border: 1.5px solid rgba(251, 191, 36, 0.35);
-      border-radius: 20px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      overflow-y: auto;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    }
-    .bubble {
-      max-width: 85%;
-      padding: 12px 16px;
-      border-radius: 16px;
-      font-size: 0.95rem;
-      line-height: 1.4;
-    }
-    .bubble.fresh {
-      align-self: flex-start;
-      background: #2d184c;
-      color: #f8fafc;
-      border-bottom-left-radius: 4px;
-      border: 1px solid rgba(192, 132, 252, 0.3);
-    }
-    .bubble.user {
-      align-self: flex-end;
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
-      color: #0f172a;
-      font-weight: 600;
-      border-bottom-right-radius: 4px;
-    }
-    .ticket-card {
-      background: #120924;
-      border: 1.5px solid #22c55e;
-      border-radius: 14px;
-      padding: 14px;
+
+    /* ROB ART BADGE */
+    .rob-art-pill {
       margin-top: 8px;
-      color: #fff;
-    }
-    .ticket-header {
-      font-weight: 800;
-      color: #22c55e;
-      font-size: 0.95rem;
-      margin-bottom: 6px;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
+      background: rgba(168, 85, 247, 0.12);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 11px;
+      color: #d8b4fe;
+      font-weight: 600;
+      letter-spacing: 0.3px;
     }
-    .input-area {
+
+    .rob-art-icon {
+      font-size: 13px;
+    }
+
+    /* CARD BASE */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    /* FRESH CHAT & VOICE ENGINE */
+    .fresh-header {
       display: flex;
-      gap: 8px;
       align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
-    .text-input {
-      flex: 1;
-      background: #1e1035;
-      border: 1.5px solid rgba(251, 191, 36, 0.4);
-      border-radius: 25px;
-      padding: 12px 18px;
-      color: #f8fafc;
-      font-size: 0.95rem;
-      outline: none;
-    }
-    .text-input:focus {
-      border-color: #fbbf24;
-    }
-    .btn {
+
+    .fresh-avatar {
       width: 48px;
       height: 48px;
       border-radius: 50%;
+      background: linear-gradient(135deg, #10b981 0%, #38bdf8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      border: 2px solid #38bdf8;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+      flex-shrink: 0;
+    }
+
+    .fresh-info h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .fresh-status {
+      font-size: 12px;
+      color: var(--accent-emerald);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 600;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-emerald);
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 8px var(--accent-emerald);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.4; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.1); }
+      100% { opacity: 0.4; transform: scale(0.9); }
+    }
+
+    /* CHAT DIALOGUE AREA */
+    .chat-box {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding: 6px 4px 10px;
+      margin-bottom: 16px;
+    }
+
+    .chat-bubble {
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.45;
+      max-width: 90%;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .bubble-fresh {
+      background: #1e293b;
+      color: #f1f5f9;
+      border-left: 3px solid var(--accent-blue);
+      align-self: flex-start;
+      border-top-left-radius: 4px;
+    }
+
+    .bubble-user {
+      background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+      color: #ffffff;
+      align-self: flex-end;
+      border-top-right-radius: 4px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ACTION BUTTONS / QUICK ROLES */
+    .quick-roles-title {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .quick-roles {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .role-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: var(--text-main);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      transition: all 0.2s ease;
+    }
+
+    .role-btn:hover {
+      background: rgba(56, 189, 248, 0.1);
+      border-color: var(--accent-blue);
+      transform: translateY(-2px);
+    }
+
+    .role-btn small {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* VOICE & INPUT CONTROLS */
+    .controls-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .voice-main-btn {
+      background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+      color: #fff;
       border: none;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.2rem;
-      transition: transform 0.1s;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+      transition: all 0.2s ease;
     }
-    .btn:active { transform: scale(0.95); }
-    .btn-mic {
-      background: #784bd1;
+
+    .voice-main-btn:hover {
+      filter: brightness(1.1);
+      transform: scale(1.01);
+    }
+
+    .voice-main-btn.listening {
+      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+      animation: pulse 1.2s infinite;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .text-input {
+      flex: 1;
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 16px;
       color: #fff;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.2s;
     }
-    .btn-mic.recording {
-      background: #ef4444;
-      animation: pulse 1s infinite alternate;
+
+    .text-input:focus {
+      border-color: var(--accent-blue);
     }
-    .btn-send {
-      background: #fbbf24;
-      color: #1e1035;
-      font-weight: bold;
+
+    .send-btn {
+      background: #1e293b;
+      border: 1px solid var(--card-border);
+      color: #fff;
+      border-radius: 12px;
+      padding: 0 18px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
     }
-    @keyframes pulse {
-      from { box-shadow: 0 0 0px #ef4444; }
-      to { box-shadow: 0 0 15px #ef4444; }
+
+    .send-btn:hover {
+      background: var(--accent-blue);
+      color: #000;
+    }
+
+    /* SYSTEM CARDS PREVIEW SECTION */
+    .system-builder-card {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .builder-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .builder-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    .system-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .module-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: all 0.25s ease;
+    }
+
+    .module-card:hover {
+      border-color: rgba(56, 189, 248, 0.3);
+      background: rgba(56, 189, 248, 0.04);
+    }
+
+    .module-icon {
+      font-size: 18px;
+      margin-bottom: 2px;
+    }
+
+    .module-card h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+
+    .module-card p {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    /* FOOTER & GUARANTEE */
+    footer {
+      text-align: center;
+      padding: 16px 8px 24px;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .trial-pill {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header-box">
-      <div class="brand-title">TappyThing ⚡</div>
-      <div class="tagline">Voice & Text Coordinator for Bagden / Aerus</div>
-    </div>
 
-    <div class="chat-box" id="chat-box">
-      <div class="bubble fresh">
-        Hey Mike! 👋 I'm <strong>Fresh</strong>, your shop coordinator. Tap the mic or type any repair, parts order, or customer invoice below!
+  <div class="container">
+    <!-- HEADER -->
+    <header>
+      <div class="logo-container">
+        <div class="logo-badge">⚡</div>
+        <div class="logo-title">TappyThing</div>
+      </div>
+      <div class="subtitle">Digital Coordinator for Real Business</div>
+      <div class="rob-art-pill">
+        <span class="rob-art-icon">🎨</span>
+        <span>Original Crew Artwork by Rob Art</span>
+      </div>
+    </header>
+
+    <!-- FRESH INTERACTIVE CHAT ENGINE -->
+    <div class="card">
+      <div class="fresh-header">
+        <div class="fresh-avatar">🧢</div>
+        <div class="fresh-info">
+          <h3>Fresh (AI Coordinator)</h3>
+          <div class="fresh-status">
+            <span class="status-dot"></span> Ready to assist & route
+          </div>
+        </div>
+      </div>
+
+      <!-- CHAT MESSAGE BOX -->
+      <div class="chat-box" id="chatBox">
+        <div class="chat-bubble bubble-fresh">
+          <strong>Hey there! I'm Fresh.</strong> I'm here to help you get your shop and tasks organized fast with zero headaches.<br><br>
+          👉 <strong>Here is what to do:</strong> Tap the blue mic below and speak, type your task in the box, or tap one of the quick shortcuts below!
+        </div>
+      </div>
+
+      <!-- QUICK ROLE SHORTCUTS -->
+      <div class="quick-roles-title">Quick System Setups:</div>
+      <div class="quick-roles">
+        <button class="role-btn" onclick="triggerRoleAction('Mona')">
+          <span>🏪 Counter Intake</span>
+          <small>Mona's check-in flow</small>
+        </button>
+        <button class="role-btn" onclick="triggerRoleAction('Mike')">
+          <span>🔧 Repair & Invoices</span>
+          <small>Mike @ Bagdons flow</small>
+        </button>
+      </div>
+
+      <!-- INPUT & VOICE CONTROLS -->
+      <div class="controls-panel">
+        <button class="voice-main-btn" id="voiceBtn" onclick="toggleVoice()">
+          <span id="micIcon">🎙️</span>
+          <span id="micText">Tap to Talk with Fresh</span>
+        </button>
+
+        <div class="input-row">
+          <input type="text" id="userInput" class="text-input" placeholder="Type a message or task for Fresh..." onkeydown="handleKey(event)">
+          <button class="send-btn" onclick="sendMessage()">Send</button>
+        </div>
       </div>
     </div>
 
-    <div class="input-area">
-      <button class="btn btn-mic" id="mic-btn" onclick="toggleVoice()" title="Tap to talk">🎤</button>
-      <input type="text" class="text-input" id="text-input" placeholder="Speak or type a repair..." onkeydown="handleKey(event)" />
-      <button class="btn btn-send" id="send-btn" onclick="handleSend()">➤</button>
+    <!-- SELF-BUILD SYSTEM PREVIEW -->
+    <div class="card system-builder-card">
+      <div class="builder-header">
+        <h3>🚀 Active System Modules</h3>
+        <span style="font-size: 11px; color: var(--accent-blue); font-weight: 600;">Self-Build Ready</span>
+      </div>
+
+      <div class="system-grid">
+        <div class="module-card">
+          <div class="module-icon">⚡</div>
+          <h4>1. Quick Intake</h4>
+          <p>Instant voice, photo, & text intake logging.</p>
+        </div>
+        <div class="module-card">
+          <div class="module-icon">📬</div>
+          <h4>2. Follow-Up</h4>
+          <p>Automated customer SMS & status notifications.</p>
+        </div>
+        <div class="module-card">
+          <div class="module-icon">📋</div>
+          <h4>3. Task Queue</h4>
+          <p>Bench tech & counter routing in real time.</p>
+        </div>
+        <div class="module-card">
+          <div class="module-icon">📊</div>
+          <h4>4. Live Dashboard</h4>
+          <p>Revenue, parts tracking, and daily ops.</p>
+        </div>
+      </div>
     </div>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="trial-pill">3-Day Free Trial • $95/mo • 30-Day Money-Back Guarantee</div>
+      <div>⚡ Powered by TappyThing & Fresh AI</div>
+      <div style="font-size: 10px; color: #64748b; margin-top: 4px;">Crew: Boudie • Fresh • Sissy • Rob Art • Umar • Nusch</div>
+    </footer>
   </div>
 
+  <!-- CLIENT-SIDE LOGIC -->
   <script>
-    const chatBox = document.getElementById("chat-box");
-    const textInput = document.getElementById("text-input");
-    const micBtn = document.getElementById("mic-btn");
-    let isRecording = false;
-    let recognition = null;
-    const synth = window.speechSynthesis;
+    const chatBox = document.getElementById('chatBox');
+    const userInput = document.getElementById('userInput');
+    const voiceBtn = document.getElementById('voiceBtn');
+    const micIcon = document.getElementById('micIcon');
+    const micText = document.getElementById('micText');
 
-    // Speech Recognition
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
+    let recognition = null;
+    let isListening = false;
+
+    // SPEECH RECOGNITION SETUP
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       recognition = new SpeechRecognition();
-      recognition.lang = "en-US";
+      recognition.continuous = false;
       recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
       recognition.onstart = () => {
-        isRecording = true;
-        micBtn.classList.add("recording");
+        isListening = true;
+        voiceBtn.classList.add('listening');
+        micIcon.innerText = '🛑';
+        micText.innerText = 'Listening to you... Speak now';
       };
+
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
-        textInput.value = transcript;
-        handleSend();
+        addMessage(transcript, 'user');
+        respondAsFresh(transcript);
       };
-      recognition.onerror = () => stopRecording();
-      recognition.onend = () => stopRecording();
+
+      recognition.onerror = (event) => {
+        console.warn('Speech error:', event.error);
+        stopListening();
+        addMessage("I didn't quite catch that. Try speaking again or typing below!", 'fresh');
+        speakText("I didn't quite catch that. Try speaking again or typing below!");
+      };
+
+      recognition.onend = () => {
+        stopListening();
+      };
     }
 
     function toggleVoice() {
       if (!recognition) {
-        alert("Voice mic requires Safari or Chrome on iOS/Android. Please check browser permissions.");
+        addMessage("Voice input isn't supported in this browser, but you can type right here!", 'fresh');
         return;
       }
-      if (isRecording) {
+      if (isListening) {
         recognition.stop();
+        stopListening();
       } else {
-        recognition.start();
+        try {
+          recognition.start();
+        } catch (e) {
+          recognition.stop();
+          setTimeout(() => recognition.start(), 200);
+        }
       }
     }
 
-    function stopRecording() {
-      isRecording = false;
-      micBtn.classList.remove("recording");
+    function stopListening() {
+      isListening = false;
+      voiceBtn.classList.remove('listening');
+      micIcon.innerText = '🎙️';
+      micText.innerText = 'Tap to Talk with Fresh';
     }
 
     function handleKey(e) {
-      if (e.key === "Enter") handleSend();
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
     }
 
-    function addBubble(sender, htmlContent) {
-      const b = document.createElement("div");
-      b.className = `bubble ${sender}`;
-      b.innerHTML = htmlContent;
-      chatBox.appendChild(b);
+    function sendMessage() {
+      const text = userInput.value.trim();
+      if (!text) return;
+      addMessage(text, 'user');
+      userInput.value = '';
+      respondAsFresh(text);
+    }
+
+    function addMessage(text, sender) {
+      const bubble = document.createElement('div');
+      bubble.className = `chat-bubble bubble-${sender}`;
+      bubble.innerHTML = text.replace(/\n/g, '<br>');
+      chatBox.appendChild(bubble);
       chatBox.scrollTop = chatBox.scrollHeight;
-      return b;
     }
 
-    function speak(text) {
-      if (!synth) return;
-      synth.cancel();
-      const clean = text.replace(/<[^>]*>/g, "");
-      const utter = new SpeechSynthesisUtterance(clean);
-      utter.rate = 1.05;
-      synth.speak(utter);
-    }
-
-    function handleSend() {
-      const msg = textInput.value.trim();
-      if (!msg) return;
-
-      addBubble("user", msg);
-      textInput.value = "";
-
-      // Process input instantly without server lag or network failure
-      setTimeout(() => {
-        processFreshLogic(msg);
-      }, 300);
-    }
-
-    function processFreshLogic(input) {
+    // FRESH INTELLIGENT DIRECTIVE RESPONSES
+    function respondAsFresh(input) {
       const lower = input.toLowerCase();
-      let replyHtml = "";
-      let speechText = "";
+      let response = "";
 
-      if (lower.includes("vacuum") || lower.includes("sales") || lower.includes("service") || lower.includes("repair") || lower.includes("dyson") || lower.includes("sebo") || lower.includes("riccar") || lower.includes("aerus") || lower.includes("tune")) {
-        
-        replyHtml = `
-          Got it locked in! 🛠️ Here is your live service & invoice ticket:
-          <div class="ticket-card">
-            <div class="ticket-header">✅ INVOICE / TICKET CREATED</div>
-            <div><strong>Shop:</strong> Bagden Vacuums / Aerus</div>
-            <div><strong>Job:</strong> ${escapeHtml(input)}</div>
-            <div><strong>Stage:</strong> Workbench & Ready Wall</div>
-            <div><strong>Billing:</strong> 3-Day Test Drive Active ($95/mo protected by 30-day guarantee)</div>
-          </div>
-          <div style="margin-top:8px; font-size:0.85rem; color:#cbd5e1;">Tap mic to log another repair or customer pickup!</div>
-        `;
-        speechText = "Got it! Service ticket created and logged to your ready wall.";
-
+      if (lower.includes('mona') || lower.includes('counter') || lower.includes('intake')) {
+        response = "Got it! For Mona's Counter Intake: Tell me the customer name, phone number, and vacuum model. I will automatically log the check-in ticket and send them a drop-off confirmation!";
+      } else if (lower.includes('mike') || lower.includes('bagdon') || lower.includes('repair') || lower.includes('invoice')) {
+        response = "Right on! For Mike @ Bagdons: Dictate the repair notes, parts used, and labor charge. I'll stage the invoice and update the shop board for Saturday settlement.";
+      } else if (lower.includes('help') || lower.includes('what to do') || lower.includes('start')) {
+        response = "I'm right here to take the work off your plate! Tell me what job came in, or tap 'Counter Intake' or 'Repair & Invoices' to start routing immediately.";
+      } else if (lower.includes('price') || lower.includes('cost') || lower.includes('trial')) {
+        response = "TappyThing is $95/month with a 3-day free trial (no card required) and a full 30-day money-back guarantee. Unlimited users included!";
       } else {
-        replyHtml = `
-          Got it! 👍 I logged: <em>"${escapeHtml(input)}"</em> into your Bagden system queue. What else do you want to add?
-        `;
-        speechText = "Logged to your system queue. What else do you want to add?";
+        response = `Got that: "${input}". I've queued this up for routing. Tell me who this is for (Mona, Mike, or shop ops) and I'll drop it right into the board!`;
       }
 
-      addBubble("fresh", replyHtml);
-      speak(speechText);
+      setTimeout(() => {
+        addMessage(response, 'fresh');
+        speakText(response);
+      }, 400);
     }
 
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.innerText = text;
-      return div.innerHTML;
+    function triggerRoleAction(role) {
+      if (role === 'Mona') {
+        addMessage("Setting up Mona's Counter Intake Flow...", 'user');
+        respondAsFresh('mona counter intake');
+      } else if (role === 'Mike') {
+        addMessage("Setting up Mike's Repair & Invoicing Flow...", 'user');
+        respondAsFresh('mike bagdons repair');
+      }
+    }
+
+    // TEXT TO SPEECH (VOICE OUT)
+    function speakText(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const cleanText = text.replace(/<[^>]*>?/gm, '').replace(/[👉⚡🎨🎙️🔧🏪📋📊🚀]/g, '');
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+      }
     }
   </script>
 </body>
-</html>.
+</html>
