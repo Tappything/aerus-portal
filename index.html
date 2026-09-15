@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TappyThing — Digital Coordinator Command Center</title>
-  
   <style>
     :root {
       --bg-dark: #090d16;
@@ -19,7 +18,6 @@
       --text-main: #f9fafb;
       --text-muted: #9ca3af;
     }
-
     * {
       box-sizing: border-box;
       margin: 0;
@@ -27,7 +25,6 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
-
     body {
       background-color: var(--bg-dark);
       color: var(--text-main);
@@ -38,7 +35,6 @@
       padding: 10px 10px 40px;
       line-height: 1.4;
     }
-
     .container {
       width: 100%;
       max-width: 480px;
@@ -46,8 +42,6 @@
       flex-direction: column;
       gap: 12px;
     }
-
-    /* TOP BAR: TEAM & TOOLS */
     .top-bar-team {
       display: flex;
       flex-wrap: wrap;
@@ -56,7 +50,6 @@
       width: 100%;
       padding: 2px 0;
     }
-
     .pill-tag {
       display: inline-flex;
       align-items: center;
@@ -69,32 +62,26 @@
       user-select: none;
       touch-action: manipulation;
     }
-
     .pill-fresh {
       background: rgba(56, 189, 248, 0.12);
       border: 1px solid rgba(56, 189, 248, 0.35);
       color: #38bdf8;
     }
-
     .pill-how {
       background: rgba(245, 158, 11, 0.12);
       border: 1px solid rgba(245, 158, 11, 0.4);
       color: #fbbf24;
     }
-
     .pill-rob {
       background: rgba(139, 92, 246, 0.15);
       border: 1px solid rgba(139, 92, 246, 0.35);
       color: #c4b5fd;
     }
-
     .pill-sissy {
       background: rgba(16, 185, 129, 0.12);
       border: 1px solid rgba(16, 185, 129, 0.35);
       color: #34d399;
     }
-
-    /* HOW IT WORKS EXPLAINER BOX */
     .how-it-works-box {
       display: none;
       background: #111827;
@@ -104,19 +91,15 @@
       font-size: 12px;
       color: #e5e7eb;
     }
-
     .how-it-works-box strong {
       color: var(--accent-gold);
     }
-
-    /* HEADER & FRESH LOGO */
     .header-section {
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 2px 0;
     }
-
     .brand-logo {
       width: 95px;
       height: 95px;
@@ -126,7 +109,6 @@
       box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
       margin-bottom: 6px;
     }
-
     .brand-title {
       font-size: 18px;
       font-weight: 800;
@@ -134,14 +116,11 @@
       text-align: center;
       letter-spacing: -0.3px;
     }
-
     .brand-sub {
       font-size: 11px;
       color: var(--text-muted);
       text-align: center;
     }
-
-    /* CENTERED CIRCULAR MIC BUTTON */
     .mic-center-container {
       display: flex;
       flex-direction: column;
@@ -149,7 +128,6 @@
       gap: 8px;
       margin: 4px 0;
     }
-
     .btn-circle-mic {
       width: 86px;
       height: 86px;
@@ -167,31 +145,25 @@
       touch-action: manipulation;
       user-select: none;
     }
-
     .btn-circle-mic:active {
       transform: scale(0.94);
     }
-
     .btn-circle-mic.listening {
       background: var(--accent-red) !important;
       border-color: #fca5a5 !important;
       box-shadow: 0 0 35px rgba(239, 68, 68, 0.8) !important;
       animation: pulse 1.2s infinite;
     }
-
     @keyframes pulse {
       0% { transform: scale(0.97); opacity: 0.95; }
       50% { transform: scale(1.05); opacity: 1; }
       100% { transform: scale(0.97); opacity: 0.95; }
     }
-
     .mic-status-label {
       font-size: 13px;
       font-weight: 700;
       color: #fff;
     }
-
-    /* FRESH LIVE CHAT & STATUS ENGINE */
     .card {
       background-color: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -201,7 +173,6 @@
       flex-direction: column;
       gap: 10px;
     }
-
     .chat-display {
       max-height: 180px;
       overflow-y: auto;
@@ -210,7 +181,6 @@
       gap: 8px;
       padding: 2px;
     }
-
     .msg {
       padding: 8px 12px;
       border-radius: 12px;
@@ -218,27 +188,22 @@
       line-height: 1.4;
       max-width: 90%;
     }
-
     .msg-fresh {
       background: #1e293b;
       color: #f3f4f6;
       border-left: 3px solid var(--accent-purple);
       align-self: flex-start;
     }
-
     .msg-user {
       background: linear-gradient(135deg, #2563eb, #7c3aed);
       color: #fff;
       align-self: flex-end;
     }
-
-    /* TEXT INPUT BAR */
     .input-bar-container {
       display: flex;
       gap: 6px;
       width: 100%;
     }
-
     .chat-input {
       flex: 1;
       background: #090d16;
@@ -249,11 +214,9 @@
       font-size: 13px;
       outline: none;
     }
-
     .chat-input:focus {
       border-color: var(--accent-purple);
     }
-
     .btn-send {
       background: var(--accent-purple);
       color: #fff;
@@ -265,15 +228,12 @@
       cursor: pointer;
       touch-action: manipulation;
     }
-
-    /* MY WORLD HUBS */
     .my-world-container {
       display: flex;
       flex-direction: column;
       gap: 8px;
       margin-top: 4px;
     }
-
     .my-world-main-btn {
       width: 100%;
       background: linear-gradient(135deg, #6d28d9 0%, #4f46e5 100%);
@@ -291,14 +251,12 @@
       touch-action: manipulation;
       user-select: none;
     }
-
     .master-bubbles-grid {
       display: none;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
       margin-top: 4px;
     }
-
     .master-bubble {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -312,12 +270,10 @@
       user-select: none;
       touch-action: manipulation;
     }
-
     .master-bubble:active {
       background: var(--card-hover);
       border-color: var(--accent-purple);
     }
-
     .bubble-head {
       display: flex;
       align-items: center;
@@ -326,7 +282,6 @@
       font-weight: 800;
       color: #fff;
     }
-
     .bubble-count {
       font-size: 10px;
       background: rgba(255, 255, 255, 0.1);
@@ -334,13 +289,10 @@
       border-radius: 999px;
       color: var(--accent-blue);
     }
-
     .bubble-desc {
       font-size: 10px;
       color: var(--text-muted);
     }
-
-    /* CASCADING DRAWER */
     .cascade-drawer {
       display: none;
       background: #0f172a;
@@ -351,7 +303,6 @@
       gap: 10px;
       margin-top: 6px;
     }
-
     .drawer-header {
       display: flex;
       justify-content: space-between;
@@ -359,13 +310,11 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       padding-bottom: 8px;
     }
-
     .drawer-title {
       font-size: 14px;
       font-weight: 800;
       color: var(--accent-gold);
     }
-
     .btn-close-drawer {
       background: rgba(255, 255, 255, 0.1);
       border: none;
@@ -377,7 +326,6 @@
       cursor: pointer;
       touch-action: manipulation;
     }
-
     .cascade-items-list {
       display: flex;
       flex-direction: column;
@@ -385,7 +333,6 @@
       max-height: 250px;
       overflow-y: auto;
     }
-
     .cascade-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -396,23 +343,19 @@
       align-items: center;
       font-size: 12px;
     }
-
     .cascade-card-title {
       font-weight: 600;
       color: #fff;
     }
-
     .status-badge {
       font-size: 10px;
       font-weight: 700;
       padding: 2px 7px;
       border-radius: 999px;
     }
-
     .badge-working { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
     .badge-done { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
     .badge-parts { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-
     .btn-add-cascade {
       background: rgba(139, 92, 246, 0.15);
       border: 1px dashed var(--accent-purple);
@@ -425,7 +368,6 @@
       text-align: center;
       touch-action: manipulation;
     }
-
     footer {
       text-align: center;
       padding: 12px;
@@ -435,55 +377,41 @@
   </style>
 </head>
 <body>
-
   <div class="container">
-    
-    <!-- TOP BAR: TEAM & TOOLS -->
     <div class="top-bar-team">
       <div class="pill-tag pill-fresh">
         <span>🎧</span>
         <span>Fresh (Coord)</span>
       </div>
-
       <div class="pill-tag pill-how" onclick="toggleHowItWorks()">
         <span>💡</span>
         <span>How Fresh Works</span>
       </div>
-
       <div class="pill-tag pill-rob">
         <span>🐷</span>
         <span>Rob Art</span>
       </div>
-
       <div class="pill-tag pill-sissy">
         <span>⚡</span>
         <span>Sissy Active</span>
       </div>
     </div>
-
-    <!-- HOW IT WORKS EXPLAINER BOX -->
     <div class="how-it-works-box" id="howItWorksBox">
       <strong>1. 🗣️ Brain Dump:</strong> Tap the circle or type below. Dictate repair invoices, personal bills, or grocery notes.<br>
       <strong>2. 🧠 Fresh Organizes:</strong> Fresh listens and tells Sissy to route your notes into Business, Personal, Invoices, or Shared spaces.<br>
       <strong>3. 🌍 My World:</strong> Tap below to see your live jobs, Saturday settlement, and team queues.
     </div>
-
-    <!-- HEADER: CIRCULAR FRESH LOGO WITH GOLD BORDER -->
     <div class="header-section">
       <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="TappyThing Fresh" class="brand-logo" onerror="this.src='logo.png'">
       <div class="brand-title">TappyThing Command Center</div>
       <div class="brand-sub">Universal Business & Personal Operating System</div>
     </div>
-
-    <!-- CENTERED CIRCULAR MIC BUTTON -->
     <div class="mic-center-container">
       <button type="button" class="btn-circle-mic" id="circleMicBtn" onclick="toggleVoice()">
         <span id="micIconDisplay">🎙️</span>
       </button>
       <div class="mic-status-label" id="micStatusLabel">Tap Circle to Talk to Fresh</div>
     </div>
-
-    <!-- FRESH LIVE COORDINATOR & CHAT BOX -->
     <div class="card">
       <div class="chat-display" id="chatBox">
         <div class="msg msg-fresh">
@@ -492,24 +420,17 @@
           <em>Ready to knock out your list or dictate an invoice? Let's roll!</em>
         </div>
       </div>
-
-      <!-- PROMINENT DIRECT INPUT BAR -->
       <div class="input-bar-container">
         <input type="text" id="userInput" class="chat-input" placeholder="Type to Fresh (e.g. Invoice for Karen $75)..." onkeydown="handleInputKey(event)">
         <button type="button" class="btn-send" onclick="sendChat()">Send</button>
       </div>
     </div>
-
-    <!-- MY WORLD (MASTER SLIDE-OUT HUBS) -->
     <div class="my-world-container">
       <button type="button" class="my-world-main-btn" onclick="toggleMyWorld()">
         <span>🌍 My World</span>
         <span id="worldArrow">▼</span>
       </button>
-
       <div class="master-bubbles-grid" id="masterBubblesGrid">
-        
-        <!-- BUBBLE 1: BUSINESS OPS -->
         <div class="master-bubble" onclick="openDrawer('business')">
           <div class="bubble-head">
             <span>🏢 Business Ops</span>
@@ -517,8 +438,6 @@
           </div>
           <div class="bubble-desc">Bench repairs, parts tracker & ready wall</div>
         </div>
-
-        <!-- BUBBLE 2: PERSONAL / HOME -->
         <div class="master-bubble" onclick="openDrawer('personal')">
           <div class="bubble-head">
             <span>🏠 Personal / Home</span>
@@ -526,8 +445,6 @@
           </div>
           <div class="bubble-desc">Bills, grocery lists & family tasks</div>
         </div>
-
-        <!-- BUBBLE 3: INVOICES & MONEY -->
         <div class="master-bubble" onclick="openDrawer('invoices')">
           <div class="bubble-head">
             <span>💵 Invoices & Money</span>
@@ -535,8 +452,6 @@
           </div>
           <div class="bubble-desc">Customer billing & Saturday settlement</div>
         </div>
-
-        <!-- BUBBLE 4: SHARED SPACES & TEAM -->
         <div class="master-bubble" onclick="openDrawer('shared')">
           <div class="bubble-head">
             <span>👥 Shared Spaces</span>
@@ -544,10 +459,7 @@
           </div>
           <div class="bubble-desc">Mike (Bagdons), Mona, Chris, Norby & AI Cast</div>
         </div>
-
       </div>
-
-      <!-- CASCADING DRAWER (OPENS ON BUBBLE CLICK) -->
       <div class="cascade-drawer" id="cascadeDrawer">
         <div class="drawer-header">
           <div class="drawer-title" id="drawerTitle">Hub Section</div>
@@ -556,15 +468,11 @@
         <div class="cascade-items-list" id="cascadeItemsList"></div>
         <button type="button" class="btn-add-cascade" onclick="addItemToCurrentCascade()">+ Add Item to This Hub</button>
       </div>
-
     </div>
-
     <footer>
       <span>⚡ Powered by TappyThing</span>
     </footer>
-
   </div>
-
   <script>
     var state = {
       business: [
@@ -712,9 +620,7 @@
       var lower = text.toLowerCase();
       var reply = "";
 
-      if (lower.indexOf('invoice') !== -1 || lower.indexOf('bill') !== -1 || lower.indexOf('charge') !== -1 || lower.indexOf('pay') !== -1 || lower.indexOf('
-
-Commit that to GitHub, wait 15 seconds for Netlify to finish the build, and then test the live site!) !== -1) {
+      if (lower.indexOf('invoice') !== -1 || lower.indexOf('bill') !== -1 || lower.indexOf('charge') !== -1 || lower.indexOf('pay') !== -1) {
         state.invoices.unshift({ title: text, status: "Saturday Settlement", badge: "badge-working" });
         reply = 'Got it! Logged invoice: "' + text + '". Sissy staged this into Invoices & Money for Saturday settlement!';
       } else if (lower.indexOf('grocery') !== -1 || lower.indexOf('milk') !== -1 || lower.indexOf('home') !== -1 || lower.indexOf('wife') !== -1 || lower.indexOf('pickleball') !== -1 || lower.indexOf('weight') !== -1) {
