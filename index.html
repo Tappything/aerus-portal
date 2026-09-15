@@ -42,24 +42,36 @@
       gap: 12px;
     }
 
-    /* TOP HEADER & ROB ART IN CORNER */
-    .header-bar {
+    /* TOP HEADER: ORIGINAL LOGO + ROB ART */
+    .header-section {
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
-      padding: 4px 0 8px;
+      position: relative;
+      padding-bottom: 4px;
+    }
+
+    .brand-logo {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #f59e0b;
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+      margin-bottom: 6px;
     }
 
     .brand-title {
-      font-size: 18px;
+      font-size: 19px;
       font-weight: 800;
-      background: linear-gradient(90deg, #38bdf8, #8b5cf6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: -0.5px;
+      color: #fff;
+      text-align: center;
     }
 
     .rob-art-tag {
+      position: absolute;
+      top: 0;
+      right: 0;
       display: inline-flex;
       align-items: center;
       gap: 4px;
@@ -72,7 +84,7 @@
       font-weight: 700;
     }
 
-    /* INTAKE ACTION BAR (TIGHT & CLEAN) */
+    /* INTAKE ACTION BUTTONS */
     .action-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -283,7 +295,6 @@
     .status-done { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
     .status-parts { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
 
-    /* VIDEO STREAM PREVIEW */
     #videoPreview {
       display: none;
       width: 100%;
@@ -297,16 +308,17 @@
 
   <div class="container">
     
-    <!-- HEADER BAR: TITLE + 🐷 ROB ART -->
-    <div class="header-bar">
-      <div class="brand-title">TappyThing Command Center</div>
+    <!-- HEADER: FRESH LOGO IMAGE + 🐷 ROB ART -->
+    <div class="header-section">
       <div class="rob-art-tag">
         <span>🐷</span>
         <span>Rob Art</span>
       </div>
+      <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="TappyThing Fresh" class="brand-logo" onerror="this.src='logo.png'">
+      <div class="brand-title">Digital Coordinator Command Center</div>
     </div>
 
-    <!-- CLEAN & TIGHT INTAKE BUTTONS -->
+    <!-- INTAKE BUTTONS -->
     <div class="action-grid">
       <button class="btn-action" id="micBtn" onclick="toggleVoice()">
         <span id="micIcon">🎙️</span>
@@ -350,7 +362,7 @@
       </div>
     </div>
 
-    <!-- MY WORLD TOGGLE & LIVE BOARD FEED -->
+    <!-- MY WORLD -->
     <div>
       <button class="my-world-btn" onclick="toggleMyWorld()">
         <span>🌍 My World</span>
@@ -454,7 +466,7 @@
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // SUBMIT TO NETLIFY FUNCTION & CONFIRM (INVOICES & INTAKE)
+    // SUBMIT TO NETLIFY FUNCTION (INVOICES & INTAKE)
     async function handleFreshSubmission(text) {
       const isInvoice = /invoice|bill|charge|total|\$/i.test(text);
       let reply = "";
@@ -470,14 +482,12 @@
         speakText(reply);
       }, 350);
 
-      // Post to your live Netlify intake function
       try {
         await fetch('/.netlify/functions/intake', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: text, type: isInvoice ? 'invoice' : 'intake' })
         });
-        // Auto-refresh My World
         if (myWorldPanel.style.display === 'flex') {
           loadMyWorld();
         }
@@ -549,7 +559,6 @@
       });
     }
 
-    // CAMERA INTAKE
     async function triggerCamera() {
       const vid = document.getElementById('videoPreview');
       if (vid.style.display === 'block') {
