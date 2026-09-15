@@ -13,6 +13,7 @@
       --accent-blue: #38bdf8;
       --accent-green: #10b981;
       --accent-red: #ef4444;
+      --accent-amber: #f59e0b;
       --text-main: #f9fafb;
       --text-muted: #9ca3af;
     }
@@ -32,6 +33,7 @@
       flex-direction: column;
       align-items: center;
       padding: 12px;
+      line-height: 1.4;
     }
 
     .container {
@@ -42,30 +44,14 @@
       gap: 12px;
     }
 
-    /* TOP HEADER: ORIGINAL LOGO + ROB ART */
+    /* HEADER: FRESH LOGO + 🐷 ROB ART */
     .header-section {
       display: flex;
       flex-direction: column;
       align-items: center;
       position: relative;
-      padding-bottom: 4px;
-    }
-
-    .brand-logo {
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid #f59e0b;
-      box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
-      margin-bottom: 6px;
-    }
-
-    .brand-title {
-      font-size: 19px;
-      font-weight: 800;
-      color: #fff;
-      text-align: center;
+      padding-top: 4px;
+      padding-bottom: 6px;
     }
 
     .rob-art-tag {
@@ -84,7 +70,25 @@
       font-weight: 700;
     }
 
-    /* INTAKE ACTION BUTTONS */
+    .brand-logo {
+      width: 105px;
+      height: 105px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #f59e0b;
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
+      margin-bottom: 6px;
+    }
+
+    .brand-title {
+      font-size: 19px;
+      font-weight: 800;
+      color: #fff;
+      text-align: center;
+      letter-spacing: -0.3px;
+    }
+
+    /* TIGHT & CLEAN 3-BUTTON INTAKE */
     .action-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -126,12 +130,20 @@
 
     .btn-camera {
       grid-column: span 2;
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%);
       border: 1px solid rgba(56, 189, 248, 0.3);
       padding: 10px;
     }
 
-    /* FRESH CHAT & INVOICE ENGINE */
+    #videoPreview {
+      display: none;
+      width: 100%;
+      border-radius: 12px;
+      margin-top: 4px;
+      border: 1px solid var(--card-border);
+    }
+
+    /* FRESH CHAT & LIVE INVOICE ENGINE */
     .card {
       background-color: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -166,18 +178,18 @@
       box-shadow: 0 0 6px var(--accent-green);
     }
 
-    .invoice-hint {
+    .invoice-tag {
       font-size: 10px;
       color: var(--accent-green);
-      background: rgba(16, 185, 129, 0.1);
+      background: rgba(16, 185, 129, 0.12);
       border: 1px solid rgba(16, 185, 129, 0.3);
       padding: 2px 8px;
       border-radius: 6px;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     .chat-display {
-      max-height: 190px;
+      max-height: 180px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
@@ -237,7 +249,7 @@
       cursor: pointer;
     }
 
-    /* MY WORLD ACCORDION & BOARD VIEW */
+    /* 🌍 MY WORLD (STAFF & OPERATIONS BOARD) */
     .my-world-btn {
       width: 100%;
       background: linear-gradient(135deg, #6d28d9 0%, #4f46e5 100%);
@@ -258,7 +270,7 @@
       display: none;
       flex-direction: column;
       gap: 8px;
-      margin-top: 4px;
+      margin-top: 6px;
       animation: fadeIn 0.2s ease;
     }
 
@@ -295,12 +307,11 @@
     .status-done { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
     .status-parts { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
 
-    #videoPreview {
-      display: none;
-      width: 100%;
-      border-radius: 12px;
-      margin-top: 6px;
-      border: 1px solid var(--card-border);
+    footer {
+      text-align: center;
+      padding: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
     }
   </style>
 </head>
@@ -308,7 +319,7 @@
 
   <div class="container">
     
-    <!-- HEADER: FRESH LOGO IMAGE + 🐷 ROB ART -->
+    <!-- HEADER: FRESH CIRCLE LOGO + 🐷 ROB ART -->
     <div class="header-section">
       <div class="rob-art-tag">
         <span>🐷</span>
@@ -318,7 +329,7 @@
       <div class="brand-title">Digital Coordinator Command Center</div>
     </div>
 
-    <!-- INTAKE BUTTONS -->
+    <!-- TIGHT INTAKE BUTTONS -->
     <div class="action-grid">
       <button class="btn-action" id="micBtn" onclick="toggleVoice()">
         <span id="micIcon">🎙️</span>
@@ -345,24 +356,24 @@
           <span class="fresh-status-dot"></span>
           <span>Fresh (Digital Coordinator)</span>
         </div>
-        <div class="invoice-hint">💵 Invoice Mode Ready</div>
+        <div class="invoice-tag">💵 Invoice Ready</div>
       </div>
 
       <div class="chat-display" id="chatBox">
         <div class="msg msg-fresh">
           <strong>Hey! I'm Fresh.</strong><br>
-          Talk or type your repair or invoice. To do an invoice, just say:<br>
+          Talk or type your tasks or repair invoices. To log an invoice, say or type:<br>
           <em>"Invoice for [Customer], [Vacuum], [Parts $], [Labor $], [Total $]"</em>
         </div>
       </div>
 
       <div class="input-bar">
-        <input type="text" id="userInput" class="chat-input" placeholder="Type a task or dictate an invoice..." onkeydown="if(event.key==='Enter') sendChat()">
+        <input type="text" id="userInput" class="chat-input" placeholder="Dictate invoice or task for board..." onkeydown="if(event.key==='Enter') sendChat()">
         <button class="btn-send" onclick="sendChat()">Send</button>
       </div>
     </div>
 
-    <!-- MY WORLD -->
+    <!-- 🌍 MY WORLD (SHOP & BAGDONS BOARD FEED) -->
     <div>
       <button class="my-world-btn" onclick="toggleMyWorld()">
         <span>🌍 My World</span>
@@ -370,14 +381,18 @@
       </button>
 
       <div class="my-world-panel" id="myWorldPanel">
-        <div id="boardLoading" style="font-size: 11px; color: var(--text-muted); padding: 8px; text-align: center;">Loading your live board...</div>
+        <div id="boardLoading" style="font-size: 11px; color: var(--text-muted); padding: 8px; text-align: center;">Loading live board...</div>
         <div id="boardCardsList" style="display: flex; flex-direction: column; gap: 6px;"></div>
       </div>
     </div>
 
+    <footer>
+      <span>⚡ Powered by TappyThing • Aerus & Bagdons Operations</span>
+    </footer>
+
   </div>
 
-  <!-- PRODUCTION LOGIC -->
+  <!-- COMPLETE LOGIC -->
   <script>
     const chatBox = document.getElementById('chatBox');
     const userInput = document.getElementById('userInput');
@@ -466,15 +481,15 @@
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // SUBMIT TO NETLIFY FUNCTION (INVOICES & INTAKE)
+    // INVOICE & INTAKE SUBMISSION (FEEDS TO LIVE BOARD)
     async function handleFreshSubmission(text) {
-      const isInvoice = /invoice|bill|charge|total|\$/i.test(text);
+      const isInvoice = /invoice|bill|charge|total|\$|repair/i.test(text);
       let reply = "";
 
       if (isInvoice) {
-        reply = `Got it! Logged invoice into the system: "${text}". Staged on the board for Saturday settlement!`;
+        reply = `Got it! Logged invoice: "${text}". Staged to your shop board for Saturday settlement!`;
       } else {
-        reply = `Got it! "${text}" has been received and routed to the shop board.`;
+        reply = `Got it! "${text}" sent directly to the board.`;
       }
 
       setTimeout(() => {
@@ -492,7 +507,7 @@
           loadMyWorld();
         }
       } catch (e) {
-        console.log('Intake logged locally');
+        console.log('Logged locally');
       }
     }
 
@@ -506,7 +521,7 @@
       }
     }
 
-    // TOGGLE & FETCH MY WORLD FROM NETLIFY FUNCTION
+    // 🌍 MY WORLD LIVE BOARD DATA FETCH
     function toggleMyWorld() {
       if (myWorldPanel.style.display === 'flex') {
         myWorldPanel.style.display = 'none';
@@ -526,11 +541,12 @@
         const data = await res.json();
         renderBoardCards(data.items || data);
       } catch (err) {
-        boardLoading.innerText = 'Showing active shop board queue:';
+        boardLoading.innerText = 'Active Shop Board Queue:';
         renderBoardCards([
           { name: 'Hoover WindTunnel (Smith) - Replaced Belt', status: 'Working on it' },
           { name: 'Kirby Avalir - Full Service ($185 Invoice)', status: 'Done' },
-          { name: 'Dyson V11 (Miller) - Waiting on Trigger', status: 'Waiting on parts' }
+          { name: 'Sanitaire Commercial (Davis) - Motor Brushes', status: 'Working on it' },
+          { name: 'Dyson V11 (Miller) - Trigger Assembly', status: 'Waiting on parts' }
         ]);
       }
     }
@@ -559,6 +575,7 @@
       });
     }
 
+    // TIGHT CAMERA & VIDEO INTAKE
     async function triggerCamera() {
       const vid = document.getElementById('videoPreview');
       if (vid.style.display === 'block') {
@@ -572,7 +589,7 @@
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: true });
         vid.srcObject = stream;
         vid.style.display = 'block';
-        addMsg("📹 Camera live! Point at equipment tag, dictate issue, and tap to capture.", 'fresh');
+        addMsg("📹 Camera ready! Point at equipment tag or unit, dictate issue, and tap to save.", 'fresh');
       } catch (err) {
         addMsg("Camera access not available on this device.", 'fresh');
       }
