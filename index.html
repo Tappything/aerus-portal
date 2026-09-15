@@ -47,7 +47,7 @@
       gap: 12px;
     }
 
-    /* TOP BAR: 4 PILLS IN ONE CLEAN ROW */
+    /* TOP BAR: TEAM & TOOLS */
     .top-bar-team {
       display: flex;
       flex-wrap: wrap;
@@ -94,7 +94,7 @@
       color: #34d399;
     }
 
-    /* HOW IT WORKS CARD */
+    /* HOW IT WORKS EXPLAINER BOX */
     .how-it-works-box {
       display: none;
       background: #111827;
@@ -109,7 +109,7 @@
       color: var(--accent-gold);
     }
 
-    /* HEADER */
+    /* HEADER & FRESH LOGO */
     .header-section {
       display: flex;
       flex-direction: column;
@@ -232,7 +232,7 @@
       align-self: flex-end;
     }
 
-    /* TEXT INPUT BAR (ALWAYS READY & PROMINENT) */
+    /* TEXT INPUT BAR */
     .input-bar-container {
       display: flex;
       gap: 6px;
@@ -266,7 +266,7 @@
       touch-action: manipulation;
     }
 
-    /* 🌍 MY WORLD (MASTER SLIDE-OUT HUBS) */
+    /* 🌍 MY WORLD HUBS */
     .my-world-container {
       display: flex;
       flex-direction: column;
@@ -340,7 +340,7 @@
       color: var(--text-muted);
     }
 
-    /* CASCADING DRAWER / ITEMS MODAL */
+    /* CASCADING DRAWER */
     .cascade-drawer {
       display: none;
       background: #0f172a;
@@ -426,7 +426,6 @@
       touch-action: manipulation;
     }
 
-    /* ERROR BANNER IF ANY JAVASCRIPT EXCEPTION OCCURS */
     #debugErrorBanner {
       display: none;
       background: #dc2626;
@@ -448,7 +447,6 @@
   </style>
 
   <script>
-    // ERROR TRAPPER SO YOU SEE ANY ISSUE DIRECTLY ON SCREEN
     window.onerror = function(msg, url, line) {
       var b = document.getElementById('debugErrorBanner');
       if (b) {
@@ -491,7 +489,6 @@
     var recognition = null;
     var isListening = false;
 
-    // HOW IT WORKS TOGGLE
     function toggleHowItWorks() {
       var box = document.getElementById('howItWorksBox');
       if (!box) return;
@@ -502,7 +499,6 @@
       }
     }
 
-    // MY WORLD TOGGLE
     function toggleMyWorld() {
       var grid = document.getElementById('masterBubblesGrid');
       var drawer = document.getElementById('cascadeDrawer');
@@ -518,7 +514,6 @@
       }
     }
 
-    // OPEN DRAWER
     function openDrawer(cat) {
       activeDrawer = cat;
       var drawer = document.getElementById('cascadeDrawer');
@@ -565,7 +560,6 @@
       addMsg('Added "' + title + '" to your hub!', 'fresh');
     }
 
-    // SEND CHAT
     function sendChat() {
       var input = document.getElementById('userInput');
       if (!input) return;
@@ -610,7 +604,7 @@
 
       if (lower.indexOf('invoice') !== -1 || lower.indexOf('bill') !== -1 || lower.indexOf('charge') !== -1 || lower.indexOf('
 
-Paste this into `index.html` on Netlify and deploy. If anything acts up on your device, the red banner at the bottom will display the exact notice, or hit F12 and let me know!) !== -1) {
+Copy the box above, paste it into your `index.html` on Netlify, and hit deploy. Let me know as soon as you see the logo and test the buttons!) !== -1) {
         state.invoices.unshift({ title: text, status: "Saturday Settlement", badge: "badge-working" });
         reply = 'Got it! Logged invoice: "' + text + '". Sissy staged this into Invoices & Money for Saturday settlement!';
       } else if (lower.indexOf('grocery') !== -1 || lower.indexOf('milk') !== -1 || lower.indexOf('home') !== -1 || lower.indexOf('wife') !== -1 || lower.indexOf('pickleball') !== -1 || lower.indexOf('weight') !== -1) {
@@ -632,7 +626,6 @@ Paste this into `index.html` on Netlify and deploy. If anything acts up on your 
       if (activeDrawer) openDrawer(activeDrawer);
     }
 
-    // VOICE
     function toggleVoice() {
       var btn = document.getElementById('circleMicBtn');
       var icon = document.getElementById('micIconDisplay');
@@ -700,7 +693,6 @@ Paste this into `index.html` on Netlify and deploy. If anything acts up on your 
       }
     }
 
-    // EXPLICIT WINDOW ATTACHMENTS
     window.toggleHowItWorks = toggleHowItWorks;
     window.toggleMyWorld = toggleMyWorld;
     window.openDrawer = openDrawer;
@@ -746,7 +738,7 @@ Paste this into `index.html` on Netlify and deploy. If anything acts up on your 
       <strong>3. 🌍 My World:</strong> Tap below to see your live jobs, Saturday settlement, and team queues.
     </div>
 
-    <!-- HEADER: FRESH LOGO -->
+    <!-- HEADER: CIRCULAR FRESH LOGO WITH GOLD BORDER -->
     <div class="header-section">
       <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="TappyThing Fresh" class="brand-logo" onerror="this.src='logo.png'">
       <div class="brand-title">TappyThing Command Center</div>
@@ -837,7 +829,6 @@ Paste this into `index.html` on Netlify and deploy. If anything acts up on your 
 
     </div>
 
-    <!-- ON-SCREEN ERROR BANNER IF ANY JAVASCRIPT EXCEPTION OCCURS -->
     <div id="debugErrorBanner"></div>
 
     <footer>
