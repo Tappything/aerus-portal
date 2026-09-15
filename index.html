@@ -388,7 +388,7 @@
         <span>🎧</span>
         <span>Fresh (Coord)</span>
       </div>
-      <div class="pill-tag pill-how" onclick="toggleHowItWorks()">
+      <div class="pill-tag pill-how" id="pillHowBtn">
         <span>💡</span>
         <span>How Fresh Works</span>
       </div>
@@ -412,7 +412,7 @@
       <div class="brand-sub">Universal Business & Personal Operating System</div>
     </div>
     <div class="mic-center-container">
-      <button type="button" class="btn-circle-mic" id="circleMicBtn" onclick="toggleVoice()">
+      <button type="button" class="btn-circle-mic" id="circleMicBtn">
         <span id="micIconDisplay">🎙️</span>
       </button>
       <div class="mic-status-label" id="micStatusLabel">Tap Circle to Talk to Fresh</div>
@@ -426,38 +426,38 @@
         </div>
       </div>
       <div class="input-bar-container">
-        <input type="text" id="userInput" class="chat-input" placeholder="Type to Fresh (e.g. Invoice for Karen $75)..." onkeydown="handleInputKey(event)">
-        <button type="button" class="btn-send" onclick="sendChat()">Send</button>
+        <input type="text" id="userInput" class="chat-input" placeholder="Type to Fresh (e.g. Invoice for Karen $75)...">
+        <button type="button" class="btn-send" id="btnSendChat">Send</button>
       </div>
     </div>
     <div class="my-world-container">
-      <button type="button" class="my-world-main-btn" onclick="toggleMyWorld()">
+      <button type="button" class="my-world-main-btn" id="btnMyWorldMain">
         <span>🌍 My World</span>
         <span id="worldArrow">▼</span>
       </button>
       <div class="master-bubbles-grid" id="masterBubblesGrid">
-        <div class="master-bubble" onclick="openDrawer('business')">
+        <div class="master-bubble" id="bubble-business">
           <div class="bubble-head">
             <span>🏢 Business Ops</span>
             <span class="bubble-count" id="count-business">0 Jobs</span>
           </div>
           <div class="bubble-desc">Bench repairs, parts tracker & ready wall</div>
         </div>
-        <div class="master-bubble" onclick="openDrawer('personal')">
+        <div class="master-bubble" id="bubble-personal">
           <div class="bubble-head">
             <span>🏠 Personal / Home</span>
             <span class="bubble-count" id="count-personal">0 Items</span>
           </div>
           <div class="bubble-desc">Bills, grocery lists & family tasks</div>
         </div>
-        <div class="master-bubble" onclick="openDrawer('invoices')">
+        <div class="master-bubble" id="bubble-invoices">
           <div class="bubble-head">
             <span>💵 Invoices & Money</span>
             <span class="bubble-count" id="count-invoices">$0 Due</span>
           </div>
           <div class="bubble-desc">Customer billing & Saturday settlement</div>
         </div>
-        <div class="master-bubble" onclick="openDrawer('shared')">
+        <div class="master-bubble" id="bubble-shared">
           <div class="bubble-head">
             <span>👥 Shared Spaces</span>
             <span class="bubble-count" id="count-shared">Team Queue</span>
@@ -468,10 +468,10 @@
       <div class="cascade-drawer" id="cascadeDrawer">
         <div class="drawer-header">
           <div class="drawer-title" id="drawerTitle">Hub Section</div>
-          <button type="button" class="btn-close-drawer" onclick="closeDrawer()">✕ Close</button>
+          <button type="button" class="btn-close-drawer" id="btnCloseDrawer">✕ Close</button>
         </div>
         <div class="cascade-items-list" id="cascadeItemsList"></div>
-        <button type="button" class="btn-add-cascade" onclick="addItemToCurrentCascade()">+ Add Item to This Hub</button>
+        <button type="button" class="btn-add-cascade" id="btnAddCascadeItem">+ Add Item to This Hub</button>
       </div>
     </div>
     <footer>
@@ -518,13 +518,15 @@
       var drawer = document.getElementById('cascadeDrawer');
       var arrow = document.getElementById('worldArrow');
       if (!grid) return;
-      if (grid.style.display === 'grid' || grid.style.display === 'block') {
-        grid.style.display = 'none';
-        if (drawer) drawer.style.display = 'none';
+      
+      var isVisible = (grid.style.display === 'grid' || window.getComputedStyle(grid).display === 'grid');
+      if (isVisible) {
+        grid.style.setProperty('display', 'none', 'important');
+        if (drawer) drawer.style.setProperty('display', 'none', 'important');
         if (arrow) arrow.innerText = '▼';
       } else {
         updateBubbleCounts();
-        grid.style.display = 'grid';
+        grid.style.setProperty('display', 'grid', 'important');
         if (arrow) arrow.innerText = '▲';
       }
     }
@@ -535,7 +537,7 @@
       var title = document.getElementById('drawerTitle');
       var listEl = document.getElementById('cascadeItemsList');
       if (!drawer || !listEl) return;
-      drawer.style.display = 'flex';
+      drawer.style.setProperty('display', 'flex', 'important');
       listEl.innerHTML = '';
 
       var titles = {
@@ -562,7 +564,7 @@
 
     function closeDrawer() {
       var drawer = document.getElementById('cascadeDrawer');
-      if (drawer) drawer.style.display = 'none';
+      if (drawer) drawer.style.setProperty('display', 'none', 'important');
       activeDrawer = null;
     }
 
@@ -587,18 +589,12 @@
       processFreshRouting(val);
     }
 
-    function handleInputKey(e) {
-      if (e.key === 'Enter') {
-        sendChat();
-      }
-    }
-
     function addMsg(text, sender) {
       var box = document.getElementById('chatBox');
       if (!box) return;
       var el = document.createElement('div');
       el.className = 'msg msg-' + sender;
-      el.innerHTML = text.replace(/\\n/g, '<br>');
+      el.innerHTML = text.replace(/\n/g, '<br>');
       box.appendChild(el);
       box.scrollTop = box.scrollHeight;
     }
@@ -684,14 +680,18 @@
       var label = document.getElementById('micStatusLabel');
       var input = document.getElementById('userInput');
 
-      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-        if (input) input.focus();
-        addMsg("Speech recognition isn't enabled in this browser. Type right in the box below!", 'fresh');
-        return;
+      if (recognition) {
+        try { recognition.abort(); } catch(e){}
       }
 
       if (isListening) {
         stopMic();
+        return;
+      }
+
+      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+        if (input) input.focus();
+        addMsg("Speech recognition isn't enabled in this browser. Type right in the box below!", 'fresh');
         return;
       }
 
@@ -742,9 +742,49 @@
       if (icon) icon.innerText = '🎙️';
       if (label) label.innerText = 'Tap Circle to Talk to Fresh';
       if (recognition) {
-        try { recognition.stop(); } catch(e){}
+        try { recognition.abort(); } catch(e){}
       }
     }
+
+    // Explicit Clean Event Binding on DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', function() {
+      var pillHow = document.getElementById('pillHowBtn');
+      if (pillHow) pillHow.addEventListener('click', toggleHowItWorks);
+
+      var btnMic = document.getElementById('circleMicBtn');
+      if (btnMic) btnMic.addEventListener('click', toggleVoice);
+
+      var btnSend = document.getElementById('btnSendChat');
+      if (btnSend) btnSend.addEventListener('click', sendChat);
+
+      var input = document.getElementById('userInput');
+      if (input) {
+        input.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') sendChat();
+        });
+      }
+
+      var btnWorld = document.getElementById('btnMyWorldMain');
+      if (btnWorld) btnWorld.addEventListener('click', toggleMyWorld);
+
+      var bBiz = document.getElementById('bubble-business');
+      if (bBiz) bBiz.addEventListener('click', function() { openDrawer('business'); });
+
+      var bPers = document.getElementById('bubble-personal');
+      if (bPers) bPers.addEventListener('click', function() { openDrawer('personal'); });
+
+      var bInv = document.getElementById('bubble-invoices');
+      if (bInv) bInv.addEventListener('click', function() { openDrawer('invoices'); });
+
+      var bShared = document.getElementById('bubble-shared');
+      if (bShared) bShared.addEventListener('click', function() { openDrawer('shared'); });
+
+      var btnClose = document.getElementById('btnCloseDrawer');
+      if (btnClose) btnClose.addEventListener('click', closeDrawer);
+
+      var btnAdd = document.getElementById('btnAddCascadeItem');
+      if (btnAdd) btnAdd.addEventListener('click', addItemToCurrentCascade);
+    });
   </script>
 </body>
 </html>
