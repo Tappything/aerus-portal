@@ -518,7 +518,7 @@
       var drawer = document.getElementById('cascadeDrawer');
       var arrow = document.getElementById('worldArrow');
       if (!grid) return;
-      if (grid.style.display === 'grid') {
+      if (grid.style.display === 'grid' || grid.style.display === 'block') {
         grid.style.display = 'none';
         if (drawer) drawer.style.display = 'none';
         if (arrow) arrow.innerText = '▼';
@@ -582,8 +582,8 @@
       if (!input) return;
       var val = input.value.trim();
       if (!val) return;
-      addMsg(val, 'user');
       input.value = '';
+      addMsg(val, 'user');
       processFreshRouting(val);
     }
 
@@ -636,6 +636,9 @@
       var lower = text.toLowerCase().trim();
       var reply = "";
       var category = "business";
+
+      var input = document.getElementById('userInput');
+      if (input) input.value = '';
 
       if (lower === 'hello' || lower === 'hi' || lower === 'hey' || lower === 'testing' || lower === 'test' || lower === 'good morning' || lower === 'sup') {
         reply = "Hey Boudie! I'm locked in and listening. Dictate a repair, invoice, or brain-dump what's on your mind!";
@@ -701,6 +704,7 @@
 
         recognition.onstart = function() {
           isListening = true;
+          if (input) input.value = '';
           if (btn) btn.classList.add('listening');
           if (icon) icon.innerText = '🛑';
           if (label) label.innerText = 'Listening to you...';
