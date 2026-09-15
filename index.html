@@ -90,6 +90,11 @@
       padding: 12px 14px;
       font-size: 12px;
       color: #e5e7eb;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .how-it-works-box strong {
       color: var(--accent-gold);
@@ -434,28 +439,28 @@
         <div class="master-bubble" onclick="openDrawer('business')">
           <div class="bubble-head">
             <span>🏢 Business Ops</span>
-            <span class="bubble-count">4 Jobs</span>
+            <span class="bubble-count" id="count-business">0 Jobs</span>
           </div>
           <div class="bubble-desc">Bench repairs, parts tracker & ready wall</div>
         </div>
         <div class="master-bubble" onclick="openDrawer('personal')">
           <div class="bubble-head">
             <span>🏠 Personal / Home</span>
-            <span class="bubble-count">3 Items</span>
+            <span class="bubble-count" id="count-personal">0 Items</span>
           </div>
           <div class="bubble-desc">Bills, grocery lists & family tasks</div>
         </div>
         <div class="master-bubble" onclick="openDrawer('invoices')">
           <div class="bubble-head">
             <span>💵 Invoices & Money</span>
-            <span class="bubble-count">$365 Due</span>
+            <span class="bubble-count" id="count-invoices">$0 Due</span>
           </div>
           <div class="bubble-desc">Customer billing & Saturday settlement</div>
         </div>
         <div class="master-bubble" onclick="openDrawer('shared')">
           <div class="bubble-head">
             <span>👥 Shared Spaces</span>
-            <span class="bubble-count">8 Members</span>
+            <span class="bubble-count" id="count-shared">Team Queue</span>
           </div>
           <div class="bubble-desc">Mike (Bagdons), Mona, Chris, Norby & AI Cast</div>
         </div>
@@ -474,38 +479,29 @@
     </footer>
   </div>
   <script>
+    var MAKE_WEBHOOK_URL = "https://hook.us2.make.com/fyt2tlyenhdx3igqo42wqh1ypr569pej";
+
     var state = {
-      business: [
-        { title: "Karen Vleck — Oreck XL Belt & Brush", status: "Workbench", badge: "badge-working" },
-        { title: "Maria Gómez — ProTeam ProVac FS 6", status: "Waiting on parts", badge: "badge-parts" },
-        { title: "Maria Gómez — Kenmore Blue Canister", status: "Workbench", badge: "badge-working" },
-        { title: "Electrolux Vintage Motor Replacement", status: "Ready", badge: "badge-done" }
-      ],
-      personal: [
-        { title: "Renpho Weight Log Check-in", status: "Daily", badge: "badge-done" },
-        { title: "Pick up Filter Cartridges for Home", status: "Pending", badge: "badge-working" },
-        { title: "Schedule Saturday Pickleball", status: "This Weekend", badge: "badge-parts" }
-      ],
-      invoices: [
-        { title: "Karen Vleck — Oreck XL Repair ($75.00)", status: "Saturday Settlement", badge: "badge-working" },
-        { title: "Maria Gómez — 3 Unit Service ($195.00)", status: "Pending Payment", badge: "badge-parts" },
-        { title: "Kirby Avalir Full Service ($95.00)", status: "Paid / Card Ready", badge: "badge-done" }
-      ],
-      shared: [
-        { title: "🤝 Mike Bagdon — Bagdons Vacuum Bench", status: "Partner Queue", badge: "badge-working" },
-        { title: "🏢 Mona — Counter Customer Intake", status: "Staff", badge: "badge-done" },
-        { title: "📦 Chris — Parts & Invoicing", status: "Staff", badge: "badge-done" },
-        { title: "🌐 Norby — Virtual Assistant Intake", status: "VA Team", badge: "badge-done" },
-        { title: "🎧 Fresh — Digital Coordinator Front", status: "AI Team", badge: "badge-working" },
-        { title: "🗄️ Sissy / Squash — Master Backend Ops", status: "AI Team", badge: "badge-working" },
-        { title: "⚡ Nosh — Fast Data & Math", status: "AI Team", badge: "badge-working" },
-        { title: "🎨 L (Elle) — Customer Voice & Design", status: "AI Team", badge: "badge-working" }
-      ]
+      business: [],
+      personal: [],
+      invoices: [],
+      shared: []
     };
 
     var activeDrawer = null;
     var recognition = null;
     var isListening = false;
+
+    function updateBubbleCounts() {
+      var bCount = document.getElementById('count-business');
+      var pCount = document.getElementById('count-personal');
+      var iCount = document.getElementById('count-invoices');
+      var sCount = document.getElementById('count-shared');
+      if (bCount) bCount.innerText = state.business.length + ' Jobs';
+      if (pCount) pCount.innerText = state.personal.length + ' Items';
+      if (iCount) iCount.innerText = state.invoices.length + ' Invoices';
+      if (sCount) sCount.innerText = state.shared.length + ' Active';
+    }
 
     function toggleHowItWorks() {
       var box = document.getElementById('howItWorksBox');
@@ -527,6 +523,7 @@
         if (drawer) drawer.style.display = 'none';
         if (arrow) arrow.innerText = '▼';
       } else {
+        updateBubbleCounts();
         grid.style.display = 'grid';
         if (arrow) arrow.innerText = '▲';
       }
@@ -551,7 +548,7 @@
 
       var items = state[cat] || [];
       if (items.length === 0) {
-        listEl.innerHTML = '<div style="font-size:11px;color:#9ca3af;padding:6px;">No items yet. Brain-dump above to add!</div>';
+        listEl.innerHTML = '<div style="font-size:12px;color:#9ca3af;padding:12px;text-align:center;">✨ Clean slate! Brain-dump above to add your first card.</div>';
         return;
       }
 
@@ -574,8 +571,10 @@
       var title = prompt("Enter new item / task / card:");
       if (!title) return;
       state[activeDrawer].unshift({ title: title, status: "Active", badge: "badge-working" });
+      updateBubbleCounts();
       openDrawer(activeDrawer);
       addMsg('Added "' + title + '" to your hub!', 'fresh');
+      sendToWebhook(title, activeDrawer);
     }
 
     function sendChat() {
@@ -599,7 +598,7 @@
       if (!box) return;
       var el = document.createElement('div');
       el.className = 'msg msg-' + sender;
-      el.innerHTML = text.replace(/\n/g, '<br>');
+      el.innerHTML = text.replace(/\\n/g, '<br>');
       box.appendChild(el);
       box.scrollTop = box.scrollHeight;
     }
@@ -616,23 +615,57 @@
       } catch (err) {}
     }
 
+    function sendToWebhook(text, category) {
+      if (!MAKE_WEBHOOK_URL) return;
+      try {
+        fetch(MAKE_WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            note: text,
+            category: category,
+            source: "TappyThing Frontend",
+            user: "William Sullivan",
+            timestamp: new Date().toISOString()
+          })
+        }).catch(function(e) { console.log("Webhook sync:", e); });
+      } catch (e) {}
+    }
+
     function processFreshRouting(text) {
-      var lower = text.toLowerCase();
+      var lower = text.toLowerCase().trim();
       var reply = "";
+      var category = "business";
+
+      if (lower === 'hello' || lower === 'hi' || lower === 'hey' || lower === 'testing' || lower === 'test' || lower === 'good morning' || lower === 'sup') {
+        reply = "Hey Boudie! I'm locked in and listening. Dictate a repair, invoice, or brain-dump what's on your mind!";
+        setTimeout(function() {
+          addMsg(reply, 'fresh');
+          speakAudio(reply);
+        }, 200);
+        return;
+      }
 
       if (lower.indexOf('invoice') !== -1 || lower.indexOf('bill') !== -1 || lower.indexOf('charge') !== -1 || lower.indexOf('pay') !== -1) {
+        category = "invoices";
         state.invoices.unshift({ title: text, status: "Saturday Settlement", badge: "badge-working" });
         reply = 'Got it! Logged invoice: "' + text + '". Sissy staged this into Invoices & Money for Saturday settlement!';
       } else if (lower.indexOf('grocery') !== -1 || lower.indexOf('milk') !== -1 || lower.indexOf('home') !== -1 || lower.indexOf('wife') !== -1 || lower.indexOf('pickleball') !== -1 || lower.indexOf('weight') !== -1) {
+        category = "personal";
         state.personal.unshift({ title: text, status: "Active", badge: "badge-parts" });
         reply = 'Filed to Personal & Home! "' + text + '" is logged in your private hub.';
       } else if (lower.indexOf('mike') !== -1 || lower.indexOf('bagdon') !== -1 || lower.indexOf('mona') !== -1 || lower.indexOf('chris') !== -1 || lower.indexOf('norby') !== -1) {
+        category = "shared";
         state.shared.unshift({ title: text, status: "Shared Queue", badge: "badge-working" });
         reply = 'Routed to Shared Spaces for the team: "' + text + '".';
       } else {
+        category = "business";
         state.business.unshift({ title: text, status: "Intake", badge: "badge-working" });
         reply = 'Dumped straight into Business Ops! Sissy filed "' + text + '" to your workbench.';
       }
+
+      updateBubbleCounts();
+      sendToWebhook(text, category);
 
       setTimeout(function() {
         addMsg(reply, 'fresh');
@@ -646,9 +679,9 @@
       var btn = document.getElementById('circleMicBtn');
       var icon = document.getElementById('micIconDisplay');
       var label = document.getElementById('micStatusLabel');
+      var input = document.getElementById('userInput');
 
       if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-        var input = document.getElementById('userInput');
         if (input) input.focus();
         addMsg("Speech recognition isn't enabled in this browser. Type right in the box below!", 'fresh');
         return;
@@ -675,6 +708,7 @@
 
         recognition.onresult = function(e) {
           var transcript = e.results[0][0].transcript;
+          if (input) input.value = '';
           addMsg(transcript, 'user');
           processFreshRouting(transcript);
         };
@@ -690,8 +724,7 @@
         recognition.start();
       } catch (e) {
         stopMic();
-        var inp = document.getElementById('userInput');
-        if (inp) inp.focus();
+        if (input) input.focus();
         addMsg("Microphone ready! Type in the box below or speak.", 'fresh');
       }
     }
