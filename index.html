@@ -266,7 +266,7 @@
       touch-action: manipulation;
     }
 
-    /* 🌍 MY WORLD HUBS */
+    /* MY WORLD HUBS */
     .my-world-container {
       display: flex;
       flex-direction: column;
@@ -426,18 +426,6 @@
       touch-action: manipulation;
     }
 
-    #debugErrorBanner {
-      display: none;
-      background: #dc2626;
-      color: #fff;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-family: monospace;
-      margin-top: 10px;
-      word-break: break-all;
-    }
-
     footer {
       text-align: center;
       padding: 12px;
@@ -445,17 +433,139 @@
       color: var(--text-muted);
     }
   </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- TOP BAR: TEAM & TOOLS -->
+    <div class="top-bar-team">
+      <div class="pill-tag pill-fresh">
+        <span>🎧</span>
+        <span>Fresh (Coord)</span>
+      </div>
+
+      <div class="pill-tag pill-how" onclick="toggleHowItWorks()">
+        <span>💡</span>
+        <span>How Fresh Works</span>
+      </div>
+
+      <div class="pill-tag pill-rob">
+        <span>🐷</span>
+        <span>Rob Art</span>
+      </div>
+
+      <div class="pill-tag pill-sissy">
+        <span>⚡</span>
+        <span>Sissy Active</span>
+      </div>
+    </div>
+
+    <!-- HOW IT WORKS EXPLAINER BOX -->
+    <div class="how-it-works-box" id="howItWorksBox">
+      <strong>1. 🗣️ Brain Dump:</strong> Tap the circle or type below. Dictate repair invoices, personal bills, or grocery notes.<br>
+      <strong>2. 🧠 Fresh Organizes:</strong> Fresh listens and tells Sissy to route your notes into Business, Personal, Invoices, or Shared spaces.<br>
+      <strong>3. 🌍 My World:</strong> Tap below to see your live jobs, Saturday settlement, and team queues.
+    </div>
+
+    <!-- HEADER: CIRCULAR FRESH LOGO WITH GOLD BORDER -->
+    <div class="header-section">
+      <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="TappyThing Fresh" class="brand-logo" onerror="this.src='logo.png'">
+      <div class="brand-title">TappyThing Command Center</div>
+      <div class="brand-sub">Universal Business & Personal Operating System</div>
+    </div>
+
+    <!-- CENTERED CIRCULAR MIC BUTTON -->
+    <div class="mic-center-container">
+      <button type="button" class="btn-circle-mic" id="circleMicBtn" onclick="toggleVoice()">
+        <span id="micIconDisplay">🎙️</span>
+      </button>
+      <div class="mic-status-label" id="micStatusLabel">Tap Circle to Talk to Fresh</div>
+    </div>
+
+    <!-- FRESH LIVE COORDINATOR & CHAT BOX -->
+    <div class="card">
+      <div class="chat-display" id="chatBox">
+        <div class="msg msg-fresh">
+          <strong>Hey there! I'm Fresh.</strong><br>
+          Tap the blue circle above to speak, or type right below. Just brain-dump what's on your mind — I organize everything into your worlds automatically.<br>
+          <em>Ready to knock out your list or dictate an invoice? Let's roll!</em>
+        </div>
+      </div>
+
+      <!-- PROMINENT DIRECT INPUT BAR -->
+      <div class="input-bar-container">
+        <input type="text" id="userInput" class="chat-input" placeholder="Type to Fresh (e.g. Invoice for Karen $75)..." onkeydown="handleInputKey(event)">
+        <button type="button" class="btn-send" onclick="sendChat()">Send</button>
+      </div>
+    </div>
+
+    <!-- MY WORLD (MASTER SLIDE-OUT HUBS) -->
+    <div class="my-world-container">
+      <button type="button" class="my-world-main-btn" onclick="toggleMyWorld()">
+        <span>🌍 My World</span>
+        <span id="worldArrow">▼</span>
+      </button>
+
+      <div class="master-bubbles-grid" id="masterBubblesGrid">
+        
+        <!-- BUBBLE 1: BUSINESS OPS -->
+        <div class="master-bubble" onclick="openDrawer('business')">
+          <div class="bubble-head">
+            <span>🏢 Business Ops</span>
+            <span class="bubble-count">4 Jobs</span>
+          </div>
+          <div class="bubble-desc">Bench repairs, parts tracker & ready wall</div>
+        </div>
+
+        <!-- BUBBLE 2: PERSONAL / HOME -->
+        <div class="master-bubble" onclick="openDrawer('personal')">
+          <div class="bubble-head">
+            <span>🏠 Personal / Home</span>
+            <span class="bubble-count">3 Items</span>
+          </div>
+          <div class="bubble-desc">Bills, grocery lists & family tasks</div>
+        </div>
+
+        <!-- BUBBLE 3: INVOICES & MONEY -->
+        <div class="master-bubble" onclick="openDrawer('invoices')">
+          <div class="bubble-head">
+            <span>💵 Invoices & Money</span>
+            <span class="bubble-count">$365 Due</span>
+          </div>
+          <div class="bubble-desc">Customer billing & Saturday settlement</div>
+        </div>
+
+        <!-- BUBBLE 4: SHARED SPACES & TEAM -->
+        <div class="master-bubble" onclick="openDrawer('shared')">
+          <div class="bubble-head">
+            <span>👥 Shared Spaces</span>
+            <span class="bubble-count">8 Members</span>
+          </div>
+          <div class="bubble-desc">Mike (Bagdons), Mona, Chris, Norby & AI Cast</div>
+        </div>
+
+      </div>
+
+      <!-- CASCADING DRAWER (OPENS ON BUBBLE CLICK) -->
+      <div class="cascade-drawer" id="cascadeDrawer">
+        <div class="drawer-header">
+          <div class="drawer-title" id="drawerTitle">Hub Section</div>
+          <button type="button" class="btn-close-drawer" onclick="closeDrawer()">✕ Close</button>
+        </div>
+        <div class="cascade-items-list" id="cascadeItemsList"></div>
+        <button type="button" class="btn-add-cascade" onclick="addItemToCurrentCascade()">+ Add Item to This Hub</button>
+      </div>
+
+    </div>
+
+    <footer>
+      <span>⚡ Powered by TappyThing</span>
+    </footer>
+
+  </div>
 
   <script>
-    window.onerror = function(msg, url, line) {
-      var b = document.getElementById('debugErrorBanner');
-      if (b) {
-        b.style.display = 'block';
-        b.innerText = 'JS Notice: ' + msg + ' (Line: ' + line + ')';
-      }
-      return false;
-    };
-
     var state = {
       business: [
         { title: "Karen Vleck — Oreck XL Belt & Brush", status: "Workbench", badge: "badge-working" },
@@ -581,7 +691,7 @@
       if (!box) return;
       var el = document.createElement('div');
       el.className = 'msg msg-' + sender;
-      el.innerHTML = text.replace(/\n/g, '<br>');
+      el.innerHTML = text.replace(/\\n/g, '<br>');
       box.appendChild(el);
       box.scrollTop = box.scrollHeight;
     }
@@ -602,9 +712,9 @@
       var lower = text.toLowerCase();
       var reply = "";
 
-      if (lower.indexOf('invoice') !== -1 || lower.indexOf('bill') !== -1 || lower.indexOf('charge') !== -1 || lower.indexOf('
+      if (lower.indexOf('invoice') !== -1 || lower.indexOf('bill') !== -1 || lower.indexOf('charge') !== -1 || lower.indexOf('pay') !== -1 || lower.indexOf('
 
-Copy the box above, paste it into your `index.html` on Netlify, and hit deploy. Let me know as soon as you see the logo and test the buttons!) !== -1) {
+Paste it in, hit deploy on Netlify, and tell me how it runs when you tap `🌍 My World` or the mic!) !== -1) {
         state.invoices.unshift({ title: text, status: "Saturday Settlement", badge: "badge-working" });
         reply = 'Got it! Logged invoice: "' + text + '". Sissy staged this into Invoices & Money for Saturday settlement!';
       } else if (lower.indexOf('grocery') !== -1 || lower.indexOf('milk') !== -1 || lower.indexOf('home') !== -1 || lower.indexOf('wife') !== -1 || lower.indexOf('pickleball') !== -1 || lower.indexOf('weight') !== -1) {
@@ -676,7 +786,7 @@ Copy the box above, paste it into your `index.html` on Netlify, and hit deploy. 
         stopMic();
         var inp = document.getElementById('userInput');
         if (inp) inp.focus();
-        addMsg("Microphone tapped! Type in the box below or speak.", 'fresh');
+        addMsg("Microphone ready! Type in the box below or speak.", 'fresh');
       }
     }
 
@@ -692,150 +802,6 @@ Copy the box above, paste it into your `index.html` on Netlify, and hit deploy. 
         try { recognition.stop(); } catch(e){}
       }
     }
-
-    window.toggleHowItWorks = toggleHowItWorks;
-    window.toggleMyWorld = toggleMyWorld;
-    window.openDrawer = openDrawer;
-    window.closeDrawer = closeDrawer;
-    window.addItemToCurrentCascade = addItemToCurrentCascade;
-    window.sendChat = sendChat;
-    window.handleInputKey = handleInputKey;
-    window.toggleVoice = toggleVoice;
-    window.stopMic = stopMic;
   </script>
-</head>
-<body>
-
-  <div class="container">
-    
-    <!-- TOP BAR: TEAM & TOOLS (FRESH | HOW IT WORKS | ROB ART | SISSY) -->
-    <div class="top-bar-team">
-      <div class="pill-tag pill-fresh">
-        <span>🎧</span>
-        <span>Fresh (Coord)</span>
-      </div>
-
-      <div class="pill-tag pill-how" onclick="toggleHowItWorks()">
-        <span>💡</span>
-        <span>How Fresh Works</span>
-      </div>
-
-      <div class="pill-tag pill-rob">
-        <span>🐷</span>
-        <span>Rob Art</span>
-      </div>
-
-      <div class="pill-tag pill-sissy">
-        <span>⚡</span>
-        <span>Sissy Active</span>
-      </div>
-    </div>
-
-    <!-- HOW IT WORKS EXPLAINER BOX -->
-    <div class="how-it-works-box" id="howItWorksBox">
-      <strong>1. 🗣️ Brain Dump:</strong> Tap the circle or type below. Dictate repair invoices, personal bills, or grocery notes.<br>
-      <strong>2. 🧠 Fresh Organizes:</strong> Fresh listens and tells Sissy to route your notes into Business, Personal, Invoices, or Shared spaces.<br>
-      <strong>3. 🌍 My World:</strong> Tap below to see your live jobs, Saturday settlement, and team queues.
-    </div>
-
-    <!-- HEADER: CIRCULAR FRESH LOGO WITH GOLD BORDER -->
-    <div class="header-section">
-      <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="TappyThing Fresh" class="brand-logo" onerror="this.src='logo.png'">
-      <div class="brand-title">TappyThing Command Center</div>
-      <div class="brand-sub">Universal Business & Personal Operating System</div>
-    </div>
-
-    <!-- CENTERED CIRCULAR MIC BUTTON -->
-    <div class="mic-center-container">
-      <button type="button" class="btn-circle-mic" id="circleMicBtn" onclick="toggleVoice()">
-        <span id="micIconDisplay">🎙️</span>
-      </button>
-      <div class="mic-status-label" id="micStatusLabel">Tap Circle to Talk to Fresh</div>
-    </div>
-
-    <!-- FRESH LIVE COORDINATOR & CHAT BOX -->
-    <div class="card">
-      <div class="chat-display" id="chatBox">
-        <div class="msg msg-fresh">
-          <strong>Hey there! I'm Fresh.</strong><br>
-          Tap the blue circle above to speak, or type right below. Just brain-dump what's on your mind — I organize everything into your worlds automatically.<br>
-          <em>Ready to knock out your list or dictate an invoice? Let's roll!</em>
-        </div>
-      </div>
-
-      <!-- PROMINENT DIRECT INPUT BAR -->
-      <div class="input-bar-container">
-        <input type="text" id="userInput" class="chat-input" placeholder="Type to Fresh (e.g. Invoice for Karen $75)..." onkeydown="handleInputKey(event)">
-        <button type="button" class="btn-send" onclick="sendChat()">Send</button>
-      </div>
-    </div>
-
-    <!-- 🌍 MY WORLD (MASTER SLIDE-OUT HUBS) -->
-    <div class="my-world-container">
-      <button type="button" class="my-world-main-btn" onclick="toggleMyWorld()">
-        <span>🌍 My World</span>
-        <span id="worldArrow">▼</span>
-      </button>
-
-      <div class="master-bubbles-grid" id="masterBubblesGrid">
-        
-        <!-- BUBBLE 1: BUSINESS OPS -->
-        <div class="master-bubble" onclick="openDrawer('business')">
-          <div class="bubble-head">
-            <span>🏢 Business Ops</span>
-            <span class="bubble-count">4 Jobs</span>
-          </div>
-          <div class="bubble-desc">Bench repairs, parts tracker & ready wall</div>
-        </div>
-
-        <!-- BUBBLE 2: PERSONAL / HOME -->
-        <div class="master-bubble" onclick="openDrawer('personal')">
-          <div class="bubble-head">
-            <span>🏠 Personal / Home</span>
-            <span class="bubble-count">3 Items</span>
-          </div>
-          <div class="bubble-desc">Bills, grocery lists & family tasks</div>
-        </div>
-
-        <!-- BUBBLE 3: INVOICES & MONEY -->
-        <div class="master-bubble" onclick="openDrawer('invoices')">
-          <div class="bubble-head">
-            <span>💵 Invoices & Money</span>
-            <span class="bubble-count">$365 Due</span>
-          </div>
-          <div class="bubble-desc">Customer billing & Saturday settlement</div>
-        </div>
-
-        <!-- BUBBLE 4: SHARED SPACES & TEAM -->
-        <div class="master-bubble" onclick="openDrawer('shared')">
-          <div class="bubble-head">
-            <span>👥 Shared Spaces</span>
-            <span class="bubble-count">8 Members</span>
-          </div>
-          <div class="bubble-desc">Mike (Bagdons), Mona, Chris, Norby & AI Cast</div>
-        </div>
-
-      </div>
-
-      <!-- CASCADING DRAWER (OPENS ON BUBBLE CLICK) -->
-      <div class="cascade-drawer" id="cascadeDrawer">
-        <div class="drawer-header">
-          <div class="drawer-title" id="drawerTitle">Hub Section</div>
-          <button type="button" class="btn-close-drawer" onclick="closeDrawer()">✕ Close</button>
-        </div>
-        <div class="cascade-items-list" id="cascadeItemsList"></div>
-        <button type="button" class="btn-add-cascade" onclick="addItemToCurrentCascade()">+ Add Item to This Hub</button>
-      </div>
-
-    </div>
-
-    <div id="debugErrorBanner"></div>
-
-    <footer>
-      <span>⚡ Powered by TappyThing</span>
-    </footer>
-
-  </div>
-
 </body>
 </html>
