@@ -33,52 +33,74 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 12px 10px 40px;
+      padding: 12px 10px 30px;
       line-height: 1.4;
     }
 
     .container {
       width: 100%;
-      max-width: 500px;
+      max-width: 480px;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    /* HEADER WITH FRESH LOGO + 🐷 ROB ART */
-    .header-section {
+    /* TOP CORNER UTILITIES (ROB ART + TIME TO TAP) */
+    .top-bar {
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
       align-items: center;
-      position: relative;
-      padding-top: 4px;
-      padding-bottom: 4px;
+      width: 100%;
+      padding: 0 2px;
+    }
+
+    .btn-compact-tap {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn-compact-tap:hover {
+      background: rgba(245, 158, 11, 0.25);
     }
 
     .rob-art-tag {
-      position: absolute;
-      top: 0;
-      right: 0;
       display: inline-flex;
       align-items: center;
       gap: 4px;
       background: rgba(139, 92, 246, 0.15);
       border: 1px solid rgba(139, 92, 246, 0.35);
-      padding: 3px 10px;
+      padding: 4px 10px;
       border-radius: 9999px;
       font-size: 11px;
       color: #c4b5fd;
       font-weight: 700;
-      box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
+    }
+
+    /* HEADER */
+    .header-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2px 0 6px;
     }
 
     .brand-logo {
-      width: 102px;
-      height: 102px;
+      width: 98px;
+      height: 98px;
       border-radius: 50%;
       object-fit: cover;
       border: 3px solid var(--accent-gold);
-      box-shadow: 0 0 22px rgba(245, 158, 11, 0.4);
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
       margin-bottom: 6px;
     }
 
@@ -96,77 +118,72 @@
       text-align: center;
     }
 
-    /* UNIFIED ACTIONS WITH FRESH */
-    .action-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
+    /* PRIMARY 1-BUTTON INTERFACE: TALK TO FRESH */
+    .primary-intake-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
     }
 
-    .btn-action {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 11px 8px;
+    .btn-talk-master {
+      width: 100%;
+      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      border-radius: 16px;
+      padding: 16px;
       color: #fff;
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 16px;
+      font-weight: 800;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 10px;
+      box-shadow: 0 4px 18px rgba(124, 58, 237, 0.35);
       transition: all 0.2s;
     }
 
-    .btn-action:hover {
-      border-color: var(--accent-purple);
-      background: rgba(139, 92, 246, 0.1);
+    .btn-talk-master:hover {
+      transform: scale(1.01);
+      box-shadow: 0 6px 22px rgba(124, 58, 237, 0.45);
     }
 
-    .btn-action.active-mic {
+    .btn-talk-master.listening {
       background: var(--accent-red) !important;
       border-color: #f87171 !important;
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.6) !important;
       animation: pulse 1.2s infinite;
     }
 
     @keyframes pulse {
-      0% { transform: scale(0.99); opacity: 0.9; }
+      0% { transform: scale(0.99); opacity: 0.95; }
       50% { transform: scale(1.02); opacity: 1; }
-      100% { transform: scale(0.99); opacity: 0.9; }
+      100% { transform: scale(0.99); opacity: 0.95; }
     }
 
-    .btn-camera {
-      grid-column: span 2;
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      padding: 10px;
-    }
-
-    .btn-tap-mode {
-      grid-column: span 2;
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      color: #000;
-      font-weight: 800;
+    .type-toggle-link {
+      background: none;
       border: none;
-      box-shadow: 0 3px 12px rgba(245, 158, 11, 0.3);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 2px 6px;
     }
 
-    #videoPreview {
-      display: none;
-      width: 100%;
-      border-radius: 12px;
-      margin-top: 4px;
-      border: 1px solid var(--card-border);
-      background: #000;
+    .type-toggle-link:hover {
+      color: #c4b5fd;
     }
 
-    /* FRESH LIVE CONVERSATION & ROUTING ENGINE */
+    /* FRESH LIVE CHAT & STATUS ENGINE */
     .card {
       background-color: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 16px;
-      padding: 14px;
+      padding: 12px 14px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -207,7 +224,7 @@
     }
 
     .chat-display {
-      max-height: 190px;
+      max-height: 180px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
@@ -236,9 +253,15 @@
       align-self: flex-end;
     }
 
-    .input-bar {
-      display: flex;
+    .input-bar-container {
+      display: none;
       gap: 6px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-3px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .chat-input {
@@ -267,7 +290,7 @@
       cursor: pointer;
     }
 
-    /* 🌍 MASTER CASCADING MY WORLD */
+    /* 🌍 MY WORLD (SLIDE-OUT HUB DRAWER) */
     .my-world-container {
       display: flex;
       flex-direction: column;
@@ -298,11 +321,6 @@
       animation: fadeIn 0.25s ease;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-4px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
     .master-bubble {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -311,14 +329,13 @@
       cursor: pointer;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
       transition: all 0.2s;
     }
 
     .master-bubble:hover {
       border-color: var(--accent-purple);
       background: var(--card-hover);
-      transform: translateY(-2px);
     }
 
     .bubble-head {
@@ -343,7 +360,7 @@
       color: var(--text-muted);
     }
 
-    /* DEEP CASCADING MODAL / DRAWER */
+    /* CASCADING DRAWER */
     .cascade-drawer {
       display: none;
       background: #0f172a;
@@ -385,7 +402,7 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      max-height: 250px;
+      max-height: 240px;
       overflow-y: auto;
     }
 
@@ -428,10 +445,6 @@
       text-align: center;
     }
 
-    .btn-add-cascade:hover {
-      background: rgba(139, 92, 246, 0.25);
-    }
-
     footer {
       text-align: center;
       padding: 10px;
@@ -444,43 +457,39 @@
 
   <div class="container">
     
-    <!-- HEADER: FRESH LOGO + 🐷 ROB ART -->
-    <div class="header-section">
+    <!-- TOP UTILITY BAR: TIME TO TAP + ROB ART -->
+    <div class="top-bar">
+      <button class="btn-compact-tap" onclick="startTimeToTap()">
+        <span>⚡</span>
+        <span>Time to Tap</span>
+      </button>
+
       <div class="rob-art-tag">
         <span>🐷</span>
         <span>Rob Art</span>
       </div>
+    </div>
+
+    <!-- HEADER: FRESH LOGO -->
+    <div class="header-section">
       <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="TappyThing Fresh" class="brand-logo" onerror="this.src='logo.png'">
       <div class="brand-title">TappyThing Command Center</div>
       <div class="brand-sub">Universal Business & Personal Operating System</div>
     </div>
 
-    <!-- UNIFIED INTAKE BUTTONS -->
-    <div class="action-grid">
-      <button class="btn-action" id="micBtn" onclick="toggleVoice()">
-        <span id="micIcon">🎙️</span>
-        <span id="micLabel">Tap to Talk</span>
+    <!-- PRIMARY 1-BUTTON INTERFACE: TALK TO FRESH -->
+    <div class="primary-intake-section">
+      <button class="btn-talk-master" id="talkMasterBtn" onclick="toggleVoice()">
+        <span id="talkMasterIcon">🎙️</span>
+        <span id="talkMasterLabel">Talk to Fresh</span>
       </button>
 
-      <button class="btn-action" onclick="focusChat()">
-        <span>⌨️</span>
-        <span>Tap to Type</span>
-      </button>
-
-      <button class="btn-action btn-camera" onclick="triggerCamera()">
-        <span id="camIcon">📹</span>
-        <span id="camLabel">Point at Equipment / Tag Intake</span>
-      </button>
-
-      <button class="btn-action btn-tap-mode" onclick="startTimeToTap()">
-        <span>⚡</span>
-        <span>"Time to Tap" (5-Min Task Knockout)</span>
+      <button class="type-toggle-link" id="typeToggleBtn" onclick="toggleTypeInput()">
+        ⌨️ Type to Fresh (Text Input)
       </button>
     </div>
 
-    <video id="videoPreview" autoplay playsinline muted></video>
-
-    <!-- LIVE FRESH COORDINATOR & CHAT BOX -->
+    <!-- FRESH LIVE COORDINATOR & CHAT BOX -->
     <div class="card">
       <div class="fresh-head">
         <div class="fresh-info">
@@ -493,21 +502,21 @@
       <div class="chat-display" id="chatBox">
         <div class="msg msg-fresh">
           <strong>Hey there! I'm Fresh.</strong><br>
-          Talk, type, or show me equipment. Just brain-dump what's in your head — I organize everything into your worlds automatically.<br>
-          <em>Dictate invoices, repair notes, personal tasks, or say <strong>"Time to Tap"</strong> to knock out your list!</em>
+          Tap the big button to speak or tap text to type. Just brain-dump what's in your head — I organize everything into your worlds automatically.<br>
+          <em>Dictate invoices, repair notes, personal tasks, or tap <strong>⚡ Time to Tap</strong> above!</em>
         </div>
       </div>
 
-      <div class="input-bar">
-        <input type="text" id="userInput" class="chat-input" placeholder="Talk or type to Fresh (e.g. Invoice for Karen, Oreck $75)..." onkeydown="if(event.key==='Enter') sendChat()">
+      <div class="input-bar-container" id="inputBarContainer">
+        <input type="text" id="userInput" class="chat-input" placeholder="Type to Fresh (e.g. Invoice for Karen, Oreck $75)..." onkeydown="if(event.key==='Enter') sendChat()">
         <button class="btn-send" onclick="sendChat()">Send</button>
       </div>
     </div>
 
-    <!-- 🌍 4 MASTER CASCADING MY WORLD BUBBLES -->
+    <!-- 🌍 MY WORLD HUB DRAWER -->
     <div class="my-world-container">
       <button class="my-world-main-btn" onclick="toggleMyWorld()">
-        <span>🌍 My World (Cascading Hubs)</span>
+        <span>🌍 My World</span>
         <span id="worldArrow">▼</span>
       </button>
 
@@ -537,7 +546,7 @@
             <span>💵 Invoices & Money</span>
             <span class="bubble-count" id="countInvoices">$365 Due</span>
           </div>
-          <div class="bubble-desc">Customer billing, card payments & Saturday settlement</div>
+          <div class="bubble-desc">Customer billing & Saturday settlement</div>
         </div>
 
         <!-- BUBBLE 4: SHARED SPACES & TEAM -->
@@ -554,17 +563,17 @@
       <!-- CASCADING DRAWER (OPENS ON BUBBLE CLICK) -->
       <div class="cascade-drawer" id="cascadeDrawer">
         <div class="drawer-header">
-          <div class="drawer-title" id="drawerTitle">Cascade Section</div>
+          <div class="drawer-title" id="drawerTitle">Hub Section</div>
           <button class="btn-close-drawer" onclick="closeDrawer()">✕ Close</button>
         </div>
         <div class="cascade-items-list" id="cascadeItemsList"></div>
-        <button class="btn-add-cascade" onclick="addItemToCurrentCascade()">+ Add Item to This Cascade</button>
+        <button class="btn-add-cascade" onclick="addItemToCurrentCascade()">+ Add Item to This Hub</button>
       </div>
 
     </div>
 
     <footer>
-      <span>⚡ Powered by TappyThing • Unlimited Free Sharing • $95/Month Flat</span>
+      <span>⚡ Powered by TappyThing</span>
     </footer>
 
   </div>
@@ -603,20 +612,20 @@
     let activeDrawer = null;
     let recognition = null;
     let isListening = false;
-    let tapTaskIndex = 0;
 
     const chatBox = document.getElementById('chatBox');
     const userInput = document.getElementById('userInput');
-    const micBtn = document.getElementById('micBtn');
-    const micIcon = document.getElementById('micIcon');
-    const micLabel = document.getElementById('micLabel');
+    const inputBarContainer = document.getElementById('inputBarContainer');
+    const talkMasterBtn = document.getElementById('talkMasterBtn');
+    const talkMasterIcon = document.getElementById('talkMasterIcon');
+    const talkMasterLabel = document.getElementById('talkMasterLabel');
     const masterBubblesGrid = document.getElementById('masterBubblesGrid');
     const worldArrow = document.getElementById('worldArrow');
     const cascadeDrawer = document.getElementById('cascadeDrawer');
     const drawerTitle = document.getElementById('drawerTitle');
     const cascadeItemsList = document.getElementById('cascadeItemsList');
 
-    // SPEECH RECOGNITION
+    // SPEECH RECOGNITION SETUP
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
       recognition = new SpeechRec();
@@ -626,9 +635,9 @@
 
       recognition.onstart = () => {
         isListening = true;
-        micBtn.classList.add('active-mic');
-        micIcon.innerText = '🛑';
-        micLabel.innerText = 'Listening...';
+        talkMasterBtn.classList.add('listening');
+        talkMasterIcon.innerText = '🛑';
+        talkMasterLabel.innerText = 'Listening to you...';
       };
 
       recognition.onresult = (e) => {
@@ -643,7 +652,8 @@
 
     function toggleVoice() {
       if (!recognition) {
-        addMsg("Speech recognition ready! Type in the bar below.", 'fresh');
+        toggleTypeInput();
+        addMsg("Speech recognition isn't supported on this browser. Type in the box below!", 'fresh');
         return;
       }
       if (isListening) {
@@ -661,13 +671,18 @@
 
     function stopMic() {
       isListening = false;
-      micBtn.classList.remove('active-mic');
-      micIcon.innerText = '🎙️';
-      micLabel.innerText = 'Tap to Talk';
+      talkMasterBtn.classList.remove('listening');
+      talkMasterIcon.innerText = '🎙️';
+      talkMasterLabel.innerText = 'Talk to Fresh';
     }
 
-    function focusChat() {
-      userInput.focus();
+    function toggleTypeInput() {
+      if (inputBarContainer.style.display === 'flex') {
+        inputBarContainer.style.display = 'none';
+      } else {
+        inputBarContainer.style.display = 'flex';
+        userInput.focus();
+      }
     }
 
     function sendChat() {
@@ -698,7 +713,6 @@
 
     // "TIME TO TAP" 5-MINUTE RAPID KNOCKOUT MODE
     function startTimeToTap() {
-      tapTaskIndex = 0;
       const intro = "Time to Tap! Let's knock out your list. First task: Karen Vleck's Oreck XL needs a belt and brush. Is that ordered or completed?";
       addMsg(intro, 'fresh');
       speakAudio(intro);
@@ -710,11 +724,7 @@
       let reply = "";
 
       // 1. Invoicing & Money
-      if (lower.includes('invoice') || lower.includes('bill') || lower.includes('charge') || lower.includes('
-
----
-
-Take your time with dinner, and whenever you paste and test it, let me know how it feels!)) {
+      if (lower.includes('invoice') || lower.includes('bill') || lower.includes('charge') || lower.includes(')) {
         state.invoices.unshift({ title: text, status: "Saturday Settlement", badge: "badge-working" });
         reply = `Got it! Logged invoice: "${text}". Sissy staged this into Invoices & Money for Saturday settlement!`;
       } 
@@ -753,7 +763,7 @@ Take your time with dinner, and whenever you paste and test it, let me know how 
       if (activeDrawer) openDrawer(activeDrawer);
     }
 
-    // 🌍 CASCADING MY WORLD NAVIGATION
+    // 🌍 MY WORLD HUB TOGGLE & DRAWER
     function toggleMyWorld() {
       if (masterBubblesGrid.style.display === 'grid') {
         masterBubblesGrid.style.display = 'none';
@@ -771,12 +781,12 @@ Take your time with dinner, and whenever you paste and test it, let me know how 
       cascadeItemsList.innerHTML = '';
 
       const titles = {
-        business: "🏢 Business Ops Cascade",
-        personal: "🏠 Personal / Home Cascade",
+        business: "🏢 Business Ops",
+        personal: "🏠 Personal / Home",
         invoices: "💵 Invoices & Saturday Settlement",
         shared: "👥 Shared Spaces (Team & AI Cast)"
       };
-      drawerTitle.innerText = titles[category] || "Cascade Hub";
+      drawerTitle.innerText = titles[category] || "Hub Section";
 
       const list = state[category] || [];
       if (list.length === 0) {
@@ -784,7 +794,7 @@ Take your time with dinner, and whenever you paste and test it, let me know how 
         return;
       }
 
-      list.forEach((item, index) => {
+      list.forEach((item) => {
         const row = document.createElement('div');
         row.className = 'cascade-card';
         row.innerHTML = `
@@ -807,34 +817,6 @@ Take your time with dinner, and whenever you paste and test it, let me know how 
       state[activeDrawer].unshift({ title: title, status: "Active", badge: "badge-working" });
       openDrawer(activeDrawer);
       addMsg(`Added "${title}" to ${drawerTitle.innerText}!`, 'fresh');
-    }
-
-    // TIGHT CAMERA & TAG INTAKE TOGGLE
-    async function triggerCamera() {
-      const vid = document.getElementById('videoPreview');
-      const camLabel = document.getElementById('camLabel');
-      const camIcon = document.getElementById('camIcon');
-
-      if (vid.style.display === 'block') {
-        vid.style.display = 'none';
-        camLabel.innerText = "Point at Equipment / Tag Intake";
-        camIcon.innerText = "📹";
-        if (vid.srcObject) {
-          vid.srcObject.getTracks().forEach(t => t.stop());
-        }
-        return;
-      }
-
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: true });
-        vid.srcObject = stream;
-        vid.style.display = 'block';
-        camLabel.innerText = "Close Camera";
-        camIcon.innerText = "🛑";
-        addMsg("📹 Camera live! Point at equipment serial tag, dictate repair details, and hit send.", 'fresh');
-      } catch (err) {
-        addMsg("Camera access not available on this browser.", 'fresh');
-      }
     }
   </script>
 </body>
