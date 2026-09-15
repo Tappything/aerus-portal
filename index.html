@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>TappyThing ⚡ Digital Coordinator</title>
+  <title>TappyThing ⚡ Chat with Fresh</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    
     body {
       background: radial-gradient(circle at top, #1e1035 0%, #0c0714 100%);
       color: #f8fafc;
@@ -14,1082 +13,242 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 12px;
+      padding: 16px;
     }
-
     .container {
       width: 100%;
-      max-width: 440px;
+      max-width: 480px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 14px;
-      position: relative;
+      height: 92vh;
+      gap: 12px;
     }
-
-    /* In-App Alert Banner */
-    .alert-banner {
-      display: none;
-      width: 100%;
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
-      color: #0c0714;
-      padding: 10px 14px;
-      border-radius: 14px;
-      font-weight: 800;
-      font-size: 0.85rem;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
-      animation: slideDown 0.3s ease-out;
-    }
-
-    @keyframes slideDown {
-      from { transform: translateY(-15px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    /* Top Strip: Rob Art Tribute */
-    .top-strip {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 2px 4px;
-    }
-
-    .lang-toggle-btn {
-      background: rgba(30, 16, 53, 0.9);
-      border: 1px solid rgba(251, 191, 36, 0.4);
-      color: #fbbf24;
-      padding: 4px 10px;
-      border-radius: 14px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .rob-art-badge {
-      background: rgba(30, 16, 53, 0.9);
-      border: 1.5px solid #f472b6;
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      color: #f472b6;
-      font-weight: 800;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 0 12px rgba(244, 114, 182, 0.3);
-    }
-
-    /* Header & Fresh Bandana Logo */
     .header-box {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       text-align: center;
-      gap: 6px;
+      padding: 8px 0;
     }
-
-    .logo-container {
-      width: 105px;
-      height: 105px;
-      border-radius: 50%;
-      border: 3px solid #fbbf24;
-      box-shadow: 0 0 25px rgba(251, 191, 36, 0.5);
-      overflow: hidden;
-      background: #180d2b;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-
-    .logo-container img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
     .brand-title {
-      font-size: 1.7rem;
+      font-size: 1.6rem;
       font-weight: 800;
       background: linear-gradient(135deg, #fbbf24 0%, #f472b6 50%, #c084fc 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      letter-spacing: -0.5px;
     }
-
-    .brand-tagline {
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: #fbbf24;
-      font-weight: 700;
-    }
-
-    .subscriber-tag {
-      background: rgba(30, 16, 53, 0.85);
-      border: 1px solid rgba(251, 191, 36, 0.35);
-      padding: 4px 14px;
-      border-radius: 20px;
-      font-size: 0.78rem;
-      color: #e9d5ff;
-      cursor: pointer;
-      margin-top: 2px;
-    }
-
-    /* Chat with Fresh Bot Trigger Button */
-    .fresh-chat-trigger-btn {
-      background: linear-gradient(135deg, rgba(244, 114, 182, 0.2), rgba(251, 191, 36, 0.2));
-      border: 1.5px solid #fbbf24;
-      color: #fbbf24;
-      padding: 8px 18px;
-      border-radius: 22px;
-      font-size: 0.88rem;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      margin-top: 4px;
-      box-shadow: 0 4px 15px rgba(251, 191, 36, 0.25);
-      transition: all 0.2s;
-    }
-
-    .fresh-chat-trigger-btn:active {
-      transform: scale(0.97);
-    }
-
-    /* 3 Action Intake Buttons */
-    .action-trio {
-      width: 100%;
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
-      margin-top: 2px;
-    }
-
-    .trio-btn {
-      background: rgba(30, 16, 53, 0.9);
-      border: 1.5px solid rgba(251, 191, 36, 0.4);
-      color: #f8fafc;
-      padding: 16px 8px;
-      border-radius: 18px;
-      font-weight: 700;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
+    .tagline {
       font-size: 0.85rem;
-      transition: all 0.15s;
+      color: #cbd5e1;
+      margin-top: 4px;
     }
-
-    .trio-btn:active {
-      transform: scale(0.96);
-      background: #3b1d6e;
-    }
-
-    .trio-btn.recording {
-      background: #ef4444 !important;
-      border-color: #fff;
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-      70% { box-shadow: 0 0 0 16px rgba(239, 68, 68, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-    }
-
-    .trio-icon {
-      font-size: 1.6rem;
-    }
-
-    #statusBox {
-      width: 100%;
-      background: rgba(20, 10, 35, 0.85);
-      border: 1px solid rgba(251, 191, 36, 0.25);
-      border-radius: 16px;
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    #statusText {
-      font-size: 0.86rem;
-      color: #fbbf24;
-      font-weight: 500;
+    .chat-box {
       flex: 1;
-    }
-
-    /* Prominent 'My World' Button */
-    .my-world-trigger {
-      width: 100%;
-      background: rgba(26, 12, 48, 0.95);
-      border: 1.5px solid #fbbf24;
-      border-radius: 20px;
-      padding: 16px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
-      transition: transform 0.15s;
-    }
-
-    .my-world-trigger:active {
-      transform: scale(0.98);
-    }
-
-    .my-world-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .my-world-title {
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: #fbbf24;
-    }
-
-    .my-world-sub {
-      font-size: 0.75rem;
-      color: #c084fc;
-      margin-top: 2px;
-    }
-
-    /* Chat with Fresh Bot Modal / Drawer */
-    .fresh-chat-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(10, 4, 18, 0.9);
-      backdrop-filter: blur(10px);
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
-      padding: 12px;
-    }
-
-    .fresh-chat-box {
-      width: 100%;
-      max-width: 440px;
-      height: 90vh;
-      max-height: 680px;
-      background: #190e2d;
-      border: 2px solid #fbbf24;
-      border-radius: 24px;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.9);
-      overflow: hidden;
-    }
-
-    .fresh-chat-header {
       background: rgba(30, 16, 53, 0.95);
-      border-bottom: 1.5px solid rgba(251, 191, 36, 0.3);
-      padding: 14px 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .fresh-chat-messages {
-      flex: 1;
-      overflow-y: auto;
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      border-radius: 20px;
       padding: 16px;
       display: flex;
       flex-direction: column;
       gap: 12px;
+      overflow-y: auto;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
-
-    .chat-bubble {
-      max-width: 85%;
+    .bubble {
+      max-width: 82%;
       padding: 12px 16px;
-      border-radius: 18px;
-      font-size: 0.9rem;
+      border-radius: 16px;
+      font-size: 0.95rem;
       line-height: 1.4;
     }
-
-    .bubble-fresh {
-      background: rgba(30, 16, 53, 0.9);
-      border: 1px solid #fbbf24;
-      color: #f8fafc;
+    .bubble.fresh {
       align-self: flex-start;
+      background: #2d184c;
+      color: #f8fafc;
       border-bottom-left-radius: 4px;
+      border: 1px solid rgba(192, 132, 252, 0.3);
     }
-
-    .bubble-user {
-      background: linear-gradient(135deg, #c084fc, #9333ea);
-      color: #fff;
+    .bubble.user {
       align-self: flex-end;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: #0f172a;
+      font-weight: 600;
       border-bottom-right-radius: 4px;
     }
-
-    .fresh-chat-input-row {
-      background: rgba(20, 10, 35, 0.95);
-      border-top: 1px solid rgba(251, 191, 36, 0.3);
-      padding: 12px;
+    .bubble.thinking {
+      align-self: flex-start;
+      background: #2d184c;
+      color: #cbd5e1;
+      font-style: italic;
+    }
+    .input-area {
       display: flex;
       gap: 8px;
+      align-items: center;
     }
-
-    .chat-input {
+    .text-input {
       flex: 1;
-      background: #10061e;
+      background: #1e1035;
       border: 1px solid rgba(251, 191, 36, 0.4);
-      border-radius: 20px;
-      padding: 12px 16px;
+      border-radius: 25px;
+      padding: 12px 18px;
       color: #f8fafc;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       outline: none;
     }
-
-    .chat-send-btn {
-      background: linear-gradient(135deg, #fbbf24, #d97706);
-      color: #0c0714;
-      border: none;
-      padding: 0 18px;
-      border-radius: 20px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    /* Live "My World" Cards Drawer */
-    .world-drawer {
-      display: none;
-      width: 100%;
-      flex-direction: column;
-      gap: 14px;
-      margin-top: 8px;
-    }
-
-    .group-section {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .group-header {
-      font-size: 0.85rem;
-      font-weight: 800;
-      color: #fbbf24;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 6px;
-    }
-
-    .card {
-      background: rgba(30, 16, 53, 0.95);
-      border: 1px solid rgba(251, 191, 36, 0.35);
-      border-radius: 18px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-    }
-
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-
-    .card-title {
-      font-weight: 700;
-      font-size: 1.05rem;
-      color: #f8fafc;
-    }
-
-    .card-badge {
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 4px 8px;
-      border-radius: 8px;
-    }
-
-    .badge-bill { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
-    .badge-ops { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
-    .badge-routed { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid #a855f7; }
-
-    .card-body {
-      font-size: 0.88rem;
-      color: #cbd5e1;
-      line-height: 1.4;
-    }
-
-    .bill-box {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(12, 7, 20, 0.85);
-      padding: 10px 14px;
-      border-radius: 12px;
-      border: 1px solid rgba(34, 197, 94, 0.4);
-    }
-
-    .bill-amount {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: #4ade80;
-    }
-
-    .send-bill-btn {
-      background: #22c55e;
-      color: #022c22;
-      border: none;
-      padding: 6px 14px;
-      border-radius: 8px;
-      font-weight: 800;
-      font-size: 0.82rem;
-      cursor: pointer;
-    }
-
-    /* Camera / Photo Modal */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(10, 4, 18, 0.85);
-      backdrop-filter: blur(10px);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-
-    .media-card-modal {
-      width: 100%;
-      max-width: 420px;
-      background: #190e2d;
-      border: 2px solid #fbbf24;
-      border-radius: 24px;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-    }
-
-    .camera-frame {
-      width: 100%;
-      aspect-ratio: 4/3;
-      background: #000;
-      border-radius: 16px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    video, img#previewImg {
-      width: 100%; height: 100%; object-fit: cover;
-    }
-    img#previewImg { display: none; }
-
-    .circle-btn {
-      background: rgba(20, 10, 35, 0.8);
-      border: 1px solid #fbbf24;
-      color: #fbbf24;
-      width: 36px;
-      height: 36px;
+    .btn {
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
+      border: none;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      font-size: 1rem;
+      font-size: 1.2rem;
+      transition: transform 0.1s, background 0.2s;
     }
-
-    .modal-btn {
-      background: rgba(30, 16, 53, 0.9);
-      border: 1px solid rgba(251, 191, 36, 0.4);
+    .btn:active { transform: scale(0.95); }
+    .btn-mic {
+      background: #784bd1;
       color: #fff;
-      padding: 12px;
-      border-radius: 14px;
-      font-weight: 700;
-      font-size: 0.88rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+    }
+    .btn-mic.recording {
+      background: #ef4444;
+      animation: pulse 1s infinite alternate;
+    }
+    .btn-send {
+      background: #fbbf24;
+      color: #1e1035;
+      font-weight: bold;
+    }
+    @keyframes pulse {
+      from { box-shadow: 0 0 0px #ef4444; }
+      to { box-shadow: 0 0 15px #ef4444; }
     }
   </style>
 </head>
 <body>
-
   <div class="container">
-    
-    <!-- In-App Notification Alert Banner -->
-    <div class="alert-banner" id="alertBanner">
-      <span id="alertBannerText">🔔 New update ready</span>
-      <button style="background:none; border:none; color:#0c0714; font-weight:900; cursor:pointer;" onclick="document.getElementById('alertBanner').style.display='none'">✖</button>
-    </div>
-
-    <!-- Top Strip: Rob Art Tribute & Spanish/English Toggle -->
-    <div class="top-strip">
-      <button class="lang-toggle-btn" id="langToggleBtn">🌐 EN / ES</button>
-      <div class="rob-art-badge">
-        <img src="rob-art.png" onerror="this.src='rob.png'; this.onerror=function(){this.style.display='none';}" style="width:20px; height:20px; border-radius:50%; object-fit:cover;" alt="Rob Art" />
-        <span>🐷 ROB ART</span>
-      </div>
-    </div>
-
-    <!-- Fresh Bandana Logo Header -->
     <div class="header-box">
-      <div class="logo-container">
-        <img src="logo.png" alt="Fresh Bandana Logo" />
-      </div>
-      <div class="brand-title">TappyThing</div>
-      <div class="brand-tagline">Digital Coordinator Command Center</div>
-      <div class="subscriber-tag" id="userTag" title="Click to switch view">Loading...</div>
-      
-      <!-- Built-in "Chat with Fresh" Bot Button -->
-      <button class="fresh-chat-trigger-btn" id="openChatBtn">
-        <span>🤵 Chat with Fresh</span>
-      </button>
+      <div class="brand-title">TappyThing ⚡</div>
+      <div class="tagline">Chat with Fresh to build your system</div>
     </div>
 
-    <!-- 3 Action Intake Buttons -->
-    <div class="action-trio">
-      <button class="trio-btn" id="talkBtn">
-        <span class="trio-icon">🎙️</span>
-        <span id="talkBtnLabel">Talk</span>
-      </button>
-
-      <button class="trio-btn" id="typeBtn">
-        <span class="trio-icon">⌨️</span>
-        <span>Type</span>
-      </button>
-
-      <button class="trio-btn" id="cameraToolBtn">
-        <span class="trio-icon">📷</span>
-        <span>Photo / Video</span>
-      </button>
-    </div>
-
-    <!-- Status & Routing Bar -->
-    <div id="statusBox">
-      <div id="statusText">Tap Talk to speak, Type for notes, or Photo/Video</div>
-    </div>
-
-    <!-- Prominent "My World" Button -->
-    <div class="my-world-trigger" id="myWorldToggle">
-      <div class="my-world-left">
-        <span style="font-size: 1.6rem;">🌍</span>
-        <div>
-          <div class="my-world-title">My World (<span id="cardCount">0</span>)</div>
-          <div class="my-world-sub" id="worldSubLabel">Live Shop Ops & Workbench queue</div>
-        </div>
-      </div>
-      <span style="font-size: 1.3rem; color: #fbbf24;" id="worldChevron">▼</span>
-    </div>
-
-    <!-- Live Data "My World" Drawer -->
-    <div class="world-drawer" id="worldDrawer">
-      <div id="liveCardsContainer" style="display: flex; flex-direction: column; gap: 14px;"></div>
-    </div>
-
-  </div>
-
-  <!-- "Chat with Fresh" Interactive Bot Modal -->
-  <div class="fresh-chat-overlay" id="freshChatModal">
-    <div class="fresh-chat-box">
-      <div class="fresh-chat-header">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <div style="width:36px; height:36px; border-radius:50%; border:2px solid #fbbf24; overflow:hidden;">
-            <img src="logo.png" style="width:100%; height:100%; object-fit:cover;" />
-          </div>
-          <div>
-            <div style="font-weight:800; color:#fbbf24; font-size:1rem;">Fresh 🤵</div>
-            <div style="font-size:0.72rem; color:#c084fc;">Digital Coordinator Assistant</div>
-          </div>
-        </div>
-        <button class="circle-btn" id="closeChatBtn">✖</button>
-      </div>
-
-      <div class="fresh-chat-messages" id="chatMessages">
-        <div class="chat-bubble bubble-fresh">
-          Hey there! I'm <b>Fresh</b> 🤵 — your digital coordinator. You can ask me how to use TappyThing, get repair info, or tell me tasks/bills and I will build the cards directly in your World! What's on your mind?
-        </div>
-      </div>
-
-      <div class="fresh-chat-input-row">
-        <input type="text" class="chat-input" id="chatInputField" placeholder="Ask Fresh or tell him a task/bill..." />
-        <button class="chat-send-btn" id="sendChatBtn">Send</button>
+    <div class="chat-box" id="chat-box">
+      <div class="bubble fresh">
+        Hey there! 👋 I'm <strong>Fresh</strong>, your digital coordinator. Tell me what kind of business or personal chaos we're organizing today, and I'll get your system ready in 60 seconds!
       </div>
     </div>
-  </div>
 
-  <!-- Camera / Photo / Video Modal Engine -->
-  <div class="modal-overlay" id="cameraModal">
-    <div class="media-card-modal">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-weight:700; color:#fbbf24; font-size:0.95rem;">📷 Capture Note</span>
-        <button class="circle-btn" id="closeModalBtn">✖</button>
-      </div>
-
-      <div class="camera-frame">
-        <video id="videoFeed" autoplay playsinline muted></video>
-        <img id="previewImg" alt="Snapshot" />
-        <canvas id="snapshotCanvas" style="display:none;"></canvas>
-      </div>
-
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-        <button class="modal-btn" id="snapStillPhotoBtn">📸 Snap Photo</button>
-        <label class="modal-btn" style="margin:0; cursor:pointer;">
-          🖼️ Photo Roll
-          <input type="file" id="fileUploadInput" accept="image/*" style="display:none;" />
-        </label>
-      </div>
-
-      <button class="modal-btn" id="savePhotoToWorldBtn" style="background:#22c55e; color:#022c22; border:none; display:none;">
-        ✅ Add to Shop Ops
-      </button>
+    <div class="input-area">
+      <button class="btn btn-mic" id="mic-btn" onclick="toggleVoice()" title="Tap to talk">🎤</button>
+      <input type="text" class="text-input" id="text-input" placeholder="Type or tap the mic..." onkeydown="handleKey(event)" />
+      <button class="btn btn-send" id="send-btn" onclick="handleSend()">➤</button>
     </div>
   </div>
 
   <script>
-    // --- 1. USER IDENTITY & ROSTER CONFIGURATION ---
-    const SHOP_STAFF = ['william', 'chris', 'paul', 'brian', 'omar', 'umar', 'bobby', 'mona', 'mike', 'norby'];
-    const urlParams = new URLSearchParams(window.location.search);
-    let currentUser = urlParams.get('user');
-
-    if (!currentUser) {
-      currentUser = localStorage.getItem('tappy_current_user');
-      if (!currentUser) {
-        currentUser = prompt("⚡ Welcome to TappyThing! What is your name?") || "Staff";
-      }
-      localStorage.setItem('tappy_current_user', currentUser);
-      window.history.replaceState({}, '', `?user=${encodeURIComponent(currentUser)}`);
-    } else {
-      localStorage.setItem('tappy_current_user', currentUser);
-    }
-
-    const isMaster = currentUser.toLowerCase() === 'william';
-    const isStaff = SHOP_STAFF.includes(currentUser.toLowerCase());
-
-    if (isMaster) {
-      document.getElementById('userTag').innerText = `👑 Master: William`;
-    } else if (isStaff) {
-      document.getElementById('userTag').innerText = `🔧 Shop Staff: ${currentUser}`;
-    } else {
-      document.getElementById('userTag').innerText = `👤 Subscriber: ${currentUser}`;
-    }
-
-    document.getElementById('worldSubLabel').innerText = isStaff ? "Live Shop Ops & Workbench queue" : "Live self-building cards & bills";
-
-    // --- 2. MULTI-LANGUAGE (ES / EN) RECOGNITION SUPPORT ---
-    let currentLang = 'en-US';
-    document.getElementById('langToggleBtn').addEventListener('click', () => {
-      currentLang = currentLang === 'en-US' ? 'es-ES' : 'en-US';
-      const label = currentLang === 'es-ES' ? '🇪🇸 Spanish Mode' : '🇺🇸 English Mode';
-      document.getElementById('langToggleBtn').innerText = label;
-      showAlertBanner(`Language switched to ${label}`);
-    });
-
-    // --- 3. IN-APP NOTIFICATIONS & ALERT BANNERS ---
-    function showAlertBanner(message) {
-      const banner = document.getElementById('alertBanner');
-      const text = document.getElementById('alertBannerText');
-      text.innerText = message;
-      banner.style.display = 'flex';
-      setTimeout(() => { banner.style.display = 'none'; }, 6000);
-    }
-
-    // --- 4. KEYWORD-BASED TEAM ROUTING ENGINE ---
-    function analyzeAndRoute(text) {
-      const lower = text.toLowerCase();
-      let assignedTo = null;
-      let routingTag = "General";
-
-      if (lower.includes('chris')) { assignedTo = 'Chris'; routingTag = 'Chris (Bench)'; }
-      else if (lower.includes('mona')) { assignedTo = 'Mona'; routingTag = 'Mona (Counter)'; }
-      else if (lower.includes('norby') || lower.includes('foas')) { assignedTo = 'Norby'; routingTag = 'Norby (FOAS)'; }
-      else if (lower.includes('mike')) { assignedTo = 'Mike'; routingTag = 'Mike (Tech)'; }
-      else if (lower.includes('brian')) { assignedTo = 'Brian'; routingTag = 'Brian'; }
-      else if (lower.includes('umar')) { assignedTo = 'Umar'; routingTag = 'Umar (Goals)'; }
-      else if (lower.includes('bobby')) { assignedTo = 'Bobby'; routingTag = 'Bobby'; }
-      else if (lower.includes('paul')) { assignedTo = 'Paul'; routingTag = 'Paul'; }
-      else if (isStaff) { assignedTo = currentUser; routingTag = currentUser; }
-
-      return { assignedTo, routingTag };
-    }
-
-    // --- 5. "CHAT WITH FRESH" CONVERSATIONAL BOT ENGINE ---
-    const freshChatModal = document.getElementById('freshChatModal');
-    document.getElementById('openChatBtn').addEventListener('click', () => {
-      freshChatModal.style.display = 'flex';
-    });
-    document.getElementById('closeChatBtn').addEventListener('click', () => {
-      freshChatModal.style.display = 'none';
-    });
-
-    function addChatBubble(sender, text) {
-      const container = document.getElementById('chatMessages');
-      const bubble = document.createElement('div');
-      bubble.className = `chat-bubble ${sender === 'fresh' ? 'bubble-fresh' : 'bubble-user'}`;
-      bubble.innerHTML = text;
-      container.appendChild(bubble);
-      container.scrollTop = container.scrollHeight;
-    }
-
-    function processFreshBotResponse(userMsg) {
-      const lower = userMsg.toLowerCase();
-      
-      // 1. Check if user is asking Fresh how it works / pricing / rules
-      if (lower.includes('how do you work') || lower.includes('what is tappything') || lower.includes('help')) {
-        return `TappyThing is your digital operations command center. You can tap <b>Talk</b>, <b>Type</b>, or <b>Photo</b> above for instant intake, or just chat with me right here. When you mention prices (e.g. <i>$120 tune up</i>), I automatically turn them into 1-tap invoices in your World!`;
-      }
-      
-      if (lower.includes('price') || lower.includes('cost') || lower.includes('pricing')) {
-        return `TappyThing is $95/month with unlimited users. Reps make $50 on their 1st referral sale, and $100 on every sale after that!`;
-      }
-
-      if (lower.includes('bench') || lower.includes('estimate') || lower.includes('rule')) {
-        return `Remember Boudie's core shop rule: <b>NO customer estimate is sent without physical bench inspection first by Chris or Mike!</b>`;
-      }
-
-      // 2. Intelligent Card / Ticket Creation directly from Chat
-      const isBill = /bill|invoice|charge|\$/i.test(userMsg);
-      const amountMatch = userMsg.match(/\$?(\d+(\.\d{2})?)/);
-      const billAmount = amountMatch ? parseFloat(amountMatch[1]) : null;
-      const { assignedTo, routingTag } = analyzeAndRoute(userMsg);
-
-      const newCard = {
-        id: Date.now(),
-        user: assignedTo || currentUser,
-        title: isBill ? `🧾 Bill: ${userMsg}` : `⚡ ${userMsg}`,
-        type: isBill ? "Bill / Invoice" : `Task (${routingTag})`,
-        details: `Created via Chat with Fresh: "${userMsg}"`,
-        billAmount: billAmount,
-        status: isBill ? "Ready to Send" : "Active",
-        createdAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-      };
-
-      let cards = JSON.parse(localStorage.getItem('tappy_cards') || '[]');
-      cards.unshift(newCard);
-      localStorage.setItem('tappy_cards', JSON.stringify(cards));
-
-      showAlertBanner(`✅ Fresh built a new card: ${newCard.title}`);
-      fetchWorldData();
-
-      if (assignedTo && assignedTo.toLowerCase() !== currentUser.toLowerCase()) {
-        return `Done! I logged that and routed it directly to <b>${assignedTo}</b>. Card has been added to My World! 🚀`;
-      } else if (isBill && billAmount) {
-        return `Got it! I generated a <b>${billAmount.toFixed(2)}</b> invoice card in your World ready to send. Anything else you need?`;
-      } else {
-        return `Locked and loaded! I've added that card to your World under <b>${routingTag}</b>. 🎩`;
-      }
-    }
-
-    document.getElementById('sendChatBtn').addEventListener('click', () => {
-      const input = document.getElementById('chatInputField');
-      const val = input.value.trim();
-      if (!val) return;
-
-      addChatBubble('user', val);
-      input.value = '';
-
-      setTimeout(() => {
-        const reply = processFreshBotResponse(val);
-        addChatBubble('fresh', reply);
-      }, 400);
-    });
-
-    document.getElementById('chatInputField').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') document.getElementById('sendChatBtn').click();
-    });
-
-    // --- 6. SPEECH RECOGNITION (TALK BUTTON) WITH ROUTING ---
-    let isListening = false;
+    const chatBox = document.getElementById("chat-box");
+    const textInput = document.getElementById("text-input");
+    const micBtn = document.getElementById("mic-btn");
+    let conversationHistory = [];
+    let isRecording = false;
     let recognition = null;
+    const synth = window.speechSynthesis;
 
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRec();
-      recognition.continuous = false;
+    // 1. Initialize Speech Recognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
       recognition.interimResults = false;
-
-      recognition.onresult = (e) => {
-        const spoken = e.results[0][0].transcript;
-        document.getElementById('statusText').innerText = `Heard: "${spoken}"`;
-        handleQuickIntake(spoken);
+      recognition.onstart = () => {
+        isRecording = true;
+        micBtn.classList.add("recording");
       };
-
-      recognition.onend = () => {
-        isListening = false;
-        document.getElementById('talkBtnLabel').innerText = "Talk";
-        document.getElementById('talkBtn').classList.remove('recording');
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        textInput.value = transcript;
+        handleSend();
       };
+      recognition.onerror = () => stopRecording();
+      recognition.onend = () => stopRecording();
     }
 
-    function handleQuickIntake(text) {
-      if (!text || text.trim() === '') return;
-
-      const { assignedTo, routingTag } = analyzeAndRoute(text);
-      const isBill = /bill|invoice|charge|\$/i.test(text);
-      const amountMatch = text.match(/\$?(\d+(\.\d{2})?)/);
-      const billAmount = amountMatch ? parseFloat(amountMatch[1]) : null;
-
-      const newCard = {
-        id: Date.now(),
-        user: assignedTo || currentUser,
-        title: isBill ? `🧾 Bill: ${text}` : text,
-        type: isBill ? "Bill / Invoice" : `Shop Intake (${routingTag})`,
-        details: text,
-        billAmount: billAmount,
-        status: isBill ? "Ready to Send" : "Intake",
-        createdAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-      };
-
-      let cards = JSON.parse(localStorage.getItem('tappy_cards') || '[]');
-      cards.unshift(newCard);
-      localStorage.setItem('tappy_cards', JSON.stringify(cards));
-
-      showAlertBanner(`✅ Card created & routed to ${assignedTo || currentUser}!`);
-      document.getElementById('statusText').innerText = `✅ Logged -> ${routingTag}`;
-      openWorldDrawer();
-    }
-
-    document.getElementById('talkBtn').addEventListener('click', () => {
-      if (!isListening) {
-        isListening = true;
-        document.getElementById('talkBtnLabel').innerText = "Listening...";
-        document.getElementById('talkBtn').classList.add('recording');
-        document.getElementById('statusText').innerText = "🎙️ Listening... (Speak now)";
-        if (recognition) {
-          recognition.lang = currentLang;
-          recognition.start();
-        } else {
-          const note = prompt("Type your note:");
-          if (note) handleQuickIntake(note);
-          isListening = false;
-          document.getElementById('talkBtnLabel').innerText = "Talk";
-          document.getElementById('talkBtn').classList.remove('recording');
-        }
-      } else {
-        isListening = false;
-        document.getElementById('talkBtnLabel').innerText = "Talk";
-        document.getElementById('talkBtn').classList.remove('recording');
-        if (recognition) recognition.stop();
-      }
-    });
-
-    document.getElementById('typeBtn').addEventListener('click', () => {
-      const typed = prompt("Type customer intake, vacuum repair note, or price ($):");
-      if (typed) handleQuickIntake(typed);
-    });
-
-    // --- 7. CAMERA / PHOTO NOTE ENGINE ---
-    let cameraStream = null;
-    const video = document.getElementById('videoFeed');
-    const previewImg = document.getElementById('previewImg');
-    const canvas = document.getElementById('snapshotCanvas');
-    let capturedPhotoData = null;
-
-    document.getElementById('cameraToolBtn').addEventListener('click', async () => {
-      document.getElementById('cameraModal').style.display = 'flex';
-      previewImg.style.display = 'none';
-      video.style.display = 'block';
-      document.getElementById('savePhotoToWorldBtn').style.display = 'none';
-      try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        video.srcObject = cameraStream;
-      } catch (e) {
-        alert("Camera permission needed.");
-      }
-    });
-
-    document.getElementById('closeModalBtn').addEventListener('click', () => {
-      if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
-      document.getElementById('cameraModal').style.display = 'none';
-    });
-
-    document.getElementById('snapStillPhotoBtn').addEventListener('click', () => {
-      canvas.width = video.videoWidth || 640;
-      canvas.height = video.videoHeight || 480;
-      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-      capturedPhotoData = canvas.toDataURL('image/jpeg');
-      video.style.display = 'none';
-      previewImg.src = capturedPhotoData;
-      previewImg.style.display = 'block';
-      document.getElementById('savePhotoToWorldBtn').style.display = 'block';
-    });
-
-    document.getElementById('fileUploadInput').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          capturedPhotoData = event.target.result;
-          video.style.display = 'none';
-          previewImg.src = capturedPhotoData;
-          previewImg.style.display = 'block';
-          document.getElementById('savePhotoToWorldBtn').style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    document.getElementById('savePhotoToWorldBtn').addEventListener('click', () => {
-      const noteTitle = prompt("Add a title for this photo note:", "Job Photo") || "Photo Card";
-      const { assignedTo, routingTag } = analyzeAndRoute(noteTitle);
-
-      const newCard = {
-        id: Date.now(),
-        user: assignedTo || currentUser,
-        title: `📷 ${noteTitle}`,
-        type: `Photo Note (${routingTag})`,
-        details: `Photo logged by ${currentUser}.`,
-        photo: capturedPhotoData,
-        billAmount: null,
-        status: "Intake",
-        createdAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-      };
-
-      let cards = JSON.parse(localStorage.getItem('tappy_cards') || '[]');
-      cards.unshift(newCard);
-      localStorage.setItem('tappy_cards', JSON.stringify(cards));
-
-      if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
-      document.getElementById('cameraModal').style.display = 'none';
-
-      showAlertBanner(`✅ Photo logged & routed to ${assignedTo || currentUser}!`);
-      openWorldDrawer();
-    });
-
-    // --- 8. MY WORLD DRAWER RENDERING ---
-    let drawerOpen = false;
-    function openWorldDrawer() {
-      drawerOpen = true;
-      document.getElementById('worldDrawer').style.display = 'flex';
-      document.getElementById('worldChevron').innerText = '▲';
-      fetchWorldData();
-    }
-
-    document.getElementById('myWorldToggle').addEventListener('click', () => {
-      drawerOpen = !drawerOpen;
-      document.getElementById('worldDrawer').style.display = drawerOpen ? 'flex' : 'none';
-      document.getElementById('worldChevron').innerText = drawerOpen ? '▲' : '▼';
-      if (drawerOpen) fetchWorldData();
-    });
-
-    async function fetchWorldData() {
-      if (isStaff) {
-        const container = document.getElementById('liveCardsContainer');
-        container.innerHTML = `<div style="text-align:center; padding:20px; color:#c084fc;">⚡ Loading Shop Ops board...</div>`;
-        try {
-          const response = await fetch('/.netlify/functions/myworld');
-          if (response.ok) {
-            const data = await response.json();
-            if (data && data.groups && data.groups.length > 0) {
-              renderLiveShopOpsGroups(data.groups);
-              return;
-            }
-          }
-        } catch (err) {
-          console.warn("Using local board fallback:", err);
-        }
-      }
-
-      renderSubscriberCards();
-    }
-
-    function renderLiveShopOpsGroups(groups) {
-      const container = document.getElementById('liveCardsContainer');
-      let totalCount = 0;
-      let localCards = JSON.parse(localStorage.getItem('tappy_cards') || '[]');
-
-      const html = groups.map(group => {
-        if (!group.items || group.items.length === 0) return '';
-        totalCount += group.items.length;
-
-        return `
-          <div class="group-section">
-            <div class="group-header">📂 ${group.title} (${group.items.length})</div>
-            ${group.items.map(item => `
-              <div class="card">
-                <div class="card-top">
-                  <div class="card-title">${item.name}</div>
-                  <span class="card-badge badge-ops">${item.status || 'Active'}</span>
-                </div>
-                ${item.details ? `<div class="card-body">${item.details}</div>` : ''}
-                ${item.billAmount ? `
-                  <div class="bill-box">
-                    <div>
-                      <div style="font-size:0.75rem; color:#94a3b8;">Invoice Total</div>
-                      <div class="bill-amount">${parseFloat(item.billAmount).toFixed(2)}</div>
-                    </div>
-                    <button class="send-bill-btn" onclick="alert('✅ Invoice ready to send!')">1-Tap Send</button>
-                  </div>
-                ` : ''}
-              </div>
-            `).join('')}
-          </div>
-        `;
-      }).join('');
-
-      document.getElementById('cardCount').innerText = totalCount + localCards.length;
-      container.innerHTML = html || `<div style="text-align:center; padding:20px; color:#fbbf24;">No items found in your shop board.</div>`;
-    }
-
-    function renderSubscriberCards() {
-      let cards = JSON.parse(localStorage.getItem('tappy_cards') || '[]');
-      const userCards = isMaster ? cards : cards.filter(c => (c.user || '').toLowerCase() === currentUser.toLowerCase());
-      document.getElementById('cardCount').innerText = userCards.length;
-
-      const container = document.getElementById('liveCardsContainer');
-      if (userCards.length === 0) {
-        container.innerHTML = `
-          <div style="text-align:center; padding:30px 15px; color:#fbbf24; background:rgba(30, 16, 53, 0.6); border-radius:18px; border:1px dashed rgba(251, 191, 36, 0.4);">
-            <div style="font-size:2rem; margin-bottom:8px;">🌱</div>
-            <div style="font-weight:800; font-size:1.1rem; color:#fff;">Welcome, ${currentUser}!</div>
-            <div style="font-size:0.85rem; color:#cbd5e1; margin-top:4px;">Your world is empty. Chat with Fresh or use Talk/Type/Photo above!</div>
-          </div>
-        `;
+    function toggleVoice() {
+      if (!recognition) {
+        alert("Voice recognition is not supported in this browser. Please use Chrome or Safari.");
         return;
       }
-
-      container.innerHTML = userCards.map(c => `
-        <div class="card">
-          <div class="card-top">
-            <div>
-              <div class="card-title">${c.title}</div>
-              <div style="font-size:0.75rem; color:#c084fc; margin-top:2px;">Owner: <b>${c.user}</b></div>
-            </div>
-            <span class="card-badge ${c.type && c.type.includes('Bill') ? 'badge-bill' : 'badge-routed'}">${c.type || 'Task'}</span>
-          </div>
-          ${c.photo ? `<img src="${c.photo}" style="width:100%; border-radius:10px; margin-top:4px;" />` : ''}
-          <div class="card-body">${c.details || ''}</div>
-          ${c.billAmount ? `
-            <div class="bill-box">
-              <div>
-                <div style="font-size:0.75rem; color:#94a3b8;">Invoice Total</div>
-                <div class="bill-amount">${parseFloat(c.billAmount).toFixed(2)}</div>
-              </div>
-              <button class="send-bill-btn" onclick="alert('✅ Invoice for ${parseFloat(c.billAmount).toFixed(2)} sent!')">1-Tap Send</button>
-            </div>
-          ` : ''}
-          <div style="display:flex; justify-content:space-between; font-size:0.72rem; color:#a855f7; margin-top:4px;">
-            <span>Status: <b style="color:#f8fafc;">${c.status || 'Active'}</b></span>
-            <span>${c.createdAt || 'Today'}</span>
-          </div>
-        </div>
-      `).join('');
+      if (isRecording) {
+        recognition.stop();
+      } else {
+        recognition.start();
+      }
     }
 
-    // Initial load
-    fetchWorldData();
+    function stopRecording() {
+      isRecording = false;
+      micBtn.classList.remove("recording");
+    }
+
+    function handleKey(e) {
+      if (e.key === "Enter") handleSend();
+    }
+
+    function addBubble(sender, text) {
+      const b = document.createElement("div");
+      b.className = `bubble ${sender}`;
+      b.innerHTML = text;
+      chatBox.appendChild(b);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return b;
+    }
+
+    function speak(text) {
+      if (!synth) return;
+      synth.cancel();
+      // Remove HTML tags for clean speech
+      const clean = text.replace(/<[^>]*>/g, "");
+      const utter = new SpeechSynthesisUtterance(clean);
+      utter.rate = 1.05;
+      synth.speak(utter);
+    }
+
+    async function handleSend() {
+      const msg = textInput.value.trim();
+      if (!msg) return;
+
+      addBubble("user", msg);
+      conversationHistory.push({ role: "user", content: msg });
+      textInput.value = "";
+
+      const thinking = addBubble("thinking", "Fresh is thinking...");
+
+      try {
+        const res = await fetch("/.netlify/functions/gemini-chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: msg,
+            history: conversationHistory
+          })
+        });
+
+        const data = await res.json();
+        chatBox.removeChild(thinking);
+
+        if (data && data.reply) {
+          let reply = data.reply;
+          addBubble("fresh", reply);
+          conversationHistory.push({ role: "model", content: reply });
+          speak(reply);
+        } else {
+          addBubble("fresh", "I had a quick glitch connecting. Tap the mic and try again!");
+        }
+      } catch (err) {
+        if (thinking.parentNode) chatBox.removeChild(thinking);
+        addBubble("fresh", "I had trouble reaching the server. Please check your internet connection.");
+      }
+    }
   </script>
 </body>
 </html>
-Click the green Commit changes button!
