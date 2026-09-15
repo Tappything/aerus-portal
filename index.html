@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TappyThing — Digital Coordinator Command Center</title>
   <style>
     :root {
@@ -46,7 +46,7 @@
       gap: 12px;
     }
 
-    /* TOP BAR UTILITIES: HOW IT WORKS + ROB ART */
+    /* TOP BAR UTILITIES */
     .top-bar {
       display: flex;
       justify-content: space-between;
@@ -56,10 +56,10 @@
     }
 
     .btn-pill-info {
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.35);
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
       color: #38bdf8;
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: 9999px;
       font-size: 11px;
       font-weight: 700;
@@ -67,11 +67,6 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      transition: all 0.2s;
-    }
-
-    .btn-pill-info:hover {
-      background: rgba(56, 189, 248, 0.22);
     }
 
     .rob-art-tag {
@@ -80,14 +75,14 @@
       gap: 4px;
       background: rgba(139, 92, 246, 0.15);
       border: 1px solid rgba(139, 92, 246, 0.35);
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: 9999px;
       font-size: 11px;
       color: #c4b5fd;
       font-weight: 700;
     }
 
-    /* HOW FRESH WORKS POPUP CARD */
+    /* HOW IT WORKS CARD */
     .how-it-works-box {
       display: none;
       background: #111827;
@@ -96,7 +91,6 @@
       padding: 12px 14px;
       font-size: 12px;
       color: #e5e7eb;
-      animation: fadeIn 0.2s ease;
     }
 
     .how-it-works-box strong {
@@ -135,48 +129,47 @@
       text-align: center;
     }
 
-    /* CENTERED CIRCULAR TALK TO FRESH BUTTON */
+    /* CENTERED CIRCULAR MIC BUTTON */
     .mic-center-container {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 8px;
-      margin: 4px 0;
+      margin: 6px 0;
     }
 
     .btn-circle-mic {
-      width: 82px;
-      height: 82px;
+      width: 84px;
+      height: 84px;
       border-radius: 50%;
       background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-      border: 3px solid rgba(139, 92, 246, 0.5);
+      border: 3px solid rgba(139, 92, 246, 0.6);
       color: #fff;
-      font-size: 32px;
+      font-size: 34px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 0 25px rgba(124, 58, 237, 0.45);
-      transition: all 0.25s ease;
-      user-select: none;
+      box-shadow: 0 0 25px rgba(124, 58, 237, 0.5);
+      transition: all 0.2s ease;
+      touch-action: manipulation;
     }
 
-    .btn-circle-mic:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 32px rgba(124, 58, 237, 0.65);
+    .btn-circle-mic:active {
+      transform: scale(0.95);
     }
 
     .btn-circle-mic.listening {
       background: var(--accent-red) !important;
       border-color: #fca5a5 !important;
-      box-shadow: 0 0 35px rgba(239, 68, 68, 0.75) !important;
+      box-shadow: 0 0 35px rgba(239, 68, 68, 0.8) !important;
       animation: pulse 1.2s infinite;
     }
 
     @keyframes pulse {
-      0% { transform: scale(0.98); opacity: 0.95; }
-      50% { transform: scale(1.06); opacity: 1; }
-      100% { transform: scale(0.98); opacity: 0.95; }
+      0% { transform: scale(0.97); opacity: 0.95; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(0.97); opacity: 0.95; }
     }
 
     .mic-status-label {
@@ -188,16 +181,12 @@
     .type-toggle-link {
       background: none;
       border: none;
-      color: var(--text-muted);
-      font-size: 11px;
-      font-weight: 600;
+      color: var(--accent-blue);
+      font-size: 12px;
+      font-weight: 700;
       cursor: pointer;
       text-decoration: underline;
-      padding: 2px 6px;
-    }
-
-    .type-toggle-link:hover {
-      color: #c4b5fd;
+      padding: 4px 8px;
     }
 
     /* FRESH LIVE CHAT & STATUS ENGINE */
@@ -228,8 +217,8 @@
     }
 
     .fresh-status-dot {
-      width: 7px;
-      height: 7px;
+      width: 8px;
+      height: 8px;
       background: var(--accent-green);
       border-radius: 50%;
       box-shadow: 0 0 6px var(--accent-green);
@@ -246,7 +235,7 @@
     }
 
     .chat-display {
-      max-height: 170px;
+      max-height: 180px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
@@ -278,12 +267,6 @@
     .input-bar-container {
       display: none;
       gap: 6px;
-      animation: fadeIn 0.2s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-3px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     .chat-input {
@@ -291,9 +274,9 @@
       background: #090d16;
       border: 1px solid var(--card-border);
       border-radius: 10px;
-      padding: 9px 12px;
+      padding: 10px 12px;
       color: #fff;
-      font-size: 12px;
+      font-size: 13px;
       outline: none;
     }
 
@@ -306,8 +289,8 @@
       color: #fff;
       border: none;
       border-radius: 10px;
-      padding: 0 14px;
-      font-size: 12px;
+      padding: 0 16px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
     }
@@ -317,7 +300,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      margin-top: 2px;
+      margin-top: 4px;
     }
 
     .my-world-main-btn {
@@ -325,15 +308,16 @@
       background: linear-gradient(135deg, #6d28d9 0%, #4f46e5 100%);
       border: none;
       border-radius: 14px;
-      padding: 13px 16px;
+      padding: 14px 16px;
       color: #fff;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 800;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
       box-shadow: 0 4px 15px rgba(109, 40, 217, 0.35);
+      touch-action: manipulation;
     }
 
     .master-bubbles-grid {
@@ -341,7 +325,6 @@
       grid-template-columns: 1fr 1fr;
       gap: 8px;
       margin-top: 4px;
-      animation: fadeIn 0.25s ease;
     }
 
     .master-bubble {
@@ -356,10 +339,8 @@
       transition: all 0.2s;
     }
 
-    .master-bubble:hover {
-      border-color: var(--accent-purple);
+    .master-bubble:active {
       background: var(--card-hover);
-      transform: translateY(-2px);
     }
 
     .bubble-head {
@@ -394,7 +375,6 @@
       flex-direction: column;
       gap: 10px;
       margin-top: 6px;
-      animation: fadeIn 0.2s ease;
     }
 
     .drawer-header {
@@ -412,12 +392,12 @@
     }
 
     .btn-close-drawer {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.1);
       border: none;
       color: #fff;
       font-size: 11px;
       font-weight: 700;
-      padding: 4px 8px;
+      padding: 5px 10px;
       border-radius: 6px;
       cursor: pointer;
     }
@@ -462,15 +442,11 @@
       border: 1px dashed var(--accent-purple);
       color: #c4b5fd;
       border-radius: 8px;
-      padding: 8px;
+      padding: 9px;
       font-size: 11px;
       font-weight: 700;
       cursor: pointer;
       text-align: center;
-    }
-
-    .btn-add-cascade:hover {
-      background: rgba(139, 92, 246, 0.25);
     }
 
     footer {
@@ -487,7 +463,7 @@
     
     <!-- TOP UTILITY BAR: HOW IT WORKS + ROB ART -->
     <div class="top-bar">
-      <button class="btn-pill-info" onclick="toggleHowItWorks()">
+      <button type="button" class="btn-pill-info" onclick="toggleHowItWorks()">
         <span>💡</span>
         <span>How Fresh Works</span>
       </button>
@@ -498,7 +474,7 @@
       </div>
     </div>
 
-    <!-- HOW IT WORKS EXPLAINER BOX (HIDDEN UNTIL CLICKED) -->
+    <!-- HOW IT WORKS EXPLAINER BOX -->
     <div class="how-it-works-box" id="howItWorksBox">
       <strong>1. 🗣️ Brain Dump:</strong> Tap the circle and talk or type. Dictate repair invoices, personal bills, or grocery notes.<br>
       <strong>2. 🧠 Fresh Organizes:</strong> Fresh listens and tells Sissy to route your notes into Business, Personal, Invoices, or Shared spaces.<br>
@@ -512,13 +488,13 @@
       <div class="brand-sub">Universal Business & Personal Operating System</div>
     </div>
 
-    <!-- CENTERED CIRCULAR MIC BUTTON (1-TOUCH TALK TO FRESH) -->
+    <!-- CENTERED CIRCULAR MIC BUTTON -->
     <div class="mic-center-container">
-      <button class="btn-circle-mic" id="circleMicBtn" onclick="toggleVoice()">
+      <button type="button" class="btn-circle-mic" id="circleMicBtn" onclick="toggleVoice()">
         <span id="micIconDisplay">🎙️</span>
       </button>
       <div class="mic-status-label" id="micStatusLabel">Tap Circle to Talk to Fresh</div>
-      <button class="type-toggle-link" onclick="toggleTypeInput()">
+      <button type="button" class="type-toggle-link" onclick="toggleTypeInput()">
         ⌨️ Tap here to type text instead
       </button>
     </div>
@@ -542,14 +518,14 @@
       </div>
 
       <div class="input-bar-container" id="inputBarContainer">
-        <input type="text" id="userInput" class="chat-input" placeholder="Type to Fresh (e.g. Invoice for Karen, Oreck $75)..." onkeydown="if(event.key==='Enter') sendChat()">
-        <button class="btn-send" onclick="sendChat()">Send</button>
+        <input type="text" id="userInput" class="chat-input" placeholder="Type to Fresh (e.g. Invoice for Karen, Oreck $75)..." onkeydown="handleInputKey(event)">
+        <button type="button" class="btn-send" onclick="sendChat()">Send</button>
       </div>
     </div>
 
     <!-- 🌍 MY WORLD (MASTER SLIDE-OUT HUBS) -->
     <div class="my-world-container">
-      <button class="my-world-main-btn" onclick="toggleMyWorld()">
+      <button type="button" class="my-world-main-btn" onclick="toggleMyWorld()">
         <span>🌍 My World</span>
         <span id="worldArrow">▼</span>
       </button>
@@ -560,7 +536,7 @@
         <div class="master-bubble" onclick="openDrawer('business')">
           <div class="bubble-head">
             <span>🏢 Business Ops</span>
-            <span class="bubble-count" id="countBusiness">4 Jobs</span>
+            <span class="bubble-count">4 Jobs</span>
           </div>
           <div class="bubble-desc">Bench repairs, parts tracker & ready wall</div>
         </div>
@@ -569,7 +545,7 @@
         <div class="master-bubble" onclick="openDrawer('personal')">
           <div class="bubble-head">
             <span>🏠 Personal / Home</span>
-            <span class="bubble-count" id="countPersonal">3 Items</span>
+            <span class="bubble-count">3 Items</span>
           </div>
           <div class="bubble-desc">Bills, grocery lists & family tasks</div>
         </div>
@@ -578,7 +554,7 @@
         <div class="master-bubble" onclick="openDrawer('invoices')">
           <div class="bubble-head">
             <span>💵 Invoices & Money</span>
-            <span class="bubble-count" id="countInvoices">$365 Due</span>
+            <span class="bubble-count">$365 Due</span>
           </div>
           <div class="bubble-desc">Customer billing & Saturday settlement</div>
         </div>
@@ -587,21 +563,21 @@
         <div class="master-bubble" onclick="openDrawer('shared')">
           <div class="bubble-head">
             <span>👥 Shared Spaces</span>
-            <span class="bubble-count" id="countShared">8 Members</span>
+            <span class="bubble-count">8 Members</span>
           </div>
           <div class="bubble-desc">Mike (Bagdons), Mona, Chris, Norby & AI Cast</div>
         </div>
 
       </div>
 
-      <!-- CASCADING DRAWER / ITEMS MODAL -->
+      <!-- CASCADING DRAWER (OPENS ON BUBBLE CLICK) -->
       <div class="cascade-drawer" id="cascadeDrawer">
         <div class="drawer-header">
           <div class="drawer-title" id="drawerTitle">Hub Section</div>
-          <button class="btn-close-drawer" onclick="closeDrawer()">✕ Close</button>
+          <button type="button" class="btn-close-drawer" onclick="closeDrawer()">✕ Close</button>
         </div>
         <div class="cascade-items-list" id="cascadeItemsList"></div>
-        <button class="btn-add-cascade" onclick="addItemToCurrentCascade()">+ Add Item to This Hub</button>
+        <button type="button" class="btn-add-cascade" onclick="addItemToCurrentCascade()">+ Add Item to This Hub</button>
       </div>
 
     </div>
@@ -613,8 +589,8 @@
   </div>
 
   <script>
-    // CORE DATA STATE
-    const state = {
+    // GLOBAL STATE
+    var state = {
       business: [
         { title: "Karen Vleck — Oreck XL Belt & Brush", status: "Workbench", badge: "badge-working" },
         { title: "Maria Gómez — ProTeam ProVac FS 6", status: "Waiting on parts", badge: "badge-parts" },
@@ -643,221 +619,237 @@
       ]
     };
 
-    let activeDrawer = null;
-    let recognition = null;
-    let isListening = false;
+    var activeDrawer = null;
+    var recognition = null;
+    var isListening = false;
 
-    const chatBox = document.getElementById('chatBox');
-    const userInput = document.getElementById('userInput');
-    const inputBarContainer = document.getElementById('inputBarContainer');
-    const circleMicBtn = document.getElementById('circleMicBtn');
-    const micIconDisplay = document.getElementById('micIconDisplay');
-    const micStatusLabel = document.getElementById('micStatusLabel');
-    const masterBubblesGrid = document.getElementById('masterBubblesGrid');
-    const worldArrow = document.getElementById('worldArrow');
-    const cascadeDrawer = document.getElementById('cascadeDrawer');
-    const drawerTitle = document.getElementById('drawerTitle');
-    const cascadeItemsList = document.getElementById('cascadeItemsList');
-    const howItWorksBox = document.getElementById('howItWorksBox');
-
-    // HOW IT WORKS TOGGLE
+    // HOW IT WORKS
     function toggleHowItWorks() {
-      if (howItWorksBox.style.display === 'block') {
-        howItWorksBox.style.display = 'none';
-      } else {
-        howItWorksBox.style.display = 'block';
+      var box = document.getElementById('howItWorksBox');
+      if (box) {
+        box.style.display = (box.style.display === 'block') ? 'none' : 'block';
       }
     }
 
-    // SPEECH RECOGNITION SETUP
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRec();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = 'en-US';
-
-      recognition.onstart = () => {
-        isListening = true;
-        circleMicBtn.classList.add('listening');
-        micIconDisplay.innerText = '🛑';
-        micStatusLabel.innerText = 'Listening to you...';
-      };
-
-      recognition.onresult = (e) => {
-        const transcript = e.results[0][0].transcript;
-        addMsg(transcript, 'user');
-        processFreshRouting(transcript);
-      };
-
-      recognition.onerror = () => stopMic();
-      recognition.onend = () => stopMic();
+    // TYPE INPUT TOGGLE
+    function toggleTypeInput() {
+      var bar = document.getElementById('inputBarContainer');
+      var input = document.getElementById('userInput');
+      if (bar) {
+        if (bar.style.display === 'flex') {
+          bar.style.display = 'none';
+        } else {
+          bar.style.display = 'flex';
+          if (input) input.focus();
+        }
+      }
     }
 
+    function handleInputKey(e) {
+      if (e.key === 'Enter') {
+        sendChat();
+      }
+    }
+
+    function sendChat() {
+      var input = document.getElementById('userInput');
+      if (!input) return;
+      var val = input.value.trim();
+      if (!val) return;
+      addMsg(val, 'user');
+      input.value = '';
+      processFreshRouting(val);
+    }
+
+    function addMsg(text, sender) {
+      var box = document.getElementById('chatBox');
+      if (!box) return;
+      var el = document.createElement('div');
+      el.className = 'msg msg-' + sender;
+      el.innerHTML = text.replace(/\n/g, '<br>');
+      box.appendChild(el);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function speakAudio(text) {
+      try {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          var clean = text.replace(/<[^>]*>?/gm, '').replace(/[🐷💵🎙️📹🛑⚡🏢🏠👥]/g, '');
+          var u = new SpeechSynthesisUtterance(clean);
+          u.rate = 1.05;
+          window.speechSynthesis.speak(u);
+        }
+      } catch (err) {
+        console.log('Audio speech not available');
+      }
+    }
+
+    // VOICE RECOGNITION (LAZY INITIALIZATION TO PREVENT MOBILE CRASHES)
     function toggleVoice() {
-      if (!recognition) {
+      var btn = document.getElementById('circleMicBtn');
+      var icon = document.getElementById('micIconDisplay');
+      var label = document.getElementById('micStatusLabel');
+
+      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
         toggleTypeInput();
         addMsg("Speech recognition isn't supported on this browser. Type in the box below!", 'fresh');
         return;
       }
+
       if (isListening) {
-        recognition.stop();
         stopMic();
-      } else {
-        try {
-          recognition.start();
-        } catch (err) {
-          recognition.stop();
-          setTimeout(() => recognition.start(), 200);
-        }
+        return;
+      }
+
+      try {
+        var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRec();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = function() {
+          isListening = true;
+          if (btn) btn.classList.add('listening');
+          if (icon) icon.innerText = '🛑';
+          if (label) label.innerText = 'Listening to you...';
+        };
+
+        recognition.onresult = function(e) {
+          var transcript = e.results[0][0].transcript;
+          addMsg(transcript, 'user');
+          processFreshRouting(transcript);
+        };
+
+        recognition.onerror = function() {
+          stopMic();
+        };
+
+        recognition.onend = function() {
+          stopMic();
+        };
+
+        recognition.start();
+      } catch (e) {
+        stopMic();
+        toggleTypeInput();
+        addMsg("Microphone tapped! Type in the box below or check browser mic permissions.", 'fresh');
       }
     }
 
     function stopMic() {
       isListening = false;
-      circleMicBtn.classList.remove('listening');
-      micIconDisplay.innerText = '🎙️';
-      micStatusLabel.innerText = 'Tap Circle to Talk to Fresh';
-    }
-
-    function toggleTypeInput() {
-      if (inputBarContainer.style.display === 'flex') {
-        inputBarContainer.style.display = 'none';
-      } else {
-        inputBarContainer.style.display = 'flex';
-        userInput.focus();
-      }
-    }
-
-    function sendChat() {
-      const val = userInput.value.trim();
-      if (!val) return;
-      addMsg(val, 'user');
-      userInput.value = '';
-      processFreshRouting(val);
-    }
-
-    function addMsg(text, sender) {
-      const el = document.createElement('div');
-      el.className = `msg msg-${sender}`;
-      el.innerHTML = text.replace(/\n/g, '<br>');
-      chatBox.appendChild(el);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    function speakAudio(text) {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const clean = text.replace(/<[^>]*>?/gm, '').replace(/[🐷💵🎙️📹🛑⚡🏢🏠👥]/g, '');
-        const u = new SpeechSynthesisUtterance(clean);
-        u.rate = 1.05;
-        window.speechSynthesis.speak(u);
+      var btn = document.getElementById('circleMicBtn');
+      var icon = document.getElementById('micIconDisplay');
+      var label = document.getElementById('micStatusLabel');
+      if (btn) btn.classList.remove('listening');
+      if (icon) icon.innerText = '🎙️';
+      if (label) label.innerText = 'Tap Circle to Talk to Fresh';
+      if (recognition) {
+        try { recognition.stop(); } catch(e){}
       }
     }
 
     // FRESH BRAIN-DUMP & INTELLIGENT AUTO-ROUTING ENGINE
-    async function processFreshRouting(text) {
-      const lower = text.toLowerCase();
-      let reply = "";
+    function processFreshRouting(text) {
+      var lower = text.toLowerCase();
+      var reply = "";
 
-      // 1. Invoicing & Money
-      if (lower.includes('invoice') || lower.includes('bill') || lower.includes('charge') || lower.includes('
+      if (lower.indexOf('invoice') !== -1 || lower.indexOf('bill') !== -1 || lower.indexOf('charge') !== -1 || lower.indexOf('
 
----
-
-Paste it in, enjoy your dinner while it deploys, and let me know how it looks when you open it!)) {
+Paste this into your Netlify `index.html` — tap `🌍 My World` or `💡 How Fresh Works` first to test the slide-outs!) !== -1) {
         state.invoices.unshift({ title: text, status: "Saturday Settlement", badge: "badge-working" });
-        reply = `Got it! Logged invoice: "${text}". Sissy staged this into Invoices & Money for Saturday settlement!`;
-      } 
-      // 2. Personal / Home
-      else if (lower.includes('grocery') || lower.includes('milk') || lower.includes('home') || lower.includes('wife') || lower.includes('pickleball') || lower.includes('weight')) {
+        reply = 'Got it! Logged invoice: "' + text + '". Sissy staged this into Invoices & Money for Saturday settlement!';
+      } else if (lower.indexOf('grocery') !== -1 || lower.indexOf('milk') !== -1 || lower.indexOf('home') !== -1 || lower.indexOf('wife') !== -1 || lower.indexOf('pickleball') !== -1 || lower.indexOf('weight') !== -1) {
         state.personal.unshift({ title: text, status: "Active", badge: "badge-parts" });
-        reply = `Filed to Personal & Home! "${text}" is logged in your private hub.`;
-      }
-      // 3. Shared & Team
-      else if (lower.includes('mike') || lower.includes('bagdon') || lower.includes('mona') || lower.includes('chris') || lower.includes('norby')) {
+        reply = 'Filed to Personal & Home! "' + text + '" is logged in your private hub.';
+      } else if (lower.indexOf('mike') !== -1 || lower.indexOf('bagdon') !== -1 || lower.indexOf('mona') !== -1 || lower.indexOf('chris') !== -1 || lower.indexOf('norby') !== -1) {
         state.shared.unshift({ title: text, status: "Shared Queue", badge: "badge-working" });
-        reply = `Routed to Shared Spaces for the team: "${text}".`;
-      }
-      // 4. General Business Repair Ops
-      else {
+        reply = 'Routed to Shared Spaces for the team: "' + text + '".';
+      } else {
         state.business.unshift({ title: text, status: "Intake", badge: "badge-working" });
-        reply = `Dumped straight into Business Ops! Sissy filed "${text}" to your workbench.`;
+        reply = 'Dumped straight into Business Ops! Sissy filed "' + text + '" to your workbench.';
       }
 
-      setTimeout(() => {
+      setTimeout(function() {
         addMsg(reply, 'fresh');
         speakAudio(reply);
-      }, 300);
+      }, 250);
 
-      // Backend sync
       try {
-        await fetch('/.netlify/functions/intake', {
+        fetch('/.netlify/functions/intake', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: text, time: new Date().toISOString() })
         });
-      } catch (e) {
-        console.log('Saved to local state');
-      }
+      } catch (e) {}
 
       if (activeDrawer) openDrawer(activeDrawer);
     }
 
-    // 🌍 MY WORLD HUB TOGGLE & DRAWER
+    // 🌍 MY WORLD TOGGLE & DRAWER
     function toggleMyWorld() {
-      if (masterBubblesGrid.style.display === 'grid') {
-        masterBubblesGrid.style.display = 'none';
-        cascadeDrawer.style.display = 'none';
-        worldArrow.innerText = '▼';
+      var grid = document.getElementById('masterBubblesGrid');
+      var drawer = document.getElementById('cascadeDrawer');
+      var arrow = document.getElementById('worldArrow');
+
+      if (!grid) return;
+      if (grid.style.display === 'grid') {
+        grid.style.display = 'none';
+        if (drawer) drawer.style.display = 'none';
+        if (arrow) arrow.innerText = '▼';
       } else {
-        masterBubblesGrid.style.display = 'grid';
-        worldArrow.innerText = '▲';
+        grid.style.display = 'grid';
+        if (arrow) arrow.innerText = '▲';
       }
     }
 
     function openDrawer(category) {
       activeDrawer = category;
-      cascadeDrawer.style.display = 'flex';
-      cascadeItemsList.innerHTML = '';
+      var drawer = document.getElementById('cascadeDrawer');
+      var title = document.getElementById('drawerTitle');
+      var listEl = document.getElementById('cascadeItemsList');
 
-      const titles = {
+      if (!drawer || !listEl) return;
+      drawer.style.display = 'flex';
+      listEl.innerHTML = '';
+
+      var titles = {
         business: "🏢 Business Ops",
         personal: "🏠 Personal / Home",
         invoices: "💵 Invoices & Saturday Settlement",
         shared: "👥 Shared Spaces (Team & AI Cast)"
       };
-      drawerTitle.innerText = titles[category] || "Hub Section";
+      if (title) title.innerText = titles[category] || "Hub Section";
 
-      const list = state[category] || [];
-      if (list.length === 0) {
-        cascadeItemsList.innerHTML = '<div style="font-size:11px;color:#9ca3af;padding:6px;">No items yet. Brain-dump above to add!</div>';
+      var items = state[category] || [];
+      if (items.length === 0) {
+        listEl.innerHTML = '<div style="font-size:11px;color:#9ca3af;padding:6px;">No items yet. Brain-dump above to add!</div>';
         return;
       }
 
-      list.forEach((item) => {
-        const row = document.createElement('div');
-        row.className = 'cascade-card';
-        row.innerHTML = `
-          <span class="cascade-card-title">${item.title}</span>
-          <span class="status-badge ${item.badge}">${item.status}</span>
-        `;
-        cascadeItemsList.appendChild(row);
-      });
+      for (var i = 0; i < items.length; i++) {
+        var card = document.createElement('div');
+        card.className = 'cascade-card';
+        card.innerHTML = '<span class="cascade-card-title">' + items[i].title + '</span><span class="status-badge ' + items[i].badge + '">' + items[i].status + '</span>';
+        listEl.appendChild(card);
+      }
     }
 
     function closeDrawer() {
-      cascadeDrawer.style.display = 'none';
+      var drawer = document.getElementById('cascadeDrawer');
+      if (drawer) drawer.style.display = 'none';
       activeDrawer = null;
     }
 
     function addItemToCurrentCascade() {
       if (!activeDrawer) return;
-      const title = prompt("Enter new item / task / card:");
+      var title = prompt("Enter new item / task / card:");
       if (!title) return;
       state[activeDrawer].unshift({ title: title, status: "Active", badge: "badge-working" });
       openDrawer(activeDrawer);
-      addMsg(`Added "${title}" to ${drawerTitle.innerText}!`, 'fresh');
+      addMsg('Added "' + title + '" to your hub!', 'fresh');
     }
   </script>
 </body>
