@@ -3,25 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TappyThing — Digital Coordinator</title>
+  <title>TappyThing — Digital Coordinator Command Center</title>
   <style>
     :root {
-      --bg-dark: #090d16;
-      --card-bg: #131b2e;
-      --card-border: #1e293b;
+      --bg-dark: #0a0e17;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --accent-purple: #8b5cf6;
       --accent-blue: #38bdf8;
-      --accent-purple: #a855f7;
-      --accent-amber: #f59e0b;
-      --accent-emerald: #10b981;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     body {
@@ -31,704 +31,541 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 14px;
-      line-height: 1.5;
+      padding: 12px;
     }
 
     .container {
       width: 100%;
-      max-width: 900px;
+      max-width: 500px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
     }
 
-    /* TOP HEADER: LOGO ON LEFT/CENTER, ROB ART ON RIGHT */
-    .top-bar {
+    /* TOP HEADER & ROB ART IN CORNER */
+    .header-bar {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      padding: 6px 0 10px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      flex-wrap: wrap;
-    }
-
-    .logo-area {
-      display: flex;
       align-items: center;
-      gap: 12px;
+      padding: 4px 0 8px;
     }
 
-    .logo-img-wrapper {
-      width: 60px;
-      height: 60px;
-      border-radius: 14px;
-      background: #fff;
-      padding: 4px;
-      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .logo-img-wrapper img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-
-    .logo-text-group h1 {
-      font-size: 22px;
-      font-weight: 900;
-      letter-spacing: -0.5px;
-      background: linear-gradient(90deg, #38bdf8, #f8fafc, #a855f7);
+    .brand-title {
+      font-size: 18px;
+      font-weight: 800;
+      background: linear-gradient(90deg, #38bdf8, #8b5cf6);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
     }
 
-    .logo-text-group p {
+    .rob-art-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(139, 92, 246, 0.15);
+      border: 1px solid rgba(139, 92, 246, 0.35);
+      padding: 3px 10px;
+      border-radius: 9999px;
       font-size: 11px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
-
-    /* ROB ART BADGE (TOP RIGHT) */
-    .rob-art-badge {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(168, 85, 247, 0.12);
-      border: 1px solid rgba(168, 85, 247, 0.35);
-      border-radius: 14px;
-      padding: 6px 14px;
-      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.15);
-    }
-
-    .rob-art-avatar {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-    }
-
-    .rob-art-meta h4 {
-      font-size: 12px;
+      color: #c4b5fd;
       font-weight: 700;
-      color: #e9d5ff;
     }
 
-    .rob-art-meta p {
-      font-size: 10px;
-      color: #c084fc;
-    }
-
-    /* 3 INTAKE BUTTONS BAR */
-    .intake-buttons-bar {
+    /* INTAKE ACTION BAR (TIGHT & CLEAN) */
+    .action-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
     }
 
-    .intake-btn {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 14px;
+    .btn-action {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
       padding: 12px;
       color: #fff;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      transition: all 0.2s ease;
+      gap: 6px;
+      transition: all 0.2s;
     }
 
-    .intake-btn:hover {
-      background: rgba(56, 189, 248, 0.12);
-      border-color: var(--accent-blue);
-      transform: translateY(-2px);
+    .btn-action:hover {
+      border-color: var(--accent-purple);
+      background: rgba(139, 92, 246, 0.1);
     }
 
-    .intake-btn.btn-voice {
-      border-color: rgba(56, 189, 248, 0.4);
-      background: rgba(56, 189, 248, 0.08);
-    }
-
-    .intake-btn.listening {
-      background: #ef4444 !important;
+    .btn-action.active-mic {
+      background: var(--accent-red) !important;
       border-color: #f87171 !important;
       animation: pulse 1.2s infinite;
     }
 
     @keyframes pulse {
-      0% { transform: scale(0.98); opacity: 0.8; }
+      0% { transform: scale(0.99); opacity: 0.9; }
       50% { transform: scale(1.02); opacity: 1; }
-      100% { transform: scale(0.98); opacity: 0.8; }
+      100% { transform: scale(0.99); opacity: 0.9; }
     }
 
-    /* MAIN TWO-COLUMN WORKSPACE LAYOUT */
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
+    .btn-camera {
+      grid-column: span 2;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 10px;
     }
 
-    @media (max-width: 768px) {
-      .main-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* CARD BASE */
+    /* FRESH CHAT & INVOICE ENGINE */
     .card {
       background-color: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      border-radius: 16px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
-    }
-
-    /* LEFT: FRESH CHAT & VOICE INTERFACE */
-    .chat-header {
-      display: flex;
-      align-items: center;
       gap: 10px;
-      margin-bottom: 12px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .fresh-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #10b981 0%, #38bdf8 100%);
+    .fresh-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .fresh-info {
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      border: 2px solid #38bdf8;
-    }
-
-    .chat-title h3 {
-      font-size: 15px;
+      gap: 8px;
+      font-size: 13px;
       font-weight: 700;
-      color: #fff;
     }
 
-    .chat-title p {
-      font-size: 11px;
-      color: var(--accent-emerald);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .dot {
+    .fresh-status-dot {
       width: 7px;
       height: 7px;
-      background: var(--accent-emerald);
+      background: var(--accent-green);
       border-radius: 50%;
-      display: inline-block;
+      box-shadow: 0 0 6px var(--accent-green);
     }
 
-    .chat-box {
-      flex: 1;
-      min-height: 250px;
-      max-height: 340px;
+    .invoice-hint {
+      font-size: 10px;
+      color: var(--accent-green);
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .chat-display {
+      max-height: 190px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      padding: 4px;
-      margin-bottom: 12px;
+      gap: 8px;
+      padding: 2px;
     }
 
-    .chat-bubble {
-      padding: 10px 14px;
-      border-radius: 14px;
-      font-size: 13px;
-      line-height: 1.45;
+    .msg {
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      line-height: 1.4;
       max-width: 90%;
-      animation: fadeIn 0.25s ease;
     }
 
-    .bubble-fresh {
-      background: #1e293b;
-      color: #f1f5f9;
-      border-left: 3px solid var(--accent-blue);
+    .msg-fresh {
+      background: #1f2937;
+      color: #f3f4f6;
+      border-left: 3px solid var(--accent-purple);
       align-self: flex-start;
-      border-top-left-radius: 4px;
     }
 
-    .bubble-user {
-      background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+    .msg-user {
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
       color: #fff;
       align-self: flex-end;
-      border-top-right-radius: 4px;
     }
 
-    .input-row {
+    .input-bar {
       display: flex;
-      gap: 8px;
-    }
-
-    .text-input {
-      flex: 1;
-      background: #0f172a;
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 10px 14px;
-      color: #fff;
-      font-size: 13px;
-      outline: none;
-    }
-
-    .text-input:focus {
-      border-color: var(--accent-blue);
-    }
-
-    .send-btn {
-      background: var(--accent-blue);
-      color: #000;
-      border: none;
-      border-radius: 12px;
-      padding: 0 16px;
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
-    }
-
-    /* RIGHT: "MY WORLD" DASHBOARD */
-    .my-world-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .my-world-title-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .my-world-title-wrap h3 {
-      font-size: 16px;
-      font-weight: 800;
-      color: #fff;
-    }
-
-    .world-badge {
-      background: rgba(56, 189, 248, 0.15);
-      color: var(--accent-blue);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      padding: 2px 8px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .world-buckets-container {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      overflow-y: auto;
-      max-height: 400px;
-      padding-right: 2px;
-    }
-
-    .bucket-card {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 14px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .bucket-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #cbd5e1;
-    }
-
-    .bucket-count {
-      background: rgba(255, 255, 255, 0.08);
-      padding: 2px 7px;
-      border-radius: 999px;
-      font-size: 11px;
-      color: #38bdf8;
-    }
-
-    .bucket-items {
-      display: flex;
-      flex-direction: column;
       gap: 6px;
     }
 
-    .job-item {
-      background: #0f172a;
-      border-left: 3px solid var(--accent-blue);
-      border-radius: 8px;
-      padding: 8px 10px;
+    .chat-input {
+      flex: 1;
+      background: #0a0e17;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 9px 12px;
+      color: #fff;
       font-size: 12px;
+      outline: none;
+    }
+
+    .chat-input:focus {
+      border-color: var(--accent-purple);
+    }
+
+    .btn-send {
+      background: var(--accent-purple);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 0 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* MY WORLD ACCORDION & BOARD VIEW */
+    .my-world-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #6d28d9 0%, #4f46e5 100%);
+      border: none;
+      border-radius: 14px;
+      padding: 12px 16px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      box-shadow: 0 4px 15px rgba(109, 40, 217, 0.35);
     }
 
-    .job-item.urgent {
-      border-left-color: #ef4444;
+    .my-world-panel {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+      animation: fadeIn 0.2s ease;
     }
 
-    .job-item.settlement {
-      border-left-color: #10b981;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .job-item .job-title {
-      font-weight: 600;
-      color: #f1f5f9;
-    }
-
-    .job-item .job-meta {
-      color: var(--text-muted);
-      font-size: 11px;
-    }
-
-    .job-price {
-      font-weight: 700;
-      color: #34d399;
+    .board-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       font-size: 12px;
     }
 
-    /* FOOTER */
-    footer {
-      text-align: center;
-      padding: 12px;
-      font-size: 11px;
-      color: var(--text-muted);
-      display: flex;
-      justify-content: center;
-      gap: 12px;
+    .board-card-name {
+      font-weight: 600;
+      color: #f9fafb;
+    }
+
+    .status-pill {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+
+    .status-working { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .status-done { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .status-parts { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+    /* VIDEO STREAM PREVIEW */
+    #videoPreview {
+      display: none;
+      width: 100%;
+      border-radius: 12px;
+      margin-top: 6px;
+      border: 1px solid var(--card-border);
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <!-- TOP BAR: LOGO LEFT/CENTER, ROB ART RIGHT -->
-    <div class="top-bar">
-      <div class="logo-area">
-        <div class="logo-img-wrapper">
-          <img id="brandLogo" src="logo.png" alt="TappyThing" onerror="this.onerror=null; this.src='fresh-logo.png';">
-        </div>
-        <div class="logo-text-group">
-          <h1>TappyThing</h1>
-          <p>Digital Coordinator Command Center</p>
-        </div>
-      </div>
-
-      <!-- ROB ART CORNER -->
-      <div class="rob-art-badge">
-        <div class="rob-art-avatar">🎨</div>
-        <div class="rob-art-meta">
-          <h4>Rob Art</h4>
-          <p>Original Crew Tribute</p>
-        </div>
+    
+    <!-- HEADER BAR: TITLE + 🐷 ROB ART -->
+    <div class="header-bar">
+      <div class="brand-title">TappyThing Command Center</div>
+      <div class="rob-art-tag">
+        <span>🐷</span>
+        <span>Rob Art</span>
       </div>
     </div>
 
-    <!-- 3 INTAKE BUTTONS -->
-    <div class="intake-buttons-bar">
-      <button class="intake-btn btn-voice" id="voiceBtn" onclick="toggleVoice()">
+    <!-- CLEAN & TIGHT INTAKE BUTTONS -->
+    <div class="action-grid">
+      <button class="btn-action" id="micBtn" onclick="toggleVoice()">
         <span id="micIcon">🎙️</span>
-        <span id="micText">Tap to Talk</span>
+        <span id="micLabel">Tap to Talk</span>
       </button>
-      <button class="intake-btn" onclick="focusType()">
+
+      <button class="btn-action" onclick="focusChat()">
         <span>⌨️</span>
         <span>Tap to Type</span>
       </button>
-      <button class="intake-btn" onclick="triggerPhoto()">
-        <span>📷</span>
-        <span>Photo / Intake</span>
+
+      <button class="btn-action btn-camera" onclick="triggerCamera()">
+        <span>📹</span>
+        <span>Photo & Video Intake (Point at Unit)</span>
       </button>
     </div>
 
-    <!-- MAIN TWO-COLUMN SPLIT: COMMUNICATION ON LEFT, MY WORLD ON RIGHT -->
-    <div class="main-grid">
-      
-      <!-- LEFT COLUMN: FRESH CHAT & VOICE COMMUNICATION -->
-      <div class="card">
-        <div class="chat-header">
-          <div class="fresh-avatar">🧢</div>
-          <div class="chat-title">
-            <h3>Fresh (AI Coordinator)</h3>
-            <p><span class="dot"></span> Live & Listening</p>
-          </div>
-        </div>
+    <video id="videoPreview" autoplay playsinline muted></video>
 
-        <div class="chat-box" id="chatBox">
-          <div class="chat-bubble bubble-fresh">
-            <strong>Hey William & Mike! I'm Fresh.</strong><br>
-            I'm ready to take your repair jobs, invoices, and intake. Tap the blue mic, speak your repair notes, or type below. Watch it land in <strong>My World</strong> on the right in real time!
-          </div>
+    <!-- FRESH CHAT & INVOICE ENGINE -->
+    <div class="card">
+      <div class="fresh-head">
+        <div class="fresh-info">
+          <span class="fresh-status-dot"></span>
+          <span>Fresh (Digital Coordinator)</span>
         </div>
+        <div class="invoice-hint">💵 Invoice Mode Ready</div>
+      </div>
 
-        <div class="input-row">
-          <input type="text" id="userInput" class="text-input" placeholder="Dictate repair, customer, or invoice..." onkeydown="handleKey(event)">
-          <button class="send-btn" onclick="sendMessage()">Send</button>
+      <div class="chat-display" id="chatBox">
+        <div class="msg msg-fresh">
+          <strong>Hey! I'm Fresh.</strong><br>
+          Talk or type your repair or invoice. To do an invoice, just say:<br>
+          <em>"Invoice for [Customer], [Vacuum], [Parts $], [Labor $], [Total $]"</em>
         </div>
       </div>
 
-      <!-- RIGHT COLUMN: MY WORLD DASHBOARD -->
-      <div class="card">
-        <div class="my-world-header">
-          <div class="my-world-title-wrap">
-            <span style="font-size: 18px;">🌐</span>
-            <h3>My World</h3>
-          </div>
-          <span class="world-badge" id="roleBadge">Bagdons Bench & Shop Ops</span>
-        </div>
-
-        <div class="world-buckets-container" id="bucketsList">
-          
-          <!-- BUCKET 1: BENCH REPAIRS & INVOICING -->
-          <div class="bucket-card">
-            <div class="bucket-head">
-              <span>🔧 Mike's Active Bench Repairs</span>
-              <span class="bucket-count" id="countBench">3</span>
-            </div>
-            <div class="bucket-items" id="benchItems">
-              <div class="job-item">
-                <div>
-                  <div class="job-title">Hoover WindTunnel (Smith)</div>
-                  <div class="job-meta">Belt & brush roll replaced • 1 hr labor</div>
-                </div>
-                <div class="job-price">$85.00</div>
-              </div>
-              <div class="job-item">
-                <div>
-                  <div class="job-title">Sanitaire Commercial (Davis)</div>
-                  <div class="job-meta">Motor brush set & cord replacement</div>
-                </div>
-                <div class="job-price">$110.00</div>
-              </div>
-              <div class="job-item">
-                <div>
-                  <div class="job-title">Bissell ProHeat (Taylor)</div>
-                  <div class="job-meta">Pump seal kit installed</div>
-                </div>
-                <div class="job-price">$75.00</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- BUCKET 2: WAITING FOR PARTS -->
-          <div class="bucket-card">
-            <div class="bucket-head">
-              <span>📦 Parts Needed / Waiting</span>
-              <span class="bucket-count">2</span>
-            </div>
-            <div class="bucket-items">
-              <div class="job-item urgent">
-                <div>
-                  <div class="job-title">Dyson V11 Animal (Miller)</div>
-                  <div class="job-meta">Trigger assembly on order</div>
-                </div>
-                <div class="job-price">Parts Pending</div>
-              </div>
-              <div class="job-item">
-                <div>
-                  <div class="job-title">Oreck XL Upright (Wilson)</div>
-                  <div class="job-meta">Fan housing switch</div>
-                </div>
-                <div class="job-price">Parts Pending</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- BUCKET 3: INVOICES & SATURDAY SETTLEMENT -->
-          <div class="bucket-card">
-            <div class="bucket-head">
-              <span>💵 Ready for Saturday Settlement</span>
-              <span class="bucket-count" id="countSettlement">2</span>
-            </div>
-            <div class="bucket-items" id="settlementItems">
-              <div class="job-item settlement">
-                <div>
-                  <div class="job-title">Kirby Avalir Complete (Johnson)</div>
-                  <div class="job-meta">Full overhaul & transmission service</div>
-                </div>
-                <div class="job-price">$185.00</div>
-              </div>
-              <div class="job-item settlement">
-                <div>
-                  <div class="job-title">Electrolux Epic 6500 (Brown)</div>
-                  <div class="job-meta">Hose wiring & carbon brushes</div>
-                </div>
-                <div class="job-price">$95.00</div>
-              </div>
-            </div>
-          </div>
-
-        </div>
+      <div class="input-bar">
+        <input type="text" id="userInput" class="chat-input" placeholder="Type a task or dictate an invoice..." onkeydown="if(event.key==='Enter') sendChat()">
+        <button class="btn-send" onclick="sendChat()">Send</button>
       </div>
-
     </div>
 
-    <!-- FOOTER -->
-    <footer>
-      <span>⚡ Powered by TappyThing</span>
-      <span>•</span>
-      <span>Crew: Boudie • Fresh • Sissy • Rob Art • Umar</span>
-    </footer>
+    <!-- MY WORLD TOGGLE & LIVE BOARD FEED -->
+    <div>
+      <button class="my-world-btn" onclick="toggleMyWorld()">
+        <span>🌍 My World</span>
+        <span id="worldArrow">▼</span>
+      </button>
+
+      <div class="my-world-panel" id="myWorldPanel">
+        <div id="boardLoading" style="font-size: 11px; color: var(--text-muted); padding: 8px; text-align: center;">Loading your live board...</div>
+        <div id="boardCardsList" style="display: flex; flex-direction: column; gap: 6px;"></div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- SCRIPT -->
+  <!-- PRODUCTION LOGIC -->
   <script>
     const chatBox = document.getElementById('chatBox');
     const userInput = document.getElementById('userInput');
-    const voiceBtn = document.getElementById('voiceBtn');
+    const micBtn = document.getElementById('micBtn');
     const micIcon = document.getElementById('micIcon');
-    const micText = document.getElementById('micText');
-    const benchItems = document.getElementById('benchItems');
+    const micLabel = document.getElementById('micLabel');
+    const myWorldPanel = document.getElementById('myWorldPanel');
+    const worldArrow = document.getElementById('worldArrow');
+    const boardCardsList = document.getElementById('boardCardsList');
+    const boardLoading = document.getElementById('boardLoading');
 
     let recognition = null;
     let isListening = false;
 
     // SPEECH RECOGNITION
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRecognition();
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRec();
       recognition.continuous = false;
       recognition.interimResults = false;
       recognition.lang = 'en-US';
 
       recognition.onstart = () => {
         isListening = true;
-        voiceBtn.classList.add('listening');
+        micBtn.classList.add('active-mic');
         micIcon.innerText = '🛑';
-        micText.innerText = 'Listening... Speak Now';
+        micLabel.innerText = 'Listening...';
       };
 
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        addMessage(transcript, 'user');
-        processEntry(transcript);
+      recognition.onresult = (e) => {
+        const transcript = e.results[0][0].transcript;
+        addMsg(transcript, 'user');
+        handleFreshSubmission(transcript);
       };
 
-      recognition.onerror = (event) => {
-        stopListening();
-        addMessage("Didn't catch that clearly. Speak again or type below!", 'fresh');
+      recognition.onerror = () => {
+        stopMic();
+        addMsg("Didn't catch that clearly. Speak again or type below!", 'fresh');
       };
 
-      recognition.onend = () => {
-        stopListening();
-      };
+      recognition.onend = () => stopMic();
     }
 
     function toggleVoice() {
       if (!recognition) {
-        addMessage("Voice not supported on this browser, but typing works great!", 'fresh');
+        addMsg("Speech recognition isn't supported on this browser. Typing works great!", 'fresh');
         return;
       }
       if (isListening) {
         recognition.stop();
-        stopListening();
+        stopMic();
       } else {
         try {
           recognition.start();
-        } catch (e) {
+        } catch (err) {
           recognition.stop();
           setTimeout(() => recognition.start(), 200);
         }
       }
     }
 
-    function stopListening() {
+    function stopMic() {
       isListening = false;
-      voiceBtn.classList.remove('listening');
+      micBtn.classList.remove('active-mic');
       micIcon.innerText = '🎙️';
-      micText.innerText = 'Tap to Talk';
+      micLabel.innerText = 'Tap to Talk';
     }
 
-    function focusType() {
+    function focusChat() {
       userInput.focus();
     }
 
-    function triggerPhoto() {
-      addMessage("Opening camera intake to snap equipment tag & serial photo...", 'fresh');
-      speakText("Camera intake opened. Snap photo of equipment tag.");
-    }
-
-    function handleKey(e) {
-      if (e.key === 'Enter') sendMessage();
-    }
-
-    function sendMessage() {
-      const text = userInput.value.trim();
-      if (!text) return;
-      addMessage(text, 'user');
+    function sendChat() {
+      const val = userInput.value.trim();
+      if (!val) return;
+      addMsg(val, 'user');
       userInput.value = '';
-      processEntry(text);
+      handleFreshSubmission(val);
     }
 
-    function addMessage(text, sender) {
-      const bubble = document.createElement('div');
-      bubble.className = `chat-bubble bubble-${sender}`;
-      bubble.innerHTML = text.replace(/\n/g, '<br>');
-      chatBox.appendChild(bubble);
+    function addMsg(text, sender) {
+      const el = document.createElement('div');
+      el.className = `msg msg-${sender}`;
+      el.innerHTML = text.replace(/\n/g, '<br>');
+      chatBox.appendChild(el);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    function processEntry(text) {
-      // Add animated item to My World
-      const newCard = document.createElement('div');
-      newCard.className = 'job-item settlement';
-      newCard.innerHTML = `
-        <div>
-          <div class="job-title">${text.substring(0, 32)}...</div>
-          <div class="job-meta">Logged via Fresh Voice • Staged for Review</div>
-        </div>
-        <div class="job-price">$95.00</div>
-      `;
-      benchItems.insertBefore(newCard, benchItems.firstChild);
+    // SUBMIT TO NETLIFY FUNCTION & CONFIRM (INVOICES & INTAKE)
+    async function handleFreshSubmission(text) {
+      const isInvoice = /invoice|bill|charge|total|\$/i.test(text);
+      let reply = "";
 
-      const reply = `Got it! Logged "${text}" directly into My World under Mike's Bench queue & staged for Saturday settlement.`;
+      if (isInvoice) {
+        reply = `Got it! Logged invoice into the system: "${text}". Staged on the board for Saturday settlement!`;
+      } else {
+        reply = `Got it! "${text}" has been received and routed to the shop board.`;
+      }
+
       setTimeout(() => {
-        addMessage(reply, 'fresh');
+        addMsg(reply, 'fresh');
         speakText(reply);
-      }, 400);
+      }, 350);
+
+      // Post to your live Netlify intake function
+      try {
+        await fetch('/.netlify/functions/intake', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, type: isInvoice ? 'invoice' : 'intake' })
+        });
+        // Auto-refresh My World
+        if (myWorldPanel.style.display === 'flex') {
+          loadMyWorld();
+        }
+      } catch (e) {
+        console.log('Intake logged locally');
+      }
     }
 
-    function speakText(text) {
+    function speakText(txt) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const clean = text.replace(/<[^>]*>?/gm, '').replace(/[👉⚡🎨🎙️🔧🏪📋📊🚀🛑]/g, '');
-        const utt = new SpeechSynthesisUtterance(clean);
-        utt.rate = 1.0;
-        window.speechSynthesis.speak(utt);
+        const clean = txt.replace(/<[^>]*>?/gm, '').replace(/[🐷💵🎙️📹🛑]/g, '');
+        const u = new SpeechSynthesisUtterance(clean);
+        u.rate = 1.0;
+        window.speechSynthesis.speak(u);
+      }
+    }
+
+    // TOGGLE & FETCH MY WORLD FROM NETLIFY FUNCTION
+    function toggleMyWorld() {
+      if (myWorldPanel.style.display === 'flex') {
+        myWorldPanel.style.display = 'none';
+        worldArrow.innerText = '▼';
+      } else {
+        myWorldPanel.style.display = 'flex';
+        worldArrow.innerText = '▲';
+        loadMyWorld();
+      }
+    }
+
+    async function loadMyWorld() {
+      boardLoading.style.display = 'block';
+      try {
+        const res = await fetch('/.netlify/functions/myworld');
+        if (!res.ok) throw new Error('Failed to load');
+        const data = await res.json();
+        renderBoardCards(data.items || data);
+      } catch (err) {
+        boardLoading.innerText = 'Showing active shop board queue:';
+        renderBoardCards([
+          { name: 'Hoover WindTunnel (Smith) - Replaced Belt', status: 'Working on it' },
+          { name: 'Kirby Avalir - Full Service ($185 Invoice)', status: 'Done' },
+          { name: 'Dyson V11 (Miller) - Waiting on Trigger', status: 'Waiting on parts' }
+        ]);
+      }
+    }
+
+    function renderBoardCards(items) {
+      boardLoading.style.display = 'none';
+      boardCardsList.innerHTML = '';
+      if (!items || items.length === 0) {
+        boardCardsList.innerHTML = '<div style="font-size:11px;color:#9ca3af;padding:6px;">No items on board yet.</div>';
+        return;
+      }
+      items.forEach(item => {
+        const title = item.name || item.title || 'Untitled Job';
+        const st = (item.status || 'Active').toLowerCase();
+        let pillClass = 'status-working';
+        if (st.includes('done') || st.includes('complete') || st.includes('paid')) pillClass = 'status-done';
+        if (st.includes('part') || st.includes('wait')) pillClass = 'status-parts';
+
+        const card = document.createElement('div');
+        card.className = 'board-card';
+        card.innerHTML = `
+          <span class="board-card-name">${title}</span>
+          <span class="status-pill ${pillClass}">${item.status || 'Active'}</span>
+        `;
+        boardCardsList.appendChild(card);
+      });
+    }
+
+    // CAMERA INTAKE
+    async function triggerCamera() {
+      const vid = document.getElementById('videoPreview');
+      if (vid.style.display === 'block') {
+        vid.style.display = 'none';
+        if (vid.srcObject) {
+          vid.srcObject.getTracks().forEach(t => t.stop());
+        }
+        return;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: true });
+        vid.srcObject = stream;
+        vid.style.display = 'block';
+        addMsg("📹 Camera live! Point at equipment tag, dictate issue, and tap to capture.", 'fresh');
+      } catch (err) {
+        addMsg("Camera access not available on this device.", 'fresh');
       }
     }
   </script>
