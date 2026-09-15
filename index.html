@@ -58,15 +58,10 @@
       max-width: 280px;
       background: #ffffff;
       border-radius: 20px;
-      padding: 12px;
+      padding: 10px;
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(56, 189, 248, 0.2);
       border: 2px solid rgba(255, 255, 255, 0.15);
       margin-bottom: 12px;
-      transition: transform 0.2s ease;
-    }
-
-    .logo-frame:hover {
-      transform: scale(1.02);
     }
 
     .brand-logo-img {
@@ -399,7 +394,7 @@
     <!-- HEADER WITH AUTHENTIC ROB ART LOGO -->
     <header>
       <div class="logo-frame">
-        <img src="logo.png" alt="FRESH - Your Digital Coordinator | Powered by TappyThing" class="brand-logo-img">
+        <img id="mainLogo" src="logo.png" alt="FRESH - Your Digital Coordinator | Powered by TappyThing" class="brand-logo-img">
       </div>
       <div class="rob-art-pill">
         <span>🎨 Original Crew Artwork by Rob Art</span>
@@ -494,6 +489,24 @@
 
   <!-- CLIENT-SIDE LOGIC -->
   <script>
+    // AUTO-RESOLVE LOGO ASSET FROM NETLIFY
+    const possibleLogoPaths = [
+      'logo.png',
+      'fresh-logo.png',
+      'assets/logo.png',
+      'assets/fresh-logo.png',
+      'images/logo.png',
+      'fresh.png'
+    ];
+    let pathIdx = 0;
+    const logoImg = document.getElementById('mainLogo');
+    logoImg.onerror = function() {
+      pathIdx++;
+      if (pathIdx < possibleLogoPaths.length) {
+        this.src = possibleLogoPaths[pathIdx];
+      }
+    };
+
     const chatBox = document.getElementById('chatBox');
     const userInput = document.getElementById('userInput');
     const voiceBtn = document.getElementById('voiceBtn');
@@ -630,3 +643,5 @@
   </script>
 </body>
 </html>
+
+
