@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TappyThing — Digital Coordinator Command Center</title>
+  
   <style>
     :root {
       --bg-dark: #090d16;
@@ -24,7 +25,7 @@
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      -webkit-tap-highlight-color: transparent;
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
     }
 
     body {
@@ -34,7 +35,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 12px 10px 40px;
+      padding: 10px 10px 40px;
       line-height: 1.4;
     }
 
@@ -46,55 +47,71 @@
       gap: 12px;
     }
 
-    /* TOP BAR UTILITIES */
-    .top-bar {
+    /* TOP BAR: 4 PILLS IN ONE CLEAN ROW */
+    .top-bar-team {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
       width: 100%;
-      padding: 0 2px;
+      padding: 2px 0;
     }
 
-    .btn-pill-info {
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      color: #38bdf8;
-      padding: 5px 12px;
+    .pill-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 9px;
       border-radius: 9999px;
       font-size: 11px;
       font-weight: 700;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
+      user-select: none;
     }
 
-    .rob-art-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
+    .pill-fresh {
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #38bdf8;
+    }
+
+    .pill-how {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+    }
+
+    .pill-rob {
       background: rgba(139, 92, 246, 0.15);
       border: 1px solid rgba(139, 92, 246, 0.35);
-      padding: 5px 12px;
-      border-radius: 9999px;
-      font-size: 11px;
       color: #c4b5fd;
-      font-weight: 700;
+    }
+
+    .pill-sissy {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
     }
 
     /* HOW IT WORKS CARD */
     .how-it-works-box {
       display: none;
       background: #111827;
-      border: 1px solid var(--accent-blue);
+      border: 1px solid var(--accent-gold);
       border-radius: 14px;
       padding: 12px 14px;
       font-size: 12px;
       color: #e5e7eb;
+      animation: fadeIn 0.2s ease;
     }
 
     .how-it-works-box strong {
       color: var(--accent-gold);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-3px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* HEADER */
@@ -135,17 +152,17 @@
       flex-direction: column;
       align-items: center;
       gap: 8px;
-      margin: 6px 0;
+      margin: 4px 0;
     }
 
     .btn-circle-mic {
-      width: 84px;
-      height: 84px;
+      width: 86px;
+      height: 86px;
       border-radius: 50%;
       background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
       border: 3px solid rgba(139, 92, 246, 0.6);
       color: #fff;
-      font-size: 34px;
+      font-size: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -153,10 +170,11 @@
       box-shadow: 0 0 25px rgba(124, 58, 237, 0.5);
       transition: all 0.2s ease;
       touch-action: manipulation;
+      user-select: none;
     }
 
     .btn-circle-mic:active {
-      transform: scale(0.95);
+      transform: scale(0.94);
     }
 
     .btn-circle-mic.listening {
@@ -178,17 +196,6 @@
       color: #fff;
     }
 
-    .type-toggle-link {
-      background: none;
-      border: none;
-      color: var(--accent-blue);
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      text-decoration: underline;
-      padding: 4px 8px;
-    }
-
     /* FRESH LIVE CHAT & STATUS ENGINE */
     .card {
       background-color: var(--card-bg);
@@ -198,40 +205,6 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-    }
-
-    .fresh-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 6px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .fresh-info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .fresh-status-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--accent-green);
-      border-radius: 50%;
-      box-shadow: 0 0 6px var(--accent-green);
-    }
-
-    .coordinator-pill {
-      font-size: 10px;
-      color: #c4b5fd;
-      background: rgba(139, 92, 246, 0.15);
-      border: 1px solid rgba(139, 92, 246, 0.35);
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-weight: 700;
     }
 
     .chat-display {
@@ -264,9 +237,11 @@
       align-self: flex-end;
     }
 
+    /* TEXT INPUT BAR (ALWAYS READY & PROMINENT) */
     .input-bar-container {
-      display: none;
+      display: flex;
       gap: 6px;
+      width: 100%;
     }
 
     .chat-input {
@@ -318,6 +293,7 @@
       align-items: center;
       box-shadow: 0 4px 15px rgba(109, 40, 217, 0.35);
       touch-action: manipulation;
+      user-select: none;
     }
 
     .master-bubbles-grid {
@@ -337,10 +313,12 @@
       flex-direction: column;
       gap: 5px;
       transition: all 0.2s;
+      user-select: none;
     }
 
     .master-bubble:active {
       background: var(--card-hover);
+      border-color: var(--accent-purple);
     }
 
     .bubble-head {
@@ -456,27 +434,281 @@
       color: var(--text-muted);
     }
   </style>
+
+  <script>
+    // DEFINE STATE AND HANDLERS IN HEAD SO THEY ARE ALWAYS AVAILABLE IMMEDIATELY
+    window.state = {
+      business: [
+        { title: "Karen Vleck — Oreck XL Belt & Brush", status: "Workbench", badge: "badge-working" },
+        { title: "Maria Gómez — ProTeam ProVac FS 6", status: "Waiting on parts", badge: "badge-parts" },
+        { title: "Maria Gómez — Kenmore Blue Canister", status: "Workbench", badge: "badge-working" },
+        { title: "Electrolux Vintage Motor Replacement", status: "Ready", badge: "badge-done" }
+      ],
+      personal: [
+        { title: "Renpho Weight Log Check-in", status: "Daily", badge: "badge-done" },
+        { title: "Pick up Filter Cartridges for Home", status: "Pending", badge: "badge-working" },
+        { title: "Schedule Saturday Pickleball", status: "This Weekend", badge: "badge-parts" }
+      ],
+      invoices: [
+        { title: "Karen Vleck — Oreck XL Repair ($75.00)", status: "Saturday Settlement", badge: "badge-working" },
+        { title: "Maria Gómez — 3 Unit Service ($195.00)", status: "Pending Payment", badge: "badge-parts" },
+        { title: "Kirby Avalir Full Service ($95.00)", status: "Paid / Card Ready", badge: "badge-done" }
+      ],
+      shared: [
+        { title: "🤝 Mike Bagdon — Bagdons Vacuum Bench", status: "Partner Queue", badge: "badge-working" },
+        { title: "🏢 Mona — Counter Customer Intake", status: "Staff", badge: "badge-done" },
+        { title: "📦 Chris — Parts & Invoicing", status: "Staff", badge: "badge-done" },
+        { title: "🌐 Norby — Virtual Assistant Intake", status: "VA Team", badge: "badge-done" },
+        { title: "🎧 Fresh — Digital Coordinator Front", status: "AI Team", badge: "badge-working" },
+        { title: "🗄️ Sissy / Squash — Master Backend Ops", status: "AI Team", badge: "badge-working" },
+        { title: "⚡ Nosh — Fast Data & Math", status: "AI Team", badge: "badge-working" },
+        { title: "🎨 L (Elle) — Customer Voice & Design", status: "AI Team", badge: "badge-working" }
+      ]
+    };
+
+    window.activeDrawer = null;
+    window.recognition = null;
+    window.isListening = false;
+
+    // HOW IT WORKS TOGGLE
+    window.toggleHowItWorks = function() {
+      var box = document.getElementById('howItWorksBox');
+      if (box) {
+        box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+      }
+    };
+
+    // MY WORLD TOGGLE
+    window.toggleMyWorld = function() {
+      var grid = document.getElementById('masterBubblesGrid');
+      var drawer = document.getElementById('cascadeDrawer');
+      var arrow = document.getElementById('worldArrow');
+
+      if (!grid) return;
+      if (grid.style.display === 'grid') {
+        grid.style.display = 'none';
+        if (drawer) drawer.style.display = 'none';
+        if (arrow) arrow.innerHTML = '&#9660;';
+      } else {
+        grid.style.display = 'grid';
+        if (arrow) arrow.innerHTML = '&#9650;';
+      }
+    };
+
+    // OPEN DRAWER FOR BUBBLES
+    window.openDrawer = function(category) {
+      window.activeDrawer = category;
+      var drawer = document.getElementById('cascadeDrawer');
+      var title = document.getElementById('drawerTitle');
+      var listEl = document.getElementById('cascadeItemsList');
+
+      if (!drawer || !listEl) return;
+      drawer.style.display = 'flex';
+      listEl.innerHTML = '';
+
+      var titles = {
+        business: "🏢 Business Ops",
+        personal: "🏠 Personal / Home",
+        invoices: "💵 Invoices & Saturday Settlement",
+        shared: "👥 Shared Spaces (Team & AI Cast)"
+      };
+      if (title) title.innerText = titles[category] || "Hub Section";
+
+      var items = window.state[category] || [];
+      if (items.length === 0) {
+        listEl.innerHTML = '<div style="font-size:11px;color:#9ca3af;padding:6px;">No items yet. Brain-dump above to add!</div>';
+        return;
+      }
+
+      for (var i = 0; i < items.length; i++) {
+        var card = document.createElement('div');
+        card.className = 'cascade-card';
+        card.innerHTML = '<span class="cascade-card-title">' + items[i].title + '</span><span class="status-badge ' + items[i].badge + '">' + items[i].status + '</span>';
+        listEl.appendChild(card);
+      }
+    };
+
+    window.closeDrawer = function() {
+      var drawer = document.getElementById('cascadeDrawer');
+      if (drawer) drawer.style.display = 'none';
+      window.activeDrawer = null;
+    };
+
+    window.addItemToCurrentCascade = function() {
+      if (!window.activeDrawer) return;
+      var title = prompt("Enter new item / task / card:");
+      if (!title) return;
+      window.state[window.activeDrawer].unshift({ title: title, status: "Active", badge: "badge-working" });
+      window.openDrawer(window.activeDrawer);
+      window.addMsg('Added "' + title + '" to your hub!', 'fresh');
+    };
+
+    // CHAT & ROUTING
+    window.sendChat = function() {
+      var input = document.getElementById('userInput');
+      if (!input) return;
+      var val = input.value.trim();
+      if (!val) return;
+      window.addMsg(val, 'user');
+      input.value = '';
+      window.processFreshRouting(val);
+    };
+
+    window.handleInputKey = function(e) {
+      if (e.key === 'Enter') {
+        window.sendChat();
+      }
+    };
+
+    window.addMsg = function(text, sender) {
+      var box = document.getElementById('chatBox');
+      if (!box) return;
+      var el = document.createElement('div');
+      el.className = 'msg msg-' + sender;
+      el.innerHTML = text.replace(/\n/g, '<br>');
+      box.appendChild(el);
+      box.scrollTop = box.scrollHeight;
+    };
+
+    window.speakAudio = function(text) {
+      try {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          var clean = text.replace(/<[^>]*>?/gm, '').replace(/[🐷💵🎙️📹🛑⚡🏢🏠👥]/g, '');
+          var u = new SpeechSynthesisUtterance(clean);
+          u.rate = 1.05;
+          window.speechSynthesis.speak(u);
+        }
+      } catch (err) {}
+    };
+
+    window.processFreshRouting = function(text) {
+      var lower = text.toLowerCase();
+      var reply = "";
+
+      if (lower.indexOf('invoice') !== -1 || lower.indexOf('bill') !== -1 || lower.indexOf('charge') !== -1 || lower.indexOf('
+
+Paste this into `index.html` and deploy—it will be fully responsive and ready to test!) !== -1) {
+        window.state.invoices.unshift({ title: text, status: "Saturday Settlement", badge: "badge-working" });
+        reply = 'Got it! Logged invoice: "' + text + '". Sissy staged this into Invoices & Money for Saturday settlement!';
+      } else if (lower.indexOf('grocery') !== -1 || lower.indexOf('milk') !== -1 || lower.indexOf('home') !== -1 || lower.indexOf('wife') !== -1 || lower.indexOf('pickleball') !== -1 || lower.indexOf('weight') !== -1) {
+        window.state.personal.unshift({ title: text, status: "Active", badge: "badge-parts" });
+        reply = 'Filed to Personal & Home! "' + text + '" is logged in your private hub.';
+      } else if (lower.indexOf('mike') !== -1 || lower.indexOf('bagdon') !== -1 || lower.indexOf('mona') !== -1 || lower.indexOf('chris') !== -1 || lower.indexOf('norby') !== -1) {
+        window.state.shared.unshift({ title: text, status: "Shared Queue", badge: "badge-working" });
+        reply = 'Routed to Shared Spaces for the team: "' + text + '".';
+      } else {
+        window.state.business.unshift({ title: text, status: "Intake", badge: "badge-working" });
+        reply = 'Dumped straight into Business Ops! Sissy filed "' + text + '" to your workbench.';
+      }
+
+      setTimeout(function() {
+        window.addMsg(reply, 'fresh');
+        window.speakAudio(reply);
+      }, 250);
+
+      if (window.activeDrawer) window.openDrawer(window.activeDrawer);
+    };
+
+    // SAFE VOICE TOGGLE
+    window.toggleVoice = function() {
+      var btn = document.getElementById('circleMicBtn');
+      var icon = document.getElementById('micIconDisplay');
+      var label = document.getElementById('micStatusLabel');
+
+      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+        var input = document.getElementById('userInput');
+        if (input) input.focus();
+        window.addMsg("Speech recognition isn't enabled in this browser. Type right in the box below!", 'fresh');
+        return;
+      }
+
+      if (window.isListening) {
+        window.stopMic();
+        return;
+      }
+
+      try {
+        var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        window.recognition = new SpeechRec();
+        window.recognition.continuous = false;
+        window.recognition.interimResults = false;
+        window.recognition.lang = 'en-US';
+
+        window.recognition.onstart = function() {
+          window.isListening = true;
+          if (btn) btn.classList.add('listening');
+          if (icon) icon.innerText = '🛑';
+          if (label) label.innerText = 'Listening to you...';
+        };
+
+        window.recognition.onresult = function(e) {
+          var transcript = e.results[0][0].transcript;
+          window.addMsg(transcript, 'user');
+          window.processFreshRouting(transcript);
+        };
+
+        window.recognition.onerror = function() {
+          window.stopMic();
+        };
+
+        window.recognition.onend = function() {
+          window.stopMic();
+        };
+
+        window.recognition.start();
+      } catch (e) {
+        window.stopMic();
+        var inp = document.getElementById('userInput');
+        if (inp) inp.focus();
+        window.addMsg("Microphone ready! Type in the box below or speak when prompted.", 'fresh');
+      }
+    };
+
+    window.stopMic = function() {
+      window.isListening = false;
+      var btn = document.getElementById('circleMicBtn');
+      var icon = document.getElementById('micIconDisplay');
+      var label = document.getElementById('micStatusLabel');
+      if (btn) btn.classList.remove('listening');
+      if (icon) icon.innerText = '🎙️';
+      if (label) label.innerText = 'Tap Circle to Talk to Fresh';
+      if (window.recognition) {
+        try { window.recognition.stop(); } catch(e){}
+      }
+    };
+  </script>
 </head>
 <body>
 
   <div class="container">
     
-    <!-- TOP UTILITY BAR: HOW IT WORKS + ROB ART -->
-    <div class="top-bar">
-      <button type="button" class="btn-pill-info" onclick="toggleHowItWorks()">
+    <!-- TOP BAR: TEAM & TOOLS (FRESH | HOW IT WORKS | ROB ART | SISSY) -->
+    <div class="top-bar-team">
+      <div class="pill-tag pill-fresh">
+        <span>🎧</span>
+        <span>Fresh (Coord)</span>
+      </div>
+
+      <div class="pill-tag pill-how" onclick="toggleHowItWorks()">
         <span>💡</span>
         <span>How Fresh Works</span>
-      </button>
+      </div>
 
-      <div class="rob-art-tag">
+      <div class="pill-tag pill-rob">
         <span>🐷</span>
         <span>Rob Art</span>
+      </div>
+
+      <div class="pill-tag pill-sissy">
+        <span>⚡</span>
+        <span>Sissy Active</span>
       </div>
     </div>
 
     <!-- HOW IT WORKS EXPLAINER BOX -->
     <div class="how-it-works-box" id="howItWorksBox">
-      <strong>1. 🗣️ Brain Dump:</strong> Tap the circle and talk or type. Dictate repair invoices, personal bills, or grocery notes.<br>
+      <strong>1. 🗣️ Brain Dump:</strong> Tap the circle or type below. Dictate repair invoices, personal bills, or grocery notes.<br>
       <strong>2. 🧠 Fresh Organizes:</strong> Fresh listens and tells Sissy to route your notes into Business, Personal, Invoices, or Shared spaces.<br>
       <strong>3. 🌍 My World:</strong> Tap below to see your live jobs, Saturday settlement, and team queues.
     </div>
@@ -494,31 +726,21 @@
         <span id="micIconDisplay">🎙️</span>
       </button>
       <div class="mic-status-label" id="micStatusLabel">Tap Circle to Talk to Fresh</div>
-      <button type="button" class="type-toggle-link" onclick="toggleTypeInput()">
-        ⌨️ Tap here to type text instead
-      </button>
     </div>
 
     <!-- FRESH LIVE COORDINATOR & CHAT BOX -->
     <div class="card">
-      <div class="fresh-head">
-        <div class="fresh-info">
-          <span class="fresh-status-dot"></span>
-          <span>Fresh (Digital Coordinator)</span>
-        </div>
-        <div class="coordinator-pill">⚡ Sissy Backend Active</div>
-      </div>
-
       <div class="chat-display" id="chatBox">
         <div class="msg msg-fresh">
           <strong>Hey there! I'm Fresh.</strong><br>
-          Tap the blue circle above to speak, or tap below to type. Just brain-dump what's on your mind — I organize everything into your worlds automatically.<br>
+          Tap the blue circle above to speak, or type right below. Just brain-dump what's on your mind — I organize everything into your worlds automatically.<br>
           <em>Ready to knock out your list or dictate an invoice? Let's roll!</em>
         </div>
       </div>
 
-      <div class="input-bar-container" id="inputBarContainer">
-        <input type="text" id="userInput" class="chat-input" placeholder="Type to Fresh (e.g. Invoice for Karen, Oreck $75)..." onkeydown="handleInputKey(event)">
+      <!-- PROMINENT DIRECT INPUT BAR -->
+      <div class="input-bar-container">
+        <input type="text" id="userInput" class="chat-input" placeholder="Type to Fresh (e.g. Invoice for Karen $75)..." onkeydown="handleInputKey(event)">
         <button type="button" class="btn-send" onclick="sendChat()">Send</button>
       </div>
     </div>
@@ -527,7 +749,7 @@
     <div class="my-world-container">
       <button type="button" class="my-world-main-btn" onclick="toggleMyWorld()">
         <span>🌍 My World</span>
-        <span id="worldArrow">▼</span>
+        <span id="worldArrow">&#9660;</span>
       </button>
 
       <div class="master-bubbles-grid" id="masterBubblesGrid">
@@ -588,269 +810,5 @@
 
   </div>
 
-  <script>
-    // GLOBAL STATE
-    var state = {
-      business: [
-        { title: "Karen Vleck — Oreck XL Belt & Brush", status: "Workbench", badge: "badge-working" },
-        { title: "Maria Gómez — ProTeam ProVac FS 6", status: "Waiting on parts", badge: "badge-parts" },
-        { title: "Maria Gómez — Kenmore Blue Canister", status: "Workbench", badge: "badge-working" },
-        { title: "Electrolux Vintage Motor Replacement", status: "Ready", badge: "badge-done" }
-      ],
-      personal: [
-        { title: "Renpho Weight Log Check-in", status: "Daily", badge: "badge-done" },
-        { title: "Pick up Filter Cartridges for Home", status: "Pending", badge: "badge-working" },
-        { title: "Schedule Saturday Pickleball", status: "This Weekend", badge: "badge-parts" }
-      ],
-      invoices: [
-        { title: "Karen Vleck — Oreck XL Repair ($75.00)", status: "Saturday Settlement", badge: "badge-working" },
-        { title: "Maria Gómez — 3 Unit Service ($195.00)", status: "Pending Payment", badge: "badge-parts" },
-        { title: "Kirby Avalir Full Service ($95.00)", status: "Paid / Card Ready", badge: "badge-done" }
-      ],
-      shared: [
-        { title: "🤝 Mike Bagdon — Bagdons Vacuum Bench", status: "Partner Queue", badge: "badge-working" },
-        { title: "🏢 Mona — Counter Customer Intake", status: "Staff", badge: "badge-done" },
-        { title: "📦 Chris — Parts & Invoicing", status: "Staff", badge: "badge-done" },
-        { title: "🌐 Norby — Virtual Assistant Intake", status: "VA Team", badge: "badge-done" },
-        { title: "🎧 Fresh — Digital Coordinator Front", status: "AI Team", badge: "badge-working" },
-        { title: "🗄️ Sissy / Squash — Master Backend Ops", status: "AI Team", badge: "badge-working" },
-        { title: "⚡ Nosh — Fast Data & Math", status: "AI Team", badge: "badge-working" },
-        { title: "🎨 L (Elle) — Customer Voice & Design", status: "AI Team", badge: "badge-working" }
-      ]
-    };
-
-    var activeDrawer = null;
-    var recognition = null;
-    var isListening = false;
-
-    // HOW IT WORKS
-    function toggleHowItWorks() {
-      var box = document.getElementById('howItWorksBox');
-      if (box) {
-        box.style.display = (box.style.display === 'block') ? 'none' : 'block';
-      }
-    }
-
-    // TYPE INPUT TOGGLE
-    function toggleTypeInput() {
-      var bar = document.getElementById('inputBarContainer');
-      var input = document.getElementById('userInput');
-      if (bar) {
-        if (bar.style.display === 'flex') {
-          bar.style.display = 'none';
-        } else {
-          bar.style.display = 'flex';
-          if (input) input.focus();
-        }
-      }
-    }
-
-    function handleInputKey(e) {
-      if (e.key === 'Enter') {
-        sendChat();
-      }
-    }
-
-    function sendChat() {
-      var input = document.getElementById('userInput');
-      if (!input) return;
-      var val = input.value.trim();
-      if (!val) return;
-      addMsg(val, 'user');
-      input.value = '';
-      processFreshRouting(val);
-    }
-
-    function addMsg(text, sender) {
-      var box = document.getElementById('chatBox');
-      if (!box) return;
-      var el = document.createElement('div');
-      el.className = 'msg msg-' + sender;
-      el.innerHTML = text.replace(/\n/g, '<br>');
-      box.appendChild(el);
-      box.scrollTop = box.scrollHeight;
-    }
-
-    function speakAudio(text) {
-      try {
-        if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel();
-          var clean = text.replace(/<[^>]*>?/gm, '').replace(/[🐷💵🎙️📹🛑⚡🏢🏠👥]/g, '');
-          var u = new SpeechSynthesisUtterance(clean);
-          u.rate = 1.05;
-          window.speechSynthesis.speak(u);
-        }
-      } catch (err) {
-        console.log('Audio speech not available');
-      }
-    }
-
-    // VOICE RECOGNITION (LAZY INITIALIZATION TO PREVENT MOBILE CRASHES)
-    function toggleVoice() {
-      var btn = document.getElementById('circleMicBtn');
-      var icon = document.getElementById('micIconDisplay');
-      var label = document.getElementById('micStatusLabel');
-
-      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-        toggleTypeInput();
-        addMsg("Speech recognition isn't supported on this browser. Type in the box below!", 'fresh');
-        return;
-      }
-
-      if (isListening) {
-        stopMic();
-        return;
-      }
-
-      try {
-        var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SpeechRec();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = 'en-US';
-
-        recognition.onstart = function() {
-          isListening = true;
-          if (btn) btn.classList.add('listening');
-          if (icon) icon.innerText = '🛑';
-          if (label) label.innerText = 'Listening to you...';
-        };
-
-        recognition.onresult = function(e) {
-          var transcript = e.results[0][0].transcript;
-          addMsg(transcript, 'user');
-          processFreshRouting(transcript);
-        };
-
-        recognition.onerror = function() {
-          stopMic();
-        };
-
-        recognition.onend = function() {
-          stopMic();
-        };
-
-        recognition.start();
-      } catch (e) {
-        stopMic();
-        toggleTypeInput();
-        addMsg("Microphone tapped! Type in the box below or check browser mic permissions.", 'fresh');
-      }
-    }
-
-    function stopMic() {
-      isListening = false;
-      var btn = document.getElementById('circleMicBtn');
-      var icon = document.getElementById('micIconDisplay');
-      var label = document.getElementById('micStatusLabel');
-      if (btn) btn.classList.remove('listening');
-      if (icon) icon.innerText = '🎙️';
-      if (label) label.innerText = 'Tap Circle to Talk to Fresh';
-      if (recognition) {
-        try { recognition.stop(); } catch(e){}
-      }
-    }
-
-    // FRESH BRAIN-DUMP & INTELLIGENT AUTO-ROUTING ENGINE
-    function processFreshRouting(text) {
-      var lower = text.toLowerCase();
-      var reply = "";
-
-      if (lower.indexOf('invoice') !== -1 || lower.indexOf('bill') !== -1 || lower.indexOf('charge') !== -1 || lower.indexOf('
-
-Paste this into your Netlify `index.html` — tap `🌍 My World` or `💡 How Fresh Works` first to test the slide-outs!) !== -1) {
-        state.invoices.unshift({ title: text, status: "Saturday Settlement", badge: "badge-working" });
-        reply = 'Got it! Logged invoice: "' + text + '". Sissy staged this into Invoices & Money for Saturday settlement!';
-      } else if (lower.indexOf('grocery') !== -1 || lower.indexOf('milk') !== -1 || lower.indexOf('home') !== -1 || lower.indexOf('wife') !== -1 || lower.indexOf('pickleball') !== -1 || lower.indexOf('weight') !== -1) {
-        state.personal.unshift({ title: text, status: "Active", badge: "badge-parts" });
-        reply = 'Filed to Personal & Home! "' + text + '" is logged in your private hub.';
-      } else if (lower.indexOf('mike') !== -1 || lower.indexOf('bagdon') !== -1 || lower.indexOf('mona') !== -1 || lower.indexOf('chris') !== -1 || lower.indexOf('norby') !== -1) {
-        state.shared.unshift({ title: text, status: "Shared Queue", badge: "badge-working" });
-        reply = 'Routed to Shared Spaces for the team: "' + text + '".';
-      } else {
-        state.business.unshift({ title: text, status: "Intake", badge: "badge-working" });
-        reply = 'Dumped straight into Business Ops! Sissy filed "' + text + '" to your workbench.';
-      }
-
-      setTimeout(function() {
-        addMsg(reply, 'fresh');
-        speakAudio(reply);
-      }, 250);
-
-      try {
-        fetch('/.netlify/functions/intake', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: text, time: new Date().toISOString() })
-        });
-      } catch (e) {}
-
-      if (activeDrawer) openDrawer(activeDrawer);
-    }
-
-    // 🌍 MY WORLD TOGGLE & DRAWER
-    function toggleMyWorld() {
-      var grid = document.getElementById('masterBubblesGrid');
-      var drawer = document.getElementById('cascadeDrawer');
-      var arrow = document.getElementById('worldArrow');
-
-      if (!grid) return;
-      if (grid.style.display === 'grid') {
-        grid.style.display = 'none';
-        if (drawer) drawer.style.display = 'none';
-        if (arrow) arrow.innerText = '▼';
-      } else {
-        grid.style.display = 'grid';
-        if (arrow) arrow.innerText = '▲';
-      }
-    }
-
-    function openDrawer(category) {
-      activeDrawer = category;
-      var drawer = document.getElementById('cascadeDrawer');
-      var title = document.getElementById('drawerTitle');
-      var listEl = document.getElementById('cascadeItemsList');
-
-      if (!drawer || !listEl) return;
-      drawer.style.display = 'flex';
-      listEl.innerHTML = '';
-
-      var titles = {
-        business: "🏢 Business Ops",
-        personal: "🏠 Personal / Home",
-        invoices: "💵 Invoices & Saturday Settlement",
-        shared: "👥 Shared Spaces (Team & AI Cast)"
-      };
-      if (title) title.innerText = titles[category] || "Hub Section";
-
-      var items = state[category] || [];
-      if (items.length === 0) {
-        listEl.innerHTML = '<div style="font-size:11px;color:#9ca3af;padding:6px;">No items yet. Brain-dump above to add!</div>';
-        return;
-      }
-
-      for (var i = 0; i < items.length; i++) {
-        var card = document.createElement('div');
-        card.className = 'cascade-card';
-        card.innerHTML = '<span class="cascade-card-title">' + items[i].title + '</span><span class="status-badge ' + items[i].badge + '">' + items[i].status + '</span>';
-        listEl.appendChild(card);
-      }
-    }
-
-    function closeDrawer() {
-      var drawer = document.getElementById('cascadeDrawer');
-      if (drawer) drawer.style.display = 'none';
-      activeDrawer = null;
-    }
-
-    function addItemToCurrentCascade() {
-      if (!activeDrawer) return;
-      var title = prompt("Enter new item / task / card:");
-      if (!title) return;
-      state[activeDrawer].unshift({ title: title, status: "Active", badge: "badge-working" });
-      openDrawer(activeDrawer);
-      addMsg('Added "' + title + '" to your hub!', 'fresh');
-    }
-  </script>
 </body>
 </html>
