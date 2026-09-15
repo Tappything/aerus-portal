@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FRESH — Your Digital Coordinator | TappyThing</title>
+  <title>TappyThing — Digital Coordinator</title>
   <style>
     :root {
       --bg-dark: #090d16;
@@ -15,7 +15,6 @@
       --accent-emerald: #10b981;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
-      --glow-blue: rgba(56, 189, 248, 0.25);
     }
 
     * {
@@ -32,141 +31,238 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 16px;
+      padding: 14px;
       line-height: 1.5;
     }
 
     .container {
       width: 100%;
-      max-width: 580px;
+      max-width: 900px;
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
-    /* AUTHENTIC BRAND LOGO & HEADER */
-    header {
+    /* TOP HEADER: LOGO ON LEFT/CENTER, ROB ART ON RIGHT */
+    .top-bar {
       display: flex;
-      flex-direction: column;
       align-items: center;
-      text-align: center;
-      padding: 12px 10px 6px;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 6px 0 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-wrap: wrap;
     }
 
-    .logo-frame {
-      width: 100%;
-      max-width: 280px;
-      background: #ffffff;
-      border-radius: 20px;
-      padding: 10px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(56, 189, 248, 0.2);
-      border: 2px solid rgba(255, 255, 255, 0.15);
-      margin-bottom: 12px;
-    }
-
-    .brand-logo-img {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 12px;
-    }
-
-    .rob-art-pill {
-      display: inline-flex;
+    .logo-area {
+      display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 12px;
+    }
+
+    .logo-img-wrapper {
+      width: 60px;
+      height: 60px;
+      border-radius: 14px;
+      background: #fff;
+      padding: 4px;
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .logo-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .logo-text-group h1 {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #38bdf8, #f8fafc, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo-text-group p {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    /* ROB ART BADGE (TOP RIGHT) */
+    .rob-art-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       background: rgba(168, 85, 247, 0.12);
       border: 1px solid rgba(168, 85, 247, 0.35);
-      padding: 4px 14px;
-      border-radius: 9999px;
-      font-size: 11px;
-      color: #d8b4fe;
-      font-weight: 600;
-      letter-spacing: 0.3px;
+      border-radius: 14px;
+      padding: 6px 14px;
+      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.15);
+    }
+
+    .rob-art-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .rob-art-meta h4 {
+      font-size: 12px;
+      font-weight: 700;
+      color: #e9d5ff;
+    }
+
+    .rob-art-meta p {
+      font-size: 10px;
+      color: #c084fc;
+    }
+
+    /* 3 INTAKE BUTTONS BAR */
+    .intake-buttons-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    .intake-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 12px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .intake-btn:hover {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: var(--accent-blue);
+      transform: translateY(-2px);
+    }
+
+    .intake-btn.btn-voice {
+      border-color: rgba(56, 189, 248, 0.4);
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .intake-btn.listening {
+      background: #ef4444 !important;
+      border-color: #f87171 !important;
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.98); opacity: 0.8; }
+      50% { transform: scale(1.02); opacity: 1; }
+      100% { transform: scale(0.98); opacity: 0.8; }
+    }
+
+    /* MAIN TWO-COLUMN WORKSPACE LAYOUT */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     /* CARD BASE */
     .card {
       background-color: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 20px;
+      border-radius: 18px;
+      padding: 18px;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
     }
 
-    /* FRESH CHAT & VOICE ENGINE */
-    .fresh-header {
+    /* LEFT: FRESH CHAT & VOICE INTERFACE */
+    .chat-header {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 14px;
-      padding-bottom: 12px;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .fresh-avatar {
-      width: 48px;
-      height: 48px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       background: linear-gradient(135deg, #10b981 0%, #38bdf8 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 26px;
+      font-size: 22px;
       border: 2px solid #38bdf8;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
-      flex-shrink: 0;
     }
 
-    .fresh-info h3 {
-      font-size: 17px;
+    .chat-title h3 {
+      font-size: 15px;
       font-weight: 700;
       color: #fff;
     }
 
-    .fresh-status {
-      font-size: 12px;
+    .chat-title p {
+      font-size: 11px;
       color: var(--accent-emerald);
       display: flex;
       align-items: center;
-      gap: 5px;
-      font-weight: 600;
+      gap: 4px;
     }
 
-    .status-dot {
-      width: 8px;
-      height: 8px;
+    .dot {
+      width: 7px;
+      height: 7px;
       background: var(--accent-emerald);
       border-radius: 50%;
       display: inline-block;
-      box-shadow: 0 0 8px var(--accent-emerald);
-      animation: pulse 2s infinite;
     }
 
-    @keyframes pulse {
-      0% { opacity: 0.4; transform: scale(0.9); }
-      50% { opacity: 1; transform: scale(1.1); }
-      100% { opacity: 0.4; transform: scale(0.9); }
-    }
-
-    /* CHAT DIALOGUE AREA */
     .chat-box {
+      flex: 1;
+      min-height: 250px;
+      max-height: 340px;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      max-height: 280px;
-      overflow-y: auto;
-      padding: 6px 4px 10px;
-      margin-bottom: 16px;
+      gap: 10px;
+      padding: 4px;
+      margin-bottom: 12px;
     }
 
     .chat-bubble {
-      padding: 12px 16px;
-      border-radius: 16px;
-      font-size: 14px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 13px;
       line-height: 1.45;
       max-width: 90%;
-      animation: fadeIn 0.3s ease;
+      animation: fadeIn 0.25s ease;
     }
 
     .bubble-fresh {
@@ -179,94 +275,9 @@
 
     .bubble-user {
       background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
-      color: #ffffff;
+      color: #fff;
       align-self: flex-end;
       border-top-right-radius: 4px;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* QUICK ROLES */
-    .quick-roles-title {
-      font-size: 12px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      margin-bottom: 8px;
-    }
-
-    .quick-roles {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .role-btn {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 10px 12px;
-      color: var(--text-main);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: left;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      transition: all 0.2s ease;
-    }
-
-    .role-btn:hover {
-      background: rgba(56, 189, 248, 0.1);
-      border-color: var(--accent-blue);
-      transform: translateY(-2px);
-    }
-
-    .role-btn small {
-      font-size: 11px;
-      color: var(--text-muted);
-      font-weight: 400;
-    }
-
-    /* VOICE & INPUT CONTROLS */
-    .controls-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .voice-main-btn {
-      background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
-      color: #fff;
-      border: none;
-      border-radius: 14px;
-      padding: 14px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
-      transition: all 0.2s ease;
-    }
-
-    .voice-main-btn:hover {
-      filter: brightness(1.1);
-      transform: scale(1.01);
-    }
-
-    .voice-main-btn.listening {
-      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-      box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
-      animation: pulse 1.2s infinite;
     }
 
     .input-row {
@@ -279,11 +290,10 @@
       background: #0f172a;
       border: 1px solid var(--card-border);
       border-radius: 12px;
-      padding: 12px 16px;
+      padding: 10px 14px;
       color: #fff;
-      font-size: 14px;
+      font-size: 13px;
       outline: none;
-      transition: border 0.2s;
     }
 
     .text-input:focus {
@@ -291,232 +301,323 @@
     }
 
     .send-btn {
-      background: #1e293b;
-      border: 1px solid var(--card-border);
-      color: #fff;
-      border-radius: 12px;
-      padding: 0 18px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .send-btn:hover {
       background: var(--accent-blue);
       color: #000;
+      border: none;
+      border-radius: 12px;
+      padding: 0 16px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
     }
 
-    /* SYSTEM MODULES */
-    .system-builder-card {
+    /* RIGHT: "MY WORLD" DASHBOARD */
+    .my-world-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .my-world-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .my-world-title-wrap h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .world-badge {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .world-buckets-container {
       display: flex;
       flex-direction: column;
-      gap: 14px;
-    }
-
-    .builder-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .builder-header h3 {
-      font-size: 16px;
-      font-weight: 700;
-      color: #f8fafc;
-    }
-
-    .system-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
       gap: 10px;
+      overflow-y: auto;
+      max-height: 400px;
+      padding-right: 2px;
     }
 
-    .module-card {
+    .bucket-card {
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 14px;
       padding: 12px;
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      transition: all 0.25s ease;
+      gap: 8px;
     }
 
-    .module-card:hover {
-      border-color: rgba(56, 189, 248, 0.3);
-      background: rgba(56, 189, 248, 0.04);
-    }
-
-    .module-icon {
-      font-size: 18px;
-      margin-bottom: 2px;
-    }
-
-    .module-card h4 {
-      font-size: 13px;
+    .bucket-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
       font-weight: 700;
-      color: #e2e8f0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #cbd5e1;
     }
 
-    .module-card p {
+    .bucket-count {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 2px 7px;
+      border-radius: 999px;
       font-size: 11px;
+      color: #38bdf8;
+    }
+
+    .bucket-items {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .job-item {
+      background: #0f172a;
+      border-left: 3px solid var(--accent-blue);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .job-item.urgent {
+      border-left-color: #ef4444;
+    }
+
+    .job-item.settlement {
+      border-left-color: #10b981;
+    }
+
+    .job-item .job-title {
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .job-item .job-meta {
       color: var(--text-muted);
-      line-height: 1.35;
+      font-size: 11px;
+    }
+
+    .job-price {
+      font-weight: 700;
+      color: #34d399;
+      font-size: 12px;
     }
 
     /* FOOTER */
     footer {
       text-align: center;
-      padding: 16px 8px 24px;
-      font-size: 12px;
+      padding: 12px;
+      font-size: 11px;
       color: var(--text-muted);
       display: flex;
-      flex-direction: column;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .trial-pill {
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: #34d399;
-      padding: 4px 12px;
-      border-radius: 9999px;
-      font-size: 11px;
-      font-weight: 600;
+      justify-content: center;
+      gap: 12px;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <!-- HEADER WITH AUTHENTIC ROB ART LOGO -->
-    <header>
-      <div class="logo-frame">
-        <img id="mainLogo" src="logo.png" alt="FRESH - Your Digital Coordinator | Powered by TappyThing" class="brand-logo-img">
-      </div>
-      <div class="rob-art-pill">
-        <span>🎨 Original Crew Artwork by Rob Art</span>
-      </div>
-    </header>
-
-    <!-- FRESH INTERACTIVE CHAT ENGINE -->
-    <div class="card">
-      <div class="fresh-header">
-        <div class="fresh-avatar">🧢</div>
-        <div class="fresh-info">
-          <h3>Fresh (AI Coordinator)</h3>
-          <div class="fresh-status">
-            <span class="status-dot"></span> Ready to assist & route
-          </div>
+    <!-- TOP BAR: LOGO LEFT/CENTER, ROB ART RIGHT -->
+    <div class="top-bar">
+      <div class="logo-area">
+        <div class="logo-img-wrapper">
+          <img id="brandLogo" src="logo.png" alt="TappyThing" onerror="this.onerror=null; this.src='fresh-logo.png';">
+        </div>
+        <div class="logo-text-group">
+          <h1>TappyThing</h1>
+          <p>Digital Coordinator Command Center</p>
         </div>
       </div>
 
-      <!-- CHAT MESSAGE BOX -->
-      <div class="chat-box" id="chatBox">
-        <div class="chat-bubble bubble-fresh">
-          <strong>Hey there! I'm Fresh.</strong> I'm here to help you get your shop and tasks organized fast with zero headaches.<br><br>
-          👉 <strong>Here is what to do:</strong> Tap the blue mic below and speak, type your task in the box, or tap one of the quick shortcuts below!
-        </div>
-      </div>
-
-      <!-- QUICK ROLE SHORTCUTS -->
-      <div class="quick-roles-title">Quick System Setups:</div>
-      <div class="quick-roles">
-        <button class="role-btn" onclick="triggerRoleAction('Mona')">
-          <span>🏪 Counter Intake</span>
-          <small>Mona's check-in flow</small>
-        </button>
-        <button class="role-btn" onclick="triggerRoleAction('Mike')">
-          <span>🔧 Repair & Invoices</span>
-          <small>Mike @ Bagdons flow</small>
-        </button>
-      </div>
-
-      <!-- INPUT & VOICE CONTROLS -->
-      <div class="controls-panel">
-        <button class="voice-main-btn" id="voiceBtn" onclick="toggleVoice()">
-          <span id="micIcon">🎙️</span>
-          <span id="micText">Tap to Talk with Fresh</span>
-        </button>
-
-        <div class="input-row">
-          <input type="text" id="userInput" class="text-input" placeholder="Type a message or task for Fresh..." onkeydown="handleKey(event)">
-          <button class="send-btn" onclick="sendMessage()">Send</button>
+      <!-- ROB ART CORNER -->
+      <div class="rob-art-badge">
+        <div class="rob-art-avatar">🎨</div>
+        <div class="rob-art-meta">
+          <h4>Rob Art</h4>
+          <p>Original Crew Tribute</p>
         </div>
       </div>
     </div>
 
-    <!-- SELF-BUILD SYSTEM PREVIEW -->
-    <div class="card system-builder-card">
-      <div class="builder-header">
-        <h3>🚀 Active System Modules</h3>
-        <span style="font-size: 11px; color: var(--accent-blue); font-weight: 600;">Self-Build Ready</span>
+    <!-- 3 INTAKE BUTTONS -->
+    <div class="intake-buttons-bar">
+      <button class="intake-btn btn-voice" id="voiceBtn" onclick="toggleVoice()">
+        <span id="micIcon">🎙️</span>
+        <span id="micText">Tap to Talk</span>
+      </button>
+      <button class="intake-btn" onclick="focusType()">
+        <span>⌨️</span>
+        <span>Tap to Type</span>
+      </button>
+      <button class="intake-btn" onclick="triggerPhoto()">
+        <span>📷</span>
+        <span>Photo / Intake</span>
+      </button>
+    </div>
+
+    <!-- MAIN TWO-COLUMN SPLIT: COMMUNICATION ON LEFT, MY WORLD ON RIGHT -->
+    <div class="main-grid">
+      
+      <!-- LEFT COLUMN: FRESH CHAT & VOICE COMMUNICATION -->
+      <div class="card">
+        <div class="chat-header">
+          <div class="fresh-avatar">🧢</div>
+          <div class="chat-title">
+            <h3>Fresh (AI Coordinator)</h3>
+            <p><span class="dot"></span> Live & Listening</p>
+          </div>
+        </div>
+
+        <div class="chat-box" id="chatBox">
+          <div class="chat-bubble bubble-fresh">
+            <strong>Hey William & Mike! I'm Fresh.</strong><br>
+            I'm ready to take your repair jobs, invoices, and intake. Tap the blue mic, speak your repair notes, or type below. Watch it land in <strong>My World</strong> on the right in real time!
+          </div>
+        </div>
+
+        <div class="input-row">
+          <input type="text" id="userInput" class="text-input" placeholder="Dictate repair, customer, or invoice..." onkeydown="handleKey(event)">
+          <button class="send-btn" onclick="sendMessage()">Send</button>
+        </div>
       </div>
 
-      <div class="system-grid">
-        <div class="module-card">
-          <div class="module-icon">⚡</div>
-          <h4>1. Quick Intake</h4>
-          <p>Instant voice, photo, & text intake logging.</p>
+      <!-- RIGHT COLUMN: MY WORLD DASHBOARD -->
+      <div class="card">
+        <div class="my-world-header">
+          <div class="my-world-title-wrap">
+            <span style="font-size: 18px;">🌐</span>
+            <h3>My World</h3>
+          </div>
+          <span class="world-badge" id="roleBadge">Bagdons Bench & Shop Ops</span>
         </div>
-        <div class="module-card">
-          <div class="module-icon">📬</div>
-          <h4>2. Follow-Up</h4>
-          <p>Automated customer SMS & status notifications.</p>
-        </div>
-        <div class="module-card">
-          <div class="module-icon">📋</div>
-          <h4>3. Task Queue</h4>
-          <p>Bench tech & counter routing in real time.</p>
-        </div>
-        <div class="module-card">
-          <div class="module-icon">📊</div>
-          <h4>4. Live Dashboard</h4>
-          <p>Revenue, parts tracking, and daily ops.</p>
+
+        <div class="world-buckets-container" id="bucketsList">
+          
+          <!-- BUCKET 1: BENCH REPAIRS & INVOICING -->
+          <div class="bucket-card">
+            <div class="bucket-head">
+              <span>🔧 Mike's Active Bench Repairs</span>
+              <span class="bucket-count" id="countBench">3</span>
+            </div>
+            <div class="bucket-items" id="benchItems">
+              <div class="job-item">
+                <div>
+                  <div class="job-title">Hoover WindTunnel (Smith)</div>
+                  <div class="job-meta">Belt & brush roll replaced • 1 hr labor</div>
+                </div>
+                <div class="job-price">$85.00</div>
+              </div>
+              <div class="job-item">
+                <div>
+                  <div class="job-title">Sanitaire Commercial (Davis)</div>
+                  <div class="job-meta">Motor brush set & cord replacement</div>
+                </div>
+                <div class="job-price">$110.00</div>
+              </div>
+              <div class="job-item">
+                <div>
+                  <div class="job-title">Bissell ProHeat (Taylor)</div>
+                  <div class="job-meta">Pump seal kit installed</div>
+                </div>
+                <div class="job-price">$75.00</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BUCKET 2: WAITING FOR PARTS -->
+          <div class="bucket-card">
+            <div class="bucket-head">
+              <span>📦 Parts Needed / Waiting</span>
+              <span class="bucket-count">2</span>
+            </div>
+            <div class="bucket-items">
+              <div class="job-item urgent">
+                <div>
+                  <div class="job-title">Dyson V11 Animal (Miller)</div>
+                  <div class="job-meta">Trigger assembly on order</div>
+                </div>
+                <div class="job-price">Parts Pending</div>
+              </div>
+              <div class="job-item">
+                <div>
+                  <div class="job-title">Oreck XL Upright (Wilson)</div>
+                  <div class="job-meta">Fan housing switch</div>
+                </div>
+                <div class="job-price">Parts Pending</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BUCKET 3: INVOICES & SATURDAY SETTLEMENT -->
+          <div class="bucket-card">
+            <div class="bucket-head">
+              <span>💵 Ready for Saturday Settlement</span>
+              <span class="bucket-count" id="countSettlement">2</span>
+            </div>
+            <div class="bucket-items" id="settlementItems">
+              <div class="job-item settlement">
+                <div>
+                  <div class="job-title">Kirby Avalir Complete (Johnson)</div>
+                  <div class="job-meta">Full overhaul & transmission service</div>
+                </div>
+                <div class="job-price">$185.00</div>
+              </div>
+              <div class="job-item settlement">
+                <div>
+                  <div class="job-title">Electrolux Epic 6500 (Brown)</div>
+                  <div class="job-meta">Hose wiring & carbon brushes</div>
+                </div>
+                <div class="job-price">$95.00</div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
+
     </div>
 
     <!-- FOOTER -->
     <footer>
-      <div class="trial-pill">3-Day Free Trial • $95/mo • 30-Day Money-Back Guarantee</div>
-      <div>⚡ Powered by TappyThing & Fresh AI</div>
-      <div style="font-size: 10px; color: #64748b; margin-top: 4px;">Crew: Boudie • Fresh • Sissy • Rob Art • Umar • Nusch</div>
+      <span>⚡ Powered by TappyThing</span>
+      <span>•</span>
+      <span>Crew: Boudie • Fresh • Sissy • Rob Art • Umar</span>
     </footer>
   </div>
 
-  <!-- CLIENT-SIDE LOGIC -->
+  <!-- SCRIPT -->
   <script>
-    // AUTO-RESOLVE LOGO ASSET FROM NETLIFY
-    const possibleLogoPaths = [
-      'logo.png',
-      'fresh-logo.png',
-      'assets/logo.png',
-      'assets/fresh-logo.png',
-      'images/logo.png',
-      'fresh.png'
-    ];
-    let pathIdx = 0;
-    const logoImg = document.getElementById('mainLogo');
-    logoImg.onerror = function() {
-      pathIdx++;
-      if (pathIdx < possibleLogoPaths.length) {
-        this.src = possibleLogoPaths[pathIdx];
-      }
-    };
-
     const chatBox = document.getElementById('chatBox');
     const userInput = document.getElementById('userInput');
     const voiceBtn = document.getElementById('voiceBtn');
     const micIcon = document.getElementById('micIcon');
     const micText = document.getElementById('micText');
+    const benchItems = document.getElementById('benchItems');
 
     let recognition = null;
     let isListening = false;
 
-    // SPEECH RECOGNITION SETUP
+    // SPEECH RECOGNITION
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       recognition = new SpeechRecognition();
@@ -528,20 +629,18 @@
         isListening = true;
         voiceBtn.classList.add('listening');
         micIcon.innerText = '🛑';
-        micText.innerText = 'Listening to you... Speak now';
+        micText.innerText = 'Listening... Speak Now';
       };
 
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         addMessage(transcript, 'user');
-        respondAsFresh(transcript);
+        processEntry(transcript);
       };
 
       recognition.onerror = (event) => {
-        console.warn('Speech error:', event.error);
         stopListening();
-        addMessage("I didn't quite catch that. Try speaking again or typing below!", 'fresh');
-        speakText("I didn't quite catch that. Try speaking again or typing below!");
+        addMessage("Didn't catch that clearly. Speak again or type below!", 'fresh');
       };
 
       recognition.onend = () => {
@@ -551,7 +650,7 @@
 
     function toggleVoice() {
       if (!recognition) {
-        addMessage("Voice input isn't supported in this browser, but you can type right here!", 'fresh');
+        addMessage("Voice not supported on this browser, but typing works great!", 'fresh');
         return;
       }
       if (isListening) {
@@ -571,13 +670,20 @@
       isListening = false;
       voiceBtn.classList.remove('listening');
       micIcon.innerText = '🎙️';
-      micText.innerText = 'Tap to Talk with Fresh';
+      micText.innerText = 'Tap to Talk';
+    }
+
+    function focusType() {
+      userInput.focus();
+    }
+
+    function triggerPhoto() {
+      addMessage("Opening camera intake to snap equipment tag & serial photo...", 'fresh');
+      speakText("Camera intake opened. Snap photo of equipment tag.");
     }
 
     function handleKey(e) {
-      if (e.key === 'Enter') {
-        sendMessage();
-      }
+      if (e.key === 'Enter') sendMessage();
     }
 
     function sendMessage() {
@@ -585,7 +691,7 @@
       if (!text) return;
       addMessage(text, 'user');
       userInput.value = '';
-      respondAsFresh(text);
+      processEntry(text);
     }
 
     function addMessage(text, sender) {
@@ -596,52 +702,35 @@
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // FRESH INTELLIGENT DIRECTIVE RESPONSES
-    function respondAsFresh(input) {
-      const lower = input.toLowerCase();
-      let response = "";
+    function processEntry(text) {
+      // Add animated item to My World
+      const newCard = document.createElement('div');
+      newCard.className = 'job-item settlement';
+      newCard.innerHTML = `
+        <div>
+          <div class="job-title">${text.substring(0, 32)}...</div>
+          <div class="job-meta">Logged via Fresh Voice • Staged for Review</div>
+        </div>
+        <div class="job-price">$95.00</div>
+      `;
+      benchItems.insertBefore(newCard, benchItems.firstChild);
 
-      if (lower.includes('mona') || lower.includes('counter') || lower.includes('intake')) {
-        response = "Got it! For Mona's Counter Intake: Tell me the customer name, phone number, and vacuum model. I will automatically log the check-in ticket and send them a drop-off confirmation!";
-      } else if (lower.includes('mike') || lower.includes('bagdon') || lower.includes('repair') || lower.includes('invoice')) {
-        response = "Right on! For Mike @ Bagdons: Dictate the repair notes, parts used, and labor charge. I'll stage the invoice and update the shop board for Saturday settlement.";
-      } else if (lower.includes('help') || lower.includes('what to do') || lower.includes('start')) {
-        response = "I'm right here to take the work off your plate! Tell me what job came in, or tap 'Counter Intake' or 'Repair & Invoices' to start routing immediately.";
-      } else if (lower.includes('price') || lower.includes('cost') || lower.includes('trial')) {
-        response = "TappyThing is $95/month with a 3-day free trial (no card required) and a full 30-day money-back guarantee. Unlimited users included!";
-      } else {
-        response = `Got that: "${input}". I've queued this up for routing. Tell me who this is for (Mona, Mike, or shop ops) and I'll drop it right into the board!`;
-      }
-
+      const reply = `Got it! Logged "${text}" directly into My World under Mike's Bench queue & staged for Saturday settlement.`;
       setTimeout(() => {
-        addMessage(response, 'fresh');
-        speakText(response);
+        addMessage(reply, 'fresh');
+        speakText(reply);
       }, 400);
     }
 
-    function triggerRoleAction(role) {
-      if (role === 'Mona') {
-        addMessage("Setting up Mona's Counter Intake Flow...", 'user');
-        respondAsFresh('mona counter intake');
-      } else if (role === 'Mike') {
-        addMessage("Setting up Mike's Repair & Invoicing Flow...", 'user');
-        respondAsFresh('mike bagdons repair');
-      }
-    }
-
-    // TEXT TO SPEECH (VOICE OUT)
     function speakText(text) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const cleanText = text.replace(/<[^>]*>?/gm, '').replace(/[👉⚡🎨🎙️🔧🏪📋📊🚀]/g, '');
-        const utterance = new SpeechSynthesisUtterance(cleanText);
-        utterance.rate = 1.0;
-        utterance.pitch = 1.0;
-        window.speechSynthesis.speak(utterance);
+        const clean = text.replace(/<[^>]*>?/gm, '').replace(/[👉⚡🎨🎙️🔧🏪📋📊🚀🛑]/g, '');
+        const utt = new SpeechSynthesisUtterance(clean);
+        utt.rate = 1.0;
+        window.speechSynthesis.speak(utt);
       }
     }
   </script>
 </body>
 </html>
-
-
