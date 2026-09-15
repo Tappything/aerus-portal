@@ -691,7 +691,7 @@
       if (!box) return;
       var el = document.createElement('div');
       el.className = 'msg msg-' + sender;
-      el.innerHTML = text.replace(/\\n/g, '<br>');
+      el.innerHTML = text.replace(/\n/g, '<br>');
       box.appendChild(el);
       box.scrollTop = box.scrollHeight;
     }
@@ -714,7 +714,7 @@
 
       if (lower.indexOf('invoice') !== -1 || lower.indexOf('bill') !== -1 || lower.indexOf('charge') !== -1 || lower.indexOf('pay') !== -1 || lower.indexOf('
 
-Paste it in, hit deploy on Netlify, and tell me how it runs when you tap `🌍 My World` or the mic!) !== -1) {
+Commit that to GitHub, wait 15 seconds for Netlify to finish the build, and then test the live site!) !== -1) {
         state.invoices.unshift({ title: text, status: "Saturday Settlement", badge: "badge-working" });
         reply = 'Got it! Logged invoice: "' + text + '". Sissy staged this into Invoices & Money for Saturday settlement!';
       } else if (lower.indexOf('grocery') !== -1 || lower.indexOf('milk') !== -1 || lower.indexOf('home') !== -1 || lower.indexOf('wife') !== -1 || lower.indexOf('pickleball') !== -1 || lower.indexOf('weight') !== -1) {
