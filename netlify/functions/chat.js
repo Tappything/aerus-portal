@@ -14,11 +14,12 @@ You have direct knowledge of Aerus Timonium's core pricing and services:
 YOUR CORE FUNCTIONS & RULES:
 1. VOICE-FIRST INTAKE & INVOICING:
    - When the user dictates a repair, note, or invoice (e.g. "Invoice for Beth Rose belt and labor"), extract the customer name, match parts/services against pricing, and calculate the total.
-   - Provide a punchy response and include the invoice summary.
+   - If missing parts/services, ask a punchy follow-up (e.g. "Got Beth Rose on file! What work or parts did Chris do on the bench?").
+   - Always return the calculated total amount (e.g. $55.00).
 
 2. DIRECT & PUNCHY TONE:
    - Direct, energetic motivational coach tone (Ogilvy clarity, Ziglar warmth).
-   - Keep responses to 2-3 short, powerful sentences. Fifth-grade clarity always. Zero fluff.
+   - Keep responses to 2 short sentences. Fifth-grade clarity always. Zero fluff.
 
 3. WORKFLOW CATEGORIZATION:
    - Intakes/Repairs -> Category: "business"
@@ -67,17 +68,22 @@ exports.handler = async function(event, context) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
+      // Offline fallback
       let cat = 'business';
       let reply = `Logged: "${userMessage}". Filed to Business Ops!`;
       let lower = userMessage.toLowerCase();
       let invoiceData = null;
 
-      if (lower.includes('invoice') || lower.includes('bill') || lower.includes('$') || lower.includes('charge')) {
+      if (lower.includes('invoice') || lower.includes('bill') || lower.includes('
+
+---
+
+Tell me **"Done"** as soon as you hit commit, and we will open up the live link and test! 🚀🎩) || lower.includes('charge')) {
         cat = 'invoices';
         const match = userMessage.match(/\$?(\d+(\.\d{2})?)/);
-        const amount = match ? `$${match[1]}` : '$40.00';
+        const amount = match ? `${match[1]}` : '$40.00';
         invoiceData = { amount, text: userMessage };
-        reply = `💵 Staged Invoice: ${amount}. Staged for Saturday Settlement!`;
+        reply = `💵 Staged Invoice for ${amount}. Ready for Saturday Settlement!`;
       } else if (lower.includes('grocery') || lower.includes('home') || lower.includes('wife')) {
         cat = 'personal';
         reply = `Filed to Personal & Home: "${userMessage}"!`;
@@ -93,6 +99,7 @@ exports.handler = async function(event, context) {
       };
     }
 
+    // Call Gemini API
     const geminiPayload = JSON.stringify({
       contents: [
         {
@@ -136,10 +143,18 @@ exports.handler = async function(event, context) {
     const lower = userMessage.toLowerCase();
     let invoiceData = null;
 
-    if (lower.includes('invoice') || lower.includes('bill') || lower.includes('$') || textOut.toLowerCase().includes('invoice') || textOut.includes('$')) {
+    if (lower.includes('invoice') || lower.includes('bill') || lower.includes('
+
+---
+
+Tell me **"Done"** as soon as you hit commit, and we will open up the live link and test! 🚀🎩) || textOut.toLowerCase().includes('invoice') || textOut.includes('
+
+---
+
+Tell me **"Done"** as soon as you hit commit, and we will open up the live link and test! 🚀🎩)) {
       cat = 'invoices';
       const match = (userMessage + ' ' + textOut).match(/\$?(\d+(\.\d{2})?)/);
-      const amount = match ? `$${match[1]}` : '$40.00';
+      const amount = match ? `${match[1]}` : '$40.00';
       invoiceData = { amount, text: userMessage };
     } else if (lower.includes('grocery') || lower.includes('home') || lower.includes('wife')) {
       cat = 'personal';
@@ -156,6 +171,7 @@ exports.handler = async function(event, context) {
         invoiceData
       })
     };
+
   } catch (err) {
     return {
       statusCode: 200,
