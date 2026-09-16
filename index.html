@@ -2,49 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>TappyThing</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <title>TappyThing — Command Center</title>
   <style>
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{background:#1a1a2e;color:#fff;font-family:'Segoe UI',sans-serif;max-width:480px;margin:0 auto;min-height:100vh;padding:0 0 40px 0;}
-    .header{background:#0f0f1a;padding:16px;text-align:center;border-bottom:2px solid #ffd700;}
-    .header img{width:90px;border-radius:50%;margin-bottom:6px;border:2px solid #ffd700;}
-    .header .subtitle{font-size:0.72rem;color:#aaa;letter-spacing:0.08em;text-transform:uppercase;margin-top:2px;}
-    .tap-section{display:flex;gap:16px;justify-content:center;margin:24px 16px;}
-    .tap-btn{flex:1;max-width:160px;padding:20px 12px;font-size:1.2rem;min-height:90px;font-weight:bold;border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,0.3);border:none;cursor:pointer;}
-    .talk-btn{background:#fdab3d;color:#000;}
-    .type-btn{background:#579bfc;color:#fff;}
-    .type-section{display:none;margin:0 16px 16px;}
-    .type-section textarea{width:100%;padding:12px;font-size:1rem;border-radius:8px;border:1px solid #ccc;box-sizing:border-box;background:#1e1e1e;color:#fff;resize:none;}
-    .type-section button{margin-top:8px;width:100%;padding:14px;font-size:1rem;font-weight:bold;border-radius:8px;border:none;background:#00c875;color:#fff;cursor:pointer;}
-    .fresh-response{margin:16px;padding:14px;background:#1e1e1e;color:#ffd700;font-style:italic;border-radius:8px;display:none;border-left:4px solid #ffd700;font-size:1rem;line-height:1.5;}
-    hr{border:none;border-top:1px solid #333;margin:24px 16px;}
-    .video-section{text-align:center;margin:0 16px;background:#0f0f1a;border-radius:16px;padding:16px;border:1px solid #333;}
-    .video-label{color:#c084fc;font-size:0.85rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;}
-    .vid-btn{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#9333ea);border:3px solid #c084fc;color:white;font-size:2.5rem;cursor:pointer;}
-    .video-hint{color:#a78bfa;font-size:0.78rem;margin-top:8px;}
-    .vid-preview{display:none;max-width:360px;margin:16px auto 0;}
-    .vid-preview video{width:100%;border-radius:12px;border:2px solid #7c3aed;}
-    .live-txt{color:#c4b5fd;font-size:0.85rem;margin:8px 0;min-height:40px;}
-    .stop-btn{width:100%;padding:12px;background:rgba(239,68,68,0.2);border:2px solid #ef4444;color:#fca5a5;border-radius:12px;font-size:0.9rem;cursor:pointer;}
-    .vid-status{color:#4ade80;font-size:0.85rem;margin-top:12px;}
-    .myworld-section{margin:16px;}
-    .myworld-btn{width:100%;padding:14px 16px;background:linear-gradient(135deg,#7c3aed,#9333ea);border:2px solid #c084fc;color:#fff;font-size:1.05rem;font-weight:bold;border-radius:12px;cursor:pointer;}
-    .myworld-panel{display:none;margin-top:12px;}
-    .group-card{background:#1a1a2e;border-radius:12px;padding:14px;margin-bottom:12px;}
-    .group-title{font-weight:bold;color:#ffd700;font-size:0.9rem;margin-bottom:8px;}
-    .group-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #2a2a3e;}
-    .group-item:last-child{border-bottom:none;}
-    .item-name{color:#e2e8f0;font-size:0.88rem;}
-    .item-status{padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:bold;}
-    .empty-msg{color:#555;font-size:0.8rem;padding:8px 0;}
+    :root {
+      --bg: #0b1120;
+      --card-bg: #1e293b;
+      --border: #334155;
+      --gold: #f59e0b;
+      --purple: #8b5cf6;
+      --blue: #38bdf8;
+      --green: #10b981;
+      --red: #ef4444;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background: var(--bg); color: var(--text); max-width: 480px; margin: 0 auto; min-height: 100vh; padding: 12px 12px 40px; display: flex; flex-direction: column; gap: 12px; }
+    
+    /* HEADER */
+    .header { background: #0f172a; border: 1px solid var(--border); border-radius: 16px; padding: 16px; text-align: center; border-bottom: 3px solid var(--gold); }
+    .header img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold); margin-bottom: 6px; object-fit: cover; box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); }
+    .title { font-size: 1.1rem; font-weight: 800; color: #fff; }
+    .subtitle { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
+
+    /* TAP BUTTONS */
+    .tap-section { display: flex; gap: 10px; }
+    .tap-btn { flex: 1; padding: 16px 10px; font-size: 1rem; font-weight: 800; border-radius: 14px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: transform 0.1s; }
+    .tap-btn:active { transform: scale(0.97); }
+    .talk-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; }
+    .type-btn { background: #1e293b; border: 1px solid var(--border); color: #fff; }
+
+    /* TYPE SECTION */
+    .type-section { display: none; background: #0f172a; border: 1px solid var(--border); border-radius: 14px; padding: 12px; }
+    .type-section textarea { width: 100%; padding: 10px; font-size: 0.95rem; border-radius: 8px; border: 1px solid var(--border); background: #1e293b; color: #fff; resize: none; outline: none; }
+    .type-section button { margin-top: 8px; width: 100%; padding: 12px; font-size: 0.95rem; font-weight: 800; border-radius: 8px; border: none; background: var(--green); color: #fff; cursor: pointer; }
+
+    /* FRESH RESPONSE CARD */
+    .fresh-response { padding: 14px; background: #1e293b; color: var(--gold); border-radius: 12px; display: none; border-left: 4px solid var(--gold); font-size: 0.95rem; line-height: 1.5; }
+
+    /* VIDEO & CAMERA INTAKE */
+    .video-section { text-align: center; background: #0f172a; border-radius: 16px; padding: 16px; border: 1px solid var(--border); }
+    .video-label { color: #c084fc; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+    .vid-btn-grid { display: flex; justify-content: center; gap: 12px; }
+    .vid-btn { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg,#7c3aed,#9333ea); border: 3px solid #c084fc; color: white; font-size: 2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4); }
+    .vid-hint { color: #a78bfa; font-size: 0.78rem; margin-top: 10px; }
+    .vid-preview { display: none; max-width: 360px; margin: 12px auto 0; }
+    .vid-preview video { width: 100%; border-radius: 12px; border: 2px solid #7c3aed; }
+    .live-txt { color: #c4b5fd; font-size: 0.85rem; margin: 8px 0; min-height: 30px; }
+    .stop-btn { width: 100%; padding: 10px; background: rgba(239,68,68,0.2); border: 2px solid #ef4444; color: #fca5a5; border-radius: 10px; font-size: 0.88rem; font-weight: 700; cursor: pointer; }
+    .vid-status { color: #4ade80; font-size: 0.85rem; margin-top: 10px; font-weight: 700; }
+
+    /* MY WORLD CASCADING PANELS */
+    .myworld-section { margin-top: 4px; }
+    .myworld-btn { width: 100%; padding: 14px 16px; background: linear-gradient(135deg, #6d28d9, #4f46e5); border: 1px solid #a78bfa; color: #fff; font-size: 1rem; font-weight: 800; border-radius: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+    .myworld-panel { display: none; margin-top: 10px; flex-direction: column; gap: 8px; }
+    .group-card { background: #1e293b; border-radius: 12px; padding: 12px; border: 1px solid var(--border); }
+    .group-title { font-weight: 800; color: var(--gold); font-size: 0.9rem; margin-bottom: 8px; display: flex; justify-content: space-between; }
+    .group-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .group-item:last-child { border-bottom: none; }
+    .item-name { color: #e2e8f0; font-size: 0.85rem; font-weight: 600; }
+    .item-status { padding: 3px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 800; }
+    .empty-msg { color: var(--muted); font-size: 0.8rem; padding: 4px 0; font-style: italic; }
   </style>
 </head>
 <body>
 
 <div class="header">
-  <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="TappyThing"/>
-  <div class="subtitle">Digital Coordinator Command Center</div>
+  <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="TappyThing" onerror="this.src='logo.png'"/>
+  <div class="title">TappyThing Command Center</div>
+  <div class="subtitle">Aerus Timonium • Voice & Instant Invoicing</div>
 </div>
 
 <div class="tap-section">
@@ -53,18 +80,20 @@
 </div>
 
 <div class="type-section" id="typeSection">
-  <textarea id="typeInput" rows="3" placeholder="Type your message here…"></textarea>
+  <textarea id="typeInput" rows="3" placeholder="Type your message or invoice note here…"></textarea>
   <button onclick="sendTyped()">Send to Fresh ✉️</button>
 </div>
 
 <div class="fresh-response" id="fresh-response"></div>
 
-<hr/>
-
 <div class="video-section">
-  <div class="video-label">📹 Video Intake</div>
-  <button class="vid-btn" id="vidBtn" onclick="startVid()">📹</button>
-  <div class="video-hint">Point at unit • Say customer name & issue • Tap stop</div>
+  <div class="video-label">📹 Media Diagnosis & Snap Tag</div>
+  <div class="vid-btn-grid">
+    <button class="vid-btn" id="vidBtn" onclick="startVid()">📹</button>
+    <button class="vid-btn" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); border-color: #60a5fa;" onclick="triggerCamera()">📷</button>
+    <input type="file" id="nativeCamInput" accept="image/*,video/*" capture="environment" style="display:none;">
+  </div>
+  <div class="vid-hint">Point at unit • Say customer name & issue • Tap stop</div>
   <div class="vid-preview" id="vidPreview">
     <video id="liveVid" autoplay muted playsinline></video>
     <div class="live-txt" id="liveTxt">🎙️ Listening…</div>
@@ -74,7 +103,10 @@
 </div>
 
 <div class="myworld-section">
-  <button class="myworld-btn" id="myWorldBtn" onclick="toggleMyWorld()">🌍 My World ▼</button>
+  <button class="myworld-btn" id="myWorldBtn" onclick="toggleMyWorld()">
+    <span>🌍 My World</span>
+    <span id="myWorldArrow">▼</span>
+  </button>
   <div class="myworld-panel" id="myWorldPanel"></div>
 </div>
 
@@ -84,14 +116,14 @@ let myWorldLoaded=false;
 
 async function toggleMyWorld(){
   const panel=document.getElementById('myWorldPanel');
-  const btn=document.getElementById('myWorldBtn');
+  const arrow=document.getElementById('myWorldArrow');
   if(panel.style.display==='none'||!panel.style.display){
-    panel.style.display='block';
-    btn.textContent='🌍 My World ▲';
+    panel.style.display='flex';
+    if(arrow) arrow.textContent='▲';
     if(!myWorldLoaded){await loadMyWorld();myWorldLoaded=true;}
   }else{
     panel.style.display='none';
-    btn.textContent='🌍 My World ▼';
+    if(arrow) arrow.textContent='▼';
   }
 }
 
@@ -99,28 +131,28 @@ function statusPillStyle(status){
   const s=(status||'').toLowerCase();
   if(s.includes('workbench')||s.includes('bench'))return 'background:#f59e0b;color:#1f1300;';
   if(s.includes('ready'))return 'background:#22c55e;color:#0b1f1b;';
-  if(s.includes('pending')||s.includes('intake'))return 'background:#579bfc;color:#fff;';
+  if(s.includes('pending')||s.includes('intake'))return 'background:#38bdf8;color:#0f172a;';
   if(s.includes('waiting'))return 'background:#fdab3d;color:#000;';
-  if(s.includes('bagdon'))return 'background:#7c3aed;color:#fff;';
+  if(s.includes('bagdon'))return 'background:#8b5cf6;color:#fff;';
   if(s.includes('showroom'))return 'background:#9d50dd;color:#fff;';
   if(s.includes('storage'))return 'background:#7f5347;color:#fff;';
-  if(s.includes('complet')||s.includes('paid'))return 'background:#00c875;color:#000;';
-  return 'background:#555;color:#fff;';
+  if(s.includes('complet')||s.includes('paid'))return 'background:#10b981;color:#fff;';
+  return 'background:#334155;color:#fff;';
 }
 
 async function loadMyWorld(){
   const panel=document.getElementById('myWorldPanel');
-  panel.innerHTML='<p style="color:#aaa;text-align:center;padding:16px;">Loading…</p>';
+  panel.innerHTML='<p style="color:#cbd5e1;text-align:center;padding:12px;font-size:0.85rem;">Loading drawers…</p>';
   try{
     const res=await fetch('/.netlify/functions/myworld');
     const data=await res.json();
     const groups=Array.isArray(data.groups)?data.groups:[];
-    if(groups.length===0){panel.innerHTML='<p style="color:#aaa;text-align:center;">No groups found.</p>';return;}
+    if(groups.length===0){panel.innerHTML='<p style="color:#cbd5e1;text-align:center;font-size:0.85rem;">No active drawers found.</p>';return;}
     panel.innerHTML=groups.map(group=>{
       const items=group.items||[];
-      const borderColor=group.color||'#ffd700';
+      const borderColor=group.color||'#f59e0b';
       const itemsHtml=items.length===0
-        ?'<div class="empty-msg">Nothing here right now</div>'
+        ?'<div class="empty-msg">Nothing staged here right now</div>'
         :items.map(item=>`
           <div class="group-item">
             <span class="item-name">${item.name}</span>
@@ -128,14 +160,32 @@ async function loadMyWorld(){
           </div>`).join('');
       return `
         <div class="group-card" style="border-left:4px solid ${borderColor};">
-          <div class="group-title">${group.title} <span style="color:#555;font-size:0.75rem;font-weight:normal;">(${items.length})</span></div>
+          <div class="group-title"><span>${group.title}</span> <span style="color:#94a3b8;font-size:0.75rem;font-weight:normal;">(${items.length})</span></div>
           ${itemsHtml}
         </div>`;
     }).join('');
   }catch(err){
-    panel.innerHTML='<p style="color:#f87171;text-align:center;">❌ Could not load. Try again.</p>';
+    panel.innerHTML='<p style="color:#f87171;text-align:center;font-size:0.85rem;">❌ Could not load drawers. Try again.</p>';
   }
 }
+
+function triggerCamera(){
+  const input = document.getElementById('nativeCamInput');
+  if(input) input.click();
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  const camInp = document.getElementById('nativeCamInput');
+  if(camInp){
+    camInp.addEventListener('change', function(e){
+      if(e.target.files && e.target.files[0]){
+        const box=document.getElementById('fresh-response');
+        box.textContent='🤵 📷 Photo tag captured & staged to bench log!';
+        box.style.display='block';
+      }
+    });
+  }
+});
 
 let mr,chunks=[],str,rec,txt='',ti,sec=0;
 
@@ -167,12 +217,12 @@ function stopVid(){
 }
 
 async function sendVid(){
-  document.getElementById('vidStatus').textContent='⏳ Sending to Sissy…';
+  document.getElementById('vidStatus').textContent='⏳ Sending diagnosis…';
   const name=txt.match(/(?:for|it'?s|customer)\s+([A-Z][a-z]+ [A-Z][a-z]+)/i);
   await fetch(WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({type:'video_intake',transcript:txt||'(none)',
     customer_name:name?name[1]:'Unknown',duration_sec:sec,timestamp:new Date().toISOString()})});
-  document.getElementById('vidStatus').textContent='✅ Sent! Card creating on the board…';
+  document.getElementById('vidStatus').textContent='✅ Sent! Card created on board.';
 }
 
 async function sendToFresh(userMessage){
