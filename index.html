@@ -22,7 +22,6 @@
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      -webkit-tap-highlight-color: transparent;
     }
     body {
       background-color: var(--bg);
@@ -66,11 +65,11 @@
       margin-top: 2px;
     }
     .logo-img {
-      width: 84px;
-      height: 84px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       border: 3px solid var(--gold);
-      box-shadow: 0 0 18px rgba(245, 158, 11, 0.35);
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.35);
       object-fit: cover;
       margin-bottom: 6px;
     }
@@ -104,7 +103,7 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       color: #fff;
-      padding: 10px;
+      padding: 12px;
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
@@ -112,7 +111,6 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      touch-action: manipulation;
     }
     .btn-mode.active-mic {
       background: var(--red) !important;
@@ -129,9 +127,9 @@
       background: #0f172a;
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 10px 12px;
+      padding: 12px 14px;
       color: #fff;
-      font-size: 13px;
+      font-size: 14px;
       outline: none;
     }
     .btn-send-main {
@@ -139,14 +137,13 @@
       border: none;
       border-radius: 12px;
       color: #fff;
-      padding: 10px;
-      font-size: 13px;
+      padding: 12px;
+      font-size: 14px;
       font-weight: 800;
       cursor: pointer;
-      touch-action: manipulation;
     }
 
-    /* BRANDED INVOICE STAGING PREVIEW */
+    /* INVOICE STAGING CARD */
     .invoice-preview-card {
       display: none;
       background: #090d16;
@@ -156,7 +153,6 @@
       flex-direction: column;
       gap: 8px;
       animation: fadeIn 0.2s ease-in-out;
-      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.15);
     }
     .inv-header {
       display: flex;
@@ -168,14 +164,7 @@
     .inv-branding {
       display: flex;
       align-items: center;
-      gap: 8px;
-    }
-    .inv-mini-logo {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: 1.5px solid var(--gold);
-      object-fit: cover;
+      gap: 6px;
     }
     .inv-brand-text {
       font-size: 11px;
@@ -203,7 +192,6 @@
     .inv-actions {
       display: flex;
       gap: 8px;
-      margin-top: 2px;
     }
     .btn-inv {
       flex: 1;
@@ -213,7 +201,6 @@
       font-size: 11px;
       font-weight: 800;
       cursor: pointer;
-      touch-action: manipulation;
     }
     .btn-inv-settle { background: var(--green); color: #fff; }
     .btn-inv-copy { background: #334155; color: #fff; border: 1px solid var(--border); }
@@ -278,15 +265,14 @@
       border: 1px dashed var(--border);
       border-radius: 10px;
       color: #e2e8f0;
-      padding: 9px;
-      font-size: 11px;
+      padding: 10px;
+      font-size: 12px;
       font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 4px;
-      touch-action: manipulation;
     }
 
     /* MY WORLD HUBS */
@@ -308,7 +294,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      touch-action: manipulation;
     }
     .bubbles-grid {
       display: none;
@@ -325,7 +310,6 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
-      touch-action: manipulation;
     }
     .bubble-head {
       display: flex;
@@ -493,39 +477,39 @@
     <!-- MAIN INPUT & CONVERSATION -->
     <div class="card">
       <div class="input-mode-btns">
-        <button type="button" class="btn-mode" id="btnMic">
+        <button type="button" class="btn-mode" id="btnMic" onclick="toggleVoice()">
           <span id="micIcon">🎙️</span>
           <span id="micLabel">Tap to Talk</span>
         </button>
-        <button type="button" class="btn-mode" id="btnFocusText">
+        <button type="button" class="btn-mode" onclick="focusInput()">
           <span>⌨️</span>
           <span>Tap to Type</span>
         </button>
       </div>
 
-      <input type="text" id="userInput" class="text-input-area" placeholder="Speak or type (e.g. Invoice for Beth Rose tune-up & belt)...">
-      <button type="button" class="btn-send-main" id="btnSend">Send to Fresh ✉️</button>
+      <input type="text" id="userInput" class="text-input-area" placeholder="Speak or type (e.g. Invoice for Beth Rose tune-up & belt)..." onkeydown="handleKey(event)">
+      <button type="button" class="btn-send-main" onclick="sendChat()">Send to Fresh ✉️</button>
 
       <!-- BRANDED INVOICE STAGING PREVIEW -->
       <div class="invoice-preview-card" id="invoicePreviewCard">
         <div class="inv-header">
           <div class="inv-branding">
-            <img src="logo.png" alt="TappyThing" class="inv-mini-logo" onerror="this.src='Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg'">
+            <span style="font-size:18px;">💵</span>
             <span class="inv-brand-text">TAPPYTHING INVOICE</span>
           </div>
           <span class="inv-amount-badge" id="invAmountDisplay">$0.00</span>
         </div>
         <div class="inv-details" id="invDetailsText">Staged invoice details will appear here.</div>
         <div class="inv-actions">
-          <button type="button" class="btn-inv btn-inv-settle" id="btnSettleSaturday">✓ Settle Saturday</button>
-          <button type="button" class="btn-inv btn-inv-copy" id="btnCopyInvoice">📋 Copy Details</button>
+          <button type="button" class="btn-inv btn-inv-settle" onclick="settleSaturday()">✓ Settle Saturday</button>
+          <button type="button" class="btn-inv btn-inv-copy" onclick="copyInvoice()">📋 Copy Details</button>
         </div>
       </div>
 
       <div class="chat-display" id="chatBox">
         <div class="msg msg-fresh">
-          <strong>Hey Boudie! Fresh here. 🤵</strong><br>
-          Tap the mic or type above. Dictate a repair, customer bill, or grocery note. I calculate pricing, stage invoices, and route tasks to your hubs instantly!
+          <strong>Hey William! Fresh here. 🤵</strong><br>
+          Tap the mic or type above. Dictate a repair, customer bill, or grocery note. I calculate pricing, stage invoices, and route tasks instantly!
         </div>
       </div>
     </div>
@@ -535,23 +519,23 @@
       <div class="media-title">📹 Video & Photo Intake</div>
       <div class="media-sub">Point at unit • Say customer name & issue • Tap stop</div>
       <div class="media-btns">
-        <button type="button" class="btn-media" id="btnTriggerVideo">📹 1-Min Video Diagnosis</button>
-        <button type="button" class="btn-media" id="btnTriggerPhoto">📷 Snap Repair Tag</button>
+        <button type="button" class="btn-media" onclick="triggerVideo()">📹 1-Min Video Diagnosis</button>
+        <button type="button" class="btn-media" onclick="triggerPhoto()">📷 Snap Repair Tag</button>
       </div>
-      <!-- Hidden Native Camera Inputs for Mobile Phone Execution -->
-      <input type="file" id="nativeVideoInput" accept="video/*" capture="environment" style="display:none;">
-      <input type="file" id="nativePhotoInput" accept="image/*" capture="environment" style="display:none;">
+      <!-- Hidden Native Camera Inputs -->
+      <input type="file" id="nativeVideoInput" accept="video/*" capture="environment" style="display:none;" onchange="onVideoSelected(event)">
+      <input type="file" id="nativePhotoInput" accept="image/*" capture="environment" style="display:none;" onchange="onPhotoSelected(event)">
     </div>
 
-    <!-- MY WORLD (PRESERVED & SPACED OUT) -->
+    <!-- MY WORLD HUBS -->
     <div class="my-world-container">
-      <button type="button" class="my-world-btn" id="btnMyWorld">
+      <button type="button" class="my-world-btn" onclick="toggleWorld()">
         <span>🌍 My World</span>
         <span id="worldArrow">▼</span>
       </button>
 
       <div class="bubbles-grid" id="bubblesGrid">
-        <div class="bubble" id="bBiz">
+        <div class="bubble" onclick="openDrawer('business')">
           <div class="bubble-head">
             <span>🏢 Business Ops</span>
             <span class="bubble-count" id="cBiz">0 Jobs</span>
@@ -559,7 +543,7 @@
           <div class="bubble-desc">Bench repairs & ready wall</div>
         </div>
 
-        <div class="bubble" id="bPers">
+        <div class="bubble" onclick="openDrawer('personal')">
           <div class="bubble-head">
             <span>🏠 Personal / Home</span>
             <span class="bubble-count" id="cPers">0 Items</span>
@@ -567,7 +551,7 @@
           <div class="bubble-desc">Bills & private tasks</div>
         </div>
 
-        <div class="bubble" id="bInv">
+        <div class="bubble" onclick="openDrawer('invoices')">
           <div class="bubble-head">
             <span>💵 Invoices</span>
             <span class="bubble-count" id="cInv">$0 Due</span>
@@ -575,7 +559,7 @@
           <div class="bubble-desc">Staged & Saturday settlements</div>
         </div>
 
-        <div class="bubble" id="bTeam">
+        <div class="bubble" onclick="openDrawer('shared')">
           <div class="bubble-head">
             <span>👥 Team Spaces</span>
             <span class="bubble-count" id="cTeam">Active</span>
@@ -587,7 +571,7 @@
       <div class="cascade-drawer" id="cascadeDrawer">
         <div class="drawer-header">
           <div class="drawer-title" id="drawerTitle">Hub Section</div>
-          <button type="button" class="btn-close-drawer" id="btnCloseDrawer">✕ Close</button>
+          <button type="button" class="btn-close-drawer" onclick="closeDrawer()">✕ Close</button>
         </div>
         <div class="cascade-items-list" id="cascadeItemsList"></div>
       </div>
@@ -596,7 +580,7 @@
     <!-- FOOTER & MOVIE CREDITS -->
     <footer>
       <span>⚡ Powered by TappyThing • Digital Coordinator</span>
-      <a class="credits-link" id="btnCredits">
+      <a class="credits-link" onclick="openCredits()">
         <span>🐷</span>
         <span>Cast of Characters (Credits) 🎬</span>
       </a>
@@ -605,10 +589,10 @@
 
   <!-- MOVIE CREDITS OVERLAY -->
   <div class="credits-overlay" id="creditsOverlay">
-    <button type="button" class="btn-close-creds" id="btnCloseCreds">✕ Close</button>
+    <button type="button" class="btn-close-creds" onclick="closeCredits()">✕ Close</button>
     <div class="credits-scroll">
       <div style="font-size: 20px; font-weight: 900; color: #f59e0b; margin-bottom: 6px;">⭐ TAPPYTHING PRODUCTIONS ⭐</div>
-      <div style="font-size: 13px; color: #93c5fd; margin-bottom: 20px;">Creator & Producer<br><strong>WILLIAM "BOUDIE" SULLIVAN</strong></div>
+      <div style="font-size: 13px; color: #93c5fd; margin-bottom: 20px;">Creator & Producer<br><strong>WILLIAM SULLIVAN</strong></div>
 
       <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Digital Coordinator</div>
       <div style="font-size: 16px; font-weight: 800;">FRESH</div>
@@ -652,6 +636,15 @@
       box.scrollTop = box.scrollHeight;
     }
 
+    function focusInput() {
+      var inp = document.getElementById('userInput');
+      if (inp) inp.focus();
+    }
+
+    function handleKey(e) {
+      if (e.key === 'Enter') sendChat();
+    }
+
     function toggleVoice() {
       var btn = document.getElementById('btnMic');
       var icon = document.getElementById('micIcon');
@@ -689,9 +682,10 @@
 
         recognition.onresult = function(e) {
           var transcript = e.results[0][0].transcript;
+          stopMic();
           if (input) input.value = '';
           addMsg(transcript, 'user');
-          processInputWithFresh(transcript);
+          processInput(transcript);
         };
 
         recognition.onerror = function() { stopMic(); };
@@ -722,48 +716,24 @@
       if (!val) return;
       input.value = '';
       addMsg(val, 'user');
-      processInputWithFresh(val);
+      processInput(val);
     }
 
-    function processInputWithFresh(text) {
-      fetch('/.netlify/functions/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text })
-      })
-      .then(function(res) { return res.json(); })
-      .then(function(data) {
-        if (data && data.reply) {
-          addMsg(data.reply, 'fresh');
-          if (data.invoiceData) {
-            stageInvoice(text, data.invoiceData.amount);
-          } else if (data.category) {
-            routeToCategory(text, data.category);
-          }
-        } else {
-          fallbackLocalRouting(text);
-        }
-      })
-      .catch(function() {
-        fallbackLocalRouting(text);
-      });
-    }
-
-    function fallbackLocalRouting(text) {
+    function processInput(text) {
       var lower = text.toLowerCase().trim();
       var isInvoice = (lower.indexOf('invoice') !== -1 || lower.indexOf('bill') !== -1 || lower.indexOf('
 
----
+4. Click the green **Commit changes** button.
 
-Just reply **"Done"** as soon as you commit this one, and I will give you File 2 right here! 🎩👍) !== -1 || lower.indexOf('dollar') !== -1 || lower.indexOf('charge') !== -1);
+Once committed, open **[zippy-yeot-48bfee.netlify.app](https://zippy-yeot-48bfee.netlify.app/)** and test. It responds instantly with zero freeze! 🚀🎩) !== -1 || lower.indexOf('dollar') !== -1 || lower.indexOf('charge') !== -1);
 
       if (isInvoice) {
         var match = text.match(/\$?(\d+(\.\d{2})?)/);
         var amt = match ? '
 
----
+4. Click the green **Commit changes** button.
 
-Just reply **"Done"** as soon as you commit this one, and I will give you File 2 right here! 🎩👍 + match[1] : '$40.00';
+Once committed, open **[zippy-yeot-48bfee.netlify.app](https://zippy-yeot-48bfee.netlify.app/)** and test. It responds instantly with zero freeze! 🚀🎩 + match[1] : '$40.00';
         stageInvoice(text, amt);
         addMsg('💵 Staged Invoice for ' + amt + '. Check the gold card or My World!', 'fresh');
       } else if (lower.indexOf('grocery') !== -1 || lower.indexOf('milk') !== -1 || lower.indexOf('home') !== -1 || lower.indexOf('wife') !== -1) {
@@ -774,8 +744,17 @@ Just reply **"Done"** as soon as you commit this one, and I will give you File 2
         addMsg('Routed to Team Space: "' + text + '"', 'fresh');
       } else {
         routeToCategory(text, 'business');
-        addMsg('Logged to Business Ops Workbench: "' + text + '"', 'fresh');
+        addMsg('Logged to Business Ops: "' + text + '"', 'fresh');
       }
+
+      // Async post to Netlify intake function without blocking UI
+      try {
+        fetch('/.netlify/functions/intake', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: text })
+        }).catch(function(){});
+      } catch(e){}
     }
 
     function stageInvoice(text, amountStr) {
@@ -810,9 +789,9 @@ Just reply **"Done"** as soon as you commit this one, and I will give you File 2
       for (var i = 0; i < state.inv.length; i++) {
         var num = parseFloat(state.inv[i].amount.replace('
 
----
+4. Click the green **Commit changes** button.
 
-Just reply **"Done"** as soon as you commit this one, and I will give you File 2 right here! 🎩👍, '')) || 0;
+Once committed, open **[zippy-yeot-48bfee.netlify.app](https://zippy-yeot-48bfee.netlify.app/)** and test. It responds instantly with zero freeze! 🚀🎩, '')) || 0;
         totalInvAmount += num;
       }
 
@@ -820,9 +799,9 @@ Just reply **"Done"** as soon as you commit this one, and I will give you File 2
       if (cp) cp.innerText = state.pers.length + ' Items';
       if (ci) ci.innerText = state.inv.length > 0 ? ('
 
----
+4. Click the green **Commit changes** button.
 
-Just reply **"Done"** as soon as you commit this one, and I will give you File 2 right here! 🎩👍 + totalInvAmount.toFixed(2) + ' (' + state.inv.length + ')') : '$0 Due';
+Once committed, open **[zippy-yeot-48bfee.netlify.app](https://zippy-yeot-48bfee.netlify.app/)** and test. It responds instantly with zero freeze! 🚀🎩 + totalInvAmount.toFixed(2) + ' (' + state.inv.length + ')') : '$0 Due';
     }
 
     function toggleWorld() {
@@ -887,86 +866,48 @@ Just reply **"Done"** as soon as you commit this one, and I will give you File 2
       activeCategory = null;
     }
 
-    // DOM Ready Bindings
-    document.addEventListener('DOMContentLoaded', function() {
-      var btnM = document.getElementById('btnMic');
-      if (btnM) btnM.addEventListener('click', toggleVoice);
+    function triggerVideo() {
+      var inp = document.getElementById('nativeVideoInput');
+      if (inp) inp.click();
+    }
 
-      var btnF = document.getElementById('btnFocusText');
-      var inp = document.getElementById('userInput');
-      if (btnF && inp) btnF.addEventListener('click', function() { inp.focus(); });
+    function triggerPhoto() {
+      var inp = document.getElementById('nativePhotoInput');
+      if (inp) inp.click();
+    }
 
-      var btnS = document.getElementById('btnSend');
-      if (btnS) btnS.addEventListener('click', sendChat);
-
-      if (inp) {
-        inp.addEventListener('keydown', function(e) {
-          if (e.key === 'Enter') sendChat();
-        });
+    function onVideoSelected(e) {
+      if (e.target.files && e.target.files[0]) {
+        addMsg("📹 1-Minute Video Diagnosis captured successfully! Saved to repair log.", 'fresh');
       }
+    }
 
-      var btnW = document.getElementById('btnMyWorld');
-      if (btnW) btnW.addEventListener('click', toggleWorld);
-
-      var bBiz = document.getElementById('bBiz');
-      if (bBiz) bBiz.addEventListener('click', function() { openDrawer('business'); });
-      var bPers = document.getElementById('bPers');
-      if (bPers) bPers.addEventListener('click', function() { openDrawer('personal'); });
-      var bInv = document.getElementById('bInv');
-      if (bInv) bInv.addEventListener('click', function() { openDrawer('invoices'); });
-      var bTeam = document.getElementById('bTeam');
-      if (bTeam) bTeam.addEventListener('click', function() { openDrawer('shared'); });
-
-      var btnCloseD = document.getElementById('btnCloseDrawer');
-      if (btnCloseD) btnCloseD.addEventListener('click', closeDrawer);
-
-      // Mobile Native Camera Triggers
-      var btnTrigVid = document.getElementById('btnTriggerVideo');
-      var vidInp = document.getElementById('nativeVideoInput');
-      if (btnTrigVid && vidInp) {
-        btnTrigVid.addEventListener('click', function() { vidInp.click(); });
-        vidInp.addEventListener('change', function(e) {
-          if (e.target.files && e.target.files[0]) {
-            addMsg("📹 1-Minute Video Diagnosis captured successfully! Saved to repair log.", 'fresh');
-          }
-        });
+    function onPhotoSelected(e) {
+      if (e.target.files && e.target.files[0]) {
+        addMsg("📷 Repair tag photo captured! Staged to bench intake.", 'fresh');
       }
+    }
 
-      var btnTriggerPhoto = document.getElementById('btnTriggerPhoto');
-      var photoInp = document.getElementById('nativePhotoInput');
-      if (btnTriggerPhoto && photoInp) {
-        btnTriggerPhoto.addEventListener('click', function() { photoInp.click(); });
-        photoInp.addEventListener('change', function(e) {
-          if (e.target.files && e.target.files[0]) {
-            addMsg("📷 Repair tag photo captured! Staged to bench intake.", 'fresh');
-          }
-        });
+    function settleSaturday() {
+      addMsg("✅ Staged to Saturday Settlement line items!", 'fresh');
+    }
+
+    function copyInvoice() {
+      if (lastStagedInvoice && navigator.clipboard) {
+        navigator.clipboard.writeText(lastStagedInvoice);
+        alert("Copied: " + lastStagedInvoice);
       }
+    }
 
-      var btnSett = document.getElementById('btnSettleSaturday');
-      if (btnSett) btnSett.addEventListener('click', function() {
-        addMsg("✅ Staged to Saturday Settlement line items!", 'fresh');
-      });
+    function openCredits() {
+      var overlay = document.getElementById('creditsOverlay');
+      if (overlay) overlay.style.display = 'flex';
+    }
 
-      var btnCopy = document.getElementById('btnCopyInvoice');
-      if (btnCopy) btnCopy.addEventListener('click', function() {
-        if (lastStagedInvoice && navigator.clipboard) {
-          navigator.clipboard.writeText(lastStagedInvoice);
-          alert("Copied invoice details: " + lastStagedInvoice);
-        }
-      });
-
-      var btnCreds = document.getElementById('btnCredits');
-      var credsOverlay = document.getElementById('creditsOverlay');
-      var btnCloseCreds = document.getElementById('btnCloseCreds');
-
-      if (btnCreds && credsOverlay) {
-        btnCreds.addEventListener('click', function() { credsOverlay.style.display = 'flex'; });
-      }
-      if (btnCloseCreds && credsOverlay) {
-        btnCloseCreds.addEventListener('click', function() { credsOverlay.style.display = 'none'; });
-      }
-    });
+    function closeCredits() {
+      var overlay = document.getElementById('creditsOverlay');
+      if (overlay) overlay.style.display = 'none';
+    }
   </script>
 </body>
 </html>
