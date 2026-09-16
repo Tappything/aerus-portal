@@ -1,790 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>TappyThing — Digital Coordinator Command Center</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TappyThing — Digital Coordinator</title>
   <style>
     :root {
-      --bg-dark: #090d16;
-      --card-bg: #111827;
-      --card-border: #1f293d;
-      --card-hover: #1e293b;
-      --accent-gold: #f59e0b;
-      --accent-purple: #8b5cf6;
-      --accent-blue: #38bdf8;
-      --accent-green: #10b981;
-      --accent-red: #ef4444;
-      --text-main: #f9fafb;
-      --text-muted: #9ca3af;
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #38bdf8;
+      --gold: #f59e0b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
     }
-    * {
-      box-sizing: border-box;
+    body {
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      min-height: 100vh;
+      background-color: var(--bg);
+      color: var(--text);
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 10px 10px 40px;
-      line-height: 1.4;
+      min-height: 100vh;
     }
-    .container {
+    .app-container {
       width: 100%;
       max-width: 480px;
+      padding: 20px;
+      box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
     }
-    .top-bar-team {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 6px;
-      width: 100%;
-      padding: 2px 0;
-    }
-    .pill-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 5px 10px;
-      border-radius: 9999px;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      user-select: none;
-      touch-action: manipulation;
-    }
-    .pill-fresh {
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      color: #38bdf8;
-    }
-    .pill-how {
-      background: rgba(245, 158, 11, 0.12);
-      border: 1px solid rgba(245, 158, 11, 0.4);
-      color: #fbbf24;
-    }
-    .pill-rob {
-      background: rgba(139, 92, 246, 0.15);
-      border: 1px solid rgba(139, 92, 246, 0.35);
-      color: #c4b5fd;
-    }
-    .pill-sissy {
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.35);
-      color: #34d399;
-    }
-    .how-it-works-box {
-      display: none;
-      background: #111827;
-      border: 1px solid var(--accent-gold);
-      border-radius: 14px;
-      padding: 12px 14px;
-      font-size: 12px;
-      color: #e5e7eb;
-      animation: fadeIn 0.2s ease-in-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-4px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .how-it-works-box strong {
-      color: var(--accent-gold);
-    }
-    .header-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2px 0;
-    }
-    .brand-logo {
-      width: 95px;
-      height: 95px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid var(--accent-gold);
-      box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
-      margin-bottom: 6px;
-    }
-    .brand-title {
-      font-size: 18px;
-      font-weight: 800;
-      color: #fff;
+    .header {
       text-align: center;
-      letter-spacing: -0.3px;
+      padding: 10px 0;
     }
-    .brand-sub {
-      font-size: 11px;
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+    .header p {
+      margin: 4px 0 0;
       color: var(--text-muted);
-      text-align: center;
-    }
-    .mic-center-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      margin: 4px 0;
-    }
-    .btn-circle-mic {
-      width: 86px;
-      height: 86px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-      border: 3px solid rgba(139, 92, 246, 0.6);
-      color: #fff;
-      font-size: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 0 25px rgba(124, 58, 237, 0.5);
-      transition: all 0.2s ease;
-      touch-action: manipulation;
-      user-select: none;
-    }
-    .btn-circle-mic:active {
-      transform: scale(0.94);
-    }
-    .btn-circle-mic.listening {
-      background: var(--accent-red) !important;
-      border-color: #fca5a5 !important;
-      box-shadow: 0 0 35px rgba(239, 68, 68, 0.8) !important;
-      animation: pulse 1.2s infinite;
-    }
-    @keyframes pulse {
-      0% { transform: scale(0.97); opacity: 0.95; }
-      50% { transform: scale(1.05); opacity: 1; }
-      100% { transform: scale(0.97); opacity: 0.95; }
-    }
-    .mic-status-label {
-      font-size: 13px;
-      font-weight: 700;
-      color: #fff;
-    }
-    .card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 12px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .chat-display {
-      max-height: 180px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding: 2px;
-    }
-    .msg {
-      padding: 8px 12px;
-      border-radius: 12px;
-      font-size: 12px;
-      line-height: 1.4;
-      max-width: 90%;
-    }
-    .msg-fresh {
-      background: #1e293b;
-      color: #f3f4f6;
-      border-left: 3px solid var(--accent-purple);
-      align-self: flex-start;
-    }
-    .msg-user {
-      background: linear-gradient(135deg, #2563eb, #7c3aed);
-      color: #fff;
-      align-self: flex-end;
-    }
-    .input-bar-container {
-      display: flex;
-      gap: 6px;
-      width: 100%;
-    }
-    .chat-input {
-      flex: 1;
-      background: #090d16;
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      color: #fff;
-      font-size: 13px;
-      outline: none;
-    }
-    .chat-input:focus {
-      border-color: var(--accent-purple);
-    }
-    .btn-send {
-      background: var(--accent-purple);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 0 16px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-    .my-world-container {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 4px;
-    }
-    .my-world-main-btn {
-      width: 100%;
-      background: linear-gradient(135deg, #6d28d9 0%, #4f46e5 100%);
-      border: none;
-      border-radius: 14px;
-      padding: 14px 16px;
-      color: #fff;
-      font-size: 15px;
-      font-weight: 800;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 4px 15px rgba(109, 40, 217, 0.35);
-      touch-action: manipulation;
-      user-select: none;
-    }
-    .master-bubbles-grid {
-      display: none;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 4px;
-    }
-    .master-bubble {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 14px;
-      padding: 12px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      transition: all 0.2s;
-      user-select: none;
-      touch-action: manipulation;
-    }
-    .master-bubble:active {
-      background: var(--card-hover);
-      border-color: var(--accent-purple);
-    }
-    .bubble-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 13px;
-      font-weight: 800;
-      color: #fff;
-    }
-    .bubble-count {
-      font-size: 10px;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 2px 6px;
-      border-radius: 999px;
-      color: var(--accent-blue);
-    }
-    .bubble-desc {
-      font-size: 10px;
-      color: var(--text-muted);
-    }
-    .cascade-drawer {
-      display: none;
-      background: #0f172a;
-      border: 1px solid var(--accent-purple);
-      border-radius: 16px;
-      padding: 14px;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 6px;
-    }
-    .drawer-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding-bottom: 8px;
-    }
-    .drawer-title {
       font-size: 14px;
-      font-weight: 800;
-      color: var(--accent-gold);
     }
-    .btn-close-drawer {
-      background: rgba(255, 255, 255, 0.1);
-      border: none;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 5px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-    .cascade-items-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      max-height: 250px;
-      overflow-y: auto;
-    }
-    .cascade-card {
+    .card-drawer {
       background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 9px 12px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .drawer-btn {
+      width: 100%;
+      padding: 16px;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 12px;
     }
-    .cascade-card-title {
-      font-weight: 600;
-      color: #fff;
+    .drawer-btn:hover {
+      background: rgba(255,255,255,0.03);
     }
-    .status-badge {
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 999px;
+    .drawer-content {
+      display: none;
+      padding: 16px;
+      border-top: 1px solid #334155;
+      background: #0f172a;
     }
-    .badge-working { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
-    .badge-done { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-    .badge-parts { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-    .btn-add-cascade {
-      background: rgba(139, 92, 246, 0.15);
-      border: 1px dashed var(--accent-purple);
-      color: #c4b5fd;
+    .drawer-content.active {
+      display: block;
+    }
+    .comm-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .action-btn {
+      background: #334155;
+      border: none;
+      padding: 12px;
       border-radius: 8px;
-      padding: 9px;
-      font-size: 11px;
-      font-weight: 700;
+      color: var(--text);
+      font-weight: bold;
       cursor: pointer;
       text-align: center;
-      touch-action: manipulation;
     }
-    footer {
-      text-align: center;
+    .action-btn:hover {
+      background: var(--accent);
+      color: #0f172a;
+    }
+    input[type="text"] {
+      width: 100%;
       padding: 12px;
-      font-size: 11px;
-      color: var(--text-muted);
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: var(--text);
+      box-sizing: border-box;
+    }
+    .directory-select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: var(--text);
+      font-size: 16px;
+    }
+    /* Hollywood Rolling Credits Overlay */
+    .credits-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: black;
+      z-index: 9999;
+      overflow: hidden;
+    }
+    .credits-content {
+      position: absolute;
+      width: 100%;
+      bottom: -100%;
+      text-align: center;
+      color: var(--gold);
+      font-family: 'Courier New', Courier, monospace;
+      animation: roll 20s linear infinite;
+    }
+    @keyframes roll {
+      0% { bottom: -100%; }
+      100% { bottom: 120%; }
+    }
+    .credits-title { font-size: 24px; font-weight: bold; margin-bottom: 20px; }
+    .credits-role { font-size: 14px; color: #fff; margin-top: 15px; }
+    .credits-name { font-size: 18px; font-weight: bold; color: var(--gold); }
+    .close-credits {
+      position: absolute;
+      top: 20px; right: 20px;
+      background: var(--gold);
+      color: black;
+      border: none;
+      padding: 8px 16px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 10000;
+      border-radius: 4px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="top-bar-team">
-      <div class="pill-tag pill-fresh">
-        <span>🎧</span>
-        <span>Fresh (Coord)</span>
-      </div>
-      <div class="pill-tag pill-how" id="pillHowBtn">
-        <span>💡</span>
-        <span>How Fresh Works</span>
-      </div>
-      <div class="pill-tag pill-rob">
-        <span>🐷</span>
-        <span>Rob Art</span>
-      </div>
-      <div class="pill-tag pill-sissy">
-        <span>⚡</span>
-        <span>Sissy Active</span>
-      </div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <div class="header">
+      <h1>TappyThing 🤵</h1>
+      <p>Digital Coordinator Engine</p>
     </div>
-    <div class="how-it-works-box" id="howItWorksBox">
-      <strong>1. 🗣️ Brain Dump:</strong> Tap the circle or type below. Dictate repair invoices, personal bills, or grocery notes.<br>
-      <strong>2. 🧠 Fresh Organizes:</strong> Fresh listens and tells Sissy to route your notes into Business, Personal, Invoices, or Shared spaces.<br>
-      <strong>3. 🌍 My World:</strong> Tap below to see your live jobs, Saturday settlement, and team queues.
-    </div>
-    <div class="header-section">
-      <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="TappyThing Fresh" class="brand-logo" onerror="this.src='logo.png'">
-      <div class="brand-title">TappyThing Command Center</div>
-      <div class="brand-sub">Universal Business & Personal Operating System</div>
-    </div>
-    <div class="mic-center-container">
-      <button type="button" class="btn-circle-mic" id="circleMicBtn">
-        <span id="micIconDisplay">🎙️</span>
+
+    <!-- Communicate with Fresh Drawer -->
+    <div class="card-drawer">
+      <button class="drawer-btn" onclick="toggleDrawer('comm-drawer')">
+        💬 Communicate with Fresh <span>▼</span>
       </button>
-      <div class="mic-status-label" id="micStatusLabel">Tap Circle to Talk to Fresh</div>
-    </div>
-    <div class="card">
-      <div class="chat-display" id="chatBox">
-        <div class="msg msg-fresh">
-          <strong>Hey there! I'm Fresh.</strong><br>
-          Tap the blue circle above to speak, or type right below. Just brain-dump what's on your mind — I organize everything into your worlds automatically.<br>
-          <em>Ready to knock out your list or dictate an invoice? Let's roll!</em>
+      <div id="comm-drawer" class="drawer-content">
+        <div class="comm-actions">
+          <button class="action-btn">🎙️ Voice</button>
+          <button class="action-btn">📷 Photo</button>
+          <button class="action-btn">💬 Text</button>
         </div>
-      </div>
-      <div class="input-bar-container">
-        <input type="text" id="userInput" class="chat-input" placeholder="Type to Fresh (e.g. Invoice for Karen $75)...">
-        <button type="button" class="btn-send" id="btnSendChat">Send</button>
+        <input type="text" placeholder="Talk or type to Fresh..." />
       </div>
     </div>
-    <div class="my-world-container">
-      <button type="button" class="my-world-main-btn" id="btnMyWorldMain">
-        <span>🌍 My World</span>
-        <span id="worldArrow">▼</span>
+
+    <!-- Fresh's World Drawer -->
+    <div class="card-drawer">
+      <button class="drawer-btn" onclick="toggleDrawer('fresh-world')">
+        🌐 Fresh's World <span>▼</span>
       </button>
-      <div class="master-bubbles-grid" id="masterBubblesGrid">
-        <div class="master-bubble" id="bubble-business">
-          <div class="bubble-head">
-            <span>🏢 Business Ops</span>
-            <span class="bubble-count" id="count-business">0 Jobs</span>
-          </div>
-          <div class="bubble-desc">Bench repairs, parts tracker & ready wall</div>
-        </div>
-        <div class="master-bubble" id="bubble-personal">
-          <div class="bubble-head">
-            <span>🏠 Personal / Home</span>
-            <span class="bubble-count" id="count-personal">0 Items</span>
-          </div>
-          <div class="bubble-desc">Bills, grocery lists & family tasks</div>
-        </div>
-        <div class="master-bubble" id="bubble-invoices">
-          <div class="bubble-head">
-            <span>💵 Invoices & Money</span>
-            <span class="bubble-count" id="count-invoices">$0 Due</span>
-          </div>
-          <div class="bubble-desc">Customer billing & Saturday settlement</div>
-        </div>
-        <div class="master-bubble" id="bubble-shared">
-          <div class="bubble-head">
-            <span>👥 Shared Spaces</span>
-            <span class="bubble-count" id="count-shared">Team Queue</span>
-          </div>
-          <div class="bubble-desc">Mike (Bagdons), Mona, Chris, Norby & AI Cast</div>
-        </div>
-      </div>
-      <div class="cascade-drawer" id="cascadeDrawer">
-        <div class="drawer-header">
-          <div class="drawer-title" id="drawerTitle">Hub Section</div>
-          <button type="button" class="btn-close-drawer" id="btnCloseDrawer">✕ Close</button>
-        </div>
-        <div class="cascade-items-list" id="cascadeItemsList"></div>
-        <button type="button" class="btn-add-cascade" id="btnAddCascadeItem">+ Add Item to This Hub</button>
+      <div id="fresh-world" class="drawer-content">
+        <p><strong>TappyThing Features & Benefits:</strong></p>
+        <ul>
+          <li>Zero-drag 1-tap voice coordinator</li>
+          <li>Auto-populating job intake</li>
+          <li>Instant billing & invoicing</li>
+        </ul>
+        <button class="action-btn" style="width:100%; margin-top:10px;" onclick="openCredits()">🎬 Cast of Characters</button>
       </div>
     </div>
-    <footer>
-      <span>⚡ Powered by TappyThing</span>
-    </footer>
+
+    <!-- Build My World / Business Directory -->
+    <div class="card-drawer">
+      <button class="drawer-btn" onclick="toggleDrawer('build-world')">
+        🏗️ Build My World (3 Days Free) <span>▼</span>
+      </button>
+      <div id="build-world" class="drawer-content">
+        <p>Select your trade to instant-build your instance:</p>
+        <select class="directory-select">
+          <option>Vacuum & Appliance Repair</option>
+          <option>HVAC & Climate Control</option>
+          <option>Plumbing Services</option>
+          <option>Auto Detailing</option>
+          <option>General Contracting</option>
+        </select>
+        <button class="action-btn" style="width:100%; margin-top:10px; background:var(--accent); color:#0f172a;">Build Instance Now</button>
+      </div>
+    </div>
   </div>
-  <script>
-    var MAKE_WEBHOOK_URL = "https://hook.us2.make.com/fyt2tlyenhdx3igqo42wqh1ypr569pej";
 
-    var state = {
-      business: [],
-      personal: [],
-      invoices: [],
-      shared: []
-    };
-
-    var activeDrawer = null;
-    var recognition = null;
-    var isListening = false;
-
-    function updateBubbleCounts() {
-      var bCount = document.getElementById('count-business');
-      var pCount = document.getElementById('count-personal');
-      var iCount = document.getElementById('count-invoices');
-      var sCount = document.getElementById('count-shared');
-      if (bCount) bCount.innerText = state.business.length + ' Jobs';
-      if (pCount) pCount.innerText = state.personal.length + ' Items';
-      if (iCount) iCount.innerText = state.invoices.length + ' Invoices';
-      if (sCount) sCount.innerText = state.shared.length + ' Active';
-    }
-
-    function toggleHowItWorks() {
-      var box = document.getElementById('howItWorksBox');
-      if (!box) return;
-      if (box.style.display === 'block') {
-        box.style.display = 'none';
-      } else {
-        box.style.display = 'block';
-      }
-    }
-
-    function toggleMyWorld() {
-      var grid = document.getElementById('masterBubblesGrid');
-      var drawer = document.getElementById('cascadeDrawer');
-      var arrow = document.getElementById('worldArrow');
-      if (!grid) return;
+  <!-- Rolling Credits Modal -->
+  <div id="creditsModal" class="credits-modal">
+    <button class="close-credits" onclick="closeCredits()">Close [X]</button>
+    <div class="credits-content">
+      <div class="credits-title">⭐ TAPPYTHING PRODUCTIONS ⭐</div>
       
-      var isVisible = (grid.style.display === 'grid' || window.getComputedStyle(grid).display === 'grid');
-      if (isVisible) {
-        grid.style.setProperty('display', 'none', 'important');
-        if (drawer) drawer.style.setProperty('display', 'none', 'important');
-        if (arrow) arrow.innerText = '▼';
-      } else {
-        updateBubbleCounts();
-        grid.style.setProperty('display', 'grid', 'important');
-        if (arrow) arrow.innerText = '▲';
-      }
+      <div class="credits-role">DIRECTED BY</div>
+      <div class="credits-name">B-U-D-I</div>
+
+      <div class="credits-role">DIGITAL COORDINATOR</div>
+      <div class="credits-name">FRESH</div>
+
+      <div class="credits-role">THE ENGINE & HEART</div>
+      <div class="credits-name">S-I-S-S-Y</div>
+
+      <div class="credits-role">THE ENERGY</div>
+      <div class="credits-name">N-U-E-S-H</div>
+
+      <div class="credits-role">SALES GURU</div>
+      <div class="credits-name">SQUASH</div>
+
+      <div class="credits-role">RESIDENT CREATIVE & PIG ICON</div>
+      <div class="credits-name">R-O-B-A-R-T</div>
+
+      <div class="credits-role">THE MONEY MAN</div>
+      <div class="credits-name">L</div>
+
+      <br><br>
+      <div style="font-size:12px; color:#888;">© TappyThing & Clean Environment LLC</div>
+    </div>
+  </div>
+
+  <script>
+    function toggleDrawer(id) {
+      const content = document.getElementById(id);
+      content.classList.toggle('active');
     }
-
-    function openDrawer(cat) {
-      activeDrawer = cat;
-      var drawer = document.getElementById('cascadeDrawer');
-      var title = document.getElementById('drawerTitle');
-      var listEl = document.getElementById('cascadeItemsList');
-      if (!drawer || !listEl) return;
-      drawer.style.setProperty('display', 'flex', 'important');
-      listEl.innerHTML = '';
-
-      var titles = {
-        business: "🏢 Business Ops",
-        personal: "🏠 Personal / Home",
-        invoices: "💵 Invoices & Saturday Settlement",
-        shared: "👥 Shared Spaces (Team & AI Cast)"
-      };
-      if (title) title.innerText = titles[cat] || "Hub Section";
-
-      var items = state[cat] || [];
-      if (items.length === 0) {
-        listEl.innerHTML = '<div style="font-size:12px;color:#9ca3af;padding:12px;text-align:center;">✨ Clean slate! Brain-dump above to add your first card.</div>';
-        return;
-      }
-
-      for (var i = 0; i < items.length; i++) {
-        var card = document.createElement('div');
-        card.className = 'cascade-card';
-        card.innerHTML = '<span class="cascade-card-title">' + items[i].title + '</span><span class="status-badge ' + items[i].badge + '">' + items[i].status + '</span>';
-        listEl.appendChild(card);
-      }
+    function openCredits() {
+      document.getElementById('creditsModal').style.display = 'block';
     }
-
-    function closeDrawer() {
-      var drawer = document.getElementById('cascadeDrawer');
-      if (drawer) drawer.style.setProperty('display', 'none', 'important');
-      activeDrawer = null;
+    function closeCredits() {
+      document.getElementById('creditsModal').style.display = 'none';
     }
-
-    function addItemToCurrentCascade() {
-      if (!activeDrawer) return;
-      var title = prompt("Enter new item / task / card:");
-      if (!title) return;
-      state[activeDrawer].unshift({ title: title, status: "Active", badge: "badge-working" });
-      updateBubbleCounts();
-      openDrawer(activeDrawer);
-      addMsg('Added "' + title + '" to your hub!', 'fresh');
-      sendToWebhook(title, activeDrawer);
-    }
-
-    function sendChat() {
-      var input = document.getElementById('userInput');
-      if (!input) return;
-      var val = input.value.trim();
-      if (!val) return;
-      input.value = '';
-      addMsg(val, 'user');
-      processFreshRouting(val);
-    }
-
-    function addMsg(text, sender) {
-      var box = document.getElementById('chatBox');
-      if (!box) return;
-      var el = document.createElement('div');
-      el.className = 'msg msg-' + sender;
-      el.innerHTML = text.replace(/\n/g, '<br>');
-      box.appendChild(el);
-      box.scrollTop = box.scrollHeight;
-    }
-
-    function speakAudio(text) {
-      try {
-        if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel();
-          var clean = text.replace(/<[^>]*>?/gm, '').replace(/[🐷💵🎙️📹🛑⚡🏢🏠👥]/g, '');
-          var u = new SpeechSynthesisUtterance(clean);
-          u.rate = 1.05;
-          window.speechSynthesis.speak(u);
-        }
-      } catch (err) {}
-    }
-
-    function sendToWebhook(text, category) {
-      if (!MAKE_WEBHOOK_URL) return;
-      try {
-        fetch(MAKE_WEBHOOK_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            note: text,
-            category: category,
-            source: "TappyThing Frontend",
-            user: "William Sullivan",
-            timestamp: new Date().toISOString()
-          })
-        }).catch(function(e) { console.log("Webhook sync:", e); });
-      } catch (e) {}
-    }
-
-    function processFreshRouting(text) {
-      var lower = text.toLowerCase().trim();
-      var reply = "";
-      var category = "business";
-
-      var input = document.getElementById('userInput');
-      if (input) input.value = '';
-
-      if (lower === 'hello' || lower === 'hi' || lower === 'hey' || lower === 'testing' || lower === 'test' || lower === 'good morning' || lower === 'sup') {
-        reply = "Hey Boudie! I'm locked in and listening. Dictate a repair, invoice, or brain-dump what's on your mind!";
-        setTimeout(function() {
-          addMsg(reply, 'fresh');
-          speakAudio(reply);
-        }, 200);
-        return;
-      }
-
-      if (lower.indexOf('invoice') !== -1 || lower.indexOf('bill') !== -1 || lower.indexOf('charge') !== -1 || lower.indexOf('pay') !== -1) {
-        category = "invoices";
-        state.invoices.unshift({ title: text, status: "Saturday Settlement", badge: "badge-working" });
-        reply = 'Got it! Logged invoice: "' + text + '". Sissy staged this into Invoices & Money for Saturday settlement!';
-      } else if (lower.indexOf('grocery') !== -1 || lower.indexOf('milk') !== -1 || lower.indexOf('home') !== -1 || lower.indexOf('wife') !== -1 || lower.indexOf('pickleball') !== -1 || lower.indexOf('weight') !== -1) {
-        category = "personal";
-        state.personal.unshift({ title: text, status: "Active", badge: "badge-parts" });
-        reply = 'Filed to Personal & Home! "' + text + '" is logged in your private hub.';
-      } else if (lower.indexOf('mike') !== -1 || lower.indexOf('bagdon') !== -1 || lower.indexOf('mona') !== -1 || lower.indexOf('chris') !== -1 || lower.indexOf('norby') !== -1) {
-        category = "shared";
-        state.shared.unshift({ title: text, status: "Shared Queue", badge: "badge-working" });
-        reply = 'Routed to Shared Spaces for the team: "' + text + '".';
-      } else {
-        category = "business";
-        state.business.unshift({ title: text, status: "Intake", badge: "badge-working" });
-        reply = 'Dumped straight into Business Ops! Sissy filed "' + text + '" to your workbench.';
-      }
-
-      updateBubbleCounts();
-      sendToWebhook(text, category);
-
-      setTimeout(function() {
-        addMsg(reply, 'fresh');
-        speakAudio(reply);
-      }, 200);
-
-      if (activeDrawer) openDrawer(activeDrawer);
-    }
-
-    function toggleVoice() {
-      var btn = document.getElementById('circleMicBtn');
-      var icon = document.getElementById('micIconDisplay');
-      var label = document.getElementById('micStatusLabel');
-      var input = document.getElementById('userInput');
-
-      if (recognition) {
-        try { recognition.abort(); } catch(e){}
-      }
-
-      if (isListening) {
-        stopMic();
-        return;
-      }
-
-      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-        if (input) input.focus();
-        addMsg("Speech recognition isn't enabled in this browser. Type right in the box below!", 'fresh');
-        return;
-      }
-
-      try {
-        var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SpeechRec();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = 'en-US';
-
-        recognition.onstart = function() {
-          isListening = true;
-          if (input) input.value = '';
-          if (btn) btn.classList.add('listening');
-          if (icon) icon.innerText = '🛑';
-          if (label) label.innerText = 'Listening to you...';
-        };
-
-        recognition.onresult = function(e) {
-          var transcript = e.results[0][0].transcript;
-          if (input) input.value = '';
-          addMsg(transcript, 'user');
-          processFreshRouting(transcript);
-        };
-
-        recognition.onerror = function() {
-          stopMic();
-        };
-
-        recognition.onend = function() {
-          stopMic();
-        };
-
-        recognition.start();
-      } catch (e) {
-        stopMic();
-        if (input) input.focus();
-        addMsg("Microphone ready! Type in the box below or speak.", 'fresh');
-      }
-    }
-
-    function stopMic() {
-      isListening = false;
-      var btn = document.getElementById('circleMicBtn');
-      var icon = document.getElementById('micIconDisplay');
-      var label = document.getElementById('micStatusLabel');
-      if (btn) btn.classList.remove('listening');
-      if (icon) icon.innerText = '🎙️';
-      if (label) label.innerText = 'Tap Circle to Talk to Fresh';
-      if (recognition) {
-        try { recognition.abort(); } catch(e){}
-      }
-    }
-
-    // Explicit Clean Event Binding on DOMContentLoaded
-    document.addEventListener('DOMContentLoaded', function() {
-      var pillHow = document.getElementById('pillHowBtn');
-      if (pillHow) pillHow.addEventListener('click', toggleHowItWorks);
-
-      var btnMic = document.getElementById('circleMicBtn');
-      if (btnMic) btnMic.addEventListener('click', toggleVoice);
-
-      var btnSend = document.getElementById('btnSendChat');
-      if (btnSend) btnSend.addEventListener('click', sendChat);
-
-      var input = document.getElementById('userInput');
-      if (input) {
-        input.addEventListener('keydown', function(e) {
-          if (e.key === 'Enter') sendChat();
-        });
-      }
-
-      var btnWorld = document.getElementById('btnMyWorldMain');
-      if (btnWorld) btnWorld.addEventListener('click', toggleMyWorld);
-
-      var bBiz = document.getElementById('bubble-business');
-      if (bBiz) bBiz.addEventListener('click', function() { openDrawer('business'); });
-
-      var bPers = document.getElementById('bubble-personal');
-      if (bPers) bPers.addEventListener('click', function() { openDrawer('personal'); });
-
-      var bInv = document.getElementById('bubble-invoices');
-      if (bInv) bInv.addEventListener('click', function() { openDrawer('invoices'); });
-
-      var bShared = document.getElementById('bubble-shared');
-      if (bShared) bShared.addEventListener('click', function() { openDrawer('shared'); });
-
-      var btnClose = document.getElementById('btnCloseDrawer');
-      if (btnClose) btnClose.addEventListener('click', closeDrawer);
-
-      var btnAdd = document.getElementById('btnAddCascadeItem');
-      if (btnAdd) btnAdd.addEventListener('click', addItemToCurrentCascade);
-    });
   </script>
 </body>
 </html>
