@@ -33,30 +33,39 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      position: relative;
+      padding-bottom: 60px;
     }
-    /* Logo Header */
+    /* Circular Logo Header */
     .brand-header {
       text-align: center;
-      padding: 10px 0;
+      padding: 12px 0;
     }
-    .brand-header img {
+    .brand-logo-container {
+      width: 160px;
+      height: 160px;
+      margin: 0 auto;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid var(--accent);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+      background: #fff;
+    }
+    .brand-logo-container img {
       width: 100%;
-      max-width: 320px;
-      height: auto;
-      border-radius: 12px;
+      height: 100%;
+      object-fit: cover;
     }
-    /* Cards & Drawers */
+    /* Rounded Cards & Drawers */
     .card-drawer {
       background: var(--card-bg);
-      border-radius: 16px;
+      border-radius: 20px;
       border: 1px solid #1e293b;
       box-shadow: 0 4px 20px rgba(0,0,0,0.4);
       overflow: hidden;
     }
     .drawer-btn {
       width: 100%;
-      padding: 18px;
+      padding: 18px 20px;
       background: none;
       border: none;
       color: var(--text);
@@ -70,51 +79,53 @@
     }
     .drawer-content {
       display: none;
-      padding: 16px;
+      padding: 18px;
       border-top: 1px solid #1e293b;
       background: #0d1322;
     }
     .drawer-content.active {
       display: block;
     }
-    /* Triangle Card Grid inside Fresh's World */
-    .triangle-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .grid-top {
-      width: 100%;
-    }
-    .grid-bottom {
+    /* Dynamic Grid inside Fresh's World (2 Cards) */
+    .grid-two {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 12px;
     }
     .mini-card {
       background: #1e293b;
       border: 1px solid #334155;
-      border-radius: 12px;
+      border-radius: 16px;
       padding: 14px;
       text-align: center;
       cursor: pointer;
-      transition: border 0.2s;
+      transition: all 0.2s;
     }
     .mini-card:hover {
       border-color: var(--accent);
+      transform: translateY(-2px);
     }
     .mini-card h4 {
       margin: 0 0 6px 0;
       color: var(--accent);
-      font-size: 15px;
+      font-size: 14px;
     }
     .mini-card p {
       margin: 0;
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text-muted);
     }
-    /* Buttons & Inputs */
+    .info-panel {
+      display: none;
+      margin-top: 12px;
+      padding: 14px;
+      background: #131c2e;
+      border-radius: 14px;
+      border: 1px dashed var(--accent);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    /* Pill Buttons & Inputs */
     .comm-actions {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -125,35 +136,63 @@
       background: var(--accent);
       color: #090d16;
       border: none;
-      padding: 14px;
-      border-radius: 10px;
+      padding: 12px;
+      border-radius: 20px;
       font-weight: 800;
       cursor: pointer;
       text-align: center;
-      font-size: 14px;
+      font-size: 13px;
+    }
+    .action-btn:hover {
+      opacity: 0.9;
     }
     input[type="text"], select {
       width: 100%;
       padding: 14px;
-      border-radius: 10px;
+      border-radius: 16px;
       border: 1px solid #334155;
       background: #1e293b;
       color: var(--text);
-      font-size: 15px;
+      font-size: 14px;
       box-sizing: border-box;
     }
-    /* Subtle Rob Art Pig Icon Guard */
-    .rob-art-tribute {
+    .active-hub-status {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 12px;
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: bold;
+      text-align: center;
+    }
+    /* Bottom Footer Bar (Rob Art + Movie Credits Link) */
+    .footer-bar {
       position: fixed;
-      bottom: 12px;
-      right: 16px;
+      bottom: 0; left: 0; width: 100%;
+      background: rgba(9, 13, 22, 0.95);
+      border-top: 1px solid #1e293b;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-sizing: border-box;
+      z-index: 100;
+    }
+    .rob-art-tribute {
       display: flex;
       align-items: center;
       gap: 6px;
-      opacity: 0.6;
-      font-size: 11px;
+      font-size: 12px;
       color: var(--pink);
+      font-weight: bold;
+    }
+    .credits-trigger {
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: bold;
       cursor: pointer;
+      text-decoration: underline;
     }
     /* Hollywood Rolling Credits Overlay */
     .credits-modal {
@@ -190,16 +229,18 @@
       font-weight: bold;
       cursor: pointer;
       z-index: 10000;
-      border-radius: 6px;
+      border-radius: 12px;
     }
   </style>
 </head>
 <body>
 
   <div class="app-container">
-    <!-- Header Logo -->
+    <!-- Circular Logo Header -->
     <div class="brand-header">
-      <img src="logo.png" alt="Fresh — Your Digital Coordinator | Powered by TappyThing" />
+      <div class="brand-logo-container">
+        <img src="logo.png" alt="Fresh Logo" />
+      </div>
     </div>
 
     <!-- Communicate with Fresh -->
@@ -209,37 +250,50 @@
       </button>
       <div id="comm-drawer" class="drawer-content">
         <div class="comm-actions">
-          <button class="action-btn">🎙️ Voice</button>
-          <button class="action-btn">📷 Photo</button>
-          <button class="action-btn">💬 Text</button>
+          <button class="action-btn" onclick="setMode('Voice')">🎙️ Voice</button>
+          <button class="action-btn" onclick="setMode('Photo')">📷 Photo</button>
+          <button class="action-btn" onclick="setMode('Text')">💬 Text</button>
         </div>
-        <input type="text" placeholder="Brain Dump: Talk or type to Fresh..." />
+        <input type="text" id="mainInput" placeholder="Brain Dump: Talk or type to Fresh..." />
       </div>
     </div>
 
-    <!-- Fresh's World (Triangle Grid) -->
+    <!-- Fresh's World -->
     <div class="card-drawer">
       <button class="drawer-btn" onclick="toggleDrawer('fresh-world')">
         🌐 Fresh's World <span>▼</span>
       </button>
       <div id="fresh-world" class="drawer-content">
-        <div class="triangle-grid">
-          <!-- Top Triangle Card -->
-          <div class="mini-card grid-top">
-            <h4>💰 COO & ROI Power Hub</h4>
-            <p>Self-building, self-training COO in your pocket. Eliminates admin drag & multiplies cash flow day 1.</p>
+        <div class="grid-two">
+          <div class="mini-card" onclick="toggleInfo('roi-panel')">
+            <h4>💰 COO & ROI Hub</h4>
+            <p>Click to open ROI & value breakdown</p>
           </div>
-          <!-- Bottom 2 Triangle Cards -->
-          <div class="grid-bottom">
-            <div class="mini-card">
-              <h4>📖 User Guide</h4>
-              <p>Dump your brain. Tap to execute. Simple step-by-step guidance.</p>
-            </div>
-            <div class="mini-card" onclick="openCredits()">
-              <h4>🎬 Cast Card</h4>
-              <p>Tap to enter the retro theater credits overlay.</p>
-            </div>
+          <div class="mini-card" onclick="toggleInfo('guide-panel')">
+            <h4>📖 User Guide</h4>
+            <p>Click for step-by-step instructions</p>
           </div>
+        </div>
+
+        <!-- ROI Panel -->
+        <div id="roi-panel" class="info-panel">
+          <strong>Your COO in Your Pocket:</strong>
+          <ul>
+            <li>Eliminates admin drag & manual data entry</li>
+            <li>Self-building and self-training—zero support calls</li>
+            <li>Auto-generates line-item invoices from your database</li>
+            <li>10x faster execution on daily store tasks</li>
+          </ul>
+        </div>
+
+        <!-- User Guide Panel -->
+        <div id="guide-panel" class="info-panel">
+          <strong>How TappyThing Works:</strong>
+          <ol>
+            <li><strong>Brain Dump:</strong> Tap the button and speak or type everything on your mind.</li>
+            <li><strong>Invisible Sorting:</strong> The system organizes tasks, clients, and repairs behind the scenes.</li>
+            <li><strong>Tap & Execute:</strong> Hit tap to receive finished actions one by one and knock them out fast.</li>
+          </ol>
         </div>
       </div>
     </div>
@@ -250,23 +304,29 @@
         🚀 My World <span>▼</span>
       </button>
       <div id="my-world" class="drawer-content">
-        <p><strong>Select Industry / Hub View:</strong></p>
-        <select class="directory-select" style="margin-bottom: 12px;">
-          <option>My Operations (Aerus Timonium Live Case Study)</option>
-          <option>Build Your World: Appliance & Repair</option>
-          <option>Build Your World: Restaurant & Hospitality</option>
-          <option>Build Your World: HVAC & Trades</option>
-          <option>Build Your World: Auto Detailing</option>
+        <p><strong>Select Active Instance:</strong></p>
+        <select id="industrySelect" class="directory-select" style="margin-bottom: 12px;" onchange="updateWorld()">
+          <option value="Aerus Timonium Store Ops">My Operations: Aerus Timonium Store Hub</option>
+          <option value="Appliance & Repair Instance">Build World: Appliance & Repair</option>
+          <option value="Restaurant & Hospitality Instance">Build World: Restaurant & Hospitality</option>
+          <option value="HVAC & Trades Instance">Build World: HVAC & Trades</option>
+          <option value="Auto Detailing Instance">Build World: Auto Detailing</option>
         </select>
-        <button class="action-btn" style="width:100%;">Launch World Instance (3 Days Free)</button>
+        <button class="action-btn" style="width:100%; border-radius: 14px;" onclick="launchWorld()">Launch World Instance (3 Days Free)</button>
+        <div id="activeStatus" class="active-hub-status">Active Hub: Aerus Timonium Store Hub</div>
       </div>
     </div>
   </div>
 
-  <!-- Subtle Rob Art Tribute Icon -->
-  <div class="rob-art-tribute">
-    <span>🐷</span>
-    <span>Rob Art</span>
+  <!-- Footer Bar: Rob Art Tribute & Cast Credits Trigger -->
+  <div class="footer-bar">
+    <div class="rob-art-tribute">
+      <span>🐷</span>
+      <span>Rob Art</span>
+    </div>
+    <div class="credits-trigger" onclick="openCredits()">
+      🎬 Cast of Characters
+    </div>
   </div>
 
   <!-- Rolling Credits Modal -->
@@ -306,9 +366,40 @@
       const content = document.getElementById(id);
       content.classList.toggle('active');
     }
+
+    function toggleInfo(panelId) {
+      const roi = document.getElementById('roi-panel');
+      const guide = document.getElementById('guide-panel');
+      if (panelId === 'roi-panel') {
+        roi.style.display = roi.style.display === 'block' ? 'none' : 'block';
+        guide.style.display = 'none';
+      } else {
+        guide.style.display = guide.style.display === 'block' ? 'none' : 'block';
+        roi.style.display = 'none';
+      }
+    }
+
+    function setMode(mode) {
+      const input = document.getElementById('mainInput');
+      input.placeholder = mode + ' Mode Active: Type or submit your brain dump...';
+      input.focus();
+    }
+
+    function updateWorld() {
+      const select = document.getElementById('industrySelect');
+      const status = document.getElementById('activeStatus');
+      status.innerText = 'Active Hub: ' + select.value;
+    }
+
+    function launchWorld() {
+      const select = document.getElementById('industrySelect');
+      alert('Launching ' + select.value + '! 3-day free run active.');
+    }
+
     function openCredits() {
       document.getElementById('creditsModal').style.display = 'block';
     }
+
     function closeCredits() {
       document.getElementById('creditsModal').style.display = 'none';
     }
