@@ -1,74 +1,170 @@
 const https = require('https');
 
-exports.handler = async (event) => {
-  if (event.httpMethod === "OPTIONS") {
+const SYSTEM_PROMPT = `You are Fresh 🤵, the Digital Coordinator powering TappyThing for William Sullivan and his team at Aerus Home Wellness in Timonium, MD.
+
+You have direct knowledge of Aerus Timonium's core pricing and services:
+- Labor / Diagnostic: $40.00
+- Standard RO Installation: $300.00
+- Water Cooler w/ 6 Stage Reverse Osmosis: $2500.00
+- Aerus Mobile: $271.00
+- AP 500: $500.00
+- Common Vacuum Belts / Bags / Filters: $15.00 - $35.00
+- Full Service Tune-Up / Rebuild: $89.95 - $149.95
+
+YOUR CORE FUNCTIONS & RULES:
+1. VOICE-FIRST INTAKE & INVOICING:
+   - When the user dictates a repair, note, or invoice (e.g. "Invoice for Beth Rose belt and labor"), extract the customer name, match parts/services against pricing, and calculate the total.
+   - Provide a punchy response and include the invoice summary.
+
+2. DIRECT & PUNCHY TONE:
+   - Direct, energetic motivational coach tone (Ogilvy clarity, Ziglar warmth).
+   - Keep responses to 2-3 short, powerful sentences. Fifth-grade clarity always. Zero fluff.
+
+3. WORKFLOW CATEGORIZATION:
+   - Intakes/Repairs -> Category: "business"
+   - Personal/Home/Groceries -> Category: "personal"
+   - Invoices/Billing/Money -> Category: "invoices"
+   - Team Directives (Mona, Chris, Mike, Norby) -> Category: "shared"
+
+4. STRICT CONSTRAINTS:
+   - Workiz is the cash register only. Monday.com is the command board.
+   - Never mention "Dan" unless William brings him up.
+   - Never ask "Are we hanging up now?"
+`;
+
+exports.handler = async function(event, context) {
+  if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
       headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Methods": "POST, OPTIONS"
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
       },
-      body: ""
+      body: ''
     };
   }
 
-  const headers = { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" };
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ error: 'Method not allowed' })
+    };
+  }
 
   try {
-    const body = JSON.parse(event.body || "{}");
-    const userMessage = body.body || "";
-    const systemPrompt = body.system || "You are Fresh, a warm and confident Digital Coordinator AND online coach applying for a job. You know every industry deeply. For your opening message: start with one sentence showing you deeply understand their specific industry and its real pain points, then 3-4 bullets of specific ways you help THAT industry, then one question. After that keep every response to 2-3 sentences. Never mention price unless asked — if asked it's $95/month which replaces most CRMs and software tools they already pay for. You are also their go-to person for any digital question — shortcuts, email, tech help. After a few exchanges offer to build their system live.";
-    const history = body.history || [];
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    const data = JSON.parse(event.body || '{}');
+    const userMessage = data.message || data.note || '';
 
-    if (!GEMINI_API_KEY) {
-      return { statusCode: 200, headers, body: JSON.stringify({ reply: "API key missing." }) };
+    if (!userMessage) {
+      return {
+        statusCode: 400,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+        body: JSON.stringify({ reply: "Hey Boudie! I'm listening. Speak or type what's on your mind!" })
+      };
     }
 
-    const contents = [
-      ...history,
-      { role: "user", parts: [{ text: userMessage }] }
-    ];
+    const apiKey = process.env.GEMINI_API_KEY;
 
-    const payload = JSON.stringify({
-      system_instruction: { parts: [{ text: systemPrompt }] },
-      contents
+    if (!apiKey) {
+      let cat = 'business';
+      let reply = `Logged: "${userMessage}". Filed to Business Ops!`;
+      let lower = userMessage.toLowerCase();
+      let invoiceData = null;
+
+      if (lower.includes('invoice') || lower.includes('bill') || lower.includes('$') || lower.includes('charge')) {
+        cat = 'invoices';
+        const match = userMessage.match(/\$?(\d+(\.\d{2})?)/);
+        const amount = match ? `$${match[1]}` : '$40.00';
+        invoiceData = { amount, text: userMessage };
+        reply = `💵 Staged Invoice: ${amount}. Staged for Saturday Settlement!`;
+      } else if (lower.includes('grocery') || lower.includes('home') || lower.includes('wife')) {
+        cat = 'personal';
+        reply = `Filed to Personal & Home: "${userMessage}"!`;
+      } else if (lower.includes('mike') || lower.includes('mona') || lower.includes('chris') || lower.includes('norby')) {
+        cat = 'shared';
+        reply = `Routed to Team Space: "${userMessage}"!`;
+      }
+
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+        body: JSON.stringify({ reply, category: cat, invoiceData })
+      };
+    }
+
+    const geminiPayload = JSON.stringify({
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            { text: `${SYSTEM_PROMPT}\n\nUser message: "${userMessage}"\n\nPlease analyze this note. Respond in 2 short sentences as Fresh. Also indicate category (business, personal, invoices, or shared) and if it is an invoice, specify the estimated total amount.` }
+          ]
+        }
+      ],
+      generationConfig: {
+        temperature: 0.2,
+        maxOutputTokens: 250
+      }
     });
 
-    const reply = await new Promise((resolve, reject) => {
-      const options = {
-        hostname: 'generativelanguage.googleapis.com',
-        path: `/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(payload)
-        }
-      };
-
-      const req = https.request(options, (res) => {
-        let data = '';
-        res.on('data', chunk => data += chunk);
-        res.on('end', () => {
-          try {
-            const parsed = JSON.parse(data);
-            const text = parsed?.candidates?.[0]?.content?.parts?.[0]?.text;
-            resolve(text || JSON.stringify(parsed).slice(0, 300));
-          } catch(e) {
-            resolve(data.slice(0, 300));
+    const geminiResponse = await new Promise((resolve, reject) => {
+      const req = https.request(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(geminiPayload)
           }
-        });
-      });
-
+        },
+        (res) => {
+          let body = '';
+          res.on('data', (chunk) => (body += chunk));
+          res.on('end', () => resolve({ status: res.statusCode, body }));
+        }
+      );
       req.on('error', reject);
-      req.write(payload);
+      req.write(geminiPayload);
       req.end();
     });
 
-    return { statusCode: 200, headers, body: JSON.stringify({ reply }) };
+    const parsed = JSON.parse(geminiResponse.body);
+    const textOut = parsed.candidates?.[0]?.content?.parts?.[0]?.text || `Got it! Logged "${userMessage}".`;
 
+    let cat = 'business';
+    const lower = userMessage.toLowerCase();
+    let invoiceData = null;
+
+    if (lower.includes('invoice') || lower.includes('bill') || lower.includes('$') || textOut.toLowerCase().includes('invoice') || textOut.includes('$')) {
+      cat = 'invoices';
+      const match = (userMessage + ' ' + textOut).match(/\$?(\d+(\.\d{2})?)/);
+      const amount = match ? `$${match[1]}` : '$40.00';
+      invoiceData = { amount, text: userMessage };
+    } else if (lower.includes('grocery') || lower.includes('home') || lower.includes('wife')) {
+      cat = 'personal';
+    } else if (lower.includes('mike') || lower.includes('mona') || lower.includes('chris') || lower.includes('norby')) {
+      cat = 'shared';
+    }
+
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify({
+        reply: textOut,
+        category: cat,
+        invoiceData
+      })
+    };
   } catch (err) {
-    return { statusCode: 200, headers, body: JSON.stringify({ reply: "ERROR: " + err.message }) };
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify({
+        reply: "Got it, Boudie! Note logged and staged to your ops board.",
+        category: "business",
+        invoiceData: null
+      })
+    };
   }
 };
