@@ -6,12 +6,13 @@
   <title>TappyThing — Digital Coordinator</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
+      --bg: #090d16;
+      --card-bg: #131c2e;
       --accent: #38bdf8;
       --gold: #f59e0b;
       --text: #f8fafc;
       --text-muted: #94a3b8;
+      --pink: #f472b6;
     }
     body {
       margin: 0;
@@ -27,60 +28,93 @@
     .app-container {
       width: 100%;
       max-width: 480px;
-      padding: 20px;
+      padding: 16px;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
       gap: 16px;
+      position: relative;
     }
-    .header {
+    /* Logo Header */
+    .brand-header {
       text-align: center;
       padding: 10px 0;
     }
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      color: var(--accent);
-      letter-spacing: -0.5px;
+    .brand-header img {
+      width: 100%;
+      max-width: 320px;
+      height: auto;
+      border-radius: 12px;
     }
-    .header p {
-      margin: 4px 0 0;
-      color: var(--text-muted);
-      font-size: 14px;
-    }
+    /* Cards & Drawers */
     .card-drawer {
       background: var(--card-bg);
-      border-radius: 12px;
-      border: 1px solid #334155;
+      border-radius: 16px;
+      border: 1px solid #1e293b;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
       overflow: hidden;
-      transition: all 0.3s ease;
     }
     .drawer-btn {
       width: 100%;
-      padding: 16px;
+      padding: 18px;
       background: none;
       border: none;
       color: var(--text);
       font-size: 18px;
-      font-weight: 600;
+      font-weight: 700;
       text-align: left;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .drawer-btn:hover {
-      background: rgba(255,255,255,0.03);
-    }
     .drawer-content {
       display: none;
       padding: 16px;
-      border-top: 1px solid #334155;
-      background: #0f172a;
+      border-top: 1px solid #1e293b;
+      background: #0d1322;
     }
     .drawer-content.active {
       display: block;
     }
+    /* Triangle Card Grid inside Fresh's World */
+    .triangle-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .grid-top {
+      width: 100%;
+    }
+    .grid-bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .mini-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: border 0.2s;
+    }
+    .mini-card:hover {
+      border-color: var(--accent);
+    }
+    .mini-card h4 {
+      margin: 0 0 6px 0;
+      color: var(--accent);
+      font-size: 15px;
+    }
+    .mini-card p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    /* Buttons & Inputs */
     .comm-actions {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -88,36 +122,38 @@
       margin-bottom: 12px;
     }
     .action-btn {
-      background: #334155;
+      background: var(--accent);
+      color: #090d16;
       border: none;
-      padding: 12px;
-      border-radius: 8px;
-      color: var(--text);
-      font-weight: bold;
+      padding: 14px;
+      border-radius: 10px;
+      font-weight: 800;
       cursor: pointer;
       text-align: center;
+      font-size: 14px;
     }
-    .action-btn:hover {
-      background: var(--accent);
-      color: #0f172a;
-    }
-    input[type="text"] {
+    input[type="text"], select {
       width: 100%;
-      padding: 12px;
-      border-radius: 8px;
+      padding: 14px;
+      border-radius: 10px;
       border: 1px solid #334155;
       background: #1e293b;
       color: var(--text);
+      font-size: 15px;
       box-sizing: border-box;
     }
-    .directory-select {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #334155;
-      background: #1e293b;
-      color: var(--text);
-      font-size: 16px;
+    /* Subtle Rob Art Pig Icon Guard */
+    .rob-art-tribute {
+      position: fixed;
+      bottom: 12px;
+      right: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.6;
+      font-size: 11px;
+      color: var(--pink);
+      cursor: pointer;
     }
     /* Hollywood Rolling Credits Overlay */
     .credits-modal {
@@ -135,14 +171,14 @@
       text-align: center;
       color: var(--gold);
       font-family: 'Courier New', Courier, monospace;
-      animation: roll 20s linear infinite;
+      animation: roll 22s linear infinite;
     }
     @keyframes roll {
       0% { bottom: -100%; }
       100% { bottom: 120%; }
     }
-    .credits-title { font-size: 24px; font-weight: bold; margin-bottom: 20px; }
-    .credits-role { font-size: 14px; color: #fff; margin-top: 15px; }
+    .credits-title { font-size: 22px; font-weight: bold; margin-bottom: 20px; }
+    .credits-role { font-size: 13px; color: #fff; margin-top: 16px; }
     .credits-name { font-size: 18px; font-weight: bold; color: var(--gold); }
     .close-credits {
       position: absolute;
@@ -154,20 +190,19 @@
       font-weight: bold;
       cursor: pointer;
       z-index: 10000;
-      border-radius: 4px;
+      border-radius: 6px;
     }
   </style>
 </head>
 <body>
 
   <div class="app-container">
-    <!-- Header -->
-    <div class="header">
-      <h1>TappyThing 🤵</h1>
-      <p>Digital Coordinator Engine</p>
+    <!-- Header Logo -->
+    <div class="brand-header">
+      <img src="logo.png" alt="Fresh — Your Digital Coordinator | Powered by TappyThing" />
     </div>
 
-    <!-- Communicate with Fresh Drawer -->
+    <!-- Communicate with Fresh -->
     <div class="card-drawer">
       <button class="drawer-btn" onclick="toggleDrawer('comm-drawer')">
         💬 Communicate with Fresh <span>▼</span>
@@ -178,43 +213,60 @@
           <button class="action-btn">📷 Photo</button>
           <button class="action-btn">💬 Text</button>
         </div>
-        <input type="text" placeholder="Talk or type to Fresh..." />
+        <input type="text" placeholder="Brain Dump: Talk or type to Fresh..." />
       </div>
     </div>
 
-    <!-- Fresh's World Drawer -->
+    <!-- Fresh's World (Triangle Grid) -->
     <div class="card-drawer">
       <button class="drawer-btn" onclick="toggleDrawer('fresh-world')">
         🌐 Fresh's World <span>▼</span>
       </button>
       <div id="fresh-world" class="drawer-content">
-        <p><strong>TappyThing Features & Benefits:</strong></p>
-        <ul>
-          <li>Zero-drag 1-tap voice coordinator</li>
-          <li>Auto-populating job intake</li>
-          <li>Instant billing & invoicing</li>
-        </ul>
-        <button class="action-btn" style="width:100%; margin-top:10px;" onclick="openCredits()">🎬 Cast of Characters</button>
+        <div class="triangle-grid">
+          <!-- Top Triangle Card -->
+          <div class="mini-card grid-top">
+            <h4>💰 COO & ROI Power Hub</h4>
+            <p>Self-building, self-training COO in your pocket. Eliminates admin drag & multiplies cash flow day 1.</p>
+          </div>
+          <!-- Bottom 2 Triangle Cards -->
+          <div class="grid-bottom">
+            <div class="mini-card">
+              <h4>📖 User Guide</h4>
+              <p>Dump your brain. Tap to execute. Simple step-by-step guidance.</p>
+            </div>
+            <div class="mini-card" onclick="openCredits()">
+              <h4>🎬 Cast Card</h4>
+              <p>Tap to enter the retro theater credits overlay.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Build My World / Business Directory -->
+    <!-- My World Stack -->
     <div class="card-drawer">
-      <button class="drawer-btn" onclick="toggleDrawer('build-world')">
-        🏗️ Build My World (3 Days Free) <span>▼</span>
+      <button class="drawer-btn" onclick="toggleDrawer('my-world')">
+        🚀 My World <span>▼</span>
       </button>
-      <div id="build-world" class="drawer-content">
-        <p>Select your trade to instant-build your instance:</p>
-        <select class="directory-select">
-          <option>Vacuum & Appliance Repair</option>
-          <option>HVAC & Climate Control</option>
-          <option>Plumbing Services</option>
-          <option>Auto Detailing</option>
-          <option>General Contracting</option>
+      <div id="my-world" class="drawer-content">
+        <p><strong>Select Industry / Hub View:</strong></p>
+        <select class="directory-select" style="margin-bottom: 12px;">
+          <option>My Operations (Aerus Timonium Live Case Study)</option>
+          <option>Build Your World: Appliance & Repair</option>
+          <option>Build Your World: Restaurant & Hospitality</option>
+          <option>Build Your World: HVAC & Trades</option>
+          <option>Build Your World: Auto Detailing</option>
         </select>
-        <button class="action-btn" style="width:100%; margin-top:10px; background:var(--accent); color:#0f172a;">Build Instance Now</button>
+        <button class="action-btn" style="width:100%;">Launch World Instance (3 Days Free)</button>
       </div>
     </div>
+  </div>
+
+  <!-- Subtle Rob Art Tribute Icon -->
+  <div class="rob-art-tribute">
+    <span>🐷</span>
+    <span>Rob Art</span>
   </div>
 
   <!-- Rolling Credits Modal -->
@@ -224,28 +276,28 @@
       <div class="credits-title">⭐ TAPPYTHING PRODUCTIONS ⭐</div>
       
       <div class="credits-role">DIRECTED BY</div>
-      <div class="credits-name">B-U-D-I</div>
+      <div class="credits-name">BOUDIE</div>
 
       <div class="credits-role">DIGITAL COORDINATOR</div>
       <div class="credits-name">FRESH</div>
 
       <div class="credits-role">THE ENGINE & HEART</div>
-      <div class="credits-name">S-I-S-S-Y</div>
+      <div class="credits-name">SISSY</div>
 
       <div class="credits-role">THE ENERGY</div>
-      <div class="credits-name">N-U-E-S-H</div>
+      <div class="credits-name">NUESH</div>
 
       <div class="credits-role">SALES GURU</div>
       <div class="credits-name">SQUASH</div>
 
       <div class="credits-role">RESIDENT CREATIVE & PIG ICON</div>
-      <div class="credits-name">R-O-B-A-R-T</div>
+      <div class="credits-name">ROB ART</div>
 
       <div class="credits-role">THE MONEY MAN</div>
       <div class="credits-name">L</div>
 
       <br><br>
-      <div style="font-size:12px; color:#888;">© TappyThing & Clean Environment LLC</div>
+      <div style="font-size:12px; color:#888;">© Clean Environment LLC • Aerus Timonium</div>
     </div>
   </div>
 
