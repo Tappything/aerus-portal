@@ -44,13 +44,12 @@
     .msg-fresh { background: #1e293b; border-left: 3px solid var(--purple); color: #e2e8f0; align-self: flex-start; }
     .msg-user { background: #4338ca; color: #fff; align-self: flex-end; }
 
-    /* GOLD INVOICE STAGING CARD */
-    .invoice-card { display: none; background: #0f172a; border: 2px solid var(--gold); border-radius: 14px; padding: 12px; flex-direction: column; gap: 6px; box-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
-    .inv-head { display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 800; color: var(--gold); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; }
-    .inv-body { font-size: 0.82rem; color: #e2e8f0; line-height: 1.4; }
+    /* GOLD INVOICE DISPLAY CARD */
+    .invoice-card { display: none; background: #0f172a; border: 2px solid var(--gold); border-radius: 14px; padding: 14px; flex-direction: column; gap: 8px; box-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
+    .inv-head { display: flex; justify-content: space-between; font-size: 0.95rem; font-weight: 800; color: var(--gold); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; }
+    .inv-body { font-size: 0.88rem; color: #e2e8f0; line-height: 1.5; }
     .inv-actions { display: flex; gap: 8px; margin-top: 4px; }
-    .btn-inv { flex: 1; padding: 8px; border-radius: 8px; border: none; font-size: 0.78rem; font-weight: 800; cursor: pointer; }
-    .btn-inv-settle { background: var(--green); color: #fff; }
+    .btn-inv { flex: 1; padding: 10px; border-radius: 8px; border: none; font-size: 0.82rem; font-weight: 800; cursor: pointer; }
     .btn-inv-copy { background: #334155; color: #fff; }
 
     /* VIDEO & CAMERA INTAKE */
@@ -83,7 +82,7 @@
 <div class="header">
   <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="TappyThing" onerror="this.src='logo.png'"/>
   <div class="title">TappyThing Command Center</div>
-  <div class="subtitle">Aerus Timonium • Voice & Instant Invoicing</div>
+  <div class="subtitle">Aerus Timonium • Digital Coordinator</div>
 </div>
 
 <div class="tap-section">
@@ -92,28 +91,27 @@
 </div>
 
 <div class="type-section" id="typeSection">
-  <textarea id="typeInput" rows="3" placeholder="Type message or dictation (e.g. Invoice for Beth Rose $75)..."></textarea>
+  <textarea id="typeInput" rows="3" placeholder="Ask Fresh something or dictate an invoice (e.g. Invoice for Beth Rose tune-up $75)..."></textarea>
   <button onclick="sendTyped()">Send to Fresh ✉️</button>
 </div>
 
-<!-- GOLD INVOICE STAGING CARD -->
+<!-- GOLD INVOICE DISPLAY CARD -->
 <div class="invoice-card" id="invoiceCard">
   <div class="inv-head">
-    <span>💵 INVOICE STAGED</span>
+    <span>📄 INVOICE PREVIEW</span>
     <span id="invAmount">$0.00</span>
   </div>
   <div class="inv-body" id="invBodyText">Customer details & line items staged here.</div>
   <div class="inv-actions">
-    <button class="btn-inv btn-inv-settle" onclick="settleSaturday()">✓ Stage for Saturday Settlement</button>
-    <button class="btn-inv btn-inv-copy" onclick="copyInvoice()">📋 Copy Details</button>
+    <button class="btn-inv btn-inv-copy" onclick="copyInvoice()">📋 Copy Invoice Details</button>
   </div>
 </div>
 
 <!-- LIVE CHAT DISPLAY BOX -->
 <div class="chat-display-box" id="chatDisplayBox">
   <div class="chat-msg msg-fresh">
-    <strong>Hey Boudie! Fresh here.</strong><br>
-    Tap the mic or type above. Dictate a repair, customer bill, or grocery note. I stage invoices and route notes to your boards automatically!
+    <strong>Ask Fresh something...</strong><br>
+    Tap the mic or type above to log notes, dictate invoices, or manage bench tasks!
   </div>
 </div>
 
@@ -158,7 +156,7 @@ function appendChat(text, sender) {
 
 function checkAndStageInvoice(text) {
   const lower = text.toLowerCase();
-  const isInv = lower.includes('invoice') || lower.includes('bill') || lower.includes('$') || lower.includes('dollar') || lower.includes('tune-up');
+  const isInv = lower.includes('invoice') || lower.includes('bill') || lower.includes('$') || lower.includes('dollar');
   
   if (isInv) {
     lastInvoiceText = text;
@@ -167,22 +165,18 @@ function checkAndStageInvoice(text) {
     const bodyEl = document.getElementById('invBodyText');
     
     const match = text.match(/\$?(\d+(\.\d{2})?)/);
-    const dollarVal = match ? '$' + match[1] : '$75.00';
+    const dollarVal = match ? '$' + match[1] : 'Pending Amount';
     
     if(amtEl) amtEl.innerText = dollarVal;
-    if(bodyEl) bodyEl.innerHTML = '<strong>Dictation:</strong> ' + text + '<br><em>Ready to stage for Saturday Settlement or ring up in Workiz.</em>';
+    if(bodyEl) bodyEl.innerHTML = '<strong>Invoice Summary:</strong><br>' + text;
     if(card) card.style.display = 'flex';
   }
-}
-
-function settleSaturday() {
-  appendChat("✅ Staged to Saturday Settlement line items!", "fresh");
 }
 
 function copyInvoice() {
   if (lastInvoiceText && navigator.clipboard) {
     navigator.clipboard.writeText(lastInvoiceText);
-    alert("Invoice details copied!");
+    alert("Invoice details copied to clipboard!");
   }
 }
 
@@ -308,7 +302,7 @@ async function sendToFresh(userMessage){
     window.speechSynthesis.speak(utter);
   }catch(e){
     console.error('sendToFresh error:',e);
-    appendChat("🤵 Logged and routed to board!", "fresh");
+    appendChat("🤵 Logged and routed!", "fresh");
   }
 }
 
