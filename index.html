@@ -156,28 +156,64 @@ function appendChat(text, sender) {
 
 function checkAndStageInvoice(text) {
   const lower = text.toLowerCase();
-  const isInv = lower.includes('invoice') || lower.includes('bill') || lower.includes('$') || lower.includes('dollar');
+  const isInv = lower.includes('invoice') || lower.includes('bill') || lower.includes('pack') || lower.includes('bag') || lower.includes('hose') || lower.includes('$');
   
   if (isInv) {
-    lastInvoiceText = text;
+    let items = [];
+    let total = 0;
+    
+    if (lower.includes('bag') || lower.includes('bags')) { items.push("• Filter Bags Pack: $24.95"); total += 24.95; }
+    if (lower.includes('hose')) { items.push("• Classic Machine Hose Assembly: $65.00"); total += 65.00; }
+    if (lower.includes('tune-up') || lower.includes('service')) { items.push("• Complete Bench Tune-Up: $75.00"); total += 75.00; }
+    
+    // Explicit dollar match fallback
+    const match = text.match(/\$?(\d+(\.\d{2})?)/);
+    if (items.length === 0 && match) {
+      total = parseFloat(match[1]);
+      items.push("• Custom Service / Item: $" + total.toFixed(2));
+    } else if (items.length === 0) {
+      items.push("• Dictated Item(s): " + text);
+      total = 40.00;
+    }
+
+    const totalStr = "$" + total.toFixed(2);
+    lastInvoiceText = "TAPPYTHING INVOICE STAGED\n" + items.join("\n") + "\nTotal: " + totalStr + "\nDictation: " + text;
+    
     const card = document.getElementById('invoiceCard');
     const amtEl = document.getElementById('invAmount');
     const bodyEl = document.getElementById('invBodyText');
     
-    const match = text.match(/\$?(\d+(\.\d{2})?)/);
-    const dollarVal = match ? '$' + match[1] : 'Pending Amount';
-    
-    if(amtEl) amtEl.innerText = dollarVal;
-    if(bodyEl) bodyEl.innerHTML = '<strong>Invoice Summary:</strong><br>' + text;
+    if(amtEl) amtEl.innerText = totalStr;
+    if(bodyEl) bodyEl.innerHTML = '<strong>Staged Line Items:</strong><br>' + items.join('<br>') + '<br><br><em>Dictation: "' + text + '"</em>';
     if(card) card.style.display = 'flex';
   }
 }
 
 function copyInvoice() {
-  if (lastInvoiceText && navigator.clipboard) {
-    navigator.clipboard.writeText(lastInvoiceText);
-    alert("Invoice details copied to clipboard!");
+  if (!lastInvoiceText) {
+    alert("No invoice staged to copy.");
+    return;
   }
+  
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(lastInvoiceText).then(() => {
+      alert("Invoice details copied successfully!");
+    }).catch(() => {
+      fallbackCopy(lastInvoiceText);
+    });
+  } else {
+    fallbackCopy(lastInvoiceText);
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  alert("Invoice details copied!");
 }
 
 async function toggleMyWorld(){
