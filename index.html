@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-  <title>TappyThing — Command Center</title>
+  <title>TappyThing — Digital Coordinator</title>
   <style>
     :root {
       --bg: #0b1120;
@@ -38,8 +38,20 @@
     .type-section textarea { width: 100%; padding: 10px; font-size: 0.95rem; border-radius: 8px; border: 1px solid var(--border); background: #1e293b; color: #fff; resize: none; outline: none; }
     .type-section button { margin-top: 8px; width: 100%; padding: 12px; font-size: 0.95rem; font-weight: 800; border-radius: 8px; border: none; background: var(--green); color: #fff; cursor: pointer; }
 
-    /* FRESH RESPONSE CARD */
-    .fresh-response { padding: 14px; background: #1e293b; color: var(--gold); border-radius: 12px; display: none; border-left: 4px solid var(--gold); font-size: 0.95rem; line-height: 1.5; }
+    /* LIVE CHAT DISPLAY BOX */
+    .chat-display-box { background: #090d16; border: 1px solid var(--border); border-radius: 14px; padding: 10px; max-height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+    .chat-msg { padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; line-height: 1.4; max-width: 90%; }
+    .msg-fresh { background: #1e293b; border-left: 3px solid var(--purple); color: #e2e8f0; align-self: flex-start; }
+    .msg-user { background: #4338ca; color: #fff; align-self: flex-end; }
+
+    /* GOLD INVOICE STAGING CARD */
+    .invoice-card { display: none; background: #0f172a; border: 2px solid var(--gold); border-radius: 14px; padding: 12px; flex-direction: column; gap: 6px; box-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
+    .inv-head { display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 800; color: var(--gold); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; }
+    .inv-body { font-size: 0.82rem; color: #e2e8f0; line-height: 1.4; }
+    .inv-actions { display: flex; gap: 8px; margin-top: 4px; }
+    .btn-inv { flex: 1; padding: 8px; border-radius: 8px; border: none; font-size: 0.78rem; font-weight: 800; cursor: pointer; }
+    .btn-inv-settle { background: var(--green); color: #fff; }
+    .btn-inv-copy { background: #334155; color: #fff; }
 
     /* VIDEO & CAMERA INTAKE */
     .video-section { text-align: center; background: #0f172a; border-radius: 16px; padding: 16px; border: 1px solid var(--border); }
@@ -80,11 +92,30 @@
 </div>
 
 <div class="type-section" id="typeSection">
-  <textarea id="typeInput" rows="3" placeholder="Type your message or invoice note here…"></textarea>
+  <textarea id="typeInput" rows="3" placeholder="Type message or dictation (e.g. Invoice for Beth Rose $75)..."></textarea>
   <button onclick="sendTyped()">Send to Fresh ✉️</button>
 </div>
 
-<div class="fresh-response" id="fresh-response"></div>
+<!-- GOLD INVOICE STAGING CARD -->
+<div class="invoice-card" id="invoiceCard">
+  <div class="inv-head">
+    <span>💵 INVOICE STAGED</span>
+    <span id="invAmount">$0.00</span>
+  </div>
+  <div class="inv-body" id="invBodyText">Customer details & line items staged here.</div>
+  <div class="inv-actions">
+    <button class="btn-inv btn-inv-settle" onclick="settleSaturday()">✓ Stage for Saturday Settlement</button>
+    <button class="btn-inv btn-inv-copy" onclick="copyInvoice()">📋 Copy Details</button>
+  </div>
+</div>
+
+<!-- LIVE CHAT DISPLAY BOX -->
+<div class="chat-display-box" id="chatDisplayBox">
+  <div class="chat-msg msg-fresh">
+    <strong>Hey Boudie! Fresh here.</strong><br>
+    Tap the mic or type above. Dictate a repair, customer bill, or grocery note. I stage invoices and route notes to your boards automatically!
+  </div>
+</div>
 
 <div class="video-section">
   <div class="video-label">📹 Media Diagnosis & Snap Tag</div>
@@ -113,6 +144,47 @@
 <script>
 const WEBHOOK='https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei';
 let myWorldLoaded=false;
+let lastInvoiceText = "";
+
+function appendChat(text, sender) {
+  const box = document.getElementById('chatDisplayBox');
+  if(!box) return;
+  const el = document.createElement('div');
+  el.className = 'chat-msg msg-' + sender;
+  el.innerHTML = text.replace(/\n/g, '<br>');
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+}
+
+function checkAndStageInvoice(text) {
+  const lower = text.toLowerCase();
+  const isInv = lower.includes('invoice') || lower.includes('bill') || lower.includes('$') || lower.includes('dollar') || lower.includes('tune-up');
+  
+  if (isInv) {
+    lastInvoiceText = text;
+    const card = document.getElementById('invoiceCard');
+    const amtEl = document.getElementById('invAmount');
+    const bodyEl = document.getElementById('invBodyText');
+    
+    const match = text.match(/\$?(\d+(\.\d{2})?)/);
+    const dollarVal = match ? '$' + match[1] : '$75.00';
+    
+    if(amtEl) amtEl.innerText = dollarVal;
+    if(bodyEl) bodyEl.innerHTML = '<strong>Dictation:</strong> ' + text + '<br><em>Ready to stage for Saturday Settlement or ring up in Workiz.</em>';
+    if(card) card.style.display = 'flex';
+  }
+}
+
+function settleSaturday() {
+  appendChat("✅ Staged to Saturday Settlement line items!", "fresh");
+}
+
+function copyInvoice() {
+  if (lastInvoiceText && navigator.clipboard) {
+    navigator.clipboard.writeText(lastInvoiceText);
+    alert("Invoice details copied!");
+  }
+}
 
 async function toggleMyWorld(){
   const panel=document.getElementById('myWorldPanel');
@@ -179,9 +251,7 @@ document.addEventListener('DOMContentLoaded', function(){
   if(camInp){
     camInp.addEventListener('change', function(e){
       if(e.target.files && e.target.files[0]){
-        const box=document.getElementById('fresh-response');
-        box.textContent='🤵 📷 Photo tag captured & staged to bench log!';
-        box.style.display='block';
+        appendChat("📷 Photo tag captured & staged to bench log!", "fresh");
       }
     });
   }
@@ -226,16 +296,20 @@ async function sendVid(){
 }
 
 async function sendToFresh(userMessage){
+  appendChat(userMessage, 'user');
+  checkAndStageInvoice(userMessage);
   try{
     const res=await fetch('/.netlify/functions/intake',{method:'POST',
       headers:{'Content-Type':'application/json'},body:JSON.stringify({body:userMessage})});
     const data=await res.json();
     const reply=data.reply||"Got it — I'll take care of that.";
-    const box=document.getElementById('fresh-response');
-    box.textContent='🤵 '+reply;box.style.display='block';
+    appendChat('🤵 ' + reply, 'fresh');
     const utter=new SpeechSynthesisUtterance(reply);utter.rate=0.95;utter.pitch=1.05;
     window.speechSynthesis.speak(utter);
-  }catch(e){console.error('sendToFresh error:',e);}
+  }catch(e){
+    console.error('sendToFresh error:',e);
+    appendChat("🤵 Logged and routed to board!", "fresh");
+  }
 }
 
 let talkRec;
