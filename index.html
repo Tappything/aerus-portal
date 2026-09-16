@@ -22,8 +22,8 @@
     .container { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 12px; }
 
     /* TOP PILLS */
-    .top-pills { display: flex; justify-content: center; gap: 6px; }
-    .pill { padding: 5px 11px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+    .top-pills { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+    .pill { padding: 4px 9px; border-radius: 999px; font-size: 10px; font-weight: 700; }
     .pill-fresh { background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; }
     .pill-sissy { background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #34d399; }
     .pill-rob { background: rgba(139, 92, 246, 0.15); border: 1px solid #8b5cf6; color: #c4b5fd; }
@@ -42,13 +42,20 @@
     .text-input-area { width: 100%; background: #0f172a; border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; color: #fff; font-size: 14px; outline: none; }
     .btn-send-main { background: linear-gradient(135deg, #2563eb, #7c3aed); border: none; border-radius: 12px; color: #fff; padding: 12px; font-size: 14px; font-weight: 800; cursor: pointer; }
 
-    /* INVOICE CARD */
+    /* INVOICE CARD & 6-STREAM PAYMENT BAR */
     .invoice-preview-card { display: none; background: #090d16; border: 2px solid var(--gold); border-radius: 14px; padding: 12px; flex-direction: column; gap: 8px; }
     .inv-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(245, 158, 11, 0.3); padding-bottom: 6px; }
     .inv-brand-text { font-size: 11px; font-weight: 800; color: var(--gold); }
     .inv-amount-badge { font-size: 16px; font-weight: 900; color: #34d399; background: rgba(16, 185, 129, 0.15); padding: 2px 8px; border-radius: 6px; border: 1px solid #10b981; }
     .inv-details { font-size: 12px; color: #f1f5f9; line-height: 1.5; background: rgba(255, 255, 255, 0.03); padding: 8px; border-radius: 8px; }
-    .btn-inv-copy { background: #334155; color: #fff; border: 1px solid var(--border); width: 100%; padding: 8px; border-radius: 8px; font-weight: 800; cursor: pointer; }
+    .pay-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 4px; }
+    .btn-pay { background: #0f172a; border: 1px solid var(--border); color: #fff; padding: 9px 4px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; text-align: center; }
+    .btn-pay-card { background: rgba(37, 99, 235, 0.2); border-color: #3b82f6; color: #93c5fd; }
+    .btn-pay-zelle { background: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #6ee7b7; }
+    .btn-pay-cash { background: rgba(245, 158, 11, 0.2); border-color: #f59e0b; color: #fde047; }
+    .btn-pay-check { background: rgba(203, 213, 225, 0.15); border-color: #cbd5e1; color: #f8fafc; }
+    .btn-pay-synch { background: rgba(168, 85, 247, 0.2); border-color: #a855f7; color: #d8b4fe; }
+    .btn-pay-venmo { background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; color: #7dd3fc; }
 
     /* CHAT DISPLAY */
     .chat-display { max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 2px; }
@@ -75,6 +82,8 @@
     .credits-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.95); z-index: 99999; justify-content: center; align-items: center; }
     .btn-close-creds { position: absolute; top: 20px; right: 20px; background: #1e293b; border: 1px solid var(--gold); color: #fff; padding: 6px 12px; border-radius: 999px; cursor: pointer; z-index: 100001; }
     .credits-scroll { position: absolute; width: 90%; max-width: 400px; text-align: center; color: #fff; animation: roll 18s linear infinite; }
+    .cred-title { font-size: 10px; color: #94a3b8; text-transform: uppercase; margin-top: 14px; font-weight: 700; letter-spacing: 1px; }
+    .cred-name { font-size: 15px; font-weight: 800; color: #fff; margin-top: 2px; }
     @keyframes roll { 0% { top: 100%; } 100% { top: -110%; } }
   </style>
 </head>
@@ -82,7 +91,7 @@
   <div class="container">
     <div class="top-pills">
       <div class="pill pill-fresh">🎧 Fresh Active</div>
-      <div class="pill pill-sissy">⚡ Connected</div>
+      <div class="pill pill-sissy">⚡ Sissy Active</div>
       <div class="pill pill-rob">🐷 Rob Art</div>
     </div>
 
@@ -114,8 +123,13 @@
           <span class="inv-amount-badge" id="invAmountDisplay">$0.00</span>
         </div>
         <div class="inv-details" id="invDetailsText">Staged invoice details will appear here.</div>
-        <div style="margin-top:6px;">
-          <button type="button" class="btn-inv-copy" onclick="copyInvoice()">📋 Copy Details</button>
+        <div class="pay-grid">
+          <button type="button" class="btn-pay btn-pay-card" onclick="closeoutPayment('Credit Card')">💳 Card</button>
+          <button type="button" class="btn-pay btn-pay-zelle" onclick="closeoutPayment('Zelle')">⚡ Zelle</button>
+          <button type="button" class="btn-pay btn-pay-cash" onclick="closeoutPayment('Cash')">💵 Cash</button>
+          <button type="button" class="btn-pay btn-pay-check" onclick="closeoutPayment('Check')">📝 Check</button>
+          <button type="button" class="btn-pay btn-pay-synch" onclick="closeoutPayment('Synchrony')">🏦 Synchrony</button>
+          <button type="button" class="btn-pay btn-pay-venmo" onclick="closeoutPayment('Venmo')">📱 Venmo</button>
         </div>
       </div>
 
@@ -155,19 +169,38 @@
     <button type="button" class="btn-close-creds" onclick="closeCredits()">✕ Close</button>
     <div class="credits-scroll">
       <div style="font-size: 20px; font-weight: 900; color: #f59e0b; margin-bottom: 12px;">⭐ TAPPYTHING PRODUCTIONS ⭐</div>
-      <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Digital Coordinator</div>
-      <div style="font-size: 16px; font-weight: 800; margin-bottom: 12px;">FRESH</div>
-      <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Creative Spirit</div>
-      <div style="font-size: 16px; font-weight: 800; margin-bottom: 12px;">ROB ART (🐷)</div>
-      <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Aerus Timonium Crew</div>
-      <div style="font-size: 14px; color: #f59e0b; margin-top: 4px;">Mona • Chris • Mike • Norby</div>
+      
+      <div class="cred-title">Digital Coordinator</div>
+      <div class="cred-name">FRESH 🤵</div>
+
+      <div class="cred-title">The Engine & Heart</div>
+      <div class="cred-name">SISSY ⚡</div>
+
+      <div class="cred-title">The Smarty Pants</div>
+      <div class="cred-name">NUSH 🧠</div>
+
+      <div class="cred-title">The Money Man</div>
+      <div class="cred-name">L 💵</div>
+
+      <div class="cred-title">Sales Coach & Motivator</div>
+      <div class="cred-name">SQUASH 🔥</div>
+
+      <div class="cred-title">Creative Spirit</div>
+      <div class="cred-name">ROB ART (🐷)</div>
     </div>
   </div>
 
   <script>
     var recognition = null;
     var isListening = false;
-    var lastStagedInvoice = null;
+    var currentSubtotal = 0;
+    var currentTax = 0;
+    var currentTotal = 0;
+    var currentCustName = "Customer";
+    var currentItemsList = [];
+
+    // Internal Ledger Storage
+    var salesLedger = JSON.parse(localStorage.getItem('tappy_sales_ledger') || '[]');
 
     function addMsg(text, sender) {
       var box = document.getElementById('chatBox');
@@ -235,54 +268,68 @@
 
     function processInput(text) {
       var lower = text.toLowerCase();
-      var isInvoice = lower.includes('invoice') || lower.includes('bill') || lower.includes('bag') || lower.includes('hose') || lower.includes('tune');
+      var isInvoice = lower.includes('invoice') || lower.includes('bill') || lower.includes('bag') || lower.includes('hose') || lower.includes('tune') || lower.includes('filter');
 
       if (isInvoice) {
-        let items = [];
-        let total = 0;
-        if (lower.includes('bag') || lower.includes('bags')) { items.push("• 9 Pk. Clean Obsessed HEPA Bags: $20.00"); total += 20.00; }
-        if (lower.includes('hose')) { items.push("• Vacuum Hose Assembly: $35.00"); total += 35.00; }
-        if (lower.includes('tune') || lower.includes('labor')) { items.push("• Equipment Labor & Maintenance: $40.00"); total += 40.00; }
+        currentItemsList = [];
+        currentSubtotal = 0;
+
+        if (lower.includes('bag') || lower.includes('bags')) { currentItemsList.push("• 9 Pk. HEPA Vacuum Bags: $20.00"); currentSubtotal += 20.00; }
+        if (lower.includes('hose')) { currentItemsList.push("• Vacuum Hose Assembly: $35.00"); currentSubtotal += 35.00; }
+        if (lower.includes('tune') || lower.includes('labor')) { currentItemsList.push("• Maintenance & Tune-Up Labor: $40.00"); currentSubtotal += 40.00; }
+        if (lower.includes('filter') || lower.includes('ap500')) { currentItemsList.push("• AP500 Guardian Filter Replacement: $85.00"); currentSubtotal += 85.00; }
 
         var match = text.match(/\$?(\d+(\.\d{2})?)/);
-        if (items.length === 0 && match) {
-          total = parseFloat(match[1]);
-          items.push("• Custom Service / Part: $" + total.toFixed(2));
-        } else if (items.length === 0) {
-          items.push("• Custom Staged Service / Intake");
-          total = 40.00;
+        if (currentItemsList.length === 0 && match) {
+          currentSubtotal = parseFloat(match[1]);
+          currentItemsList.push("• Custom Service / Parts: $" + currentSubtotal.toFixed(2));
+        } else if (currentItemsList.length === 0) {
+          currentSubtotal = 40.00;
+          currentItemsList.push("• General Maintenance & Service Intake");
         }
 
-        var totalStr = "$" + total.toFixed(2);
-        stageInvoice(text, totalStr, items);
-        addMsg('💵 Staged Invoice for ' + totalStr + '. Details ready to copy below!', 'fresh');
+        // Calculate MD 6% Sales Tax
+        currentTax = currentSubtotal * 0.06;
+        currentTotal = currentSubtotal + currentTax;
+
+        stageInvoice(currentTotal, currentSubtotal, currentTax, currentItemsList);
+        addMsg('💵 Invoice staged for $' + currentTotal.toFixed(2) + ' (includes MD 6% tax). Select payment method below to close out!', 'fresh');
       } else {
         addMsg('🤵 Logged and routed to your board!', 'fresh');
       }
-
-      fetch('/.netlify/functions/intake', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ body: text })
-      }).catch(function(){});
     }
 
-    function stageInvoice(text, amountStr, itemsList) {
-      lastStagedInvoice = "TAPPYTHING INVOICE\n" + itemsList.join("\n") + "\nTotal: " + amountStr;
-      document.getElementById('invAmountDisplay').innerText = amountStr;
-      document.getElementById('invDetailsText').innerHTML = '<strong>Staged Line Items:</strong><br>' + itemsList.join('<br>');
+    function stageInvoice(total, sub, tax, items) {
+      document.getElementById('invAmountDisplay').innerText = "$" + total.toFixed(2);
+      document.getElementById('invDetailsText').innerHTML = 
+        '<strong>Line Items:</strong><br>' + items.join('<br>') + 
+        '<br><br>Subtotal: $' + sub.toFixed(2) + '<br>MD Tax (6%): $' + tax.toFixed(2) + '<br><strong>Total Due: $' + total.toFixed(2) + '</strong>';
       document.getElementById('invoicePreviewCard').style.display = 'flex';
     }
 
-    function copyInvoice() {
-      if (!lastStagedInvoice) return;
-      var ta = document.createElement('textarea');
-      ta.value = lastStagedInvoice;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      alert("Invoice details copied to clipboard!");
+    function closeoutPayment(method) {
+      var extraNote = "";
+      if (method === 'Check') {
+        var chkNum = prompt("Enter Check # for bank deposit slip:", "");
+        if (chkNum) extraNote = " (Check #" + chkNum + ")";
+      }
+
+      var record = {
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+        customer: currentCustName,
+        subtotal: currentSubtotal,
+        tax: currentTax,
+        total: currentTotal,
+        method: method + extraNote,
+        items: currentItemsList
+      };
+
+      salesLedger.push(record);
+      localStorage.setItem('tappy_sales_ledger', JSON.stringify(salesLedger));
+
+      document.getElementById('invoicePreviewCard').style.display = 'none';
+      addMsg('✅ <strong>PAID & CLOSED OUT VIA ' + method.toUpperCase() + extraNote.toUpperCase() + '!</strong><br>Logged to your TappyThing Sales Ledger ($' + currentTotal.toFixed(2) + ').', 'fresh');
     }
 
     function toggleWorld() {
@@ -300,28 +347,36 @@
 
     async function loadMyWorld() {
       var panel = document.getElementById('myWorldPanel');
-      panel.innerHTML = '<div style="font-size:12px;color:#94a3b8;text-align:center;">Connecting to live boards...</div>';
+      
+      // Calculate Ledger Totals
+      var totalRev = salesLedger.reduce((acc, r) => acc + (r.total || 0), 0);
+      var totalTax = salesLedger.reduce((acc, r) => acc + (r.tax || 0), 0);
+      var cashTotal = salesLedger.filter(r => r.method.includes('Cash')).reduce((acc, r) => acc + (r.total || 0), 0);
+      var checkTotal = salesLedger.filter(r => r.method.includes('Check')).reduce((acc, r) => acc + (r.total || 0), 0);
+
+      panel.innerHTML = `
+        <div class="group-card" style="border-color:var(--gold);">
+          <div class="group-title">💵 TappyThing Sales & Tax Ledger</div>
+          <div class="group-item"><strong>Gross Revenue:</strong> $${totalRev.toFixed(2)} (${salesLedger.length} Jobs)</div>
+          <div class="group-item"><strong>MD Sales Tax (6%):</strong> $${totalTax.toFixed(2)}</div>
+          <div class="group-item"><strong>💵 Cash Envelope:</strong> $${cashTotal.toFixed(2)}</div>
+          <div class="group-item"><strong>📝 Check Deposits:</strong> $${checkTotal.toFixed(2)}</div>
+        </div>
+      `;
+
       try {
         var res = await fetch('/.netlify/functions/myworld');
         var data = await res.json();
         var groups = Array.isArray(data.groups) ? data.groups : [];
-        if (groups.length === 0) {
-          panel.innerHTML = '<div style="font-size:12px;color:#94a3b8;text-align:center;">No active items on live board.</div>';
-          return;
+        if (groups.length > 0) {
+          panel.innerHTML += groups.map(g => `
+            <div class="group-card">
+              <div class="group-title">${g.title} (${(g.items || []).length})</div>
+              ${(g.items || []).map(i => `<div class="group-item">• ${i.name || i.title || 'Board Item'}</div>`).join('')}
+            </div>
+          `).join('');
         }
-        panel.innerHTML = groups.map(g => `
-          <div class="group-card">
-            <div class="group-title">${g.title} (${(g.items || []).length})</div>
-            ${(g.items || []).map(i => `<div class="group-item">• ${i.name || i.title || 'Board Item'}</div>`).join('')}
-          </div>
-        `).join('');
-      } catch (e) {
-        panel.innerHTML = `
-          <div class="group-card"><div class="group-title">🏢 Business Ops (Live)</div></div>
-          <div class="group-card"><div class="group-title">🏠 Personal / Home (Live)</div></div>
-          <div class="group-card"><div class="group-title">💵 Staged Invoices (Live)</div></div>
-        `;
-      }
+      } catch (e) {}
     }
 
     function triggerVideo() { document.getElementById('nativeVideoInput').click(); }
