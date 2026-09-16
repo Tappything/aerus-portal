@@ -80,7 +80,7 @@
   <div class="container">
     <div class="top-pills">
       <div class="pill pill-fresh">🎧 Fresh Active</div>
-      <div class="pill pill-sissy">⚡ Sissy Active</div>
+      <div class="pill pill-sissy">⚡ Connected</div>
       <div class="pill pill-rob">🐷 Rob Art</div>
     </div>
 
@@ -100,14 +100,14 @@
         </button>
       </div>
 
-      <input type="text" id="userInput" class="text-input-area" placeholder="Speak or type (e.g. Invoice for Beth Rose bags & hose)..." onkeydown="handleKey(event)">
+      <input type="text" id="userInput" class="text-input-area" placeholder="Ask Fresh something or dictate an invoice..." onkeydown="handleKey(event)">
       <button type="button" class="btn-send-main" onclick="sendChat()">Send to Fresh ✉️</button>
 
       <div class="invoice-preview-card" id="invoicePreviewCard">
         <div class="inv-header">
           <div style="display:flex;align-items:center;gap:6px;">
-            <span style="font-size:18px;">💵</span>
-            <span class="inv-brand-text" id="invCustName">TAPPYTHING INVOICE</span>
+            <span style="font-size:18px;">📄</span>
+            <span class="inv-brand-text" id="invCustName">INVOICE PREVIEW</span>
           </div>
           <span class="inv-amount-badge" id="invAmountDisplay">$0.00</span>
         </div>
@@ -120,7 +120,7 @@
       <div class="chat-display" id="chatBox">
         <div class="msg msg-fresh">
           <strong>Fresh ready. 🤵</strong><br>
-          Tap the mic or type above. Dictate a repair, customer bill, or grocery note. I calculate pricing and stage tasks!
+          Tap the mic or type above to dictate an intake, calculate an invoice, or route a task!
         </div>
       </div>
     </div>
