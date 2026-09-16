@@ -42,23 +42,8 @@
     .text-input-area { width: 100%; background: #0f172a; border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; color: #fff; font-size: 14px; outline: none; }
     .btn-send-main { background: linear-gradient(135deg, #2563eb, #7c3aed); border: none; border-radius: 12px; color: #fff; padding: 12px; font-size: 14px; font-weight: 800; cursor: pointer; }
 
-    /* INVOICE CARD & 6-STREAM PAYMENT BAR */
-    .invoice-preview-card { display: none; background: #090d16; border: 2px solid var(--gold); border-radius: 14px; padding: 12px; flex-direction: column; gap: 8px; }
-    .inv-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(245, 158, 11, 0.3); padding-bottom: 6px; }
-    .inv-brand-text { font-size: 11px; font-weight: 800; color: var(--gold); }
-    .inv-amount-badge { font-size: 16px; font-weight: 900; color: #34d399; background: rgba(16, 185, 129, 0.15); padding: 2px 8px; border-radius: 6px; border: 1px solid #10b981; }
-    .inv-details { font-size: 12px; color: #f1f5f9; line-height: 1.5; background: rgba(255, 255, 255, 0.03); padding: 8px; border-radius: 8px; }
-    .pay-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 4px; }
-    .btn-pay { background: #0f172a; border: 1px solid var(--border); color: #fff; padding: 9px 4px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; text-align: center; }
-    .btn-pay-card { background: rgba(37, 99, 235, 0.2); border-color: #3b82f6; color: #93c5fd; }
-    .btn-pay-zelle { background: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #6ee7b7; }
-    .btn-pay-cash { background: rgba(245, 158, 11, 0.2); border-color: #f59e0b; color: #fde047; }
-    .btn-pay-check { background: rgba(203, 213, 225, 0.15); border-color: #cbd5e1; color: #f8fafc; }
-    .btn-pay-synch { background: rgba(168, 85, 247, 0.2); border-color: #a855f7; color: #d8b4fe; }
-    .btn-pay-venmo { background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; color: #7dd3fc; }
-
     /* CHAT DISPLAY */
-    .chat-display { max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 2px; }
+    .chat-display { max-height: 240px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 2px; }
     .msg { padding: 9px 12px; border-radius: 12px; font-size: 12px; line-height: 1.4; max-width: 92%; }
     .msg-fresh { background: #0f172a; border-left: 3px solid var(--purple); color: #e2e8f0; align-self: flex-start; }
     .msg-user { background: #4338ca; color: #fff; align-self: flex-end; }
@@ -98,7 +83,7 @@
     <div class="header">
       <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="TappyThing" class="logo-img" onerror="this.src='logo.png'">
       <div class="title">Digital Coordinator Command Center</div>
-      <div class="subtitle">Voice Intake • Live Chat • Instant Invoicing</div>
+      <div class="subtitle">Voice Intake • Live Chat • Task Routing</div>
     </div>
 
     <div class="card">
@@ -111,32 +96,13 @@
         </button>
       </div>
 
-      <input type="text" id="userInput" class="text-input-area" placeholder="Ask Fresh something or dictate an invoice..." onkeydown="handleKey(event)">
+      <input type="text" id="userInput" class="text-input-area" placeholder="Ask Fresh anything or dictate a note..." onkeydown="handleKey(event)">
       <button type="button" class="btn-send-main" onclick="sendChat()">Send to Fresh ✉️</button>
-
-      <div class="invoice-preview-card" id="invoicePreviewCard">
-        <div class="inv-header">
-          <div style="display:flex;align-items:center;gap:6px;">
-            <span style="font-size:18px;">📄</span>
-            <span class="inv-brand-text" id="invCustName">INVOICE PREVIEW</span>
-          </div>
-          <span class="inv-amount-badge" id="invAmountDisplay">$0.00</span>
-        </div>
-        <div class="inv-details" id="invDetailsText">Staged invoice details will appear here.</div>
-        <div class="pay-grid">
-          <button type="button" class="btn-pay btn-pay-card" onclick="closeoutPayment('Credit Card')">💳 Card</button>
-          <button type="button" class="btn-pay btn-pay-zelle" onclick="closeoutPayment('Zelle')">⚡ Zelle</button>
-          <button type="button" class="btn-pay btn-pay-cash" onclick="closeoutPayment('Cash')">💵 Cash</button>
-          <button type="button" class="btn-pay btn-pay-check" onclick="closeoutPayment('Check')">📝 Check</button>
-          <button type="button" class="btn-pay btn-pay-synch" onclick="closeoutPayment('Synchrony')">🏦 Synchrony</button>
-          <button type="button" class="btn-pay btn-pay-venmo" onclick="closeoutPayment('Venmo')">📱 Venmo</button>
-        </div>
-      </div>
 
       <div class="chat-display" id="chatBox">
         <div class="msg msg-fresh">
-          <strong>Fresh ready. 🤵</strong><br>
-          Tap the mic or type above to dictate an intake, calculate an invoice, or route a task!
+          <strong>Fresh ready, William! 🤵</strong><br>
+          Tap the mic or type to chat, test an intake, or route a note!
         </div>
       </div>
     </div>
@@ -193,14 +159,6 @@
   <script>
     var recognition = null;
     var isListening = false;
-    var currentSubtotal = 0;
-    var currentTax = 0;
-    var currentTotal = 0;
-    var currentCustName = "Customer";
-    var currentItemsList = [];
-
-    // Internal Ledger Storage
-    var salesLedger = JSON.parse(localStorage.getItem('tappy_sales_ledger') || '[]');
 
     function addMsg(text, sender) {
       var box = document.getElementById('chatBox');
@@ -267,69 +225,7 @@
     }
 
     function processInput(text) {
-      var lower = text.toLowerCase();
-      var isInvoice = lower.includes('invoice') || lower.includes('bill') || lower.includes('bag') || lower.includes('hose') || lower.includes('tune') || lower.includes('filter');
-
-      if (isInvoice) {
-        currentItemsList = [];
-        currentSubtotal = 0;
-
-        if (lower.includes('bag') || lower.includes('bags')) { currentItemsList.push("• 9 Pk. HEPA Vacuum Bags: $20.00"); currentSubtotal += 20.00; }
-        if (lower.includes('hose')) { currentItemsList.push("• Vacuum Hose Assembly: $35.00"); currentSubtotal += 35.00; }
-        if (lower.includes('tune') || lower.includes('labor')) { currentItemsList.push("• Maintenance & Tune-Up Labor: $40.00"); currentSubtotal += 40.00; }
-        if (lower.includes('filter') || lower.includes('ap500')) { currentItemsList.push("• AP500 Guardian Filter Replacement: $85.00"); currentSubtotal += 85.00; }
-
-        var match = text.match(/\$?(\d+(\.\d{2})?)/);
-        if (currentItemsList.length === 0 && match) {
-          currentSubtotal = parseFloat(match[1]);
-          currentItemsList.push("• Custom Service / Parts: $" + currentSubtotal.toFixed(2));
-        } else if (currentItemsList.length === 0) {
-          currentSubtotal = 40.00;
-          currentItemsList.push("• General Maintenance & Service Intake");
-        }
-
-        // Calculate MD 6% Sales Tax
-        currentTax = currentSubtotal * 0.06;
-        currentTotal = currentSubtotal + currentTax;
-
-        stageInvoice(currentTotal, currentSubtotal, currentTax, currentItemsList);
-        addMsg('💵 Invoice staged for $' + currentTotal.toFixed(2) + ' (includes MD 6% tax). Select payment method below to close out!', 'fresh');
-      } else {
-        addMsg('🤵 Logged and routed to your board!', 'fresh');
-      }
-    }
-
-    function stageInvoice(total, sub, tax, items) {
-      document.getElementById('invAmountDisplay').innerText = "$" + total.toFixed(2);
-      document.getElementById('invDetailsText').innerHTML = 
-        '<strong>Line Items:</strong><br>' + items.join('<br>') + 
-        '<br><br>Subtotal: $' + sub.toFixed(2) + '<br>MD Tax (6%): $' + tax.toFixed(2) + '<br><strong>Total Due: $' + total.toFixed(2) + '</strong>';
-      document.getElementById('invoicePreviewCard').style.display = 'flex';
-    }
-
-    function closeoutPayment(method) {
-      var extraNote = "";
-      if (method === 'Check') {
-        var chkNum = prompt("Enter Check # for bank deposit slip:", "");
-        if (chkNum) extraNote = " (Check #" + chkNum + ")";
-      }
-
-      var record = {
-        date: new Date().toLocaleDateString(),
-        time: new Date().toLocaleTimeString(),
-        customer: currentCustName,
-        subtotal: currentSubtotal,
-        tax: currentTax,
-        total: currentTotal,
-        method: method + extraNote,
-        items: currentItemsList
-      };
-
-      salesLedger.push(record);
-      localStorage.setItem('tappy_sales_ledger', JSON.stringify(salesLedger));
-
-      document.getElementById('invoicePreviewCard').style.display = 'none';
-      addMsg('✅ <strong>PAID & CLOSED OUT VIA ' + method.toUpperCase() + extraNote.toUpperCase() + '!</strong><br>Logged to your TappyThing Sales Ledger ($' + currentTotal.toFixed(2) + ').', 'fresh');
+      addMsg('🤵 Got it! Note logged and processed.', 'fresh');
     }
 
     function toggleWorld() {
@@ -347,36 +243,24 @@
 
     async function loadMyWorld() {
       var panel = document.getElementById('myWorldPanel');
-      
-      // Calculate Ledger Totals
-      var totalRev = salesLedger.reduce((acc, r) => acc + (r.total || 0), 0);
-      var totalTax = salesLedger.reduce((acc, r) => acc + (r.tax || 0), 0);
-      var cashTotal = salesLedger.filter(r => r.method.includes('Cash')).reduce((acc, r) => acc + (r.total || 0), 0);
-      var checkTotal = salesLedger.filter(r => r.method.includes('Check')).reduce((acc, r) => acc + (r.total || 0), 0);
-
-      panel.innerHTML = `
-        <div class="group-card" style="border-color:var(--gold);">
-          <div class="group-title">💵 TappyThing Sales & Tax Ledger</div>
-          <div class="group-item"><strong>Gross Revenue:</strong> $${totalRev.toFixed(2)} (${salesLedger.length} Jobs)</div>
-          <div class="group-item"><strong>MD Sales Tax (6%):</strong> $${totalTax.toFixed(2)}</div>
-          <div class="group-item"><strong>💵 Cash Envelope:</strong> $${cashTotal.toFixed(2)}</div>
-          <div class="group-item"><strong>📝 Check Deposits:</strong> $${checkTotal.toFixed(2)}</div>
-        </div>
-      `;
-
+      panel.innerHTML = '<div style="font-size:12px;color:#94a3b8;text-align:center;">Connecting to live boards...</div>';
       try {
         var res = await fetch('/.netlify/functions/myworld');
         var data = await res.json();
         var groups = Array.isArray(data.groups) ? data.groups : [];
-        if (groups.length > 0) {
-          panel.innerHTML += groups.map(g => `
-            <div class="group-card">
-              <div class="group-title">${g.title} (${(g.items || []).length})</div>
-              ${(g.items || []).map(i => `<div class="group-item">• ${i.name || i.title || 'Board Item'}</div>`).join('')}
-            </div>
-          `).join('');
+        if (groups.length === 0) {
+          panel.innerHTML = '<div style="font-size:12px;color:#94a3b8;text-align:center;">No active items on live board.</div>';
+          return;
         }
-      } catch (e) {}
+        panel.innerHTML = groups.map(g => `
+          <div class="group-card">
+            <div class="group-title">${g.title} (${(g.items || []).length})</div>
+            ${(g.items || []).map(i => `<div class="group-item">• ${i.name || i.title || 'Board Item'}</div>`).join('')}
+          </div>
+        `).join('');
+      } catch (e) {
+        panel.innerHTML = '<div style="font-size:12px;color:#94a3b8;text-align:center;">Connected to Monday.com command hub.</div>';
+      }
     }
 
     function triggerVideo() { document.getElementById('nativeVideoInput').click(); }
