@@ -111,7 +111,7 @@
 <div class="chat-display-box" id="chatDisplayBox">
   <div class="chat-msg msg-fresh">
     <strong>Fresh ready.</strong><br>
-    Tap the mic or type above. Dictate a repair, customer invoice, or note!
+    Tap the mic or type above. Tell me who we are billing and what items they need!
   </div>
 </div>
 
@@ -158,7 +158,6 @@ function appendChat(text, sender) {
 function processInvoiceInput(text) {
   const lower = text.toLowerCase();
   
-  // Extract Customer Name if provided
   const nameMatch = text.match(/(?:for|customer)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
   if (nameMatch) {
     currentInvoiceState.customer = nameMatch[1];
@@ -167,7 +166,6 @@ function processInvoiceInput(text) {
   let items = [];
   let total = 0;
 
-  // Real price lookup logic matching Aerus price book
   if (lower.includes('bag') || lower.includes('bags')) { items.push("• 9 Pk. Clean Obsessed HEPA Bags: $20.00"); total += 20.00; }
   if (lower.includes('hose')) { items.push("• Vacuum Hose Assembly: $35.00"); total += 35.00; }
   if (lower.includes('tune') || lower.includes('labor')) { items.push("• Equipment Labor & Maintenance: $40.00"); total += 40.00; }
