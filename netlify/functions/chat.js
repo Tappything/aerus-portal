@@ -1,33 +1,32 @@
 exports.handler = async (event, context) => {
-  // Only allow POST requests
-  if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: "Method Not Allowed" })
-    };
+  const headers = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Content-Type": "application/json"
+  };
+
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 200, headers, body: "" };
   }
 
   try {
     const data = JSON.parse(event.body || "{}");
     const userMessage = data.message || data.body || "";
-
-    // Simple echo / response logic for intake
-    let reply = "Got it! Logged and routed to your board.";
     
-    const lower = userMessage.toLowerCase();
-    if (lower.includes("invoice") || lower.includes("bill")) {
-      reply = "Invoice request received. Staging line items on screen.";
-    }
-
     return {
       statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ reply: reply, received: userMessage })
+      headers,
+      body: JSON.stringify({
+        reply: "Received! Logged to your board.",
+        received: userMessage
+      })
     };
   } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Failed to process request", details: err.message })
+      headers,
+      body: JSON.stringify({ error: err.message })
     };
   }
 };
