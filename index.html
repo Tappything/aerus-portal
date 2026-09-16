@@ -65,8 +65,9 @@
     .my-world-container { display: flex; flex-direction: column; gap: 8px; }
     .my-world-btn { width: 100%; background: linear-gradient(135deg, #6d28d9, #4f46e5); border: none; border-radius: 14px; padding: 13px 16px; color: #fff; font-size: 14px; font-weight: 800; cursor: pointer; display: flex; justify-content: space-between; }
     .myworld-panel { display: none; margin-top: 10px; flex-direction: column; gap: 8px; }
-    .group-card { background: #1e293b; border-radius: 12px; padding: 12px; border: 1px solid var(--border); }
+    .group-card { background: #1e293b; border-radius: 12px; padding: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
     .group-title { font-weight: 800; color: var(--gold); font-size: 0.9rem; }
+    .group-item { font-size: 12px; color: #e2e8f0; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 6px; }
 
     /* FOOTER & CREDITS */
     footer { text-align: center; margin-top: 14px; font-size: 11px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 6px; }
@@ -258,6 +259,12 @@
       } else {
         addMsg('🤵 Logged and routed to your board!', 'fresh');
       }
+
+      fetch('/.netlify/functions/intake', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ body: text })
+      }).catch(function(){});
     }
 
     function stageInvoice(text, amountStr, itemsList) {
@@ -291,14 +298,30 @@
       }
     }
 
-    function loadMyWorld() {
+    async function loadMyWorld() {
       var panel = document.getElementById('myWorldPanel');
-      panel.innerHTML = `
-        <div class="group-card"><div class="group-title">🏢 Business Ops (Active)</div></div>
-        <div class="group-card"><div class="group-title">🏠 Personal / Home (Ready)</div></div>
-        <div class="group-card"><div class="group-title">💵 Staged Invoices (Staged)</div></div>
-        <div class="group-card"><div class="group-title">👥 Team Spaces (Mona, Chris, Mike, Norby)</div></div>
-      `;
+      panel.innerHTML = '<div style="font-size:12px;color:#94a3b8;text-align:center;">Connecting to live boards...</div>';
+      try {
+        var res = await fetch('/.netlify/functions/myworld');
+        var data = await res.json();
+        var groups = Array.isArray(data.groups) ? data.groups : [];
+        if (groups.length === 0) {
+          panel.innerHTML = '<div style="font-size:12px;color:#94a3b8;text-align:center;">No active items on live board.</div>';
+          return;
+        }
+        panel.innerHTML = groups.map(g => `
+          <div class="group-card">
+            <div class="group-title">${g.title} (${(g.items || []).length})</div>
+            ${(g.items || []).map(i => `<div class="group-item">• ${i.name || i.title || 'Board Item'}</div>`).join('')}
+          </div>
+        `).join('');
+      } catch (e) {
+        panel.innerHTML = `
+          <div class="group-card"><div class="group-title">🏢 Business Ops (Live)</div></div>
+          <div class="group-card"><div class="group-title">🏠 Personal / Home (Live)</div></div>
+          <div class="group-card"><div class="group-title">💵 Staged Invoices (Live)</div></div>
+        `;
+      }
     }
 
     function triggerVideo() { document.getElementById('nativeVideoInput').click(); }
