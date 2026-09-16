@@ -72,8 +72,9 @@
     footer { text-align: center; margin-top: 14px; font-size: 11px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 6px; }
     .credits-link { color: var(--gold); text-decoration: none; font-weight: 700; cursor: pointer; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 4px 10px; border-radius: 999px; }
     .credits-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.95); z-index: 99999; justify-content: center; align-items: center; }
-    .btn-close-creds { position: absolute; top: 20px; right: 20px; background: #1e293b; border: 1px solid var(--gold); color: #fff; padding: 6px 12px; border-radius: 999px; cursor: pointer; }
-    .credits-scroll { position: absolute; width: 90%; max-width: 400px; text-align: center; color: #fff; }
+    .btn-close-creds { position: absolute; top: 20px; right: 20px; background: #1e293b; border: 1px solid var(--gold); color: #fff; padding: 6px 12px; border-radius: 999px; cursor: pointer; z-index: 100001; }
+    .credits-scroll { position: absolute; width: 90%; max-width: 400px; text-align: center; color: #fff; animation: roll 18s linear infinite; }
+    @keyframes roll { 0% { top: 100%; } 100% { top: -110%; } }
   </style>
 </head>
 <body>
@@ -152,12 +153,13 @@
   <div class="credits-overlay" id="creditsOverlay">
     <button type="button" class="btn-close-creds" onclick="closeCredits()">✕ Close</button>
     <div class="credits-scroll">
-      <div style="font-size: 20px; font-weight: 900; color: #f59e0b; margin-bottom: 6px;">⭐ TAPPYTHING PRODUCTIONS ⭐</div>
-      <div style="font-size: 13px; color: #93c5fd; margin-bottom: 20px;">Creator & Producer<br><strong>WILLIAM SULLIVAN</strong></div>
+      <div style="font-size: 20px; font-weight: 900; color: #f59e0b; margin-bottom: 12px;">⭐ TAPPYTHING PRODUCTIONS ⭐</div>
       <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Digital Coordinator</div>
-      <div style="font-size: 16px; font-weight: 800;">FRESH</div>
-      <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase; margin-top: 12px;">Creative Spirit</div>
-      <div style="font-size: 16px; font-weight: 800;">ROB ART (🐷)</div>
+      <div style="font-size: 16px; font-weight: 800; margin-bottom: 12px;">FRESH</div>
+      <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Creative Spirit</div>
+      <div style="font-size: 16px; font-weight: 800; margin-bottom: 12px;">ROB ART (🐷)</div>
+      <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Aerus Timonium Crew</div>
+      <div style="font-size: 14px; color: #f59e0b; margin-top: 4px;">Mona • Chris • Mike • Norby</div>
     </div>
   </div>
 
@@ -245,6 +247,9 @@
         if (items.length === 0 && match) {
           total = parseFloat(match[1]);
           items.push("• Custom Service / Part: $" + total.toFixed(2));
+        } else if (items.length === 0) {
+          items.push("• Custom Staged Service / Intake");
+          total = 40.00;
         }
 
         var totalStr = "$" + total.toFixed(2);
@@ -279,10 +284,21 @@
       if (panel.style.display === 'none' || !panel.style.display) {
         panel.style.display = 'flex';
         arrow.innerText = '▲';
+        loadMyWorld();
       } else {
         panel.style.display = 'none';
         arrow.innerText = '▼';
       }
+    }
+
+    function loadMyWorld() {
+      var panel = document.getElementById('myWorldPanel');
+      panel.innerHTML = `
+        <div class="group-card"><div class="group-title">🏢 Business Ops (Active)</div></div>
+        <div class="group-card"><div class="group-title">🏠 Personal / Home (Ready)</div></div>
+        <div class="group-card"><div class="group-title">💵 Staged Invoices (Staged)</div></div>
+        <div class="group-card"><div class="group-title">👥 Team Spaces (Mona, Chris, Mike, Norby)</div></div>
+      `;
     }
 
     function triggerVideo() { document.getElementById('nativeVideoInput').click(); }
