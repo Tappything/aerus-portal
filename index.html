@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-  <title>TappyThing — Digital Coordinator</title>
+  <title>TappyThing — Command Center</title>
   <style>
     :root {
       --bg: #0b1120;
@@ -39,7 +39,7 @@
     .type-section button { margin-top: 8px; width: 100%; padding: 12px; font-size: 0.95rem; font-weight: 800; border-radius: 8px; border: none; background: var(--green); color: #fff; cursor: pointer; }
 
     /* LIVE CHAT DISPLAY BOX */
-    .chat-display-box { background: #090d16; border: 1px solid var(--border); border-radius: 14px; padding: 10px; max-height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+    .chat-display-box { background: #090d16; border: 1px solid var(--border); border-radius: 14px; padding: 10px; max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
     .chat-msg { padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; line-height: 1.4; max-width: 90%; }
     .msg-fresh { background: #1e293b; border-left: 3px solid var(--purple); color: #e2e8f0; align-self: flex-start; }
     .msg-user { background: #4338ca; color: #fff; align-self: flex-end; }
@@ -91,14 +91,14 @@
 </div>
 
 <div class="type-section" id="typeSection">
-  <textarea id="typeInput" rows="3" placeholder="Ask Fresh something or dictate an invoice (e.g. Invoice for Beth Rose tune-up $75)..."></textarea>
+  <textarea id="typeInput" rows="3" placeholder="Speak or type (e.g. Invoice for Beth Rose: 1 pack HEPA bags, 1 hose)..."></textarea>
   <button onclick="sendTyped()">Send to Fresh ✉️</button>
 </div>
 
 <!-- GOLD INVOICE DISPLAY CARD -->
 <div class="invoice-card" id="invoiceCard">
   <div class="inv-head">
-    <span>📄 INVOICE PREVIEW</span>
+    <span id="invCustName">📄 INVOICE PREVIEW</span>
     <span id="invAmount">$0.00</span>
   </div>
   <div class="inv-body" id="invBodyText">Customer details & line items staged here.</div>
@@ -110,8 +110,8 @@
 <!-- LIVE CHAT DISPLAY BOX -->
 <div class="chat-display-box" id="chatDisplayBox">
   <div class="chat-msg msg-fresh">
-    <strong>Ask Fresh something...</strong><br>
-    Tap the mic or type above to log notes, dictate invoices, or manage bench tasks!
+    <strong>Fresh ready.</strong><br>
+    Tap the mic or type above. Dictate a repair, customer invoice, or note!
   </div>
 </div>
 
@@ -143,6 +143,7 @@
 const WEBHOOK='https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei';
 let myWorldLoaded=false;
 let lastInvoiceText = "";
+let currentInvoiceState = { customer: "", items: [] };
 
 function appendChat(text, sender) {
   const box = document.getElementById('chatDisplayBox');
@@ -154,35 +155,43 @@ function appendChat(text, sender) {
   box.scrollTop = box.scrollHeight;
 }
 
-function checkAndStageInvoice(text) {
+function processInvoiceInput(text) {
   const lower = text.toLowerCase();
-  const isInv = lower.includes('invoice') || lower.includes('bill') || lower.includes('pack') || lower.includes('bag') || lower.includes('hose') || lower.includes('$');
   
-  if (isInv) {
-    let items = [];
-    let total = 0;
-    
-    if (lower.includes('bag') || lower.includes('bags')) { items.push("• Filter Bags Pack: $24.95"); total += 24.95; }
-    if (lower.includes('hose')) { items.push("• Classic Machine Hose Assembly: $65.00"); total += 65.00; }
-    if (lower.includes('tune-up') || lower.includes('service')) { items.push("• Complete Bench Tune-Up: $75.00"); total += 75.00; }
-    
-    const match = text.match(/\$?(\d+(\.\d{2})?)/);
-    if (items.length === 0 && match) {
-      total = parseFloat(match[1]);
-      items.push("• Custom Service / Item: $" + total.toFixed(2));
-    } else if (items.length === 0) {
-      items.push("• Staged Dictation: " + text);
-    }
+  // Extract Customer Name if provided
+  const nameMatch = text.match(/(?:for|customer)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
+  if (nameMatch) {
+    currentInvoiceState.customer = nameMatch[1];
+  }
 
-    const totalStr = total > 0 ? "$" + total.toFixed(2) : "Staged";
-    lastInvoiceText = "TAPPYTHING INVOICE STAGED\n" + items.join("\n") + "\nTotal: " + totalStr + "\nDictation: " + text;
+  let items = [];
+  let total = 0;
+
+  // Real price lookup logic matching Aerus price book
+  if (lower.includes('bag') || lower.includes('bags')) { items.push("• 9 Pk. Clean Obsessed HEPA Bags: $20.00"); total += 20.00; }
+  if (lower.includes('hose')) { items.push("• Vacuum Hose Assembly: $35.00"); total += 35.00; }
+  if (lower.includes('tune') || lower.includes('labor')) { items.push("• Equipment Labor & Maintenance: $40.00"); total += 40.00; }
+  
+  const matchPrice = text.match(/\$?(\d+(\.\d{2})?)/);
+  if (items.length === 0 && matchPrice) {
+    total = parseFloat(matchPrice[1]);
+    items.push("• Custom Service / Part: $" + total.toFixed(2));
+  }
+
+  if (items.length > 0 || currentInvoiceState.customer) {
+    const custName = currentInvoiceState.customer || "Customer Invoice";
+    const totalStr = "$" + total.toFixed(2);
+    
+    lastInvoiceText = "TAPPYTHING INVOICE\nCustomer: " + custName + "\n" + items.join("\n") + "\nTotal: " + totalStr;
     
     const card = document.getElementById('invoiceCard');
+    const custEl = document.getElementById('invCustName');
     const amtEl = document.getElementById('invAmount');
     const bodyEl = document.getElementById('invBodyText');
     
+    if(custEl) custEl.innerText = "📄 " + custName.toUpperCase();
     if(amtEl) amtEl.innerText = totalStr;
-    if(bodyEl) bodyEl.innerHTML = '<strong>Staged Line Items:</strong><br>' + items.join('<br>') + '<br><br><em>Dictation: "' + text + '"</em>';
+    if(bodyEl) bodyEl.innerHTML = '<strong>Line Items:</strong><br>' + (items.length > 0 ? items.join('<br>') : '<em>Dictate items (e.g., bags, hose, labor)...</em>');
     if(card) card.style.display = 'flex';
   }
 }
@@ -192,26 +201,13 @@ function copyInvoice() {
     alert("No invoice staged to copy.");
     return;
   }
-  
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(lastInvoiceText).then(() => {
-      alert("Invoice details copied successfully!");
-    }).catch(() => {
-      fallbackCopy(lastInvoiceText);
-    });
-  } else {
-    fallbackCopy(lastInvoiceText);
-  }
-}
-
-function fallbackCopy(text) {
   const ta = document.createElement('textarea');
-  ta.value = text;
+  ta.value = lastInvoiceText;
   document.body.appendChild(ta);
   ta.select();
   document.execCommand('copy');
   document.body.removeChild(ta);
-  alert("Invoice details copied!");
+  alert("Invoice details copied to clipboard!");
 }
 
 async function toggleMyWorld(){
@@ -325,18 +321,28 @@ async function sendVid(){
 
 async function sendToFresh(userMessage){
   appendChat(userMessage, 'user');
-  checkAndStageInvoice(userMessage);
+  processInvoiceInput(userMessage);
+  
+  const lower = userMessage.toLowerCase();
+  if (lower === 'invoice' || lower === 'i need an invoice' || lower === 'create invoice') {
+    const promptReply = "Who is the invoice for, and what items or services are we billing?";
+    appendChat('🤵 ' + promptReply, 'fresh');
+    const utter = new SpeechSynthesisUtterance(promptReply);
+    window.speechSynthesis.speak(utter);
+    return;
+  }
+
   try{
     const res=await fetch('/.netlify/functions/intake',{method:'POST',
       headers:{'Content-Type':'application/json'},body:JSON.stringify({body:userMessage})});
     const data=await res.json();
-    const reply=data.reply||"Staged and logged to board.";
+    const reply=data.reply||"Staged to your board.";
     appendChat('🤵 ' + reply, 'fresh');
     const utter=new SpeechSynthesisUtterance(reply);utter.rate=0.95;utter.pitch=1.05;
     window.speechSynthesis.speak(utter);
   }catch(e){
     console.error('sendToFresh error:',e);
-    appendChat("🤵 Logged and routed!", "fresh");
+    appendChat("🤵 Logged and routed to board!", "fresh");
   }
 }
 
