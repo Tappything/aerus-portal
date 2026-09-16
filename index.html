@@ -166,17 +166,15 @@ function checkAndStageInvoice(text) {
     if (lower.includes('hose')) { items.push("• Classic Machine Hose Assembly: $65.00"); total += 65.00; }
     if (lower.includes('tune-up') || lower.includes('service')) { items.push("• Complete Bench Tune-Up: $75.00"); total += 75.00; }
     
-    // Explicit dollar match fallback
     const match = text.match(/\$?(\d+(\.\d{2})?)/);
     if (items.length === 0 && match) {
       total = parseFloat(match[1]);
       items.push("• Custom Service / Item: $" + total.toFixed(2));
     } else if (items.length === 0) {
-      items.push("• Dictated Item(s): " + text);
-      total = 40.00;
+      items.push("• Staged Dictation: " + text);
     }
 
-    const totalStr = "$" + total.toFixed(2);
+    const totalStr = total > 0 ? "$" + total.toFixed(2) : "Staged";
     lastInvoiceText = "TAPPYTHING INVOICE STAGED\n" + items.join("\n") + "\nTotal: " + totalStr + "\nDictation: " + text;
     
     const card = document.getElementById('invoiceCard');
@@ -332,7 +330,7 @@ async function sendToFresh(userMessage){
     const res=await fetch('/.netlify/functions/intake',{method:'POST',
       headers:{'Content-Type':'application/json'},body:JSON.stringify({body:userMessage})});
     const data=await res.json();
-    const reply=data.reply||"Got it — I'll take care of that.";
+    const reply=data.reply||"Staged and logged to board.";
     appendChat('🤵 ' + reply, 'fresh');
     const utter=new SpeechSynthesisUtterance(reply);utter.rate=0.95;utter.pitch=1.05;
     window.speechSynthesis.speak(utter);
