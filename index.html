@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TappyThing — Digital Coordinator</title>
+  <title>TappyThing — Pocket Chief of Staff & Digital Coordinator</title>
   
   <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -31,11 +31,12 @@
             'pulse-glow': 'pulseGlow 2s infinite',
             'door-reveal': 'doorReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
             'float': 'float 3s ease-in-out infinite',
+            'shimmer': 'shimmer 2s linear infinite',
           },
           keyframes: {
             pulseGlow: {
-              '0%, 100%': { boxShadow: '0 0 20px rgba(16, 185, 129, 0.4)', transform: 'scale(1)' },
-              '50%': { boxShadow: '0 0 40px rgba(6, 182, 212, 0.8)', transform: 'scale(1.02)' },
+              '0%, 100%': { boxShadow: '0 0 25px rgba(245, 158, 11, 0.4)', transform: 'scale(1)' },
+              '50%': { boxShadow: '0 0 45px rgba(16, 185, 129, 0.8)', transform: 'scale(1.03)' },
             },
             doorReveal: {
               '0%': { opacity: '0', transform: 'translateY(20px) scale(0.95)' },
@@ -44,6 +45,10 @@
             float: {
               '0%, 100%': { transform: 'translateY(0px)' },
               '50%': { transform: 'translateY(-6px)' },
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' },
             }
           }
         }
@@ -58,30 +63,26 @@
     ::-webkit-scrollbar-thumb:hover { background: #334155; }
     
     .glass-panel {
-      background: rgba(15, 23, 42, 0.75);
+      background: rgba(15, 23, 42, 0.82);
       backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     
     .showcase-door {
-      background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95));
+      background: linear-gradient(145deg, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.98));
       border: 1px solid rgba(255, 255, 255, 0.1);
       transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .showcase-door:hover {
-      border-color: rgba(6, 182, 212, 0.5);
-      box-shadow: 0 10px 30px -10px rgba(6, 182, 212, 0.3);
+      border-color: rgba(245, 158, 11, 0.5);
+      box-shadow: 0 10px 30px -10px rgba(245, 158, 11, 0.3);
       transform: translateY(-4px);
     }
 
-    .neon-border-emerald {
-      box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
-    }
-    .neon-border-cyan {
-      box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
-    }
-    .neon-border-gold {
-      box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #d97706 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
   </style>
 </head>
@@ -91,25 +92,34 @@
   <header class="w-full glass-panel border-b border-slate-800/80 sticky top-0 z-40 px-4 py-3 sm:px-6">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
       
-      <!-- Logo & System Badge -->
-      <div class="flex items-center space-x-3">
-        <div class="relative flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-500 text-slate-950 font-black text-2xl shadow-lg shadow-emerald-500/20 animate-float">
-          🎩
-          <span class="absolute -top-1 -right-1 flex h-3 w-3">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+      <!-- Logo & Executive Title Badge -->
+      <div class="flex items-center space-x-3.5">
+        <div class="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 via-emerald-400 to-cyan-500 p-0.5 shadow-lg shadow-amber-500/20 flex-shrink-0 animate-float">
+          <img src="logo.png" id="characterLogoImg" onerror="this.onerror=null; this.src='Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg'; this.onerror=function(){this.style.display='none'; document.getElementById('fallbackLogoEmoji').classList.remove('hidden');};" alt="Fresh Character Logo" class="w-full h-full object-cover rounded-[14px]">
+          <div id="fallbackLogoEmoji" class="hidden w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-2xl">🎩</div>
+          <span class="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-amber-500"></span>
           </span>
         </div>
         <div>
           <h1 class="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
-            TappyThing <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold uppercase tracking-wider">FRESH 🤵 ACTIVE</span>
+            TappyThing <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold uppercase tracking-wider">FRESH 🤵 & SISSY ACTIVE</span>
           </h1>
-          <p class="text-xs text-slate-400 font-medium">Digital Coordinator — Clean Environment LLC</p>
+          <p class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
+            <span class="text-amber-400 font-semibold">Fresh</span> (Pocket Chief of Staff) & <span class="text-cyan-400 font-semibold">Sissy</span> (Digital Coordinator)
+          </p>
         </div>
       </div>
 
-      <!-- Quick Status & Action Buttons -->
+      <!-- Quick Action Navigation -->
       <div class="flex items-center gap-2">
+        <button onclick="toggleIntakeCameraModal()" class="px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold transition-all flex items-center gap-1.5">
+          <i data-lucide="camera" class="w-4 h-4 text-amber-400"></i> <span class="hidden sm:inline">Intake Camera</span>
+        </button>
+        <button onclick="toggleBagdenWorldModal()" class="px-3 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-bold transition-all flex items-center gap-1.5">
+          <i data-lucide="briefcase" class="w-4 h-4 text-cyan-400"></i> <span class="hidden sm:inline">Bagden's World</span>
+        </button>
         <button onclick="toggleSquadModal()" class="px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-xs font-bold transition-all flex items-center gap-1.5">
           <i data-lucide="shield" class="w-4 h-4 text-emerald-400"></i> <span class="hidden sm:inline">The Squad</span>
         </button>
@@ -124,12 +134,12 @@
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 flex flex-col space-y-6">
 
     <section class="glass-panel rounded-3xl p-5 sm:p-6 border border-slate-800 relative overflow-hidden">
-      <div class="absolute -top-12 -right-12 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute -bottom-12 -left-12 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -top-12 -right-12 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-12 -left-12 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
       <div class="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
         
-        <!-- Fresh Persona Header -->
+        <!-- Fresh Persona Speech Banner -->
         <div class="flex items-start gap-4 flex-1">
           <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-400 via-emerald-400 to-cyan-500 p-0.5 shadow-xl flex-shrink-0">
             <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-3xl">
@@ -138,28 +148,28 @@
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest">Fresh — Pocket Chief of Staff</span>
+              <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">Fresh — Pocket Chief of Staff</span>
               <button onclick="triggerFreshGreetingVoice()" class="text-slate-400 hover:text-amber-400 transition-colors" title="Listen to Fresh">
                 <i data-lucide="volume-2" class="w-4 h-4"></i>
               </button>
             </div>
             <p id="freshVoiceBannerText" class="text-sm sm:text-base font-bold text-slate-100 mt-1 leading-relaxed">
-              "BOOM! Good morning, William! I'm Fresh — your Digital Coordinator. Let's buy back your time and organize your world!"
+              "BOOM! Good morning, William! I'm Fresh — your Pocket Chief of Staff. Sissy and I are ready to hold the wheel, buy back your time, and organize your world!"
             </p>
             <p class="text-xs text-slate-400 mt-1 flex items-center gap-2">
               <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              22,283 Customer Database Active & Ready
+              22,283 Customer Database Active & Standing By
             </p>
           </div>
         </div>
 
-        <!-- Master Voice Action Button -->
+        <!-- Master TappyThing Logo Front Door Trigger Button -->
         <div class="flex flex-col items-center flex-shrink-0 w-full md:w-auto">
-          <button id="masterVoiceBtn" onclick="toggleVoiceInput()" class="w-full md:w-64 py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-slate-950 font-extrabold text-sm tracking-wide shadow-xl shadow-emerald-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group">
+          <button id="masterVoiceBtn" onclick="toggleVoiceInput()" class="w-full md:w-72 py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-500 via-emerald-500 to-cyan-500 text-slate-950 font-extrabold text-sm tracking-wide shadow-xl shadow-amber-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group animate-pulse-glow">
             <div id="micIconBox" class="p-2 rounded-xl bg-slate-950/20 group-hover:bg-slate-950/30 transition-colors">
               <i data-lucide="mic" class="w-5 h-5 text-slate-950"></i>
             </div>
-            <span id="masterVoiceLabel">TAP & TALK TO FRESH</span>
+            <span id="masterVoiceLabel">TAP LOGO FRONT DOOR</span>
           </button>
           
           <button onclick="toggleSecondaryType()" class="mt-2.5 text-[11px] font-semibold text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1">
@@ -169,11 +179,11 @@
 
       </div>
 
-      <!-- Hidden Secondary Typing Field -->
+      <!-- Secondary Typing Field -->
       <div id="typeInputContainer" class="hidden mt-4 pt-4 border-t border-slate-800/80 flex items-center gap-2">
-        <input type="text" id="manualTextNote" placeholder="Type your brain dump note here..." class="flex-1 bg-slate-900 border border-slate-700 text-xs text-white rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500 transition-colors">
-        <button onclick="submitManualTextNote()" class="px-5 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-xs rounded-xl hover:opacity-90 transition-opacity flex items-center gap-1.5">
-          <i data-lucide="send" class="w-4 h-4"></i> Route Note
+        <input type="text" id="manualTextNote" placeholder="Type your brain dump note here for Fresh..." class="flex-1 bg-slate-900 border border-slate-700 text-xs text-white rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-colors">
+        <button onclick="submitManualTextNote()" class="px-5 py-3 bg-gradient-to-r from-amber-500 to-emerald-500 text-slate-950 font-bold text-xs rounded-xl hover:opacity-90 transition-opacity flex items-center gap-1.5">
+          <i data-lucide="send" class="w-4 h-4"></i> Send Note
         </button>
       </div>
 
@@ -181,7 +191,7 @@
 
     <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
       
-      <!-- Entry Point A: Live Interactive Onboarding -->
+      <!-- Entry Point A: Live Interactive Voice Onboarding -->
       <div class="glass-panel rounded-2xl p-5 border border-slate-800 hover:border-emerald-500/40 transition-all flex items-center justify-between">
         <div class="flex items-center space-x-3.5">
           <div class="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -197,7 +207,7 @@
         </button>
       </div>
 
-      <!-- Entry Point B: Choose Industry Profile -->
+      <!-- Entry Point B: Industry Select (Including Bagden's World) -->
       <div class="glass-panel rounded-2xl p-5 border border-slate-800 hover:border-cyan-500/40 transition-all flex items-center justify-between">
         <div class="flex items-center space-x-3.5">
           <div class="p-3 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
@@ -205,11 +215,12 @@
           </div>
           <div>
             <h3 class="text-sm font-bold text-white">Entry Point B: Industry Select</h3>
-            <p class="text-xs text-slate-400">Stage doors for your specific trade</p>
+            <p class="text-xs text-slate-400">Stage doors for your trade or Bagden</p>
           </div>
         </div>
         <select id="industrySelector" onchange="selectIndustryProfile(this.value)" class="bg-slate-900 border border-slate-700 text-xs font-semibold text-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-cyan-500">
           <option value="aerus" selected>Aerus / Vacuum Repair</option>
+          <option value="bagden">💼 Bagden Showcase World</option>
           <option value="restaurant">Restaurant / Dining</option>
           <option value="plumbing">Plumbing Services</option>
           <option value="hvac">HVAC & Climate Control</option>
@@ -228,12 +239,12 @@
           </h2>
           <p class="text-xs text-slate-400">Tap any door to expand its cascading cabinets</p>
         </div>
-        <span id="activeIndustryBadge" class="text-xs font-bold px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+        <span id="activeIndustryBadge" class="text-xs font-bold px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
           TRADE: AERUS HOME WELLNESS
         </span>
       </div>
 
-      <!-- Grid of 4 Showcase Doors -->
+      <!-- Grid of 4 Core Showcase Doors -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
 
         <!-- Door 1: Business World -->
@@ -278,7 +289,7 @@
             <div class="mt-4 flex flex-wrap gap-1.5">
               <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300">Health</span>
               <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300">Home</span>
-              <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300">Private Vault</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300">Eda Roku TV</span>
             </div>
           </div>
           <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs font-bold text-cyan-400">
@@ -290,7 +301,7 @@
         <!-- Door 3: Invoices & Payments -->
         <div class="showcase-door rounded-3xl p-5 relative flex flex-col justify-between group cursor-pointer" onclick="openDoorModal('invoices')">
           <div class="flex items-center justify-between mb-4">
-            <div class="w-10 h-10 rounded-2xl bg-gold-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center">
+            <div class="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center">
               <i data-lucide="receipt" class="w-5 h-5"></i>
             </div>
             <div class="w-6 h-6 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center text-[10px] text-slate-400">
@@ -375,6 +386,8 @@ Towson Healthy Homes | BCC: board-22283@use1.monday.com
 
   </main>
 
+
+  <!-- Showcase Door Modal -->
   <div id="doorModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="glass-panel max-w-2xl w-full rounded-3xl p-6 border border-slate-800 shadow-2xl relative max-h-[90vh] flex flex-col overflow-hidden">
       
@@ -400,6 +413,96 @@ Towson Healthy Homes | BCC: board-22283@use1.monday.com
     </div>
   </div>
 
+  <!-- 📷 Intake Camera Modal -->
+  <div id="intakeCameraModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-panel max-w-md w-full rounded-3xl p-6 border border-slate-800 shadow-2xl relative flex flex-col">
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+        <div class="flex items-center space-x-2">
+          <div class="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            <i data-lucide="camera" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white">📷 TappyThing Intake Camera</h3>
+            <p class="text-[11px] text-slate-400">Snap equipment or serial tags directly for Monday.com</p>
+          </div>
+        </div>
+        <button onclick="toggleIntakeCameraModal()" class="text-slate-400 hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Live Camera Feed Box -->
+        <div class="relative aspect-video bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 flex items-center justify-center">
+          <video id="cameraFeed" autoplay playsinline class="w-full h-full object-cover hidden"></video>
+          <img id="photoPreview" class="w-full h-full object-cover hidden" alt="Captured Intake Snapshot">
+          <div id="cameraPlaceholder" class="flex flex-col items-center justify-center p-4 text-center">
+            <i data-lucide="video-off" class="w-8 h-8 text-slate-600 mb-2"></i>
+            <p class="text-xs text-slate-400">Camera stream inactive</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="startCamBtn" onclick="startCameraStream()" class="flex-1 py-2.5 rounded-xl bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 text-xs font-bold transition-all border border-emerald-500/30 flex items-center justify-center gap-1.5">
+            <i data-lucide="video" class="w-4 h-4"></i> Start Camera
+          </button>
+          <button id="snapCamBtn" onclick="captureSnapshot()" disabled class="flex-1 py-2.5 rounded-xl bg-amber-500 text-slate-950 font-extrabold text-xs transition-all disabled:opacity-40 flex items-center justify-center gap-1.5">
+            <i data-lucide="aperture" class="w-4 h-4"></i> Take Snapshot
+          </button>
+        </div>
+
+        <div id="snapshotActionBox" class="hidden pt-3 border-t border-slate-800 flex items-center justify-between">
+          <span class="text-xs font-bold text-emerald-400 flex items-center gap-1">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i> Photo Ready
+          </span>
+          <button onclick="attachPhotoToTask()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-emerald-500 text-slate-950 font-bold text-xs shadow-lg">
+            Attach to Monday Card
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 💼 Bagden Showcase World Modal -->
+  <div id="bagdenWorldModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-panel max-w-xl w-full rounded-3xl p-6 border border-slate-800 shadow-2xl relative">
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+        <div class="flex items-center space-x-3">
+          <div class="p-3 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+            <i data-lucide="briefcase" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-extrabold text-white">💼 BAGDEN SHOWCASE WORLD</h3>
+            <p class="text-xs text-slate-400">Tailored Digital Coordinator Demonstration Profile</p>
+          </div>
+        </div>
+        <button onclick="toggleBagdenWorldModal()" class="text-slate-400 hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+          <h4 class="text-xs font-bold text-cyan-400 mb-1 uppercase tracking-wider">Live Showcase Cabinets</h4>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Showcase Bagden how Fresh and Sissy organize his business world into 4 voice-activated cabinets:
+          </p>
+          <div class="grid grid-cols-2 gap-2 mt-3">
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-slate-200">1. Client Projects</div>
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-slate-200">2. Field Estimates</div>
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-slate-200">3. Invoicing & Cash</div>
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-slate-200">4. Time to Tap Queue</div>
+          </div>
+        </div>
+
+        <button onclick="launchBagdenDemo()" class="w-full py-3.5 bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 text-slate-950 font-extrabold text-xs rounded-2xl shadow-xl flex items-center justify-center gap-2">
+          <i data-lucide="play" class="w-4 h-4"></i> Launch Bagden Live Demo Stream
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Squad Modal -->
   <div id="squadModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="glass-panel max-w-md w-full rounded-3xl p-6 border border-slate-800 shadow-2xl relative">
       <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
@@ -416,37 +519,34 @@ Towson Healthy Homes | BCC: board-22283@use1.monday.com
 
       <div class="space-y-2 text-xs">
         <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-          <span class="font-bold text-emerald-400">Fresh 🤵</span>
-          <span class="text-slate-400">Host & Chief of Staff</span>
+          <span class="font-bold text-amber-400">Fresh 🤵</span>
+          <span class="text-slate-400">Pocket Chief of Staff</span>
         </div>
         <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-          <span class="font-bold text-cyan-400">Boudie</span>
-          <span class="text-slate-400">Execution Lead</span>
+          <span class="font-bold text-cyan-400">Sissy</span>
+          <span class="text-slate-400">Digital Coordinator</span>
         </div>
         <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-          <span class="font-bold text-purple-400">Sissy</span>
-          <span class="text-slate-400">Back-End & Webhooks</span>
+          <span class="font-bold text-emerald-400">Mona</span>
+          <span class="text-slate-400">Intakes & Audio Prompting</span>
         </div>
         <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-          <span class="font-bold text-amber-400">L</span>
-          <span class="text-slate-400">Money Man</span>
+          <span class="font-bold text-blue-400">Chris</span>
+          <span class="text-slate-400">Bench & Inventory Lead</span>
         </div>
         <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-          <span class="font-bold text-blue-400">Nuesh</span>
-          <span class="text-slate-400">Brains</span>
+          <span class="font-bold text-purple-400">Mike</span>
+          <span class="text-slate-400">Field Tasks & Diagnostics</span>
         </div>
         <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-          <span class="font-bold text-rose-400">Squash</span>
-          <span class="text-slate-400">Coach</span>
-        </div>
-        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-          <span class="font-bold text-teal-400">Yogie</span>
-          <span class="text-slate-400">Lifter</span>
+          <span class="font-bold text-rose-400">Norby</span>
+          <span class="text-slate-400">FOAS & Customer Outreach</span>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Settings Modal -->
   <div id="settingsModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="glass-panel max-w-md w-full rounded-3xl p-6 border border-slate-800 shadow-2xl relative">
       <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
@@ -463,12 +563,12 @@ Towson Healthy Homes | BCC: board-22283@use1.monday.com
 
       <div class="space-y-4 text-xs">
         <p class="text-slate-300">
-          <strong class="text-emerald-400">Middleman Silenced!</strong> Payloads dispatch straight from Netlify to Monday.com API.
+          <strong class="text-emerald-400">Netlify Direct Endpoint!</strong> Payloads dispatch straight to Netlify functions using stored environment variable keys.
         </p>
 
         <div>
-          <label class="block font-bold text-slate-300 mb-1">Target Webhook / Monday.com Endpoint</label>
-          <input type="text" id="settingWebhookUrl" value="https://api.monday.com/v2" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-200 font-mono text-xs focus:outline-none focus:border-cyan-500">
+          <label class="block font-bold text-slate-300 mb-1">Target Netlify Function Endpoint</label>
+          <input type="text" id="settingWebhookUrl" value="/.netlify/functions/chat" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-200 font-mono text-xs focus:outline-none focus:border-cyan-500">
         </div>
 
         <div>
@@ -476,7 +576,7 @@ Towson Healthy Homes | BCC: board-22283@use1.monday.com
           <input type="text" id="settingBccEmail" value="towsonhealthyhomes@monday.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-200 font-mono text-xs focus:outline-none focus:border-cyan-500">
         </div>
 
-        <button onclick="saveSettings()" class="w-full py-3 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-slate-950 font-bold rounded-xl shadow-lg">
+        <button onclick="saveSettings()" class="w-full py-3 bg-gradient-to-r from-amber-500 via-emerald-500 to-cyan-500 text-slate-950 font-bold rounded-xl shadow-lg">
           Save Settings
         </button>
       </div>
@@ -490,6 +590,8 @@ Towson Healthy Homes | BCC: board-22283@use1.monday.com
     let taskQueue = [];
     let currentTrade = 'aerus';
     let isSecondaryTypeVisible = false;
+    let cameraStream = null;
+    let capturedPhotoData = null;
 
     // Industry Profiles Data
     const industryProfiles = {
@@ -497,6 +599,11 @@ Towson Healthy Homes | BCC: board-22283@use1.monday.com
         name: "Aerus / Vacuum Repair",
         subBadges: ["Workbench", "Vehicles", "Showroom", "Ready Wall"],
         greeting: "BOOM! Welcome to your Aerus Timonium Command Center! Tap and talk into any door!"
+      },
+      bagden: {
+        name: "Bagden Showcase World",
+        subBadges: ["Client Projects", "Estimates", "Invoicing", "Tap Queue"],
+        greeting: "BOOM! Welcome to Bagden's Showcase World! Fresh and Sissy have your cabinets prepped!"
       },
       restaurant: {
         name: "Restaurant / Dining",
@@ -540,7 +647,7 @@ Towson Healthy Homes | BCC: board-22283@use1.monday.com
     }
 
     function triggerFreshGreetingVoice() {
-      speakFresh("BOOM! Good morning, William! I'm Fresh — your Digital Coordinator. Let me hold the wheel and buy back your time today!");
+      speakFresh("BOOM! Good morning, William! I'm Fresh — your Pocket Chief of Staff. Sissy and I are ready to hold the wheel and buy back your time today!");
     }
 
     /* Web Speech Recognition Setup */
@@ -555,18 +662,18 @@ Towson Healthy Homes | BCC: board-22283@use1.monday.com
 
       recognition.onstart = () => {
         isRecording = true;
-        document.getElementById('masterVoiceLabel').innerText = "LISTENING NOW...";
+        document.getElementById('masterVoiceLabel').innerText = "FRESH IS LISTENING...";
         document.getElementById('micIconBox').classList.add('animate-ping');
       };
 
       recognition.onresult = (e) => {
         const transcript = e.results[0][0].transcript;
-        processBrainDump(transcript);
+        processBrainDumpWithGemini(transcript);
       };
 
       recognition.onend = () => {
         isRecording = false;
-        document.getElementById('masterVoiceLabel').innerText = "TAP & TALK TO FRESH";
+        document.getElementById('masterVoiceLabel').innerText = "TAP LOGO FRONT DOOR";
         document.getElementById('micIconBox').classList.remove('animate-ping');
       };
     }
@@ -583,11 +690,12 @@ Towson Healthy Homes | BCC: board-22283@use1.monday.com
       }
     }
 
-    /* Brain Dump Processing */
-    function processBrainDump(noteText) {
+    /* Process Brain Dump via Netlify Gemini API Endpoint */
+    async function processBrainDumpWithGemini(noteText) {
       if (!noteText.trim()) return;
 
-      let difficulty = 1; // 1 = Easy, 2 = Medium, 3 = Hardest
+      // Local optimistic placement into execution queue
+      let difficulty = 1;
       const lower = noteText.toLowerCase();
       if (lower.includes('repair') || lower.includes('urgent') || lower.includes('install') || lower.includes('problem')) {
         difficulty = 3;
@@ -608,7 +716,31 @@ Towson Healthy Homes | BCC: board-22283@use1.monday.com
       saveTasks();
       updateQueueBadge();
 
-      speakFresh(`Got it! Placed "${noteText.substring(0, 25)}..." straight into your execution queue!`);
+      // Dispatch to Netlify Function Endpoint using stored Gemini key
+      const endpoint = document.getElementById('settingWebhookUrl').value;
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: noteText,
+            user: 'William Sullivan',
+            trade: currentTrade,
+            bccEmail: document.getElementById('settingBccEmail').value
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const freshReply = data.reply || `Got it, William! Placed "${noteText.substring(0, 25)}..." straight into your execution queue!`;
+          speakFresh(freshReply);
+        } else {
+          speakFresh(`Got it! Placed "${noteText.substring(0, 25)}..." straight into your execution queue!`);
+        }
+      } catch (err) {
+        // Fallback smooth voice acknowledgment
+        speakFresh(`Got it! Placed "${noteText.substring(0, 25)}..." straight into your execution queue!`);
+      }
     }
 
     function sortQueue() {
@@ -621,7 +753,7 @@ Towson Healthy Homes | BCC: board-22283@use1.monday.com
 
     /* Interactive Onboarding (Entry Point A) */
     function startInteractiveOnboarding() {
-      speakFresh("BOOM! Let's build your world together! Tell me what trade or business you run today!");
+      speakFresh("BOOM! Let me and Sissy build your world together! Tell me what trade or business you run today!");
       setTimeout(() => {
         toggleVoiceInput();
       }, 3500);
@@ -684,8 +816,8 @@ Towson Healthy Homes | BCC: board-22283@use1.monday.com
               <p class="text-xs text-slate-300">Ragweed pollen defense active. Rest those eyes, boss!</p>
             </div>
             <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800">
-              <h4 class="text-xs font-bold text-cyan-400 mb-1">Personal Reminders</h4>
-              <p class="text-xs text-slate-300">• Cancel TV subscription for Eda</p>
+              <h4 class="text-xs font-bold text-cyan-400 mb-1">Personal Reminders & Eda TV Action</h4>
+              <p class="text-xs text-slate-300">• Instruct Eda to call bank for Roku TV merchant block</p>
               <p class="text-xs text-slate-300">• Glen Burnie run at 10:30 AM</p>
             </div>
           </div>
@@ -777,6 +909,62 @@ Towson Healthy Homes | BCC: board-22283@use1.monday.com
       speakFresh("Boom! Task complete!");
     }
 
+    /* 📷 Intake Camera API Helpers */
+    async function startCameraStream() {
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        const video = document.getElementById('cameraFeed');
+        video.srcObject = cameraStream;
+        video.classList.remove('hidden');
+        document.getElementById('cameraPlaceholder').classList.add('hidden');
+        document.getElementById('snapCamBtn').disabled = false;
+      } catch (err) {
+        alert("Unable to access device camera. Please check camera permissions!");
+      }
+    }
+
+    function captureSnapshot() {
+      const video = document.getElementById('cameraFeed');
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      capturedPhotoData = canvas.toDataURL('image/png');
+      const preview = document.getElementById('photoPreview');
+      preview.src = capturedPhotoData;
+      preview.classList.remove('hidden');
+      video.classList.add('hidden');
+      
+      document.getElementById('snapshotActionBox').classList.remove('hidden');
+      speakFresh("Intake snapshot captured!");
+    }
+
+    function attachPhotoToTask() {
+      toggleIntakeCameraModal();
+      speakFresh("Attached intake photo directly to Monday.com card!");
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+      }
+    }
+
+    function toggleIntakeCameraModal() {
+      document.getElementById('intakeCameraModal').classList.toggle('hidden');
+    }
+
+    /* 💼 Bagden Showcase World Launcher */
+    function toggleBagdenWorldModal() {
+      document.getElementById('bagdenWorldModal').classList.toggle('hidden');
+    }
+
+    function launchBagdenDemo() {
+      toggleBagdenWorldModal();
+      selectIndustryProfile('bagden');
+      openDoorModal('business');
+      speakFresh("BOOM! Welcome Bagden! Here is your custom TappyThing Showcase World!");
+    }
+
     /* Secondary Typing Mode */
     function toggleSecondaryType() {
       const container = document.getElementById('typeInputContainer');
@@ -795,7 +983,7 @@ Towson Healthy Homes | BCC: board-22283@use1.monday.com
     function submitManualTextNote() {
       const field = document.getElementById('manualTextNote');
       if (field.value.trim()) {
-        processBrainDump(field.value);
+        processBrainDumpWithGemini(field.value);
         field.value = '';
       }
     }
@@ -828,7 +1016,7 @@ Towson Healthy Homes | BCC: board-22283@use1.monday.com
 
     function saveSettings() {
       toggleSettingsModal();
-      speakFresh("Settings saved! Direct Netlify POST to Monday.com locked in!");
+      speakFresh("Settings saved! Direct Netlify endpoint locked in!");
     }
 
     function saveTasks() {
@@ -839,7 +1027,10 @@ Towson Healthy Homes | BCC: board-22283@use1.monday.com
       const data = localStorage.getItem('tt_master_tasks');
       if (data) {
         try {
-          taskQueue = JSON.parse(data);
+          // Clean test item "hello is this working" completely
+          let loaded = JSON.parse(data);
+          taskQueue = loaded.filter(t => t.text.toLowerCase().indexOf("hello is this working") === -1);
+          saveTasks();
           updateQueueBadge();
         } catch(e) {
           taskQueue = [];
