@@ -115,10 +115,13 @@
                     <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
                 </button>
 
+                <!-- Full Cabinets List -->
                 <div id="businessCabinets" class="p-3 space-y-2 border-t border-gray-800/80">
+                    
+                    <!-- Today's Schedule -->
                     <div class="cabinet-card p-3 rounded-lg">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-xs font-bold text-white"><i class="fas fa-wrench text-blue-400 mr-1.5"></i>Eugene Gumenick</span>
+                            <span class="text-xs font-bold text-white"><i class="fas fa-car text-blue-400 mr-1.5"></i>Eugene Gumenick</span>
                             <span class="text-[10px] px-2 py-0.5 bg-blue-950 text-blue-300 rounded-full border border-blue-800">Next Stop</span>
                         </div>
                         <p class="text-[11px] text-gray-300">104 Gittings Ave • Baltimore MD 21212</p>
@@ -131,8 +134,73 @@
                         </div>
                         <p class="text-[11px] text-gray-300">Guardian Platinum cord repair • HEPA filter drop-shipped</p>
                     </div>
+
+                    <!-- Workbench Queue -->
+                    <div class="cabinet-card p-3 rounded-lg border-l-indigo-500">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs font-bold text-white"><i class="fas fa-wrench text-indigo-400 mr-1.5"></i>Workbench Queue</span>
+                            <span class="text-[10px] px-2 py-0.5 bg-indigo-950 text-indigo-300 rounded-full border border-indigo-800">3 Active</span>
+                        </div>
+                        <p class="text-[11px] text-gray-300">Electrolux Guardian tune-up • Lux Legacy motor swap</p>
+                    </div>
+
+                    <!-- Vehicles Cabinet -->
+                    <div class="cabinet-card p-3 rounded-lg border-l-amber-500">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs font-bold text-white"><i class="fas fa-truck text-amber-400 mr-1.5"></i>Field Vehicles</span>
+                            <span class="text-[10px] px-2 py-0.5 bg-amber-950 text-amber-300 rounded-full border border-amber-800">Ready</span>
+                        </div>
+                        <p class="text-[11px] text-gray-300">Van 1 loaded for Timonium route • Field diag kit ready</p>
+                    </div>
+
+                    <!-- Showroom Floor -->
+                    <div class="cabinet-card p-3 rounded-lg border-l-emerald-500">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs font-bold text-white"><i class="fas fa-store text-emerald-400 mr-1.5"></i>Showroom Floor</span>
+                            <span class="text-[10px] px-2 py-0.5 bg-emerald-950 text-emerald-300 rounded-full border border-emerald-800">Operational</span>
+                        </div>
+                        <p class="text-[11px] text-gray-300">Air purifier display active • Demo units prepped</p>
+                    </div>
+
+                    <!-- Bagden's World Sub-Cabinet -->
+                    <div class="mt-3 p-3 bg-blue-950/30 rounded-xl border border-blue-800/40">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-bold text-blue-300 flex items-center gap-1.5">
+                                <i class="fas fa-layer-group"></i> Bagden's World (Shared Offshoot)
+                            </span>
+                            <span class="text-[10px] bg-blue-900/80 text-blue-200 px-2 py-0.5 rounded">Synced</span>
+                        </div>
+                        <p class="text-[11px] text-gray-300">📌 <strong>Bench Item:</strong> Aerus Central Vac unit assigned to Mike Bagden</p>
+                    </div>
+
                 </div>
             </div>
+
+            <!-- PERSONAL WORLD -->
+            <div class="glass-panel rounded-xl overflow-hidden border border-gray-800">
+                <button onclick="toggleCabinet('personalCabinets')" class="w-full p-4 flex items-center justify-between text-left bg-gradient-to-r from-gray-900 to-gray-800/80">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 rounded-lg bg-emerald-600/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+                            <i class="fas fa-user text-sm"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-white">Personal World</h4>
+                            <p class="text-xs text-gray-400">Personal Tasks, Notes & Eda Tracking</p>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                </button>
+
+                <div id="personalCabinets" class="hidden p-3 space-y-2 border-t border-gray-800/80">
+                    <div class="p-2.5 bg-gray-900/60 rounded-lg text-xs text-gray-300">
+                        • Eda TV setup checklist logged
+                    </div>
+                    <div class="p-2.5 bg-gray-900/60 rounded-lg text-xs text-gray-300">
+                        • Ragweed seasonal alert reminder active
+                    </div>
+                </div>
+            </div>
+
         </section>
 
     </main>
@@ -189,20 +257,22 @@
                 document.getElementById('transcriptBox').classList.remove('hidden');
                 document.getElementById('sendVoiceBtn').classList.remove('hidden');
             } else {
-                stopAndSendVoice();
-            }
-        }
-
-        function stopAndSendVoice() {
-            if (recognition && isListening) {
-                recognition.stop();
-                isListening = false;
-                document.getElementById('micBtn').classList.remove('animate-pulse', 'bg-red-600');
+                stopMicUI();
                 sendToFresh();
             }
         }
 
+        function stopMicUI() {
+            if (recognition && isListening) {
+                recognition.stop();
+                isListening = false;
+            }
+            document.getElementById('micBtn').classList.remove('animate-pulse', 'bg-red-600');
+            document.getElementById('voiceStatus').innerText = "Tap to start speaking directly to Fresh";
+        }
+
         async function sendToFresh() {
+            stopMicUI();
             const userPrompt = finalSpeechText || document.getElementById('userSpeech').innerText;
             if (!userPrompt || userPrompt === "Listening...") return;
 
@@ -226,8 +296,15 @@
             }
         }
 
-        function toggleCabinet(id) { document.getElementById(id).classList.toggle('hidden'); }
-        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
+        function toggleCabinet(id) { 
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden'); 
+        }
+
+        function toggleModal(id) { 
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden'); 
+        }
     </script>
 </body>
 </html>
