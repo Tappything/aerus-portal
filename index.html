@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TappyThing — Digital Coordinator Command Center</title>
-    <!-- Tailwind CSS for styling -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -17,35 +17,58 @@
             color: #f3f4f6;
         }
         .glow-card {
-            background: rgba(17, 24, 39, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+            transition: all 0.3s ease;
         }
         .glow-card:hover {
-            border-color: rgba(59, 130, 246, 0.5);
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+            border-color: rgba(59, 130, 246, 0.55);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.35);
+        }
+        .glow-card-emerald {
+            border-color: rgba(16, 185, 129, 0.25);
+        }
+        .glow-card-emerald:hover {
+            border-color: rgba(16, 185, 129, 0.55);
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.35);
+        }
+        .glow-card-purple {
+            border-color: rgba(168, 85, 247, 0.25);
+        }
+        .glow-card-purple:hover {
+            border-color: rgba(168, 85, 247, 0.55);
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.35);
+        }
+        .glow-card-amber {
+            border-color: rgba(245, 158, 11, 0.25);
+        }
+        .glow-card-amber:hover {
+            border-color: rgba(245, 158, 11, 0.55);
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.35);
         }
         .glow-button {
             background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
             box-shadow: 0 0 15px rgba(37, 99, 235, 0.5);
         }
         .glow-button:hover {
-            box-shadow: 0 0 25px rgba(37, 99, 235, 0.8);
+            box-shadow: 0 0 25px rgba(37, 99, 235, 0.85);
         }
         .mic-pulse {
             animation: pulse 2s infinite;
         }
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
-            70% { box-shadow: 0 0 0 20px rgba(59, 130, 246, 0); }
+            70% { box-shadow: 0 0 0 22px rgba(59, 130, 246, 0); }
             100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
         }
     </style>
 </head>
-<body class="min-h-screen pb-12">
-    <!-- Top Header Navigation -->
-    <nav class="border-b border-gray-800 bg-gray-900/80 sticky top-0 z-50 backdrop-blur-md">
+<body class="min-h-screen pb-16">
+
+    <!-- Navigation Header -->
+    <nav class="border-b border-gray-800 bg-gray-900/90 sticky top-0 z-50 backdrop-blur-md">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xl shadow-lg shadow-blue-500/30">
@@ -63,38 +86,38 @@
                     <span class="text-gray-600">|</span>
                     <span class="text-gray-400">Assets: <strong class="text-emerald-400 font-bold">1,090</strong></span>
                 </div>
-                <button class="bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-2">
+                <button class="bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-2">
                     <i class="fa-solid fa-users text-blue-400"></i>
-                    <span>The Squad </span>
+                    <span>The Squad</span>
                 </button>
             </div>
         </div>
     </nav>
 
-    <!-- Main Container -->
+    <!-- Main Dashboard Container -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
 
-        <!-- Voice Command Center -->
+        <!-- Voice Intake Command Center -->
         <section class="glow-card rounded-2xl p-6 text-center border border-blue-500/30 relative overflow-hidden">
             <div class="absolute -top-24 -left-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
             
             <div class="flex flex-col items-center justify-center">
-                <!-- Large Voice Button -->
+                <!-- Main Voice Mic Button -->
                 <button id="micBtn" onclick="toggleVoiceIntake()" class="w-24 h-24 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-3xl shadow-xl transition-all duration-300 mic-pulse mb-3">
                     <i class="fa-solid fa-microphone" id="micIcon"></i>
                 </button>
-                <p class="text-xs text-gray-400 font-medium mb-4" id="voiceStatus">Tap to speak directly to Fresh — Voice Intake Active</p>
+                <p class="text-xs text-gray-400 font-medium mb-3" id="voiceStatus">Tap to speak directly to Fresh — Voice Intake Active</p>
 
-                <!-- Audio Output Status Indicator -->
-                <div class="flex items-center justify-center space-x-2 mb-3">
-                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Voice Output Engaged</span>
+                <!-- Voice Output Indicator -->
+                <div class="flex items-center justify-center space-x-2 mb-4">
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Voice Output Engaged (Out Loud Enabled)</span>
                 </div>
 
-                <!-- Input Box / Prompt Display -->
+                <!-- Input Box -->
                 <div class="w-full max-w-2xl bg-gray-900/90 border border-gray-700 rounded-xl p-3 text-left mb-3">
-                    <div class="text-xs text-gray-500 font-semibold mb-1">YOU:</div>
-                    <textarea id="promptInput" rows="2" class="w-full bg-transparent text-gray-100 text-sm focus:outline-none resize-none" placeholder="Tap microphone to talk, or type your update here..."></textarea>
+                    <div class="text-xs text-gray-500 font-semibold mb-1">YOU SAY:</div>
+                    <textarea id="promptInput" rows="2" class="w-full bg-transparent text-gray-100 text-sm focus:outline-none resize-none" placeholder="Tap microphone to speak, or type your message here..."></textarea>
                 </div>
 
                 <!-- Action Button -->
@@ -103,63 +126,101 @@
                     <span>SEND TO FRESH 🚀</span>
                 </button>
 
-                <!-- Fresh Response Display -->
+                <!-- Response Box -->
                 <div class="w-full max-w-2xl bg-blue-950/40 border border-blue-800/50 rounded-xl p-4 text-left mt-4">
-                    <div class="text-xs text-blue-400 font-semibold mb-1 flex items-center space-x-2">
-                        <span>FRESH 🤵</span>
-                        <span class="text-[100%] text-blue-300 font-normal">(Voice Engine Ready)</span>
+                    <div class="text-xs text-blue-400 font-semibold mb-1 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span>FRESH 🤵</span>
+                            <span class="text-[100%] text-blue-300 font-normal">(Voice Engine Online)</span>
+                        </div>
+                        <button onclick="repeatSpeech()" class="text-gray-400 hover:text-white text-xs">
+                            <i class="fa-solid fa-volume-high"></i> Play Again
+                        </button>
                     </div>
                     <p id="freshReply" class="text-sm text-gray-200 font-medium leading-relaxed">Fresh is online and ready for the next play!</p>
                 </div>
             </div>
         </section>
 
-        <!-- Today's Schedule Card -->
-        <section class="glow-card rounded-2xl p-5 border border-amber-500/20">
-            <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-calendar-day text-amber-400"></i>
-                    <h2 class="font-bold text-sm text-gray-200 uppercase tracking-wider">What's Next — Active Schedule</h2>
-                </div>
-                <span class="text-xs bg-amber-950/60 text-amber-300 border border-amber-800/60 px-2.5 py-1 rounded-full font-semibold">2 Stops Today</span>
-            </div>
+        <!-- Active Schedule & Vault Search Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Stop 1 -->
-                <div class="bg-gray-900/80 rounded-xl p-4 border border-gray-800 flex justify-between items-start">
-                    <div>
-                        <div class="flex items-center space-x-2 mb-1">
-                            <span class="text-xs font-bold px-2 py-0.5 rounded bg-blue-900 text-blue-300">PICKUP LOGGED</span>
-                            <span class="text-xs text-gray-400">Stop #1</span>
-                        </div>
-                        <h3 class="font-bold text-white text-base">Eugene Gumenick</h3>
-                        <p class="text-xs text-gray-400">104 Gittings Ave, Baltimore, MD 21212</p>
-                        <p class="text-xs text-amber-400/90 mt-2 font-medium"><i class="fa-solid fa-wrench mr-1"></i> Diagnostic: Cord & Cord Winder check (Mike/Chris)</p>
+            <!-- Schedule Card (2 Columns) -->
+            <section class="lg:col-span-2 glow-card glow-card-amber rounded-2xl p-5">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-calendar-day text-amber-400"></i>
+                        <h2 class="font-bold text-sm text-gray-200 uppercase tracking-wider">What's Next — Active Schedule</h2>
                     </div>
-                    <a href="tel:4104930223" class="w-8 h-8 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-700 flex items-center justify-center text-blue-400 transition">
-                        <i class="fa-solid fa-phone text-xs"></i>
-                    </a>
+                    <span class="text-xs bg-amber-950/60 text-amber-300 border border-amber-800/60 px-2.5 py-1 rounded-full font-semibold">2 Stops Today</span>
                 </div>
-
-                <!-- Stop 2 -->
-                <div class="bg-gray-900/80 rounded-xl p-4 border border-gray-800 flex justify-between items-start">
-                    <div>
-                        <div class="flex items-center space-x-2 mb-1">
-                            <span class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-900 text-emerald-300">DELIVERED & PAID</span>
-                            <span class="text-xs text-gray-400">Stop #2 • 3:30 PM</span>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Stop 1: Eugene -->
+                    <div class="bg-gray-900/80 rounded-xl p-4 border border-gray-800 flex justify-between items-start">
+                        <div>
+                            <div class="flex items-center space-x-2 mb-1">
+                                <span class="text-xs font-bold px-2 py-0.5 rounded bg-blue-900 text-blue-300">PICKUP LOGGED</span>
+                                <span class="text-xs text-gray-400">Stop #1</span>
+                            </div>
+                            <h3 class="font-bold text-white text-base">Eugene Gumenick</h3>
+                            <p class="text-xs text-gray-400">104 Gittings Ave, Baltimore, MD 21212</p>
+                            <p class="text-xs text-amber-400/90 mt-2 font-medium"><i class="fa-solid fa-wrench mr-1"></i> Cord & Cord Winder Check (Mike/Chris)</p>
                         </div>
-                        <h3 class="font-bold text-white text-base">Susan Bratten</h3>
-                        <p class="text-xs text-gray-400">113 Bellemore Rd, Baltimore, MD 21210</p>
-                        <p class="text-xs text-emerald-400/90 mt-2 font-medium"><i class="fa-solid fa-check-circle mr-1"></i> Payment Collected • Follow-up queued</p>
+                        <a href="tel:4104930223" class="w-8 h-8 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-700 flex items-center justify-center text-blue-400 transition">
+                            <i class="fa-solid fa-phone text-xs"></i>
+                        </a>
                     </div>
-                    <a href="tel:4436768088" class="w-8 h-8 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-700 flex items-center justify-center text-blue-400 transition">
-                        <i class="fa-solid fa-phone text-xs"></i>
-                    </a>
-                </div>
-            </div>
-        </section>
 
-        <!-- 4-Door Dashboard Grid -->
+                    <!-- Stop 2: Susan -->
+                    <div class="bg-gray-900/80 rounded-xl p-4 border border-gray-800 flex justify-between items-start">
+                        <div>
+                            <div class="flex items-center space-x-2 mb-1">
+                                <span class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-900 text-emerald-300">DELIVERED & PAID</span>
+                                <span class="text-xs text-gray-400">Stop #2 • 3:30 PM</span>
+                            </div>
+                            <h3 class="font-bold text-white text-base">Susan Bratten</h3>
+                            <p class="text-xs text-gray-400">113 Bellemore Rd, Baltimore, MD 21210</p>
+                            <p class="text-xs text-emerald-400/90 mt-2 font-medium"><i class="fa-solid fa-check-circle mr-1"></i> Payment Collected • Follow-up queued</p>
+                        </div>
+                        <a href="tel:4436768088" class="w-8 h-8 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-700 flex items-center justify-center text-blue-400 transition">
+                            <i class="fa-solid fa-phone text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 22,283 Vault Fast Lookup Card (1 Column) -->
+            <section class="glow-card rounded-2xl p-5">
+                <div class="flex items-center space-x-2 mb-3">
+                    <i class="fa-solid fa-database text-blue-400"></i>
+                    <h2 class="font-bold text-sm text-gray-200 uppercase tracking-wider">Vault Fast Lookup</h2>
+                </div>
+                <div class="relative mb-3">
+                    <input type="text" id="vaultSearchInput" onkeyup="searchVault()" placeholder="Search 22,283 records..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 pl-8">
+                    <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-xs text-gray-500"></i>
+                </div>
+                <div id="searchResults" class="space-y-2 text-xs max-h-36 overflow-y-auto">
+                    <div class="p-2 rounded bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+                        <div>
+                            <p class="font-bold text-gray-200">Eugene Gumenick</p>
+                            <p class="text-gray-500 text-[10px]">Client #22114 • 104 Gittings Ave</p>
+                        </div>
+                        <span class="text-[10px] text-blue-400 font-semibold">Bench Queue</span>
+                    </div>
+                    <div class="p-2 rounded bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+                        <div>
+                            <p class="font-bold text-gray-200">Susan Bratten</p>
+                            <p class="text-gray-500 text-[10px]">Client #8466 • 113 Bellemore Rd</p>
+                        </div>
+                        <span class="text-[10px] text-emerald-400 font-semibold">Active Customer</span>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- 4-Door Core Dashboard Grid -->
         <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
             <!-- DOOR 1: Business World -->
@@ -179,18 +240,22 @@
 
                 <div class="space-y-2 text-xs">
                     <div class="p-3 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
-                        <span class="text-gray-300">Eugene Gumenick — Bench Repair</span>
-                        <span class="text-amber-400 font-semibold">Assigned: Mike & Chris</span>
+                        <span class="text-gray-300">Eugene Gumenick — Lux Legacy Diagnostic</span>
+                        <span class="text-amber-400 font-semibold">Bench Assigned: Mike & Chris</span>
                     </div>
                     <div class="p-3 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
-                        <span class="text-gray-300">Master Vault Active Customers</span>
-                        <span class="text-blue-400 font-semibold">22,283 Records</span>
+                        <span class="text-gray-300">Master Vault Active Customer Records</span>
+                        <span class="text-blue-400 font-semibold">22,283 Records Loaded</span>
+                    </div>
+                    <div class="p-3 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+                        <span class="text-gray-300">Operational Assets & Inventory Items</span>
+                        <span class="text-emerald-400 font-semibold">1,090 Items Live</span>
                     </div>
                 </div>
             </div>
 
             <!-- DOOR 2: Personal World -->
-            <div class="glow-card rounded-2xl p-5 border border-emerald-500/20">
+            <div class="glow-card glow-card-emerald rounded-2xl p-5">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center space-x-3">
                         <div class="w-9 h-9 rounded-xl bg-emerald-900/50 border border-emerald-700/50 flex items-center justify-center text-emerald-400">
@@ -207,7 +272,7 @@
                 <div class="space-y-2 text-xs">
                     <div class="p-3 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
                         <span class="text-gray-300">Eda Home Checklist</span>
-                        <span class="text-emerald-400 font-semibold">TV & Media Active</span>
+                        <span class="text-emerald-400 font-semibold">TV Setup & Streaming Active</span>
                     </div>
                     <div class="p-3 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
                         <span class="text-gray-300">Personal Vault Privacy Shield</span>
@@ -216,8 +281,8 @@
                 </div>
             </div>
 
-            <!-- DOOR 3: Invoices & Cash Register -->
-            <div class="glow-card rounded-2xl p-5 border border-purple-500/20">
+            <!-- DOOR 3: Cash Register & Invoices -->
+            <div class="glow-card glow-card-purple rounded-2xl p-5">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center space-x-3">
                         <div class="w-9 h-9 rounded-xl bg-purple-900/50 border border-purple-700/50 flex items-center justify-center text-purple-400">
@@ -225,13 +290,13 @@
                         </div>
                         <div>
                             <h3 class="font-bold text-gray-100">Door 3: Cash Register & Invoices</h3>
-                            <p class="text-xs text-gray-400">MD 6% Tax Calculator & Paper Invoices</p>
+                            <p class="text-xs text-gray-400">MD 6% Tax Calculator & Stripe Swap Setup</p>
                         </div>
                     </div>
                     <i class="fa-solid fa-chevron-down text-gray-500"></i>
                 </div>
 
-                <!-- Calculator Tool -->
+                <!-- Sales Tax & Invoice Tool -->
                 <div class="bg-gray-900/90 rounded-xl p-4 border border-gray-800 space-y-3">
                     <div class="flex items-center justify-between">
                         <label class="text-xs text-gray-400">Subtotal Amount ($)</label>
@@ -253,7 +318,7 @@
             </div>
 
             <!-- DOOR 4: Voice Coordinator Hub -->
-            <div class="glow-card rounded-2xl p-5 border border-amber-500/20">
+            <div class="glow-card glow-card-amber rounded-2xl p-5">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center space-x-3">
                         <div class="w-9 h-9 rounded-xl bg-amber-900/50 border border-amber-700/50 flex items-center justify-center text-amber-400">
@@ -261,7 +326,7 @@
                         </div>
                         <div>
                             <h3 class="font-bold text-gray-100">Door 4: Coordinator Hub</h3>
-                            <p class="text-xs text-gray-400">Team Routing & Direct Lines</p>
+                            <p class="text-xs text-gray-400">Team Communication Boards</p>
                         </div>
                     </div>
                     <i class="fa-solid fa-chevron-down text-gray-500"></i>
@@ -269,12 +334,20 @@
 
                 <div class="space-y-2 text-xs">
                     <div class="p-2.5 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
-                        <span class="text-gray-300">Team Communications — All Hands</span>
-                        <span class="text-emerald-400">Active</span>
+                        <span class="text-gray-300">📢 Team Communications — All Hands</span>
+                        <span class="text-emerald-400 font-semibold">Active</span>
                     </div>
                     <div class="p-2.5 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
-                        <span class="text-gray-300">William & Chris / Mona / Norby</span>
-                        <span class="text-blue-400">1:1 Direct</span>
+                        <span class="text-gray-300">💬 William & Chris — Direct Line</span>
+                        <span class="text-blue-400 font-semibold">Private 1:1</span>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+                        <span class="text-gray-300">💬 William & Mona — Direct Line</span>
+                        <span class="text-blue-400 font-semibold">Private 1:1</span>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+                        <span class="text-gray-300">💬 William & Norby — Direct Line</span>
+                        <span class="text-blue-400 font-semibold">Private 1:1</span>
                     </div>
                 </div>
             </div>
@@ -293,7 +366,7 @@
             document.getElementById('totalResult').innerText = '$' + total.toFixed(2);
         }
 
-        // Print Paper Invoice Demo
+        // Paper Invoice Generator
         function printInvoice() {
             const subtotal = document.getElementById('subtotalInput').value || "0.00";
             const tax = (parseFloat(subtotal) * 0.06).toFixed(2);
@@ -305,7 +378,7 @@
                 <head><title>Print Invoice — Aerus Home Wellness</title></head>
                 <body style="font-family: Arial, sans-serif; padding: 30px;">
                     <h2>AERUS HOME WELLNESS</h2>
-                    <p>Timonium, MD • Clean Environment LLC</p>
+                    <p>Timonium MD • Clean Environment LLC</p>
                     <hr/>
                     <h3>CUSTOMER INVOICE</h3>
                     <p><strong>Subtotal:</strong> $${subtotal}</p>
@@ -320,9 +393,10 @@
             win.print();
         }
 
-        // Voice Recognition Handling (SpeechToText)
+        // Voice Recognition (SpeechToText)
         let recognition;
         let isListening = false;
+        let currentReplyText = "Fresh is online and ready for the next play!";
 
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -332,7 +406,7 @@
 
             recognition.onstart = function() {
                 isListening = true;
-                document.getElementById('voiceStatus').innerText = "Listening... Speak into your mic now!";
+                document.getElementById('voiceStatus').innerText = "Listening... Speak now!";
                 document.getElementById('micBtn').classList.add('bg-red-600');
             };
 
@@ -344,7 +418,7 @@
             };
 
             recognition.onerror = function(event) {
-                document.getElementById('voiceStatus').innerText = "Speech error. Please try typing.";
+                document.getElementById('voiceStatus').innerText = "Speech input error. Try typing below.";
                 document.getElementById('micBtn').classList.remove('bg-red-600');
                 isListening = false;
             };
@@ -357,7 +431,6 @@
 
         function toggleVoiceIntake() {
             if (!recognition) {
-                alert("Speech recognition is not supported on this browser. You can type in the text box!");
                 return;
             }
             if (isListening) {
@@ -367,10 +440,10 @@
             }
         }
 
-        // Web Speech API Voice Out Loud (TextToSpeech)
+        // Web Speech API Audio Output (TextToSpeech out loud)
         function speakResponse(text) {
             if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); // Stop any previous speech
+                window.speechSynthesis.cancel(); // Reset audio queue
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.rate = 1.0;
                 utterance.pitch = 1.0;
@@ -378,7 +451,11 @@
             }
         }
 
-        // Main Send Function to Netlify Backend Function
+        function repeatSpeech() {
+            speakResponse(currentReplyText);
+        }
+
+        // Main Voice & Message Handler sending { prompt: transcript } to Netlify Backend Function
         async function sendToFresh() {
             const promptText = document.getElementById('promptInput').value.trim();
             if (!promptText) return;
@@ -387,7 +464,7 @@
             freshReplyEl.innerText = "Fresh is thinking...";
 
             try {
-                // EXPLICIT MATCH: payload sends { prompt: transcript } to match chat.js
+                // MATCHING KEY NAME: Sending { prompt: promptText } to Netlify backend
                 const response = await fetch('/.netlify/functions/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -397,15 +474,46 @@
                 const data = await response.json();
                 const reply = data.reply || "Done, Chief! Next play?";
 
+                currentReplyText = reply;
                 freshReplyEl.innerText = reply;
-                speakResponse(reply); // Speak response out loud!
+                speakResponse(reply); // Speak out loud instantly
 
             } catch (err) {
                 console.error("Error communicating with Fresh:", err);
-                const errorMsg = "Fresh connection error. Check your Netlify deployment!";
+                const errorMsg = "Fresh connection error. Check Netlify function logs!";
                 freshReplyEl.innerText = errorMsg;
                 speakResponse(errorMsg);
             }
+        }
+
+        // Vault Fast Search Engine
+        function searchVault() {
+            const query = document.getElementById('vaultSearchInput').value.toLowerCase();
+            const resultsContainer = document.getElementById('searchResults');
+            
+            const records = [
+                { name: "Eugene Gumenick", id: "22114", address: "104 Gittings Ave", status: "Bench Queue", statusClass: "text-blue-400" },
+                { name: "Susan Bratten", id: "8466", address: "113 Bellemore Rd", status: "Active Customer", statusClass: "text-emerald-400" },
+                { name: "Robert Smith", id: "1092", address: "402 York Rd", status: "Vault Record", statusClass: "text-gray-400" },
+                { name: "Mary Johnson", id: "5512", address: "7820 Bellona Ave", status: "Vault Record", statusClass: "text-gray-400" }
+            ];
+
+            const filtered = records.filter(r => r.name.toLowerCase().includes(query) || r.address.toLowerCase().includes(query) || r.id.includes(query));
+
+            if (filtered.length === 0) {
+                resultsContainer.innerHTML = `<p class="text-gray-500 text-xs py-2">No matching vault records found.</p>`;
+                return;
+            }
+
+            resultsContainer.innerHTML = filtered.map(r => `
+                <div class="p-2 rounded bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+                    <div>
+                        <p class="font-bold text-gray-200">${r.name}</p>
+                        <p class="text-gray-500 text-[10px]">Client #${r.id} • ${r.address}</p>
+                    </div>
+                    <span class="text-[10px] ${r.statusClass} font-semibold">${r.status}</span>
+                </div>
+            `).join('');
         }
     </script>
 </body>
