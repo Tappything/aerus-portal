@@ -1,14 +1,17 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<html lang="en" class="h-full bg-slate-950 text-slate-100 selection:bg-cyan-500 selection:text-slate-950">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TappyThing — Digital Coordinator</title>
+  
+  <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
   <script>
     tailwind.config = {
       theme: {
@@ -21,47 +24,76 @@
               emerald: '#10b981',
               cyan: '#06b6d4',
               gold: '#f59e0b',
-              amber: '#d97706',
+              purple: '#a855f7',
             }
           },
           animation: {
-            'pulse-glow': 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'bounce-subtle': 'bounceSubtle 2s infinite',
+            'pulse-glow': 'pulseGlow 2s infinite',
+            'door-reveal': 'doorReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            'float': 'float 3s ease-in-out infinite',
           },
           keyframes: {
             pulseGlow: {
-              '0%, 100%': { boxShadow: '0 0 25px rgba(16, 185, 129, 0.4)', transform: 'scale(1)' },
-              '50%': { boxShadow: '0 0 50px rgba(6, 182, 212, 0.8)', transform: 'scale(1.03)' },
+              '0%, 100%': { boxShadow: '0 0 20px rgba(16, 185, 129, 0.4)', transform: 'scale(1)' },
+              '50%': { boxShadow: '0 0 40px rgba(6, 182, 212, 0.8)', transform: 'scale(1.02)' },
             },
-            bounceSubtle: {
-              '0%, 100%': { transform: 'translateY(-3%)' },
-              '50%': { transform: 'translateY(0)' },
+            doorReveal: {
+              '0%': { opacity: '0', transform: 'translateY(20px) scale(0.95)' },
+              '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-6px)' },
             }
           }
         }
       }
     }
   </script>
+
   <style>
-    /* Custom scrollbars and glowing glass effects */
     ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #0f172a; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    ::-webkit-scrollbar-track { background: #020617; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    
     .glass-panel {
-      background: rgba(15, 23, 42, 0.8);
-      backdrop-filter: blur(12px);
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .showcase-door {
+      background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95));
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .showcase-door:hover {
+      border-color: rgba(6, 182, 212, 0.5);
+      box-shadow: 0 10px 30px -10px rgba(6, 182, 212, 0.3);
+      transform: translateY(-4px);
+    }
+
+    .neon-border-emerald {
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+    }
+    .neon-border-cyan {
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+    }
+    .neon-border-gold {
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
     }
   </style>
 </head>
-<body class="h-full flex flex-col font-sans antialiased overflow-x-hidden selection:bg-brand-cyan selection:text-slate-900">
+
+<body class="h-full flex flex-col font-sans antialiased overflow-x-hidden bg-slate-950">
 
   <header class="w-full glass-panel border-b border-slate-800/80 sticky top-0 z-40 px-4 py-3 sm:px-6">
-    <div class="max-w-6xl mx-auto flex items-center justify-between">
-      <!-- Logo & System Status -->
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      
+      <!-- Logo & System Badge -->
       <div class="flex items-center space-x-3">
-        <div class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-500 text-slate-950 font-black text-xl shadow-lg shadow-emerald-500/20">
+        <div class="relative flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-500 text-slate-950 font-black text-2xl shadow-lg shadow-emerald-500/20 animate-float">
           🎩
           <span class="absolute -top-1 -right-1 flex h-3 w-3">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -69,238 +101,345 @@
           </span>
         </div>
         <div>
-          <h1 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2">
-            TappyThing <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">FRESH ACTIVE</span>
+          <h1 class="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
+            TappyThing <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold uppercase tracking-wider">FRESH 🤵 ACTIVE</span>
           </h1>
-          <p class="text-xs text-slate-400 font-medium hidden sm:block">Voice-First Digital Coordinator — Clean Environment LLC</p>
+          <p class="text-xs text-slate-400 font-medium">Digital Coordinator — Clean Environment LLC</p>
         </div>
       </div>
 
-      <!-- Hub Selector Switch (Business / Personal World) -->
-      <div class="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-800">
-        <button id="btnHubBusiness" onclick="setHub('business')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 shadow-md">
-          <i data-lucide="briefcase" class="w-3.5 h-3.5"></i> Business World
+      <!-- Quick Status & Action Buttons -->
+      <div class="flex items-center gap-2">
+        <button onclick="toggleSquadModal()" class="px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-xs font-bold transition-all flex items-center gap-1.5">
+          <i data-lucide="shield" class="w-4 h-4 text-emerald-400"></i> <span class="hidden sm:inline">The Squad</span>
         </button>
-        <button id="btnHubPersonal" onclick="setHub('personal')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5 text-slate-400 hover:text-white">
-          <i data-lucide="user" class="w-3.5 h-3.5"></i> Personal World
+        <button onclick="toggleSettingsModal()" class="p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 transition-all" title="Direct Integration Settings">
+          <i data-lucide="settings" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <!-- Settings / Team Modal Button -->
-      <div class="flex items-center gap-2">
-        <button onclick="toggleTeamModal()" class="p-2 rounded-xl bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800 transition-colors" title="View Team Squad">
-          <i data-lucide="users" class="w-5 h-5"></i>
-        </button>
-        <button onclick="toggleSettingsModal()" class="p-2 rounded-xl bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800 transition-colors" title="Direct Webhook Settings">
-          <i data-lucide="settings" class="w-5 h-5"></i>
-        </button>
-      </div>
     </div>
   </header>
 
-  <main class="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 flex flex-col space-y-6">
 
-    <!-- Left Column: Voice Button & Quick Tapping Controls -->
-    <section class="lg:col-span-5 flex flex-col space-y-6">
-      
-      <!-- Fresh Coaching Card -->
-      <div class="glass-panel rounded-2xl p-5 border border-slate-800/80 relative overflow-hidden">
-        <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
-        <div class="flex items-start gap-4">
-          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 via-emerald-400 to-cyan-500 p-0.5 shadow-lg flex-shrink-0">
-            <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-2xl">
+    <section class="glass-panel rounded-3xl p-5 sm:p-6 border border-slate-800 relative overflow-hidden">
+      <div class="absolute -top-12 -right-12 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-12 -left-12 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+        
+        <!-- Fresh Persona Header -->
+        <div class="flex items-start gap-4 flex-1">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-400 via-emerald-400 to-cyan-500 p-0.5 shadow-xl flex-shrink-0">
+            <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-3xl">
               🤵
             </div>
           </div>
-          <div class="flex-1">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Fresh — Digital Coordinator</span>
-              <button onclick="speakFreshGreeting()" class="text-slate-400 hover:text-amber-400 transition-colors" title="Play Sound">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest">Fresh — Pocket Chief of Staff</span>
+              <button onclick="triggerFreshGreetingVoice()" class="text-slate-400 hover:text-amber-400 transition-colors" title="Listen to Fresh">
                 <i data-lucide="volume-2" class="w-4 h-4"></i>
               </button>
             </div>
-            <p id="freshVoiceText" class="text-sm font-semibold text-slate-200 mt-1 leading-relaxed">
-              "BOOM! Good morning, William! One button, tap it, talk, done. I've got the front door covered. What are we crushing first today?"
+            <p id="freshVoiceBannerText" class="text-sm sm:text-base font-bold text-slate-100 mt-1 leading-relaxed">
+              "BOOM! Good morning, William! I'm Fresh — your Digital Coordinator. Let's buy back your time and organize your world!"
+            </p>
+            <p class="text-xs text-slate-400 mt-1 flex items-center gap-2">
+              <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              22,283 Customer Database Active & Ready
             </p>
           </div>
         </div>
-      </div>
 
-      <div class="glass-panel rounded-3xl p-6 border border-slate-800/80 flex flex-col items-center justify-center text-center relative overflow-hidden group">
-        
-        <div class="mb-4">
-          <span id="activeHubBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            <i data-lucide="briefcase" class="w-3.5 h-3.5"></i> ACTIVE HUB: BUSINESS WORLD
-          </span>
-        </div>
-
-        <!-- Dynamic Tap Button -->
-        <button id="tapTalkBtn" onclick="toggleVoiceRecording()" class="relative z-10 w-44 h-44 sm:w-52 sm:h-52 rounded-full bg-gradient-to-tr from-emerald-500 via-teal-400 to-cyan-500 p-1.5 shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none cursor-pointer">
-          <div id="tapBtnInner" class="w-full h-full rounded-full bg-slate-950 flex flex-col items-center justify-center p-4 border border-emerald-400/30 transition-all duration-300">
-            <i id="tapIcon" data-lucide="mic" class="w-12 h-12 text-emerald-400 mb-2 transition-transform group-hover:scale-110"></i>
-            <span id="tapMainLabel" class="text-lg font-extrabold text-white tracking-wide">TAP & TALK</span>
-            <span id="tapSubLabel" class="text-xs font-bold text-slate-400 mt-0.5">Brain Dump Mode</span>
-          </div>
-        </button>
-
-        <!-- Live Audio Wave Indicator -->
-        <div id="audioWave" class="hidden flex items-center justify-center gap-1 mt-6 h-6">
-          <span class="w-1 bg-emerald-400 h-2 rounded-full animate-pulse"></span>
-          <span class="w-1 bg-cyan-400 h-5 rounded-full animate-pulse delay-75"></span>
-          <span class="w-1 bg-amber-400 h-3 rounded-full animate-pulse delay-150"></span>
-          <span class="w-1 bg-emerald-400 h-6 rounded-full animate-pulse delay-100"></span>
-          <span class="w-1 bg-cyan-400 h-2 rounded-full animate-pulse delay-200"></span>
-        </div>
-
-        <p id="transcriptPreview" class="text-xs text-slate-400 mt-4 h-8 max-w-xs truncate italic">
-          "Tap the button above and start speaking..."
-        </p>
-
-        <!-- Secondary Input Option Toggle -->
-        <div class="mt-6 w-full pt-4 border-t border-slate-800/80 flex flex-col items-center">
-          <button onclick="toggleTypeMode()" class="text-xs font-semibold text-slate-400 hover:text-cyan-400 flex items-center gap-1.5 transition-colors">
-            <i data-lucide="keyboard" class="w-3.5 h-3.5"></i> <span id="typeToggleLabel">Type Instead (Secondary Option)</span>
+        <!-- Master Voice Action Button -->
+        <div class="flex flex-col items-center flex-shrink-0 w-full md:w-auto">
+          <button id="masterVoiceBtn" onclick="toggleVoiceInput()" class="w-full md:w-64 py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-slate-950 font-extrabold text-sm tracking-wide shadow-xl shadow-emerald-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group">
+            <div id="micIconBox" class="p-2 rounded-xl bg-slate-950/20 group-hover:bg-slate-950/30 transition-colors">
+              <i data-lucide="mic" class="w-5 h-5 text-slate-950"></i>
+            </div>
+            <span id="masterVoiceLabel">TAP & TALK TO FRESH</span>
           </button>
-
-          <!-- Hidden Text Input Field -->
-          <div id="typeModeContainer" class="hidden w-full mt-3 flex items-center gap-2">
-            <input type="text" id="manualTextInput" placeholder="Type your brain dump here..." class="flex-1 bg-slate-900 border border-slate-700 text-xs text-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-cyan-500 transition-colors">
-            <button onclick="submitManualInput()" class="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-xs rounded-xl hover:opacity-90 transition-opacity flex items-center gap-1">
-              <i data-lucide="send" class="w-3.5 h-3.5"></i> Dump
-            </button>
-          </div>
+          
+          <button onclick="toggleSecondaryType()" class="mt-2.5 text-[11px] font-semibold text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1">
+            <i data-lucide="keyboard" class="w-3.5 h-3.5"></i> <span id="typeToggleText">Type Instead (Secondary Option)</span>
+          </button>
         </div>
+
       </div>
 
-      <div class="grid grid-cols-2 gap-3">
-        <button onclick="triggerTappingEngine()" class="glass-panel hover:bg-slate-800/80 p-4 rounded-2xl border border-amber-500/30 text-left transition-all group flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-2">
-            <span class="p-2 rounded-xl bg-amber-500/10 text-amber-400"><i data-lucide="zap" class="w-5 h-5"></i></span>
-            <span class="text-[10px] font-bold text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full">22,283 READY</span>
-          </div>
-          <div>
-            <h3 class="text-sm font-bold text-white group-hover:text-amber-400 transition-colors">Tapping Engine</h3>
-            <p class="text-xs text-slate-400">Instant database outreach</p>
-          </div>
-        </button>
-
-        <button onclick="triggerEasyInvoicing()" class="glass-panel hover:bg-slate-800/80 p-4 rounded-2xl border border-emerald-500/30 text-left transition-all group flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-2">
-            <span class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400"><i data-lucide="receipt" class="w-5 h-5"></i></span>
-            <span class="text-[10px] font-bold text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">5th-GRADE</span>
-          </div>
-          <div>
-            <h3 class="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors">3-Step Invoice</h3>
-            <p class="text-xs text-slate-400">Get paid in seconds</p>
-          </div>
+      <!-- Hidden Secondary Typing Field -->
+      <div id="typeInputContainer" class="hidden mt-4 pt-4 border-t border-slate-800/80 flex items-center gap-2">
+        <input type="text" id="manualTextNote" placeholder="Type your brain dump note here..." class="flex-1 bg-slate-900 border border-slate-700 text-xs text-white rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500 transition-colors">
+        <button onclick="submitManualTextNote()" class="px-5 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-xs rounded-xl hover:opacity-90 transition-opacity flex items-center gap-1.5">
+          <i data-lucide="send" class="w-4 h-4"></i> Route Note
         </button>
       </div>
 
     </section>
 
-    <section class="lg:col-span-7 flex flex-col space-y-6">
-
-      <!-- The Tap Task Execution Queue -->
-      <div class="glass-panel rounded-3xl p-6 border border-slate-800/80 flex-1 flex flex-col">
-        <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
-          <div class="flex items-center space-x-2">
-            <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400">
-              <i data-lucide="list-todo" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <h2 class="text-base font-bold text-white">THE TAP — Execution Queue</h2>
-              <p class="text-xs text-slate-400">Sorted automatically: Hardest $\rightarrow$ Easiest</p>
-            </div>
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      
+      <!-- Entry Point A: Live Interactive Onboarding -->
+      <div class="glass-panel rounded-2xl p-5 border border-slate-800 hover:border-emerald-500/40 transition-all flex items-center justify-between">
+        <div class="flex items-center space-x-3.5">
+          <div class="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <i data-lucide="sparkles" class="w-6 h-6"></i>
           </div>
-          <div class="flex items-center space-x-2">
-            <span id="taskCountBadge" class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-slate-800 text-slate-300">0 Tasks</span>
+          <div>
+            <h3 class="text-sm font-bold text-white">Entry Point A: Live Onboarding</h3>
+            <p class="text-xs text-slate-400">Interactive spoken setup with Fresh</p>
           </div>
         </div>
-
-        <!-- Task List Container -->
-        <div id="taskList" class="flex-1 space-y-3 overflow-y-auto max-h-[380px] pr-1">
-          <!-- Empty State -->
-          <div id="emptyTaskState" class="h-48 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-slate-800 rounded-2xl">
-            <div class="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center text-slate-500 mb-3">
-              <i data-lucide="mic-off" class="w-6 h-6"></i>
-            </div>
-            <h3 class="text-sm font-bold text-slate-300">No active dumps in queue</h3>
-            <p class="text-xs text-slate-500 mt-1 max-w-xs">Tap the big green button, talk out loud, and Fresh will prioritize your items here automatically!</p>
-          </div>
-        </div>
+        <button onclick="startInteractiveOnboarding()" class="px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 text-xs font-bold transition-all border border-emerald-500/30">
+          Start Voice Flow
+        </button>
       </div>
 
-      <!-- Tapping Engine Live Output Box -->
-      <div id="tappingPanel" class="glass-panel rounded-3xl p-6 border border-amber-500/30 bg-slate-950/80 flex flex-col">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center space-x-2">
-            <span class="p-2 rounded-xl bg-amber-500/10 text-amber-400"><i data-lucide="sparkles" class="w-5 h-5"></i></span>
-            <h3 class="text-sm font-bold text-white">TAPPING OUTPUT — Ready To Copy & Send</h3>
+      <!-- Entry Point B: Choose Industry Profile -->
+      <div class="glass-panel rounded-2xl p-5 border border-slate-800 hover:border-cyan-500/40 transition-all flex items-center justify-between">
+        <div class="flex items-center space-x-3.5">
+          <div class="p-3 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+            <i data-lucide="briefcase" class="w-6 h-6"></i>
           </div>
-          <button onclick="copyTappingOutput()" class="px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 text-xs font-bold transition-colors flex items-center gap-1.5">
+          <div>
+            <h3 class="text-sm font-bold text-white">Entry Point B: Industry Select</h3>
+            <p class="text-xs text-slate-400">Stage doors for your specific trade</p>
+          </div>
+        </div>
+        <select id="industrySelector" onchange="selectIndustryProfile(this.value)" class="bg-slate-900 border border-slate-700 text-xs font-semibold text-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-cyan-500">
+          <option value="aerus" selected>Aerus / Vacuum Repair</option>
+          <option value="restaurant">Restaurant / Dining</option>
+          <option value="plumbing">Plumbing Services</option>
+          <option value="hvac">HVAC & Climate Control</option>
+          <option value="landscaping">Landscaping & Lawn</option>
+        </select>
+      </div>
+
+    </section>
+
+    <section class="space-y-4">
+      
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-extrabold text-white flex items-center gap-2">
+            Showcase TappyThing™ Doors
+          </h2>
+          <p class="text-xs text-slate-400">Tap any door to expand its cascading cabinets</p>
+        </div>
+        <span id="activeIndustryBadge" class="text-xs font-bold px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+          TRADE: AERUS HOME WELLNESS
+        </span>
+      </div>
+
+      <!-- Grid of 4 Showcase Doors -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+
+        <!-- Door 1: Business World -->
+        <div class="showcase-door rounded-3xl p-5 relative flex flex-col justify-between group cursor-pointer" onclick="openDoorModal('business')">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center">
+              <i data-lucide="building-2" class="w-5 h-5"></i>
+            </div>
+            <div class="w-6 h-6 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center text-[10px] text-slate-400">
+              🎩
+            </div>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white group-hover:text-emerald-400 transition-colors">TappyThing: Business World</h3>
+            <p class="text-xs text-slate-400 mt-1">Shop & Operations Cabinets</p>
+            <div class="mt-4 flex flex-wrap gap-1.5" id="businessSubBadges">
+              <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300">Workbench</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300">Vehicles</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300">Showroom</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300">Ready Wall</span>
+            </div>
+          </div>
+          <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs font-bold text-emerald-400">
+            <span>Expand Door</span>
+            <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        </div>
+
+        <!-- Door 2: Personal World -->
+        <div class="showcase-door rounded-3xl p-5 relative flex flex-col justify-between group cursor-pointer" onclick="openDoorModal('personal')">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-10 h-10 rounded-2xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 flex items-center justify-center">
+              <i data-lucide="user-check" class="w-5 h-5"></i>
+            </div>
+            <div class="w-6 h-6 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center text-[10px] text-slate-400">
+              🎩
+            </div>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white group-hover:text-cyan-400 transition-colors">TappyThing: Personal World</h3>
+            <p class="text-xs text-slate-400 mt-1">Private Vault & Personal Life</p>
+            <div class="mt-4 flex flex-wrap gap-1.5">
+              <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300">Health</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300">Home</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300">Private Vault</span>
+            </div>
+          </div>
+          <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs font-bold text-cyan-400">
+            <span>Expand Door</span>
+            <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        </div>
+
+        <!-- Door 3: Invoices & Payments -->
+        <div class="showcase-door rounded-3xl p-5 relative flex flex-col justify-between group cursor-pointer" onclick="openDoorModal('invoices')">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-10 h-10 rounded-2xl bg-gold-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center">
+              <i data-lucide="receipt" class="w-5 h-5"></i>
+            </div>
+            <div class="w-6 h-6 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center text-[10px] text-slate-400">
+              🎩
+            </div>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white group-hover:text-amber-400 transition-colors">TappyThing: Invoices & Payments</h3>
+            <p class="text-xs text-slate-400 mt-1">Quick Closeout & 6 Streams</p>
+            <div class="mt-4 flex flex-wrap gap-1.5">
+              <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300">MD 6% Tax</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300">CC / Zelle</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300">Synchrony</span>
+            </div>
+          </div>
+          <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs font-bold text-amber-400">
+            <span>Expand Door</span>
+            <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        </div>
+
+        <!-- Door 4: Time to Tap (Task Execution Queue) -->
+        <div class="showcase-door rounded-3xl p-5 relative flex flex-col justify-between group cursor-pointer" onclick="openDoorModal('tap')">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-10 h-10 rounded-2xl bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center justify-center">
+              <i data-lucide="zap" class="w-5 h-5"></i>
+            </div>
+            <div class="w-6 h-6 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center text-[10px] text-slate-400">
+              🎩
+            </div>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white group-hover:text-purple-400 transition-colors">TappyThing: Time to Tap</h3>
+            <p class="text-xs text-slate-400 mt-1">Task Queue (Hardest $\rightarrow$ Easiest)</p>
+            <div class="mt-4 flex items-center gap-2">
+              <span id="queueCountBadge" class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">0 Items</span>
+            </div>
+          </div>
+          <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs font-bold text-purple-400">
+            <span>Expand Door</span>
+            <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="glass-panel rounded-3xl p-6 border border-slate-800 flex flex-col space-y-4">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div class="flex items-center space-x-3">
+          <div class="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            <i data-lucide="database" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white">TAPPING ENGINE — 22,283 Database Outreach</h3>
+            <p class="text-xs text-slate-400">1-click finished copy for Aerus Timonium customer sweep</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="generateTappingCopy()" class="px-4 py-2 rounded-xl bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 text-xs font-bold transition-colors border border-amber-500/30 flex items-center gap-1.5">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Generate Fresh Copy
+          </button>
+          <button onclick="copyTappingText()" class="px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 text-xs font-bold transition-colors border border-emerald-500/30 flex items-center gap-1.5">
             <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Output
           </button>
         </div>
-
-        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 text-xs font-mono text-slate-300 leading-relaxed overflow-x-auto min-h-[110px]" id="tappingTextOutput">
-          [TAPPING OUTREACH READY]
-          To: Valued Customer (Aerus Home Wellness / Clean Environment LLC)
-          Subject: Quick Wellness Checkup for your Aerus System
-
-          Hi! Fresh here following up from William's desk at Aerus Timonium. Just checking in on your air and surface wellness system to make sure everything is running 100% peak for allergy season. 
-
-          Reply "YES" to grab your seasonal filter refresh special, or tap here to book a 2-minute diagnostic checkup!
-        </div>
-        <p class="text-[11px] text-slate-500 mt-2 flex items-center gap-1">
-          <i data-lucide="info" class="w-3 h-3"></i> Tapping into 22,283 customer database. Copy, paste, send in seconds. Zero friction.
-        </p>
       </div>
 
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 font-mono text-xs text-slate-300 leading-relaxed min-h-[100px]" id="tappingCopyBox">
+[TAPPING OUTREACH READY — AERUS TIMONIUM]
+To: Valued Aerus Customer
+Subject: Quick Seasonal System Refresh — Aerus Home Wellness
+
+Hi! Fresh here following up from William's desk at Aerus Timonium. Your system is due for a quick seasonal filter refresh and surface diagnostic check.
+
+Reply "READY" to claim your priority drop-ship filter or schedule a 1-minute tech checkup!
+
+Towson Healthy Homes | BCC: board-22283@use1.monday.com
+      </div>
     </section>
 
   </main>
 
-  <!-- Team Modal -->
-  <div id="teamModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="glass-panel max-w-md w-full rounded-3xl p-6 border border-slate-800 shadow-2xl relative">
-      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
-        <div class="flex items-center space-x-2">
-          <div class="p-2 rounded-xl bg-amber-500/10 text-amber-400">
-            <i data-lucide="shield" class="w-5 h-5"></i>
+  <div id="doorModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-panel max-w-2xl w-full rounded-3xl p-6 border border-slate-800 shadow-2xl relative max-h-[90vh] flex flex-col overflow-hidden">
+      
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div class="flex items-center space-x-3">
+          <div id="modalDoorIcon" class="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400">
+            <i data-lucide="door-open" class="w-6 h-6"></i>
           </div>
-          <h3 class="text-base font-bold text-white">The Official Squad</h3>
+          <div>
+            <h3 id="modalDoorTitle" class="text-lg font-extrabold text-white">Door Title</h3>
+            <p id="modalDoorSub" class="text-xs text-slate-400">Cascading Sub-TappyThings</p>
+          </div>
         </div>
-        <button onclick="toggleTeamModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+        <button onclick="closeDoorModal()" class="p-2 text-slate-400 hover:text-white rounded-xl bg-slate-900 border border-slate-800">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <div class="space-y-2.5 text-xs">
-        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+      <div id="modalDoorBody" class="flex-1 overflow-y-auto py-4 space-y-4">
+        <!-- Content dynamically injected via JS -->
+      </div>
+
+    </div>
+  </div>
+
+  <div id="squadModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-panel max-w-md w-full rounded-3xl p-6 border border-slate-800 shadow-2xl relative">
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+        <div class="flex items-center space-x-2">
+          <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
+            <i data-lucide="shield" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-base font-bold text-white">The Official Squad Roster</h3>
+        </div>
+        <button onclick="toggleSquadModal()" class="text-slate-400 hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-2 text-xs">
+        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
           <span class="font-bold text-emerald-400">Fresh 🤵</span>
-          <span class="text-slate-400">Host, Digital Coordinator, Coach</span>
+          <span class="text-slate-400">Host & Chief of Staff</span>
         </div>
-        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
           <span class="font-bold text-cyan-400">Boudie</span>
-          <span class="text-slate-400">Execution Powerhouse</span>
+          <span class="text-slate-400">Execution Lead</span>
         </div>
-        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
           <span class="font-bold text-purple-400">Sissy</span>
-          <span class="text-slate-400">Back-end Data & Webhooks</span>
+          <span class="text-slate-400">Back-End & Webhooks</span>
         </div>
-        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
           <span class="font-bold text-amber-400">L</span>
           <span class="text-slate-400">Money Man</span>
         </div>
-        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
           <span class="font-bold text-blue-400">Nuesh</span>
           <span class="text-slate-400">Brains</span>
         </div>
-        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
           <span class="font-bold text-rose-400">Squash</span>
           <span class="text-slate-400">Coach</span>
         </div>
-        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
           <span class="font-bold text-teal-400">Yogie</span>
           <span class="text-slate-400">Lifter</span>
         </div>
@@ -308,65 +447,86 @@
     </div>
   </div>
 
-  <!-- Settings Modal -->
-  <div id="settingsModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+  <div id="settingsModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="glass-panel max-w-md w-full rounded-3xl p-6 border border-slate-800 shadow-2xl relative">
       <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
         <div class="flex items-center space-x-2">
           <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400">
-            <i data-lucide="link-2" class="w-5 h-5"></i>
+            <i data-lucide="link" class="w-5 h-5"></i>
           </div>
-          <h3 class="text-base font-bold text-white">Direct Webhook Integration</h3>
+          <h3 class="text-base font-bold text-white">Direct Connect Settings</h3>
         </div>
-        <button onclick="toggleSettingsModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+        <button onclick="toggleSettingsModal()" class="text-slate-400 hover:text-white p-1">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
       <div class="space-y-4 text-xs">
-        <p class="text-slate-300 leading-relaxed">
-          <strong class="text-emerald-400">Direct Connect Active!</strong> Payloads route directly to Monday.com or custom API endpoints without middleman tools like Make.com.
+        <p class="text-slate-300">
+          <strong class="text-emerald-400">Middleman Silenced!</strong> Payloads dispatch straight from Netlify to Monday.com API.
         </p>
 
         <div>
-          <label class="block font-bold text-slate-300 mb-1">Target Webhook URL / Monday.com API</label>
-          <input type="text" id="webhookUrlInput" placeholder="https://api.monday.com/v2 or custom webhook..." value="https://api.monday.com/v2" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-200 font-mono text-xs focus:outline-none focus:border-cyan-500">
+          <label class="block font-bold text-slate-300 mb-1">Target Webhook / Monday.com Endpoint</label>
+          <input type="text" id="settingWebhookUrl" value="https://api.monday.com/v2" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-200 font-mono text-xs focus:outline-none focus:border-cyan-500">
         </div>
 
         <div>
-          <label class="block font-bold text-slate-300 mb-1">BCC Board Email Address</label>
-          <input type="text" id="bccEmailInput" placeholder="board-123456@use1.monday.com" value="towsonhealthyhomes@monday.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-200 font-mono text-xs focus:outline-none focus:border-cyan-500">
+          <label class="block font-bold text-slate-300 mb-1">BCC Monday.com Board Email</label>
+          <input type="text" id="settingBccEmail" value="towsonhealthyhomes@monday.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-200 font-mono text-xs focus:outline-none focus:border-cyan-500">
         </div>
 
-        <button onclick="saveWebhookSettings()" class="w-full py-3 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-slate-950 font-bold rounded-xl shadow-lg hover:opacity-95 transition-opacity">
-          Save Settings & Return
+        <button onclick="saveSettings()" class="w-full py-3 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-slate-950 font-bold rounded-xl shadow-lg">
+          Save Settings
         </button>
       </div>
     </div>
   </div>
 
   <script>
-    /* Global Application State */
-    let currentHub = 'business'; // 'business' or 'personal'
+    /* State Management */
     let isRecording = false;
     let recognition = null;
     let taskQueue = [];
-    let isTypeModeVisible = false;
+    let currentTrade = 'aerus';
+    let isSecondaryTypeVisible = false;
 
-    // Webhook Settings
-    let webhookSettings = {
-      url: localStorage.getItem('tt_webhook_url') || 'https://api.monday.com/v2',
-      bcc: localStorage.getItem('tt_bcc_email') || 'towsonhealthyhomes@monday.com'
+    // Industry Profiles Data
+    const industryProfiles = {
+      aerus: {
+        name: "Aerus / Vacuum Repair",
+        subBadges: ["Workbench", "Vehicles", "Showroom", "Ready Wall"],
+        greeting: "BOOM! Welcome to your Aerus Timonium Command Center! Tap and talk into any door!"
+      },
+      restaurant: {
+        name: "Restaurant / Dining",
+        subBadges: ["Kitchen", "Dining Room", "Bar", "Walk-in Box"],
+        greeting: "BOOM! Restaurant World staged! Kitchen, Dining, and Bar cabinets ready!"
+      },
+      plumbing: {
+        name: "Plumbing Services",
+        subBadges: ["Dispatch", "Van Parts", "Field Installs", "Invoicing"],
+        greeting: "BOOM! Plumbing Hub active! Let's conquer those field jobs!"
+      },
+      hvac: {
+        name: "HVAC & Climate Control",
+        subBadges: ["Diagnostics", "Tech Vans", "Maintenance", "Quotes"],
+        greeting: "BOOM! HVAC Hub active! Time to run that field sweep!"
+      },
+      landscaping: {
+        name: "Landscaping & Lawn",
+        subBadges: ["Mow Crews", "Equipment", "Seasonal", "Estimates"],
+        greeting: "BOOM! Landscaping Hub live! Let's crush today's routes!"
+      }
     };
 
     window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
-      setupSpeechRecognition();
-      loadStoredTasks();
-      updateHubUI();
+      initSpeech();
+      loadTasks();
     });
 
-    /* Speech Synthesis Helper (Fresh Voice Output) */
+    /* Speech Synthesis Voice Helper */
     function speakFresh(text) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
@@ -374,368 +534,319 @@
         utterance.rate = 1.05;
         utterance.pitch = 1.0;
         
-        const voices = window.speechSynthesis.getVoices();
-        const preferredVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Male')));
-        if (preferredVoice) utterance.voice = preferredVoice;
-
-        document.getElementById('freshVoiceText').innerText = `"${text}"`;
+        document.getElementById('freshVoiceBannerText').innerText = `"${text}"`;
         window.speechSynthesis.speak(utterance);
       }
     }
 
-    function speakFreshGreeting() {
-      speakFresh("BOOM! Good morning, William! Fresh here on your hip. Tap and talk, and let's win today!");
+    function triggerFreshGreetingVoice() {
+      speakFresh("BOOM! Good morning, William! I'm Fresh — your Digital Coordinator. Let me hold the wheel and buy back your time today!");
     }
 
-    /* Hub Toggle Logic (2-Hub Cascading System) */
-    function setHub(hubName) {
-      currentHub = hubName;
-      updateHubUI();
-      const text = hubName === 'business' 
-        ? "Business World active! Let's hit the customer engine and route those wins!" 
-        : "Personal World active! Keeping your life smooth, sharp, and organized!";
-      speakFresh(text);
-    }
-
-    function updateHubUI() {
-      const btnBiz = document.getElementById('btnHubBusiness');
-      const btnPers = document.getElementById('btnHubPersonal');
-      const badge = document.getElementById('activeHubBadge');
-
-      if (currentHub === 'business') {
-        btnBiz.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 shadow-md";
-        btnPers.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5 text-slate-400 hover:text-white";
-        badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-        badge.innerHTML = `<i data-lucide="briefcase" class="w-3.5 h-3.5"></i> ACTIVE HUB: BUSINESS WORLD`;
-      } else {
-        btnPers.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 shadow-md";
-        btnBiz.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5 text-slate-400 hover:text-white";
-        badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20";
-        badge.innerHTML = `<i data-lucide="user" class="w-3.5 h-3.5"></i> ACTIVE HUB: PERSONAL WORLD`;
-      }
-      lucide.createIcons();
-      renderTasks();
-    }
-
-    /* Web Speech Recognition Logic */
-    function setupSpeechRecognition() {
+    /* Web Speech Recognition Setup */
+    function initSpeech() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        document.getElementById('transcriptPreview').innerText = "Voice recognition not supported on this browser. Use manual input.";
-        return;
-      }
+      if (!SpeechRecognition) return;
 
       recognition = new SpeechRecognition();
       recognition.continuous = false;
-      recognition.interimResults = true;
+      recognition.interimResults = false;
       recognition.lang = 'en-US';
 
       recognition.onstart = () => {
         isRecording = true;
-        updateRecordingStateUI(true);
+        document.getElementById('masterVoiceLabel').innerText = "LISTENING NOW...";
+        document.getElementById('micIconBox').classList.add('animate-ping');
       };
 
-      recognition.onresult = (event) => {
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          transcript += event.results[i][0].transcript;
-        }
-        document.getElementById('transcriptPreview').innerText = `"${transcript}"`;
-      };
-
-      recognition.onerror = (event) => {
-        console.error("Speech Error:", event.error);
-        stopRecordingState();
-        speakFresh("Got it! Let me hear that again, boss!");
+      recognition.onresult = (e) => {
+        const transcript = e.results[0][0].transcript;
+        processBrainDump(transcript);
       };
 
       recognition.onend = () => {
-        if (isRecording) {
-          const finalNote = document.getElementById('transcriptPreview').innerText.replace(/^"|"$/g, '');
-          if (finalNote && finalNote !== "Tap the button above and start speaking...") {
-            processBrainDump(finalNote);
-          }
-        }
-        stopRecordingState();
+        isRecording = false;
+        document.getElementById('masterVoiceLabel').innerText = "TAP & TALK TO FRESH";
+        document.getElementById('micIconBox').classList.remove('animate-ping');
       };
     }
 
-    function toggleVoiceRecording() {
+    function toggleVoiceInput() {
       if (!recognition) {
-        alert("Speech Recognition is not available. Please use the secondary typing option!");
+        alert("Speech Recognition is not supported on this browser. Use the secondary typing option below!");
         return;
       }
-
-      if (!isRecording) {
-        try {
-          recognition.start();
-        } catch(e) {
-          console.log("Already started:", e);
-        }
-      } else {
+      if (isRecording) {
         recognition.stop();
-      }
-    }
-
-    function updateRecordingStateUI(recording) {
-      const btnInner = document.getElementById('tapBtnInner');
-      const icon = document.getElementById('tapIcon');
-      const mainLabel = document.getElementById('tapMainLabel');
-      const wave = document.getElementById('audioWave');
-
-      if (recording) {
-        btnInner.classList.add('animate-pulse-glow', 'border-cyan-400', 'bg-slate-900');
-        icon.className = "w-12 h-12 text-cyan-400 mb-2 animate-bounce";
-        mainLabel.innerText = "LISTENING...";
-        wave.classList.remove('hidden');
       } else {
-        stopRecordingState();
+        recognition.start();
       }
     }
 
-    function stopRecordingState() {
-      isRecording = false;
-      const btnInner = document.getElementById('tapBtnInner');
-      const icon = document.getElementById('tapIcon');
-      const mainLabel = document.getElementById('tapMainLabel');
-      const wave = document.getElementById('audioWave');
+    /* Brain Dump Processing */
+    function processBrainDump(noteText) {
+      if (!noteText.trim()) return;
 
-      btnInner.classList.remove('animate-pulse-glow', 'border-cyan-400', 'bg-slate-900');
-      icon.className = "w-12 h-12 text-emerald-400 mb-2 transition-transform group-hover:scale-110";
-      mainLabel.innerText = "TAP & TALK";
-      wave.classList.add('hidden');
-    }
-
-    /* Brain Dump & Task Priority Router */
-    function processBrainDump(rawText) {
-      if (!rawText.trim()) return;
-
-      let difficulty = 1;
-      const lower = rawText.toLowerCase();
-      if (lower.includes('repair') || lower.includes('estimate') || lower.includes('install') || lower.includes('urgent') || lower.includes('problem')) {
-        difficulty = 3; // Hardest
-      } else if (lower.includes('follow up') || lower.includes('call') || lower.includes('email') || lower.includes('order')) {
-        difficulty = 2; // Medium
+      let difficulty = 1; // 1 = Easy, 2 = Medium, 3 = Hardest
+      const lower = noteText.toLowerCase();
+      if (lower.includes('repair') || lower.includes('urgent') || lower.includes('install') || lower.includes('problem')) {
+        difficulty = 3;
+      } else if (lower.includes('call') || lower.includes('email') || lower.includes('order')) {
+        difficulty = 2;
       }
 
       const newTask = {
         id: Date.now(),
-        text: rawText,
-        hub: currentHub,
+        text: noteText,
         difficulty: difficulty,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         completed: false
       };
 
       taskQueue.push(newTask);
-      sortTaskQueue();
-      saveTasksToStorage();
-      renderTasks();
+      sortQueue();
+      saveTasks();
+      updateQueueBadge();
 
-      sendDirectWebhook(newTask);
-
-      const responses = [
-        "BOOM! Tapped right into the queue! Hardest items at the top—let's crush them!",
-        "Dump received and sorted! What's our next play?",
-        "Solid! Direct webhook dispatched to the board. Next item?"
-      ];
-      speakFresh(responses[Math.floor(Math.random() * responses.length)]);
-      
-      document.getElementById('transcriptPreview').innerText = "Dump captured! Ready for next voice input...";
+      speakFresh(`Got it! Placed "${noteText.substring(0, 25)}..." straight into your execution queue!`);
     }
 
-    function sortTaskQueue() {
+    function sortQueue() {
       taskQueue.sort((a, b) => b.difficulty - a.difficulty);
     }
 
-    function renderTasks() {
-      const container = document.getElementById('taskList');
-      const filtered = taskQueue.filter(t => t.hub === currentHub);
-      document.getElementById('taskCountBadge').innerText = `${filtered.length} Tasks`;
+    function updateQueueBadge() {
+      document.getElementById('queueCountBadge').innerText = `${taskQueue.length} Items`;
+    }
 
-      if (filtered.length === 0) {
-        container.innerHTML = `
-          <div id="emptyTaskState" class="h-48 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-slate-800 rounded-2xl">
-            <div class="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center text-slate-500 mb-3">
-              <i data-lucide="mic-off" class="w-6 h-6"></i>
-            </div>
-            <h3 class="text-sm font-bold text-slate-300">No active dumps in queue</h3>
-            <p class="text-xs text-slate-500 mt-1 max-w-xs">Tap the big green button, talk out loud, and Fresh will prioritize your items here automatically!</p>
+    /* Interactive Onboarding (Entry Point A) */
+    function startInteractiveOnboarding() {
+      speakFresh("BOOM! Let's build your world together! Tell me what trade or business you run today!");
+      setTimeout(() => {
+        toggleVoiceInput();
+      }, 3500);
+    }
+
+    /* Select Industry (Entry Point B) */
+    function selectIndustryProfile(key) {
+      currentTrade = key;
+      const profile = industryProfiles[key];
+      
+      document.getElementById('activeIndustryBadge').innerText = `TRADE: ${profile.name.toUpperCase()}`;
+      
+      // Update sub-badges on Door 1
+      const subContainer = document.getElementById('businessSubBadges');
+      subContainer.innerHTML = profile.subBadges.map(b => `<span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300">${b}</span>`).join('');
+      
+      speakFresh(profile.greeting);
+    }
+
+    /* Expand Showcase Door Modal */
+    function openDoorModal(type) {
+      const modal = document.getElementById('doorModal');
+      const title = document.getElementById('modalDoorTitle');
+      const sub = document.getElementById('modalDoorSub');
+      const body = document.getElementById('modalDoorBody');
+      const icon = document.getElementById('modalDoorIcon');
+
+      modal.classList.remove('hidden');
+
+      if (type === 'business') {
+        title.innerText = "TappyThing: Business World";
+        sub.innerText = "Cascading Shop & Operations Cabinets";
+        icon.className = "p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400";
+        
+        const subList = industryProfiles[currentTrade].subBadges;
+        body.innerHTML = `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            ${subList.map(item => `
+              <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between hover:border-emerald-500/40 transition-colors">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-bold text-emerald-400">${item} Cabinet</span>
+                  <i data-lucide="folder-kanban" class="w-4 h-4 text-slate-500"></i>
+                </div>
+                <p class="text-[11px] text-slate-400">Dedicated cabinet for ${item.toLowerCase()} voice notes and team routing.</p>
+                <button onclick="speakFresh('Opened ${item} cabinet!')" class="mt-3 px-3 py-1.5 rounded-xl bg-slate-800 text-slate-200 text-xs font-bold hover:bg-emerald-500 hover:text-slate-950 transition-colors">
+                  Open Cabinet
+                </button>
+              </div>
+            `).join('')}
           </div>
         `;
-        lucide.createIcons();
-        return;
-      }
-
-      container.innerHTML = filtered.map(task => {
-        let diffBadge = '';
-        if (task.difficulty === 3) {
-          diffBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-red-500/10 text-red-400 border border-red-500/20">HARDEST / HIGH PRIORITY</span>`;
-        } else if (task.difficulty === 2) {
-          diffBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/10 text-amber-400 border border-amber-500/20">MEDIUM</span>`;
-        } else {
-          diffBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">EASY WIN</span>`;
-        }
-
-        return `
-          <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-slate-700 transition-all flex items-start justify-between gap-3 group">
-            <div class="flex items-start space-x-3 flex-1">
-              <button onclick="toggleTaskComplete(${task.id})" class="mt-0.5 text-slate-500 hover:text-emerald-400 transition-colors">
-                <i data-lucide="${task.completed ? 'check-circle-2' : 'circle'}" class="w-5 h-5 ${task.completed ? 'text-emerald-400' : ''}"></i>
-              </button>
-              <div class="flex-1">
-                <div class="flex items-center gap-2 mb-1">
-                  ${diffBadge}
-                  <span class="text-[10px] text-slate-500">${task.timestamp}</span>
-                </div>
-                <p class="text-xs font-semibold ${task.completed ? 'line-through text-slate-500' : 'text-slate-200'}">${escapeHtml(task.text)}</p>
+      } else if (type === 'personal') {
+        title.innerText = "TappyThing: Personal World";
+        sub.innerText = "Private Vault & Personal Life";
+        icon.className = "p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400";
+        body.innerHTML = `
+          <div class="space-y-3">
+            <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+              <h4 class="text-xs font-bold text-cyan-400 mb-1">Private Health & Fitness Vault</h4>
+              <p class="text-xs text-slate-300">Ragweed pollen defense active. Rest those eyes, boss!</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+              <h4 class="text-xs font-bold text-cyan-400 mb-1">Personal Reminders</h4>
+              <p class="text-xs text-slate-300">• Cancel TV subscription for Eda</p>
+              <p class="text-xs text-slate-300">• Glen Burnie run at 10:30 AM</p>
+            </div>
+          </div>
+        `;
+      } else if (type === 'invoices') {
+        title.innerText = "TappyThing: Invoices & Payments";
+        sub.innerText = "Quick Closeout & 6 Payment Streams";
+        icon.className = "p-2.5 rounded-xl bg-amber-500/10 text-amber-400";
+        body.innerHTML = `
+          <div class="space-y-4">
+            <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold text-white">5th-Grade Simple Invoice Generator</span>
+                <label class="flex items-center gap-1.5 text-xs text-slate-300">
+                  <input type="checkbox" id="mdTaxToggle" checked onchange="calcInvoice()" class="rounded bg-slate-800 border-slate-700 text-amber-500">
+                  MD 6% Tax
+                </label>
+              </div>
+              <div class="grid grid-cols-2 gap-2 mb-3">
+                <input type="text" id="invCustomer" placeholder="Customer Name" value="Dave Peterson" class="bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-white">
+                <input type="number" id="invAmount" placeholder="Amount ($)" value="185.00" oninput="calcInvoice()" class="bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-white">
+              </div>
+              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-amber-300" id="invTotalDisplay">
+                Total Due: $196.10 (Includes MD 6% Tax)
               </div>
             </div>
-            <button onclick="deleteTask(${task.id})" class="opacity-0 group-hover:opacity-100 p-1 text-slate-500 hover:text-red-400 transition-opacity">
-              <i data-lucide="trash-2" class="w-4 h-4"></i>
-            </button>
+
+            <div>
+              <p class="text-xs font-bold text-slate-300 mb-2">Select 1-Tap Payment Stream:</p>
+              <div class="grid grid-cols-3 gap-2">
+                <button onclick="speakFresh('Processing Credit Card via Workiz Cash Register!')" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-200 hover:border-amber-400">Credit Card</button>
+                <button onclick="speakFresh('Cash Payment logged!')" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-200 hover:border-amber-400">Cash</button>
+                <button onclick="speakFresh('Check Payment logged!')" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-200 hover:border-amber-400">Check</button>
+                <button onclick="speakFresh('Zelle link dispatched!')" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-200 hover:border-amber-400">Zelle</button>
+                <button onclick="speakFresh('Venmo request sent!')" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-200 hover:border-amber-400">Venmo</button>
+                <button onclick="speakFresh('Synchrony financing portal opened!')" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-200 hover:border-amber-400">Synchrony</button>
+              </div>
+            </div>
           </div>
         `;
-      }).join('');
+      } else if (type === 'tap') {
+        title.innerText = "TappyThing: Time to Tap";
+        sub.innerText = "Execution Queue (Sorted Hardest to Easiest)";
+        icon.className = "p-2.5 rounded-xl bg-purple-500/10 text-purple-400";
+        
+        if (taskQueue.length === 0) {
+          body.innerHTML = `
+            <div class="p-8 text-center border-2 border-dashed border-slate-800 rounded-2xl">
+              <p class="text-xs text-slate-400">No active tasks in queue. Tap the main microphone to speak your first note!</p>
+            </div>
+          `;
+        } else {
+          body.innerHTML = taskQueue.map(t => {
+            let badge = t.difficulty === 3 ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 font-bold">HARDEST</span>' : '<span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">EASY WIN</span>';
+            return `
+              <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div>
+                  <div class="flex items-center gap-2 mb-1">${badge} <span class="text-[10px] text-slate-500">${t.timestamp}</span></div>
+                  <p class="text-xs font-semibold text-slate-200">${t.text}</p>
+                </div>
+                <button onclick="completeTask(${t.id})" class="p-2 text-emerald-400 hover:bg-slate-800 rounded-xl">
+                  <i data-lucide="check-circle" class="w-5 h-5"></i>
+                </button>
+              </div>
+            `;
+          }).join('');
+        }
+      }
 
       lucide.createIcons();
     }
 
-    function toggleTaskComplete(id) {
-      const task = taskQueue.find(t => t.id === id);
-      if (task) {
-        task.completed = !task.completed;
-        if (task.completed) speakFresh("Boom! Knocked out!");
-        saveTasksToStorage();
-        renderTasks();
-      }
+    function calcInvoice() {
+      const amt = parseFloat(document.getElementById('invAmount').value) || 0;
+      const hasTax = document.getElementById('mdTaxToggle').checked;
+      const total = hasTax ? (amt * 1.06) : amt;
+      document.getElementById('invTotalDisplay').innerText = `Total Due: $${total.toFixed(2)} ${hasTax ? '(Includes MD 6% Tax)' : '(Tax Exempt)'}`;
     }
 
-    function deleteTask(id) {
+    function closeDoorModal() {
+      document.getElementById('doorModal').classList.add('hidden');
+    }
+
+    function completeTask(id) {
       taskQueue = taskQueue.filter(t => t.id !== id);
-      saveTasksToStorage();
-      renderTasks();
+      saveTasks();
+      updateQueueBadge();
+      openDoorModal('tap');
+      speakFresh("Boom! Task complete!");
     }
 
-    function sendDirectWebhook(taskData) {
-      const payload = {
-        title: `[${taskData.hub.toUpperCase()}] ${taskData.text.substring(0, 30)}...`,
-        note: taskData.text,
-        hub: taskData.hub,
-        priority: taskData.difficulty === 3 ? "High" : "Normal",
-        timestamp: taskData.timestamp,
-        source: "Fresh_TappyThing",
-        bcc: webhookSettings.bcc
-      };
+    /* Secondary Typing Mode */
+    function toggleSecondaryType() {
+      const container = document.getElementById('typeInputContainer');
+      const text = document.getElementById('typeToggleText');
+      isSecondaryTypeVisible = !isSecondaryTypeVisible;
 
-      if (webhookSettings.url && webhookSettings.url !== 'https://api.monday.com/v2') {
-        fetch(webhookSettings.url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        }).catch(err => console.warn("Direct webhook dispatch error:", err));
-      }
-    }
-
-    /* Secondary Manual Input Toggle */
-    function toggleTypeMode() {
-      const container = document.getElementById('typeModeContainer');
-      const label = document.getElementById('typeToggleLabel');
-      isTypeModeVisible = !isTypeModeVisible;
-
-      if (isTypeModeVisible) {
+      if (isSecondaryTypeVisible) {
         container.classList.remove('hidden');
-        label.innerText = "Hide Typing Option";
+        text.innerText = "Hide Typing Option";
       } else {
         container.classList.add('hidden');
-        label.innerText = "Type Instead (Secondary Option)";
+        text.innerText = "Type Instead (Secondary Option)";
       }
     }
 
-    function submitManualInput() {
-      const input = document.getElementById('manualTextInput');
-      if (input.value.trim()) {
-        processBrainDump(input.value);
-        input.value = '';
+    function submitManualTextNote() {
+      const field = document.getElementById('manualTextNote');
+      if (field.value.trim()) {
+        processBrainDump(field.value);
+        field.value = '';
       }
     }
 
-    /* Tapping Engine (Database Outreach) */
-    function triggerTappingEngine() {
-      const tappingText = `[TAPPING OUTREACH READY — 22,283 DATABASE ENGINE]
-To: Valued Aerus Customer
-Subject: Aerus Home Wellness Special Checkup — Timonium MD
-
-Hi! Fresh here following up from William Sullivan's desk at Aerus Home Wellness. 
-
-We are running our seasonal system checkup sweep across Towson & Timonium. Your Aerus system is due for a quick filter and surface unit tune-up. 
-
-Reply "READY" to grab your priority drop-ship filter or schedule a 1-minute tech check. 
-
-Direct Line: Towson Healthy Homes
-BCC: ${webhookSettings.bcc}`;
-
-      document.getElementById('tappingTextOutput').innerText = tappingText;
-      speakFresh("Tapping engine engaged! Pre-written outreach ready for your 22,283 customer database!");
+    /* Tapping Outreach Copy */
+    function generateTappingCopy() {
+      const templates = [
+        `[TAPPING OUTREACH READY — AERUS TIMONIUM]\nTo: Valued Aerus Customer\nSubject: Quick Seasonal System Refresh — Aerus Home Wellness\n\nHi! Fresh here following up from William's desk at Aerus Timonium. Your system is due for a quick seasonal filter refresh and surface diagnostic check.\n\nReply "READY" to claim your priority drop-ship filter or schedule a 1-minute tech checkup!\n\nTowson Healthy Homes | BCC: board-22283@use1.monday.com`,
+        `[TAPPING OUTREACH READY — AERUS TIMONIUM]\nTo: Aerus VIP Member\nSubject: Allergy Season Protection Tune-Up\n\nHi! Fresh here from Aerus Home Wellness. Ragweed counts are peaking in MD. Let's make sure your HEPA units are running 100% peak.\n\nReply "YES" to confirm your filter replacement!\n\nTowson Healthy Homes | BCC: board-22283@use1.monday.com`
+      ];
+      const selected = templates[Math.floor(Math.random() * templates.length)];
+      document.getElementById('tappingCopyBox').innerText = selected;
+      speakFresh("Generated fresh outreach copy for your 22,283 customer database!");
     }
 
-    function triggerEasyInvoicing() {
-      const invoiceText = `[3-STEP FIFTH-GRADE INVOICE]
-1. Customer: [Insert Name / Phone]
-2. Service: Aerus Unit Repair / Filter Replacements
-3. Total Due: $185.00
-Payment Link generated via Workiz Cash Register. Card processing ready.`;
-
-      document.getElementById('tappingTextOutput').innerText = invoiceText;
-      speakFresh("3-Step Invoice ready! Keep it fifth-grade simple and let's get paid!");
-    }
-
-    function copyTappingOutput() {
-      const text = document.getElementById('tappingTextOutput').innerText;
+    function copyTappingText() {
+      const copyText = document.getElementById('tappingCopyBox').innerText;
       document.execCommand('copy');
       speakFresh("Copied to clipboard! Ready to paste and send!");
+    }
+
+    /* Modals */
+    function toggleSquadModal() {
+      document.getElementById('squadModal').classList.toggle('hidden');
     }
 
     function toggleSettingsModal() {
       document.getElementById('settingsModal').classList.toggle('hidden');
     }
 
-    function toggleTeamModal() {
-      document.getElementById('teamModal').classList.toggle('hidden');
-    }
-
-    function saveWebhookSettings() {
-      const url = document.getElementById('webhookUrlInput').value;
-      const bcc = document.getElementById('bccEmailInput').value;
-
-      webhookSettings.url = url;
-      webhookSettings.bcc = bcc;
-
-      localStorage.setItem('tt_webhook_url', url);
-      localStorage.setItem('tt_bcc_email', bcc);
-
+    function saveSettings() {
       toggleSettingsModal();
-      speakFresh("Settings saved! Middleman bypassed!");
+      speakFresh("Settings saved! Direct Netlify POST to Monday.com locked in!");
     }
 
-    function saveTasksToStorage() {
-      localStorage.setItem('tt_tasks', JSON.stringify(taskQueue));
+    function saveTasks() {
+      localStorage.setItem('tt_master_tasks', JSON.stringify(taskQueue));
     }
 
-    function loadStoredTasks() {
-      const stored = localStorage.getItem('tt_tasks');
-      if (stored) {
+    function loadTasks() {
+      const data = localStorage.getItem('tt_master_tasks');
+      if (data) {
         try {
-          taskQueue = JSON.parse(stored);
+          taskQueue = JSON.parse(data);
+          updateQueueBadge();
         } catch(e) {
           taskQueue = [];
         }
       }
     }
-
-    function escapeHtml(str) {
-      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-    }
   </script>
+
 </body>
 </html>
