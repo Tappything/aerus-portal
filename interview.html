@@ -1,631 +1,594 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>TappyThing — Just Talk</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TappyThing — Aerus Digital Coordinator</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Styles & Print Engine CSS -->
   <style>
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{background:#0f0f1a;color:#fff;font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 100px 0;}
-    .header{width:100%;max-width:480px;text-align:center;padding:24px 16px 16px;border-bottom:2px solid #ffd700;}
-    .fresh-card img{width:80px;height:80px;border-radius:50%;border:3px solid #ffd700;object-fit:cover;}
-    .fresh-name{font-size:1.2rem;font-weight:bold;color:#ffd700;margin-top:8px;}
-    .fresh-title{font-size:0.72rem;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px;}
-    .fresh-badge{display:inline-block;margin-top:6px;background:#1a1a2e;border:1px solid #ffd700;border-radius:20px;padding:4px 14px;font-size:0.72rem;color:#ffd700;}
-    .section{display:none;width:100%;max-width:480px;padding:16px 16px 0;}
-    .card{background:#1a1a2e;border-radius:12px;padding:16px;margin-bottom:10px;}
-    .card.gold{border-left:4px solid #ffd700;}
-    .card.green{border-left:4px solid #00c875;}
-    .card.blue{border-left:4px solid #579bfc;}
-    .card.red{border-left:4px solid #df2f4a;}
-    .label{font-size:0.7rem;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;}
-    .title{font-size:1rem;font-weight:bold;color:#ffd700;margin-bottom:8px;}
-    .body-text{color:#e2e8f0;font-size:0.92rem;line-height:1.8;}
-    .body-text strong{color:#ffd700;}
-    .btn{width:100%;padding:13px;font-size:0.95rem;font-weight:bold;border:none;border-radius:10px;cursor:pointer;margin-top:10px;}
-    .btn-gold{background:#ffd700;color:#000;}
-    .btn-green{background:#00c875;color:#000;}
-    .btn-blue{background:#579bfc;color:#fff;}
-    .btn-red{background:#df2f4a;color:#fff;}
-    .btn-outline{background:transparent;color:#ffd700;border:2px solid #ffd700;}
-    .hook-card{background:#1a1a2e;border-radius:12px;padding:20px;margin-bottom:10px;text-align:center;border:1px solid #2a2a3e;}
-    .hook-line{font-size:1rem;color:#e2e8f0;line-height:1.8;margin-bottom:10px;}
-    .hook-line strong{color:#ffd700;}
-    .hook-sub{font-size:0.78rem;color:#555;}
-    .cover-box{display:flex;gap:8px;margin-bottom:8px;}
-    .cover-box input{flex:1;padding:13px;font-size:0.95rem;border-radius:10px;border:1px solid #333;background:#1a1a2e;color:#fff;outline:none;}
-    .cover-box input:focus{border-color:#ffd700;}
-    .demo-board{background:#0f0f1a;border:1px solid #2a2a3e;border-radius:10px;padding:12px;margin-bottom:10px;}
-    .demo-board-title{font-size:0.78rem;color:#ffd700;font-weight:bold;margin-bottom:8px;}
-    .demo-seats{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
-    .demo-seat{width:34px;height:34px;border-radius:6px;background:#1a1a2e;border:1px solid #333;display:flex;align-items:center;justify-content:center;font-size:0.62rem;color:#aaa;cursor:pointer;transition:all 0.2s;}
-    .demo-seat.lit{background:#ffd70022;border-color:#ffd700;color:#ffd700;}
-    .demo-seat.green{background:#00c87522;border-color:#00c875;color:#00c875;}
-    .demo-items{display:flex;flex-wrap:wrap;gap:5px;}
-    .demo-item{padding:5px 10px;border-radius:16px;background:#1a1a2e;border:1px solid #333;font-size:0.7rem;color:#aaa;}
-    .demo-item.lit{border-color:#579bfc;color:#579bfc;background:#579bfc11;}
-    .talk-box{width:100%;padding:12px;border-radius:10px;border:1px solid #333;background:#0f0f1a;color:#fff;font-size:0.92rem;min-height:90px;resize:none;outline:none;margin-bottom:8px;}
-    .talk-box:focus{border-color:#ffd700;}
-    .mic-big{width:100%;padding:16px;background:#df2f4a;color:#fff;font-size:1.05rem;font-weight:bold;border:none;border-radius:12px;cursor:pointer;margin-bottom:8px;transition:all 0.2s;}
-    .mic-big.listening{background:#c0392b;animation:micpulse 1s infinite;}
-    .mic-big.done{background:#00c875;}
-    @keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(223,47,74,0.5);}50%{box-shadow:0 0 0 12px rgba(223,47,74,0);}}
-    .mic-hint{font-size:0.73rem;color:#555;text-align:center;margin-bottom:8px;}
-    .info-confirm{background:#0f0f1a;border:1px solid #2a2a3e;border-radius:10px;padding:12px;margin-bottom:10px;}
-    .info-row{display:flex;gap:10px;padding:4px 0;border-bottom:1px solid #1a1a2e;}
-    .info-row:last-child{border-bottom:none;}
-    .info-label{font-size:0.7rem;color:#555;width:70px;flex-shrink:0;padding-top:2px;}
-    .info-value{font-size:0.85rem;color:#ffd700;font-weight:bold;}
-    .buckets-wrap{display:flex;flex-direction:column;gap:10px;margin-bottom:8px;}
-    .bucket{background:#1a1a2e;border:1px solid #2a2a3e;border-radius:12px;padding:12px 14px;transition:all 0.3s;opacity:0;transform:translateY(12px);}
-    .bucket.show{opacity:1;transform:translateY(0);}
-    .bucket.flash{border-color:#ffd700;}
-    .bucket-header{display:flex;align-items:center;gap:10px;}
-    .bucket-icon{font-size:1.2rem;}
-    .bucket-name{font-weight:bold;color:#ffd700;font-size:0.88rem;flex:1;}
-    .bucket-count{font-size:0.68rem;color:#555;background:#0f0f1a;padding:2px 8px;border-radius:10px;}
-    .bucket-items{margin-top:8px;padding-top:8px;border-top:1px solid #2a2a3e;}
-    .bucket-item{font-size:0.8rem;color:#e2e8f0;padding:4px 0;display:flex;align-items:center;gap:6px;animation:slideIn 0.3s ease;}
-    .bucket-item::before{content:'→';color:#ffd700;font-size:0.68rem;}
-    @keyframes slideIn{from{opacity:0;transform:translateX(-8px);}to{opacity:1;transform:translateX(0);}}
-    .reveal-card{background:#1a1a2e;border:1px solid #ffd700;border-radius:12px;padding:16px;margin-bottom:10px;animation:fadeIn 0.5s ease;}
-    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-    .reveal-title{color:#ffd700;font-weight:bold;font-size:0.95rem;margin-bottom:8px;}
-    .reveal-body{color:#e2e8f0;font-size:0.85rem;line-height:1.75;}
-    .tap-item{background:#1a1a2e;border:1px solid #2a2a3e;border-radius:10px;padding:11px 13px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
-    .tap-text{flex:1;color:#e2e8f0;font-size:0.88rem;}
-    .tap-done{padding:7px 13px;background:#00c875;color:#000;font-weight:bold;border:none;border-radius:8px;cursor:pointer;font-size:0.8rem;}
-    .tap-skip{padding:7px 13px;background:transparent;color:#aaa;border:1px solid #333;border-radius:8px;cursor:pointer;font-size:0.8rem;}
-    .live-msg{color:#00c875;font-weight:700;font-size:0.85rem;background:rgba(0,200,117,0.08);border:1px solid rgba(0,200,117,0.4);border-radius:10px;padding:10px 12px;margin-bottom:8px;text-align:center;}
-    .chat-log{background:#1a1a2e;border-radius:12px;padding:12px;min-height:60px;max-height:260px;overflow-y:auto;margin-bottom:8px;}
-    .msg{margin-bottom:10px;line-height:1.6;}
-    .msg.fresh{color:#ffd700;font-size:0.85rem;}
-    .msg.fresh span{font-weight:bold;}
-    .msg.prospect{color:#e2e8f0;font-size:0.85rem;text-align:right;}
-    .msg.prospect span{font-weight:bold;color:#579bfc;}
-    .thinking{color:#aaa;font-style:italic;font-size:0.8rem;padding:4px 0;}
-    .input-area{position:fixed;bottom:0;left:0;right:0;background:#0f0f1a;border-top:1px solid #1a1a2e;padding:10px 16px;}
-    .input-wrap{max-width:480px;margin:0 auto;}
-    .input-row{display:flex;gap:8px;margin-bottom:4px;}
-    .input-row input{flex:1;padding:11px 13px;font-size:0.92rem;border-radius:10px;border:1px solid #333;background:#1a1a2e;color:#fff;outline:none;}
-    .input-row input:focus{border-color:#ffd700;}
-    .btn-send{padding:11px 15px;background:#ffd700;color:#000;font-weight:bold;border:none;border-radius:10px;cursor:pointer;}
-    .btn-mic-sm{padding:11px 13px;background:#1a1a2e;color:#fff;border:1px solid #333;border-radius:10px;cursor:pointer;font-size:1rem;transition:all 0.2s;}
-    .btn-mic-sm.listening{background:#df2f4a;border-color:#df2f4a;animation:micpulse 1s infinite;}
-    .btn-cam-sm{padding:11px 13px;background:#1a1a2e;color:#fff;border:1px solid #333;border-radius:10px;cursor:pointer;font-size:1rem;}
-    .input-hint{font-size:0.65rem;color:#444;text-align:center;}
-    .trial-inner{background:#1a1a2e;border-radius:16px;border:1px solid #333;padding:18px;}
-    .trial-inner h3{color:#ffd700;font-size:0.95rem;margin-bottom:8px;}
-    .trial-inner p{color:#aaa;font-size:0.82rem;line-height:1.6;margin-bottom:14px;}
-    .option-btns{display:flex;flex-direction:column;gap:10px;}
-    .trial-form input{width:100%;padding:11px;margin-bottom:8px;border-radius:8px;border:1px solid #333;background:#0f0f1a;color:#fff;font-size:0.92rem;display:block;}
-    .trial-form button{width:100%;padding:13px;background:#ffd700;color:#000;font-weight:bold;border:none;border-radius:10px;font-size:0.95rem;cursor:pointer;}
-    .guarantee{font-size:0.7rem;color:#555;text-align:center;margin-top:10px;}
-    .rob-art{position:fixed;bottom:68px;right:12px;text-align:center;opacity:0.6;cursor:pointer;}
-    .rob-art div{font-size:1.2rem;}
-    .rob-art span{font-size:0.46rem;color:#444;display:block;letter-spacing:0.08em;}
-    .pulse{animation:pulse 2s infinite;}
-    @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.4);}50%{box-shadow:0 0 0 8px rgba(255,215,0,0);}}
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+    /* Glowing Effects */
+    .glow-blue { box-shadow: 0 0 25px -5px rgba(59, 130, 246, 0.4); }
+    .glow-emerald { box-shadow: 0 0 20px -5px rgba(16, 185, 129, 0.3); }
+
+    /* Print Stylesheet for Printable Invoice */
+    @media print {
+      body * { visibility: hidden; }
+      #printable-invoice-area, #printable-invoice-area * { visibility: visible; }
+      #printable-invoice-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        color: #000 !important;
+        background: #fff !important;
+        padding: 20px;
+      }
+      .no-print { display: none !important; }
+    }
   </style>
 </head>
-<body>
+<body class="h-full font-sans bg-slate-950 text-slate-100 flex flex-col antialiased selection:bg-brand-500 selection:text-white">
 
-<div class="header">
-  <div class="fresh-card">
-    <img src="Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh" id="freshImg"/>
-    <div class="fresh-name">Fresh</div>
-    <div class="fresh-title">Digital Coordinator & Coach</div>
-    <div class="fresh-badge" id="mainBadge">✨ Your TappyThing</div>
-  </div>
-</div>
-
-<!-- COVER -->
-<div class="section" id="coverSection" style="display:block;">
-  <div class="hook-card">
-    <div class="hook-line">Most businesses are drowning in<br><strong>software, sticky notes, and group texts.</strong><br>TappyThing fixes all of it.<br><strong>Less than $100 a month. Just talk.</strong></div>
-    <div class="hook-sub">businesses · homes · families · individuals · anyone</div>
-  </div>
-  <div class="card gold">
-    <div class="body-text" style="margin-bottom:10px;">What kind of business — or world — do you want to organize?</div>
-    <div class="cover-box">
-      <input type="text" id="worldInput" placeholder="e.g. restaurant, barber shop, busy mom…" onkeydown="if(event.key==='Enter')showDemo()"/>
-      <button class="btn btn-gold" style="width:auto;margin:0;padding:13px 16px;" onclick="showDemo()">Go →</button>
-    </div>
-  </div>
-</div>
-
-<!-- DEMO -->
-<div class="section" id="demoSection">
-  <div class="card green">
-    <div class="label">👋 Hi — I'm Fresh</div>
-    <div class="body-text" id="freshIntro"></div>
-  </div>
-  <div id="demoBoardWrap"></div>
-  <button class="btn btn-gold" style="width:calc(100% - 32px);margin:0 16px 10px;" onclick="showTalk()">Build Mine From Scratch →</button>
-</div>
-
-<!-- TALK -->
-<div class="section" id="talkSection">
-  <div class="card blue">
-    <div class="label">🎙️ Tell Me About Your World</div>
-    <div class="title">Just talk — your name, your business, what keeps you busy.</div>
-    <button class="mic-big" id="convoMic" onclick="toggleConvoMic()">🎙️ Tap to Talk</button>
-    <div class="mic-hint" id="convoHint">Tap and talk — name, business, location, headaches. Don't stop to organize.</div>
-    <textarea class="talk-box" id="convoText" placeholder="Or type it here…"></textarea>
-    <button class="btn btn-green" onclick="processConvo()">Go — Build My TappyThing →</button>
-  </div>
-</div>
-
-<!-- SYSTEM -->
-<div class="section" id="systemSection">
-  <div class="live-msg" id="liveMsg">Fresh is building your TappyThing…</div>
-  <div class="info-confirm" id="infoConfirm" style="display:none;"></div>
-  <div class="buckets-wrap" id="bucketsWrap"></div>
-  <div class="reveal-card" id="revealCard" style="display:none;">
-    <div class="reveal-title">💡 What you just did has a name.</div>
-    <div class="reveal-body">
-      That's called a <strong style="color:#ffd700;">Brain Dump</strong> — and it just built your entire system automatically. No forms. No setup. No IT person. You just talked and TappyThing organized everything.<br><br>
-      Most people do this every morning. Some do it driving to work. Whenever something's on your mind — hit the mic and talk. Fresh sorts it. Nothing gets lost. Nothing gets forgotten.<br><br>
-      And this — <strong style="color:#ffd700;">Time to Tap</strong> — is how you knock things out. Hardest first, easiest last. Ten minutes and your whole list is shorter.<br><br>
-      <strong style="color:#ffd700;">Share your TappyThing with your whole team.</strong> Everyone sees what they need. One system. Everyone connected. No group texts. No missed messages. No hidden costs. No per-user fees.<br><br>
-      Less than $100 a month covers everything. The only thing separate is a physical tap button for your counter — that's hardware, priced on its own. But your whole digital system? All in.
-    </div>
-  </div>
-  <div class="chat-log" id="chatLog"></div>
-</div>
-
-<!-- TIME TO TAP -->
-<div class="section" id="tapSection">
-  <div class="card gold">
-    <div class="label">⚡ Time to Tap</div>
-    <div class="title">Let's knock things out</div>
-    <div class="body-text" style="margin-bottom:10px;font-size:0.85rem;">Hardest first, easiest last. Say <strong>"Time to Tap"</strong> anytime.</div>
-    <div id="tapItems"></div>
-    <button class="btn btn-outline" onclick="doneTapping()">All done →</button>
-  </div>
-</div>
-
-<!-- TRIAL -->
-<div class="section" id="trialSection">
-  <div class="trial-inner">
-    <h3>Your TappyThing is live. Want to keep it?</h3>
-    <p>Everything you built stays with you. Fresh keeps sorting. Your team stays connected. Less than $100 a month — no contracts, no setup fees, full refund if it's not for you.</p>
-    <div class="option-btns">
-      <button class="btn btn-green" onclick="showForm('now')">Yes — let's do this →</button>
-      <button class="btn btn-outline" onclick="showForm('later')">Give me a few days →</button>
-    </div>
-    <div class="trial-form" id="trialForm" style="display:none;margin-top:14px;">
-      <input id="trialName" type="text" placeholder="Your name"/>
-      <input id="trialBiz" type="text" placeholder="Your business or world"/>
-      <input id="trialPhone" type="tel" placeholder="Your phone number"/>
-      <button onclick="submitTrial()">Let's do this! 🎉</button>
-      <div id="trialStatus" style="margin-top:10px;font-size:0.82rem;color:#00c875;"></div>
-    </div>
-    <div class="guarantee">🛡️ Full refund within 30 days. No questions asked.</div>
-  </div>
-</div>
-
-<div class="rob-art" title="In memory of Rob — artist, brother, inspiration">
-  <div>🐷</div>
-  <span>ROB ART</span>
-</div>
-
-<div class="input-area" id="inputArea" style="display:none;">
-  <div class="input-wrap">
-    <div class="input-row">
-      <input type="text" id="mainInput" placeholder="Talk to Fresh — sort, ask, tap through tasks…" onkeydown="if(event.key==='Enter')handleInput()"/>
-      <button class="btn-mic-sm" id="micBtn" onclick="toggleMic()" title="Talk">🎙️</button>
-      <button class="btn-cam-sm" onclick="snapPhoto()" title="Snap a photo of your notes">📷</button>
-      <button class="btn-send" onclick="handleInput()">→</button>
-    </div>
-    <div class="input-hint">🎙️ Talk &nbsp;|&nbsp; 📷 Snap notes &nbsp;|&nbsp; ⌨️ Type &nbsp;|&nbsp; Say "Time to Tap"</div>
-  </div>
-</div>
-
-<input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none;" onchange="handlePhoto(event)"/>
-
-<script>
-const CHAT='/.netlify/functions/chat';
-const WEBHOOK='https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei';
-const REF=new URLSearchParams(window.location.search).get('ref')||'direct';
-let businessType='',bucketData={},replyCount=0,choiceType='';
-let isListening=false,convoListening=false;
-let recognition=null,convoRecognition=null;
-let userInfo={name:'',phone:'',location:''};
-let sissyNotified=false;
-
-const TAPPY_SYSTEM=`You are Fresh, TappyThing's Digital Coordinator. TappyThing is a voice-first digital organizing system — NOT an app to download. It works in the browser. Users talk or type and Fresh organizes everything automatically into their system (buckets). Key facts: costs less than $100/month, no hidden fees, no per-user fees, full team sharing included. Physical tap button is separate hardware. Brain Dump = talking to sort everything. Time to Tap = working through task list hardest first. Never say "Tabby" — always say "TappyThing." Keep responses 1-3 sentences. Be warm and real.`;
-
-const freshIntros={
-  vacuum:`I've worked with vacuum and appliance repair shops. Machines pile up, parts go missing, customers wonder where their vacuum is — it never stops. Here's what a typical repair shop looks like in TappyThing. Take a look — then I'll build yours from scratch.`,
-  dental:`I work with dental offices. Recalls not going out, no-shows killing your schedule, front desk drowning — I know the pain. Here's what most dental offices set up. Then we'll build yours.`,
-  barber:`I work with barber shops. Keeping chairs full, walk-ins, remembering regulars — a lot to juggle for one person. Here's a typical barber shop TappyThing. Then let's build yours.`,
-  restaurant:`I work with restaurants and bars of all sizes. Reservations, staff issues, inventory, private party leads — it never slows down. Here's what a typical place looks like. Then I'll build yours from scratch.`,
-  salon:`I work with salons. No-shows, cancellations, client preferences — I've heard it all. Here's a typical salon setup. Then we'll make yours.`,
-  liquor:`I work with liquor stores. Inventory, vendor orders, staff scheduling — always something. Here's what most stores set up. Then let's build yours.`,
-  contractor:`I work with contractors. Notes that never make it back, double orders, customers chasing updates. Here's a typical contractor TappyThing. Then yours.`,
-  gym:`I work with gyms. Leads falling through, members going quiet, scheduling chaos. Here's a typical gym setup. Then we'll build yours.`,
-  auto:`I work with auto shops and dealerships. Parts delayed, customers wanting updates, leads going cold. Here's what most shops look like. Then let's build yours.`,
-  pet:`I work with pet businesses — daycares, groomers, vets. Appointments, records, supply orders — lots of parts. Here's a typical setup. Then yours.`,
-  home:`I help homeowners and families stay organized. Appointments, errands, repairs, bills — it piles up. Here's what most people set up. Then let's build yours.`,
-  default:`I work with all kinds of businesses and individuals. Whatever's piling up or taking too long — that's what I handle. Here's a sample of what TappyThing looks like. Then I'll build yours from scratch.`
-};
-
-const demoBoards={
-  restaurant:`
-    <div class="demo-board">
-      <div class="demo-board-title">🍺 Bar — 20 Seats</div>
-      <div class="demo-seats">${Array.from({length:20},(_,i)=>`<div class="demo-seat${[2,5,8,12,16].includes(i)?' lit':''}">${i+1}</div>`).join('')}</div>
-    </div>
-    <div class="demo-board">
-      <div class="demo-board-title">🍽️ Dining Room — 12 Tables</div>
-      <div class="demo-seats">${Array.from({length:12},(_,i)=>`<div class="demo-seat${[1,4,7].includes(i)?' green':''}">T${i+1}</div>`).join('')}</div>
-    </div>
-    <div class="demo-board">
-      <div class="demo-board-title">📋 Today's Board</div>
-      <div class="demo-items">
-        <div class="demo-item lit">Reservations</div>
-        <div class="demo-item lit">Staff Notes</div>
-        <div class="demo-item">Inventory</div>
-        <div class="demo-item">Events</div>
-        <div class="demo-item lit">Follow-Ups</div>
+  <!-- HEADER & SYSTEM METRICS -->
+  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Brand & Profile Title -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center font-bold text-white shadow-lg glow-blue">
+          🤵
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-lg font-bold text-white tracking-tight">Fresh</h1>
+            <span class="px-2 py-0.5 text-xs font-medium bg-brand-500/10 text-brand-400 border border-brand-500/20 rounded-full">Pocket Chief of Staff</span>
+          </div>
+          <p class="text-xs text-slate-400">Sissy: Digital Coordinator • Aerus Home Wellness Timonium</p>
+        </div>
       </div>
-    </div>`,
-  vacuum:`
-    <div class="demo-board">
-      <div class="demo-board-title">🔧 Bench — Machines In Shop</div>
-      <div class="demo-seats">${['Shark','Oreck','Dyson','Hoover','Miele','Kirby'].map(m=>`<div class="demo-seat lit" style="width:auto;padding:4px 8px;font-size:0.62rem;">${m}</div>`).join('')}</div>
+
+      <!-- Live Counters & Squad Links -->
+      <div class="flex items-center space-x-4 text-xs">
+        <div class="hidden md:flex items-center space-x-4 bg-slate-800/40 px-3 py-1.5 rounded-lg border border-slate-700/50">
+          <div>
+            <span class="text-slate-400">Vault:</span>
+            <span class="font-semibold text-emerald-400 ml-1">22,283 Records</span>
+          </div>
+          <span class="text-slate-600">|</span>
+          <div>
+            <span class="text-slate-400">Assets:</span>
+            <span class="font-semibold text-brand-400 ml-1">1,090 Live</span>
+          </div>
+        </div>
+
+        <button onclick="alert('The Squad: Mona (Intakes), Chris (Bench), Mike (Field), Norby (FOAS)')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg transition-all flex items-center space-x-2">
+          <i class="fa-solid fa-users text-brand-400"></i>
+          <span>The Squad</span>
+        </button>
+      </div>
+
     </div>
-    <div class="demo-board">
-      <div class="demo-board-title">📦 Parts & Inventory</div>
-      <div class="demo-items">
-        <div class="demo-item lit">Belts</div>
-        <div class="demo-item">Bags</div>
-        <div class="demo-item lit">Filters</div>
-        <div class="demo-item">Motors</div>
-        <div class="demo-item lit">Hoses</div>
-        <div class="demo-item">Brushes</div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- VOICE ASSISTANT COMMAND MODULE -->
+    <section class="bg-gradient-to-b from-slate-900 to-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+      <div class="absolute -right-10 -top-10 w-40 h-40 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="max-w-3xl mx-auto text-center space-y-4">
+        <p class="text-xs font-semibold tracking-widest text-brand-400 uppercase">Voice Engine Ready</p>
+
+        <!-- Mic Tap Circle -->
+        <div class="flex justify-center py-2">
+          <button id="mic-btn" onclick="toggleVoiceInput()" class="w-20 h-20 rounded-full bg-brand-600 hover:bg-brand-500 text-white flex items-center justify-center shadow-lg transition-all duration-300 transform active:scale-95 glow-blue group">
+            <i id="mic-icon" class="fa-solid fa-microphone text-2xl group-hover:scale-110 transition-transform"></i>
+          </button>
+        </div>
+
+        <p id="voice-status-indicator" class="text-xs text-slate-400">Tap mic to speak or enter prompt below</p>
+
+        <!-- Text Input Fallback / Input Box -->
+        <div class="flex gap-2 max-w-xl mx-auto">
+          <input type="text" id="user-input" placeholder="Talk to Fresh or type command..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors" onkeydown="if(event.key==='Enter') sendToFresh()" />
+          <button onclick="sendToFresh()" class="px-5 py-3 bg-brand-600 hover:bg-brand-500 text-white font-medium text-sm rounded-xl transition-all shadow-md flex items-center space-x-2 active:scale-95">
+            <span>SEND TO FRESH</span>
+            <i class="fa-solid fa-paper-plane text-xs"></i>
+          </button>
+        </div>
+
+        <!-- Out-Loud Spoken Response Log Box -->
+        <div id="response-box" class="hidden bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-left max-w-xl mx-auto space-y-2">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <span class="text-xs font-semibold text-brand-400"><i class="fa-solid fa-volume-high mr-1"></i> FRESH RESPONSE</span>
+            <button onclick="repeatSpeech()" class="text-xs text-slate-400 hover:text-slate-200"><i class="fa-solid fa-rotate-right mr-1"></i> Play Again</button>
+          </div>
+          <p id="response-text" class="text-sm text-slate-200 leading-relaxed font-normal"></p>
+        </div>
       </div>
-    </div>`,
-  barber:`
-    <div class="demo-board">
-      <div class="demo-board-title">💈 Chairs</div>
-      <div class="demo-seats">${['Chair 1','Chair 2','Chair 3'].map((c,i)=>`<div class="demo-seat${i<2?' lit':''}" style="width:auto;padding:4px 10px;font-size:0.62rem;">${c}</div>`).join('')}</div>
+    </section>
+
+    <!-- ACCORDION SECTIONS -->
+    <div class="space-y-4">
+
+      <!-- SECTION 1: BUSINESS WORLD -->
+      <div class="border border-slate-800 rounded-xl bg-slate-900/40 overflow-hidden transition-all">
+        <button onclick="toggleAccordion('business-world')" class="w-full px-6 py-4 flex items-center justify-between bg-slate-900/80 hover:bg-slate-800/60 transition-colors text-left">
+          <div class="flex items-center space-x-3">
+            <div class="p-2 bg-blue-500/10 text-blue-400 rounded-lg">
+              <i class="fa-solid fa-briefcase text-lg"></i>
+            </div>
+            <div>
+              <h2 class="font-semibold text-slate-100">Business World</h2>
+              <p class="text-xs text-slate-400">Shop Ops, Workbench Queue & Active Field Visits</p>
+            </div>
+          </div>
+          <i id="icon-business-world" class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-200"></i>
+        </button>
+
+        <div id="panel-business-world" class="p-6 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Monday.com Live Board Stream</h3>
+            <button onclick="fetchMondayBoard()" class="text-xs text-brand-400 hover:text-brand-300 flex items-center space-x-1">
+              <i class="fa-solid fa-arrows-rotate"></i>
+              <span>Refresh Board</span>
+            </button>
+          </div>
+
+          <!-- Dynamic Live Board Items Container -->
+          <div id="monday-items-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Loading Placeholder -->
+            <div class="p-4 bg-slate-950/60 border border-slate-800 rounded-xl animate-pulse space-y-2">
+              <div class="h-4 bg-slate-800 rounded w-3/4"></div>
+              <div class="h-3 bg-slate-800/60 rounded w-1/2"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: PERSONAL WORLD -->
+      <div class="border border-slate-800 rounded-xl bg-slate-900/40 overflow-hidden transition-all">
+        <button onclick="toggleAccordion('personal-world')" class="w-full px-6 py-4 flex items-center justify-between bg-slate-900/80 hover:bg-slate-800/60 transition-colors text-left">
+          <div class="flex items-center space-x-3">
+            <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg">
+              <i class="fa-solid fa-user-shield text-lg"></i>
+            </div>
+            <div>
+              <h2 class="font-semibold text-slate-100">Personal World</h2>
+              <p class="text-xs text-slate-400">Personal Tasks, Notes & Focus Vault</p>
+            </div>
+          </div>
+          <i id="icon-personal-world" class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-200"></i>
+        </button>
+
+        <div id="panel-personal-world" class="hidden p-6 space-y-4">
+          <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-4">
+            <p class="text-sm text-slate-300"><i class="fa-solid fa-lock text-emerald-400 mr-2"></i>Personal Vault Privacy Shield active. Non-operational notes secured separately.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: CASH REGISTER & INVOICES -->
+      <div class="border border-slate-800 rounded-xl bg-slate-900/40 overflow-hidden transition-all">
+        <button onclick="toggleAccordion('cash-register')" class="w-full px-6 py-4 flex items-center justify-between bg-slate-900/80 hover:bg-slate-800/60 transition-colors text-left">
+          <div class="flex items-center space-x-3">
+            <div class="p-2 bg-amber-500/10 text-amber-400 rounded-lg">
+              <i class="fa-solid fa-file-invoice-dollar text-lg"></i>
+            </div>
+            <div>
+              <h2 class="font-semibold text-slate-100">Cash Register & Invoices</h2>
+              <p class="text-xs text-slate-400">MD 6% Tax Calculator & Printable Invoice Builder</p>
+            </div>
+          </div>
+          <i id="icon-cash-register" class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-200"></i>
+        </button>
+
+        <div id="panel-cash-register" class="p-6 space-y-6">
+          
+          <!-- Interactive Invoice Builder Form -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Item Inputs -->
+            <div class="lg:col-span-2 space-y-4">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Line Items</h3>
+                <button onclick="addInvoiceRow()" class="text-xs text-brand-400 hover:text-brand-300 font-medium">+ Add Line Item</button>
+              </div>
+
+              <!-- Customer Info Inputs -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <input type="text" id="inv-customer-name" placeholder="Customer Name" value="Aerus Valued Client" class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500" />
+                <input type="text" id="inv-customer-phone" placeholder="Phone / Account #" value="(410) 555-0199" class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500" />
+              </div>
+
+              <div id="invoice-items-list" class="space-y-3">
+                <!-- Line Item Row 1 -->
+                <div class="flex items-center gap-2 inv-row">
+                  <input type="text" placeholder="Description (e.g., Lux Legacy Service)" value="Aerus Deluxe Maintenance & Service" class="inv-desc flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500" />
+                  <input type="number" step="0.01" placeholder="Amount" value="120.00" oninput="calculateInvoiceTotals()" class="inv-amount w-28 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500 text-right" />
+                  <button onclick="removeInvoiceRow(this)" class="text-slate-500 hover:text-rose-400 p-2"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tax Summary Card -->
+            <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-5 flex flex-col justify-between space-y-4">
+              <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Payment Summary</h3>
+              
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between text-slate-400">
+                  <span>Subtotal:</span>
+                  <span id="inv-subtotal-display" class="font-medium text-slate-200">$120.00</span>
+                </div>
+                <div class="flex justify-between text-slate-400">
+                  <span>MD Sales Tax (6%):</span>
+                  <span id="inv-tax-display" class="font-medium text-slate-200">$7.20</span>
+                </div>
+                <div class="border-t border-slate-800 pt-2 flex justify-between font-bold text-base text-emerald-400">
+                  <span>Total Due:</span>
+                  <span id="inv-total-display">$127.20</span>
+                </div>
+              </div>
+
+              <button onclick="generateAndPrintInvoice()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm rounded-xl transition-all shadow-md flex items-center justify-center space-x-2 active:scale-95 glow-emerald">
+                <i class="fa-solid fa-print"></i>
+                <span>Generate & Print Paper Invoice</span>
+              </button>
+            </div>
+
+          </div>
+
+          <!-- HIDDEN PRINTABLE INVOICE AREA -->
+          <div class="hidden">
+            <div id="printable-invoice-area" class="p-8 space-y-6">
+              <div class="flex justify-between border-b pb-4">
+                <div>
+                  <h1 class="text-2xl font-bold">AERUS HOME WELLNESS</h1>
+                  <p class="text-sm">Clean Environment LLC • Timonium, MD</p>
+                  <p class="text-sm">Phone: (410) 555-AERUS</p>
+                </div>
+                <div class="text-right">
+                  <h2 class="text-xl font-bold">INVOICE</h2>
+                  <p class="text-sm">Date: <span id="print-date"></span></p>
+                </div>
+              </div>
+
+              <div>
+                <h3 class="font-bold text-sm uppercase mb-1">Billed To:</h3>
+                <p id="print-customer-name" class="text-sm"></p>
+                <p id="print-customer-phone" class="text-sm"></p>
+              </div>
+
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b">
+                    <th class="py-2">Description</th>
+                    <th class="py-2 text-right">Amount</th>
+                  </tr>
+                </thead>
+                <tbody id="print-items-body"></tbody>
+              </table>
+
+              <div class="flex justify-end pt-4 border-t">
+                <div class="w-48 space-y-1 text-right">
+                  <p class="text-sm">Subtotal: <span id="print-subtotal"></span></p>
+                  <p class="text-sm">MD Tax (6%): <span id="print-tax"></span></p>
+                  <p class="font-bold text-base">Total: <span id="print-total"></span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SECTION 4: COORDINATOR HUB -->
+      <div class="border border-slate-800 rounded-xl bg-slate-900/40 overflow-hidden transition-all">
+        <button onclick="toggleAccordion('coordinator-hub')" class="w-full px-6 py-4 flex items-center justify-between bg-slate-900/80 hover:bg-slate-800/60 transition-colors text-left">
+          <div class="flex items-center space-x-3">
+            <div class="p-2 bg-indigo-500/10 text-indigo-400 rounded-lg">
+              <i class="fa-solid fa-comments text-lg"></i>
+            </div>
+            <div>
+              <h2 class="font-semibold text-slate-100">Coordinator Hub</h2>
+              <p class="text-xs text-slate-400">Team Communication Boards & Direct Lines</p>
+            </div>
+          </div>
+          <i id="icon-coordinator-hub" class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-200"></i>
+        </button>
+
+        <div id="panel-coordinator-hub" class="hidden p-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="p-4 bg-slate-950/60 border border-slate-800 rounded-xl space-y-2">
+              <div class="flex items-center space-x-2 text-xs font-semibold text-indigo-400">
+                <i class="fa-solid fa-bullhorn"></i>
+                <span>All Hands</span>
+              </div>
+              <p class="text-sm font-medium">Team Communications</p>
+            </div>
+            <div class="p-4 bg-slate-950/60 border border-slate-800 rounded-xl space-y-2">
+              <div class="flex items-center space-x-2 text-xs font-semibold text-slate-400">
+                <i class="fa-solid fa-wrench"></i>
+                <span>Chris (Bench)</span>
+              </div>
+              <p class="text-sm font-medium">Direct Line</p>
+            </div>
+            <div class="p-4 bg-slate-950/60 border border-slate-800 rounded-xl space-y-2">
+              <div class="flex items-center space-x-2 text-xs font-semibold text-slate-400">
+                <i class="fa-solid fa-headset"></i>
+                <span>Mona (Intakes)</span>
+              </div>
+              <p class="text-sm font-medium">Direct Line</p>
+            </div>
+            <div class="p-4 bg-slate-950/60 border border-slate-800 rounded-xl space-y-2">
+              <div class="flex items-center space-x-2 text-xs font-semibold text-slate-400">
+                <i class="fa-solid fa-envelope"></i>
+                <span>Norby (FOAS)</span>
+              </div>
+              <p class="text-sm font-medium">Direct Line</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
-    <div class="demo-board">
-      <div class="demo-board-title">📋 Today</div>
-      <div class="demo-items">
-        <div class="demo-item lit">Walk-Ins</div>
-        <div class="demo-item lit">Appointments</div>
-        <div class="demo-item">Supplies</div>
-        <div class="demo-item lit">Follow-Ups</div>
-      </div>
-    </div>`,
-  auto:`
-    <div class="demo-board">
-      <div class="demo-board-title">🚗 Service Bays</div>
-      <div class="demo-seats">${['Bay 1','Bay 2','Bay 3','Bay 4'].map((b,i)=>`<div class="demo-seat${i<3?' lit':''}" style="width:auto;padding:4px 10px;font-size:0.62rem;">${b}</div>`).join('')}</div>
-    </div>
-    <div class="demo-board">
-      <div class="demo-board-title">📋 Shop Board</div>
-      <div class="demo-items">
-        <div class="demo-item lit">Intake</div>
-        <div class="demo-item lit">Parts Ordered</div>
-        <div class="demo-item">Ready</div>
-        <div class="demo-item lit">Follow-Ups</div>
-        <div class="demo-item">Invoices</div>
-      </div>
-    </div>`,
-  default:`
-    <div class="demo-board">
-      <div class="demo-board-title">📋 Sample TappyThing</div>
-      <div class="demo-items">
-        <div class="demo-item lit">Intake</div>
-        <div class="demo-item lit">Follow-Ups</div>
-        <div class="demo-item">Tasks</div>
-        <div class="demo-item lit">Notes</div>
-        <div class="demo-item">Completed</div>
-      </div>
-    </div>`
-};
 
-function getKey(s){
-  s=(s||'').toLowerCase();
-  if(s.includes('vacuum')||s.includes('repair shop')||s.includes('appliance'))return 'vacuum';
-  if(s.includes('dentist')||s.includes('dental'))return 'dental';
-  if(s.includes('barber'))return 'barber';
-  if(s.includes('liquor')||s.includes('beverage')||s.includes('wine'))return 'liquor';
-  if(s.includes('restaurant')||s.includes('bier')||s.includes('beer')||s.includes('bar')||s.includes('cafe')||s.includes('diner'))return 'restaurant';
-  if(s.includes('salon')||s.includes('hair')||s.includes('nail')||s.includes('spa'))return 'salon';
-  if(s.includes('contractor')||s.includes('plumb')||s.includes('hvac')||s.includes('electric'))return 'contractor';
-  if(s.includes('gym')||s.includes('fitness')||s.includes('yoga'))return 'gym';
-  if(s.includes('auto')||s.includes('mechanic')||s.includes('car')||s.includes('dealer')||s.includes('tire'))return 'auto';
-  if(s.includes('real estate')||s.includes('realtor'))return 'realestate';
-  if(s.includes('retail')||s.includes('store')||s.includes('shop'))return 'retail';
-  if(s.includes('law')||s.includes('attorney')||s.includes('lawyer'))return 'law';
-  if(s.includes('pet')||s.includes('dog')||s.includes('cat')||s.includes('groomer')||s.includes('daycare'))return 'pet';
-  if(s.includes('mom')||s.includes('parent')||s.includes('family')||s.includes('kids'))return 'mom';
-  if(s.includes('home')||s.includes('homeowner')||s.includes('house'))return 'home';
-  return 'default';
-}
+  </main>
 
-function show(id){const el=document.getElementById(id);if(el){el.style.display='block';setTimeout(()=>el.scrollIntoView({behavior:'smooth'}),50);}}
-function hide(id){const el=document.getElementById(id);if(el)el.style.display='none';}
+  <!-- JAVASCRIPT LOGIC ENGINE -->
+  <script>
+    let lastSpokenReply = "";
 
-function showDemo(){
-  businessType=document.getElementById('worldInput').value.trim();
-  if(!businessType)return;
-  document.getElementById('mainBadge').textContent='✨ Your TappyThing — '+businessType;
-  hide('coverSection');
-  const key=getKey(businessType);
-  document.getElementById('freshIntro').innerHTML=freshIntros[key]||freshIntros.default;
-  document.getElementById('demoBoardWrap').innerHTML=`<div style="padding:0 0 4px 0;font-size:0.7rem;color:#555;text-align:center;text-transform:uppercase;letter-spacing:0.1em;">Sample — typical ${businessType}</div>`+(demoBoards[key]||demoBoards.default);
-  show('demoSection');
-  speak((freshIntros[key]||freshIntros.default));
-}
+    // Load Live Board Data on Page Load
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchMondayBoard();
+      calculateInvoiceTotals();
+    });
 
-function showTalk(){
-  hide('demoSection');
-  show('talkSection');
-  speak(`Now tell me about YOUR ${businessType}. Just talk — your name, what you deal with every day, your team, your headaches. Don't organize it. Just dump it all out.`);
-}
-
-function setupConvoMic(){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR)return;
-  convoRecognition=new SR();
-  convoRecognition.continuous=true;
-  convoRecognition.interimResults=true;
-  convoRecognition.lang='en-US';
-  convoRecognition.onstart=()=>{convoListening=true;document.getElementById('convoMic').classList.add('listening');document.getElementById('convoMic').textContent='🔴 Recording… tap to stop';document.getElementById('convoHint').textContent='Keep going — get it ALL out!';};
-  convoRecognition.onresult=(e)=>{let t='';for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript+' ';document.getElementById('convoText').value=t.trim();};
-  convoRecognition.onend=()=>{convoListening=false;document.getElementById('convoMic').classList.remove('listening');document.getElementById('convoMic').classList.add('done');document.getElementById('convoMic').textContent='✅ Got it — tap Go';document.getElementById('convoHint').textContent='Fresh heard everything';};
-}
-
-function toggleConvoMic(){
-  if(!convoRecognition)setupConvoMic();
-  if(!convoRecognition){alert('Microphone not available');return;}
-  if(convoListening)convoRecognition.stop();
-  else convoRecognition.start();
-}
-
-async function sendToSissy(name,phone,location,business,buckets,rawDump){
-  if(sissyNotified)return;
-  sissyNotified=true;
-  try{await fetch(WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'trial_signup',name:name||'Unknown',phone:phone||'',location:location||'',business:business||businessType,ref:REF,buckets:buckets.map(b=>b.title).join(', '),rawDump:rawDump||'',timestamp:new Date().toISOString(),source:'TappyThing'})});}catch(e){}
-}
-
-async function processConvo(){
-  const dump=document.getElementById('convoText').value.trim();
-  if(!dump){speak('Just tell me a little about yourself first!');return;}
-  hide('talkSection');
-  document.getElementById('freshImg').classList.add('pulse');
-  show('systemSection');
-  document.getElementById('inputArea').style.display='block';
-  document.getElementById('liveMsg').textContent='Fresh is building your TappyThing…';
-
-  const prompt=`You are Fresh. Someone who runs a ${businessType} just talked: "${dump}".
-1. Extract name, phone, location if mentioned.
-2. Build 4-6 smart buckets for their specific business.
-3. Sort every item, task, or problem they mentioned into buckets.
-4. Time to Tap list — most important first, easiest last.
-5. Warm 2-3 sentence response using their name. Say "Based on what you told me, here's your TappyThing" — make it feel personal. Do NOT say brain dump.
-JSON only: {"name":"","phone":"","location":"","buckets":[{"icon":"emoji","title":"name","items":["item"]}],"reply":"2-3 sentences","tapItems":["hardest","second","third","easiest"]}`;
-
-  try{
-    const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:prompt,system:'JSON only. No markdown.',history:[]})});
-    const data=await res.json();
-    const parsed=JSON.parse(data.reply.replace(/```json|```/g,'').trim());
-    if(parsed.name)userInfo.name=parsed.name;
-    if(parsed.phone)userInfo.phone=parsed.phone;
-    if(parsed.location)userInfo.location=parsed.location;
-    const rows=[];
-    if(parsed.name)rows.push(`<div class="info-row"><div class="info-label">Name</div><div class="info-value">${parsed.name}</div></div>`);
-    if(parsed.location)rows.push(`<div class="info-row"><div class="info-label">Location</div><div class="info-value">${parsed.location}</div></div>`);
-    if(parsed.phone)rows.push(`<div class="info-row"><div class="info-label">Phone</div><div class="info-value">${parsed.phone}</div></div>`);
-    if(rows.length>0){document.getElementById('infoConfirm').innerHTML=rows.join('');document.getElementById('infoConfirm').style.display='block';}
-    buildBuckets(parsed.buckets||[]);
-    document.getElementById('liveMsg').textContent='Your TappyThing is live. 💛';
-    setTimeout(()=>{document.getElementById('revealCard').style.display='block';document.getElementById('revealCard').scrollIntoView({behavior:'smooth'});},700);
-    appendMsg('fresh',parsed.reply||`Based on what you told me, here's your TappyThing. Take a look above. 💛`);
-    speak(parsed.reply||'Based on what you told me, here is your TappyThing.');
-    if(parsed.tapItems&&parsed.tapItems.length>0)setupTapItems(parsed.tapItems);
-    sendToSissy(parsed.name,parsed.phone,parsed.location,businessType,parsed.buckets||[],dump);
-  }catch(e){
-    buildBuckets([{icon:'📝',title:'Intake',items:[]},{icon:'🔁',title:'Follow-Ups',items:[]},{icon:'✅',title:'Ready',items:[]},{icon:'📊',title:'Notes',items:[]}]);
-    document.getElementById('liveMsg').textContent='Your TappyThing is live. 💛';
-    setTimeout(()=>{document.getElementById('revealCard').style.display='block';},700);
-    appendMsg('fresh','Based on what you told me, here\'s your TappyThing. Keep talking and I\'ll keep sorting. 💛');
-  }
-}
-
-function buildBuckets(buckets){
-  bucketData={};
-  const wrap=document.getElementById('bucketsWrap');
-  wrap.innerHTML='';
-  buckets.forEach((b,i)=>{
-    bucketData[i]={title:b.title,icon:b.icon,items:b.items||[]};
-    const div=document.createElement('div');
-    div.className='bucket';
-    div.id='bucket-'+i;
-    const items=b.items||[];
-    div.innerHTML=`<div class="bucket-header"><div class="bucket-icon">${b.icon}</div><div class="bucket-name">${b.title}</div><div class="bucket-count" id="bcount-${i}">${items.length>0?items.length+' item'+(items.length>1?'s':''):'empty'}</div></div><div class="bucket-items" id="bitems-${i}">${items.map(it=>`<div class="bucket-item">${it}</div>`).join('')}</div>`;
-    wrap.appendChild(div);
-    setTimeout(()=>div.classList.add('show'),i*200);
-  });
-}
-
-function addToBucket(i,item){
-  if(!bucketData[i])i=0;
-  if(!bucketData[i])return;
-  bucketData[i].items.push(item);
-  const itemsDiv=document.getElementById('bitems-'+i);
-  if(itemsDiv){const row=document.createElement('div');row.className='bucket-item';row.textContent=item;itemsDiv.appendChild(row);}
-  const count=bucketData[i].items.length;
-  const countEl=document.getElementById('bcount-'+i);
-  if(countEl)countEl.textContent=count+' item'+(count>1?'s':'');
-  const bucket=document.getElementById('bucket-'+i);
-  if(bucket){bucket.classList.add('flash');setTimeout(()=>bucket.classList.remove('flash'),1500);}
-}
-
-function setupTapItems(items){
-  const el=document.getElementById('tapItems');
-  el.innerHTML=items.map((item,i)=>`<div class="tap-item" id="tapitem-${i}"><div class="tap-text">${item}</div><button class="tap-done" onclick="tapDone(${i})">✅ Done</button><button class="tap-skip" onclick="tapSkip(${i})">Skip</button></div>`).join('');
-  setTimeout(()=>show('tapSection'),1000);
-}
-
-function tapDone(i){
-  const el=document.getElementById('tapitem-'+i);
-  if(el){el.style.opacity='0.4';el.querySelector('.tap-text').style.textDecoration='line-through';}
-  replyCount++;checkTrialCta();
-}
-
-function tapSkip(i){const el=document.getElementById('tapitem-'+i);if(el)el.style.opacity='0.3';}
-
-function doneTapping(){
-  hide('tapSection');
-  appendMsg('fresh','Nice work! Say "Time to Tap" anytime to pull this back up. 💛');
-  speak('Nice work.');
-  replyCount+=3;checkTrialCta();
-}
-
-function snapPhoto(){document.getElementById('photoInput').click();}
-
-async function handlePhoto(event){
-  const file=event.target.files[0];
-  if(!file)return;
-  appendMsg('prospect','📷 Photo sent');
-  appendMsg('fresh','Got it — I\'ll read your notes and sort everything from the photo. That feature is coming very soon. For now just tell me what was on it and I\'ll sort it! 💛');
-  speak('Got it. Photo intake is coming very soon.');
-  event.target.value='';
-}
-
-function setupMic(){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){document.getElementById('micBtn').style.display='none';return;}
-  recognition=new SR();
-  recognition.continuous=false;
-  recognition.interimResults=true;
-  recognition.lang='en-US';
-  recognition.onstart=()=>{isListening=true;document.getElementById('micBtn').classList.add('listening');};
-  recognition.onresult=(e)=>{let t='';for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;document.getElementById('mainInput').value=t;};
-  recognition.onend=()=>{isListening=false;document.getElementById('micBtn').classList.remove('listening');const v=document.getElementById('mainInput').value.trim();if(v)handleInput();};
-  recognition.onerror=()=>{isListening=false;document.getElementById('micBtn').classList.remove('listening');};
-}
-
-function toggleMic(){
-  if(!recognition)setupMic();
-  if(!recognition)return;
-  if(isListening)recognition.stop();
-  else recognition.start();
-}
-
-async function handleInput(){
-  const input=document.getElementById('mainInput');
-  const msg=input.value.trim();
-  if(!msg)return;
-  input.value='';
-
-  if(msg.toLowerCase().includes('how much')||msg.toLowerCase().includes('what does it cost')||msg.toLowerCase().includes('price')||msg.toLowerCase().includes('how much is')){
-    appendMsg('fresh','Less than $100 a month — and it replaces most of the software you\'re already paying for. No hidden fees, no per-user costs. All in. 💛');
-    speak('Less than a hundred bucks a month. No hidden fees. All in.');
-    replyCount++;checkTrialCta();
-    return;
-  }
-
-  if(msg.toLowerCase().includes('what is tappything')||msg.toLowerCase().includes('how does this work')||msg.toLowerCase().includes('what do you do')){
-    appendMsg('fresh','TappyThing is what you\'re using right now. You just talked — and your system built itself. No app to download. No setup. You talk, we organize everything automatically. Less than $100 a month. 💛');
-    speak('TappyThing is what you\'re using right now. You just talked and your system built itself. No app to download.');
-    replyCount++;checkTrialCta();
-    return;
-  }
-
-  if(msg.toLowerCase().includes('time to tap')||msg.toLowerCase().includes('knock out')||msg.toLowerCase().includes('what can we do')){
-    show('tapSection');
-    appendMsg('fresh','Time to Tap! Hardest first, easiest last. Let\'s go. 💛');
-    speak('Time to Tap. Let\'s knock it out.');
-    return;
-  }
-
-  appendMsg('prospect',msg);
-  const log=document.getElementById('chatLog');
-  const thinking=document.createElement('div');
-  thinking.className='thinking';
-  thinking.textContent='Fresh is sorting…';
-  log.appendChild(thinking);
-  log.scrollTop=log.scrollHeight;
-
-  const bucketNames=Object.values(bucketData).map((b,i)=>i+': '+b.title).join(', ');
-  const prompt=`Fresh, TappyThing coordinator for ${businessType}. User said: "${msg}". Buckets: ${bucketNames}. Create new bucket if needed. JSON only: {"bucketIndex":<number or -1>,"newBucket":{"icon":"emoji","title":"name"} or null,"itemLabel":"short label","reply":"1-2 sentences"}`;
-
-  try{
-    const res=await fetch(CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:prompt,system:TAPPY_SYSTEM+' Reply JSON only. No markdown.',history:[]})});
-    const data=await res.json();
-    const parsed=JSON.parse(data.reply.replace(/```json|```/g,'').trim());
-    if(log.contains(thinking))log.removeChild(thinking);
-    if(parsed.bucketIndex===-1&&parsed.newBucket){
-      const newI=Object.keys(bucketData).length;
-      bucketData[newI]={title:parsed.newBucket.title,icon:parsed.newBucket.icon,items:[]};
-      const wrap=document.getElementById('bucketsWrap');
-      const div=document.createElement('div');
-      div.className='bucket';
-      div.id='bucket-'+newI;
-      div.innerHTML=`<div class="bucket-header"><div class="bucket-icon">${parsed.newBucket.icon}</div><div class="bucket-name">${parsed.newBucket.title}</div><div class="bucket-count" id="bcount-${newI}">empty</div></div><div class="bucket-items" id="bitems-${newI}"></div>`;
-      wrap.appendChild(div);
-      setTimeout(()=>div.classList.add('show'),50);
-      addToBucket(newI,parsed.itemLabel||msg);
-    }else{
-      addToBucket(parsed.bucketIndex||0,parsed.itemLabel||msg);
+    // --- ACCORDION TOGGLE LOGIC ---
+    function toggleAccordion(id) {
+      const panel = document.getElementById(`panel-${id}`);
+      const icon = document.getElementById(`icon-${id}`);
+      if (panel) {
+        panel.classList.toggle('hidden');
+        if (icon) {
+          icon.classList.toggle('rotate-180');
+        }
+      }
     }
-    appendMsg('fresh',parsed.reply||'Got it — added to your TappyThing. 💛');
-    speak(parsed.reply||'Got it.');
-  }catch(e){
-    if(log.contains(thinking))log.removeChild(thinking);
-    addToBucket(0,msg);
-    appendMsg('fresh','Got it — added to your TappyThing. 💛');
-  }
-  replyCount++;checkTrialCta();
-}
 
-function checkTrialCta(){if(replyCount>=8)show('trialSection');}
+    // --- VOICE & AI ENGINE (chat.js integration) ---
+    async function sendToFresh() {
+      const inputEl = document.getElementById('user-input');
+      const prompt = inputEl.value.trim();
+      if (!prompt) return;
 
-function appendMsg(role,text){
-  const log=document.getElementById('chatLog');
-  const div=document.createElement('div');
-  div.className=`msg ${role}`;
-  div.innerHTML=role==='fresh'?`<span>Fresh 🤵</span><br>${text}`:`<span>You 💬</span><br>${text}`;
-  log.appendChild(div);
-  log.scrollTop=log.scrollHeight;
-}
+      const respBox = document.getElementById('response-box');
+      const respText = document.getElementById('response-text');
+      const statusInd = document.getElementById('voice-status-indicator');
 
-function showForm(type){
-  choiceType=type;
-  document.getElementById('trialForm').style.display='block';
-  document.querySelectorAll('.option-btns .btn').forEach(b=>b.style.display='none');
-}
+      statusInd.innerText = "Transmitting to Fresh Backend...";
+      respBox.classList.remove('hidden');
+      respText.innerText = "Thinking...";
 
-async function submitTrial(){
-  const name=document.getElementById('trialName').value.trim()||userInfo.name;
-  const biz=document.getElementById('trialBiz').value.trim()||businessType;
-  const phone=document.getElementById('trialPhone').value.trim()||userInfo.phone;
-  if(!name||!phone){document.getElementById('trialStatus').textContent='Please fill in your name and phone.';return;}
-  document.getElementById('trialStatus').textContent='Sending...';
-  await fetch(WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'trial_signup',choice:choiceType,name,business:biz,phone,ref:REF,timestamp:new Date().toISOString()})});
-  document.getElementById('trialStatus').textContent="You're in! Fresh will be in touch shortly. 💛";
-  speak("You're in! Fresh will be in touch shortly.");
-}
+      try {
+        const response = await fetch('/.netlify/functions/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
+        });
 
-function speak(text){try{const u=new SpeechSynthesisUtterance(text);u.rate=1.1;u.pitch=1.2;window.speechSynthesis.speak(u);}catch(e){}}
+        const data = await response.json();
+        const reply = data.reply || "I heard you, Chief! Engine ready.";
 
-setupMic();
-const params=new URLSearchParams(window.location.search);
-const demoVal=params.get('demo');
-if(demoVal){
-  window.addEventListener('load',()=>{
-    document.getElementById('worldInput').value=demoVal;
-    showDemo();
-  });
-}
-</script>
+        respText.innerText = reply;
+        lastSpokenReply = reply;
+        speakOutLoud(reply);
+
+        statusInd.innerText = "Tap mic to speak or enter prompt below";
+        inputEl.value = "";
+
+      } catch (err) {
+        respText.innerText = "Connection error: " + err.message;
+        statusInd.innerText = "Error connecting to backend.";
+      }
+    }
+
+    function speakOutLoud(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // Stop current speech
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function repeatSpeech() {
+      if (lastSpokenReply) speakOutLoud(lastSpokenReply);
+    }
+
+    function toggleVoiceInput() {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert("Speech recognition is not supported in this browser. Type below!");
+        return;
+      }
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      
+      const statusInd = document.getElementById('voice-status-indicator');
+      const micBtn = document.getElementById('mic-btn');
+
+      recognition.onstart = () => {
+        statusInd.innerText = "Listening... Speak now!";
+        micBtn.classList.add('animate-pulse', 'bg-red-600');
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('user-input').value = transcript;
+        sendToFresh();
+      };
+
+      recognition.onerror = () => {
+        statusInd.innerText = "Voice input error. Try typing!";
+      };
+
+      recognition.onend = () => {
+        micBtn.classList.remove('animate-pulse', 'bg-red-600');
+      };
+
+      recognition.start();
+    }
+
+    // --- MONDAY.COM LIVE API FETCH ROUTINE ---
+    async function fetchMondayBoard() {
+      const container = document.getElementById('monday-items-container');
+      
+      try {
+        const res = await fetch('/.netlify/functions/monday');
+        const data = await res.json();
+
+        if (data.error) {
+          container.innerHTML = `<div class="col-span-full p-4 bg-amber-500/10 border border-amber-500/20 text-amber-300 rounded-xl text-xs">API Status: ${data.error}</div>`;
+          return;
+        }
+
+        if (!data.groups || data.groups.length === 0) {
+          container.innerHTML = `<div class="col-span-full p-4 bg-slate-950 border border-slate-800 text-slate-400 rounded-xl text-xs">No active items in Bagdons Queue or Ready Wall.</div>`;
+          return;
+        }
+
+        let html = '';
+        data.groups.forEach(group => {
+          const items = group.items_page?.items || [];
+          items.forEach(item => {
+            html += `
+              <div class="p-4 bg-slate-950/80 border border-slate-800 rounded-xl space-y-2 hover:border-slate-700 transition-all">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-brand-400 uppercase tracking-wider">${group.title}</span>
+                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                </div>
+                <h4 class="font-semibold text-sm text-slate-100">${item.name}</h4>
+              </div>
+            `;
+          });
+        });
+
+        container.innerHTML = html || `<div class="col-span-full p-4 bg-slate-950 border border-slate-800 text-slate-400 rounded-xl text-xs">No items currently active.</div>`;
+
+      } catch (err) {
+        container.innerHTML = `<div class="col-span-full p-4 bg-rose-500/10 border border-rose-500/20 text-rose-300 rounded-xl text-xs">Failed to load Monday board items.</div>`;
+      }
+    }
+
+    // --- INVOICE ENGINE & TAX CALCULATOR ---
+    function addInvoiceRow() {
+      const list = document.getElementById('invoice-items-list');
+      const div = document.createElement('div');
+      div.className = 'flex items-center gap-2 inv-row';
+      div.innerHTML = `
+        <input type="text" placeholder="Description" value="Repair / Part Item" class="inv-desc flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500" />
+        <input type="number" step="0.01" placeholder="Amount" value="45.00" oninput="calculateInvoiceTotals()" class="inv-amount w-28 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500 text-right" />
+        <button onclick="removeInvoiceRow(this)" class="text-slate-500 hover:text-rose-400 p-2"><i class="fa-solid fa-trash"></i></button>
+      `;
+      list.appendChild(div);
+      calculateInvoiceTotals();
+    }
+
+    function removeInvoiceRow(btn) {
+      btn.closest('.inv-row').remove();
+      calculateInvoiceTotals();
+    }
+
+    function calculateInvoiceTotals() {
+      const amounts = document.querySelectorAll('.inv-amount');
+      let subtotal = 0;
+      amounts.forEach(input => {
+        subtotal += parseFloat(input.value) || 0;
+      });
+
+      const tax = subtotal * 0.06; // MD 6% Sales Tax
+      const total = subtotal + tax;
+
+      document.getElementById('inv-subtotal-display').innerText = '$' + subtotal.toFixed(2);
+      document.getElementById('inv-tax-display').innerText = '$' + tax.toFixed(2);
+      document.getElementById('inv-total-display').innerText = '$' + total.toFixed(2);
+    }
+
+    function generateAndPrintInvoice() {
+      const name = document.getElementById('inv-customer-name').value;
+      const phone = document.getElementById('inv-customer-phone').value;
+
+      document.getElementById('print-date').innerText = new Date().toLocaleDateString();
+      document.getElementById('print-customer-name').innerText = name;
+      document.getElementById('print-customer-phone').innerText = phone;
+
+      const rows = document.querySelectorAll('.inv-row');
+      let tableHtml = '';
+      let subtotal = 0;
+
+      rows.forEach(row => {
+        const desc = row.querySelector('.inv-desc').value;
+        const amt = parseFloat(row.querySelector('.inv-amount').value) || 0;
+        subtotal += amt;
+        tableHtml += `
+          <tr class="border-b">
+            <td class="py-2 text-sm">${desc}</td>
+            <td class="py-2 text-sm text-right">$${amt.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+      const tax = subtotal * 0.06;
+      const total = subtotal + tax;
+
+      document.getElementById('print-items-body').innerHTML = tableHtml;
+      document.getElementById('print-subtotal').innerText = '$' + subtotal.toFixed(2);
+      document.getElementById('print-tax').innerText = '$' + tax.toFixed(2);
+      document.getElementById('print-total').innerText = '$' + total.toFixed(2);
+
+      window.print();
+    }
+  </script>
 </body>
 </html>
