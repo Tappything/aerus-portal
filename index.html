@@ -33,7 +33,7 @@
 </head>
 <body class="min-h-screen pb-12">
 
-    <!-- TOP HEADER / EXECUTIVE DUO -->
+    <!-- HEADER: EXECUTIVE DUO -->
     <header class="glass-panel sticky top-0 z-50 px-4 py-3 border-b border-gray-800">
         <div class="max-w-md mx-auto flex items-center justify-between">
             <div class="flex items-center space-x-3">
@@ -52,9 +52,6 @@
             <div class="flex items-center space-x-2">
                 <button onclick="toggleModal('squadModal')" class="px-2.5 py-1.5 text-xs font-medium bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg border border-gray-700 transition">
                     The Squad 🎭
-                </button>
-                <button onclick="triggerCamera()" class="p-2 bg-gray-800 hover:bg-gray-700 text-blue-400 rounded-lg border border-gray-700 transition">
-                    <i class="fas me-0 fa-camera"></i>
                 </button>
             </div>
         </div>
@@ -96,14 +93,14 @@
             </div>
         </section>
 
-        <!-- SHOWCASE DASHBOARD / DOORS -->
+        <!-- DASHBOARD CABINETS -->
         <section class="space-y-3">
             <div class="flex items-center justify-between px-1">
                 <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wide">Showcase Doors</h3>
                 <span class="text-xs text-blue-400">Aerus Timonium Mode</span>
             </div>
 
-            <!-- DOOR 1: BUSINESS WORLD -->
+            <!-- BUSINESS WORLD -->
             <div class="glass-panel rounded-xl overflow-hidden border border-gray-800">
                 <button onclick="toggleCabinet('businessCabinets')" class="w-full p-4 flex items-center justify-between text-left bg-gradient-to-r from-gray-900 to-gray-800/80">
                     <div class="flex items-center space-x-3">
@@ -119,201 +116,49 @@
                 </button>
 
                 <div id="businessCabinets" class="p-3 space-y-2 border-t border-gray-800/80">
-                    <!-- Workbench -->
                     <div class="cabinet-card p-3 rounded-lg">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-xs font-bold text-white"><i class="fas fa-wrench text-blue-400 mr-1.5"></i>Workbench Queue</span>
-                            <span class="text-[10px] px-2 py-0.5 bg-blue-950 text-blue-300 rounded-full border border-blue-800">3 Active</span>
+                            <span class="text-xs font-bold text-white"><i class="fas fa-wrench text-blue-400 mr-1.5"></i>Eugene Gumenick</span>
+                            <span class="text-[10px] px-2 py-0.5 bg-blue-950 text-blue-300 rounded-full border border-blue-800">Next Stop</span>
                         </div>
-                        <p class="text-[11px] text-gray-300">Electrolux Guardian tune-up • Lux Legacy motor swap</p>
+                        <p class="text-[11px] text-gray-300">104 Gittings Ave • Baltimore MD 21212</p>
                     </div>
 
-                    <!-- Vehicles Cabinet -->
-                    <div class="cabinet-card p-3 rounded-lg border-l-amber-500">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-xs font-bold text-white"><i class="fas fa-truck text-amber-400 mr-1.5"></i>Field Vehicles</span>
-                            <span class="text-[10px] px-2 py-0.5 bg-amber-950 text-amber-300 rounded-full border border-amber-800">Ready</span>
-                        </div>
-                        <p class="text-[11px] text-gray-300">Van 1 loaded for Timonium route • Field diag kit ready</p>
-                    </div>
-
-                    <!-- Showroom Cabinet -->
-                    <div class="cabinet-card p-3 rounded-lg border-l-emerald-500">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-xs font-bold text-white"><i class="fas fa-store text-emerald-400 mr-1.5"></i>Showroom Floor</span>
-                            <span class="text-[10px] px-2 py-0.5 bg-emerald-950 text-emerald-300 rounded-full border border-emerald-800">Operational</span>
-                        </div>
-                        <p class="text-[11px] text-gray-300">Air purifier display active • Demo units prepped</p>
-                    </div>
-
-                    <!-- Ready Wall -->
                     <div class="cabinet-card p-3 rounded-lg border-l-purple-500">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-xs font-bold text-white"><i class="fas fa-check-circle text-purple-400 mr-1.5"></i>Ready Wall</span>
-                            <span class="text-[10px] px-2 py-0.5 bg-purple-950 text-purple-300 rounded-full border border-purple-800">4 Pickups</span>
+                            <span class="text-xs font-bold text-white"><i class="fas fa-check-circle text-purple-400 mr-1.5"></i>Susan Bratton</span>
+                            <span class="text-[10px] px-2 py-0.5 bg-purple-950 text-purple-300 rounded-full border border-purple-800">2:30 PM Drop-Off</span>
                         </div>
-                        <p class="text-[11px] text-gray-300">Customer pickup notifications dispatched by Sissy</p>
+                        <p class="text-[11px] text-gray-300">Guardian Platinum cord repair • HEPA filter drop-shipped</p>
                     </div>
-
-                    <!-- Bagden's World Cascading Sub-Cabinet -->
-                    <div class="mt-3 p-3 bg-blue-950/30 rounded-xl border border-blue-800/40">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-bold text-blue-300 flex items-center gap-1.5">
-                                <i class="fas fa-layer-group"></i> Bagden's World (Shared Offshoot)
-                            </span>
-                            <span class="text-[10px] bg-blue-900/80 text-blue-200 px-2 py-0.5 rounded">Synced</span>
-                        </div>
-                        <p class="text-[11px] text-gray-300 mb-2">Cascading view: Shared repair queue & field diagnostics</p>
-                        <div class="p-2 bg-gray-900/80 rounded text-[11px] text-gray-300">
-                            📌 <strong>Bench Item:</strong> Aerus Central Vac unit assigned to Mike Bagden
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- DOOR 2: PERSONAL WORLD -->
-            <div class="glass-panel rounded-xl overflow-hidden border border-gray-800">
-                <button onclick="toggleCabinet('personalCabinets')" class="w-full p-4 flex items-center justify-between text-left bg-gradient-to-r from-gray-900 to-gray-800/80">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-9 h-9 rounded-lg bg-emerald-600/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
-                            <i class="fas fa-user text-sm"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-sm text-white">Personal World</h4>
-                            <p class="text-xs text-gray-400">Personal Tasks, Notes & Eda Tracking</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
-                </button>
-
-                <div id="personalCabinets" class="hidden p-3 space-y-2 border-t border-gray-800/80">
-                    <div class="p-2.5 bg-gray-900/60 rounded-lg text-xs text-gray-300">
-                        • Eda TV setup checklist logged
-                    </div>
-                    <div class="p-2.5 bg-gray-900/60 rounded-lg text-xs text-gray-300">
-                        • Ragweed seasonal alert reminder active
-                    </div>
-                </div>
-            </div>
-
-            <!-- DOOR 3: INVOICES & PAYMENTS -->
-            <div class="glass-panel rounded-xl overflow-hidden border border-gray-800">
-                <button onclick="toggleCabinet('invoiceCabinet')" class="w-full p-4 flex items-center justify-between text-left bg-gradient-to-r from-gray-900 to-gray-800/80">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-9 h-9 rounded-lg bg-purple-600/20 text-purple-400 flex items-center justify-center border border-purple-500/30">
-                            <i class="fas fa-file-invoice-dollar text-sm"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-sm text-white">Invoices & Payments</h4>
-                            <p class="text-xs text-gray-400">Build Invoices + Workiz Cash Register</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
-                </button>
-
-                <div id="invoiceCabinet" class="hidden p-4 space-y-3 border-t border-gray-800/80">
-                    <div class="bg-gray-900/80 p-3 rounded-lg border border-gray-800 space-y-2 text-xs">
-                        <div class="flex justify-between font-semibold text-gray-200">
-                            <span>Service & Tune-Up</span>
-                            <span>$120.00</span>
-                        </div>
-                        <div class="flex justify-between text-gray-400">
-                            <span>Replacement HEPA Filter</span>
-                            <span>$35.00</span>
-                        </div>
-                        <div class="flex justify-between text-gray-400">
-                            <span>MD Sales Tax (6%)</span>
-                            <span>$9.30</span>
-                        </div>
-                        <div class="border-t border-gray-800 pt-2 flex justify-between font-bold text-blue-400 text-sm">
-                            <span>Total Due</span>
-                            <span>$164.30</span>
-                        </div>
-                    </div>
-
-                    <!-- Workiz Clipboard Button -->
-                    <button onclick="copyToCashRegister()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-lg transition flex items-center justify-center gap-2">
-                        <i class="fas fa-copy"></i> 📋 Copy to Cash Register (Workiz)
-                    </button>
-
-                    <!-- Stripe Phase 2 Showcase Button -->
-                    <button disabled class="w-full py-2 bg-gray-800 text-gray-400 font-semibold text-xs rounded-lg border border-gray-700 opacity-75 cursor-not-allowed flex items-center justify-center gap-2">
-                        <i class="fas fa-credit-card"></i> 💳 Pay Now / Stripe Coming Soon
-                    </button>
-                </div>
-            </div>
-
-            <!-- DOOR 4: TAPPY MACHINE ENGINE -->
-            <div class="glass-panel rounded-xl overflow-hidden border border-gray-800">
-                <button onclick="toggleCabinet('databaseCabinet')" class="w-full p-4 flex items-center justify-between text-left bg-gradient-to-r from-gray-900 to-gray-800/80">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-9 h-9 rounded-lg bg-amber-600/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
-                            <i class="fas fa-database text-sm"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-sm text-white">Tappy Machine Engine</h4>
-                            <p class="text-xs text-gray-400">22,283 Customer Database Active</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
-                </button>
-
-                <div id="databaseCabinet" class="hidden p-3 space-y-2 border-t border-gray-800/80 text-xs">
-                    <input type="text" placeholder="Search 22,283 records by name, phone, or address..." class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white text-xs focus:outline-none focus:border-blue-500">
-                    <p class="text-[11px] text-gray-400">Instant outreach & customer history ready for 1-tap dispatch.</p>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- SQUAD MODAL (HIDDEN BY DEFAULT) -->
+    <!-- SQUAD MODAL -->
     <div id="squadModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="glass-panel max-w-xs w-full rounded-2xl p-5 border border-gray-700">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="font-bold text-sm text-white flex items-center gap-2">
-                    <span>The Squad 🎭</span>
-                </h3>
+                <h3 class="font-bold text-sm text-white">The Squad 🎭</h3>
                 <button onclick="toggleModal('squadModal')" class="text-gray-400 hover:text-white">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="space-y-2.5 text-xs text-gray-300">
-                <div class="p-2 bg-gray-900/80 rounded-lg flex justify-between items-center">
-                    <span class="font-bold text-blue-400">Fresh 🤵</span>
-                    <span class="text-gray-400">Pocket Chief of Staff</span>
-                </div>
-                <div class="p-2 bg-gray-900/80 rounded-lg flex justify-between items-center">
-                    <span class="font-bold text-emerald-400">Sissy</span>
-                    <span class="text-gray-400">Digital Coordinator</span>
-                </div>
-                <div class="p-2 bg-gray-900/80 rounded-lg flex justify-between items-center">
-                    <span class="font-bold text-purple-400">L</span>
-                    <span class="text-gray-400">System Support</span>
-                </div>
-                <div class="p-2 bg-gray-900/80 rounded-lg flex justify-between items-center">
-                    <span class="font-bold text-amber-400">Squash</span>
-                    <span class="text-gray-400">System Support</span>
-                </div>
-                <div class="p-2 bg-gray-900/80 rounded-lg flex justify-between items-center">
-                    <span class="font-bold text-rose-400">Yogi</span>
-                    <span class="text-gray-400">System Support</span>
-                </div>
-                <div class="p-2 bg-gray-900/80 rounded-lg flex justify-between items-center">
-                    <span class="font-bold text-indigo-400">Nush</span>
-                    <span class="text-gray-400">System Support</span>
-                </div>
+            <div class="space-y-2 text-xs text-gray-300">
+                <p>• <strong>Fresh 🤵</strong> — Pocket Chief of Staff</p>
+                <p>• <strong>Sissy</strong> — Digital Coordinator</p>
+                <p>• <strong>L / Squash / Yogi / Nush</strong> — System Support</p>
             </div>
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
     <script>
         let isListening = false;
         let recognition = null;
         let finalSpeechText = "";
 
-        // Web Speech API Initialization
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
@@ -331,25 +176,15 @@
                 }
                 document.getElementById('userSpeech').innerText = finalSpeechText || interimTranscript;
             };
-
-            recognition.onerror = (event) => {
-                console.error("Speech Recognition Error:", event.error);
-                document.getElementById('voiceStatus').innerText = "Mic error. Tap to retry.";
-            };
         }
 
         function toggleVoice() {
-            if (!recognition) {
-                alert("Speech recognition is not supported on this device/browser.");
-                return;
-            }
-
+            if (!recognition) return alert("Speech recognition not supported on this device.");
             if (!isListening) {
                 finalSpeechText = "";
                 recognition.start();
                 isListening = true;
                 document.getElementById('micBtn').classList.add('animate-pulse', 'bg-red-600');
-                document.getElementById('micIcon').className = 'fas fa-stop';
                 document.getElementById('voiceStatus').innerText = "Fresh is listening... Tap Send when finished.";
                 document.getElementById('transcriptBox').classList.remove('hidden');
                 document.getElementById('sendVoiceBtn').classList.remove('hidden');
@@ -363,8 +198,6 @@
                 recognition.stop();
                 isListening = false;
                 document.getElementById('micBtn').classList.remove('animate-pulse', 'bg-red-600');
-                document.getElementById('micIcon').className = 'fas fa-microphone';
-                document.getElementById('voiceStatus').innerText = "Processing with Fresh...";
                 sendToFresh();
             }
         }
@@ -377,65 +210,24 @@
             document.getElementById('freshResponseText').innerText = "Fresh is thinking...";
 
             try {
-                // Live Gemini Payload through Netlify backend function
                 const res = await fetch('/.netlify/functions/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: userPrompt,
-                        systemPrompt: "You are Fresh, Pocket Chief of Staff for Aerus Timonium. Direct, punchy, energetic, $0 fluff. Answer William out loud directly and clearly."
-                    })
+                    body: JSON.stringify({ message: userPrompt })
                 });
-
                 if (res.ok) {
                     const data = await res.json();
-                    const freshText = data.reply || "Got it William! Processed and filed directly into your system hub!";
-                    document.getElementById('freshResponseText').innerText = freshText;
-                    speakOutLoud(freshText);
+                    document.getElementById('freshResponseText').innerText = data.reply;
                 } else {
-                    // Smart Fallback Response
-                    const fallbackText = `Got it William! I heard "${userPrompt}". Routing that straight into your command hub now. Zero admin drag!`;
-                    document.getElementById('freshResponseText').innerText = fallbackText;
-                    speakOutLoud(fallbackText);
+                    document.getElementById('freshResponseText').innerText = `Got it William! Processed: "${userPrompt}"`;
                 }
             } catch (err) {
-                const fallbackText = `Got it William! Processing "${userPrompt}" and organizing your cabinets now!`;
-                document.getElementById('freshResponseText').innerText = fallbackText;
-                speakOutLoud(fallbackText);
-            }
-
-            document.getElementById('voiceStatus').innerText = "Tap to start speaking directly to Fresh";
-        }
-
-        function speakOutLoud(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = 1.05;
-                utterance.pitch = 1.0;
-                window.speechSynthesis.speak(utterance);
+                document.getElementById('freshResponseText').innerText = `Got it William! Processed: "${userPrompt}"`;
             }
         }
 
-        function toggleCabinet(id) {
-            const el = document.getElementById(id);
-            el.classList.toggle('hidden');
-        }
-
-        function toggleModal(id) {
-            const el = document.getElementById(id);
-            el.classList.toggle('hidden');
-        }
-
-        function triggerCamera() {
-            alert("Camera Intake active — Snapshot feature ready for card attachment.");
-        }
-
-        function copyToCashRegister() {
-            const text = "TappyThing Invoice — Total: $164.30 (Includes MD 6% Tax). Workiz Cash Register Entry.";
-            navigator.clipboard.writeText(text);
-            alert("📋 Formatted Invoice copied to Clipboard! Ready to paste into Workiz Cash Register.");
-        }
+        function toggleCabinet(id) { document.getElementById(id).classList.toggle('hidden'); }
+        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
     </script>
 </body>
 </html>
