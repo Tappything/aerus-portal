@@ -1,108 +1,364 @@
-<script>
-    let isListening = false;
-    let recognition = null;
-    let finalSpeechText = "";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TappyThing — Digital Coordinator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #070a0f;
+            color: #f0f6fc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        .glow-door {
+            background: linear-gradient(145deg, rgba(22, 27, 34, 0.9), rgba(13, 17, 23, 0.95));
+            border: 1px solid rgba(56, 139, 253, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .glow-door:hover {
+            border-color: rgba(56, 139, 253, 0.8);
+            box-shadow: 0 0 25px rgba(56, 139, 253, 0.35);
+        }
+        .glow-button {
+            box-shadow: 0 0 30px rgba(56, 139, 253, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glow-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 45px rgba(56, 139, 253, 0.8);
+        }
+        .gold-badge {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
 
-    // STEP 1: Capture User Spoken Text
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SpeechRecognition();
-        recognition.continuous = false; // Stops automatically when user finishes speaking
-        recognition.interimResults = true;
+    <!-- HEADER: EXECUTIVE DUO -->
+    <header class="w-full bg-gray-950/90 backdrop-blur-md px-6 py-4 border-b border-blue-900/40 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <img src="logo.png" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Fresh+Chief&background=0D1117&color=388BFD&size=128';" class="w-12 h-12 rounded-full border-2 border-blue-400 shadow-lg object-cover" alt="Fresh Logo">
+                    <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-gray-950"></span>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-white flex items-center gap-2">
+                        Fresh 🤵 <span class="text-xs px-2.5 py-0.5 rounded-full gold-badge font-bold tracking-wide">Pocket Chief of Staff</span>
+                    </h1>
+                    <p class="text-xs text-blue-300">Sissy: Digital Coordinator • Aerus Home Wellness Timonium</p>
+                </div>
+            </div>
 
-        recognition.onresult = (event) => {
-            let interimTranscript = '';
-            for (let i = event.resultIndex; i < event.results.length; ++i) {
-                if (event.results[i].isFinal) {
-                    finalSpeechText += event.results[i][0].transcript;
-                } else {
-                    interimTranscript += event.results[i][0].transcript;
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center space-x-3 text-xs bg-gray-900 px-3 py-1.5 rounded-xl border border-gray-800">
+                    <span class="text-gray-400">Vault: <strong class="text-blue-400">22,283</strong></span>
+                    <span class="text-gray-600">|</span>
+                    <span class="text-gray-400">Assets: <strong class="text-emerald-400">1,090</strong></span>
+                </div>
+                <button onclick="toggleModal('squadModal')" class="px-3.5 py-2 text-xs font-bold bg-blue-950 hover:bg-blue-900 text-blue-300 rounded-xl border border-blue-700/60 transition">
+                    The Squad 🎭
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN DASHBOARD -->
+    <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-8 flex-grow">
+
+        <!-- VOICE ENGINE -->
+        <section class="glow-door rounded-3xl p-6 sm:p-8 text-center relative overflow-hidden max-w-3xl mx-auto">
+            <span class="text-xs font-bold text-blue-400 tracking-widest uppercase bg-blue-950/80 px-3 py-1 rounded-full border border-blue-800/50">One Button Command Engine</span>
+            <h2 class="text-2xl font-black text-white mt-3">Talk to Fresh</h2>
+            
+            <button id="micBtn" onclick="toggleVoice()" class="glow-button w-28 h-28 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-4xl mx-auto flex items-center justify-center my-6 border-4 border-blue-400/40">
+                <i id="micIcon" class="fas fa-microphone"></i>
+            </button>
+
+            <p id="voiceStatus" class="text-xs text-gray-400 font-medium">Tap to speak directly to Fresh — Voice Intake Active</p>
+
+            <div id="transcriptBox" class="hidden mt-4 p-4 bg-gray-950/90 rounded-2xl text-xs text-gray-200 text-left border border-gray-800 max-h-28 overflow-y-auto">
+                <span class="text-blue-400 font-bold">You:</span> <span id="userSpeech">Listening...</span>
+            </div>
+
+            <button id="sendVoiceBtn" onclick="sendToFresh()" class="hidden w-full mt-4 py-3 bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-sm rounded-xl shadow-xl transition flex items-center justify-center gap-2">
+                <i class="fas fa-paper-plane"></i> SEND TO FRESH 🚀
+            </button>
+
+            <div id="freshResponse" class="hidden mt-4 p-4 bg-blue-950/60 rounded-2xl text-left border border-blue-700/50">
+                <p class="text-xs font-bold text-blue-300 flex items-center gap-2 mb-1">
+                    <span>Fresh 🤵</span> <span class="text-[10px] text-gray-400 font-normal">(Voice Output Engaged)</span>
+                </p>
+                <p id="freshResponseText" class="text-xs text-gray-100 leading-relaxed"></p>
+            </div>
+        </section>
+
+        <!-- THE 4 DYNAMIC SHOWCASE DOORS -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- DOOR 1: BUSINESS WORLD -->
+            <div class="glow-door rounded-2xl overflow-hidden border border-blue-900/50">
+                <button onclick="toggleCabinet('businessCabinets')" class="w-full p-5 flex items-center justify-between text-left bg-gradient-to-r from-gray-900 via-gray-900 to-blue-950/40">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-11 h-11 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center border border-blue-500/40 text-lg">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base text-white">Business World</h3>
+                            <p class="text-xs text-gray-400">Shop Ops, Workbench Queue & Active Field Visits</p>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-down text-gray-400"></i>
+                </button>
+
+                <div id="businessCabinets" class="p-4 space-y-3 border-t border-gray-800">
+                    <div class="p-3 bg-gray-900/80 rounded-xl border-l-4 border-l-blue-500 flex justify-between items-center">
+                        <div>
+                            <h4 class="text-xs font-bold text-white">Eugene Gumenick</h4>
+                            <p class="text-[11px] text-gray-400">104 Gittings Ave • Baltimore, MD 21212</p>
+                        </div>
+                        <span class="text-[10px] px-2.5 py-1 bg-blue-950 text-blue-300 font-bold rounded-lg border border-blue-800">Next Stop</span>
+                    </div>
+
+                    <div class="p-3 bg-gray-900/80 rounded-xl border-l-4 border-l-purple-500 flex justify-between items-center">
+                        <div>
+                            <h4 class="text-xs font-bold text-white">Susan Bratton</h4>
+                            <p class="text-[11px] text-gray-400">Cord repair drop-off (2:30 PM - 3:30 PM) • Filter drop-shipped</p>
+                        </div>
+                        <span class="text-[10px] px-2.5 py-1 bg-purple-950 text-purple-300 font-bold rounded-lg border border-purple-800">Drop-Off Ready</span>
+                    </div>
+
+                    <div class="p-3 bg-gray-900/80 rounded-xl border-l-4 border-l-indigo-500">
+                        <div class="flex justify-between items-center mb-1">
+                            <h4 class="text-xs font-bold text-white">Workbench Queue (Chris Lead)</h4>
+                            <span class="text-[10px] px-2 py-0.5 bg-indigo-950 text-indigo-300 rounded font-bold">3 Units</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400">Lux Legacy motor swap • Karen Ross Oreck repair</p>
+                    </div>
+
+                    <div class="p-3 bg-blue-950/40 rounded-xl border border-blue-800/50">
+                        <h4 class="text-xs font-bold text-blue-300">Bagden's World (Shared Offshoot)</h4>
+                        <p class="text-[11px] text-gray-300 mt-0.5">📌 Central Vac unit assigned to Mike Bagden</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DOOR 2: PERSONAL WORLD -->
+            <div class="glow-door rounded-2xl overflow-hidden border border-emerald-900/50">
+                <button onclick="toggleCabinet('personalCabinets')" class="w-full p-5 flex items-center justify-between text-left bg-gradient-to-r from-gray-900 via-gray-900 to-emerald-950/40">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-11 h-11 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center border border-emerald-500/40 text-lg">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base text-white">Personal World</h3>
+                            <p class="text-xs text-gray-400">Personal Tasks, Notes & Eda Tracking</p>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-down text-gray-400"></i>
+                </button>
+
+                <div id="personalCabinets" class="p-4 space-y-3 border-t border-gray-800">
+                    <div class="p-3 bg-gray-900/80 rounded-xl border-l-4 border-l-emerald-500">
+                        <h4 class="text-xs font-bold text-white">Eda Home Checklist</h4>
+                        <p class="text-[11px] text-gray-400">TV setup & streaming media configuration</p>
+                    </div>
+                    <div class="p-3 bg-gray-900/80 rounded-xl border-l-4 border-l-amber-500">
+                        <h4 class="text-xs font-bold text-white">Seasonal Alert</h4>
+                        <p class="text-[11px] text-gray-400">Ragweed allergen reminder active</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DOOR 3: INVOICES & CASH REGISTER -->
+            <div class="glow-door rounded-2xl overflow-hidden border border-amber-900/50">
+                <button onclick="toggleCabinet('cashCabinets')" class="w-full p-5 flex items-center justify-between text-left bg-gradient-to-r from-gray-900 via-gray-900 to-amber-950/40">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-11 h-11 rounded-xl bg-amber-600/20 text-amber-400 flex items-center justify-center border border-amber-500/40 text-lg">
+                            <i class="fas fa-cash-register"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base text-white">Invoices & Cash Register</h3>
+                            <p class="text-xs text-gray-400">Fast Invoicing & MD 6% Tax Calculator</p>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-down text-gray-400"></i>
+                </button>
+
+                <div id="cashCabinets" class="p-4 space-y-3 border-t border-gray-800">
+                    <div class="p-3 bg-gray-900/80 rounded-xl">
+                        <label class="text-xs text-gray-300 font-bold block mb-1">Quick MD Sales Tax (6%):</label>
+                        <div class="flex gap-2">
+                            <input id="calcAmount" type="number" placeholder="Enter subtotal..." class="bg-gray-950 border border-gray-700 text-xs text-white rounded-lg p-2 flex-grow">
+                            <button onclick="calcTax()" class="px-3 py-2 bg-amber-600 hover:bg-amber-500 font-bold text-xs text-white rounded-lg">Calculate</button>
+                        </div>
+                        <p id="taxResult" class="text-xs text-amber-300 font-bold mt-2 hidden"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DOOR 4: TIME TO TAP -->
+            <div class="glow-door rounded-2xl overflow-hidden border border-purple-900/50">
+                <button onclick="toggleCabinet('tapCabinets')" class="w-full p-5 flex items-center justify-between text-left bg-gradient-to-r from-gray-900 via-gray-900 to-purple-950/40">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-11 h-11 rounded-xl bg-purple-600/20 text-purple-400 flex items-center justify-center border border-purple-500/40 text-lg">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base text-white">Time to Tap</h3>
+                            <p class="text-xs text-gray-400">One Pile Dumping Ground — Raw Intakes & Voice Deposits</p>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-down text-gray-400"></i>
+                </button>
+
+                <div id="tapCabinets" class="p-4 space-y-3 border-t border-gray-800">
+                    <div class="p-3 bg-gray-900/80 rounded-xl border border-purple-800/40 text-xs text-gray-300">
+                        ⚡ <strong>One Pile Intake:</strong> Tap the mic, speak your note, and Fresh routes it automatically.
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="w-full border-t border-gray-900 py-4 text-center text-xs text-gray-600">
+        TappyThing © Clean Environment LLC • Aerus Timonium Live Operations Case Study
+    </footer>
+
+    <!-- SQUAD MOVIE CREDITS MODAL -->
+    <div id="squadModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glow-door max-w-sm w-full rounded-3xl p-6 text-center border border-blue-700/60 relative">
+            <button onclick="toggleModal('squadModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3 class="font-black text-lg text-white mb-4">THE SQUAD 🎭</h3>
+            <div class="space-y-3 text-xs text-gray-300 text-left">
+                <p>• <strong>Fresh 🤵</strong> — Pocket Chief of Staff & Voice Engine</p>
+                <p>• <strong>Sissy</strong> — Digital Coordinator & Visual Architect</p>
+                <p>• <strong>Mona</strong> — Digital, Intakes, Customer Audio Prompting</p>
+                <p>• <strong>Chris</strong> — Bench Lead, Inventory, Workiz & Repairs</p>
+                <p>• <strong>Mike</strong> — Field Diagnostics & Installation Lead</p>
+                <p>• <strong>Norby</strong> — FOAS Entry, Outreach & Corporate Ops</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isListening = false;
+        let recognition = null;
+        let finalSpeechText = "";
+
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+
+            recognition.onresult = (event) => {
+                let interimTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalSpeechText += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
                 }
-            }
-            const currentText = finalSpeechText || interimTranscript;
-            document.getElementById('userSpeech').innerText = currentText;
-        };
+                const currentText = finalSpeechText || interimTranscript;
+                document.getElementById('userSpeech').innerText = currentText;
+            };
 
-        recognition.onend = () => {
-            if (isListening) {
+            recognition.onend = () => {
+                if (isListening) {
+                    stopMicUI();
+                    sendToFresh();
+                }
+            };
+        }
+
+        function toggleVoice() {
+            if (!recognition) return alert("Speech recognition not supported on this browser.");
+            if (!isListening) {
+                finalSpeechText = "";
+                document.getElementById('userSpeech').innerText = "Listening...";
+                recognition.start();
+                isListening = true;
+                document.getElementById('micBtn').classList.add('animate-pulse', 'bg-red-600');
+                document.getElementById('voiceStatus').innerText = "Fresh is listening... Speak your command!";
+                document.getElementById('transcriptBox').classList.remove('hidden');
+                document.getElementById('sendVoiceBtn').classList.remove('hidden');
+            } else {
                 stopMicUI();
                 sendToFresh();
             }
-        };
-    }
+        }
 
-    function toggleVoice() {
-        if (!recognition) return alert("Speech recognition not supported on this browser.");
-        if (!isListening) {
-            finalSpeechText = "";
-            document.getElementById('userSpeech').innerText = "Listening...";
-            recognition.start();
-            isListening = true;
-            document.getElementById('micBtn').classList.add('animate-pulse', 'bg-red-600');
-            document.getElementById('voiceStatus').innerText = "Fresh is listening... Speak your command!";
-            document.getElementById('transcriptBox').classList.remove('hidden');
-            document.getElementById('sendVoiceBtn').classList.remove('hidden');
-        } else {
+        function stopMicUI() {
+            if (recognition && isListening) {
+                recognition.stop();
+                isListening = false;
+            }
+            document.getElementById('micBtn').classList.remove('animate-pulse', 'bg-red-600');
+            document.getElementById('voiceStatus').innerText = "Tap to speak directly to Fresh — Voice Intake Active";
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        async function sendToFresh() {
             stopMicUI();
-            sendToFresh();
+            const userPrompt = finalSpeechText || document.getElementById('userSpeech').innerText;
+            if (!userPrompt || userPrompt === "Listening...") return;
+
+            document.getElementById('freshResponse').classList.remove('hidden');
+            document.getElementById('freshResponseText').innerText = "Fresh is thinking...";
+
+            try {
+                const res = await fetch('/.netlify/functions/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: userPrompt })
+                });
+
+                const data = await res.json();
+                const freshReply = data.reply || "Fresh is online and ready for the next play!";
+
+                document.getElementById('freshResponseText').innerText = freshReply;
+                speakText(freshReply);
+
+            } catch (err) {
+                console.error(err);
+                const errorMsg = "Glitch in the connection. Check Netlify GEMINI_API_KEY settings!";
+                document.getElementById('freshResponseText').innerText = errorMsg;
+                speakText(errorMsg);
+            }
         }
-    }
 
-    function stopMicUI() {
-        if (recognition && isListening) {
-            recognition.stop();
-            isListening = false;
+        function toggleCabinet(id) { document.getElementById(id).classList.toggle('hidden'); }
+        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
+
+        function calcTax() {
+            const val = parseFloat(document.getElementById('calcAmount').value);
+            if (isNaN(val)) return;
+            const tax = (val * 0.06).toFixed(2);
+            const total = (val + parseFloat(tax)).toFixed(2);
+            const res = document.getElementById('taxResult');
+            res.innerText = `Subtotal: $${val.toFixed(2)} | Tax (6%): $${tax} | Total: $${total}`;
+            res.classList.remove('hidden');
         }
-        document.getElementById('micBtn').classList.remove('animate-pulse', 'bg-red-600');
-        document.getElementById('voiceStatus').innerText = "Tap to speak directly to Fresh";
-    }
-
-    // STEP 4: Speak Response Text Out Loud
-    function speakText(text) {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel(); // Clear queued speech
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 1.0;
-            utterance.pitch = 1.0;
-            window.speechSynthesis.speak(utterance);
-        }
-    }
-
-    // STEPS 2, 3, & 5: Post to Netlify Function -> Render -> Speak Out Loud
-    async function sendToFresh() {
-        stopMicUI();
-        const userPrompt = finalSpeechText || document.getElementById('userSpeech').innerText;
-        if (!userPrompt || userPrompt === "Listening...") return;
-
-        // UI Loading Indicator
-        document.getElementById('freshResponse').classList.remove('hidden');
-        document.getElementById('freshResponseText').innerText = "Fresh is thinking...";
-
-        try {
-            // STEP 2: POST to Netlify Gemini Function
-            const res = await fetch('/.netlify/functions/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: userPrompt })
-            });
-
-            const data = await res.json();
-            const freshReply = data.reply || "Fresh is online and ready for the next play!";
-
-            // STEP 5: Display response text on screen
-            document.getElementById('freshResponseText').innerText = freshReply;
-
-            // STEP 4: Speak response out loud
-            speakText(freshReply);
-
-        } catch (err) {
-            console.error(err);
-            const errorMsg = "Glitch in the connection. Check your Netlify GEMINI_API_KEY settings!";
-            document.getElementById('freshResponseText').innerText = errorMsg;
-            speakText(errorMsg);
-        }
-    }
-
-    function toggleCabinet(id) { document.getElementById(id).classList.toggle('hidden'); }
-    function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
-</script>
+    </script>
+</body>
+</html>
