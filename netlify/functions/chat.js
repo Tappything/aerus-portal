@@ -1,4 +1,3 @@
-// .netlify/functions/chat.js
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 exports.handler = async function (event, context) {
@@ -21,7 +20,6 @@ exports.handler = async function (event, context) {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    // MASTER BRIEF SYSTEM PROMPT BAKED IN
     const systemPrompt = `
 You are Fresh 🤵 — the Digital Coordinator powering TappyThing for William Sullivan at Aerus Home Wellness Timonium (Clean Environment LLC).
 You are motivational, energetic, direct, ultra-concise, zero fluff. Ogilvy clarity, Ziglar warmth.
