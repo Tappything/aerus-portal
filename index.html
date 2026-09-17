@@ -3,436 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TappyThing — Digital Coordinator Dashboard</title>
-    <!-- Tailwind CSS -->
+    <title>TappyThing — Digital Coordinator</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #0d1117;
+            background-color: #070a0f;
             color: #f0f6fc;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            overflow-x: hidden;
         }
-        .glass-panel {
-            background: rgba(22, 27, 34, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(48, 54, 61, 0.8);
+        .glow-door {
+            background: linear-gradient(145deg, rgba(22, 27, 34, 0.9), rgba(13, 17, 23, 0.95));
+            border: 1px solid rgba(56, 139, 253, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .glow-door:hover {
+            border-color: rgba(56, 139, 253, 0.8);
+            box-shadow: 0 0 25px rgba(56, 139, 253, 0.35);
         }
         .glow-button {
             box-shadow: 0 0 30px rgba(56, 139, 253, 0.5);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .glow-button:hover {
-            box-shadow: 0 0 45px rgba(56, 139, 253, 0.8);
-            transform: scale(1.03);
-        }
         .glow-button:active {
-            transform: scale(0.96);
+            transform: scale(0.95);
+            box-shadow: 0 0 45px rgba(56, 139, 253, 0.8);
         }
-        .door-card {
-            transition: all 0.3s ease-in-out;
-            border: 1px solid rgba(56, 139, 253, 0.2);
-        }
-        .door-card:hover {
-            border-color: rgba(56, 139, 253, 0.6);
-            transform: translateY(-2px);
-        }
-        /* Movie Credits Animation */
-        @keyframes creditsScroll {
-            0% { transform: translateY(100%); }
-            100% { transform: translateY(-120%); }
-        }
-        .animate-credits {
-            animation: creditsScroll 12s linear infinite;
-        }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0d1117;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #30363d;
-            border-radius: 3px;
+        .gold-badge {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            color: #ffffff;
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
-    <!-- HEADER: EXECUTIVE DUO -->
-    <header class="glass-panel sticky top-0 z-40 px-6 py-4 border-b border-gray-800 shadow-2xl">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <!-- FULL-WIDTH EDGE-TO-EDGE HEADER -->
+    <header class="w-full bg-gray-950/90 backdrop-blur-md px-6 py-4 border-b border-blue-900/40 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
             <div class="flex items-center space-x-4">
                 <div class="relative">
-                    <img src="https://ui-avatars.com/api/?name=Fresh+Chief&background=0D1117&color=388BFD&size=128" 
-                         class="w-12 h-12 rounded-full border-2 border-blue-500 object-cover shadow-lg" alt="Fresh Logo">
-                    <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-gray-900 animate-pulse"></span>
+                    <img src="logo.png" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Fresh+Chief&background=0D1117&color=388BFD&size=128';" class="w-12 h-12 rounded-full border-2 border-blue-400 shadow-lg object-cover" alt="Fresh Logo">
+                    <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-gray-950"></span>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg leading-tight text-white flex items-center gap-2">
-                        Fresh 🤵 <span class="text-xs font-semibold px-2.5 py-0.5 bg-blue-900/70 text-blue-300 rounded-full border border-blue-700/50 shadow">Pocket Chief of Staff</span>
+                    <h1 class="font-bold text-lg text-white flex items-center gap-2">
+                        Fresh 🤵 <span class="text-xs px-2.5 py-0.5 rounded-full gold-badge font-bold tracking-wide">Pocket Chief of Staff</span>
                     </h1>
-                    <p class="text-xs text-gray-400 font-medium">Sissy: Digital Coordinator • 🎨 Rob Art • Clean Environment LLC</p>
+                    <p class="text-xs text-blue-300">Sissy: Digital Coordinator • Aerus Home Wellness Timonium</p>
                 </div>
             </div>
 
-            <!-- SEARCH BAR & DATABASE METRICS -->
-            <div class="flex items-center space-x-3 w-full md:w-auto">
-                <div class="relative flex-1 md:w-64">
-                    <i class="fas fa-search absolute left-3 top-2.5 text-gray-500 text-xs"></i>
-                    <input type="text" id="dbSearchInput" onkeyup="searchVault()" placeholder="Search 22,283 Records..." 
-                           class="w-full bg-gray-900 border border-gray-700 rounded-lg pl-9 pr-3 py-1.5 text-xs text-gray-200 focus:outline-none focus:border-blue-500 transition">
+            <!-- LIVE VAULT COUNTER & SQUAD BUTTON -->
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center space-x-3 text-xs bg-gray-900 px-3 py-1.5 rounded-xl border border-gray-800">
+                    <span class="text-gray-400">Vault: <strong class="text-blue-400">22,283</strong></span>
+                    <span class="text-gray-600">|</span>
+                    <span class="text-gray-400">Assets: <strong class="text-emerald-400">1,090</strong></span>
                 </div>
-                <button onclick="openSquadModal()" class="px-3.5 py-1.5 text-xs font-semibold bg-blue-950 hover:bg-blue-900 text-blue-300 rounded-lg border border-blue-800/80 transition flex items-center gap-1.5 shadow">
-                    <i class="fas fa-film text-blue-400"></i> The Squad 🎭
+                <button onclick="toggleModal('squadModal')" class="px-3.5 py-2 text-xs font-bold bg-blue-950 hover:bg-blue-900 text-blue-300 rounded-xl border border-blue-700/60 transition">
+                    The Squad 🎭
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- INDUSTRY SELECT BAR -->
-    <section class="bg-gray-950/90 border-b border-gray-800/80 py-2.5 px-6">
-        <div class="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto text-xs whitespace-nowrap gap-4">
-            <div class="flex items-center space-x-2 text-gray-400">
-                <i class="fas fa-sliders-h text-blue-400"></i>
-                <span class="font-semibold text-gray-300">Active Trade Door:</span>
+    <!-- IMMERSIVE MAIN ENGINE LAYOUT -->
+    <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-8 flex-grow">
+
+        <!-- VOICE-FIRST COMMAND CENTER -->
+        <section class="glow-door rounded-3xl p-6 sm:p-8 text-center relative overflow-hidden max-w-3xl mx-auto">
+            <span class="text-xs font-bold text-blue-400 tracking-widest uppercase bg-blue-950/80 px-3 py-1 rounded-full border border-blue-800/50">One Button Command Engine</span>
+            <h2 class="text-2xl font-black text-white mt-3">Talk to Fresh</h2>
+            
+            <button id="micBtn" onclick="toggleVoice()" class="glow-button w-28 h-28 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-4xl mx-auto flex items-center justify-center my-6 border-4 border-blue-400/40">
+                <i id="micIcon" class="fas fa-microphone"></i>
+            </button>
+
+            <p id="voiceStatus" class="text-xs text-gray-400 font-medium">Tap to speak directly to Fresh — Voice Intake Active</p>
+
+            <div id="transcriptBox" class="hidden mt-4 p-4 bg-gray-950/90 rounded-2xl text-xs text-gray-200 text-left border border-gray-800 max-h-28 overflow-y-auto">
+                <span class="text-blue-400 font-bold">You:</span> <span id="userSpeech">Listening...</span>
             </div>
-            <div class="flex items-center space-x-2">
-                <button class="px-3 py-1 bg-blue-600 text-white font-bold rounded-full text-[11px] shadow">Aerus Home Wellness (Timonium)</button>
-                <button class="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-full text-[11px] transition">HVAC / Clean Air Ops</button>
-                <button class="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-full text-[11px] transition">Carpet Cleaning & Restorations</button>
-                <button class="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-full text-[11px] transition">Small Appliance Repair</button>
-            </div>
-            <div class="text-right text-[11px] text-gray-400 font-mono">
-                <span class="text-blue-400 font-bold">22,283</span> Customers | <span class="text-green-400 font-bold">1,090</span> Active Assets
-            </div>
-        </div>
-    </section>
 
-    <!-- MAIN DASHBOARD CONTENT -->
-    <main class="max-w-7xl mx-auto px-4 md:px-6 py-6 flex-grow space-y-6">
+            <button id="sendVoiceBtn" onclick="sendToFresh()" class="hidden w-full mt-4 py-3 bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-sm rounded-xl shadow-xl transition flex items-center justify-center gap-2">
+                <i class="fas fa-paper-plane"></i> SEND TO FRESH 🚀
+            </button>
 
-        <!-- VOICE COMMAND LOOP CENTER -->
-        <section class="glass-panel rounded-2xl p-6 text-center relative overflow-hidden shadow-2xl">
-            <div class="max-w-xl mx-auto space-y-3">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-950/80 border border-blue-800/60 text-blue-300 text-xs font-semibold">
-                    <span class="w-2 h-2 rounded-full bg-blue-400 animate-ping"></span>
-                    TappyThing Dynamic Voice Engine Active
-                </div>
-                <h2 class="text-2xl font-black text-white tracking-tight">Talk to Fresh</h2>
-                <p class="text-xs text-gray-400">Tap the mic once, speak your mind, and Fresh will log it and talk back out loud.</p>
-
-                <!-- Glowing Central Mic Button -->
-                <div class="py-2">
-                    <button id="micBtn" onclick="toggleVoice()" 
-                            class="glow-button w-28 h-28 rounded-full bg-gradient-to-tr from-blue-700 to-blue-500 hover:from-blue-600 hover:to-blue-400 text-white text-4xl mx-auto flex items-center justify-center border-4 border-blue-400/40 shadow-2xl transition">
-                        <i id="micIcon" class="fas fa-microphone"></i>
-                    </button>
-                </div>
-
-                <p id="voiceStatus" class="text-xs font-medium text-gray-400">Status: Ready. Tap microphone to speak.</p>
-
-                <!-- Speech Transcript Output -->
-                <div id="transcriptBox" class="hidden p-3.5 bg-gray-900/90 rounded-xl text-left border border-gray-800 text-xs text-gray-200">
-                    <span class="text-blue-400 font-bold">You Said:</span> <span id="userSpeech" class="italic">Listening...</span>
-                </div>
-
-                <!-- Manual Override Button -->
-                <button id="sendVoiceBtn" onclick="sendToFresh()" 
-                        class="hidden w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center justify-center gap-2">
-                    <i class="fas fa-paper-plane"></i> SEND TO FRESH 🚀
-                </button>
-
-                <!-- Fresh Spoken Response Container -->
-                <div id="freshResponse" class="hidden p-4 bg-blue-950/60 rounded-xl text-left border border-blue-800/70 shadow-lg">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-xs font-bold text-blue-300 flex items-center gap-1.5">
-                            <i class="fas fa-robot text-blue-400"></i> Fresh Response:
-                        </span>
-                        <span class="text-[10px] text-gray-400">Out Loud Speech Active</span>
-                    </div>
-                    <p id="freshResponseText" class="text-xs text-gray-100 leading-relaxed font-sans"></p>
-                </div>
+            <div id="freshResponse" class="hidden mt-4 p-4 bg-blue-950/60 rounded-2xl text-left border border-blue-700/50">
+                <p class="text-xs font-bold text-blue-300 flex items-center gap-2 mb-1">
+                    <span>Fresh 🤵</span> <span class="text-[10px] text-gray-400 font-normal">(Voice Output Engaged)</span>
+                </p>
+                <p id="freshResponseText" class="text-xs text-gray-100 leading-relaxed"></p>
             </div>
         </section>
 
-        <!-- THE 4 DYNAMIC SHOWCASE DOORS (GRID LAYOUT) -->
-        <section>
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-base font-bold text-white flex items-center gap-2">
-                    <i class="fas fa-door-open text-blue-400"></i> The 4 Interactive Showcase Doors
-                </h3>
-                <span class="text-xs text-gray-400">Tap any door to expand/collapse</span>
+        <!-- THE 4 DYNAMIC SHOWCASE DOORS (IMMERSIVE GRID) -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- DOOR 1: BUSINESS WORLD -->
+            <div class="glow-door rounded-2xl overflow-hidden border border-blue-900/50">
+                <button onclick="toggleCabinet('businessCabinets')" class="w-full p-5 flex items-center justify-between text-left bg-gradient-to-r from-gray-900 via-gray-900 to-blue-950/40">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-11 h-11 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center border border-blue-500/40 text-lg">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base text-white">Business World</h3>
+                            <p class="text-xs text-gray-400">Shop Ops, Workbench Queue & Active Field Visits</p>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-down text-gray-400"></i>
+                </button>
+
+                <div id="businessCabinets" class="p-4 space-y-3 border-t border-gray-800">
+                    <div class="p-3 bg-gray-900/80 rounded-xl border-l-4 border-l-blue-500 flex justify-between items-center">
+                        <div>
+                            <h4 class="text-xs font-bold text-white">Eugene Gumenick</h4>
+                            <p class="text-[11px] text-gray-400">104 Gittings Ave • Baltimore, MD 21212</p>
+                        </div>
+                        <span class="text-[10px] px-2.5 py-1 bg-blue-950 text-blue-300 font-bold rounded-lg border border-blue-800">Next Stop</span>
+                    </div>
+
+                    <div class="p-3 bg-gray-900/80 rounded-xl border-l-4 border-l-purple-500 flex justify-between items-center">
+                        <div>
+                            <h4 class="text-xs font-bold text-white">Susan Bratton</h4>
+                            <p class="text-[11px] text-gray-400">Cord repair drop-off (2:30 PM - 3:30 PM) • Filter drop-shipped</p>
+                        </div>
+                        <span class="text-[10px] px-2.5 py-1 bg-purple-950 text-purple-300 font-bold rounded-lg border border-purple-800">Drop-Off Ready</span>
+                    </div>
+
+                    <div class="p-3 bg-gray-900/80 rounded-xl border-l-4 border-l-indigo-500">
+                        <div class="flex justify-between items-center mb-1">
+                            <h4 class="text-xs font-bold text-white">Workbench Queue (Chris Lead)</h4>
+                            <span class="text-[10px] px-2 py-0.5 bg-indigo-950 text-indigo-300 rounded font-bold">3 Units</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400">Lux Legacy motor swap • Karen Ross Oreck repair</p>
+                    </div>
+
+                    <div class="p-3 bg-blue-950/40 rounded-xl border border-blue-800/50">
+                        <h4 class="text-xs font-bold text-blue-300">Bagden's World (Shared Offshoot)</h4>
+                        <p class="text-[11px] text-gray-300 mt-0.5">📌 Central Vac unit assigned to Mike Bagden</p>
+                    </div>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                
-                <!-- DOOR 1: BUSINESS WORLD -->
-                <div class="door-card glass-panel rounded-2xl overflow-hidden shadow-xl">
-                    <button onclick="toggleDoor('doorBusiness')" class="w-full p-5 flex items-center justify-between text-left bg-gradient-to-r from-gray-900 via-gray-900 to-gray-800/90">
-                        <div class="flex items-center space-x-3.5">
-                            <div class="w-10 h-10 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center border border-blue-500/30 text-lg">
-                                <i class="fas fa-briefcase"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-base text-white">1. Business World</h4>
-                                <p class="text-xs text-gray-400">Shop Ops, Workbench Queue & Live Schedule</p>
-                            </div>
+            <!-- DOOR 2: PERSONAL WORLD -->
+            <div class="glow-door rounded-2xl overflow-hidden border border-emerald-900/50">
+                <button onclick="toggleCabinet('personalCabinets')" class="w-full p-5 flex items-center justify-between text-left bg-gradient-to-r from-gray-900 via-gray-900 to-emerald-950/40">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-11 h-11 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center border border-emerald-500/40 text-lg">
+                            <i class="fas fa-user-shield"></i>
                         </div>
-                        <i id="iconBusiness" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
-                    </button>
-
-                    <div id="doorBusiness" class="p-4 space-y-3 border-t border-gray-800/80">
-                        
-                        <!-- Today's Live Schedule -->
-                        <div class="p-3 bg-blue-950/40 rounded-xl border border-blue-800/50 space-y-2">
-                            <div class="flex justify-between items-center text-xs font-bold text-blue-300">
-                                <span><i class="fas fa-calendar-day mr-1"></i> Today's Schedule</span>
-                                <span class="text-[10px] bg-blue-900 text-blue-200 px-2 py-0.5 rounded">2 Stops</span>
-                            </div>
-                            
-                            <!-- Eugene Gumenick -->
-                            <div class="p-2.5 bg-gray-900/80 rounded-lg border-l-4 border-blue-500">
-                                <div class="flex justify-between text-xs font-bold text-white">
-                                    <span>Eugene Gumenick</span>
-                                    <span class="text-blue-400">Next Stop</span>
-                                </div>
-                                <p class="text-[11px] text-gray-400 mt-0.5">104 Gittings Ave, Baltimore MD 21212 • (410) 493-0223</p>
-                            </div>
-
-                            <!-- Susan Bratton -->
-                            <div class="p-2.5 bg-gray-900/80 rounded-lg border-l-4 border-purple-500">
-                                <div class="flex justify-between text-xs font-bold text-white">
-                                    <span>Susan Bratton</span>
-                                    <span class="text-purple-400">2:30 PM - 3:30 PM Drop-Off</span>
-                                </div>
-                                <p class="text-[11px] text-gray-400 mt-0.5">Guardian Platinum cord repair finished • HEPA filter drop-shipped via FedEx</p>
-                            </div>
-                        </div>
-
-                        <!-- Workbench Queue -->
-                        <div class="p-3 bg-gray-900/60 rounded-xl border border-gray-800">
-                            <div class="flex justify-between items-center text-xs font-bold text-gray-300 mb-2">
-                                <span><i class="fas fa-wrench text-amber-400 mr-1.5"></i> Workbench Queue</span>
-                                <span class="text-[10px] bg-amber-950 text-amber-300 px-2 py-0.5 rounded border border-amber-800">3 Active</span>
-                            </div>
-                            <ul class="text-xs text-gray-300 space-y-1.5">
-                                <li class="flex items-center justify-between">
-                                    <span>• Electrolux Guardian tune-up</span>
-                                    <span class="text-[10px] text-gray-500">Chris Lead</span>
-                                </li>
-                                <li class="flex items-center justify-between">
-                                    <span>• Lux Legacy motor swap</span>
-                                    <span class="text-[10px] text-gray-500">Parts Ready</span>
-                                </li>
-                                <li class="flex items-center justify-between">
-                                    <span>• Karen Ross Oreck Service</span>
-                                    <span class="text-[10px] text-gray-500">Call Prepped</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <!-- Field Vehicles & Showroom -->
-                        <div class="grid grid-cols-2 gap-2 text-xs">
-                            <div class="p-2.5 bg-gray-900/60 rounded-xl border border-gray-800">
-                                <span class="font-bold text-emerald-400 block mb-1"><i class="fas fa-truck mr-1"></i> Field Vans</span>
-                                <span class="text-gray-400 text-[11px]">Van 1 loaded for Timonium route</span>
-                            </div>
-                            <div class="p-2.5 bg-gray-900/60 rounded-xl border border-gray-800">
-                                <span class="font-bold text-indigo-400 block mb-1"><i class="fas fa-store mr-1"></i> Showroom</span>
-                                <span class="text-gray-400 text-[11px]">Air purifiers active & prepped</span>
-                            </div>
-                        </div>
-
-                        <!-- Bagden's World -->
-                        <div class="p-2.5 bg-blue-950/30 rounded-xl border border-blue-900/40 text-xs">
-                            <span class="font-bold text-blue-300 flex items-center gap-1">
-                                <i class="fas fa-layer-group"></i> Bagden's World (Offshoot)
-                            </span>
-                            <p class="text-[11px] text-gray-300 mt-1">📌 Aerus Central Vac unit assigned to Mike Bagden (1-min direct log)</p>
+                        <div>
+                            <h3 class="font-bold text-base text-white">Personal World</h3>
+                            <p class="text-xs text-gray-400">Personal Tasks, Notes & Eda Tracking</p>
                         </div>
                     </div>
-                </div>
+                    <i class="fas fa-chevron-down text-gray-400"></i>
+                </button>
 
-                <!-- DOOR 2: PERSONAL WORLD -->
-                <div class="door-card glass-panel rounded-2xl overflow-hidden shadow-xl">
-                    <button onclick="toggleDoor('doorPersonal')" class="w-full p-5 flex items-center justify-between text-left bg-gradient-to-r from-gray-900 via-gray-900 to-gray-800/90">
-                        <div class="flex items-center space-x-3.5">
-                            <div class="w-10 h-10 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 text-lg">
-                                <i class="fas fa-user-shield"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-base text-white">2. Personal World</h4>
-                                <p class="text-xs text-gray-400">Personal Tasks, Family Notes & Eda Tracking</p>
-                            </div>
-                        </div>
-                        <i id="iconPersonal" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
-                    </button>
-
-                    <div id="doorPersonal" class="p-4 space-y-3 border-t border-gray-800/80">
-                        <div class="p-3 bg-gray-900/60 rounded-xl border border-gray-800 space-y-2">
-                            <div class="flex justify-between items-center text-xs font-bold text-emerald-400">
-                                <span><i class="fas fa-tv mr-1.5"></i> Eda TV & Home Setup</span>
-                                <span class="text-[10px] text-gray-500">Active</span>
-                            </div>
-                            <p class="text-xs text-gray-300">TV setup checklist confirmed and scheduled for evening review.</p>
-                        </div>
-
-                        <div class="p-3 bg-gray-900/60 rounded-xl border border-gray-800 space-y-2">
-                            <div class="flex justify-between items-center text-xs font-bold text-amber-400">
-                                <span><i class="fas fa-leaf mr-1.5"></i> Seasonal Reminders</span>
-                            </div>
-                            <p class="text-xs text-gray-300">Ragweed seasonal alert active — verify shop air purifier filters.</p>
-                        </div>
+                <div id="personalCabinets" class="p-4 space-y-3 border-t border-gray-800">
+                    <div class="p-3 bg-gray-900/80 rounded-xl border-l-4 border-l-emerald-500">
+                        <h4 class="text-xs font-bold text-white">Eda Home Checklist</h4>
+                        <p class="text-[11px] text-gray-400">TV setup & streaming media configuration</p>
+                    </div>
+                    <div class="p-3 bg-gray-900/80 rounded-xl border-l-4 border-l-amber-500">
+                        <h4 class="text-xs font-bold text-white">Seasonal Alert</h4>
+                        <p class="text-[11px] text-gray-400">Ragweed allergen reminder active</p>
                     </div>
                 </div>
-
-                <!-- DOOR 3: INVOICES & PAYMENTS -->
-                <div class="door-card glass-panel rounded-2xl overflow-hidden shadow-xl">
-                    <button onclick="toggleDoor('doorInvoices')" class="w-full p-5 flex items-center justify-between text-left bg-gradient-to-r from-gray-900 via-gray-900 to-gray-800/90">
-                        <div class="flex items-center space-x-3.5">
-                            <div class="w-10 h-10 rounded-xl bg-purple-600/20 text-purple-400 flex items-center justify-center border border-purple-500/30 text-lg">
-                                <i class="fas fa-cash-register"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-base text-white">3. Invoices & Cash Register</h4>
-                                <p class="text-xs text-gray-400">Workiz Invoicing, Zelle & MD Tax Calc</p>
-                            </div>
-                        </div>
-                        <i id="iconInvoices" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
-                    </button>
-
-                    <div id="doorInvoices" class="p-4 space-y-3 border-t border-gray-800/80">
-                        <!-- Quick Tax Calculator Widget -->
-                        <div class="p-3.5 bg-gray-900/80 rounded-xl border border-gray-800 text-xs space-y-2">
-                            <div class="flex justify-between font-bold text-purple-300">
-                                <span>MD 6% Tax Quick Calculator</span>
-                                <span>Clean Environment LLC</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <input type="number" id="calcSubtotal" oninput="calculateTax()" placeholder="Subtotal ($)" 
-                                       class="w-full bg-gray-950 border border-gray-700 rounded p-2 text-white focus:outline-none">
-                                <div class="text-right whitespace-nowrap">
-                                    <span class="block text-[10px] text-gray-400">Total + Tax</span>
-                                    <span id="calcTotal" class="font-bold text-green-400 text-sm">$0.00</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Workiz Cash Register Shortcut -->
-                        <div class="p-3 bg-purple-950/40 rounded-xl border border-purple-800/50 flex items-center justify-between text-xs">
-                            <div>
-                                <span class="font-bold text-purple-300 block">Workiz Cash Register</span>
-                                <span class="text-gray-400 text-[11px]">Invoicing & Credit Card Payments Only</span>
-                            </div>
-                            <button class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-lg transition">Open Workiz</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- DOOR 4: TIME TO TAP (ONE PILE DUMPING GROUND) -->
-                <div class="door-card glass-panel rounded-2xl overflow-hidden shadow-xl">
-                    <button onclick="toggleDoor('doorTap')" class="w-full p-5 flex items-center justify-between text-left bg-gradient-to-r from-gray-900 via-gray-900 to-gray-800/90">
-                        <div class="flex items-center space-x-3.5">
-                            <div class="w-10 h-10 rounded-xl bg-amber-600/20 text-amber-400 flex items-center justify-center border border-amber-500/30 text-lg">
-                                <i class="fas fa-hand-pointer"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-base text-white">4. Time to Tap</h4>
-                                <p class="text-xs text-gray-400">One Pile Dumping Ground for Intakes & Ideas</p>
-                            </div>
-                        </div>
-                        <i id="iconTap" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
-                    </button>
-
-                    <div id="doorTap" class="p-4 space-y-3 border-t border-gray-800/80">
-                        <textarea id="quickDump" rows="3" placeholder="Dump everything here (voice note transcript, raw ideas, repair intakes)... Fresh sorts it out." 
-                                  class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-xs text-gray-200 focus:outline-none focus:border-amber-500 transition"></textarea>
-                        
-                        <button onclick="submitDump()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl transition shadow flex items-center justify-center gap-2">
-                            <i class="fas fa-bolt"></i> DUMP INTO SYSTEM PILE 🚀
-                        </button>
-                    </div>
-                </div>
-
             </div>
+
+            <!-- DOOR 3: INVOICES & CASH REGISTER -->
+            <div class="glow-door rounded-2xl overflow-hidden border border-amber-900/50">
+                <button onclick="toggleCabinet('cashCabinets')" class="w-full p-5 flex items-center justify-between text-left bg-gradient-to-r from-gray-900 via-gray-900 to-amber-950/40">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-11 h-11 rounded-xl bg-amber-600/20 text-amber-400 flex items-center justify-center border border-amber-500/40 text-lg">
+                            <i class="fas fa-cash-register"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base text-white">Invoices & Cash Register</h3>
+                            <p class="text-xs text-gray-400">Fast Invoicing & MD 6% Tax Calculator</p>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-down text-gray-400"></i>
+                </button>
+
+                <div id="cashCabinets" class="p-4 space-y-3 border-t border-gray-800">
+                    <div class="p-3 bg-gray-900/80 rounded-xl">
+                        <label class="text-xs text-gray-300 font-bold block mb-1">Quick MD Sales Tax (6%):</label>
+                        <div class="flex gap-2">
+                            <input id="calcAmount" type="number" placeholder="Enter subtotal..." class="bg-gray-950 border border-gray-700 text-xs text-white rounded-lg p-2 flex-grow">
+                            <button onclick="calcTax()" class="px-3 py-2 bg-amber-600 hover:bg-amber-500 font-bold text-xs text-white rounded-lg">Calculate</button>
+                        </div>
+                        <p id="taxResult" class="text-xs text-amber-300 font-bold mt-2 hidden"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DOOR 4: TIME TO TAP (ONE PILE DUMPING GROUND) -->
+            <div class="glow-door rounded-2xl overflow-hidden border border-purple-900/50">
+                <button onclick="toggleCabinet('tapCabinets')" class="w-full p-5 flex items-center justify-between text-left bg-gradient-to-r from-gray-900 via-gray-900 to-purple-950/40">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-11 h-11 rounded-xl bg-purple-600/20 text-purple-400 flex items-center justify-center border border-purple-500/40 text-lg">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base text-white">Time to Tap</h3>
+                            <p class="text-xs text-gray-400">One Pile Dumping Ground — Raw Intakes & Voice Deposits</p>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-down text-gray-400"></i>
+                </button>
+
+                <div id="tapCabinets" class="p-4 space-y-3 border-t border-gray-800">
+                    <div class="p-3 bg-gray-900/80 rounded-xl border border-purple-800/40 text-xs text-gray-300">
+                        ⚡ <strong>One Pile Intake:</strong> Tap the mic, speak your note, and Fresh routes it to Monday.com automatically.
+                    </div>
+                </div>
+            </div>
+
         </section>
 
     </main>
 
     <!-- FOOTER -->
-    <footer class="border-t border-gray-800 py-4 px-6 text-center text-xs text-gray-500">
-        TappyThing Digital Coordinator System • Clean Environment LLC • Aerus Timonium MD
+    <footer class="w-full border-t border-gray-900 py-4 text-center text-xs text-gray-600">
+        TappyThing © Clean Environment LLC • Aerus Timonium Live Operations Case Study
     </footer>
 
-    <!-- THE SQUAD MOVIE CREDITS MODAL -->
-    <div id="squadModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="glass-panel max-w-sm w-full h-[420px] rounded-3xl p-6 border border-gray-700 relative overflow-hidden flex flex-col justify-between shadow-2xl">
-            
-            <div class="flex justify-between items-center border-b border-gray-800 pb-3 z-10 bg-gray-900/90">
-                <h3 class="font-bold text-sm text-white flex items-center gap-2">
-                    <i class="fas fa-film text-blue-400"></i> The Squad Movie Credits 🎭
-                </h3>
-                <button onclick="closeSquadModal()" class="text-gray-400 hover:text-white text-lg">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <!-- Scrollable Movie Credits Area -->
-            <div class="relative flex-grow overflow-hidden my-4">
-                <div class="absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-gray-900 to-transparent z-10 pointer-events-none"></div>
-                <div class="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-gray-900 to-transparent z-10 pointer-events-none"></div>
-
-                <div class="animate-credits text-center space-y-6 text-xs text-gray-300 font-sans py-4">
-                    <div>
-                        <p class="text-[10px] uppercase tracking-widest text-blue-400 font-bold mb-1">POCKET CHIEF OF STAFF</p>
-                        <p class="text-sm font-bold text-white">Fresh 🤵</p>
-                    </div>
-
-                    <div>
-                        <p class="text-[10px] uppercase tracking-widest text-emerald-400 font-bold mb-1">DIGITAL COORDINATOR</p>
-                        <p class="text-sm font-bold text-white">Sissy</p>
-                    </div>
-
-                    <div>
-                        <p class="text-[10px] uppercase tracking-widest text-purple-400 font-bold mb-1">CREATIVE & ART DIRECTION</p>
-                        <p class="text-sm font-bold text-white">🎨 Rob Art</p>
-                    </div>
-
-                    <div>
-                        <p class="text-[10px] uppercase tracking-widest text-amber-400 font-bold mb-1">SYSTEM SUPPORT & INFRASTRUCTURE</p>
-                        <p class="text-xs font-semibold text-gray-200">L • Squash • Yogi • Nush</p>
-                    </div>
-
-                    <div>
-                        <p class="text-[10px] uppercase tracking-widest text-red-400 font-bold mb-1">LIVE WORKING CASE STUDY</p>
-                        <p class="text-xs font-bold text-white">William Sullivan</p>
-                        <p class="text-[11px] text-gray-400">Aerus Home Wellness (Timonium, MD)</p>
-                    </div>
-
-                    <div class="pt-4 border-t border-gray-800">
-                        <p class="text-[10px] text-gray-500">TappyThing Subscription Product</p>
-                        <p class="text-[10px] text-gray-500">Clean Environment LLC</p>
-                    </div>
-                </div>
-            </div>
-
-            <button onclick="closeSquadModal()" class="w-full py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs rounded-xl z-10 transition">
-                Close Credits
+    <!-- SQUAD MOVIE CREDITS MODAL -->
+    <div id="squadModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glow-door max-w-sm w-full rounded-3xl p-6 text-center border border-blue-700/60 relative">
+            <button onclick="toggleModal('squadModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fas fa-times"></i>
             </button>
+            <h3 class="font-black text-lg text-white mb-4">THE SQUAD 🎭</h3>
+            <div class="space-y-3 text-xs text-gray-300 text-left">
+                <p>• <strong>Fresh 🤵</strong> — Pocket Chief of Staff & Voice Engine</p>
+                <p>• <strong>Sissy</strong> — Digital Coordinator & Visual Architect</p>
+                <p>• <strong>Mona</strong> — Digital, Intakes, Customer Audio Prompting</p>
+                <p>• <strong>Chris</strong> — Bench Lead, Inventory, Workiz & Repairs</p>
+                <p>• <strong>Mike</strong> — Field Diagnostics & Installation Lead</p>
+                <p>• <strong>Norby</strong> — FOAS Entry, Outreach & Corporate Ops</p>
+            </div>
         </div>
     </div>
 
-    <!-- INTERACTIVE SCRIPT LOGIC -->
     <script>
         let isListening = false;
         let recognition = null;
         let finalSpeechText = "";
 
-        // Initialize Browser Speech Recognition
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
@@ -450,21 +273,16 @@
                 }
                 document.getElementById('userSpeech').innerText = finalSpeechText || interimTranscript;
             };
-
-            recognition.onerror = () => {
-                stopMicUI();
-            };
         }
 
-        // Voice Toggle Handler
         function toggleVoice() {
-            if (!recognition) return alert("Speech recognition is not supported on this browser.");
+            if (!recognition) return alert("Speech recognition not supported on this browser.");
             if (!isListening) {
                 finalSpeechText = "";
                 recognition.start();
                 isListening = true;
-                document.getElementById('micBtn').classList.add('animate-pulse', 'bg-red-600', 'from-red-700', 'to-red-500');
-                document.getElementById('voiceStatus').innerText = "Fresh is listening... Tap mic again or hit SEND to execute.";
+                document.getElementById('micBtn').classList.add('animate-pulse', 'bg-red-600');
+                document.getElementById('voiceStatus').innerText = "Fresh is listening... Tap Send when finished.";
                 document.getElementById('transcriptBox').classList.remove('hidden');
                 document.getElementById('sendVoiceBtn').classList.remove('hidden');
             } else {
@@ -478,80 +296,62 @@
                 recognition.stop();
                 isListening = false;
             }
-            document.getElementById('micBtn').classList.remove('animate-pulse', 'bg-red-600', 'from-red-700', 'to-red-500');
-            document.getElementById('voiceStatus').innerText = "Status: Ready. Tap microphone to speak.";
+            document.getElementById('micBtn').classList.remove('animate-pulse', 'bg-red-600');
+            document.getElementById('voiceStatus').innerText = "Tap to speak directly to Fresh — Voice Intake Active";
         }
 
-        // Send Voice Command to Fresh & Trigger Out Loud Speech Synthesis
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
         async function sendToFresh() {
             stopMicUI();
             const userPrompt = finalSpeechText || document.getElementById('userSpeech').innerText;
             if (!userPrompt || userPrompt === "Listening...") return;
 
             document.getElementById('freshResponse').classList.remove('hidden');
-            const respBox = document.getElementById('freshResponseText');
-            respBox.innerText = "Fresh is processing your command...";
+            document.getElementById('freshResponseText').innerText = "Fresh is thinking...";
 
-            // Generate reply based on context
-            let replyText = `Boom! Fresh here! Got your command: "${userPrompt}". Logged directly to your TappyThing board with zero friction!`;
-            
-            if (userPrompt.toLowerCase().includes("eugene")) {
-                replyText = "Boom! Eugene Gumenick is queued up for your 104 Gittings Ave visit. Map and customer phone 410-493-0223 locked!";
-            } else if (userPrompt.toLowerCase().includes("susan")) {
-                replyText = "Boom! Susan Bratton's drop-off is prepped for 2:30 to 3:30 PM today. HEPA filter drop-shipped from corporate!";
-            } else if (userPrompt.toLowerCase().includes("eric")) {
-                replyText = "Boom! Referral text prepped for Eric Bearinger at 443-289-1907 for carpet cleaning!";
-            }
-
-            respBox.innerText = replyText;
-
-            // Trigger Out Loud Speech Synthesis
-            speakOutLoud(replyText);
-        }
-
-        // Speech Synthesis (Fresh Talks Out Loud)
-        function speakOutLoud(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); // Stop ongoing speech
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = 1.05;
-                utterance.pitch = 1.0;
-                window.speechSynthesis.speak(utterance);
+            try {
+                const res = await fetch('/.netlify/functions/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: userPrompt })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('freshResponseText').innerText = data.reply;
+                    speakText(data.reply);
+                } else {
+                    const fallback = `Got it William! Logged: "${userPrompt}"`;
+                    document.getElementById('freshResponseText').innerText = fallback;
+                    speakText(fallback);
+                }
+            } catch (err) {
+                const fallback = `Got it William! Logged: "${userPrompt}"`;
+                document.getElementById('freshResponseText').innerText = fallback;
+                speakText(fallback);
             }
         }
 
-        // Toggle Doors
-        function toggleDoor(doorId) {
-            const door = document.getElementById(doorId);
-            door.classList.toggle('hidden');
-        }
+        function toggleCabinet(id) { document.getElementById(id).classList.toggle('hidden'); }
+        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
 
-        // Tax Calculator
-        function calculateTax() {
-            const subtotal = parseFloat(document.getElementById('calcSubtotal').value) || 0;
-            const total = subtotal * 1.06;
-            document.getElementById('calcTotal').innerText = '$' + total.toFixed(2);
+        function calcTax() {
+            const val = parseFloat(document.getElementById('calcAmount').value);
+            if (isNaN(val)) return;
+            const tax = (val * 0.06).toFixed(2);
+            const total = (val + parseFloat(tax)).toFixed(2);
+            const res = document.getElementById('taxResult');
+            res.innerText = `Subtotal: $${val.toFixed(2)} | Tax (6%): $${tax} | Total: $${total}`;
+            res.classList.remove('hidden');
         }
-
-        // Vault Search Demo
-        function searchVault() {
-            const query = document.getElementById('dbSearchInput').value.toLowerCase();
-            if (query.length > 2) {
-                console.log("Searching vault for:", query);
-            }
-        }
-
-        // One Pile Dump Action
-        function submitDump() {
-            const text = document.getElementById('quickDump').value;
-            if (!text) return;
-            speakOutLoud("Dump received into system pile! Fresh is sorting it now.");
-            document.getElementById('quickDump').value = "";
-        }
-
-        // Squad Modal Functions
-        function openSquadModal() { document.getElementById('squadModal').classList.remove('hidden'); }
-        function closeSquadModal() { document.getElementById('squadModal').classList.add('hidden'); }
     </script>
 </body>
 </html>
