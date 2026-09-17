@@ -1,332 +1,741 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TappyThing — Digital Coordinator</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #07080c;
-            color: #f3f4f6;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            overflow-x: hidden;
-        }
-
-        /* Ambient Glow Effect */
-        .ambient-glow {
-            position: absolute;
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(0,0,0,0) 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* Hero Box Glow & Pulse */
-        .hero-box {
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(16px);
-            border: 2px solid rgba(245, 158, 11, 0.4);
-            box-shadow: 0 0 35px rgba(245, 158, 11, 0.25);
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .hero-box:hover {
-            border-color: rgba(245, 158, 11, 0.8);
-            box-shadow: 0 0 50px rgba(245, 158, 11, 0.45);
-            transform: translateY(-2px) scale(1.02);
-        }
-
-        /* Sound Wave Bar Animation */
-        .sound-bar {
-            width: 4px;
-            height: 14px;
-            background-color: #f59e0b;
-            border-radius: 2px;
-            animation: wave 1s ease-in-out infinite;
-        }
-        .sound-bar:nth-child(1) { animation-delay: 0.0s; }
-        .sound-bar:nth-child(2) { animation-delay: 0.2s; }
-        .sound-bar:nth-child(3) { animation-delay: 0.4s; }
-        .sound-bar:nth-child(4) { animation-delay: 0.1s; }
-        .sound-bar:nth-child(5) { animation-delay: 0.3s; }
-
-        @keyframes wave {
-            0%, 100% { height: 6px; }
-            50% { height: 24px; }
-        }
-
-        /* Cascading Animation for Boards */
-        .cascade-in {
-            animation: cascadeOpen 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        @keyframes cascadeOpen {
-            from {
-                opacity: 0;
-                transform: translateY(20px) scale(0.96);
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TappyThing — Digital Coordinator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              emerald: '#10b981',
+              cyan: '#06b6d4',
+              gold: '#f59e0b',
+              amber: '#d97706',
             }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
+          },
+          animation: {
+            'pulse-glow': 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'bounce-subtle': 'bounceSubtle 2s infinite',
+          },
+          keyframes: {
+            pulseGlow: {
+              '0%, 100%': { boxShadow: '0 0 25px rgba(16, 185, 129, 0.4)', transform: 'scale(1)' },
+              '50%': { boxShadow: '0 0 50px rgba(6, 182, 212, 0.8)', transform: 'scale(1.03)' },
+            },
+            bounceSubtle: {
+              '0%, 100%': { transform: 'translateY(-3%)' },
+              '50%': { transform: 'translateY(0)' },
             }
+          }
         }
-    </style>
+      }
+    }
+  </script>
+  <style>
+    /* Custom scrollbars and glowing glass effects */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
 </head>
-<body class="p-4 sm:p-6 select-none relative">
+<body class="h-full flex flex-col font-sans antialiased overflow-x-hidden selection:bg-brand-cyan selection:text-slate-900">
 
-    <div class="ambient-glow"></div>
-
-    <!-- MAIN CONTAINER -->
-    <div id="mainContainer" class="w-full max-w-4xl flex flex-col items-center justify-center my-auto z-10">
-
-        <!-- STEP 1: ULTRA-CLEAN INITIAL LOGO HERO BOX -->
-        <div id="initialHeroBox" onclick="igniteFreshExperience()" class="hero-box rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center cursor-pointer max-w-sm w-full group">
-            
-            <!-- Logo Visual Representation -->
-            <div class="w-44 h-44 sm:w-52 sm:h-52 mb-4 rounded-2xl overflow-hidden bg-black border border-amber-500/30 flex items-center justify-center p-2 group-hover:border-amber-400 transition-all shadow-xl">
-                <div class="flex flex-col items-center">
-                    <div class="text-6xl sm:text-7xl mb-1">🕶️</div>
-                    <div class="font-black text-2xl tracking-widest text-white">FRESH</div>
-                    <div class="text-[9px] text-amber-400 tracking-wider font-semibold uppercase">Your Digital Coordinator</div>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-2 mt-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold tracking-widest uppercase group-hover:bg-amber-500/20 transition-colors">
-                <i class="fa-solid fa-microphone text-sm animate-pulse"></i>
-                <span>TAP TO START</span>
-            </div>
+  <header class="w-full glass-panel border-b border-slate-800/80 sticky top-0 z-40 px-4 py-3 sm:px-6">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <!-- Logo & System Status -->
+      <div class="flex items-center space-x-3">
+        <div class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-500 text-slate-950 font-black text-xl shadow-lg shadow-emerald-500/20">
+          🎩
+          <span class="absolute -top-1 -right-1 flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+          </span>
         </div>
-
-        <!-- STEP 2 & 3: EXPANDED FRESH EXPERIENCE CONTAINER -->
-        <div id="expandedContainer" class="hidden w-full flex flex-col items-center">
-
-            <!-- Fresh Voice Header Card -->
-            <div class="hero-box w-full max-w-2xl rounded-2xl p-4 sm:p-5 mb-6 text-left border-l-4 border-amber-500 shadow-2xl relative">
-                <div class="flex items-start gap-4">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-600 to-amber-950 flex items-center justify-center text-amber-200 shrink-0 border border-amber-500/40 text-2xl shadow-md">
-                        🤵
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-center justify-between">
-                            <h4 class="font-black text-white text-sm tracking-wide">FRESH — DIGITAL COORDINATOR</h4>
-                            <div id="audioWave" class="hidden flex items-center gap-1">
-                                <div class="sound-bar"></div>
-                                <div class="sound-bar"></div>
-                                <div class="sound-bar"></div>
-                                <div class="sound-bar"></div>
-                                <div class="sound-bar"></div>
-                            </div>
-                        </div>
-                        <p id="freshVoiceText" class="text-gray-200 text-sm sm:text-base mt-1.5 leading-relaxed font-medium">
-                            Initializing Fresh...
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Industry Input / Prompt Section -->
-            <div id="industryPromptSection" class="w-full max-w-lg mb-8 transition-all duration-300">
-                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 text-center">
-                    Tell Fresh your business to build your worlds live:
-                </p>
-                <div class="relative flex items-center">
-                    <input type="text" id="industryInput" placeholder="e.g. Vacuum Repair, Cleaning, Plumbing..." 
-                        class="w-full bg-gray-900/90 border border-gray-700 text-white rounded-xl px-4 py-3.5 pl-10 text-sm focus:outline-none focus:border-amber-500 transition-colors shadow-inner"
-                        onkeydown="if(event.key==='Enter') startWorldPresentation(this.value)">
-                    <i class="fa-solid fa-briefcase absolute left-3.5 text-gray-500 text-sm"></i>
-                    <button onclick="startWorldPresentation(document.getElementById('industryInput').value)" class="absolute right-2 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-lg transition-colors">
-                        BUILD
-                    </button>
-                </div>
-                
-                <!-- Quick Chips -->
-                <div class="flex flex-wrap gap-2 justify-center mt-3 text-xs">
-                    <button onclick="startWorldPresentation('Vacuum Repair')" class="px-3 py-1 bg-gray-800/80 hover:bg-gray-700 text-gray-300 rounded-full border border-gray-700 transition-all">
-                        🧹 Vacuum Repair
-                    </button>
-                    <button onclick="startWorldPresentation('Plumbing')" class="px-3 py-1 bg-gray-800/80 hover:bg-gray-700 text-gray-300 rounded-full border border-gray-700 transition-all">
-                        🔧 Plumbing
-                    </button>
-                    <button onclick="startWorldPresentation('House Cleaning')" class="px-3 py-1 bg-gray-800/80 hover:bg-gray-700 text-gray-300 rounded-full border border-gray-700 transition-all">
-                        ✨ Cleaning
-                    </button>
-                    <button onclick="startWorldPresentation('HVAC')" class="px-3 py-1 bg-gray-800/80 hover:bg-gray-700 text-gray-300 rounded-full border border-gray-700 transition-all">
-                        ❄️ HVAC
-                    </button>
-                </div>
-            </div>
-
-            <!-- DYNAMIC WORLD BOARDS CONTAINER -->
-            <div id="worldBoardsContainer" class="w-full max-w-4xl flex flex-col gap-8">
-                
-                <!-- BUSINESS WORLD BOARD -->
-                <div id="businessWorldBoard" class="hidden cascade-in hero-box rounded-2xl p-5 border-t-4 border-amber-500">
-                    <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-800">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xl">💼</span>
-                            <h3 class="text-base font-black text-white tracking-wide">
-                                MY BUSINESS WORLD — <span id="bizIndustryTitle" class="text-amber-400">SERVICES</span>
-                            </h3>
-                        </div>
-                        <span class="text-xs bg-amber-950/80 text-amber-300 border border-amber-800/60 px-2.5 py-1 rounded-full font-bold">LIVE BOARD</span>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
-                        <!-- Col 1 -->
-                        <div class="bg-gray-900/90 p-3 rounded-xl border border-gray-800">
-                            <div class="text-xs font-bold text-amber-400 mb-2 uppercase">1. Intake / On Bench</div>
-                            <div class="bg-gray-950 p-2.5 rounded-lg border border-gray-800 mb-2">
-                                <div class="font-bold text-xs text-white">Cheryl Urban</div>
-                                <div class="text-[11px] text-gray-400">Simplicity vacuum pickup for bench diagnosis.</div>
-                            </div>
-                        </div>
-                        <!-- Col 2 -->
-                        <div class="bg-gray-900/90 p-3 rounded-xl border border-gray-800">
-                            <div class="text-xs font-bold text-blue-400 mb-2 uppercase">2. In-Progress / Ready</div>
-                            <div class="bg-gray-950 p-2.5 rounded-lg border border-gray-800 mb-2">
-                                <div class="font-bold text-xs text-white">Laurie Jones</div>
-                                <div class="text-[11px] text-gray-400">Field diagnostic completed by Mike. Ready.</div>
-                            </div>
-                        </div>
-                        <!-- Col 3 -->
-                        <div class="bg-gray-900/90 p-3 rounded-xl border border-gray-800">
-                            <div class="text-xs font-bold text-emerald-400 mb-2 uppercase">3. Completed / Paid</div>
-                            <div class="bg-gray-950 p-2.5 rounded-lg border border-gray-800">
-                                <div class="font-bold text-xs text-white">San Fuji Drop-Off</div>
-                                <div class="text-[11px] text-emerald-400 font-bold">$161.90 ✓ Paid & Closed</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PERSONAL / HOME WORLD BOARD -->
-                <div id="personalWorldBoard" class="hidden cascade-in hero-box rounded-2xl p-5 border-t-4 border-purple-500">
-                    <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-800">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xl">🏠</span>
-                            <h3 class="text-base font-black text-white tracking-wide">
-                                MY PERSONAL & HOME WORLD
-                            </h3>
-                        </div>
-                        <span class="text-xs bg-purple-950/80 text-purple-300 border border-purple-800/60 px-2.5 py-1 rounded-full font-bold">ALL-IN-ONE</span>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
-                        <!-- Col 1 -->
-                        <div class="bg-gray-900/90 p-3 rounded-xl border border-gray-800">
-                            <div class="text-xs font-bold text-purple-400 mb-2 uppercase">Home Repairs</div>
-                            <div class="bg-gray-950 p-2.5 rounded-lg border border-gray-800">
-                                <div class="font-bold text-xs text-white">HVAC Filter Swap</div>
-                                <div class="text-[11px] text-gray-400">Scheduled filter delivery for main unit.</div>
-                            </div>
-                        </div>
-                        <!-- Col 2 -->
-                        <div class="bg-gray-900/90 p-3 rounded-xl border border-gray-800">
-                            <div class="text-xs font-bold text-purple-400 mb-2 uppercase">Deliveries & Orders</div>
-                            <div class="bg-gray-950 p-2.5 rounded-lg border border-gray-800">
-                                <div class="font-bold text-xs text-white">Bagdon's Drop-off</div>
-                                <div class="text-[11px] text-gray-400">DeSouza vacuum dropped off for Mike.</div>
-                            </div>
-                        </div>
-                        <!-- Col 3 -->
-                        <div class="bg-gray-900/90 p-3 rounded-xl border border-gray-800">
-                            <div class="text-xs font-bold text-purple-400 mb-2 uppercase">Personal Tasks</div>
-                            <div class="bg-gray-950 p-2.5 rounded-lg border border-gray-800">
-                                <div class="font-bold text-xs text-white">Route Wrap-Up</div>
-                                <div class="text-[11px] text-gray-400">Head home for rest after Baldwin pickup.</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- FINAL CTA CARD -->
-                <div id="ctaCard" class="hidden cascade-in hero-box rounded-2xl p-6 text-center border border-amber-500/50 bg-gradient-to-br from-amber-950/40 via-gray-900 to-black">
-                    <h3 class="text-xl font-black text-white mb-2">Ready to take control of your business and home?</h3>
-                    <p class="text-sm text-gray-300 mb-4 max-w-md mx-auto">One tap. Zero tech drag. Fresh handles the rest.</p>
-                    <button onclick="alert('Setup initiated! Welcome to TappyThing.')" class="px-8 py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-black text-sm rounded-xl tracking-wider uppercase transition-all shadow-lg transform hover:scale-105 active:scale-95">
-                        SET UP YOUR SYSTEM NOW
-                    </button>
-                </div>
-
-            </div>
+        <div>
+          <h1 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2">
+            TappyThing <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">FRESH ACTIVE</span>
+          </h1>
+          <p class="text-xs text-slate-400 font-medium hidden sm:block">Voice-First Digital Coordinator — Clean Environment LLC</p>
         </div>
+      </div>
 
+      <!-- Hub Selector Switch (Business / Personal World) -->
+      <div class="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+        <button id="btnHubBusiness" onclick="setHub('business')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 shadow-md">
+          <i data-lucide="briefcase" class="w-3.5 h-3.5"></i> Business World
+        </button>
+        <button id="btnHubPersonal" onclick="setHub('personal')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5 text-slate-400 hover:text-white">
+          <i data-lucide="user" class="w-3.5 h-3.5"></i> Personal World
+        </button>
+      </div>
+
+      <!-- Settings / Team Modal Button -->
+      <div class="flex items-center gap-2">
+        <button onclick="toggleTeamModal()" class="p-2 rounded-xl bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800 transition-colors" title="View Team Squad">
+          <i data-lucide="users" class="w-5 h-5"></i>
+        </button>
+        <button onclick="toggleSettingsModal()" class="p-2 rounded-xl bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800 transition-colors" title="Direct Webhook Settings">
+          <i data-lucide="settings" class="w-5 h-5"></i>
+        </button>
+      </div>
     </div>
+  </header>
 
-    <script>
-        function igniteFreshExperience() {
-            // Hide initial hero box
-            document.getElementById('initialHeroBox').classList.add('hidden');
-            // Reveal expanded container
-            document.getElementById('expandedContainer').classList.remove('hidden');
+  <main class="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-            const welcomeMsg = "Welcome aboard! I'm Fresh, your Digital Coordinator. What business are you running today?";
-            updateFreshSpeech(welcomeMsg);
-            speakOutLoud(welcomeMsg);
+    <!-- Left Column: Voice Button & Quick Tapping Controls -->
+    <section class="lg:col-span-5 flex flex-col space-y-6">
+      
+      <!-- Fresh Coaching Card -->
+      <div class="glass-panel rounded-2xl p-5 border border-slate-800/80 relative overflow-hidden">
+        <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="flex items-start gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 via-emerald-400 to-cyan-500 p-0.5 shadow-lg flex-shrink-0">
+            <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-2xl">
+              🤵
+            </div>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Fresh — Digital Coordinator</span>
+              <button onclick="speakFreshGreeting()" class="text-slate-400 hover:text-amber-400 transition-colors" title="Play Sound">
+                <i data-lucide="volume-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <p id="freshVoiceText" class="text-sm font-semibold text-slate-200 mt-1 leading-relaxed">
+              "BOOM! Good morning, William! One button, tap it, talk, done. I've got the front door covered. What are we crushing first today?"
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-panel rounded-3xl p-6 border border-slate-800/80 flex flex-col items-center justify-center text-center relative overflow-hidden group">
+        
+        <div class="mb-4">
+          <span id="activeHubBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <i data-lucide="briefcase" class="w-3.5 h-3.5"></i> ACTIVE HUB: BUSINESS WORLD
+          </span>
+        </div>
+
+        <!-- Dynamic Tap Button -->
+        <button id="tapTalkBtn" onclick="toggleVoiceRecording()" class="relative z-10 w-44 h-44 sm:w-52 sm:h-52 rounded-full bg-gradient-to-tr from-emerald-500 via-teal-400 to-cyan-500 p-1.5 shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none cursor-pointer">
+          <div id="tapBtnInner" class="w-full h-full rounded-full bg-slate-950 flex flex-col items-center justify-center p-4 border border-emerald-400/30 transition-all duration-300">
+            <i id="tapIcon" data-lucide="mic" class="w-12 h-12 text-emerald-400 mb-2 transition-transform group-hover:scale-110"></i>
+            <span id="tapMainLabel" class="text-lg font-extrabold text-white tracking-wide">TAP & TALK</span>
+            <span id="tapSubLabel" class="text-xs font-bold text-slate-400 mt-0.5">Brain Dump Mode</span>
+          </div>
+        </button>
+
+        <!-- Live Audio Wave Indicator -->
+        <div id="audioWave" class="hidden flex items-center justify-center gap-1 mt-6 h-6">
+          <span class="w-1 bg-emerald-400 h-2 rounded-full animate-pulse"></span>
+          <span class="w-1 bg-cyan-400 h-5 rounded-full animate-pulse delay-75"></span>
+          <span class="w-1 bg-amber-400 h-3 rounded-full animate-pulse delay-150"></span>
+          <span class="w-1 bg-emerald-400 h-6 rounded-full animate-pulse delay-100"></span>
+          <span class="w-1 bg-cyan-400 h-2 rounded-full animate-pulse delay-200"></span>
+        </div>
+
+        <p id="transcriptPreview" class="text-xs text-slate-400 mt-4 h-8 max-w-xs truncate italic">
+          "Tap the button above and start speaking..."
+        </p>
+
+        <!-- Secondary Input Option Toggle -->
+        <div class="mt-6 w-full pt-4 border-t border-slate-800/80 flex flex-col items-center">
+          <button onclick="toggleTypeMode()" class="text-xs font-semibold text-slate-400 hover:text-cyan-400 flex items-center gap-1.5 transition-colors">
+            <i data-lucide="keyboard" class="w-3.5 h-3.5"></i> <span id="typeToggleLabel">Type Instead (Secondary Option)</span>
+          </button>
+
+          <!-- Hidden Text Input Field -->
+          <div id="typeModeContainer" class="hidden w-full mt-3 flex items-center gap-2">
+            <input type="text" id="manualTextInput" placeholder="Type your brain dump here..." class="flex-1 bg-slate-900 border border-slate-700 text-xs text-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-cyan-500 transition-colors">
+            <button onclick="submitManualInput()" class="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-xs rounded-xl hover:opacity-90 transition-opacity flex items-center gap-1">
+              <i data-lucide="send" class="w-3.5 h-3.5"></i> Dump
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="triggerTappingEngine()" class="glass-panel hover:bg-slate-800/80 p-4 rounded-2xl border border-amber-500/30 text-left transition-all group flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-2">
+            <span class="p-2 rounded-xl bg-amber-500/10 text-amber-400"><i data-lucide="zap" class="w-5 h-5"></i></span>
+            <span class="text-[10px] font-bold text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full">22,283 READY</span>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-white group-hover:text-amber-400 transition-colors">Tapping Engine</h3>
+            <p class="text-xs text-slate-400">Instant database outreach</p>
+          </div>
+        </button>
+
+        <button onclick="triggerEasyInvoicing()" class="glass-panel hover:bg-slate-800/80 p-4 rounded-2xl border border-emerald-500/30 text-left transition-all group flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-2">
+            <span class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400"><i data-lucide="receipt" class="w-5 h-5"></i></span>
+            <span class="text-[10px] font-bold text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">5th-GRADE</span>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors">3-Step Invoice</h3>
+            <p class="text-xs text-slate-400">Get paid in seconds</p>
+          </div>
+        </button>
+      </div>
+
+    </section>
+
+    <section class="lg:col-span-7 flex flex-col space-y-6">
+
+      <!-- The Tap Task Execution Queue -->
+      <div class="glass-panel rounded-3xl p-6 border border-slate-800/80 flex-1 flex flex-col">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+          <div class="flex items-center space-x-2">
+            <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400">
+              <i data-lucide="list-todo" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="text-base font-bold text-white">THE TAP — Execution Queue</h2>
+              <p class="text-xs text-slate-400">Sorted automatically: Hardest $\rightarrow$ Easiest</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span id="taskCountBadge" class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-slate-800 text-slate-300">0 Tasks</span>
+          </div>
+        </div>
+
+        <!-- Task List Container -->
+        <div id="taskList" class="flex-1 space-y-3 overflow-y-auto max-h-[380px] pr-1">
+          <!-- Empty State -->
+          <div id="emptyTaskState" class="h-48 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-slate-800 rounded-2xl">
+            <div class="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center text-slate-500 mb-3">
+              <i data-lucide="mic-off" class="w-6 h-6"></i>
+            </div>
+            <h3 class="text-sm font-bold text-slate-300">No active dumps in queue</h3>
+            <p class="text-xs text-slate-500 mt-1 max-w-xs">Tap the big green button, talk out loud, and Fresh will prioritize your items here automatically!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tapping Engine Live Output Box -->
+      <div id="tappingPanel" class="glass-panel rounded-3xl p-6 border border-amber-500/30 bg-slate-950/80 flex flex-col">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center space-x-2">
+            <span class="p-2 rounded-xl bg-amber-500/10 text-amber-400"><i data-lucide="sparkles" class="w-5 h-5"></i></span>
+            <h3 class="text-sm font-bold text-white">TAPPING OUTPUT — Ready To Copy & Send</h3>
+          </div>
+          <button onclick="copyTappingOutput()" class="px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 text-xs font-bold transition-colors flex items-center gap-1.5">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Output
+          </button>
+        </div>
+
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 text-xs font-mono text-slate-300 leading-relaxed overflow-x-auto min-h-[110px]" id="tappingTextOutput">
+          [TAPPING OUTREACH READY]
+          To: Valued Customer (Aerus Home Wellness / Clean Environment LLC)
+          Subject: Quick Wellness Checkup for your Aerus System
+
+          Hi! Fresh here following up from William's desk at Aerus Timonium. Just checking in on your air and surface wellness system to make sure everything is running 100% peak for allergy season. 
+
+          Reply "YES" to grab your seasonal filter refresh special, or tap here to book a 2-minute diagnostic checkup!
+        </div>
+        <p class="text-[11px] text-slate-500 mt-2 flex items-center gap-1">
+          <i data-lucide="info" class="w-3 h-3"></i> Tapping into 22,283 customer database. Copy, paste, send in seconds. Zero friction.
+        </p>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Team Modal -->
+  <div id="teamModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-panel max-w-md w-full rounded-3xl p-6 border border-slate-800 shadow-2xl relative">
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+        <div class="flex items-center space-x-2">
+          <div class="p-2 rounded-xl bg-amber-500/10 text-amber-400">
+            <i data-lucide="shield" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-base font-bold text-white">The Official Squad</h3>
+        </div>
+        <button onclick="toggleTeamModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-2.5 text-xs">
+        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+          <span class="font-bold text-emerald-400">Fresh 🤵</span>
+          <span class="text-slate-400">Host, Digital Coordinator, Coach</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+          <span class="font-bold text-cyan-400">Boudie</span>
+          <span class="text-slate-400">Execution Powerhouse</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+          <span class="font-bold text-purple-400">Sissy</span>
+          <span class="text-slate-400">Back-end Data & Webhooks</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+          <span class="font-bold text-amber-400">L</span>
+          <span class="text-slate-400">Money Man</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+          <span class="font-bold text-blue-400">Nuesh</span>
+          <span class="text-slate-400">Brains</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+          <span class="font-bold text-rose-400">Squash</span>
+          <span class="text-slate-400">Coach</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+          <span class="font-bold text-teal-400">Yogie</span>
+          <span class="text-slate-400">Lifter</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-panel max-w-md w-full rounded-3xl p-6 border border-slate-800 shadow-2xl relative">
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+        <div class="flex items-center space-x-2">
+          <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400">
+            <i data-lucide="link-2" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-base font-bold text-white">Direct Webhook Integration</h3>
+        </div>
+        <button onclick="toggleSettingsModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <p class="text-slate-300 leading-relaxed">
+          <strong class="text-emerald-400">Direct Connect Active!</strong> Payloads route directly to Monday.com or custom API endpoints without middleman tools like Make.com.
+        </p>
+
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Target Webhook URL / Monday.com API</label>
+          <input type="text" id="webhookUrlInput" placeholder="https://api.monday.com/v2 or custom webhook..." value="https://api.monday.com/v2" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-200 font-mono text-xs focus:outline-none focus:border-cyan-500">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">BCC Board Email Address</label>
+          <input type="text" id="bccEmailInput" placeholder="board-123456@use1.monday.com" value="towsonhealthyhomes@monday.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-200 font-mono text-xs focus:outline-none focus:border-cyan-500">
+        </div>
+
+        <button onclick="saveWebhookSettings()" class="w-full py-3 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-slate-950 font-bold rounded-xl shadow-lg hover:opacity-95 transition-opacity">
+          Save Settings & Return
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* Global Application State */
+    let currentHub = 'business'; // 'business' or 'personal'
+    let isRecording = false;
+    let recognition = null;
+    let taskQueue = [];
+    let isTypeModeVisible = false;
+
+    // Webhook Settings
+    let webhookSettings = {
+      url: localStorage.getItem('tt_webhook_url') || 'https://api.monday.com/v2',
+      bcc: localStorage.getItem('tt_bcc_email') || 'towsonhealthyhomes@monday.com'
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      setupSpeechRecognition();
+      loadStoredTasks();
+      updateHubUI();
+    });
+
+    /* Speech Synthesis Helper (Fresh Voice Output) */
+    function speakFresh(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.05;
+        utterance.pitch = 1.0;
+        
+        const voices = window.speechSynthesis.getVoices();
+        const preferredVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Male')));
+        if (preferredVoice) utterance.voice = preferredVoice;
+
+        document.getElementById('freshVoiceText').innerText = `"${text}"`;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function speakFreshGreeting() {
+      speakFresh("BOOM! Good morning, William! Fresh here on your hip. Tap and talk, and let's win today!");
+    }
+
+    /* Hub Toggle Logic (2-Hub Cascading System) */
+    function setHub(hubName) {
+      currentHub = hubName;
+      updateHubUI();
+      const text = hubName === 'business' 
+        ? "Business World active! Let's hit the customer engine and route those wins!" 
+        : "Personal World active! Keeping your life smooth, sharp, and organized!";
+      speakFresh(text);
+    }
+
+    function updateHubUI() {
+      const btnBiz = document.getElementById('btnHubBusiness');
+      const btnPers = document.getElementById('btnHubPersonal');
+      const badge = document.getElementById('activeHubBadge');
+
+      if (currentHub === 'business') {
+        btnBiz.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 shadow-md";
+        btnPers.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5 text-slate-400 hover:text-white";
+        badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+        badge.innerHTML = `<i data-lucide="briefcase" class="w-3.5 h-3.5"></i> ACTIVE HUB: BUSINESS WORLD`;
+      } else {
+        btnPers.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 shadow-md";
+        btnBiz.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5 text-slate-400 hover:text-white";
+        badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20";
+        badge.innerHTML = `<i data-lucide="user" class="w-3.5 h-3.5"></i> ACTIVE HUB: PERSONAL WORLD`;
+      }
+      lucide.createIcons();
+      renderTasks();
+    }
+
+    /* Web Speech Recognition Logic */
+    function setupSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        document.getElementById('transcriptPreview').innerText = "Voice recognition not supported on this browser. Use manual input.";
+        return;
+      }
+
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        isRecording = true;
+        updateRecordingStateUI(true);
+      };
+
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        document.getElementById('transcriptPreview').innerText = `"${transcript}"`;
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Speech Error:", event.error);
+        stopRecordingState();
+        speakFresh("Got it! Let me hear that again, boss!");
+      };
+
+      recognition.onend = () => {
+        if (isRecording) {
+          const finalNote = document.getElementById('transcriptPreview').innerText.replace(/^"|"$/g, '');
+          if (finalNote && finalNote !== "Tap the button above and start speaking...") {
+            processBrainDump(finalNote);
+          }
+        }
+        stopRecordingState();
+      };
+    }
+
+    function toggleVoiceRecording() {
+      if (!recognition) {
+        alert("Speech Recognition is not available. Please use the secondary typing option!");
+        return;
+      }
+
+      if (!isRecording) {
+        try {
+          recognition.start();
+        } catch(e) {
+          console.log("Already started:", e);
+        }
+      } else {
+        recognition.stop();
+      }
+    }
+
+    function updateRecordingStateUI(recording) {
+      const btnInner = document.getElementById('tapBtnInner');
+      const icon = document.getElementById('tapIcon');
+      const mainLabel = document.getElementById('tapMainLabel');
+      const wave = document.getElementById('audioWave');
+
+      if (recording) {
+        btnInner.classList.add('animate-pulse-glow', 'border-cyan-400', 'bg-slate-900');
+        icon.className = "w-12 h-12 text-cyan-400 mb-2 animate-bounce";
+        mainLabel.innerText = "LISTENING...";
+        wave.classList.remove('hidden');
+      } else {
+        stopRecordingState();
+      }
+    }
+
+    function stopRecordingState() {
+      isRecording = false;
+      const btnInner = document.getElementById('tapBtnInner');
+      const icon = document.getElementById('tapIcon');
+      const mainLabel = document.getElementById('tapMainLabel');
+      const wave = document.getElementById('audioWave');
+
+      btnInner.classList.remove('animate-pulse-glow', 'border-cyan-400', 'bg-slate-900');
+      icon.className = "w-12 h-12 text-emerald-400 mb-2 transition-transform group-hover:scale-110";
+      mainLabel.innerText = "TAP & TALK";
+      wave.classList.add('hidden');
+    }
+
+    /* Brain Dump & Task Priority Router */
+    function processBrainDump(rawText) {
+      if (!rawText.trim()) return;
+
+      let difficulty = 1;
+      const lower = rawText.toLowerCase();
+      if (lower.includes('repair') || lower.includes('estimate') || lower.includes('install') || lower.includes('urgent') || lower.includes('problem')) {
+        difficulty = 3; // Hardest
+      } else if (lower.includes('follow up') || lower.includes('call') || lower.includes('email') || lower.includes('order')) {
+        difficulty = 2; // Medium
+      }
+
+      const newTask = {
+        id: Date.now(),
+        text: rawText,
+        hub: currentHub,
+        difficulty: difficulty,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        completed: false
+      };
+
+      taskQueue.push(newTask);
+      sortTaskQueue();
+      saveTasksToStorage();
+      renderTasks();
+
+      sendDirectWebhook(newTask);
+
+      const responses = [
+        "BOOM! Tapped right into the queue! Hardest items at the top—let's crush them!",
+        "Dump received and sorted! What's our next play?",
+        "Solid! Direct webhook dispatched to the board. Next item?"
+      ];
+      speakFresh(responses[Math.floor(Math.random() * responses.length)]);
+      
+      document.getElementById('transcriptPreview').innerText = "Dump captured! Ready for next voice input...";
+    }
+
+    function sortTaskQueue() {
+      taskQueue.sort((a, b) => b.difficulty - a.difficulty);
+    }
+
+    function renderTasks() {
+      const container = document.getElementById('taskList');
+      const filtered = taskQueue.filter(t => t.hub === currentHub);
+      document.getElementById('taskCountBadge').innerText = `${filtered.length} Tasks`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div id="emptyTaskState" class="h-48 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-slate-800 rounded-2xl">
+            <div class="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center text-slate-500 mb-3">
+              <i data-lucide="mic-off" class="w-6 h-6"></i>
+            </div>
+            <h3 class="text-sm font-bold text-slate-300">No active dumps in queue</h3>
+            <p class="text-xs text-slate-500 mt-1 max-w-xs">Tap the big green button, talk out loud, and Fresh will prioritize your items here automatically!</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = filtered.map(task => {
+        let diffBadge = '';
+        if (task.difficulty === 3) {
+          diffBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-red-500/10 text-red-400 border border-red-500/20">HARDEST / HIGH PRIORITY</span>`;
+        } else if (task.difficulty === 2) {
+          diffBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/10 text-amber-400 border border-amber-500/20">MEDIUM</span>`;
+        } else {
+          diffBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">EASY WIN</span>`;
         }
 
-        async function startWorldPresentation(industry) {
-            const indName = (industry && industry.trim()) ? industry.trim() : "Vacuum Repair";
-            document.getElementById('bizIndustryTitle').innerText = indName.toUpperCase();
-            document.getElementById('industryPromptSection').classList.add('hidden');
+        return `
+          <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-slate-700 transition-all flex items-start justify-between gap-3 group">
+            <div class="flex items-start space-x-3 flex-1">
+              <button onclick="toggleTaskComplete(${task.id})" class="mt-0.5 text-slate-500 hover:text-emerald-400 transition-colors">
+                <i data-lucide="${task.completed ? 'check-circle-2' : 'circle'}" class="w-5 h-5 ${task.completed ? 'text-emerald-400' : ''}"></i>
+              </button>
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                  ${diffBadge}
+                  <span class="text-[10px] text-slate-500">${task.timestamp}</span>
+                </div>
+                <p class="text-xs font-semibold ${task.completed ? 'line-through text-slate-500' : 'text-slate-200'}">${escapeHtml(task.text)}</p>
+              </div>
+            </div>
+            <button onclick="deleteTask(${task.id})" class="opacity-0 group-hover:opacity-100 p-1 text-slate-500 hover:text-red-400 transition-opacity">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+      }).join('');
 
-            // Step 1: Show Business World
-            const msg1 = `Got it! Here is what your ${indName} business world looks like!`;
-            updateFreshSpeech(msg1);
-            speakOutLoud(msg1);
-            document.getElementById('businessWorldBoard').classList.remove('hidden');
+      lucide.createIcons();
+    }
 
-            // Step 2: Show Personal World after delay
-            setTimeout(() => {
-                const msg2 = `And here is what your personal home world looks like — all managed in one clean spot!`;
-                updateFreshSpeech(msg2);
-                speakOutLoud(msg2);
-                document.getElementById('personalWorldBoard').classList.remove('hidden');
+    function toggleTaskComplete(id) {
+      const task = taskQueue.find(t => t.id === id);
+      if (task) {
+        task.completed = !task.completed;
+        if (task.completed) speakFresh("Boom! Knocked out!");
+        saveTasksToStorage();
+        renderTasks();
+      }
+    }
 
-                // Step 3: Show CTA Prompt
-                setTimeout(() => {
-                    const msg3 = `Would you like to set one up for yourself now?`;
-                    updateFreshSpeech(msg3);
-                    speakOutLoud(msg3);
-                    document.getElementById('ctaCard').classList.remove('hidden');
-                }, 4000);
+    function deleteTask(id) {
+      taskQueue = taskQueue.filter(t => t.id !== id);
+      saveTasksToStorage();
+      renderTasks();
+    }
 
-            }, 4000);
+    function sendDirectWebhook(taskData) {
+      const payload = {
+        title: `[${taskData.hub.toUpperCase()}] ${taskData.text.substring(0, 30)}...`,
+        note: taskData.text,
+        hub: taskData.hub,
+        priority: taskData.difficulty === 3 ? "High" : "Normal",
+        timestamp: taskData.timestamp,
+        source: "Fresh_TappyThing",
+        bcc: webhookSettings.bcc
+      };
+
+      if (webhookSettings.url && webhookSettings.url !== 'https://api.monday.com/v2') {
+        fetch(webhookSettings.url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(err => console.warn("Direct webhook dispatch error:", err));
+      }
+    }
+
+    /* Secondary Manual Input Toggle */
+    function toggleTypeMode() {
+      const container = document.getElementById('typeModeContainer');
+      const label = document.getElementById('typeToggleLabel');
+      isTypeModeVisible = !isTypeModeVisible;
+
+      if (isTypeModeVisible) {
+        container.classList.remove('hidden');
+        label.innerText = "Hide Typing Option";
+      } else {
+        container.classList.add('hidden');
+        label.innerText = "Type Instead (Secondary Option)";
+      }
+    }
+
+    function submitManualInput() {
+      const input = document.getElementById('manualTextInput');
+      if (input.value.trim()) {
+        processBrainDump(input.value);
+        input.value = '';
+      }
+    }
+
+    /* Tapping Engine (Database Outreach) */
+    function triggerTappingEngine() {
+      const tappingText = `[TAPPING OUTREACH READY — 22,283 DATABASE ENGINE]
+To: Valued Aerus Customer
+Subject: Aerus Home Wellness Special Checkup — Timonium MD
+
+Hi! Fresh here following up from William Sullivan's desk at Aerus Home Wellness. 
+
+We are running our seasonal system checkup sweep across Towson & Timonium. Your Aerus system is due for a quick filter and surface unit tune-up. 
+
+Reply "READY" to grab your priority drop-ship filter or schedule a 1-minute tech check. 
+
+Direct Line: Towson Healthy Homes
+BCC: ${webhookSettings.bcc}`;
+
+      document.getElementById('tappingTextOutput').innerText = tappingText;
+      speakFresh("Tapping engine engaged! Pre-written outreach ready for your 22,283 customer database!");
+    }
+
+    function triggerEasyInvoicing() {
+      const invoiceText = `[3-STEP FIFTH-GRADE INVOICE]
+1. Customer: [Insert Name / Phone]
+2. Service: Aerus Unit Repair / Filter Replacements
+3. Total Due: $185.00
+Payment Link generated via Workiz Cash Register. Card processing ready.`;
+
+      document.getElementById('tappingTextOutput').innerText = invoiceText;
+      speakFresh("3-Step Invoice ready! Keep it fifth-grade simple and let's get paid!");
+    }
+
+    function copyTappingOutput() {
+      const text = document.getElementById('tappingTextOutput').innerText;
+      document.execCommand('copy');
+      speakFresh("Copied to clipboard! Ready to paste and send!");
+    }
+
+    function toggleSettingsModal() {
+      document.getElementById('settingsModal').classList.toggle('hidden');
+    }
+
+    function toggleTeamModal() {
+      document.getElementById('teamModal').classList.toggle('hidden');
+    }
+
+    function saveWebhookSettings() {
+      const url = document.getElementById('webhookUrlInput').value;
+      const bcc = document.getElementById('bccEmailInput').value;
+
+      webhookSettings.url = url;
+      webhookSettings.bcc = bcc;
+
+      localStorage.setItem('tt_webhook_url', url);
+      localStorage.setItem('tt_bcc_email', bcc);
+
+      toggleSettingsModal();
+      speakFresh("Settings saved! Middleman bypassed!");
+    }
+
+    function saveTasksToStorage() {
+      localStorage.setItem('tt_tasks', JSON.stringify(taskQueue));
+    }
+
+    function loadStoredTasks() {
+      const stored = localStorage.getItem('tt_tasks');
+      if (stored) {
+        try {
+          taskQueue = JSON.parse(stored);
+        } catch(e) {
+          taskQueue = [];
         }
+      }
+    }
 
-        function updateFreshSpeech(text) {
-            document.getElementById('freshVoiceText').innerText = text;
-        }
-
-        function speakOutLoud(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = 1.05;
-                utterance.pitch = 1.0;
-
-                const audioWave = document.getElementById('audioWave');
-                utterance.onstart = () => audioWave.classList.remove('hidden');
-                utterance.onend = () => audioWave.classList.add('hidden');
-                utterance.onerror = () => audioWave.classList.add('hidden');
-
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-    </script>
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+  </script>
 </body>
 </html>
