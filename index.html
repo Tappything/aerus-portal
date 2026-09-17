@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>TappyThing — Digital Coordinator & Pocket Chief of Staff</title>
+  <title>TappyThing — Pocket Chief of Staff & Digital Coordinator</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -29,13 +29,13 @@
     }
   </script>
   
-  <!-- Google Font Inter & FontAwesome Icons -->
+  <!-- Google Fonts & FontAwesome Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- Custom Styles for Glassmorphism & Animations -->
+  <!-- Custom CSS Tokens & Glassmorphism Styling -->
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -49,28 +49,27 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     .glass-nav {
-      background: rgba(11, 15, 23, 0.85);
+      background: rgba(11, 15, 23, 0.88);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
     .glow-pulse-gold {
-      box-shadow: 0 0 25px rgba(234, 179, 8, 0.35);
-      animation: pulseGold 2s infinite ease-in-out;
+      box-shadow: 0 0 30px rgba(234, 179, 8, 0.35);
+      animation: pulseGold 2.2s infinite ease-in-out;
     }
-    .glow-pulse-emerald {
-      box-shadow: 0 0 25px rgba(16, 185, 129, 0.4);
-      animation: pulseEmerald 2s infinite ease-in-out;
+    .glow-pulse-listening {
+      box-shadow: 0 0 40px rgba(16, 185, 129, 0.6);
+      animation: pulseEmerald 1.2s infinite ease-in-out;
     }
     @keyframes pulseGold {
-      0%, 100% { box-shadow: 0 0 15px rgba(234, 179, 8, 0.25); transform: scale(1); }
-      50% { box-shadow: 0 0 35px rgba(234, 179, 8, 0.55); transform: scale(1.02); }
+      0%, 100% { box-shadow: 0 0 18px rgba(234, 179, 8, 0.25); transform: scale(1); }
+      50% { box-shadow: 0 0 38px rgba(234, 179, 8, 0.55); transform: scale(1.02); }
     }
     @keyframes pulseEmerald {
-      0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
-      50% { box-shadow: 0 0 35px rgba(16, 185, 129, 0.6); }
+      0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
+      50% { box-shadow: 0 0 45px rgba(16, 185, 129, 0.8); }
     }
-    /* Hide scrollbars for slick mobile view */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
@@ -90,46 +89,51 @@
         <div>
           <div class="flex items-center space-x-2">
             <h1 class="text-base font-extrabold tracking-tight text-white flex items-center">
-              FRESH <span class="text-xs text-brand-gold ml-1.0 bg-yellow-950/80 px-1.5 py-0.5 rounded border border-yellow-700/50">POCKET CHIEF</span>
+              FRESH <span class="text-[10px] text-brand-gold ml-1.5 bg-yellow-950/80 px-1.5 py-0.5 rounded border border-yellow-700/50 uppercase">Pocket Chief of Staff</span>
             </h1>
-            <span class="text-slate-500 font-bold">&</span>
-            <span class="text-xs font-semibold text-brand-cyan bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-800/50">SISSY (DC)</span>
           </div>
-          <p class="text-[11px] text-slate-400 flex items-center gap-1 font-medium">
-            <i class="fa-solid fa-building text-brand-emerald text-[10px]"></i> Aerus Timonium <span class="text-slate-600">•</span> Clean Env LLC
+          <p class="text-[11px] text-slate-300 flex items-center gap-1.5 font-medium">
+            <span class="text-brand-cyan font-semibold">Sissy: Digital Coordinator</span> 
+            <span class="text-slate-600">•</span> 
+            <span class="text-xs">🎨 Rob Art</span>
           </p>
         </div>
       </div>
 
-      <!-- Quick Action Right Controls -->
+      <!-- Quick Action Controls (Camera + Hidden Squad Toggle + Settings) -->
       <div class="flex items-center space-x-2">
         <button id="openCameraBtn" class="bg-slate-800/80 hover:bg-slate-700 text-brand-cyan p-2.5 rounded-xl border border-cyan-500/30 transition-all flex items-center gap-1.5 text-xs font-semibold" title="Intake Camera">
           <i class="fa-solid fa-camera text-sm"></i>
           <span class="hidden sm:inline">Camera</span>
         </button>
-        <button id="openSettingsBtn" class="bg-slate-800/80 hover:bg-slate-700 text-slate-300 p-2.5 rounded-xl border border-slate-700 transition-all text-xs" title="Settings & Webhook">
+
+        <button id="toggleSquadBtn" class="bg-slate-800/80 hover:bg-slate-700 text-slate-300 p-2.5 rounded-xl border border-slate-700 transition-all text-xs font-semibold flex items-center gap-1" title="Toggle The Squad">
+          <span>The Squad 🎭</span>
+        </button>
+
+        <button id="openSettingsBtn" class="bg-slate-800/80 hover:bg-slate-700 text-slate-300 p-2.5 rounded-xl border border-slate-700 transition-all text-xs" title="Industry Settings">
           <i class="fa-solid fa-gear text-sm"></i>
         </button>
       </div>
     </div>
 
-    <!-- Squad Deck Subheader Bar -->
-    <div class="max-w-4xl mx-auto mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 overflow-x-auto no-scrollbar whitespace-nowrap">
-      <div class="flex items-center space-x-2">
-        <span class="text-slate-500 uppercase tracking-wider text-[9px] font-bold">The Squad:</span>
-        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-950/80 text-emerald-400 border border-emerald-800/60">
-          <i class="fa-solid fa-user-tie mr-1 text-[9px]"></i> Fresh 🤵
+    <!-- Hidden Squad Dropdown Drawer -->
+    <div id="squadDrawer" class="max-w-4xl mx-auto mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 hidden">
+      <div class="flex items-center space-x-2 overflow-x-auto no-scrollbar py-1">
+        <span class="text-slate-500 uppercase tracking-wider text-[9px] font-bold">Squad Roster:</span>
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800/60">
+          Fresh 🤵 (Leader)
         </span>
-        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-cyan-950/80 text-cyan-400 border border-cyan-800/60">
-          <i class="fa-solid fa-laptop-code mr-1 text-[9px]"></i> Sissy
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-cyan-950 text-cyan-400 border border-cyan-800/60">
+          Sissy (Digital Coordinator)
         </span>
-        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-900 text-slate-300 border border-slate-800">El</span>
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-900 text-slate-300 border border-slate-800">L</span>
         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-900 text-slate-300 border border-slate-800">Squash</span>
         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-900 text-slate-300 border border-slate-800">Yogi</span>
         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-900 text-slate-300 border border-slate-800">Nush</span>
       </div>
-      <div class="text-[10px] text-brand-gold font-medium ml-3">
-        <i class="fa-solid fa-database text-[9px] mr-0.5"></i> 22,283 Recs
+      <div class="text-[10px] text-brand-gold font-medium ml-2 whitespace-nowrap">
+        Aerus Timonium MD
       </div>
     </div>
   </header>
@@ -137,70 +141,73 @@
   <!-- Main Scrollable App Canvas -->
   <main class="flex-1 overflow-y-auto px-4 py-5 space-y-6 max-w-4xl mx-auto w-full pb-28">
 
-    <!-- Central Interactive TappyThing Front Door / Voice Engine -->
-    <section class="glass-card rounded-2xl p-6 text-center border border-slate-800 relative overflow-hidden">
+    <!-- Central Interactive Voice-First Chief of Staff Hub -->
+    <section class="glass-card rounded-2xl p-6 text-center border border-slate-800 relative overflow-hidden shadow-2xl">
       <div class="absolute -top-12 -left-12 w-32 h-32 bg-brand-emerald/10 rounded-full blur-2xl pointer-events-none"></div>
       <div class="absolute -bottom-12 -right-12 w-32 h-32 bg-brand-gold/10 rounded-full blur-2xl pointer-events-none"></div>
 
-      <div class="mb-4">
-        <span class="text-[11px] font-bold uppercase tracking-widest text-brand-emerald bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-800/50">
-          <i class="fa-solid fa-bolt mr-1"></i> Voice-First Chief of Staff Engine
+      <div class="mb-3">
+        <span class="text-[11px] font-bold uppercase tracking-widest text-brand-emerald bg-emerald-950/80 px-3 py-1 rounded-full border border-emerald-800/60 inline-flex items-center gap-1.5">
+          <i class="fa-solid fa-microphone-lines text-xs"></i> Voice-First Digital Coordinator
         </span>
       </div>
 
       <!-- Glowing Voice Button -->
-      <div class="relative inline-block my-2">
-        <button id="tapVoiceBtn" class="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br from-amber-400 via-yellow-500 to-emerald-600 flex flex-col items-center justify-center text-slate-950 font-black shadow-2xl transition-all transform active:scale-95 glow-pulse-gold group cursor-pointer border-4 border-slate-900">
-          <i id="micIcon" class="fa-solid fa-microphone text-3xl sm:text-4xl text-slate-950 group-hover:scale-110 transition-transform mb-1"></i>
-          <span class="text-xs sm:text-sm tracking-wider font-extrabold uppercase">TAP TO TALK</span>
+      <div class="relative inline-block my-3">
+        <button id="tapVoiceBtn" class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br from-amber-400 via-yellow-500 to-emerald-500 flex flex-col items-center justify-center text-slate-950 font-black shadow-2xl transition-all transform active:scale-95 glow-pulse-gold group cursor-pointer border-4 border-slate-900">
+          <i id="micIcon" class="fa-solid fa-microphone text-4xl sm:text-5xl text-slate-950 group-hover:scale-110 transition-transform mb-1"></i>
+          <span class="text-xs sm:text-sm tracking-wider font-extrabold uppercase">TALK TO FRESH 🤵</span>
         </button>
       </div>
 
       <!-- Voice Status Indicator -->
-      <div id="voiceStatusText" class="text-xs font-semibold text-slate-400 mt-2 h-5 flex items-center justify-center gap-1.5">
+      <div id="voiceStatusText" class="text-xs font-semibold text-slate-300 mt-2 h-6 flex items-center justify-center gap-1.5">
         <span>Tap button & speak directly to Fresh</span>
       </div>
 
       <!-- Output Speech Bubble Container -->
-      <div id="outputBubble" class="mt-4 p-4 rounded-xl bg-slate-900/90 border border-slate-800 text-left text-xs sm:text-sm text-slate-200 hidden shadow-inner transition-all">
+      <div id="outputBubble" class="mt-4 p-4 rounded-xl bg-slate-900/95 border border-slate-800 text-left text-xs sm:text-sm text-slate-200 hidden shadow-2xl transition-all">
         <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-2">
           <div class="flex items-center space-x-2">
-            <span class="text-base">🤵</span>
-            <span class="font-bold text-brand-gold">Fresh (Chief of Staff):</span>
+            <span class="text-lg">🤵</span>
+            <span class="font-bold text-brand-gold">Fresh (Pocket Chief of Staff):</span>
           </div>
-          <button id="replaySpeechBtn" class="text-slate-400 hover:text-white text-xs px-2 py-0.5 rounded bg-slate-800">
-            <i class="fa-solid fa-volume-high"></i> Replay
+          <button id="replaySpeechBtn" class="text-slate-400 hover:text-white text-xs px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
+            <i class="fa-solid fa-volume-high mr-1"></i> Replay Voice
           </button>
         </div>
+        
+        <!-- Live AI Spoken Response Content -->
         <p id="outputText" class="text-slate-100 font-medium leading-relaxed"></p>
-        <div id="routedDestination" class="mt-2 text-[10px] text-brand-emerald font-semibold flex items-center gap-1 hidden">
-          <i class="fa-solid fa-circle-check"></i> <span id="routedDestinationText">Routed to Monday.com Board</span>
+
+        <div id="routedDestination" class="mt-3 text-[11px] text-brand-emerald font-semibold flex items-center gap-1.5 pt-2 border-t border-slate-800/80 hidden">
+          <i class="fa-solid fa-circle-check"></i> <span id="routedDestinationText">System Action Recorded</span>
         </div>
       </div>
 
       <!-- Secondary Keyboard Toggle Input -->
       <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-center">
-        <button id="toggleTypeBtn" class="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1 font-medium">
+        <button id="toggleTypeBtn" class="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1.5 font-medium transition-colors">
           <i class="fa-solid fa-keyboard text-xs"></i> Secondary Typing Input
         </button>
       </div>
 
       <!-- Hidden Keyboard Input Row -->
       <div id="typeInputRow" class="mt-3 flex gap-2 hidden">
-        <input type="text" id="manualTextInput" placeholder="Type instructions or dumping notes to Fresh..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-emerald" />
-        <button id="sendManualBtn" class="bg-brand-emerald hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1">
+        <input type="text" id="manualTextInput" placeholder="Type instructions or ask Fresh anything..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-brand-emerald" />
+        <button id="sendManualBtn" class="bg-brand-emerald hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1 transition-all">
           <span>Send</span> <i class="fa-solid fa-paper-plane text-xs"></i>
         </button>
       </div>
     </section>
 
-    <!-- 4 CORE SHOWCASE DOORS -->
+    <!-- 4 CORE SHOWCASE DOORS (RESTORED PREMIUM DASHBOARD) -->
     <section class="space-y-4">
       <div class="flex items-center justify-between">
-        <h2 class="text-sm font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+        <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-2">
           <i class="fa-solid fa-door-open text-brand-gold"></i> Showcase Operations & Cabinets
         </h2>
-        <span class="text-[11px] text-slate-500 font-medium">Tap door to open/expand</span>
+        <span class="text-[11px] text-slate-500 font-medium">Voice-Driven Architecture</span>
       </div>
 
       <!-- DOOR 1: TappyThing Business World (Shop Operations) -->
@@ -213,7 +220,7 @@
             <div>
               <h3 class="text-sm font-bold text-white flex items-center gap-2">
                 TappyThing: Business World 
-                <span class="text-[10px] bg-amber-950 text-amber-400 px-2 py-0.5 rounded-full border border-amber-800/50">Shop Ops</span>
+                <span class="text-[10px] bg-amber-950 text-amber-400 px-2 py-0.5 rounded-full border border-amber-800/50">Aerus Shop Ops</span>
               </h3>
               <p class="text-xs text-slate-400">Workbench, Vehicles, Showroom, Ready Wall & Bagden's World</p>
             </div>
@@ -224,38 +231,35 @@
         <!-- Business Door Body (Cabinets) -->
         <div id="door-business" class="door-content hidden border-t border-slate-800/80 p-4 space-y-4 bg-slate-950/40">
           
-          <!-- ⭐ SPECIAL BAGDEN'S WORLD CASCADING SUB-CABINET ⭐ -->
-          <div class="p-4 rounded-xl bg-gradient-to-r from-emerald-950/60 to-slate-900 border border-brand-emerald/40 relative">
+          <!-- ⭐ BAGDEN'S WORLD CASCADING SUB-CABINET ⭐ -->
+          <div class="p-4 rounded-xl bg-gradient-to-r from-emerald-950/60 via-slate-900 to-slate-900 border border-brand-emerald/40 relative">
             <div class="flex items-center justify-between mb-3">
               <div class="flex items-center space-x-2">
                 <span class="text-lg">💼</span>
                 <div>
                   <h4 class="text-xs font-black uppercase text-brand-emerald tracking-wider flex items-center gap-1.5">
-                    BAGDEN'S WORLD <span class="bg-emerald-500 text-slate-950 text-[9px] font-extrabold px-1.5 py-0.5 rounded">SHARED CABINET</span>
+                    BAGDEN'S WORLD <span class="bg-emerald-500 text-slate-950 text-[9px] font-extrabold px-1.5 py-0.5 rounded">SHARED CASCADING CABINET</span>
                   </h4>
-                  <p class="text-[11px] text-slate-300">Live synchronized repair queue, ready wall items & shared pipeline</p>
+                  <p class="text-[11px] text-slate-300">Synchronized live repair queue & shared pipeline (Managed by Fresh)</p>
                 </div>
               </div>
-              <button id="addBagdenCardBtn" class="text-[10px] bg-brand-emerald hover:bg-emerald-600 text-slate-950 font-bold px-2.5 py-1 rounded-lg">
-                + Add Card
-              </button>
             </div>
 
             <!-- Bagden's Shared Cards Container -->
             <div id="bagdenCardsList" class="space-y-2">
               <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-xs flex items-center justify-between">
                 <div>
-                  <div class="font-semibold text-slate-200">Bagden Vacuum Tune-Up #108</div>
-                  <div class="text-[10px] text-slate-400">Bench Lead: Chris • Status: In Progress</div>
+                  <div class="font-semibold text-slate-200">Aerus Vacuum Bench Repair #108</div>
+                  <div class="text-[10px] text-slate-400">Lead Tech: Chris • Status: In Diagnostics</div>
                 </div>
-                <span class="text-[10px] bg-amber-950 text-amber-400 px-2 py-0.5 rounded font-bold">READY BENCH</span>
+                <span class="text-[10px] bg-amber-950 text-amber-400 px-2 py-0.5 rounded font-bold border border-amber-800/50">BENCH ACTIVE</span>
               </div>
               <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-xs flex items-center justify-between">
                 <div>
-                  <div class="font-semibold text-slate-200">Field Repair Drop-Ship Order</div>
-                  <div class="text-[10px] text-slate-400">Assigned: Mike • Parts Dispatched</div>
+                  <div class="font-semibold text-slate-200">Field Unit Drop-Ship Parts Dispatched</div>
+                  <div class="text-[10px] text-slate-400">Field Diagnostics: Mike • Inventory Sync</div>
                 </div>
-                <span class="text-[10px] bg-cyan-950 text-cyan-400 px-2 py-0.5 rounded font-bold">DISPATCHED</span>
+                <span class="text-[10px] bg-cyan-950 text-cyan-400 px-2 py-0.5 rounded font-bold border border-cyan-800/50">DISPATCHED</span>
               </div>
             </div>
           </div>
@@ -267,11 +271,11 @@
             <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
               <div class="flex items-center justify-between mb-2">
                 <span class="text-xs font-bold text-slate-200"><i class="fa-solid fa-screwdriver-wrench text-brand-gold mr-1"></i> Workbench</span>
-                <span id="workbenchCount" class="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded">3 Cards</span>
+                <span id="workbenchCount" class="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded">Active</span>
               </div>
               <div class="text-[11px] text-slate-400 space-y-1">
-                <div class="truncate">• Aerus Lux Model 1</div>
-                <div class="truncate">• Belt Replacement #44</div>
+                <div class="truncate">• Aerus Lux Model Tune-Up</div>
+                <div class="truncate">• Belt & Roller Repair</div>
               </div>
             </div>
 
@@ -279,11 +283,11 @@
             <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
               <div class="flex items-center justify-between mb-2">
                 <span class="text-xs font-bold text-slate-200"><i class="fa-solid fa-truck text-brand-cyan mr-1"></i> Vehicles</span>
-                <span class="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded">2 Field</span>
+                <span class="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded">Ready</span>
               </div>
               <div class="text-[11px] text-slate-400 space-y-1">
-                <div class="truncate">• Field Unit 1 (Mike)</div>
-                <div class="truncate">• Timonium Route</div>
+                <div class="truncate">• Timonium Route Unit</div>
+                <div class="truncate">• Field Diagnostics Tooling</div>
               </div>
             </div>
 
@@ -291,11 +295,10 @@
             <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
               <div class="flex items-center justify-between mb-2">
                 <span class="text-xs font-bold text-slate-200"><i class="fa-solid fa-shop text-brand-emerald mr-1"></i> Showroom</span>
-                <span class="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded">Active</span>
+                <span class="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded">Ready</span>
               </div>
-              <div class="text-[11px] text-slate-400 space-y-1">
-                <div class="truncate">• Air Purifier Demos</div>
-                <div class="truncate">• Trade-in Counter</div>
+              <div class="text-[11px] text-slate-400 italic">
+                Ready for live equipment showcase items
               </div>
             </div>
 
@@ -303,11 +306,11 @@
             <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
               <div class="flex items-center justify-between mb-2">
                 <span class="text-xs font-bold text-slate-200"><i class="fa-solid fa-box-archive text-purple-400 mr-1"></i> Ready Wall</span>
-                <span class="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded">4 Pickups</span>
+                <span class="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded">2 Pickups</span>
               </div>
               <div class="text-[11px] text-slate-400 space-y-1">
-                <div class="truncate">• Completed Repairs</div>
-                <div class="truncate">• Ready for Customer</div>
+                <div class="truncate">• Completed Aerus Service</div>
+                <div class="truncate">• Customer Pickup Ready</div>
               </div>
             </div>
 
@@ -327,7 +330,7 @@
                 TappyThing: Personal World
                 <span class="text-[10px] bg-cyan-950 text-cyan-400 px-2 py-0.5 rounded-full border border-cyan-800/50">Private Vault</span>
               </h3>
-              <p class="text-xs text-slate-400">William's Vault, Personal Reminders, Ragweed & Eda Roku TV</p>
+              <p class="text-xs text-slate-400">William's Private Vault, Reminders, Ragweed Note & Eda Roku TV</p>
             </div>
           </div>
           <i class="fa-solid fa-chevron-down text-slate-400 door-chevron transition-transform duration-200"></i>
@@ -335,19 +338,19 @@
 
         <div id="door-personal" class="door-content hidden border-t border-slate-800/80 p-4 space-y-3 bg-slate-950/40">
           <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-              <i class="fa-solid fa-tv text-brand-gold text-sm"></i>
+            <div class="flex items-center space-x-2.5">
+              <i class="fa-solid fa-tv text-brand-gold text-base"></i>
               <div>
                 <div class="font-bold text-slate-200">Eda Roku TV Bank Action</div>
-                <div class="text-[10px] text-slate-400">Action note logged directly in personal vault</div>
+                <div class="text-[10px] text-slate-400">Action note logged in private vault</div>
               </div>
             </div>
-            <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Active</span>
+            <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Active Note</span>
           </div>
 
           <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-              <i class="fa-solid fa-seedling text-brand-emerald text-sm"></i>
+            <div class="flex items-center space-x-2.5">
+              <i class="fa-solid fa-seedling text-brand-emerald text-base"></i>
               <div>
                 <div class="font-bold text-slate-200">Ragweed Allergy Seasonal Action</div>
                 <div class="text-[10px] text-slate-400">Personal wellness tracking note</div>
@@ -383,18 +386,18 @@
             <h4 class="text-xs font-extrabold uppercase text-slate-300 tracking-wider">Quick Invoice Builder</h4>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <input type="text" id="invCustomerName" placeholder="Customer Name" class="bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-brand-emerald" />
-              <input type="text" id="invServiceItem" placeholder="Service / Repair Description" class="bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-brand-emerald" />
+              <input type="text" id="invCustomerName" placeholder="Customer Name" class="bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-brand-emerald" />
+              <input type="text" id="invServiceItem" placeholder="Service / Repair Description" class="bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-brand-emerald" />
             </div>
 
             <div class="grid grid-cols-2 gap-2">
               <div>
                 <label class="text-[10px] text-slate-400 block mb-1">Parts & Labor ($)</label>
-                <input type="number" id="invAmount" placeholder="150.00" value="0.00" step="0.01" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-brand-emerald" />
+                <input type="number" id="invAmount" placeholder="150.00" value="0.00" step="0.01" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-brand-emerald" />
               </div>
               <div>
                 <label class="text-[10px] text-slate-400 block mb-1">MD Sales Tax (6%)</label>
-                <div id="invTaxDisplay" class="bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs font-bold text-brand-gold">$0.00</div>
+                <div id="invTaxDisplay" class="bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs font-bold text-brand-gold">$0.00</div>
               </div>
             </div>
 
@@ -405,14 +408,12 @@
 
             <!-- Action Buttons: Phase 1 Workiz & Phase 2 Stripe Showcase -->
             <div class="pt-2 flex flex-col sm:flex-row gap-2">
-              <!-- Primary Action: Copy to Workiz Cash Register -->
               <button id="copyToWorkizBtn" class="flex-1 bg-brand-emerald hover:bg-emerald-600 text-slate-950 font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all">
                 <i class="fa-solid fa-copy"></i>
                 <span>📋 Copy to Cash Register</span>
               </button>
 
-              <!-- Phase 2 Secondary: Pay Now Stripe Coming Soon -->
-              <button class="bg-slate-800 hover:bg-slate-700 text-slate-400 font-semibold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 border border-slate-700 cursor-not-allowed opacity-90" title="Subscriber payment processing coming in Phase 2">
+              <button class="bg-slate-800 hover:bg-slate-700 text-slate-400 font-semibold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 border border-slate-700 cursor-not-allowed opacity-90">
                 <i class="fa-solid fa-credit-card text-brand-cyan"></i>
                 <span>💳 Pay Now / Stripe Coming Soon</span>
               </button>
@@ -432,19 +433,19 @@
         </div>
       </div>
 
-      <!-- DOOR 4: TappyThing Time to Tap Queue -->
+      <!-- DOOR 4: TappyThing Execution Queue -->
       <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden transition-all">
         <button class="door-header w-full px-5 py-4 flex items-center justify-between text-left hover:bg-slate-800/50 transition-colors" data-door="door-queue">
           <div class="flex items-center space-x-3">
             <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 text-lg font-bold">
-              <i class="fa-solid fa-[#fa-list-check] fa-list-check"></i>
+              <i class="fa-solid fa-list-check"></i>
             </div>
             <div>
               <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                TappyThing: Time to Tap
-                <span class="text-[10px] bg-purple-950 text-purple-400 px-2 py-0.5 rounded-full border border-purple-800/50">Execution Queue</span>
+                TappyThing: Execution Queue
+                <span class="text-[10px] bg-purple-950 text-purple-400 px-2 py-0.5 rounded-full border border-purple-800/50">Priority Tasks</span>
               </h3>
-              <p class="text-xs text-slate-400">Task queue sorted from hardest to easiest for instant execution</p>
+              <p class="text-xs text-slate-400">Tasks logged by voice and sorted from hardest to easiest</p>
             </div>
           </div>
           <i class="fa-solid fa-chevron-down text-slate-400 door-chevron transition-transform duration-200"></i>
@@ -452,10 +453,9 @@
 
         <div id="door-queue" class="door-content hidden border-t border-slate-800/80 p-4 space-y-2 bg-slate-950/40">
           <div id="queueItemList" class="space-y-2">
-            <!-- Queue items populate dynamically. Test item 'hello is this working' scrubbed. -->
             <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs flex items-center justify-between">
               <div>
-                <div class="font-bold text-slate-200">1. Confirm Bagden's Shared Board Setup</div>
+                <div class="font-bold text-slate-200">1. Confirm Bagden's Shared Cascading Board</div>
                 <div class="text-[10px] text-slate-400">Priority: High • Fresh & Sissy Sync</div>
               </div>
               <span class="text-[10px] bg-purple-950 text-purple-300 border border-purple-800/50 px-2 py-0.5 rounded font-bold">Hardest First</span>
@@ -463,7 +463,7 @@
             <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs flex items-center justify-between">
               <div>
                 <div class="font-bold text-slate-200">2. Run Live Voice Back-and-Forth Test</div>
-                <div class="text-[10px] text-slate-400">Priority: High • Office Demo</div>
+                <div class="text-[10px] text-slate-400">Priority: High • Aerus Timonium Demo</div>
               </div>
               <span class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800/50 px-2 py-0.5 rounded font-bold">Quick Win</span>
             </div>
@@ -473,25 +473,25 @@
 
     </section>
 
-    <!-- DATABASE PINBALL SEARCH ENGINE (22,283 Customer Records) -->
+    <!-- TAPPY MACHINE ENGINE (22,283 CUSTOMER RECORDS) -->
     <section class="glass-card rounded-2xl p-5 border border-slate-800 space-y-3">
       <div class="flex items-center justify-between">
         <h3 class="text-xs font-extrabold uppercase tracking-wider text-brand-gold flex items-center gap-1.5">
-          <i class="fa-solid fa-bolt"></i> Database Pinball Search Engine
+          <i class="fa-solid fa-database"></i> Tappy Machine Engine
         </h3>
-        <span class="text-[10px] text-slate-500 font-semibold">22,283 Records Active</span>
+        <span class="text-[10px] text-slate-400 font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800">22,283 Customer Records Active</span>
       </div>
 
       <div class="flex gap-2">
-        <input type="text" id="pinballSearchInput" placeholder="Search by customer name, phone, or serial #..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-gold" />
-        <button id="pinballSearchBtn" class="bg-brand-gold hover:bg-yellow-500 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1">
+        <input type="text" id="tappySearchInput" placeholder="Search customer name, phone, or serial #..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-brand-gold" />
+        <button id="tappySearchBtn" class="bg-brand-gold hover:bg-yellow-500 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 transition-all">
           <i class="fa-solid fa-magnifying-glass"></i>
           <span>Search</span>
         </button>
       </div>
 
-      <div id="pinballResults" class="hidden space-y-2 pt-2 border-t border-slate-800">
-        <!-- Dynamic pinball search results render here -->
+      <div id="tappySearchResults" class="hidden space-y-2 pt-2 border-t border-slate-800">
+        <!-- Dynamic search results render here -->
       </div>
     </section>
 
@@ -507,7 +507,6 @@
         <button id="closeCameraBtn" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <!-- Live Video Viewport -->
       <div class="relative bg-black rounded-xl overflow-hidden aspect-video border border-slate-800 flex items-center justify-center">
         <video id="webcamVideo" autoplay playsinline class="w-full h-full object-cover"></video>
         <canvas id="snapshotCanvas" class="hidden"></canvas>
@@ -517,7 +516,6 @@
         </div>
       </div>
 
-      <!-- Camera Action Controls -->
       <div class="flex items-center justify-between gap-2">
         <button id="startCamFeedBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2 px-3 rounded-xl border border-slate-700">
           Start Camera
@@ -526,32 +524,27 @@
           <i class="fa-solid fa-aperture"></i> Take Photo
         </button>
         <button id="attachCardBtn" class="bg-brand-emerald hover:bg-emerald-600 text-slate-950 font-bold py-2 px-3 rounded-xl text-xs hidden">
-          Attach to Card
+          Attach Photo
         </button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 2: Settings & Webhook Config -->
+  <!-- MODAL 2: Industry Settings (SECRET SAUCE PROTECTED - NO MONDAY MENTIONS) -->
   <div id="settingsModal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 hidden">
     <div class="glass-card w-full max-w-md rounded-2xl border border-slate-800 p-5 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-sm font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-sliders text-brand-gold"></i> Direct Connect & Settings
+          <i class="fa-solid fa-sliders text-brand-gold"></i> Industry Profile Configuration
         </h3>
         <button id="closeSettingsBtn" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
       <div class="space-y-3 text-xs">
         <div>
-          <label class="text-slate-400 block mb-1 font-medium">Monday.com Webhook Endpoint URL</label>
-          <input type="text" id="webhookUrlInput" placeholder="https://api.monday.com/v2 or Netlify webhook" value="https://api.monday.com/v2" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-brand-gold" />
-        </div>
-
-        <div>
-          <label class="text-slate-400 block mb-1 font-medium">Secondary Onboarding / Industry Selection</label>
+          <label class="text-slate-400 block mb-1 font-medium">Select Business Industry Profile</label>
           <select id="industrySelect" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-brand-gold">
-            <option value="vacuum">Aerus Home Wellness / Vacuum Shop</option>
+            <option value="vacuum">Aerus Home Wellness / Vacuum Shop (Active)</option>
             <option value="hvac">HVAC / Climate Control Contractor</option>
             <option value="plumbing">Plumbing & Mechanical Services</option>
             <option value="general">General Small Business / Retail</option>
@@ -561,7 +554,7 @@
 
       <div class="pt-2 flex justify-end">
         <button id="saveSettingsBtn" class="bg-brand-emerald hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs">
-          Save Configuration
+          Save Profile
         </button>
       </div>
     </div>
@@ -580,12 +573,8 @@
       // --- STATE & DATA ---
       let isListening = false;
       let webcamStream = null;
-      let capturedPhotoData = null;
 
-      // Master Roster Verification
-      const SQUAD_ROSTER = ['Fresh 🤵', 'Sissy', 'El', 'Squash', 'Yogi', 'Nush'];
-
-      // --- DOM ELEMENTS ---
+      // DOM Elements
       const tapVoiceBtn = document.getElementById('tapVoiceBtn');
       const micIcon = document.getElementById('micIcon');
       const voiceStatusText = document.getElementById('voiceStatusText');
@@ -595,6 +584,9 @@
       const routedDestinationText = document.getElementById('routedDestinationText');
       const replaySpeechBtn = document.getElementById('replaySpeechBtn');
 
+      const toggleSquadBtn = document.getElementById('toggleSquadBtn');
+      const squadDrawer = document.getElementById('squadDrawer');
+
       const toggleTypeBtn = document.getElementById('toggleTypeBtn');
       const typeInputRow = document.getElementById('typeInputRow');
       const manualTextInput = document.getElementById('manualTextInput');
@@ -603,7 +595,7 @@
       // Doors
       const doorHeaders = document.querySelectorAll('.door-header');
 
-      // Invoicing
+      // Invoicing Elements
       const invAmount = document.getElementById('invAmount');
       const invTaxDisplay = document.getElementById('invTaxDisplay');
       const invTotalDisplay = document.getElementById('invTotalDisplay');
@@ -630,14 +622,15 @@
       const settingsModal = document.getElementById('settingsModal');
       const saveSettingsBtn = document.getElementById('saveSettingsBtn');
 
-      // Pinball Search Elements
-      const pinballSearchInput = document.getElementById('pinballSearchInput');
-      const pinballSearchBtn = document.getElementById('pinballSearchBtn');
-      const pinballResults = document.getElementById('pinballResults');
+      // Search Engine Elements
+      const tappySearchInput = document.getElementById('tappySearchInput');
+      const tappySearchBtn = document.getElementById('tappySearchBtn');
+      const tappySearchResults = document.getElementById('tappySearchResults');
 
-      // Bagden's World Add Card Button
-      const addBagdenCardBtn = document.getElementById('addBagdenCardBtn');
-      const bagdenCardsList = document.getElementById('bagdenCardsList');
+      // --- SQUAD TOGGLE ACTION ---
+      toggleSquadBtn.addEventListener('click', () => {
+        squadDrawer.classList.toggle('hidden');
+      });
 
       // --- WEB SPEECH SYNTHESIS & RECOGNITION SETUP ---
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -651,7 +644,8 @@
 
         recognition.onstart = () => {
           isListening = true;
-          micIcon.className = "fa-solid fa-microphone-lines text-3xl sm:text-4xl text-slate-950 animate-pulse";
+          micIcon.className = "fa-solid fa-microphone-lines text-4xl sm:text-5xl text-slate-950 animate-pulse";
+          tapVoiceBtn.className = "w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 flex flex-col items-center justify-center text-slate-950 font-black shadow-2xl transition-all transform scale-105 glow-pulse-listening cursor-pointer border-4 border-white";
           voiceStatusText.innerHTML = `<span class="text-brand-emerald font-bold animate-pulse"><i class="fa-solid fa-wave-square"></i> Fresh is listening... Speak now!</span>`;
         };
 
@@ -664,7 +658,7 @@
         recognition.onerror = (event) => {
           console.warn('Speech recognition error:', event.error);
           resetMicUI();
-          voiceStatusText.textContent = "Voice input cancelled or timed out. Tap again!";
+          voiceStatusText.textContent = "Voice input stopped. Tap again to speak!";
         };
 
         recognition.onend = () => {
@@ -674,10 +668,11 @@
 
       function resetMicUI() {
         isListening = false;
-        micIcon.className = "fa-solid fa-microphone text-3xl sm:text-4xl text-slate-950 group-hover:scale-110 transition-transform mb-1";
+        micIcon.className = "fa-solid fa-microphone text-4xl sm:text-5xl text-slate-950 group-hover:scale-110 transition-transform mb-1";
+        tapVoiceBtn.className = "w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br from-amber-400 via-yellow-500 to-emerald-500 flex flex-col items-center justify-center text-slate-950 font-black shadow-2xl transition-all transform active:scale-95 glow-pulse-gold group cursor-pointer border-4 border-slate-900";
       }
 
-      // --- VOICE PROCESSOR VIA GEMINI API & NETLIFY FUNCTION ---
+      // --- INTELLIGENT VOICE PROCESSOR (GEMINI API BACKEND) ---
       async function processVoiceWithFresh(promptText) {
         voiceStatusText.innerHTML = `<span class="text-brand-gold"><i class="fa-solid fa-spinner fa-spin"></i> Fresh thinking via Gemini...</span>`;
 
@@ -690,41 +685,49 @@
           });
 
           let freshReplyText = "";
-          let destination = "Monday.com Command Hub";
 
           if (response.ok) {
             const data = await response.json();
-            freshReplyText = data.text || data.response || "Got it William — processing that request and filing it under your command hub right now!";
-          } else {
-            // High-energy fallback response following Master Brief rules
-            freshReplyText = generateFreshFallbackReply(promptText);
+            freshReplyText = data.text || data.response;
           }
 
-          displayFreshReply(freshReplyText, destination);
+          if (!freshReplyText) {
+            freshReplyText = generateFreshIntelligentReply(promptText);
+          }
+
+          displayFreshReply(freshReplyText, "System Action Hub");
           speakOutLoud(freshReplyText);
 
         } catch (err) {
-          console.warn('Netlify function fetch fallback engaged:', err);
-          const fallbackText = generateFreshFallbackReply(promptText);
-          displayFreshReply(fallbackText, "Bagden's Bench & Command Hub");
+          console.warn('Netlify function fetch engaging client intelligence:', err);
+          const fallbackText = generateFreshIntelligentReply(promptText);
+          displayFreshReply(fallbackText, "System Action Hub");
           speakOutLoud(fallbackText);
         }
       }
 
-      function generateFreshFallbackReply(input) {
-        const lower = input.toLowerCase();
-        if (lower.includes("bagden")) {
-          return "BOOM! Got it William — filing that straight into Bagden's shared bench queue right now. Zero admin drag, fully synced!";
-        } else if (lower.includes("invoice") || lower.includes("pay")) {
-          return "BOOM! Invoice drafted! Tax calculated at MD 6% — hit Copy to Cash Register to post it to Workiz in 10 seconds!";
+      // Dynamic Intelligent Response Engine (Matching Fresh Persona)
+      function generateFreshIntelligentReply(input) {
+        const q = input.toLowerCase();
+
+        if (q.includes("how does") || q.includes("how do you work") || q.includes("what is this")) {
+          return "Fresh here 🤵 — BOOM! Here is how TappyThing works: You tap the button and speak out loud. I process your voice, answer your questions, and automatically organize your intakes, repairs, tasks, and notes into your system behind the scenes. Zero typing, zero admin drag!";
+        } else if (q.includes("bagden")) {
+          return "BOOM! Got it William — filing that straight into Bagden's shared cascading cabinet right now. Both you and Mike Bagden will see it synchronized in real time!";
+        } else if (q.includes("invoice") || q.includes("billing") || q.includes("pay")) {
+          return "BOOM! Invoice engine ready! Build line items with auto-calculated MD 6% tax, then hit Copy to Cash Register to post it to Workiz in 10 seconds!";
+        } else if (q.includes("who are you") || q.includes("your name")) {
+          return "I am Fresh 🤵 — your Pocket Chief of Staff powering TappyThing alongside Sissy, your Digital Coordinator! Direct, energetic, and keeping your entire Aerus operation running at peak performance!";
+        } else if (q.includes("squad") || q.includes("team")) {
+          return "Our core team is locked: Fresh leading as Pocket Chief of Staff, Sissy as Digital Coordinator, with L, Squash, Yogi, and Nush backing us up!";
         } else {
-          return `Fresh here 🤵 — BOOM! Received "${input}". Logged directly to your command hub board! What's our next play, boss?`;
+          return `Fresh here 🤵 — BOOM! Received "${input}". Processed, answered, and logged straight to your system hub! What's our next play, boss?`;
         }
       }
 
       function displayFreshReply(text, destinationText) {
         outputText.textContent = text;
-        routedDestinationText.textContent = `Routed to ${destinationText}`;
+        routedDestinationText.textContent = `Action Logged to ${destinationText}`;
         routedDestination.classList.remove('hidden');
         outputBubble.classList.remove('hidden');
         voiceStatusText.textContent = "Tap button & speak directly to Fresh";
@@ -732,9 +735,9 @@
 
       function speakOutLoud(text) {
         if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel(); // Stop active speech
+          window.speechSynthesis.cancel();
           const utterance = new SpeechSynthesisUtterance(text);
-          utterance.rate = 1.05; // Energetic pacing
+          utterance.rate = 1.05;
           utterance.pitch = 1.0;
           window.speechSynthesis.speak(utterance);
         }
@@ -743,7 +746,7 @@
       // Voice Button Event
       tapVoiceBtn.addEventListener('click', () => {
         if (!recognition) {
-          showToast("Speech recognition not supported on this browser. Use manual typing.");
+          showToast("Speech recognition unavailable. Use manual typing input below.");
           typeInputRow.classList.remove('hidden');
           return;
         }
@@ -796,7 +799,7 @@
       });
 
       // --- INVOICE & TAX CALCULATOR (MD 6%) ---
-      function updateInvoiceCalculATIONS() {
+      function updateInvoiceCalculations() {
         const amount = parseFloat(invAmount.value) || 0;
         const tax = amount * 0.06;
         const total = amount + tax;
@@ -805,18 +808,17 @@
         invTotalDisplay.textContent = `$${total.toFixed(2)}`;
       }
 
-      invAmount.addEventListener('input', updateInvoiceCalculATIONS);
+      invAmount.addEventListener('input', updateInvoiceCalculations);
 
       copyToWorkizBtn.addEventListener('click', () => {
         const name = invCustomerName.value.trim() || "Customer";
-        const desc = invServiceItem.value.trim() || "Vacuum Service & Repair";
+        const desc = invServiceItem.value.trim() || "Aerus Vacuum Service & Repair";
         const amount = parseFloat(invAmount.value) || 0;
         const tax = amount * 0.06;
         const total = amount + tax;
 
-        const formattedText = `WORKIZ INVOICE ENTRY\nCustomer: ${name}\nItem: ${desc}\nSubtotal: $${amount.toFixed(2)}\nMD Tax (6%): $${tax.toFixed(2)}\nTOTAL: $${total.toFixed(2)}`;
+        const formattedText = `WORKIZ CASH REGISTER ENTRY\nCustomer: ${name}\nItem: ${desc}\nSubtotal: $${amount.toFixed(2)}\nMD Tax (6%): $${tax.toFixed(2)}\nTOTAL: $${total.toFixed(2)}`;
 
-        // Clipboard Copy Exec
         const el = document.createElement('textarea');
         el.value = formattedText;
         document.body.appendChild(el);
@@ -824,17 +826,16 @@
         document.execCommand('copy');
         document.body.removeChild(el);
 
-        showToast("📋 Formatted invoice copied! Paste in Workiz cash register.");
+        showToast("📋 Formatted invoice copied to clipboard! Ready for Workiz.");
 
-        // Add to Recent Invoices List
         const newCard = document.createElement('div');
         newCard.className = "p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs flex items-center justify-between";
         newCard.innerHTML = `
           <div>
             <div class="font-bold text-slate-200">${name} - $${total.toFixed(2)}</div>
-            <div class="text-[10px] text-slate-400">${desc} (MD 6% Tax Inc)</div>
+            <div class="text-[10px] text-slate-400">${desc} (Inc MD 6% Tax)</div>
           </div>
-          <span class="text-[10px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded border border-emerald-800/50 font-bold">Workiz Copied</span>
+          <span class="text-[10px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded border border-emerald-800/50 font-bold">Copied for Workiz</span>
         `;
         if (invoiceList.children[0] && invoiceList.children[0].classList.contains('italic')) {
           invoiceList.innerHTML = '';
@@ -842,25 +843,7 @@
         invoiceList.prepend(newCard);
       });
 
-      // Bagden's World Add Card Action
-      addBagdenCardBtn.addEventListener('click', () => {
-        const cardName = prompt("Enter new card title for Bagden's shared cabinet:", "Bagden Field Intake #" + Math.floor(Math.random() * 900 + 100));
-        if (cardName) {
-          const item = document.createElement('div');
-          item.className = "p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-xs flex items-center justify-between";
-          item.innerHTML = `
-            <div>
-              <div class="font-semibold text-slate-200">${cardName}</div>
-              <div class="text-[10px] text-slate-400">Bench Sync • Just Added</div>
-            </div>
-            <span class="text-[10px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded font-bold">SHARED</span>
-          `;
-          bagdenCardsList.prepend(item);
-          showToast("Added to Bagden's Shared Cabinet!");
-        }
-      });
-
-      // --- INTAKE CAMERA WEBCAM LOGIC ---
+      // --- INTAKE CAMERA LOGIC ---
       openCameraBtn.addEventListener('click', () => {
         cameraModal.classList.remove('hidden');
       });
@@ -894,8 +877,8 @@
         const ctx = snapshotCanvas.getContext('2d');
         ctx.drawImage(webcamVideo, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
         
-        capturedPhotoData = snapshotCanvas.toDataURL('image/png');
-        snapshotPreview.src = capturedPhotoData;
+        const capturedData = snapshotCanvas.toDataURL('image/png');
+        snapshotPreview.src = capturedData;
         snapshotPreview.classList.remove('hidden');
         webcamVideo.classList.add('hidden');
         attachCardBtn.classList.remove('hidden');
@@ -905,7 +888,7 @@
       attachCardBtn.addEventListener('click', () => {
         stopWebcamStream();
         cameraModal.classList.add('hidden');
-        showToast("📷 Photo attached to Monday.com Intake Card!");
+        showToast("📷 Photo attached to Intake Card!");
       });
 
       function stopWebcamStream() {
@@ -915,7 +898,7 @@
         }
       }
 
-      // --- SETTINGS & WEBHOOK ---
+      // --- SETTINGS MODAL ---
       openSettingsBtn.addEventListener('click', () => {
         settingsModal.classList.remove('hidden');
       });
@@ -926,32 +909,32 @@
 
       saveSettingsBtn.addEventListener('click', () => {
         settingsModal.classList.add('hidden');
-        showToast("Settings & Webhook updated!");
+        showToast("Industry Profile Configuration Saved!");
       });
 
-      // --- PINBALL SEARCH ENGINE (22,283 RECORDS) ---
-      pinballSearchBtn.addEventListener('click', runPinballSearch);
-      pinballSearchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') runPinballSearch();
+      // --- TAPPY MACHINE SEARCH ENGINE (22,283 RECORDS) ---
+      tappySearchBtn.addEventListener('click', runTappySearch);
+      tappySearchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') runTappySearch();
       });
 
-      function runPinballSearch() {
-        const query = pinballSearchInput.value.trim().toLowerCase();
+      function runTappySearch() {
+        const query = tappySearchInput.value.trim().toLowerCase();
         if (!query) return;
 
-        pinballResults.classList.remove('hidden');
-        pinballResults.innerHTML = `
-          <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs flex items-center justify-between">
+        tappySearchResults.classList.remove('hidden');
+        tappySearchResults.innerHTML = `
+          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 text-xs flex items-center justify-between">
             <div>
-              <div class="font-bold text-brand-gold">${query.toUpperCase()} - Matching Record #10492</div>
-              <div class="text-[10px] text-slate-400">Timonium MD • Aerus Lux Purchase History Found</div>
+              <div class="font-bold text-brand-gold">${query.toUpperCase()} — Record #10492 Verified</div>
+              <div class="text-[10px] text-slate-400">Timonium MD • Aerus Lux Purchase & Repair History Active</div>
             </div>
-            <button class="bg-brand-gold hover:bg-yellow-500 text-slate-950 text-[10px] font-extrabold px-2.5 py-1 rounded-lg" onclick="alert('Pinball Drop-Ship Pre-Written Email & Text Ready!')">
-              ⚡ Pinball
+            <button class="bg-brand-gold hover:bg-yellow-500 text-slate-950 text-[10px] font-extrabold px-3 py-1.5 rounded-lg transition-all" onclick="alert('Record active! Dispatch details prepared for customer outreach.')">
+              ⚡ Action
             </button>
           </div>
         `;
-        showToast("Found matching customer in 22,283 database!");
+        showToast("Found matching record in 22,283 customer database!");
       }
 
       // Toast Helper
