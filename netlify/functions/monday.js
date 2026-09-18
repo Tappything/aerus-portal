@@ -52,7 +52,12 @@ exports.handler = async (event) => {
         try {
           const parsed = JSON.parse(data);
           const groups = parsed.data?.boards?.[0]?.groups || [];
-          const targetGroups = groups;
+          const targetGroups = groups.filter(g =>
+    g.title.toLowerCase().includes("bagdon") ||
+    g.title.toLowerCase().includes("ready wall") ||
+    g.title.toLowerCase().includes("workbench") ||
+    g.title.toLowerCase().includes("intake")
+);
           resolve({
             statusCode: 200,
             headers: { 'Content-Type': 'application/json' },
