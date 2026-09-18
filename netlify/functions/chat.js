@@ -6,28 +6,27 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { prompt } = JSON.parse(event.body || '{}');
+    const body = JSON.parse(event.body || '{}');
+    const prompt = body.prompt || body.message || '';
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
       return {
         statusCode: 200,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reply: "API key missing in Netlify settings." })
+        body: JSON.stringify({ reply: "API key missing." })
       };
     }
 
-    const systemPrompt = "You are Fresh, a high-energy Digital Coordinator and Pocket Chief of Staff for William Sullivan at Aerus Home Wellness in Timonium MD. You are direct, punchy, motivational, and deeply practical. Keep responses to 2-3 short sentences maximum. Fifth grade clarity always. Zero fluff.";
+    const fullPrompt = "You are Fresh, a high-energy Digital Coordinator for William Sullivan at Aerus Home Wellness Timonium MD. Be direct, punchy, motivational. Max 2 sentences. No fluff.\n\nWilliam says: " + prompt;
 
     const postData = JSON.stringify({
-      contents: [{
-        parts: [{ text: systemPrompt + "\n\nUser said: " + prompt }]
-      }],
-      generationConfig: { temperature: 0.7, maxOutputTokens: 150 }
+      contents: [{ parts: [{ text: fullPrompt }] }],
+      generationConfig: { temperature: 0.7, maxOutputTokens: 100 }
     });
 
     return new Promise((resolve) => {
-      const options = {
+      const req = https.request({
         hostname: 'generativelanguage.googleapis.com',
         path: '/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey,
         method: 'POST',
@@ -35,38 +34,34 @@ exports.handler = async (event) => {
           'Content-Type': 'application/json',
           'Content-Length': Buffer.byteLength(postData)
         }
-      };
-
-      const req = https.request(options, (res) => {
+      }, (res) => {
         let data = '';
         res.on('data', (chunk) => data += chunk);
         res.on('end', () => {
           try {
             const parsed = JSON.parse(data);
-            const reply = parsed.candidates[0].content.parts[0].text || "Got it Chief! What is the next play?";
+            const reply = parsed.candidates[0].content.parts[0].text;
             resolve({
               statusCode: 200,
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ reply: reply })
+              body: JSON.stringify({ reply: reply.trim() })
             });
           } catch(e) {
             resolve({
               statusCode: 200,
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ reply: "Fresh is processing! Try again in one second." })
+              body: JSON.stringify({ reply: "Loud and clear Chief! What is the next play?" })
             });
           }
         });
       });
-
-      req.on('error', (e) => {
+      req.on('error', () => {
         resolve({
           statusCode: 200,
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reply: "Connection error. Check Netlify logs." })
+          body: JSON.stringify({ reply: "Loud and clear Chief! What is the next play?" })
         });
       });
-
       req.write(postData);
       req.end();
     });
@@ -75,7 +70,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reply: "Fresh is ready! Send your message again." })
+      body: JSON.stringify({ reply: "Loud and clear Chief! What is the next play?" })
     };
   }
 };
