@@ -245,75 +245,120 @@
         </section>
     </main>
     <script>
-        function calculateTax() {
-            const s = parseFloat(document.getElementById("subtotalInput").value) || 0;
-            document.getElementById("taxResult").innerText = "$" + (s * 0.06).toFixed(2);
-            document.getElementById("totalResult").innerText = "$" + (s * 1.06).toFixed(2);
+let lastReply = '';
+
+async function sendToFresh() {
+    const prompt = document.getElementById('promptInput').value.trim();
+    if (!prompt) return;
+    const replyEl = document.getElementById('freshReply');
+    replyEl.textContent = 'Fresh is thinking...';
+    try {
+        const res = await fetch('/.netlify/functions/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: prompt })
+        });
+        const data = await res.json();
+        lastReply = data.reply || 'Fresh had nothing to say!';
+        replyEl.textContent = lastReply;
+        if (window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+            const utter = new SpeechSynthesisUtterance(lastReply);
+            window.speechSynthesis.speak(utter);
         }
-        function printInvoice() {
-            const s = document.getElementById("subtotalInput").value || "0.00";
-            const tax = (parseFloat(s) * 0.06).toFixed(2);
-            const total = (parseFloat(s) * 1.06).toFixed(2);
-            const w = window.open("","","height=500,width=600");
-            w.document.write("<html><head><title>Invoice</title></head><body style='font-family:Arial;padding:30px'><h2>AERUS HOME WELLNESS</h2><p>Timonium MD - Clean Environment LLC</p><hr><h3>CUSTOMER INVOICE</h3><p><b>Subtotal:</b> $"+s+"</p><p><b>MD Tax (6%):</b> $"+tax+"</p><h3><b>Total Due: $"+total+"</b></h3><hr><p>Thank you for your business!</p></body></html>");
-            w.document.close();
-            w.print();
+    } catch(err) {
+        replyEl.textContent = 'Error: ' + err.message;
+    }
+}
+
+function repeatSpeech() {
+    if (!lastReply) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(lastReply);
+    window.speechSynthesis.speak(utter);
+}
+
+let recognition;
+function toggleVoiceIntake() {
+    const btn = document.getElementById('micBtn');
+    const status = document.getElementById('voiceStatus');
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+        status.textContent = 'Voice not supported in this browser.';
+        return;
+    }
+    if (!recognition) {
+        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.onresult = (e) => {
+            document.getElementById('promptInput').value = e.results[0][0].transcript;
+            status.textContent = 'Tap to speak directly to Fresh — Voice Intake Active';
+            btn.classList.remove('bg-red-600');
+            btn.classList.add('bg-blue-600');
+            sendToFresh();
+        };
+        recognition.onerror = () => {
+            status.textContent = 'Tap to speak directly to Fresh — Voice Intake Active';
+            btn.classList.remove('bg-red-600');
+            btn.classList.add('bg-blue-600');
+        };
+    }
+    recognition.start();
+    btn.classList.remove('bg-blue-600');
+    btn.classList.add('bg-red-600');
+    status.textContent = 'Listening... speak now!';
+}
+
+function calculateTax() {
+    const sub = parseFloat(document.getElementById('subtotalInput').value) || 0;
+    const tax = sub * 0.06;
+    const total = sub + tax;
+    document.getElementById('taxResult').textContent = '
+
+**Commit → Netlify deploys → Fresh talks for real!** 🎉
+
+Go do it — you've got 15 minutes! 👍 + tax.toFixed(2);
+    const totalEl = document.getElementById('totalResult');
+    if (totalEl) totalEl.textContent = '
+
+**Commit → Netlify deploys → Fresh talks for real!** 🎉
+
+Go do it — you've got 15 minutes! 👍 + total.toFixed(2);
+}
+
+function searchVault() {
+    const q = document.getElementById('vaultSearchInput').value.toLowerCase();
+    const results = document.getElementById('searchResults');
+    if (!q) return;
+    results.innerHTML = '<p class="text-gray-500 text-xs text-center py-2">Searching vault...</p>';
+}
+
+async function loadMondayData() {
+    const container = document.getElementById('mondayCards');
+    container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">Loading live board data...</p>';
+    try {
+        const res = await fetch('/.netlify/functions/monday');
+        const data = await res.json();
+        if (!data.items || data.items.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">No items found.</p>';
+            return;
         }
-        let recognition, isListening = false, currentReplyText = "Fresh is online and ready!";
-        if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
-            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SR();
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.onstart = () => { isListening = true; document.getElementById("voiceStatus").innerText = "Listening... Speak now!"; document.getElementById("micBtn").classList.add("bg-red-600"); };
-            recognition.onresult = (e) => { const t = e.results[0][0].transcript; document.getElementById("promptInput").value = t; document.getElementById("voiceStatus").innerText = "Voice captured! Sending to Fresh..."; sendToFresh(); };
-            recognition.onerror = () => { stopMic(); };
-            recognition.onend = () => { stopMic(); };
-        }
-        function toggleVoiceIntake() { if (!recognition) return; isListening ? recognition.stop() : recognition.start(); }
-        function stopMic() { isListening = false; document.getElementById("micBtn").classList.remove("bg-red-600"); document.getElementById("voiceStatus").innerText = "Tap to speak directly to Fresh — Voice Intake Active"; }
-        function speakResponse(text) { if ("speechSynthesis" in window) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.rate = 1.0; u.pitch = 1.0; window.speechSynthesis.speak(u); } }
-        function repeatSpeech() { speakResponse(currentReplyText); }
-        async function sendToFresh() {
-            const p = document.getElementById("promptInput").value.trim();
-            if (!p) return;
-            const el = document.getElementById("freshReply");
-            el.innerText = "Fresh is thinking...";
-            try {
-                const res = await fetch("/.netlify/functions/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: p }) });
-                const data = await res.json();
-                const reply = data.reply || "Done Chief! Next play?";
-                currentReplyText = reply;
-                el.innerText = reply;
-                speakResponse(reply);
-            } catch(err) {
-                const msg = "Fresh connection error. Check Netlify logs!";
-                el.innerText = msg;
-                speakResponse(msg);
-            }
-        }
-        async function loadMondayData() {
-            const c = document.getElementById("mondayCards");
-            c.innerHTML = "<p class='text-gray-500 text-xs py-2 text-center'>Loading live board data...</p>";
-            try {
-                const res = await fetch("/.netlify/functions/monday");
-                const data = await res.json();
-                if (data.error) { c.innerHTML = "<p class='text-red-400 text-xs py-2'>Error: " + data.error + "</p>"; return; }
-                const groups = data.groups || [];
-                if (groups.length === 0) { c.innerHTML = "<p class='text-gray-500 text-xs py-2 text-center'>No active jobs found.</p>"; return; }
-                c.innerHTML = "";
-                groups.forEach(g => { g.items_page.items.forEach(item => { const color = g.title.toLowerCase().includes("ready") ? "text-emerald-400" : "text-amber-400"; c.innerHTML += "<div class='p-3 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center'><span class='text-gray-300'>" + item.name + "</span><span class='" + color + " font-semibold text-xs'>" + g.title + "</span></div>"; }); });
-            } catch(err) { c.innerHTML = "<p class='text-red-400 text-xs py-2 text-center'>Board connection error.</p>"; }
-        }
-        function searchVault() {
-            const q = document.getElementById("vaultSearchInput").value.toLowerCase();
-            const r = document.getElementById("searchResults");
-            const recs = [{name:"Eugene Gumenick",addr:"104 Gittings Ave",status:"Bench Queue",cls:"text-blue-400"},{name:"Susan Bratten",addr:"113 Bellemore Rd",status:"Active Customer",cls:"text-emerald-400"},{name:"Pat Moore",addr:"Edgewood MD 21040",status:"Rescheduled",cls:"text-amber-400"},{name:"Jeanette Del Souza",addr:"Bagdon Bench",status:"In Service",cls:"text-purple-400"}];
-            const f = recs.filter(x => x.name.toLowerCase().includes(q) || x.addr.toLowerCase().includes(q));
-            if (!f.length) { r.innerHTML = "<p class='text-gray-500 text-xs py-2'>No records found.</p>"; return; }
-            r.innerHTML = f.map(x => "<div class='p-2 rounded bg-gray-900/60 border border-gray-800 flex justify-between items-center'><div><p class='font-bold text-gray-200'>" + x.name + "</p><p class='text-gray-500 text-[10px]'>" + x.addr + "</p></div><span class='text-[10px] " + x.cls + " font-semibold'>" + x.status + "</span></div>").join("");
-        }
-        window.addEventListener("load", loadMondayData);
-    </script>
-</body>
+        container.innerHTML = data.items.map(item => `
+            <div class="p-2 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+                <span class="text-gray-200 font-medium">${item.name}</span>
+                <span class="text-xs text-blue-400">${item.group || ''}</span>
+            </div>
+        `).join('');
+    } catch(e) {
+        container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">Could not load board data.</p>';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadMondayData();
+    document.getElementById('promptInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendToFresh(); }
+    });
+});
+</script>
 </html>
