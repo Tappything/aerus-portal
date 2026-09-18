@@ -1,78 +1,70 @@
 const https = require('https');
 
-exports.handler = async (event) => {
+exports.handler = function(event, context, callback) {
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+    return callback(null, { statusCode: 405, body: 'Method Not Allowed' });
   }
 
-  try {
-    const body = JSON.parse(event.body || '{}');
-    const prompt = body.prompt || body.message || '';
-    const apiKey = process.env.GEMINI_API_KEY;
+  var body = JSON.parse(event.body || '{}');
+  var prompt = body.prompt || body.message || '';
+  var apiKey = process.env.GEMINI_API_KEY;
 
-    if (!apiKey) {
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reply: "API key missing." })
-      };
-    }
-
-    const fullPrompt = "You are Fresh 🤵 — a sharp, intelligent AI business coordinator for TappyThing, created by William Sullivan. You help small business owners solve real problems, stay organized, and move fast. Be conversational, specific, and genuinely helpful. Give real thoughtful answers. Never use catchphrases or canned responses.\n\nUser message: " + prompt;
-
-    const postData = JSON.stringify({
-      contents: [{ parts: [{ text: fullPrompt }] }],
-      generationConfig: { temperature: 0.9, maxOutputTokens: 500 }
-    });
-
-    return new Promise((resolve) => {
-      const req = https.request({
-        hostname: 'generativelanguage.googleapis.com',
-        path: '/v1beta/models/gemini-3.6-flash:generateContent?key=' + apiKey,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-goog-api-key': apiKey,
-          'Content-Length': Buffer.byteLength(postData)
-        }
-      }, (res) => {
-        let data = '';
-        res.on('data', (chunk) => data += chunk);
-        res.on('end', () => {
-          try {
-            const parsed = JSON.parse(data);
-            const reply = parsed.candidates[0].content.parts[0].text;
-            resolve({
-              statusCode: 200,
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ reply: reply.trim() })
-            });
-          } catch(e) {
-            resolve({
-              statusCode: 200,
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ reply: "DEBUG: " + data.substring(0, 300) })
-            });
-          }
-        });
-      });
-      req.on('error', (e) => {
-        resolve({
-          statusCode: 200,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reply: "ERROR: " + e.message })
-        });
-      });
-      req.write(postData);
-      req.end();
-    });
-
-  } catch(err) {
-    return {
+  if (!apiKey) {
+    return callback(null, {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reply: "CATCH: " + err.message })
-    };
+      body: JSON.stringify({ reply: 'API key missing.' })
+    });
   }
+
+  var fullPrompt = 'You are Fresh, a sharp Digital Coordinator for William Sullivan at Aerus Home Wellness in Timonium MD. Be direct, helpful, and energetic. Max 3 sentences. User says: ' + prompt;
+
+  var postData = JSON.stringify({
+    contents: [{ parts: [{ text: fullPrompt }] }],
+    generationConfig: { temperature: 0.9, maxOutputTokens: 200 }
+  });
+
+  var options = {
+    hostname: 'generativelanguage.googleapis.com',
+    path: '/v1beta/models/gemini-3.6-flash:generateContent?key=' + apiKey,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-goog-api-key': apiKey,
+      'Content-Length': Buffer.byteLength(postData)
+    }
+  };
+
+  var req = https.request(options, function(res) {
+    var data = '';
+    res.on('data', function(chunk) { data += chunk; });
+    res.on('end', function() {
+      try {
+        var parsed = JSON.parse(data);
+        var reply = parsed.candidates[0].content.parts[0].text;
+        callback(null, {
+          statusCode: 200,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reply: reply.trim() })
+        });
+      } catch(e) {
+        callback(null, {
+          statusCode: 200,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reply: 'ERROR: ' + data.substring(0, 200) })
+        });
+      }
+    });
+  });
+
+  req.on('error', function(e) {
+    callback(null, {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reply: 'Connection error: ' + e.message })
+    });
+  });
+
+  req.write(postData);
+  req.end();
 };
-Only thing that changed — gemini-2.0-flash → gemini-3.6-flash
