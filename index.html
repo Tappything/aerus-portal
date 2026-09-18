@@ -1,362 +1,293 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TappyThing — Digital Coordinator Command Center</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: "Inter", sans-serif; background-color: #0b0f19; color: #f3f4f6; }
-        .glow-card { background: rgba(17,24,39,0.75); backdrop-filter: blur(14px); border: 1px solid rgba(59,130,246,0.25); box-shadow: 0 8px 32px 0 rgba(0,0,0,0.45); transition: all 0.3s ease; }
-        .glow-card-emerald { border-color: rgba(16,185,129,0.25); }
-        .glow-card-purple { border-color: rgba(168,85,247,0.25); }
-        .glow-card-amber { border-color: rgba(245,158,11,0.25); }
-        .glow-button { background: linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%); box-shadow: 0 0 15px rgba(37,99,235,0.5); }
-        .mic-pulse { animation: pulse 2s infinite; }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(59,130,246,0.7); }
-            70% { box-shadow: 0 0 0 22px rgba(59,130,246,0); }
-            100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TappyThing</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body{font-family:sans-serif;background-color:#0b0f19;color:#f3f4f6}
+.glow-card{background:rgba(17,24,39,0.75);border:1px solid rgba(59,130,246,0.25);box-shadow:0 8px 32px 0 rgba(0,0,0,0.45)}
+.glow-card-emerald{border-color:rgba(16,185,129,0.25)}
+.glow-card-purple{border-color:rgba(168,85,247,0.25)}
+.glow-card-amber{border-color:rgba(245,158,11,0.25)}
+.glow-button{background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);box-shadow:0 0 15px rgba(37,99,235,0.5)}
+.mic-pulse{animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(59,130,246,0.7)}70%{box-shadow:0 0 0 22px rgba(59,130,246,0)}100%{box-shadow:0 0 0 0 rgba(59,130,246,0)}}
+</style>
 </head>
 <body class="min-h-screen pb-16">
-    <nav class="border-b border-gray-800 bg-gray-900/90 sticky top-0 z-50 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xl shadow-lg shadow-blue-500/30">🤵</div>
-                <div>
-                    <h1 class="font-extrabold text-lg text-white tracking-wide">Fresh <span class="text-xs px-2 py-0.5 rounded bg-blue-900/80 text-blue-300 font-normal border border-blue-700">Pocket Chief of Staff</span></h1>
-                    <p class="text-xs text-gray-400">Sissy: Digital Coordinator • Aerus Home Wellness Timonium</p>
-                </div>
-            </div>
-            <div class="flex items-center space-x-4">
-                <div class="hidden sm:flex items-center space-x-3 bg-gray-800/80 px-3 py-1.5 rounded-lg border border-gray-700 text-xs">
-                    <span class="text-gray-400">Vault: <strong class="text-blue-400">22,283</strong></span>
-                    <span class="text-gray-600">|</span>
-                    <span class="text-gray-400">Assets: <strong class="text-emerald-400">1,090</strong></span>
-                </div>
-                <button class="bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-2">
-                    <i class="fa-solid fa-users text-blue-400"></i><span>The Squad</span>
-                </button>
-            </div>
-        </div>
-    </nav>
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
-        <section class="glow-card rounded-2xl p-6 text-center border border-blue-500/30 relative overflow-hidden">
-            <div class="absolute -top-24 -left-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="flex flex-col items-center justify-center">
-                <button id="micBtn" onclick="toggleVoiceIntake()" class="w-24 h-24 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-3xl shadow-xl transition-all duration-300 mic-pulse mb-3">
-                    <i class="fa-solid fa-microphone" id="micIcon"></i>
-                </button>
-                <p class="text-xs text-gray-400 font-medium mb-3" id="voiceStatus">Tap to speak directly to Fresh — Voice Intake Active</p>
-                <div class="flex items-center justify-center space-x-2 mb-4">
-                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Voice Output Engaged</span>
-                </div>
-                <div class="w-full max-w-2xl bg-gray-900/90 border border-gray-700 rounded-xl p-3 text-left mb-3">
-                    <div class="text-xs text-gray-500 font-semibold mb-1">YOU SAY:</div>
-                    <textarea id="promptInput" rows="2" class="w-full bg-transparent text-gray-100 text-sm focus:outline-none resize-none" placeholder="Tap microphone to speak, or type your message here..."></textarea>
-                </div>
-                <button onclick="sendToFresh()" class="w-full max-w-2xl glow-button py-3 rounded-xl font-bold text-white tracking-wide transition flex items-center justify-center space-x-2 text-sm">
-                    <i class="fa-solid fa-paper-plane"></i><span>SEND TO FRESH 🚀</span>
-                </button>
-                <div class="w-full max-w-2xl bg-blue-950/40 border border-blue-800/50 rounded-xl p-4 text-left mt-4">
-                    <div class="text-xs text-blue-400 font-semibold mb-1 flex items-center justify-between">
-                        <div class="flex items-center space-x-2">
-                            <span>FRESH 🤵</span>
-                            <span class="text-blue-300 font-normal">(Voice Engine Online)</span>
-                        </div>
-                        <button onclick="repeatSpeech()" class="text-gray-400 hover:text-white text-xs">
-                            <i class="fa-solid fa-volume-high"></i> Play Again
-                        </button>
-                    </div>
-                    <p id="freshReply" class="text-sm text-gray-200 font-medium leading-relaxed">Fresh is online and ready for you!</p>
-                </div>
-            </div>
-        </section>
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <section class="lg:col-span-2 glow-card glow-card-amber rounded-2xl p-5">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center space-x-2">
-                        <i class="fa-solid fa-calendar-day text-amber-400"></i>
-                        <h2 class="font-bold text-sm text-gray-200 uppercase tracking-wider">Active Schedule</h2>
-                    </div>
-                    <span class="text-xs bg-amber-950/60 text-amber-300 border border-amber-800/60 px-2.5 py-1 rounded-full font-semibold">2 Stops Today</span>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-gray-900/80 rounded-xl p-4 border border-gray-800 flex justify-between items-start">
-                        <div>
-                            <div class="flex items-center space-x-2 mb-1">
-                                <span class="text-xs font-bold px-2 py-0.5 rounded bg-blue-900 text-blue-300">PICKUP LOGGED</span>
-                                <span class="text-xs text-gray-400">Stop 1</span>
-                            </div>
-                            <h3 class="font-bold text-white text-base">Eugene Gumenick</h3>
-                            <p class="text-xs text-gray-400">104 Gittings Ave, Baltimore MD 21212</p>
-                            <p class="text-xs text-amber-400/90 mt-2 font-medium"><i class="fa-solid fa-wrench mr-1"></i>Cord &amp; Cord Winder Check</p>
-                        </div>
-                        <a href="tel:4104930223" class="w-8 h-8 rounded-lg bg-gray-800 border border-gray-700 flex items-center justify-center text-blue-400">
-                            <i class="fa-solid fa-phone text-xs"></i>
-                        </a>
-                    </div>
-                    <div class="bg-gray-900/80 rounded-xl p-4 border border-gray-800 flex justify-between items-start">
-                        <div>
-                            <div class="flex items-center space-x-2 mb-1">
-                                <span class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-900 text-emerald-300">DELIVERED &amp; PAID</span>
-                                <span class="text-xs text-gray-400">Stop 2 • 3:30 PM</span>
-                            </div>
-                            <h3 class="font-bold text-white text-base">Susan Bratten</h3>
-                            <p class="text-xs text-gray-400">113 Bellemore Rd, Baltimore MD 21210</p>
-                            <p class="text-xs text-emerald-400/90 mt-2 font-medium"><i class="fa-solid fa-check-circle mr-1"></i>Payment Collected</p>
-                        </div>
-                        <a href="tel:4436768088" class="w-8 h-8 rounded-lg bg-gray-800 border border-gray-700 flex items-center justify-center text-blue-400">
-                            <i class="fa-solid fa-phone text-xs"></i>
-                        </a>
-                    </div>
-                </div>
-            </section>
-            <section class="glow-card rounded-2xl p-5">
-                <div class="flex items-center space-x-2 mb-3">
-                    <i class="fa-solid fa-database text-blue-400"></i>
-                    <h2 class="font-bold text-sm text-gray-200 uppercase tracking-wider">Vault Fast Lookup</h2>
-                </div>
-                <div class="relative mb-3">
-                    <input type="text" id="vaultSearchInput" onkeyup="searchVault()" placeholder="Search 22,283 records..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 pl-8">
-                    <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-xs text-gray-500"></i>
-                </div>
-                <div id="searchResults" class="space-y-2 text-xs max-h-36 overflow-y-auto">
-                    <div class="p-2 rounded bg-gray-900/60 border border-gray-800 flex justify-between items-center">
-                        <div><p class="font-bold text-gray-200">Eugene Gumenick</p><p class="text-gray-500 text-[10px]">104 Gittings Ave</p></div>
-                        <span class="text-[10px] text-blue-400 font-semibold">Bench Queue</span>
-                    </div>
-                    <div class="p-2 rounded bg-gray-900/60 border border-gray-800 flex justify-between items-center">
-                        <div><p class="font-bold text-gray-200">Susan Bratten</p><p class="text-gray-500 text-[10px]">113 Bellemore Rd</p></div>
-                        <span class="text-[10px] text-emerald-400 font-semibold">Active Customer</span>
-                    </div>
-                </div>
-            </section>
-        </div>
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="glow-card rounded-2xl p-5 border border-blue-500/20">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-9 h-9 rounded-xl bg-blue-900/50 border border-blue-700/50 flex items-center justify-center text-blue-400">
-                            <i class="fa-solid fa-briefcase"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-100">Business World</h3>
-                            <p class="text-xs text-gray-400">Live Shop Ops &amp; Workbench Queue</p>
-                        </div>
-                    </div>
-                    <button onclick="loadMondayData()" class="text-xs text-blue-400 hover:text-blue-300 px-2 py-1 rounded border border-blue-800/50">
-                        <i class="fa-solid fa-rotate-right"></i> Refresh
-                    </button>
-                </div>
-                <div id="mondayCards" class="space-y-2 text-xs">
-                    <p class="text-gray-500 text-xs py-2 text-center">Loading live board data...</p>
-                </div>
-            </div>
-            <div class="glow-card glow-card-emerald rounded-2xl p-5">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-9 h-9 rounded-xl bg-emerald-900/50 border border-emerald-700/50 flex items-center justify-center text-emerald-400">
-                            <i class="fa-solid fa-user"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-100">Personal World</h3>
-                            <p class="text-xs text-gray-400">Personal Tasks, Notes &amp; Focus</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="space-y-2 text-xs">
-                    <div class="p-3 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
-                        <span class="text-gray-300">Eda Home Checklist</span>
-                        <span class="text-emerald-400 font-semibold">TV Setup Active</span>
-                    </div>
-                    <div class="p-3 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
-                        <span class="text-gray-300">Personal Vault</span>
-                        <span class="text-gray-400">Locked &amp; Separate</span>
-                    </div>
-                </div>
-            </div>
-            <div class="glow-card glow-card-purple rounded-2xl p-5">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-9 h-9 rounded-xl bg-purple-900/50 border border-purple-700/50 flex items-center justify-center text-purple-400">
-                            <i class="fa-solid fa-receipt"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-100">Cash Register &amp; Invoices</h3>
-                            <p class="text-xs text-gray-400">MD 6% Tax Calculator &amp; Print Invoice</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-900/90 rounded-xl p-4 border border-gray-800 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <label class="text-xs text-gray-400">Subtotal ($)</label>
-                        <input type="number" id="subtotalInput" oninput="calculateTax()" placeholder="100.00" class="w-28 bg-gray-800 border border-gray-700 rounded px-2 py-1 text-right text-sm text-white focus:outline-none">
-                    </div>
-                    <div class="flex items-center justify-between text-xs">
-                        <span class="text-gray-400">MD Sales Tax (6%)</span>
-                        <span id="taxResult" class="text-gray-200 font-medium">$0.00</span>
-                    </div>
-                    <div class="flex items-center justify-between text-xs font-bold border-t border-gray-700 pt-2">
-                        <span class="text-gray-200">Total Due</span>
-                        <span id="totalResult" class="text-white">$0.00</span>
-                    </div>
-                    <button onclick="window.print()" class="w-full bg-purple-800 hover:bg-purple-700 text-white text-xs font-bold py-2 rounded-lg mt-1">Generate &amp; Print Invoice</button>
-                </div>
-            </div>
-            <div class="glow-card glow-card-amber rounded-2xl p-5">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-9 h-9 rounded-xl bg-amber-900/50 border border-amber-700/50 flex items-center justify-center text-amber-400">
-                            <i class="fa-solid fa-headset"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-100">Coordinator Hub</h3>
-                            <p class="text-xs text-gray-400">Team Communication Boards</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="space-y-2 text-xs">
-                    <div class="p-2.5 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
-                        <span class="text-gray-300">📢 Team Communications — All Hands</span>
-                        <span class="text-emerald-400 font-semibold">Active</span>
-                    </div>
-                    <div class="p-2.5 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
-                        <span class="text-gray-300">💬 William &amp; Chris — Direct Line</span>
-                        <span class="text-blue-400 font-semibold">Private 1:1</span>
-                    </div>
-                    <div class="p-2.5 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
-                        <span class="text-gray-300">💬 William &amp; Mona — Direct Line</span>
-                        <span class="text-blue-400 font-semibold">Private 1:1</span>
-                    </div>
-                    <div class="p-2.5 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
-                        <span class="text-gray-300">💬 William &amp; Norby — Direct Line</span>
-                        <span class="text-blue-400 font-semibold">Private 1:1</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
+<nav class="border-b border-gray-800 bg-gray-900/90 sticky top-0 z-50 backdrop-blur-md">
+<div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xl">&#x1F935;</div>
+<div>
+<h1 class="font-extrabold text-lg text-white">Fresh <span class="text-xs px-2 py-0.5 rounded bg-blue-900/80 text-blue-300 font-normal border border-blue-700">Pocket Chief of Staff</span></h1>
+<p class="text-xs text-gray-400">Sissy: Digital Coordinator - Aerus Home Wellness Timonium</p>
+</div>
+</div>
+<div class="flex items-center space-x-3 bg-gray-800/80 px-3 py-1.5 rounded-lg border border-gray-700 text-xs">
+<span class="text-gray-400">Vault: <strong class="text-blue-400">22,283</strong></span>
+<span class="text-gray-600">|</span>
+<span class="text-gray-400">Assets: <strong class="text-emerald-400">1,090</strong></span>
+</div>
+</div>
+</nav>
+<main class="max-w-7xl mx-auto px-4 pt-6 space-y-6">
+<section class="glow-card rounded-2xl p-6 text-center border border-blue-500/30">
+<div class="flex flex-col items-center justify-center">
+<button id="micBtn" onclick="toggleVoiceIntake()" class="w-24 h-24 rounded-full bg-blue-600 text-white flex items-center justify-center text-3xl shadow-xl mic-pulse mb-3">
+<i class="fa-solid fa-microphone"></i>
+</button>
+<p class="text-xs text-gray-400 font-medium mb-3" id="voiceStatus">Tap to speak directly to Fresh</p>
+<div class="flex items-center justify-center space-x-2 mb-4">
+<span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Voice Output Engaged</span>
+</div>
+<div class="w-full max-w-2xl bg-gray-900/90 border border-gray-700 rounded-xl p-3 text-left mb-3">
+<div class="text-xs text-gray-500 font-semibold mb-1">YOU SAY:</div>
+<textarea id="promptInput" rows="2" class="w-full bg-transparent text-gray-100 text-sm focus:outline-none resize-none" placeholder="Tap microphone to speak, or type your message here..."></textarea>
+</div>
+<button onclick="sendToFresh()" class="w-full max-w-2xl glow-button py-3 rounded-xl font-bold text-white flex items-center justify-center space-x-2 text-sm">
+<i class="fa-solid fa-paper-plane"></i><span>SEND TO FRESH</span>
+</button>
+<div class="w-full max-w-2xl bg-blue-950/40 border border-blue-800/50 rounded-xl p-4 text-left mt-4">
+<div class="text-xs text-blue-400 font-semibold mb-1 flex items-center justify-between">
+<span>FRESH (Voice Engine Online)</span>
+<button onclick="repeatSpeech()" class="text-gray-400 text-xs"><i class="fa-solid fa-volume-high"></i> Play Again</button>
+</div>
+<p id="freshReply" class="text-sm text-gray-200 font-medium leading-relaxed">Fresh is online and ready for you!</p>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<section class="lg:col-span-2 glow-card glow-card-amber rounded-2xl p-5">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-calendar-day text-amber-400"></i>
+<h2 class="font-bold text-sm text-gray-200 uppercase">Active Schedule</h2>
+</div>
+<span class="text-xs bg-amber-950/60 text-amber-300 border border-amber-800/60 px-2.5 py-1 rounded-full font-semibold">Today</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="bg-gray-900/80 rounded-xl p-4 border border-gray-800 flex justify-between items-start">
+<div>
+<span class="text-xs font-bold px-2 py-0.5 rounded bg-blue-900 text-blue-300">PICKUP LOGGED</span>
+<h3 class="font-bold text-white text-base mt-1">Eugene Gumenick</h3>
+<p class="text-xs text-gray-400">104 Gittings Ave, Baltimore MD 21212</p>
+<p class="text-xs text-amber-400/90 mt-2"><i class="fa-solid fa-wrench mr-1"></i>Cord and Cord Winder Check</p>
+</div>
+<a href="tel:4104930223" class="w-8 h-8 rounded-lg bg-gray-800 border border-gray-700 flex items-center justify-center text-blue-400"><i class="fa-solid fa-phone text-xs"></i></a>
+</div>
+<div class="bg-gray-900/80 rounded-xl p-4 border border-gray-800 flex justify-between items-start">
+<div>
+<span class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-900 text-emerald-300">DELIVERED AND PAID</span>
+<h3 class="font-bold text-white text-base mt-1">Susan Bratten</h3>
+<p class="text-xs text-gray-400">113 Bellemore Rd, Baltimore MD 21210</p>
+<p class="text-xs text-emerald-400/90 mt-2"><i class="fa-solid fa-check-circle mr-1"></i>Payment Collected</p>
+</div>
+<a href="tel:4436768088" class="w-8 h-8 rounded-lg bg-gray-800 border border-gray-700 flex items-center justify-center text-blue-400"><i class="fa-solid fa-phone text-xs"></i></a>
+</div>
+</div>
+</section>
+<section class="glow-card rounded-2xl p-5">
+<div class="flex items-center space-x-2 mb-3">
+<i class="fa-solid fa-database text-blue-400"></i>
+<h2 class="font-bold text-sm text-gray-200 uppercase">Vault Fast Lookup</h2>
+</div>
+<div class="relative mb-3">
+<input type="text" id="vaultSearchInput" onkeyup="searchVault()" placeholder="Search 22,283 records..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none pl-8">
+<i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-xs text-gray-500"></i>
+</div>
+<div id="searchResults" class="space-y-2 text-xs max-h-36 overflow-y-auto">
+<div class="p-2 rounded bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+<div><p class="font-bold text-gray-200">Eugene Gumenick</p><p class="text-gray-500">104 Gittings Ave</p></div>
+<span class="text-blue-400 font-semibold">Bench Queue</span>
+</div>
+<div class="p-2 rounded bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+<div><p class="font-bold text-gray-200">Susan Bratten</p><p class="text-gray-500">113 Bellemore Rd</p></div>
+<span class="text-emerald-400 font-semibold">Active Customer</span>
+</div>
+</div>
+</section>
+</div>
+<section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="glow-card rounded-2xl p-5 border border-blue-500/20">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded-xl bg-blue-900/50 border border-blue-700/50 flex items-center justify-center text-blue-400"><i class="fa-solid fa-briefcase"></i></div>
+<div>
+<h3 class="font-bold text-gray-100">Business World</h3>
+<p class="text-xs text-gray-400">Live Shop Ops and Workbench Queue</p>
+</div>
+</div>
+<button onclick="loadMondayData()" class="text-xs text-blue-400 px-2 py-1 rounded border border-blue-800/50"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+</div>
+<div id="mondayCards" class="space-y-2 text-xs">
+<p class="text-gray-500 text-xs py-2 text-center">Loading live board data...</p>
+</div>
+</div>
+<div class="glow-card glow-card-emerald rounded-2xl p-5">
+<div class="flex items-center space-x-3 mb-4">
+<div class="w-9 h-9 rounded-xl bg-emerald-900/50 border border-emerald-700/50 flex items-center justify-center text-emerald-400"><i class="fa-solid fa-user"></i></div>
+<div><h3 class="font-bold text-gray-100">Personal World</h3><p class="text-xs text-gray-400">Personal Tasks and Focus</p></div>
+</div>
+<div class="space-y-2 text-xs">
+<div class="p-3 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+<span class="text-gray-300">Eda Home Checklist</span><span class="text-emerald-400 font-semibold">TV Setup Active</span>
+</div>
+<div class="p-3 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+<span class="text-gray-300">Personal Vault</span><span class="text-gray-400">Locked and Separate</span>
+</div>
+</div>
+</div>
+<div class="glow-card glow-card-purple rounded-2xl p-5">
+<div class="flex items-center space-x-3 mb-4">
+<div class="w-9 h-9 rounded-xl bg-purple-900/50 border border-purple-700/50 flex items-center justify-center text-purple-400"><i class="fa-solid fa-receipt"></i></div>
+<div><h3 class="font-bold text-gray-100">Cash Register and Invoices</h3><p class="text-xs text-gray-400">MD 6 percent Tax Calculator</p></div>
+</div>
+<div class="bg-gray-900/90 rounded-xl p-4 border border-gray-800 space-y-3">
+<div class="flex items-center justify-between">
+<label class="text-xs text-gray-400">Subtotal</label>
+<input type="number" id="subtotalInput" oninput="calculateTax()" placeholder="100.00" class="w-28 bg-gray-800 border border-gray-700 rounded px-2 py-1 text-right text-sm text-white focus:outline-none">
+</div>
+<div class="flex items-center justify-between text-xs">
+<span class="text-gray-400">MD Sales Tax 6 percent</span>
+<span id="taxResult" class="text-gray-200 font-medium">0.00</span>
+</div>
+<div class="flex items-center justify-between text-xs font-bold border-t border-gray-700 pt-2">
+<span class="text-gray-200">Total Due</span><span id="totalResult" class="text-white">0.00</span>
+</div>
+<button onclick="window.print()" class="w-full bg-purple-800 text-white text-xs font-bold py-2 rounded-lg mt-1">Generate and Print Invoice</button>
+</div>
+</div>
+<div class="glow-card glow-card-amber rounded-2xl p-5">
+<div class="flex items-center space-x-3 mb-4">
+<div class="w-9 h-9 rounded-xl bg-amber-900/50 border border-amber-700/50 flex items-center justify-center text-amber-400"><i class="fa-solid fa-headset"></i></div>
+<div><h3 class="font-bold text-gray-100">Coordinator Hub</h3><p class="text-xs text-gray-400">Team Communication Boards</p></div>
+</div>
+<div class="space-y-2 text-xs">
+<div class="p-2.5 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+<span class="text-gray-300">Team Communications All Hands</span><span class="text-emerald-400 font-semibold">Active</span>
+</div>
+<div class="p-2.5 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+<span class="text-gray-300">William and Chris Direct Line</span><span class="text-blue-400 font-semibold">Private 1to1</span>
+</div>
+<div class="p-2.5 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+<span class="text-gray-300">William and Mona Direct Line</span><span class="text-blue-400 font-semibold">Private 1to1</span>
+</div>
+<div class="p-2.5 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+<span class="text-gray-300">William and Norby Direct Line</span><span class="text-blue-400 font-semibold">Private 1to1</span>
+</div>
+</div>
+</div>
+</section>
+</main>
 <script>
 var lastReply = '';
-
 function sendToFresh() {
-    var prompt = document.getElementById('promptInput').value.trim();
-    if (!prompt) return;
-    var replyEl = document.getElementById('freshReply');
-    replyEl.textContent = 'Fresh is thinking...';
-    fetch('/.netlify/functions/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: prompt })
-    })
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-        lastReply = data.reply || 'Fresh had nothing to say!';
-        replyEl.textContent = lastReply;
-        if (window.speechSynthesis) {
-            window.speechSynthesis.cancel();
-            var utter = new SpeechSynthesisUtterance(lastReply);
-            window.speechSynthesis.speak(utter);
-        }
-    })
-    .catch(function(err) {
-        replyEl.textContent = 'Error: ' + err.message;
-    });
+var prompt = document.getElementById('promptInput').value.trim();
+if (!prompt) return;
+var replyEl = document.getElementById('freshReply');
+replyEl.textContent = 'Fresh is thinking...';
+fetch('/.netlify/functions/chat', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ prompt: prompt })
+})
+.then(function(res) { return res.json(); })
+.then(function(data) {
+lastReply = data.reply || 'Fresh had nothing to say!';
+replyEl.textContent = lastReply;
+if (window.speechSynthesis) {
+window.speechSynthesis.cancel();
+var utter = new SpeechSynthesisUtterance(lastReply);
+window.speechSynthesis.speak(utter);
 }
-
+})
+.catch(function(err) {
+replyEl.textContent = 'Error connecting to Fresh.';
+});
+}
 function repeatSpeech() {
-    if (!lastReply) return;
-    window.speechSynthesis.cancel();
-    var utter = new SpeechSynthesisUtterance(lastReply);
-    window.speechSynthesis.speak(utter);
+if (!lastReply) return;
+window.speechSynthesis.cancel();
+var utter = new SpeechSynthesisUtterance(lastReply);
+window.speechSynthesis.speak(utter);
 }
-
 function toggleVoiceIntake() {
-    var btn = document.getElementById('micBtn');
-    var status = document.getElementById('voiceStatus');
-    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) {
-        status.textContent = 'Voice not supported — use Chrome or Edge.';
-        return;
-    }
-    var recognition = new SR();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = 'en-US';
-    btn.style.background = '#dc2626';
-    status.textContent = 'Listening... speak now!';
-    recognition.start();
-    recognition.onresult = function(e) {
-        var transcript = e.results[0][0].transcript;
-        document.getElementById('promptInput').value = transcript;
-        btn.style.background = '';
-        status.textContent = 'Tap to speak directly to Fresh — Voice Intake Active';
-        sendToFresh();
-    };
-    recognition.onerror = function(e) {
-        btn.style.background = '';
-        status.textContent = 'Mic error: ' + e.error + ' — try again';
-    };
-    recognition.onend = function() {
-        btn.style.background = '';
-    };
+var btn = document.getElementById('micBtn');
+var status = document.getElementById('voiceStatus');
+var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (!SR) { status.textContent = 'Voice not supported. Use Chrome.'; return; }
+var recognition = new SR();
+recognition.continuous = false;
+recognition.interimResults = false;
+recognition.lang = 'en-US';
+btn.style.background = '#dc2626';
+status.textContent = 'Listening... speak now!';
+recognition.start();
+recognition.onresult = function(e) {
+var transcript = e.results[0][0].transcript;
+document.getElementById('promptInput').value = transcript;
+btn.style.background = '';
+status.textContent = 'Tap to speak directly to Fresh';
+sendToFresh();
+};
+recognition.onerror = function(e) {
+btn.style.background = '';
+status.textContent = 'Mic error. Try again.';
+};
+recognition.onend = function() { btn.style.background = ''; };
 }
-
 function calculateTax() {
-    var sub = parseFloat(document.getElementById('subtotalInput').value) || 0;
-    var tax = sub * 0.06;
-    var total = sub + tax;
-    document.getElementById('taxResult').textContent = '
-
-**Key fix this time** — I rewrote ALL the JavaScript using old-school `var` and `.then()` instead of `async/await` — zero chance of syntax corruption! Commit and go! 🎯 + tax.toFixed(2);
-    var totalEl = document.getElementById('totalResult');
-    if (totalEl) { totalEl.textContent = '
-
-**Key fix this time** — I rewrote ALL the JavaScript using old-school __CODE_BLOCK_2__ and __CODE_BLOCK_3__ instead of __CODE_BLOCK_4__ — zero chance of syntax corruption! Commit and go! 🎯 + total.toFixed(2); }
+var sub = parseFloat(document.getElementById('subtotalInput').value) || 0;
+var tax = sub * 0.06;
+var total = sub + tax;
+document.getElementById('taxResult').textContent = tax.toFixed(2);
+var totalEl = document.getElementById('totalResult');
+if (totalEl) { totalEl.textContent = total.toFixed(2); }
 }
-
 function searchVault() {
-    var q = document.getElementById('vaultSearchInput').value.toLowerCase();
-    var results = document.getElementById('searchResults');
-    if (!q) return;
-    results.innerHTML = '<p class="text-gray-500 text-xs text-center py-2">Searching vault...</p>';
+var q = document.getElementById('vaultSearchInput').value.toLowerCase();
+var results = document.getElementById('searchResults');
+if (!q) return;
+results.innerHTML = '<p class="text-gray-500 text-xs text-center py-2">Searching vault...</p>';
 }
-
 function loadMondayData() {
-    var container = document.getElementById('mondayCards');
-    container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">Loading live board data...</p>';
-    fetch('/.netlify/functions/monday')
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-        if (!data.items || data.items.length === 0) {
-            container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">No items found.</p>';
-            return;
-        }
-        var html = '';
-        for (var i = 0; i < data.items.length; i++) {
-            html += '<div class="p-2 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">';
-            html += '<span class="text-gray-200 font-medium">' + data.items[i].name + '</span>';
-            html += '<span class="text-xs text-blue-400">' + (data.items[i].group || '') + '</span>';
-            html += '</div>';
-        }
-        container.innerHTML = html;
-    })
-    .catch(function() {
-        container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">Could not load board data.</p>';
-    });
+var container = document.getElementById('mondayCards');
+container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">Loading live board data...</p>';
+fetch('/.netlify/functions/monday')
+.then(function(res) { return res.json(); })
+.then(function(data) {
+var groups = data.groups || [];
+if (groups.length === 0) {
+container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">No items found.</p>';
+return;
 }
-
+var html = '';
+for (var g = 0; g < groups.length; g++) {
+var grp = groups[g];
+var items = grp.items_page ? grp.items_page.items : [];
+for (var i = 0; i < items.length; i++) {
+html = html + '<div class="p-2 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">';
+html = html + '<span class="text-gray-200 font-medium">' + items[i].name + '</span>';
+html = html + '<span class="text-xs text-blue-400">' + grp.title + '</span>';
+html = html + '</div>';
+}
+}
+container.innerHTML = html || '<p class="text-gray-500 text-xs py-2 text-center">No items found.</p>';
+})
+.catch(function() {
+container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">Could not load board data.</p>';
+});
+}
 document.addEventListener('DOMContentLoaded', function() {
-    loadMondayData();
-    document.getElementById('promptInput').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendToFresh(); }
-    });
+loadMondayData();
+document.getElementById('promptInput').addEventListener('keydown', function(e) {
+if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendToFresh(); }
+});
 });
 </script>
 </body>
