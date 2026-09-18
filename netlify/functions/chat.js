@@ -28,7 +28,7 @@ exports.handler = async (event) => {
     return new Promise((resolve) => {
       const req = https.request({
         hostname: 'generativelanguage.googleapis.com',
-        path: '/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey,
+        path: '/v1beta/models/gemini-3.6-flash:generateContent?key=' + apiKey,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,3 +75,4 @@ exports.handler = async (event) => {
     };
   }
 };
+Only thing that changed — gemini-2.0-flash → gemini-3.6-flash
