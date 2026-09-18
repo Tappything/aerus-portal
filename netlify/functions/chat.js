@@ -18,17 +18,17 @@ exports.handler = async (event) => {
       };
     }
 
-    const fullPrompt = "You are Fresh 🤵 — Digital Coordinator for William Sullivan at Aerus Home Wellness Timonium MD. You are energetic, sharp, direct and motivating. Max 2 sentences. No fluff.\n\nWilliam says: " + prompt;
+    const fullPrompt = "You are Fresh 🤵 — a sharp, intelligent AI business coordinator for TappyThing, created by William Sullivan. You help small business owners solve real problems, stay organized, and move fast. Be conversational, specific, and genuinely helpful. Give real thoughtful answers. Never use catchphrases or canned responses.\n\nUser message: " + prompt;
 
     const postData = JSON.stringify({
       contents: [{ parts: [{ text: fullPrompt }] }],
-      generationConfig: { temperature: 0.7, maxOutputTokens: 100 }
+      generationConfig: { temperature: 0.9, maxOutputTokens: 500 }
     });
 
     return new Promise((resolve) => {
       const req = https.request({
         hostname: 'generativelanguage.googleapis.com',
-        path: /v1beta/models/gemini-2.0-flash:generateContent?key=
+        path: '/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ exports.handler = async (event) => {
             resolve({
               statusCode: 200,
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ reply: "DEBUG RESPONSE: " + data.substring(0, 300) })
+              body: JSON.stringify({ reply: "DEBUG: " + data.substring(0, 300) })
             });
           }
         });
