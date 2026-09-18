@@ -44,7 +44,10 @@
             </div>
         </div>
     </nav>
+
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+
+        <!-- FRESH CHAT -->
         <section class="glow-card rounded-2xl p-6 text-center border border-blue-500/30 relative overflow-hidden">
             <div class="absolute -top-24 -left-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
             <div class="flex flex-col items-center justify-center">
@@ -73,10 +76,12 @@
                             <i class="fa-solid fa-volume-high"></i> Play Again
                         </button>
                     </div>
-                    <p id="freshReply" class="text-sm text-gray-200 font-medium leading-relaxed">Fresh is online and ready for the next play!</p>
+                    <p id="freshReply" class="text-sm text-gray-200 font-medium leading-relaxed">Fresh is online and ready for you!</p>
                 </div>
             </div>
         </section>
+
+        <!-- SCHEDULE + VAULT -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <section class="lg:col-span-2 glow-card glow-card-amber rounded-2xl p-5">
                 <div class="flex items-center justify-between mb-3">
@@ -138,7 +143,11 @@
                 </div>
             </section>
         </div>
+
+        <!-- BUSINESS / PERSONAL / CASH / COORDINATOR -->
         <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- Business World -->
             <div class="glow-card rounded-2xl p-5 border border-blue-500/20">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center space-x-3">
@@ -158,6 +167,8 @@
                     <p class="text-gray-500 text-xs py-2 text-center">Loading live board data...</p>
                 </div>
             </div>
+
+            <!-- Personal World -->
             <div class="glow-card glow-card-emerald rounded-2xl p-5">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center space-x-3">
@@ -181,6 +192,8 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Cash Register -->
             <div class="glow-card glow-card-purple rounded-2xl p-5">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center space-x-3">
@@ -202,15 +215,17 @@
                         <span class="text-gray-400">MD Sales Tax (6%)</span>
                         <span id="taxResult" class="text-gray-200 font-medium">$0.00</span>
                     </div>
-                    <div class="border-t border-gray-800 pt-2 flex items-center justify-between">
-                        <span class="text-xs font-bold text-white">Total Due</span>
-                        <span id="totalResult" class="text-base font-extrabold text-emerald-400">$0.00</span>
+                    <div class="flex items-center justify-between text-xs font-bold border-t border-gray-700 pt-2">
+                        <span class="text-gray-200">Total Due</span>
+                        <span id="totalResult" class="text-white">$0.00</span>
                     </div>
-                    <button onclick="printInvoice()" class="w-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2 rounded-lg transition flex items-center justify-center space-x-2">
-                        <i class="fa-solid fa-print"></i><span>Generate & Print Invoice</span>
+                    <button onclick="window.print()" class="w-full bg-purple-800 hover:bg-purple-700 text-white text-xs font-bold py-2 rounded-lg mt-1">
+                        Generate & Print Invoice
                     </button>
                 </div>
             </div>
+
+            <!-- Coordinator Hub -->
             <div class="glow-card glow-card-amber rounded-2xl p-5">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center space-x-3">
@@ -242,123 +257,144 @@
                     </div>
                 </div>
             </div>
+
         </section>
     </main>
+
     <script>
-let lastReply = '';
+    let lastReply = '';
 
-async function sendToFresh() {
-    const prompt = document.getElementById('promptInput').value.trim();
-    if (!prompt) return;
-    const replyEl = document.getElementById('freshReply');
-    replyEl.textContent = 'Fresh is thinking...';
-    try {
-        const res = await fetch('/.netlify/functions/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: prompt })
-        });
-        const data = await res.json();
-        lastReply = data.reply || 'Fresh had nothing to say!';
-        replyEl.textContent = lastReply;
-        if (window.speechSynthesis) {
-            window.speechSynthesis.cancel();
-            const utter = new SpeechSynthesisUtterance(lastReply);
-            window.speechSynthesis.speak(utter);
+    async function sendToFresh() {
+        const prompt = document.getElementById('promptInput').value.trim();
+        if (!prompt) return;
+        const replyEl = document.getElementById('freshReply');
+        replyEl.textContent = 'Fresh is thinking...';
+        try {
+            const res = await fetch('/.netlify/functions/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: prompt })
+            });
+            const data = await res.json();
+            lastReply = data.reply || 'Fresh had nothing to say!';
+            replyEl.textContent = lastReply;
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+                const utter = new SpeechSynthesisUtterance(lastReply);
+                window.speechSynthesis.speak(utter);
+            }
+        } catch(err) {
+            replyEl.textContent = 'Error: ' + err.message;
         }
-    } catch(err) {
-        replyEl.textContent = 'Error: ' + err.message;
     }
-}
 
-function repeatSpeech() {
-    if (!lastReply) return;
-    window.speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(lastReply);
-    window.speechSynthesis.speak(utter);
-}
-
-let recognition;
-function toggleVoiceIntake() {
-    const btn = document.getElementById('micBtn');
-    const status = document.getElementById('voiceStatus');
-    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-        status.textContent = 'Voice not supported in this browser.';
-        return;
+    function repeatSpeech() {
+        if (!lastReply) return;
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(lastReply);
+        window.speechSynthesis.speak(utter);
     }
-    if (!recognition) {
-        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.onresult = (e) => {
-            document.getElementById('promptInput').value = e.results[0][0].transcript;
-            status.textContent = 'Tap to speak directly to Fresh — Voice Intake Active';
-            btn.classList.remove('bg-red-600');
-            btn.classList.add('bg-blue-600');
-            sendToFresh();
-        };
-        recognition.onerror = () => {
-            status.textContent = 'Tap to speak directly to Fresh — Voice Intake Active';
-            btn.classList.remove('bg-red-600');
-            btn.classList.add('bg-blue-600');
-        };
-    }
-    recognition.start();
-    btn.classList.remove('bg-blue-600');
-    btn.classList.add('bg-red-600');
-    status.textContent = 'Listening... speak now!';
-}
 
-function calculateTax() {
-    const sub = parseFloat(document.getElementById('subtotalInput').value) || 0;
-    const tax = sub * 0.06;
-    const total = sub + tax;
-    document.getElementById('taxResult').textContent = '
-
-**Commit → Netlify deploys → Fresh talks for real!** 🎉
-
-Go do it — you've got 15 minutes! 👍 + tax.toFixed(2);
-    const totalEl = document.getElementById('totalResult');
-    if (totalEl) totalEl.textContent = '
-
-**Commit → Netlify deploys → Fresh talks for real!** 🎉
-
-Go do it — you've got 15 minutes! 👍 + total.toFixed(2);
-}
-
-function searchVault() {
-    const q = document.getElementById('vaultSearchInput').value.toLowerCase();
-    const results = document.getElementById('searchResults');
-    if (!q) return;
-    results.innerHTML = '<p class="text-gray-500 text-xs text-center py-2">Searching vault...</p>';
-}
-
-async function loadMondayData() {
-    const container = document.getElementById('mondayCards');
-    container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">Loading live board data...</p>';
-    try {
-        const res = await fetch('/.netlify/functions/monday');
-        const data = await res.json();
-        if (!data.items || data.items.length === 0) {
-            container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">No items found.</p>';
+    function toggleVoiceIntake() {
+        const btn = document.getElementById('micBtn');
+        const status = document.getElementById('voiceStatus');
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            status.textContent = 'Voice not supported — use Chrome or Edge.';
             return;
         }
-        container.innerHTML = data.items.map(item => `
-            <div class="p-2 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
-                <span class="text-gray-200 font-medium">${item.name}</span>
-                <span class="text-xs text-blue-400">${item.group || ''}</span>
-            </div>
-        `).join('');
-    } catch(e) {
-        container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">Could not load board data.</p>';
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+        btn.classList.remove('bg-blue-600');
+        btn.classList.add('bg-red-600');
+        status.textContent = 'Listening... speak now!';
+        recognition.start();
+        recognition.onresult = (e) => {
+            const transcript = e.results[0][0].transcript;
+            document.getElementById('promptInput').value = transcript;
+            btn.classList.remove('bg-red-600');
+            btn.classList.add('bg-blue-600');
+            status.textContent = 'Tap to speak directly to Fresh — Voice Intake Active';
+            sendToFresh();
+        };
+        recognition.onerror = (e) => {
+            btn.classList.remove('bg-red-600');
+            btn.classList.add('bg-blue-600');
+            status.textContent = 'Mic error: ' + e.error + ' — try again';
+        };
+        recognition.onend = () => {
+            btn.classList.remove('bg-red-600');
+            btn.classList.add('bg-blue-600');
+        };
     }
-}
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadMondayData();
-    document.getElementById('promptInput').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendToFresh(); }
+    function calculateTax() {
+        const sub = parseFloat(document.getElementById('subtotalInput').value) || 0;
+        const tax = sub * 0.06;
+        const total = sub + tax;
+        document.getElementById('taxResult').textContent = '
+
+**That's the WHOLE file — clean, no corruption!**
+
+Steps:
+1. GitHub → `index.html` → click pencil ✏️
+2. **Ctrl+A** to select everything
+3. **Delete**
+4. **Paste** the code above
+5. **Commit** green button at bottom
+
+Fresh will talk AND the mic will work! 🎯 + tax.toFixed(2);
+        const totalEl = document.getElementById('totalResult');
+        if (totalEl) totalEl.textContent = '
+
+**That's the WHOLE file — clean, no corruption!**
+
+Steps:
+1. GitHub → __CODE_BLOCK_1__ → click pencil ✏️
+2. **Ctrl+A** to select everything
+3. **Delete**
+4. **Paste** the code above
+5. **Commit** green button at bottom
+
+Fresh will talk AND the mic will work! 🎯 + total.toFixed(2);
+    }
+
+    function searchVault() {
+        const q = document.getElementById('vaultSearchInput').value.toLowerCase();
+        const results = document.getElementById('searchResults');
+        if (!q) return;
+        results.innerHTML = '<p class="text-gray-500 text-xs text-center py-2">Searching vault...</p>';
+    }
+
+    async function loadMondayData() {
+        const container = document.getElementById('mondayCards');
+        container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">Loading live board data...</p>';
+        try {
+            const res = await fetch('/.netlify/functions/monday');
+            const data = await res.json();
+            if (!data.items || data.items.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">No items found.</p>';
+                return;
+            }
+            container.innerHTML = data.items.map(item =>
+                '<div class="p-2 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">' +
+                '<span class="text-gray-200 font-medium">' + item.name + '</span>' +
+                '<span class="text-xs text-blue-400">' + (item.group || '') + '</span>' +
+                '</div>'
+            ).join('');
+        } catch(e) {
+            container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">Could not load board data.</p>';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadMondayData();
+        document.getElementById('promptInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendToFresh(); }
+        });
     });
-});
-</script>
+    </script>
+</body>
 </html>
