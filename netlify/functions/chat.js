@@ -1,37 +1,77 @@
-const fetch = require('node-fetch');
+const https = require('https');
 
-exports.handler = async function(event, context) {
+exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  const { message } = JSON.parse(event.body);
-  const apiKey = process.env.GEMINI_API_KEY;
+  try {
+    const body = JSON.parse(event.body || '{}');
+    const prompt = body.prompt || body.message || '';
+    const apiKey = process.env.GEMINI_API_KEY;
 
-  const systemPrompt = `You are Fresh 🤵 — the AI Digital Coordinator for TappyThing, created by William Sullivan. 
-You are energetic, sharp, loyal, and always on point. You speak with confidence and warmth. 
-You help small business owners stay organized, take action, and move fast. 
-Always respond in Fresh's voice — direct, motivating, and smart. Keep responses concise and actionable.`;
-
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: `${systemPrompt}\n\nUser: ${message}` }]
-        }]
-      })
+    if (!apiKey) {
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reply: "API key missing." })
+      };
     }
-  );
 
-  const data = await response.json();
-  const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Fresh is thinking... try again!";
+    const fullPrompt = "You are Fresh 🤵 — Digital Coordinator for William Sullivan at Aerus Home Wellness Timonium MD. You are energetic, sharp, direct and motivating. Max 2 sentences. No fluff.\n\nWilliam says: " + prompt;
 
-  return {
-    statusCode: 200,
-    headers: { 'Access-Control-Allow-Origin': '*' },
-    body: JSON.stringify({ reply })
-  };
+    const postData = JSON.stringify({
+      contents: [{ parts: [{ text: fullPrompt }] }],
+      generationConfig: { temperature: 0.7, maxOutputTokens: 100 }
+    });
+
+    return new Promise((resolve) => {
+      const req = https.request({
+        hostname: 'generativelanguage.googleapis.com',
+        path: '/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey,
+          'Content-Length': Buffer.byteLength(postData)
+        }
+      }, (res) => {
+        let data = '';
+        res.on('data', (chunk) => data += chunk);
+        res.on('end', () => {
+          try {
+            const parsed = JSON.parse(data);
+            const reply = parsed.candidates[0].content.parts[0].text;
+            resolve({
+              statusCode: 200,
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ reply: reply.trim() })
+            });
+          } catch(e) {
+            resolve({
+              statusCode: 200,
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ reply: "DEBUG RESPONSE: " + data.substring(0, 300) })
+            });
+          }
+        });
+      });
+      req.on('error', (e) => {
+        resolve({
+          statusCode: 200,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reply: "ERROR: " + e.message })
+        });
+      });
+      req.write(postData);
+      req.end();
+    });
+
+  } catch(err) {
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reply: "CATCH: " + err.message })
+    };
+  }
 };
