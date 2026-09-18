@@ -14,59 +14,15 @@ exports.handler = async (event) => {
       return {
         statusCode: 200,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reply: "API key missing." })
+        body: JSON.stringify({ reply: "NO KEY FOUND" })
       };
     }
 
-    const fullPrompt = "You are Fresh, a high-energy Digital Coordinator for William Sullivan at Aerus Home Wellness Timonium MD. Be direct, punchy, motivational. Max 2 sentences. No fluff.\n\nWilliam says: " + prompt;
-
-    const postData = JSON.stringify({
-      contents: [{ parts: [{ text: fullPrompt }] }],
-      generationConfig: { temperature: 0.7, maxOutputTokens: 100 }
-    });
-
-    return new Promise((resolve) => {
-      const req = https.request({
-        hostname: 'generativelanguage.googleapis.com',
-        path: '/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + apiKey,
-          'x-goog-api-key': apiKey,
-          'Content-Length': Buffer.byteLength(postData)
-        }
-      }, (res) => {
-        let data = '';
-        res.on('data', (chunk) => data += chunk);
-        res.on('end', () => {
-          try {
-            const parsed = JSON.parse(data);
-            const reply = parsed.candidates[0].content.parts[0].text;
-            resolve({
-              statusCode: 200,
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ reply: reply.trim() })
-            });
-          } catch(e) {
-            resolve({
-              statusCode: 200,
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ reply: "DEBUG: " + data.substring(0, 200) })
-            });
-          }
-        });
-      });
-      req.on('error', (e) => {
-        resolve({
-          statusCode: 200,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reply: "ERROR: " + e.message })
-        });
-      });
-      req.write(postData);
-      req.end();
-    });
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reply: "KEY STARTS WITH: " + apiKey.substring(0, 10) })
+    };
 
   } catch(err) {
     return {
