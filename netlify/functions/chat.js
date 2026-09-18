@@ -28,11 +28,12 @@ exports.handler = async (event) => {
     return new Promise((resolve) => {
       const req = https.request({
         hostname: 'generativelanguage.googleapis.com',
-        path: '/v1beta/models/gemini-1.5-flash:generateContent',
+        path: '/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + apiKey,
+          'x-goog-api-key': apiKey,
           'Content-Length': Buffer.byteLength(postData)
         }
       }, (res) => {
@@ -51,16 +52,16 @@ exports.handler = async (event) => {
             resolve({
               statusCode: 200,
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ reply: "Loud and clear Chief! What is the next play?" })
+              body: JSON.stringify({ reply: "DEBUG: " + data.substring(0, 200) })
             });
           }
         });
       });
-      req.on('error', () => {
+      req.on('error', (e) => {
         resolve({
           statusCode: 200,
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reply: "Loud and clear Chief! What is the next play?" })
+          body: JSON.stringify({ reply: "ERROR: " + e.message })
         });
       });
       req.write(postData);
@@ -71,7 +72,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reply: "Loud and clear Chief! What is the next play?" })
+      body: JSON.stringify({ reply: "CATCH: " + err.message })
     };
   }
 };
