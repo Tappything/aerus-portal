@@ -13,7 +13,7 @@ exports.handler = async (event) => {
   }
 
   const query = `query \{
-    boards(ids: [${boardId\}]) \{
+     const query = "{ boards(ids: [" + boardId + "]) { groups { title items_page { items { id name column_values { title text } } } } } }";
       groups {
         title
         items_page {
