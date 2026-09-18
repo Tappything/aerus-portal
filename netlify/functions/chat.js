@@ -18,7 +18,7 @@ exports.handler = async function(event) {
 
     var fullPrompt = 'You are Fresh, a sharp Digital Coordinator for William Sullivan at Aerus Home Wellness in Timonium MD. Be direct, helpful, and energetic. Max 1 sentences. User says: ' + prompt;
 
-    var response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=' + apiKey, {
+    var response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=' + apiKey, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
