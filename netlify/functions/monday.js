@@ -8,28 +8,11 @@ exports.handler = async (event) => {
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: "Missing Monday API credentials." })
+      body: JSON.stringify({ error: "Missing credentials." })
     };
   }
 
-  const query = `query \{
-     const query = "{ boards(ids: [" + boardId + "]) { groups { title items_page { items { id name column_values { title text } } } } } }";
-      groups {
-        title
-        items_page {
-          items {
-            id
-            name
-            column_values {
-              title
-              text
-            \}
-          }
-        }
-      }
-    }
-  }`;
-
+  const query = "{ boards(ids: [" + boardId + "]) { groups { title items_page { items { id name } } } } }";
   const postData = JSON.stringify({ query });
 
   return new Promise((resolve) => {
@@ -52,16 +35,10 @@ exports.handler = async (event) => {
         try {
           const parsed = JSON.parse(data);
           const groups = parsed.data?.boards?.[0]?.groups || [];
-          const targetGroups = groups.filter(g =>
-    g.title.toLowerCase().includes("bagdon") ||
-    g.title.toLowerCase().includes("ready wall") ||
-    g.title.toLowerCase().includes("workbench") ||
-    g.title.toLowerCase().includes("intake")
-);
           resolve({
             statusCode: 200,
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ groups: targetGroups })
+            body: JSON.stringify({ groups: groups })
           });
         } catch (e) {
           resolve({
