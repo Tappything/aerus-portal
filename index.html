@@ -1,256 +1,307 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TappyThing — Aerus Home Wellness</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    body {
-      background-color: #0f172a;
-      color: #f8fafc;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-    .teal-badge {
-      font-size: 48px;
-      margin-bottom: 8px;
-    }
-    h1 {
-      font-size: 26px;
-      color: #38bdf8;
-      margin-bottom: 4px;
-      font-weight: 700;
-    }
-    p.subtitle {
-      font-size: 14px;
-      color: #94a3b8;
-    }
-    .main-card {
-      background-color: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      width: 100%;
-      max-width: 500px;
-      padding: 24px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-      margin-bottom: 20px;
-    }
-    textarea {
-      width: 100%;
-      height: 110px;
-      background-color: #0f172a;
-      border: 1px solid #475569;
-      border-radius: 12px;
-      color: #f8fafc;
-      padding: 14px;
-      font-size: 16px;
-      resize: none;
-      margin-bottom: 16px;
-      outline: none;
-    }
-    textarea:focus {
-      border-color: #14b8a6;
-    }
-    .btn-action {
-      width: 100%;
-      background-color: #14b8a6;
-      color: #0f172a;
-      border: none;
-      border-radius: 12px;
-      padding: 16px;
-      font-size: 18px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .btn-action:hover {
-      background-color: #0d9488;
-      color: #ffffff;
-    }
-    .response-area {
-      margin-top: 16px;
-      background-color: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 14px;
-      font-size: 14px;
-      color: #cbd5e1;
-      min-height: 52px;
-    }
-    .card-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      width: 100%;
-      max-width: 500px;
-      margin-bottom: 20px;
-    }
-    .info-card {
-      background-color: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 16px;
-      text-align: center;
-    }
-    .info-card h3 {
-      font-size: 14px;
-      color: #2dd4bf;
-      margin-bottom: 4px;
-    }
-    .info-card p {
-      font-size: 12px;
-      color: #94a3b8;
-    }
-    .board-container {
-      width: 100%;
-      max-width: 500px;
-      background-color: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 20px;
-    }
-    .board-header {
-      font-size: 16px;
-      color: #38bdf8;
-      font-weight: 600;
-      margin-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .board-list {
-      list-style: none;
-    }
-    .board-item {
-      background-color: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 10px 14px;
-      margin-bottom: 8px;
-      font-size: 13px;
-      color: #e2e8f0;
-      display: flex;
-      justify-content: space-between;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TappyThing</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body{font-family:sans-serif;background-color:#0b0f19;color:#f3f4f6}
+.glow-card{background:rgba(17,24,39,0.75);border:1px solid rgba(59,130,246,0.25);box-shadow:0 8px 32px 0 rgba(0,0,0,0.45)}
+.glow-card-emerald{border-color:rgba(16,185,129,0.25)}
+.glow-card-purple{border-color:rgba(168,85,247,0.25)}
+.glow-card-amber{border-color:rgba(245,158,11,0.25)}
+.glow-button{background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);box-shadow:0 0 15px rgba(37,99,235,0.5)}
+.mic-pulse{animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(59,130,246,0.7)}70%{box-shadow:0 0 0 22px rgba(59,130,246,0)}100%{box-shadow:0 0 0 0 rgba(59,130,246,0)}}
+</style>
 </head>
-<body>
+<body class="min-h-screen pb-16">
+<nav class="border-b border-gray-800 bg-gray-900/90 sticky top-0 z-50 backdrop-blur-md">
+<div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xl">&#x1F935;</div>
+<div>
+<h1 class="font-extrabold text-lg text-white">Fresh <span class="text-xs px-2 py-0.5 rounded bg-blue-900/80 text-blue-300 font-normal border border-blue-700">Pocket Chief of Staff</span></h1>
+<p class="text-xs text-gray-400">Sissy: Digital Coordinator - Aerus Home Wellness Timonium</p>
+</div>
+</div>
+<div class="flex items-center space-x-3 bg-gray-800/80 px-3 py-1.5 rounded-lg border border-gray-700 text-xs">
+<span class="text-gray-400">Vault: <strong class="text-blue-400">22,283</strong></span>
+<span class="text-gray-600">|</span>
+<span class="text-gray-400">Assets: <strong class="text-emerald-400">1,090</strong></span>
+</div>
+</div>
+</nav>
+<main class="max-w-7xl mx-auto px-4 pt-6 space-y-6">
+<section class="glow-card rounded-2xl p-6 text-center border border-blue-500/30">
+<div class="flex flex-col items-center justify-center">
+<button id="micBtn" onclick="toggleVoiceIntake()" class="w-24 h-24 rounded-full bg-blue-600 text-white flex items-center justify-center text-3xl shadow-xl mic-pulse mb-3">
+<i class="fa-solid fa-microphone"></i>
+</button>
+<p class="text-xs text-gray-400 font-medium mb-3" id="voiceStatus">Tap to speak directly to Fresh</p>
+<div class="flex items-center justify-center space-x-2 mb-4">
+<span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Voice Output Engaged</span>
+</div>
+<div class="w-full max-w-2xl bg-gray-900/90 border border-gray-700 rounded-xl p-3 text-left mb-3">
+<div class="text-xs text-gray-500 font-semibold mb-1">YOU SAY:</div>
+<textarea id="promptInput" rows="2" class="w-full bg-transparent text-gray-100 text-sm focus:outline-none resize-none" placeholder="Tap microphone to speak, or type your message here..."></textarea>
+</div>
+<button onclick="sendToFresh()" class="w-full max-w-2xl glow-button py-3 rounded-xl font-bold text-white flex items-center justify-center space-x-2 text-sm">
+<i class="fa-solid fa-paper-plane"></i><span>SEND TO FRESH</span>
+</button>
+<div class="w-full max-w-2xl bg-blue-950/40 border border-blue-800/50 rounded-xl p-4 text-left mt-4">
+<div class="text-xs text-blue-400 font-semibold mb-1 flex items-center justify-between">
+<span>FRESH (Voice Engine Online)</span>
+<button onclick="repeatSpeech()" class="text-gray-400 text-xs"><i class="fa-solid fa-volume-high"></i> Play Again</button>
+</div>
+<p id="freshReply" class="text-sm text-gray-200 font-medium leading-relaxed">Fresh is online and ready for you!</p>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<section class="lg:col-span-2 glow-card glow-card-amber rounded-2xl p-5">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-calendar-day text-amber-400"></i>
+<h2 class="font-bold text-sm text-gray-200 uppercase">Active Schedule</h2>
+</div>
+<span class="text-xs bg-amber-950/60 text-amber-300 border border-amber-800/60 px-2.5 py-1 rounded-full font-semibold">Today</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="bg-gray-900/80 rounded-xl p-4 border border-gray-800 flex justify-between items-start">
+<div>
+<span class="text-xs font-bold px-2 py-0.5 rounded bg-blue-900 text-blue-300">PICKUP LOGGED</span>
+<h3 class="font-bold text-white text-base mt-1">Eugene Gumenick</h3>
+<p class="text-xs text-gray-400">104 Gittings Ave, Baltimore MD 21212</p>
+<p class="text-xs text-amber-400/90 mt-2"><i class="fa-solid fa-wrench mr-1"></i>Cord and Cord Winder Check</p>
+</div>
+<a href="tel:4104930223" class="w-8 h-8 rounded-lg bg-gray-800 border border-gray-700 flex items-center justify-center text-blue-400"><i class="fa-solid fa-phone text-xs"></i></a>
+</div>
+<div class="bg-gray-900/80 rounded-xl p-4 border border-gray-800 flex justify-between items-start">
+<div>
+<span class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-900 text-emerald-300">DELIVERED AND PAID</span>
+<h3 class="font-bold text-white text-base mt-1">Susan Bratten</h3>
+<p class="text-xs text-gray-400">113 Bellemore Rd, Baltimore MD 21210</p>
+<p class="text-xs text-emerald-400/90 mt-2"><i class="fa-solid fa-check-circle mr-1"></i>Payment Collected</p>
+</div>
+<a href="tel:4436768088" class="w-8 h-8 rounded-lg bg-gray-800 border border-gray-700 flex items-center justify-center text-blue-400"><i class="fa-solid fa-phone text-xs"></i></a>
+</div>
+</div>
+</section>
+<section class="glow-card rounded-2xl p-5">
+<div class="flex items-center space-x-2 mb-3">
+<i class="fa-solid fa-database text-blue-400"></i>
+<h2 class="font-bold text-sm text-gray-200 uppercase">Vault Fast Lookup</h2>
+</div>
+<div class="relative mb-3">
+<input type="text" id="vaultSearchInput" onkeyup="searchVault()" placeholder="Search 22,283 records..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none pl-8">
+<i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-xs text-gray-500"></i>
+</div>
+<div id="searchResults" class="space-y-2 text-xs max-h-36 overflow-y-auto">
+<div class="p-2 rounded bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+<div><p class="font-bold text-gray-200">Eugene Gumenick</p><p class="text-gray-500">104 Gittings Ave</p></div>
+<span class="text-blue-400 font-semibold">Bench Queue</span>
+</div>
+<div class="p-2 rounded bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+<div><p class="font-bold text-gray-200">Susan Bratten</p><p class="text-gray-500">113 Bellemore Rd</p></div>
+<span class="text-emerald-400 font-semibold">Active Customer</span>
+</div>
+</div>
+</section>
+</div>
+<section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="glow-card rounded-2xl p-5 border border-blue-500/20">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded-xl bg-blue-900/50 border border-blue-700/50 flex items-center justify-center text-blue-400"><i class="fa-solid fa-briefcase"></i></div>
+<div>
+<h3 class="font-bold text-gray-100">Business World</h3>
+<p class="text-xs text-gray-400">Live Shop Ops and Workbench Queue</p>
+</div>
+</div>
+<button onclick="loadMondayData()" class="text-xs text-blue-400 px-2 py-1 rounded border border-blue-800/50"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+</div>
+<div id="mondayCards" class="space-y-2 text-xs">
+<p class="text-gray-500 text-xs py-2 text-center">Loading live board data...</p>
+</div>
+</div>
+<div class="glow-card glow-card-emerald rounded-2xl p-5">
+<div class="flex items-center space-x-3 mb-4">
+<div class="w-9 h-9 rounded-xl bg-emerald-900/50 border border-emerald-700/50 flex items-center justify-center text-emerald-400"><i class="fa-solid fa-user"></i></div>
+<div><h3 class="font-bold text-gray-100">Personal World</h3><p class="text-xs text-gray-400">Personal Tasks and Focus</p></div>
+</div>
+<div class="space-y-2 text-xs">
+<div class="p-3 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+<span class="text-gray-300">Eda Home Checklist</span><span class="text-emerald-400 font-semibold">TV Setup Active</span>
+</div>
+<div class="p-3 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+<span class="text-gray-300">Personal Vault</span><span class="text-gray-400">Locked and Separate</span>
+</div>
+</div>
+</div>
+<div class="glow-card glow-card-purple rounded-2xl p-5">
+<div class="flex items-center space-x-3 mb-4">
+<div class="w-9 h-9 rounded-xl bg-purple-900/50 border border-purple-700/50 flex items-center justify-center text-purple-400"><i class="fa-solid fa-receipt"></i></div>
+<div><h3 class="font-bold text-gray-100">Cash Register and Invoices</h3><p class="text-xs text-gray-400">MD 6 percent Tax Calculator</p></div>
+</div>
+<div class="bg-gray-900/90 rounded-xl p-4 border border-gray-800 space-y-3">
+<div class="flex items-center justify-between">
+<label class="text-xs text-gray-400">Subtotal</label>
+<input type="number" id="subtotalInput" oninput="calculateTax()" placeholder="100.00" class="w-28 bg-gray-800 border border-gray-700 rounded px-2 py-1 text-right text-sm text-white focus:outline-none">
+</div>
+<div class="flex items-center justify-between text-xs">
+<span class="text-gray-400">MD Sales Tax 6 percent</span>
+<span id="taxResult" class="text-gray-200 font-medium">0.00</span>
+</div>
+<div class="flex items-center justify-between text-xs font-bold border-t border-gray-700 pt-2">
+<span class="text-gray-200">Total Due</span><span id="totalResult" class="text-white">0.00</span>
+</div>
+<button onclick="window.print()" class="w-full bg-purple-800 text-white text-xs font-bold py-2 rounded-lg mt-1">Generate and Print Invoice</button>
+</div>
+</div>
+<div class="glow-card glow-card-amber rounded-2xl p-5">
+<div class="flex items-center space-x-3 mb-4">
+<div class="w-9 h-9 rounded-xl bg-amber-900/50 border border-amber-700/50 flex items-center justify-center text-amber-400"><i class="fa-solid fa-headset"></i></div>
+<div><h3 class="font-bold text-gray-100">Coordinator Hub</h3><p class="text-xs text-gray-400">Team Communication Boards</p></div>
+</div>
+<div class="space-y-2 text-xs">
+<div class="p-2.5 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+<span class="text-gray-300">Team Communications All Hands</span><span class="text-emerald-400 font-semibold">Active</span>
+</div>
+<div class="p-2.5 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+<span class="text-gray-300">William and Chris Direct Line</span><span class="text-blue-400 font-semibold">Private 1to1</span>
+</div>
+<div class="p-2.5 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+<span class="text-gray-300">William and Mona Direct Line</span><span class="text-blue-400 font-semibold">Private 1to1</span>
+</div>
+<div class="p-2.5 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">
+<span class="text-gray-300">William and Norby Direct Line</span><span class="text-blue-400 font-semibold">Private 1to1</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<script>
+var lastReply = '';
+function sendToFresh() {
+var prompt = document.getElementById('promptInput').value.trim();
+if (!prompt) return;
+var replyEl = document.getElementById('freshReply');
+replyEl.textContent = 'Fresh is thinking...';
 
-  <header>
-    <div class="teal-badge">💎</div>
-    <h1>TappyThing</h1>
-    <p class="subtitle">Digital Coordinator — Aerus Home Wellness</p>
-  </header>
+// 1. Gemini AI Chat Function
+fetch('/.netlify/functions/chat', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ prompt: prompt })
+})
+.then(function(res) { return res.json(); })
+.then(function(data) {
+lastReply = data.reply || 'Fresh had nothing to say!';
+replyEl.textContent = lastReply;
+if (window.speechSynthesis) {
+window.speechSynthesis.cancel();
+var utter = new SpeechSynthesisUtterance(lastReply);
+window.speechSynthesis.speak(utter);
+}
+})
+.catch(function(err) {
+replyEl.textContent = 'Error connecting to Fresh.';
+});
 
-  <div class="main-card">
-    <textarea id="promptInput" placeholder="Tap and speak or type your intake here..."></textarea>
-    <button class="btn-action" onclick="sendToFresh()">Send to Coordinator</button>
-    <div class="response-area" id="freshReply">Fresh is ready for intake...</div>
-  </div>
+// 2. Make.com Webhook Trigger
+fetch('https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ body: prompt })
+}).catch(function(e) { console.log('Webhook error:', e); });
 
-  <div class="card-grid">
-    <div class="info-card">
-      <h3>Intakes</h3>
-      <p>Voice / Text Queue</p>
-    </div>
-    <div class="info-card">
-      <h3>Bench Repairs</h3>
-      <p>Workiz Sync</p>
-    </div>
-    <div class="info-card">
-      <h3>Field Tasks</h3>
-      <p>Diagnostics & Deliveries</p>
-    </div>
-    <div class="info-card">
-      <h3>Command Hub</h3>
-      <p>Monday Board Live</p>
-    </div>
-  </div>
+// Clear input field after sending
+document.getElementById('promptInput').value = '';
+}
 
-  <div class="board-container">
-    <div class="board-header">
-      <span>Live Ops Board</span>
-      <span style="font-size: 12px; color: #2dd4bf;">Active Sync</span>
-    </div>
-    <ul class="board-list" id="boardItems">
-      <li class="board-item"><span>Loading board items...</span></li>
-    </ul>
-  </div>
-
-  <script>
-    var lastReply = '';
-
-    // Fetch Monday Board Items
-    function loadMondayBoard() {
-      fetch('/.netlify/functions/monday')
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-          var container = document.getElementById('boardItems');
-          if (!data || !data.items || data.items.length === 0) {
-            container.innerHTML = '<li class="board-item"><span>No recent items found</span></li>';
-            return;
-          }
-          var html = '';
-          data.items.slice(0, 5).forEach(function(item) {
-            html += '<li class="board-item"><span>' + item.name + '</span></li>';
-          });
-          container.innerHTML = html;
-        })
-        .catch(function(err) {
-          document.getElementById('boardItems').innerHTML = '<li class="board-item"><span>Board sync ready</span></li>';
-        });
-    }
-
-    // Main Intake Trigger
-    function sendToFresh() {
-      var prompt = document.getElementById('promptInput').value.trim();
-      if (!prompt) return;
-
-      var replyEl = document.getElementById('freshReply');
-      replyEl.textContent = 'Fresh is thinking...';
-
-      // 1. Gemini AI Engine
-      fetch('/.netlify/functions/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: prompt })
-      })
-      .then(function(res) { return res.json(); })
-      .then(function(data) {
-        lastReply = data.reply || 'Fresh had nothing to say!';
-        replyEl.textContent = lastReply;
-        loadMondayBoard();
-      })
-      .catch(function(err) {
-        replyEl.textContent = 'Error communicating with Fresh.';
-      });
-
-      // 2. Make.com Webhook Pipeline
-      fetch('https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ body: prompt })
-      }).catch(function(e) { console.log('Webhook error:', e); });
-
-      document.getElementById('promptInput').value = '';
-    }
-
-    // Load board on page open
-    window.onload = loadMondayBoard;
-  </script>
-
+function repeatSpeech() {
+if (!lastReply) return;
+window.speechSynthesis.cancel();
+var utter = new SpeechSynthesisUtterance(lastReply);
+window.speechSynthesis.speak(utter);
+}
+function toggleVoiceIntake() {
+var btn = document.getElementById('micBtn');
+var status = document.getElementById('voiceStatus');
+var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (!SR) { status.textContent = 'Voice not supported. Use Chrome.'; return; }
+var recognition = new SR();
+recognition.continuous = false;
+recognition.interimResults = false;
+recognition.lang = 'en-US';
+btn.style.background = '#dc2626';
+status.textContent = 'Listening... speak now!';
+recognition.start();
+recognition.onresult = function(e) {
+var transcript = e.results[0][0].transcript;
+document.getElementById('promptInput').value = transcript;
+btn.style.background = '';
+status.textContent = 'Tap to speak directly to Fresh';
+sendToFresh();
+};
+recognition.onerror = function(e) {
+btn.style.background = '';
+status.textContent = 'Mic error. Try again.';
+};
+recognition.onend = function() { btn.style.background = ''; };
+}
+function calculateTax() {
+var sub = parseFloat(document.getElementById('subtotalInput').value) || 0;
+var tax = sub * 0.06;
+var total = sub + tax;
+document.getElementById('taxResult').textContent = tax.toFixed(2);
+var totalEl = document.getElementById('totalResult');
+if (totalEl) { totalEl.textContent = total.toFixed(2); }
+}
+function searchVault() {
+var q = document.getElementById('vaultSearchInput').value.toLowerCase();
+var results = document.getElementById('searchResults');
+if (!q) return;
+results.innerHTML = '<p class="text-gray-500 text-xs text-center py-2">Searching vault...</p>';
+}
+function loadMondayData() {
+var container = document.getElementById('mondayCards');
+container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">Loading live board data...</p>';
+fetch('/.netlify/functions/monday')
+.then(function(res) { return res.json(); })
+.then(function(data) {
+var groups = data.groups || [];
+if (groups.length === 0) {
+container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">No items found.</p>';
+return;
+}
+var html = '';
+for (var g = 0; g < groups.length; g++) {
+var grp = groups[g];
+var items = grp.items_page ? grp.items_page.items : [];
+for (var i = 0; i < items.length; i++) {
+html = html + '<div class="p-2 rounded-lg bg-gray-900/60 border border-gray-800 flex justify-between items-center">';
+html = html + '<span class="text-gray-200 font-medium">' + items[i].name + '</span>';
+html = html + '<span class="text-xs text-blue-400">' + grp.title + '</span>';
+html = html + '</div>';
+}
+}
+container.innerHTML = html || '<p class="text-gray-500 text-xs py-2 text-center">No items found.</p>';
+})
+.catch(function() {
+container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">Could not load board data.</p>';
+});
+}
+document.addEventListener('DOMContentLoaded', function() {
+loadMondayData();
+document.getElementById('promptInput').addEventListener('keydown', function(e) {
+if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendToFresh(); }
+});
+});
+</script>
 </body>
 </html>
