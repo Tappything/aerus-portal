@@ -5,28 +5,152 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>TappyThing — Aerus Home Wellness</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    body { background-color: #121212; color: #E0E0E0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
-    header { text-align: center; margin-bottom: 24px; }
-    .gold-badge { font-size: 48px; margin-bottom: 8px; }
-    h1 { font-size: 24px; color: #FFFFFF; margin-bottom: 4px; }
-    p.subtitle { font-size: 14px; color: #A0A0A0; }
-    .main-card { background-color: #1E1E1E; border: 1px solid #333333; border-radius: 16px; width: 100%; max-width: 480px; padding: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); margin-bottom: 20px; }
-    textarea { width: 100%; height: 100px; background-color: #2A2A2A; border: 1px solid #444444; border-radius: 12px; color: #FFFFFF; padding: 12px; font-size: 16px; resize: none; margin-bottom: 16px; outline: none; }
-    textarea:focus { border-color: #FFD700; }
-    .btn-action { width: 100%; background-color: #FFD700; color: #121212; border: none; border-radius: 12px; padding: 16px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background-color 0.2s ease; }
-    .btn-action:hover { background-color: #E6C200; }
-    .response-area { margin-top: 16px; background-color: #2A2A2A; border-radius: 12px; padding: 12px; font-size: 14px; color: #D4D4D4; min-height: 48px; }
-    .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; max-width: 480px; }
-    .info-card { background-color: #1E1E1E; border: 1px solid #333333; border-radius: 12px; padding: 16px; text-align: center; }
-    .info-card h3 { font-size: 14px; color: #FFD700; margin-bottom: 4px; }
-    .info-card p { font-size: 12px; color: #A0A0A0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .teal-badge {
+      font-size: 48px;
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-size: 26px;
+      color: #38bdf8;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+    p.subtitle {
+      font-size: 14px;
+      color: #94a3b8;
+    }
+    .main-card {
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 500px;
+      padding: 24px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      margin-bottom: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 110px;
+      background-color: #0f172a;
+      border: 1px solid #475569;
+      border-radius: 12px;
+      color: #f8fafc;
+      padding: 14px;
+      font-size: 16px;
+      resize: none;
+      margin-bottom: 16px;
+      outline: none;
+    }
+    textarea:focus {
+      border-color: #14b8a6;
+    }
+    .btn-action {
+      width: 100%;
+      background-color: #14b8a6;
+      color: #0f172a;
+      border: none;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-action:hover {
+      background-color: #0d9488;
+      color: #ffffff;
+    }
+    .response-area {
+      margin-top: 16px;
+      background-color: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 14px;
+      color: #cbd5e1;
+      min-height: 52px;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 20px;
+    }
+    .info-card {
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+    .info-card h3 {
+      font-size: 14px;
+      color: #2dd4bf;
+      margin-bottom: 4px;
+    }
+    .info-card p {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .board-container {
+      width: 100%;
+      max-width: 500px;
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 20px;
+    }
+    .board-header {
+      font-size: 16px;
+      color: #38bdf8;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .board-list {
+      list-style: none;
+    }
+    .board-item {
+      background-color: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+    }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="gold-badge">🏆</div>
+    <div class="teal-badge">💎</div>
     <h1>TappyThing</h1>
     <p class="subtitle">Digital Coordinator — Aerus Home Wellness</p>
   </header>
@@ -38,15 +162,59 @@
   </div>
 
   <div class="card-grid">
-    <div class="info-card"><h3>Intakes</h3><p>Voice / Text Queue</p></div>
-    <div class="info-card"><h3>Bench Repairs</h3><p>Workiz Sync</p></div>
-    <div class="info-card"><h3>Field Tasks</h3><p>Diagnostics & Deliveries</p></div>
-    <div class="info-card"><h3>Command Hub</h3><p>Monday Board Live</p></div>
+    <div class="info-card">
+      <h3>Intakes</h3>
+      <p>Voice / Text Queue</p>
+    </div>
+    <div class="info-card">
+      <h3>Bench Repairs</h3>
+      <p>Workiz Sync</p>
+    </div>
+    <div class="info-card">
+      <h3>Field Tasks</h3>
+      <p>Diagnostics & Deliveries</p>
+    </div>
+    <div class="info-card">
+      <h3>Command Hub</h3>
+      <p>Monday Board Live</p>
+    </div>
+  </div>
+
+  <div class="board-container">
+    <div class="board-header">
+      <span>Live Ops Board</span>
+      <span style="font-size: 12px; color: #2dd4bf;">Active Sync</span>
+    </div>
+    <ul class="board-list" id="boardItems">
+      <li class="board-item"><span>Loading board items...</span></li>
+    </ul>
   </div>
 
   <script>
     var lastReply = '';
 
+    // Fetch Monday Board Items
+    function loadMondayBoard() {
+      fetch('/.netlify/functions/monday')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          var container = document.getElementById('boardItems');
+          if (!data || !data.items || data.items.length === 0) {
+            container.innerHTML = '<li class="board-item"><span>No recent items found</span></li>';
+            return;
+          }
+          var html = '';
+          data.items.slice(0, 5).forEach(function(item) {
+            html += '<li class="board-item"><span>' + item.name + '</span></li>';
+          });
+          container.innerHTML = html;
+        })
+        .catch(function(err) {
+          document.getElementById('boardItems').innerHTML = '<li class="board-item"><span>Board sync ready</span></li>';
+        });
+    }
+
+    // Main Intake Trigger
     function sendToFresh() {
       var prompt = document.getElementById('promptInput').value.trim();
       if (!prompt) return;
@@ -54,7 +222,7 @@
       var replyEl = document.getElementById('freshReply');
       replyEl.textContent = 'Fresh is thinking...';
 
-      // 1. Gemini Chat AI Engine
+      // 1. Gemini AI Engine
       fetch('/.netlify/functions/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -64,12 +232,13 @@
       .then(function(data) {
         lastReply = data.reply || 'Fresh had nothing to say!';
         replyEl.textContent = lastReply;
+        loadMondayBoard();
       })
       .catch(function(err) {
         replyEl.textContent = 'Error communicating with Fresh.';
       });
 
-      // 2. Make.com Webhook Pipeline Trigger
+      // 2. Make.com Webhook Pipeline
       fetch('https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -78,6 +247,9 @@
 
       document.getElementById('promptInput').value = '';
     }
+
+    // Load board on page open
+    window.onload = loadMondayBoard;
   </script>
 
 </body>
