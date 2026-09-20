@@ -1,337 +1,177 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>TappyThing — Digital Coordinator</title>
-
-<script src="\" target="_blank" rel="noopener noreferrer">https://cdn.tailwindcss.com">\
-
-<link rel="stylesheet" href="" target="_blank" rel="noopener noreferrer">https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background-color:#0b0f19;color:#f3f4f6}
-
 .glow-card{background:rgba(17,24,39,0.75);border:1px solid rgba(59,130,246,0.25);box-shadow:0 8px 32px 0 rgba(0,0,0,0.45)}
-
 .glow-card-emerald{border-color:rgba(16,185,129,0.25)}
-
 .glow-card-purple{border-color:rgba(168,85,247,0.25)}
-
 .glow-card-amber{border-color:rgba(245,158,11,0.25)}
-
 .glow-button{background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);box-shadow:0 0 15px rgba(37,99,235,0.5)}
-
 .mic-pulse{animation:pulse 2s infinite}
-
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(59,130,246,0.7)}70%{box-shadow:0 0 0 22px rgba(59,130,246,0)}100%{box-shadow:0 0 0 0 rgba(59,130,246,0)}}
-
 details > summary { list-style: none; }
-
 details > summary::-webkit-details-marker { display: none; }
-
 </style>
-
 </head>
-
 <body class="min-h-screen pb-16">
 
 <nav class="border-b border-gray-800 bg-gray-900/90 sticky top-0 z-50 backdrop-blur-md">
-
 <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-
 <div class="flex items-center space-x-3">
-
 <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-10 h-10 rounded-full object-cover border-2 border-blue-400 shadow-lg" />
-
 <div>
-
 <h1 class="font-extrabold text-lg text-white flex items-center gap-2">TappyThing <span class="text-xs px-2 py-0.5 rounded bg-blue-900/80 text-blue-300 font-normal border border-blue-700">Digital Coordinator</span></h1>
-
 <p class="text-xs text-gray-400">Fresh — Pocket Chief of Staff | Aerus Home Wellness</p>
-
 </div>
-
 </div>
-
 <div class="flex items-center space-x-2">
-
 <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-
 <span class="text-xs text-emerald-400 font-semibold tracking-wide uppercase hidden sm:inline">System Active</span>
-
 </div>
-
 </div>
-
 </nav>
 
 <main class="max-w-7xl mx-auto px-4 pt-6 space-y-6">
 
 <section class="glow-card rounded-2xl p-6 text-center border border-blue-500/30">
-
 <div class="flex flex-col items-center justify-center">
-
 <div class="flex items-center justify-center mb-3">
-
 <button id="micBtn" onclick="toggleVoiceIntake()" class="w-24 h-24 rounded-full bg-blue-600 text-white flex items-center justify-center text-3xl shadow-xl mic-pulse hover:bg-blue-500 transition">
-
 <i class="fa-solid fa-microphone"></i>
-
 </button>
-
 <input type="file" accept="image/*" capture="environment" id="cameraInput" style="display:none" onchange="previewPhoto(this)"><button onclick="document.getElementById('cameraInput').click()" class="w-10 h-10 rounded-full bg-gray-700 text-white flex items-center justify-center text-xl border border-gray-600 ml-2">📷</button>
-
 </div>
-
 <p class="text-xs text-gray-400 font-medium mb-3" id="voiceStatus">Tap microphone to speak directly to Fresh</p>
-
 <div class="flex items-center justify-center space-x-2 mb-4">
-
 <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-
 <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Voice Output Engaged</span>
-
 </div>
-
 <div class="w-full max-w-2xl bg-gray-900/90 border border-gray-700 rounded-xl p-3 text-left mb-3">
-
 <div class="text-xs text-gray-500 font-semibold mb-1">YOU SAY:</div>
-
 <textarea id="promptInput" rows="2" class="w-full bg-transparent text-gray-100 text-sm focus:outline-none resize-none" placeholder="Tap microphone to speak, or type your message here..."></textarea>
-
 </div>
-
 <button onclick="sendToFresh()" class="w-full max-w-2xl glow-button py-3 rounded-xl font-bold text-white flex items-center justify-center space-x-2 text-sm hover:opacity-95 transition">
-
 <i class="fa-solid fa-paper-plane"></i><span>SEND TO FRESH</span>
-
 </button>
-
 <div class="w-full max-w-2xl bg-blue-950/40 border border-blue-800/50 rounded-xl p-4 text-left mt-4">
-
 <div class="text-xs text-blue-400 font-semibold mb-1 flex items-center justify-between">
-
 <span>FRESH (Voice Engine Online)</span>
-
 <button onclick="repeatSpeech()" class="text-gray-400 text-xs hover:text-white"><i class="fa-solid fa-volume-high"></i> Play Again</button>
-
 </div>
-
 <p id="freshReply" class="text-sm text-gray-200 font-medium leading-relaxed">Fresh is online and ready for you!</p>
-
 </div>
-
 </div>
-
 </section>
 
 <section class="glow-card glow-card-amber rounded-2xl p-5">
-
 <div class="flex items-center justify-between mb-3">
-
 <div class="flex items-center space-x-2">
-
 <i class="fa-solid fa-calendar-day text-amber-400"></i>
-
 <h2 class="font-bold text-sm text-gray-200 uppercase tracking-wider">Active Schedule — Today</h2>
-
 </div>
-
 <button onclick="loadCalendarData()" class="text-xs bg-amber-950/60 text-amber-300 border border-amber-800/60 px-2.5 py-1 rounded-full font-semibold hover:bg-amber-900/80 transition"><i class="fa-solid fa-rotate-right mr-1"></i> Sync Calendar</button>
-
 </div>
-
 <div id="calendarEventsContainer" class="space-y-3 max-h-64 overflow-y-auto pr-1">
-
 <p class="text-gray-500 text-xs py-2 text-center">Syncing Google Calendar appointments...</p>
-
 </div>
-
 </section>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
 <section class="glow-card rounded-2xl p-5 border border-blue-500/20">
-
 <div class="flex items-center justify-between mb-4">
-
 <div class="flex items-center space-x-3">
-
 <div class="w-9 h-9 rounded-xl bg-blue-900/50 border border-blue-700/50 flex items-center justify-center text-blue-400"><i class="fa-solid fa-briefcase"></i></div>
-
 <div>
-
 <h3 class="font-bold text-gray-100">Business World</h3>
-
 <p class="text-xs text-gray-400">Live Shop Ops and Workbench Queue</p>
-
 </div>
-
 </div>
-
 <button onclick="loadMondayData()" class="text-xs text-blue-400 px-2 py-1 rounded border border-blue-800/50 hover:bg-blue-900/30 transition"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
-
 </div>
-
 <div class="space-y-3 text-xs">
-
 <details class="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden group">
-
 <summary class="p-3 font-bold text-blue-400 flex justify-between items-center cursor-pointer hover:bg-gray-800/50 transition">
-
 <span>📋 INTAKE</span>
-
 <i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
-
 </summary>
-
 <div id="drawer-intake" class="p-3 border-t border-gray-800/60 space-y-2">
-
 <p class="text-gray-500 text-center py-1">Loading intake items...</p>
-
 </div>
-
 </details>
-
 <details class="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden group">
-
 <summary class="p-3 font-bold text-amber-400 flex justify-between items-center cursor-pointer hover:bg-gray-800/50 transition">
-
 <span>🔧 WORKBENCH</span>
-
 <i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
-
 </summary>
-
 <div id="drawer-workbench" class="p-3 border-t border-gray-800/60 space-y-2">
-
 <p class="text-gray-500 text-center py-1">Loading bench repairs...</p>
-
 </div>
-
 </details>
-
 <details class="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden group">
-
 <summary class="p-3 font-bold text-emerald-400 flex justify-between items-center cursor-pointer hover:bg-gray-800/50 transition">
-
 <span>✅ READY WALL</span>
-
 <i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
-
 </summary>
-
 <div id="drawer-ready" class="p-3 border-t border-gray-800/60 space-y-2">
-
 <p class="text-gray-500 text-center py-1">Loading ready pickups...</p>
-
 </div>
-
 </details>
-
 <details class="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden group">
-
 <summary class="p-3 font-bold text-gray-400 flex justify-between items-center cursor-pointer hover:bg-gray-800/50 transition">
-
 <span>🔵 COMPLETED</span>
-
 <i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
-
 </summary>
-
 <div id="drawer-completed" class="p-3 border-t border-gray-800/60 space-y-2">
-
 <p class="text-gray-500 text-center py-1">Loading completed items...</p>
-
 </div>
-
 </details>
-
 </div>
-
 </section>
 
 <section class="glow-card glow-card-emerald rounded-2xl p-5">
-
 <div class="flex items-center space-x-3 mb-4">
-
 <div class="w-9 h-9 rounded-xl bg-emerald-900/50 border border-emerald-700/50 flex items-center justify-center text-emerald-400"><i class="fa-solid fa-user"></i></div>
-
 <div><h3 class="font-bold text-gray-100">Personal World</h3><p class="text-xs text-gray-400">Personal Tasks and Focus Drawers</p></div>
-
 </div>
-
 <div class="space-y-3 text-xs">
-
 <details class="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden group">
-
 <summary class="p-3 font-semibold text-gray-200 flex justify-between items-center cursor-pointer hover:bg-gray-800/50">
-
 <span>🏠 Home Tasks</span><i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
-
 </summary>
-
 <div class="p-3 border-t border-gray-800/60 text-gray-500 text-center italic">Talk to Fresh to set up your Home Tasks</div>
-
 </details>
-
 <details class="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden group">
-
 <summary class="p-3 font-semibold text-gray-200 flex justify-between items-center cursor-pointer hover:bg-gray-800/50">
-
 <span>💰 Banking & Finance</span><i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
-
 </summary>
-
 <div class="p-3 border-t border-gray-800/60 text-gray-500 text-center italic">Talk to Fresh to set up your Banking & Finance</div>
-
 </details>
-
 <details class="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden group">
-
 <summary class="p-3 font-semibold text-gray-200 flex justify-between items-center cursor-pointer hover:bg-gray-800/50">
-
 <span>👨‍👩‍👧 Family</span><i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
-
 </summary>
-
 <div class="p-3 border-t border-gray-800/60 text-gray-500 text-center italic">Talk to Fresh to set up your Family</div>
-
 </details>
-
 <details class="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden group">
-
 <summary class="p-3 font-semibold text-gray-200 flex justify-between items-center cursor-pointer hover:bg-gray-800/50">
-
 <span>🏥 Health</span><i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
-
 </summary>
-
 <div class="p-3 border-t border-gray-800/60 text-gray-500 text-center italic">Talk to Fresh to set up your Health</div>
-
 </details>
-
 <details class="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden group">
-
 <summary class="p-3 font-semibold text-gray-200 flex justify-between items-center cursor-pointer hover:bg-gray-800/50">
-
 <span>🔒 Private Vault</span><i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
-
 </summary>
-
 <div class="p-3 border-t border-gray-800/60 text-gray-500 text-center italic">Talk to Fresh to set up your Private Vault</div>
-
 </details>
-
 </div>
-
 </section>
 
 </div>
@@ -339,247 +179,131 @@ details > summary::-webkit-details-marker { display: none; }
 <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
 <div class="glow-card glow-card-amber rounded-2xl p-5">
-
 <div class="flex items-center space-x-3 mb-4">
-
 <div class="w-9 h-9 rounded-xl bg-amber-900/50 border border-amber-700/50 flex items-center justify-center text-amber-400"><i class="fa-solid fa-headset"></i></div>
-
 <div><h3 class="font-bold text-gray-100">Coordinator Hub</h3><p class="text-xs text-gray-400">Direct Team Communications</p></div>
-
 </div>
-
 <div class="space-y-2 text-xs">
-
 <details class="bg-gray-900/80 border border-gray-800 rounded-lg overflow-hidden group">
-
 <summary class="p-2.5 font-semibold text-gray-300 flex justify-between items-center cursor-pointer hover:bg-gray-800/50"><span>💬 Message Chris</span><i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i></summary>
-
 <div class="p-3 border-t border-gray-800/60 space-y-2"><textarea placeholder="Message Chris (Parts & Bench)..." class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white focus:outline-none resize-none" rows="2"></textarea><button onclick="alert('Message routed to Chris')" class="w-full bg-blue-600 text-white font-bold py-1 rounded">Send</button></div>
-
 </details>
-
 <details class="bg-gray-900/80 border border-gray-800 rounded-lg overflow-hidden group">
-
 <summary class="p-2.5 font-semibold text-gray-300 flex justify-between items-center cursor-pointer hover:bg-gray-800/50"><span>💬 Message Mona</span><i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i></summary>
-
 <div class="p-3 border-t border-gray-800/60 space-y-2"><textarea placeholder="Message Mona (Digital & Intakes)..." class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white focus:outline-none resize-none" rows="2"></textarea><button onclick="alert('Message routed to Mona')" class="w-full bg-blue-600 text-white font-bold py-1 rounded">Send</button></div>
-
 </details>
-
 <details class="bg-gray-900/80 border border-gray-800 rounded-lg overflow-hidden group">
-
 <summary class="p-2.5 font-semibold text-gray-300 flex justify-between items-center cursor-pointer hover:bg-gray-800/50"><span>💬 Message Norby</span><i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i></summary>
-
 <div class="p-3 border-t border-gray-800/60 space-y-2"><textarea placeholder="Message Norby (Outreach & Leads)..." class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white focus:outline-none resize-none" rows="2"></textarea><button onclick="alert('Message routed to Norby')" class="w-full bg-blue-600 text-white font-bold py-1 rounded">Send</button></div>
-
 </details>
-
 <details class="bg-gray-900/80 border border-gray-800 rounded-lg overflow-hidden group">
-
 <summary class="p-2.5 font-semibold text-gray-300 flex justify-between items-center cursor-pointer hover:bg-gray-800/50"><span>💬 Message Mike</span><i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i></summary>
-
 <div class="p-3 border-t border-gray-800/60 space-y-2"><textarea placeholder="Message Mike (Bench Tech)..." class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white focus:outline-none resize-none" rows="2"></textarea><button onclick="alert('Message routed to Mike')" class="w-full bg-blue-600 text-white font-bold py-1 rounded">Send</button></div>
-
 </details>
-
 </div>
-
 </div>
 
 <div class="glow-card glow-card-purple rounded-2xl p-5">
-
 <details class="group" open>
-
 <summary class="flex items-center justify-between cursor-pointer">
-
 <div class="flex items-center space-x-3">
-
 <div class="w-9 h-9 rounded-xl bg-purple-900/50 border border-purple-700/50 flex items-center justify-center text-purple-400"><i class="fa-solid fa-receipt"></i></div>
-
 <div><h3 class="font-bold text-gray-100">💰 INVOICES & PAYMENTS</h3><p class="text-xs text-purple-300 font-semibold">Tap to Toggle</p></div>
-
 </div>
-
 <i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
-
 </summary>
-
 <div class="mt-4 space-y-3 text-xs border-t border-gray-800 pt-3">
-
 <div class="bg-purple-950/40 border border-purple-800/50 p-3 rounded-xl text-center space-y-1">
-
 <p class="font-bold text-purple-300 text-sm">🚀 Coming Soon</p>
-
 <p class="text-gray-300">Full invoicing + Stripe payments dropping soon.</p>
-
 <p class="text-purple-400 font-semibold">Included in your $95/month. No extra charge. Ever.</p>
-
 </div>
-
 <div class="bg-gray-900/90 rounded-xl p-3 border border-gray-800 space-y-2">
-
 <p class="font-bold text-gray-300 mb-1">MD 6% Tax Calculator</p>
-
 <div class="flex items-center justify-between">
-
 <label class="text-gray-400">Subtotal</label>
-
 <input type="number" id="subtotalInput" oninput="calculateTax()" placeholder="100.00" class="w-24 bg-gray-800 border border-gray-700 rounded px-2 py-1 text-right text-sm text-white focus:outline-none">
-
 </div>
-
 <div class="flex items-center justify-between"><span class="text-gray-400">MD Sales Tax 6%</span><span id="taxResult" class="text-gray-200 font-medium">0.00</span></div>
-
 <div class="flex items-center justify-between font-bold border-t border-gray-700 pt-1.5"><span class="text-gray-200">Total Due</span><span id="totalResult" class="text-white">0.00</span></div>
-
 <button onclick="window.print()" class="w-full bg-purple-800 hover:bg-purple-700 text-white font-bold py-1.5 rounded-lg mt-1 transition">Generate & Print Invoice</button>
-
 </div>
-
 </div>
-
 </details>
-
 </div>
 
 <div class="glow-card rounded-2xl p-5 border border-blue-500/20">
-
 <details class="group">
-
 <summary class="flex items-center justify-between cursor-pointer">
-
 <div class="flex items-center space-x-3">
-
 <div class="w-9 h-9 rounded-xl bg-blue-900/50 border border-blue-700/50 flex items-center justify-center text-blue-400"><i class="fa-solid fa-box-open"></i></div>
-
 <div><h3 class="font-bold text-gray-100">📦 TRACKING & ORDERS</h3><p class="text-xs text-gray-400">Quick Launch Carriers</p></div>
-
 </div>
-
 <i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
-
 </summary>
-
 <div class="mt-4 grid grid-cols-2 gap-2 text-xs border-t border-gray-800 pt-3">
-
 <a href="https://www.ups.com/track" target="_blank" class="p-2.5 rounded-lg bg-amber-950/40 border border-amber-800/50 text-amber-300 font-bold flex items-center justify-center space-x-2 hover:bg-amber-900/60 transition"><i class="fa-solid fa-truck-fast"></i><span>🟤 UPS</span></a>
-
 <a href="https://www.fedex.com/en-us/tracking.html" target="_blank" class="p-2.5 rounded-lg bg-purple-950/40 border border-purple-800/50 text-purple-300 font-bold flex items-center justify-center space-x-2 hover:bg-purple-900/60 transition"><i class="fa-solid fa-plane"></i><span>🟣 FedEx</span></a>
-
-<a href="https://tools.usps.com/go/TrackConfirmAction\_input" target="_blank" class="p-2.5 rounded-lg bg-blue-950/40 border border-blue-800/50 text-blue-300 font-bold flex items-center justify-center space-x-2 hover:bg-blue-900/60 transition"><i class="fa-solid fa-envelope"></i><span>🔵 USPS</span></a>
-
+<a href="https://tools.usps.com/go/TrackConfirmAction_input" target="_blank" class="p-2.5 rounded-lg bg-blue-950/40 border border-blue-800/50 text-blue-300 font-bold flex items-center justify-center space-x-2 hover:bg-blue-900/60 transition"><i class="fa-solid fa-envelope"></i><span>🔵 USPS</span></a>
 <a href="https://www.amazon.com/gp/css/order-history" target="_blank" class="p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-gray-200 font-bold flex items-center justify-center space-x-2 hover:bg-gray-700 transition"><i class="fa-brands fa-amazon"></i><span>📦 Amazon</span></a>
-
 </div>
-
 </details>
-
 </div>
 
 <div class="glow-card glow-card-emerald rounded-2xl p-5">
-
 <details class="group">
-
 <summary class="flex items-center justify-between cursor-pointer">
-
 <div class="flex items-center space-x-3">
-
 <div class="w-9 h-9 rounded-xl bg-emerald-900/50 border border-emerald-700/50 flex items-center justify-center text-emerald-400"><i class="fa-solid fa-wallet"></i></div>
-
 <div><h3 class="font-bold text-gray-100">💸 QUICK PAY</h3><p class="text-xs text-gray-400">Launch Mobile Pay Apps</p></div>
-
 </div>
-
 <i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
-
 </summary>
-
 <div class="mt-4 space-y-2 text-xs border-t border-gray-800 pt-3">
-
 <a href="https://cash.app" target="_blank" class="p-2.5 rounded-lg bg-emerald-950/40 border border-emerald-800/50 text-emerald-300 font-bold flex items-center justify-between hover:bg-emerald-900/60 transition"><span>💚 Cash App</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-
 <a href="https://venmo.com" target="_blank" class="p-2.5 rounded-lg bg-blue-950/40 border border-blue-800/50 text-blue-300 font-bold flex items-center justify-between hover:bg-blue-900/60 transition"><span>💙 Venmo</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-
 <a href="https://www.zellepay.com" target="_blank" class="p-2.5 rounded-lg bg-purple-950/40 border border-purple-800/50 text-purple-300 font-bold flex items-center justify-between hover:bg-purple-900/60 transition"><span>🔵 Zelle</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-
 </div>
-
 </details>
-
 </div>
 
 <div class="glow-card glow-card-amber rounded-2xl p-5">
-
 <details class="group">
-
 <summary class="flex items-center justify-between cursor-pointer">
-
 <div class="flex items-center space-x-3">
-
 <div class="w-9 h-9 rounded-xl bg-amber-900/50 border border-amber-700/50 flex items-center justify-center text-amber-400"><i class="fa-solid fa-baseball"></i></div>
-
 <div><h3 class="font-bold text-gray-100">⚾ MY WORLD</h3><p class="text-xs text-gray-400">Orioles Score & Timonium Weather</p></div>
-
 </div>
-
 <i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
-
 </summary>
-
 <div class="mt-4 space-y-3 text-xs border-t border-gray-800 pt-3">
-
 <a href="https://www.mlb.com/orioles" target="_blank" class="p-2.5 rounded-lg bg-amber-950/40 border border-amber-800/50 text-amber-300 font-bold flex items-center justify-between hover:bg-amber-900/60 transition"><span>⚾ Baltimore Orioles Live</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-
 <div id="weatherBox" class="p-3 rounded-lg bg-gray-900/80 border border-gray-800 text-gray-300">
-
 <p class="font-bold text-blue-400 mb-1"><i class="fa-solid fa-cloud-sun mr-1"></i> Timonium MD Weather</p>
-
 <p id="weatherDetails" class="text-xs text-gray-400">Loading forecast...</p>
-
 </div>
-
 </div>
-
 </details>
-
 </div>
 
 <div class="glow-card rounded-2xl p-5 border border-purple-500/30">
-
 <details class="group">
-
 <summary class="flex items-center justify-between cursor-pointer">
-
 <div class="flex items-center space-x-3">
-
 <div class="w-9 h-9 rounded-xl bg-purple-900/50 border border-purple-700/50 flex items-center justify-center text-purple-400"><i class="fa-solid fa-briefcase"></i></div>
-
 <div><h3 class="font-bold text-gray-100">💼 BECOME A REP</h3><p class="text-xs text-purple-300 font-semibold">Affiliate Opportunities</p></div>
-
 </div>
-
 <i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
-
 </summary>
-
 <div class="mt-4 space-y-3 text-xs border-t border-gray-800 pt-3 text-center">
-
 <div class="bg-gray-900/90 border border-gray-800 p-4 rounded-xl space-y-2">
-
 <p class="font-bold text-purple-400 text-sm">🔒 Sales Rep Portal</p>
-
 <p class="text-gray-200">Earn <strong>$100–$200</strong> per client.</p>
-
 <p class="text-gray-400">Set your own hours. Work from anywhere.</p>
-
 <button onclick="alert('Launching Fresh Rep Interview Form...')" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 rounded-lg mt-2 transition">Apply to Become a Rep</button>
-
 </div>
-
 </div>
-
 </details>
-
 </div>
 
 </section>
@@ -587,347 +311,185 @@ details > summary::-webkit-details-marker { display: none; }
 </main>
 
 <footer class="text-center py-6 text-xs text-gray-500 border-t border-gray-800/80 mt-12">
-
 <p>Powered by <strong>TappyThing</strong></p>
-
 </footer>
 
 <script>
-
 var lastReply = '';
 
 function previewPhoto(input) { if (input.files && input.files[0]) { var reader = new FileReader(); reader.onload = function(e) { document.getElementById('promptInput').style.backgroundImage = 'none'; }; reader.readAsDataURL(input.files[0]); } }
 
 function sendToFresh() {
-
-var prompt = document.getElementById('promptInput').value.trim();
-
-if (!prompt) return;
-
-var replyEl = document.getElementById('freshReply');
-
-replyEl.textContent = 'Fresh is thinking...';
-
-fetch('/.netlify/functions/chat', {
-
-method: 'POST',
-
-headers: { 'Content-Type': 'application/json' },
-
-body: JSON.stringify({ prompt: prompt })
-
-})
-
-.then(function(res) { return res.json(); })
-
-.then(function(data) {
-
-lastReply = data.reply || 'Fresh had nothing to say!';
-
-replyEl.textContent = lastReply;
-
-if (window.speechSynthesis) {
-
-window.speechSynthesis.cancel();
-
-var utter = new SpeechSynthesisUtterance(lastReply);
-
-var voices = window.speechSynthesis.getVoices();
-
-var usVoice = voices.find(function(v) { return v.lang === 'en-US'; });
-
-if (usVoice) utter.voice = usVoice;
-
-window.speechSynthesis.speak(utter);
-
-}
-
-})
-
-.catch(function(err) {
-
-replyEl.textContent = 'Error connecting to Fresh.';
-
-});
-
-fetch('https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1', {
-
-method: 'POST',
-
-headers: { 'Content-Type': 'application/json' },
-
-body: JSON.stringify({ body: prompt })
-
-}).catch(function(e) { console.log('Webhook error:', e); });
-
-document.getElementById('promptInput').value = '';
-
+  var prompt = document.getElementById('promptInput').value.trim();
+  if (!prompt) return;
+  var replyEl = document.getElementById('freshReply');
+  replyEl.textContent = 'Fresh is thinking...';
+  fetch('/.netlify/functions/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt: prompt })
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    lastReply = data.reply || 'Fresh had nothing to say!';
+    replyEl.textContent = lastReply;
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+      var utter = new SpeechSynthesisUtterance(lastReply);
+      var voices = window.speechSynthesis.getVoices();
+      var usVoice = voices.find(function(v) { return v.lang === 'en-US'; });
+      if (usVoice) utter.voice = usVoice;
+      window.speechSynthesis.speak(utter);
+    }
+  })
+  .catch(function(err) {
+    replyEl.textContent = 'Error connecting to Fresh.';
+  });
+  fetch('https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ body: prompt })
+  }).catch(function(e) { console.log('Webhook error:', e); });
+  document.getElementById('promptInput').value = '';
 }
 
 function repeatSpeech() {
-
-if (!lastReply) return;
-
-window.speechSynthesis.cancel();
-
-var utter = new SpeechSynthesisUtterance(lastReply);
-
-var voices = window.speechSynthesis.getVoices();
-
-var usVoice = voices.find(function(v) { return v.lang === 'en-US'; });
-
-if (usVoice) utter.voice = usVoice;
-
-window.speechSynthesis.speak(utter);
-
+  if (!lastReply) return;
+  window.speechSynthesis.cancel();
+  var utter = new SpeechSynthesisUtterance(lastReply);
+  var voices = window.speechSynthesis.getVoices();
+  var usVoice = voices.find(function(v) { return v.lang === 'en-US'; });
+  if (usVoice) utter.voice = usVoice;
+  window.speechSynthesis.speak(utter);
 }
 
 function toggleVoiceIntake() {
-
-var btn = document.getElementById('micBtn');
-
-var status = document.getElementById('voiceStatus');
-
-var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-if (!SR) { status.textContent = 'Voice not supported. Use Chrome.'; return; }
-
-var recognition = new SR();
-
-recognition.continuous = false;
-
-recognition.interimResults = false;
-
-recognition.lang = 'en-US';
-
-btn.style.background = '#dc2626';
-
-status.textContent = 'Listening... speak now!';
-
-recognition.start();
-
-recognition.onresult = function(e) {
-
-var transcript = e.results[0][0].transcript;
-
-document.getElementById('promptInput').value = transcript;
-
-btn.style.background = '';
-
-status.textContent = 'Tap to speak directly to Fresh';
-
-setTimeout(function() { sendToFresh(); }, 500);
-
-};
-
-recognition.onerror = function(e) {
-
-btn.style.background = '';
-
-status.textContent = 'Mic error. Try again.';
-
-};
-
-recognition.onend = function() { btn.style.background = ''; };
-
+  var btn = document.getElementById('micBtn');
+  var status = document.getElementById('voiceStatus');
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { status.textContent = 'Voice not supported. Use Chrome.'; return; }
+  var recognition = new SR();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = 'en-US';
+  btn.style.background = '#dc2626';
+  status.textContent = 'Listening... speak now!';
+  recognition.start();
+  recognition.onresult = function(e) {
+    var transcript = e.results[0][0].transcript;
+    document.getElementById('promptInput').value = transcript;
+    btn.style.background = '';
+    status.textContent = 'Tap to speak directly to Fresh';
+    setTimeout(function() { sendToFresh(); }, 500);
+  };
+  recognition.onerror = function(e) {
+    btn.style.background = '';
+    status.textContent = 'Mic error. Try again.';
+  };
+  recognition.onend = function() { btn.style.background = ''; };
 }
 
 function loadCalendarData() {
-
-var container = document.getElementById('calendarEventsContainer');
-
-container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">Syncing calendar...</p>';
-
-fetch('/.netlify/functions/calendar?t=' + new Date().getTime())
-
-.then(function(res) { return res.json(); })
-
-.then(function(data) {
-
-var events = data.events || [];
-
-var today = new Date().toDateString();
-
-var todayEvents = events.filter(function(ev) {
-
-return new Date(ev.start).toDateString() === today;
-
-});
-
-if (todayEvents.length === 0) {
-
-container.innerHTML = '<p class="text-gray-400 text-xs py-2 text-center">No appointments scheduled for today.</p>';
-
-return;
-
-}
-
-var html = '';
-
-todayEvents.forEach(function(ev) {
-
-var statusStyle = ev.isPast ? 'opacity-50 border-gray-800 bg-gray-900/40' : (ev.isCurrent ? 'border-amber-500 bg-amber-950/40 shadow-lg' : 'border-gray-700 bg-gray-900/80');
-
-var badge = ev.isCurrent ? '<span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-900 text-amber-300">NOW ACTIVE</span>' : '<span class="text-xs font-bold px-2 py-0.5 rounded bg-gray-800 text-gray-300">' + (ev.time || 'Today') + '</span>';
-
-html += '<div class="rounded-xl p-3 border flex justify-between items-start transition ' + statusStyle + '">';
-
-html += '<div>' + badge + '<h3 class="font-bold text-white text-sm mt-1">' + (ev.summary || 'Appointment') + '</h3>';
-
-if (ev.address) html += '<p class="text-xs text-gray-400 mt-0.5">' + ev.address + '</p>';
-
-html += '</div></div>';
-
-});
-
-container.innerHTML = html;
-
-})
-
-.catch(function(err) {
-
-container.innerHTML = '<div class="p-3 bg-gray-900/80 rounded-xl border border-gray-800"><span class="text-xs font-bold px-2 py-0.5 rounded bg-blue-900 text-blue-300">TODAY</span><h3 class="font-bold text-white text-sm mt-1">Schedule sync active</h3></div>';
-
-});
-
+  var container = document.getElementById('calendarEventsContainer');
+  container.innerHTML = '<p class="text-gray-500 text-xs py-2 text-center">Syncing calendar...</p>';
+  fetch('/.netlify/functions/calendar?t=' + new Date().getTime())
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      var events = data.events || [];
+      var today = new Date().toDateString();
+      var todayEvents = events.filter(function(ev) {
+        return new Date(ev.start).toDateString() === today;
+      });
+      if (todayEvents.length === 0) {
+        container.innerHTML = '<p class="text-gray-400 text-xs py-2 text-center">No appointments scheduled for today.</p>';
+        return;
+      }
+      var html = '';
+      todayEvents.forEach(function(ev) {
+        var statusStyle = ev.isPast ? 'opacity-50 border-gray-800 bg-gray-900/40' : (ev.isCurrent ? 'border-amber-500 bg-amber-950/40 shadow-lg' : 'border-gray-700 bg-gray-900/80');
+        var badge = ev.isCurrent ? '<span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-900 text-amber-300">NOW ACTIVE</span>' : '<span class="text-xs font-bold px-2 py-0.5 rounded bg-gray-800 text-gray-300">' + (ev.time || 'Today') + '</span>';
+        html += '<div class="rounded-xl p-3 border flex justify-between items-start transition ' + statusStyle + '">';
+        html += '<div>' + badge + '<h3 class="font-bold text-white text-sm mt-1">' + (ev.summary || 'Appointment') + '</h3>';
+        if (ev.address) html += '<p class="text-xs text-gray-400 mt-0.5">' + ev.address + '</p>';
+        html += '</div></div>';
+      });
+      container.innerHTML = html;
+    })
+    .catch(function(err) {
+      container.innerHTML = '<div class="p-3 bg-gray-900/80 rounded-xl border border-gray-800"><span class="text-xs font-bold px-2 py-0.5 rounded bg-blue-900 text-blue-300">TODAY</span><h3 class="font-bold text-white text-sm mt-1">Schedule sync active</h3></div>';
+    });
 }
 
 function loadMondayData() {
-
-var drawers = {
-
-intake: document.getElementById('drawer-intake'),
-
-workbench: document.getElementById('drawer-workbench'),
-
-ready: document.getElementById('drawer-ready'),
-
-completed: document.getElementById('drawer-completed')
-
-};
-
-fetch('/.netlify/functions/monday?t=' + new Date().getTime())
-
-.then(function(res) { return res.json(); })
-
-.then(function(data) {
-
-var groups = data.groups || [];
-
-var html = { intake: '', workbench: '', ready: '', completed: '' };
-
-for (var g = 0; g < groups.length; g++) {
-
-var grp = groups[g];
-
-var titleLower = (grp.title || '').toLowerCase();
-
-var category = 'intake';
-
-if (titleLower.indexOf('bench') !== -1 || titleLower.indexOf('work') !== -1 || titleLower.indexOf('repair') !== -1) category = 'workbench';
-
-else if (titleLower.indexOf('ready') !== -1 || titleLower.indexOf('wall') !== -1 || titleLower.indexOf('pickup') !== -1) category = 'ready';
-
-else if (titleLower.indexOf('complete') !== -1 || titleLower.indexOf('done') !== -1 || titleLower.indexOf('archive') !== -1) category = 'completed';
-
-var items = grp.items_page ? grp.items_page.items : [];
-
-for (var i = 0; i < items.length; i++) {
-
-html[category] += '<div class="p-2 rounded bg-gray-900/90 border border-gray-800 flex justify-between items-center">';
-
-html[category] += '<span class="text-gray-200 font-medium">' + items[i].name + '</span>';
-
-html[category] += '<span class="text-xs text-gray-400">' + grp.title + '</span>';
-
-html[category] += '</div>';
-
-}
-
-}
-
-for (var key in drawers) {
-
-drawers[key].innerHTML = html[key] || '<p class="text-gray-500 text-center py-1">No items in this category.</p>';
-
-}
-
-})
-
-.catch(function(err) {
-
-for (var key in drawers) {
-
-drawers[key].innerHTML = '<p class="text-gray-500 text-center py-1">Board sync active.</p>';
-
-}
-
-});
-
+  var drawers = {
+    intake: document.getElementById('drawer-intake'),
+    workbench: document.getElementById('drawer-workbench'),
+    ready: document.getElementById('drawer-ready'),
+    completed: document.getElementById('drawer-completed')
+  };
+  fetch('/.netlify/functions/monday?t=' + new Date().getTime())
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      var groups = data.groups || [];
+      var html = { intake: '', workbench: '', ready: '', completed: '' };
+      for (var g = 0; g < groups.length; g++) {
+        var grp = groups[g];
+        var titleLower = (grp.title || '').toLowerCase();
+        var category = 'intake';
+        if (titleLower.indexOf('bench') !== -1 || titleLower.indexOf('work') !== -1 || titleLower.indexOf('repair') !== -1) category = 'workbench';
+        else if (titleLower.indexOf('ready') !== -1 || titleLower.indexOf('wall') !== -1 || titleLower.indexOf('pickup') !== -1) category = 'ready';
+        else if (titleLower.indexOf('complete') !== -1 || titleLower.indexOf('done') !== -1 || titleLower.indexOf('archive') !== -1) category = 'completed';
+        var items = grp.items_page ? grp.items_page.items : [];
+        for (var i = 0; i < items.length; i++) {
+          html[category] += '<div class="p-2 rounded bg-gray-900/90 border border-gray-800 flex justify-between items-center">';
+          html[category] += '<span class="text-gray-200 font-medium">' + items[i].name + '</span>';
+          html[category] += '<span class="text-xs text-gray-400">' + grp.title + '</span>';
+          html[category] += '</div>';
+        }
+      }
+      for (var key in drawers) {
+        drawers[key].innerHTML = html[key] || '<p class="text-gray-500 text-center py-1">No items in this category.</p>';
+      }
+    })
+    .catch(function(err) {
+      for (var key in drawers) {
+        drawers[key].innerHTML = '<p class="text-gray-500 text-center py-1">Board sync active.</p>';
+      }
+    });
 }
 
 function calculateTax() {
-
-var sub = parseFloat(document.getElementById('subtotalInput').value) || 0;
-
-var tax = sub * 0.06;
-
-var total = sub + tax;
-
-document.getElementById('taxResult').textContent = tax.toFixed(2);
-
-var totalEl = document.getElementById('totalResult');
-
-if (totalEl) { totalEl.textContent = total.toFixed(2); }
-
+  var sub = parseFloat(document.getElementById('subtotalInput').value) || 0;
+  var tax = sub * 0.06;
+  var total = sub + tax;
+  document.getElementById('taxResult').textContent = tax.toFixed(2);
+  var totalEl = document.getElementById('totalResult');
+  if (totalEl) { totalEl.textContent = total.toFixed(2); }
 }
 
 function loadTimoniumWeather() {
-
-fetch('https://api.open-meteo.com/v1/forecast?latitude\=39.4398\&longitude\=-76.6239\&daily\=temperature\_2m\_max,temperature\_2m\_min,weathercode\&timezone\=America%2FNew\_York')
-
-.then(function(res) { return res.json(); })
-
-.then(function(data) {
-
-if (data && data.daily) {
-
-var max = Math.round((data.daily.temperature_2m_max[1] * 9/5) + 32);
-
-var min = Math.round((data.daily.temperature_2m_min[1] * 9/5) + 32);
-
-document.getElementById('weatherDetails').textContent = 'Tomorrow: High ' + max + '°F / Low ' + min + '°F';
-
-}
-
-})
-
-.catch(function() {
-
-document.getElementById('weatherDetails').textContent = 'Timonium MD: Check weather.com';
-
-});
-
+  fetch('https://api.open-meteo.com/v1/forecast?latitude=39.4398&longitude=-76.6239&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=America%2FNew_York')
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      if (data && data.daily) {
+        var max = Math.round((data.daily.temperature_2m_max[1] * 9/5) + 32);
+        var min = Math.round((data.daily.temperature_2m_min[1] * 9/5) + 32);
+        document.getElementById('weatherDetails').textContent = 'Tomorrow: High ' + max + '°F / Low ' + min + '°F';
+      }
+    })
+    .catch(function() {
+      document.getElementById('weatherDetails').textContent = 'Timonium MD: Check weather.com';
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-
-loadMondayData();
-
-loadCalendarData();
-
-loadTimoniumWeather();
-
-document.getElementById('promptInput').addEventListener('keydown', function(e) {
-
-if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendToFresh(); }
-
+  loadMondayData();
+  loadCalendarData();
+  loadTimoniumWeather();
+  document.getElementById('promptInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendToFresh(); }
+  });
 });
-
-});
-
 </script>
-
 </body>
-
 </html>
