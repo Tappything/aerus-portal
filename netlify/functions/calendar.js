@@ -13,16 +13,32 @@ exports.handler = async (event, context) => {
 
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
-    // Fetch upcoming events for the next 7 days
     const now = new Date();
-    const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    
+    // Set timeMin to start of today (00:00:00) and timeMax to end of today (23:59:59)
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
 
     const response = await calendar.events.list({
       calendarId: 'primary',
-      timeMin: now.toISOString(),
-      timeMax: nextWeek.toISOString(),
+      timeMin: startOfToday.toISOString(),
+      timeMax: endOfToday.toISOString(),
       singleEvents: true,
       orderBy: 'startTime',
+    });
+
+    const events = (response.data.items || []).map(evt => {
+      const start = new Date(evt.start.dateTime || evt.start.date);
+      const end = new Date(evt.end.dateTime || evt.end.date);
+
+      const isPast = end < now;
+      const isCurrent = start <= now && end >= now;
+
+      return {
+        ...evt,
+        isPast,
+        isCurrent
+      };
     });
 
     return {
@@ -33,7 +49,7 @@ exports.handler = async (event, context) => {
       },
       body: JSON.stringify({
         success: true,
-        events: response.data.items || []
+        events
       })
     };
   } catch (error) {
