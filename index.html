@@ -380,7 +380,7 @@ function toggleVoiceIntake() {
     document.getElementById('promptInput').value = transcript;
     btn.style.background = '';
     status.textContent = 'Tap to speak directly to Fresh';
-    sendToFresh();
+    setTimeout(function() { sendToFresh(); }, 500);
   };
   recognition.onerror = function(e) {
     btn.style.background = '';
