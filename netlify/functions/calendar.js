@@ -1,9 +1,12 @@
 const https = require('https');
 
-// Simple regex parser for iCal format to avoid heavy external dependencies
 function parseICS(icsData) {
   const events = [];
   const now = new Date();
+  
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+  const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+
   const veventRegex = /BEGIN:VEVENT([\s\S]*?)END:VEVENT/g;
   let match;
 
@@ -15,30 +18,35 @@ function parseICS(icsData) {
     const dtendMatch = eventContent.match(/DTEND(?:;[^:]*)?:(.*)/);
 
     if (dtstartMatch) {
-      const summary = summaryMatch ? summaryMatch[1].trim() : 'Event';
+      const summary = summaryMatch ? summaryMatch[1].trim() : 'Busy';
       const startDateStr = parseiCalDate(dtstartMatch[1].trim());
       const endDateStr = dtendMatch ? parseiCalDate(dtendMatch[1].trim()) : startDateStr;
 
       const startDate = new Date(startDateStr);
       const endDate = new Date(endDateStr);
 
-      const isPast = endDate < now;
-      const isCurrent = startDate <= now && endDate >= now;
+      if (endDate >= startOfToday && startDate <= endOfToday) {
+        const isPast = endDate < now;
+        const isCurrent = startDate <= now && endDate >= now;
+        
+        // Target 1: Add formatted 12-hour AM/PM time field
+        const formattedTime = startDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 
-      events.push({
-        summary,
-        start: startDateStr,
-        end: endDateStr,
-        isPast,
-        isCurrent
-      });
+        events.push({
+          summary,
+          start: startDateStr,
+          end: endDateStr,
+          time: formattedTime,
+          isPast,
+          isCurrent
+        });
+      }
     }
   }
   return events;
 }
 
 function parseiCalDate(dateStr) {
-  // Converts YYYYMMDDTHHMMSSZ or YYYYMMDD to ISO string
   if (dateStr.length === 8) {
     const y = dateStr.substring(0, 4);
     const m = dateStr.substring(4, 6);
