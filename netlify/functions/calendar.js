@@ -1,90 +1,92 @@
-exports.handler = async (event, context) => {
-  try {
-    const clientId = process.env.GOOGLE_CALENDAR_CLIENT_ID;
-    const clientSecret = process.env.GOOGLE_CALENDAR_CLIENT_SECRET;
-    const refreshToken = process.env.GOOGLE_CALENDAR_REFRESH_TOKEN;
+const https = require('https');
 
-    if (!clientId || !clientSecret || !refreshToken) {
-      throw new Error('Missing Google Calendar OAuth environment variables.');
+// Simple regex parser for iCal format to avoid heavy external dependencies
+function parseICS(icsData) {
+  const events = [];
+  const now = new Date();
+  const veventRegex = /BEGIN:VEVENT([\s\S]*?)END:VEVENT/g;
+  let match;
+
+  while ((match = veventRegex.exec(icsData)) !== null) {
+    const eventContent = match[1];
+    
+    const summaryMatch = eventContent.match(/SUMMARY:(.*)/);
+    const dtstartMatch = eventContent.match(/DTSTART(?:;[^:]*)?:(.*)/);
+    const dtendMatch = eventContent.match(/DTEND(?:;[^:]*)?:(.*)/);
+
+    if (dtstartMatch) {
+      const summary = summaryMatch ? summaryMatch[1].trim() : 'Event';
+      const startDateStr = parseiCalDate(dtstartMatch[1].trim());
+      const endDateStr = dtendMatch ? parseiCalDate(dtendMatch[1].trim()) : startDateStr;
+
+      const startDate = new Date(startDateStr);
+      const endDate = new Date(endDateStr);
+
+      const isPast = endDate < now;
+      const isCurrent = startDate <= now && endDate >= now;
+
+      events.push({
+        summary,
+        start: startDateStr,
+        end: endDateStr,
+        isPast,
+        isCurrent
+      });
     }
-
-    // Step 1: Exchange Refresh Token for an Access Token
-    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        client_id: clientId,
-        client_secret: clientSecret,
-        refresh_token: refreshToken,
-        grant_type: 'refresh_token'
-      })
-    });
-
-    const tokenData = await tokenResponse.json();
-
-    if (!tokenData.access_token) {
-      throw new Error(`Failed to obtain access token: ${JSON.stringify(tokenData)}`);
-    }
-
-    const accessToken = tokenData.access_token;
-
-    // Step 2: Set boundaries for TODAY only
-    const now = new Date();
-    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-
-    const timeMin = encodeURIComponent(startOfDay.toISOString());
-    const timeMax = encodeURIComponent(endOfDay.toISOString());
-
-    // Step 3: Fetch today's events from Google Calendar REST API
-    const calendarUrl = `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`;
-
-    const calResponse = await fetch(calendarUrl, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    });
-
-    const calData = await calResponse.json();
-
-    if (calData.error) {
-      throw new Error(`Calendar API Error: ${calData.error.message}`);
-    }
-
-    // Step 4: Map events with rolling flags (isPast, isCurrent)
-    const events = (calData.items || []).map(evt => {
-      const startTime = new Date(evt.start.dateTime || evt.start.date);
-      const endTime = new Date(evt.end.dateTime || evt.end.date);
-
-      return {
-        ...evt,
-        isPast: endTime < now,
-        isCurrent: startTime <= now && endTime >= now
-      };
-    });
-
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({
-        success: true,
-        events
-      })
-    };
-  } catch (error) {
-    return {
-      statusCode: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({
-        success: false,
-        error: error.message
-      })
-    };
   }
+  return events;
+}
+
+function parseiCalDate(dateStr) {
+  // Converts YYYYMMDDTHHMMSSZ or YYYYMMDD to ISO string
+  if (dateStr.length === 8) {
+    const y = dateStr.substring(0, 4);
+    const m = dateStr.substring(4, 6);
+    const d = dateStr.substring(6, 8);
+    return `${y}-${m}-${d}T00:00:00.000Z`;
+  }
+  const y = dateStr.substring(0, 4);
+  const m = dateStr.substring(4, 6);
+  const d = dateStr.substring(6, 8);
+  const h = dateStr.substring(9, 11) || '00';
+  const min = dateStr.substring(11, 13) || '00';
+  const s = dateStr.substring(13, 15) || '00';
+  return `${y}-${m}-${d}T${h}:${min}:${s}.000Z`;
+}
+
+exports.handler = async function(event, context) {
+  const calendarId = 'william@towsonhealthyhomes.com';
+  const url = `https://calendar.google.com/calendar/ical/${encodeURIComponent(calendarId)}/public/basic.ics`;
+
+  return new Promise((resolve) => {
+    https.get(url, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const parsedEvents = parseICS(data);
+          resolve({
+            statusCode: 200,
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ success: true, events: parsedEvents })
+          });
+        } catch (err) {
+          resolve({
+            statusCode: 500,
+            headers: { "Access-Control-Allow-Origin": "*" },
+            body: JSON.stringify({ success: false, error: err.message })
+          });
+        }
+      });
+    }).on('error', (e) => {
+      resolve({
+        statusCode: 500,
+        headers: { "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({ success: false, error: e.message })
+      });
+    });
+  });
 };
