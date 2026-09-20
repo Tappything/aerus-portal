@@ -17,6 +17,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Ar
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(59,130,246,0.7)}70%{box-shadow:0 0 0 22px rgba(59,130,246,0)}100%{box-shadow:0 0 0 0 rgba(59,130,246,0)}}
 details > summary { list-style: none; }
 details > summary::-webkit-details-marker { display: none; }
+/* CHANGE 1 — Smooth Drawer Animation */
+details > div { animation: slideDown 0.2s ease-out; } @keyframes slideDown { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body class="min-h-screen pb-16">
@@ -36,6 +38,9 @@ details > summary::-webkit-details-marker { display: none; }
 </div>
 </div>
 </nav>
+
+<!-- CHANGE 3 — Slide-Over Card Panel -->
+<div id="cardPanel" onclick="closeCard()" class="fixed inset-0 bg-black/60 z-50 hidden backdrop-blur-sm"><div onclick="event.stopPropagation()" class="absolute right-0 top-0 h-full w-full max-w-sm bg-gray-900 border-l border-gray-700 p-6 overflow-y-auto shadow-2xl"><div class="flex items-center justify-between mb-6"><h2 class="font-bold text-white text-lg">Customer Card</h2><button onclick="closeCard()" class="text-gray-400 hover:text-white text-3xl leading-none">×</button></div><div id="cardContent" class="space-y-4"></div></div></div>
 
 <main class="max-w-7xl mx-auto px-4 pt-6 space-y-6">
 
@@ -96,10 +101,11 @@ details > summary::-webkit-details-marker { display: none; }
 <button onclick="loadMondayData()" class="text-xs text-blue-400 px-2 py-1 rounded border border-blue-800/50 hover:bg-blue-900/30 transition"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
 </div>
 <div class="space-y-3 text-xs">
+<!-- CHANGE 2 — Glowing Dots replacing chevrons -->
 <details class="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden group">
 <summary class="p-3 font-bold text-blue-400 flex justify-between items-center cursor-pointer hover:bg-gray-800/50 transition">
 <span>📋 INTAKE</span>
-<i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
+<span class="w-3 h-3 rounded-full border-2 border-gray-600 group-open:border-blue-400 group-open:bg-blue-400 group-open:shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-300 flex-shrink-0"></span>
 </summary>
 <div id="drawer-intake" class="p-3 border-t border-gray-800/60 space-y-2">
 <p class="text-gray-500 text-center py-1">Loading intake items...</p>
@@ -108,7 +114,7 @@ details > summary::-webkit-details-marker { display: none; }
 <details class="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden group">
 <summary class="p-3 font-bold text-amber-400 flex justify-between items-center cursor-pointer hover:bg-gray-800/50 transition">
 <span>🔧 WORKBENCH</span>
-<i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
+<span class="w-3 h-3 rounded-full border-2 border-gray-600 group-open:border-blue-400 group-open:bg-blue-400 group-open:shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-300 flex-shrink-0"></span>
 </summary>
 <div id="drawer-workbench" class="p-3 border-t border-gray-800/60 space-y-2">
 <p class="text-gray-500 text-center py-1">Loading bench repairs...</p>
@@ -117,7 +123,7 @@ details > summary::-webkit-details-marker { display: none; }
 <details class="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden group">
 <summary class="p-3 font-bold text-emerald-400 flex justify-between items-center cursor-pointer hover:bg-gray-800/50 transition">
 <span>✅ READY WALL</span>
-<i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
+<span class="w-3 h-3 rounded-full border-2 border-gray-600 group-open:border-blue-400 group-open:bg-blue-400 group-open:shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-300 flex-shrink-0"></span>
 </summary>
 <div id="drawer-ready" class="p-3 border-t border-gray-800/60 space-y-2">
 <p class="text-gray-500 text-center py-1">Loading ready pickups...</p>
@@ -126,7 +132,7 @@ details > summary::-webkit-details-marker { display: none; }
 <details class="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden group">
 <summary class="p-3 font-bold text-gray-400 flex justify-between items-center cursor-pointer hover:bg-gray-800/50 transition">
 <span>🔵 COMPLETED</span>
-<i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
+<span class="w-3 h-3 rounded-full border-2 border-gray-600 group-open:border-blue-400 group-open:bg-blue-400 group-open:shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-300 flex-shrink-0"></span>
 </summary>
 <div id="drawer-completed" class="p-3 border-t border-gray-800/60 space-y-2">
 <p class="text-gray-500 text-center py-1">Loading completed items...</p>
@@ -143,31 +149,31 @@ details > summary::-webkit-details-marker { display: none; }
 <div class="space-y-3 text-xs">
 <details class="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden group">
 <summary class="p-3 font-semibold text-gray-200 flex justify-between items-center cursor-pointer hover:bg-gray-800/50">
-<span>🏠 Home Tasks</span><i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
+<span>🏠 Home Tasks</span><span class="w-3 h-3 rounded-full border-2 border-gray-600 group-open:border-blue-400 group-open:bg-blue-400 group-open:shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-300 flex-shrink-0"></span>
 </summary>
 <div class="p-3 border-t border-gray-800/60 text-gray-500 text-center italic">Talk to Fresh to set up your Home Tasks</div>
 </details>
 <details class="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden group">
 <summary class="p-3 font-semibold text-gray-200 flex justify-between items-center cursor-pointer hover:bg-gray-800/50">
-<span>💰 Banking & Finance</span><i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
+<span>💰 Banking & Finance</span><span class="w-3 h-3 rounded-full border-2 border-gray-600 group-open:border-blue-400 group-open:bg-blue-400 group-open:shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-300 flex-shrink-0"></span>
 </summary>
 <div class="p-3 border-t border-gray-800/60 text-gray-500 text-center italic">Talk to Fresh to set up your Banking & Finance</div>
 </details>
 <details class="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden group">
 <summary class="p-3 font-semibold text-gray-200 flex justify-between items-center cursor-pointer hover:bg-gray-800/50">
-<span>👨‍👩‍👧 Family</span><i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
+<span>👨‍👩‍👧 Family</span><span class="w-3 h-3 rounded-full border-2 border-gray-600 group-open:border-blue-400 group-open:bg-blue-400 group-open:shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-300 flex-shrink-0"></span>
 </summary>
 <div class="p-3 border-t border-gray-800/60 text-gray-500 text-center italic">Talk to Fresh to set up your Family</div>
 </details>
 <details class="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden group">
 <summary class="p-3 font-semibold text-gray-200 flex justify-between items-center cursor-pointer hover:bg-gray-800/50">
-<span>🏥 Health</span><i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
+<span>🏥 Health</span><span class="w-3 h-3 rounded-full border-2 border-gray-600 group-open:border-blue-400 group-open:bg-blue-400 group-open:shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-300 flex-shrink-0"></span>
 </summary>
 <div class="p-3 border-t border-gray-800/60 text-gray-500 text-center italic">Talk to Fresh to set up your Health</div>
 </details>
 <details class="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden group">
 <summary class="p-3 font-semibold text-gray-200 flex justify-between items-center cursor-pointer hover:bg-gray-800/50">
-<span>🔒 Private Vault</span><i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
+<span>🔒 Private Vault</span><span class="w-3 h-3 rounded-full border-2 border-gray-600 group-open:border-blue-400 group-open:bg-blue-400 group-open:shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-300 flex-shrink-0"></span>
 </summary>
 <div class="p-3 border-t border-gray-800/60 text-gray-500 text-center italic">Talk to Fresh to set up your Private Vault</div>
 </details>
@@ -185,19 +191,19 @@ details > summary::-webkit-details-marker { display: none; }
 </div>
 <div class="space-y-2 text-xs">
 <details class="bg-gray-900/80 border border-gray-800 rounded-lg overflow-hidden group">
-<summary class="p-2.5 font-semibold text-gray-300 flex justify-between items-center cursor-pointer hover:bg-gray-800/50"><span>💬 Message Chris</span><i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i></summary>
+<summary class="p-2.5 font-semibold text-gray-300 flex justify-between items-center cursor-pointer hover:bg-gray-800/50"><span>💬 Message Chris</span><span class="w-3 h-3 rounded-full border-2 border-gray-600 group-open:border-blue-400 group-open:bg-blue-400 group-open:shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-300 flex-shrink-0"></span></summary>
 <div class="p-3 border-t border-gray-800/60 space-y-2"><textarea placeholder="Message Chris (Parts & Bench)..." class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white focus:outline-none resize-none" rows="2"></textarea><button onclick="alert('Message routed to Chris')" class="w-full bg-blue-600 text-white font-bold py-1 rounded">Send</button></div>
 </details>
 <details class="bg-gray-900/80 border border-gray-800 rounded-lg overflow-hidden group">
-<summary class="p-2.5 font-semibold text-gray-300 flex justify-between items-center cursor-pointer hover:bg-gray-800/50"><span>💬 Message Mona</span><i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i></summary>
+<summary class="p-2.5 font-semibold text-gray-300 flex justify-between items-center cursor-pointer hover:bg-gray-800/50"><span>💬 Message Mona</span><span class="w-3 h-3 rounded-full border-2 border-gray-600 group-open:border-blue-400 group-open:bg-blue-400 group-open:shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-300 flex-shrink-0"></span></summary>
 <div class="p-3 border-t border-gray-800/60 space-y-2"><textarea placeholder="Message Mona (Digital & Intakes)..." class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white focus:outline-none resize-none" rows="2"></textarea><button onclick="alert('Message routed to Mona')" class="w-full bg-blue-600 text-white font-bold py-1 rounded">Send</button></div>
 </details>
 <details class="bg-gray-900/80 border border-gray-800 rounded-lg overflow-hidden group">
-<summary class="p-2.5 font-semibold text-gray-300 flex justify-between items-center cursor-pointer hover:bg-gray-800/50"><span>💬 Message Norby</span><i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i></summary>
+<summary class="p-2.5 font-semibold text-gray-300 flex justify-between items-center cursor-pointer hover:bg-gray-800/50"><span>💬 Message Norby</span><span class="w-3 h-3 rounded-full border-2 border-gray-600 group-open:border-blue-400 group-open:bg-blue-400 group-open:shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-300 flex-shrink-0"></span></summary>
 <div class="p-3 border-t border-gray-800/60 space-y-2"><textarea placeholder="Message Norby (Outreach & Leads)..." class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white focus:outline-none resize-none" rows="2"></textarea><button onclick="alert('Message routed to Norby')" class="w-full bg-blue-600 text-white font-bold py-1 rounded">Send</button></div>
 </details>
 <details class="bg-gray-900/80 border border-gray-800 rounded-lg overflow-hidden group">
-<summary class="p-2.5 font-semibold text-gray-300 flex justify-between items-center cursor-pointer hover:bg-gray-800/50"><span>💬 Message Mike</span><i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i></summary>
+<summary class="p-2.5 font-semibold text-gray-300 flex justify-between items-center cursor-pointer hover:bg-gray-800/50"><span>💬 Message Mike</span><span class="w-3 h-3 rounded-full border-2 border-gray-600 group-open:border-blue-400 group-open:bg-blue-400 group-open:shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-300 flex-shrink-0"></span></summary>
 <div class="p-3 border-t border-gray-800/60 space-y-2"><textarea placeholder="Message Mike (Bench Tech)..." class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white focus:outline-none resize-none" rows="2"></textarea><button onclick="alert('Message routed to Mike')" class="w-full bg-blue-600 text-white font-bold py-1 rounded">Send</button></div>
 </details>
 </div>
@@ -210,7 +216,7 @@ details > summary::-webkit-details-marker { display: none; }
 <div class="w-9 h-9 rounded-xl bg-purple-900/50 border border-purple-700/50 flex items-center justify-center text-purple-400"><i class="fa-solid fa-receipt"></i></div>
 <div><h3 class="font-bold text-gray-100">💰 INVOICES & PAYMENTS</h3><p class="text-xs text-purple-300 font-semibold">Tap to Toggle</p></div>
 </div>
-<i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
+<span class="w-3 h-3 rounded-full border-2 border-gray-600 group-open:border-blue-400 group-open:bg-blue-400 group-open:shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-300 flex-shrink-0"></span>
 </summary>
 <div class="mt-4 space-y-3 text-xs border-t border-gray-800 pt-3">
 <div class="bg-purple-950/40 border border-purple-800/50 p-3 rounded-xl text-center space-y-1">
@@ -239,7 +245,7 @@ details > summary::-webkit-details-marker { display: none; }
 <div class="w-9 h-9 rounded-xl bg-blue-900/50 border border-blue-700/50 flex items-center justify-center text-blue-400"><i class="fa-solid fa-box-open"></i></div>
 <div><h3 class="font-bold text-gray-100">📦 TRACKING & ORDERS</h3><p class="text-xs text-gray-400">Quick Launch Carriers</p></div>
 </div>
-<i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
+<span class="w-3 h-3 rounded-full border-2 border-gray-600 group-open:border-blue-400 group-open:bg-blue-400 group-open:shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-300 flex-shrink-0"></span>
 </summary>
 <div class="mt-4 grid grid-cols-2 gap-2 text-xs border-t border-gray-800 pt-3">
 <a href="https://www.ups.com/track" target="_blank" class="p-2.5 rounded-lg bg-amber-950/40 border border-amber-800/50 text-amber-300 font-bold flex items-center justify-center space-x-2 hover:bg-amber-900/60 transition"><i class="fa-solid fa-truck-fast"></i><span>🟤 UPS</span></a>
@@ -257,7 +263,7 @@ details > summary::-webkit-details-marker { display: none; }
 <div class="w-9 h-9 rounded-xl bg-emerald-900/50 border border-emerald-700/50 flex items-center justify-center text-emerald-400"><i class="fa-solid fa-wallet"></i></div>
 <div><h3 class="font-bold text-gray-100">💸 QUICK PAY</h3><p class="text-xs text-gray-400">Launch Mobile Pay Apps</p></div>
 </div>
-<i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
+<span class="w-3 h-3 rounded-full border-2 border-gray-600 group-open:border-blue-400 group-open:bg-blue-400 group-open:shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-300 flex-shrink-0"></span>
 </summary>
 <div class="mt-4 space-y-2 text-xs border-t border-gray-800 pt-3">
 <a href="https://cash.app" target="_blank" class="p-2.5 rounded-lg bg-emerald-950/40 border border-emerald-800/50 text-emerald-300 font-bold flex items-center justify-between hover:bg-emerald-900/60 transition"><span>💚 Cash App</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
@@ -274,7 +280,7 @@ details > summary::-webkit-details-marker { display: none; }
 <div class="w-9 h-9 rounded-xl bg-amber-900/50 border border-amber-700/50 flex items-center justify-center text-amber-400"><i class="fa-solid fa-baseball"></i></div>
 <div><h3 class="font-bold text-gray-100">⚾ MY WORLD</h3><p class="text-xs text-gray-400">Orioles Score & Timonium Weather</p></div>
 </div>
-<i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
+<span class="w-3 h-3 rounded-full border-2 border-gray-600 group-open:border-blue-400 group-open:bg-blue-400 group-open:shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-300 flex-shrink-0"></span>
 </summary>
 <div class="mt-4 space-y-3 text-xs border-t border-gray-800 pt-3">
 <a href="https://www.mlb.com/orioles" target="_blank" class="p-2.5 rounded-lg bg-amber-950/40 border border-amber-800/50 text-amber-300 font-bold flex items-center justify-between hover:bg-amber-900/60 transition"><span>⚾ Baltimore Orioles Live</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
@@ -293,7 +299,7 @@ details > summary::-webkit-details-marker { display: none; }
 <div class="w-9 h-9 rounded-xl bg-purple-900/50 border border-purple-700/50 flex items-center justify-center text-purple-400"><i class="fa-solid fa-briefcase"></i></div>
 <div><h3 class="font-bold text-gray-100">💼 BECOME A REP</h3><p class="text-xs text-purple-300 font-semibold">Affiliate Opportunities</p></div>
 </div>
-<i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
+<span class="w-3 h-3 rounded-full border-2 border-gray-600 group-open:border-blue-400 group-open:bg-blue-400 group-open:shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-300 flex-shrink-0"></span>
 </summary>
 <div class="mt-4 space-y-3 text-xs border-t border-gray-800 pt-3 text-center">
 <div class="bg-gray-900/90 border border-gray-800 p-4 rounded-xl space-y-2">
@@ -441,7 +447,8 @@ function loadMondayData() {
         else if (titleLower.indexOf('complete') !== -1 || titleLower.indexOf('done') !== -1 || titleLower.indexOf('archive') !== -1) category = 'completed';
         var items = grp.items_page ? grp.items_page.items : [];
         for (var i = 0; i < items.length; i++) {
-          html[category] += '<div class="p-2 rounded bg-gray-900/90 border border-gray-800 flex justify-between items-center">';
+          /* CHANGE 4 — Tappable Board Items */
+          html[category] += '<div onclick="openCard(\'' + items[i].name.replace(/\'/g, '') + '\', \'' + grp.title + '\')" class="p-2 rounded bg-gray-900/90 border border-gray-800 flex justify-between items-center cursor-pointer hover:bg-gray-800 transition">';
           html[category] += '<span class="text-gray-200 font-medium">' + items[i].name + '</span>';
           html[category] += '<span class="text-xs text-gray-400">' + grp.title + '</span>';
           html[category] += '</div>';
@@ -480,6 +487,16 @@ function loadTimoniumWeather() {
     .catch(function() {
       document.getElementById('weatherDetails').textContent = 'Timonium MD: Check weather.com';
     });
+}
+
+/* CHANGE 5 — Card Panel Functions */
+function openCard(name, group) { 
+  document.getElementById('cardContent').innerHTML = '<div class="space-y-4"><div class="bg-gray-800 rounded-xl p-4 border border-gray-700"><p class="text-xs text-gray-400 uppercase mb-1">Customer</p><h3 class="font-bold text-white text-xl">' + name + '</h3><p class="text-sm text-blue-400 mt-1">' + group + '</p></div><div class="bg-gray-800 rounded-xl p-4 border border-gray-700"><p class="text-xs text-gray-400 uppercase mb-2">Quick Actions</p><div class="grid grid-cols-2 gap-2"><button class="bg-blue-600 text-white font-bold py-2.5 rounded-lg text-sm">📞 Call</button><button onclick="window.print()" class="bg-gray-700 text-white font-bold py-2.5 rounded-lg text-sm">🖨️ Print</button></div></div><div class="bg-gray-800 rounded-xl p-4 border border-gray-700"><p class="text-xs text-gray-400 uppercase mb-2">Timeline</p><p class="text-xs text-gray-500 italic">Full history coming soon</p></div><div class="bg-gray-800 rounded-xl p-4 border border-gray-700"><p class="text-xs text-gray-400 uppercase mb-2">Attachments</p><p class="text-xs text-gray-500 italic">Documents & photos coming soon</p></div><div class="bg-gray-800 rounded-xl p-4 border border-gray-700"><p class="text-xs text-gray-400 uppercase mb-2">Communications</p><p class="text-xs text-gray-500 italic">Calls, texts & emails coming soon</p></div></div>'; 
+  document.getElementById('cardPanel').classList.remove('hidden'); 
+} 
+
+function closeCard() { 
+  document.getElementById('cardPanel').classList.add('hidden'); 
 }
 
 document.addEventListener('DOMContentLoaded', function() {
