@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TappyThing — Your Digital Coordinator</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #0b0f19; color: #f3f4f6; }
+.glow-card { background: rgba(17, 24, 39, 0.85); border: 1px solid rgba(59, 130, 246, 0.3); box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5); }
+.glow-button { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); box-shadow: 0 0 25px rgba(37, 99, 235, 0.6); }
+.mic-pulse { animation: pulse 2s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(59, 130, 246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); } }
+</style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
+
+<main class="w-full max-w-xl space-y-8 text-center">
+
+  <!-- Fresh Identity Header -->
+  <div class="flex flex-col items-center space-y-4">
+    <div class="relative">
+      <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh Coordinator" class="w-28 h-28 rounded-full object-cover border-4 border-blue-500 shadow-2xl" />
+      <span class="absolute bottom-1 right-1 w-5 h-5 bg-emerald-500 border-2 border-gray-900 rounded-full animate-pulse"></span>
+    </div>
+    <div>
+      <h1 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Meet Fresh 🤵</h1>
+      <p class="text-blue-400 font-semibold text-sm mt-1">Your Pocket Chief of Staff • Powered by TappyThing</p>
+    </div>
+  </div>
+
+  <!-- Hero Value Card -->
+  <div class="glow-card rounded-3xl p-6 md:p-8 text-left space-y-6 backdrop-blur-md">
+    <h2 class="text-xl md:text-2xl font-bold text-center text-white leading-snug">
+      "Tap it. Talk into it. Consider it done."
+    </h2>
+    <p class="text-gray-300 text-sm text-center leading-relaxed">
+      Stop drowning in tasks, sticky notes, and admin drag. Fresh organizes your entire business and personal world through simple voice notes.
+    </p>
+
+    <!-- 3 Core Bullets -->
+    <div class="space-y-4 pt-2 border-t border-gray-800">
+      <div class="flex items-start space-x-3">
+        <div class="w-8 h-8 rounded-lg bg-blue-900/50 border border-blue-500/40 flex items-center justify-center text-blue-400 flex-shrink-0 mt-0.5"><i class="fa-solid fa-microphone"></i></div>
+        <div>
+          <h3 class="font-bold text-white text-sm">Voice-First One-Tap Intake</h3>
+          <p class="text-gray-400 text-xs">Dump ideas, repairs, tasks, and notes in one place. Fresh sorts and routes everything automatically.</p>
+        </div>
+      </div>
+
+      <div class="flex items-start space-x-3">
+        <div class="w-8 h-8 rounded-lg bg-emerald-900/50 border border-emerald-500/40 flex items-center justify-center text-emerald-400 flex-shrink-0 mt-0.5"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+        <div>
+          <h3 class="font-bold text-white text-sm">Self-Building & Zero Setup Maintenance</h3>
+          <p class="text-gray-400 text-xs">Fresh interviews you to build your personal system instantly. No setup calls or tech confusion required.</p>
+        </div>
+      </div>
+
+      <div class="flex items-start space-x-3">
+        <div class="w-8 h-8 rounded-lg bg-amber-900/50 border border-amber-500/40 flex items-center justify-center text-amber-400 flex-shrink-0 mt-0.5"><i class="fa-solid fa-briefcase"></i></div>
+        <div>
+          <h3 class="font-bold text-white text-sm">Business & Personal Worlds Synced</h3>
+          <p class="text-gray-400 text-xs">Keep shop operations, staff queues, and family tasks organized side-by-side in real time.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing & Signup Action Area -->
+    <div class="pt-6 border-t border-gray-800 space-y-4 text-center">
+      <div class="bg-gray-900/90 border border-gray-800 p-4 rounded-2xl">
+        <span class="text-xs font-bold uppercase text-blue-400 tracking-widest">All-Inclusive Subscription</span>
+        <div class="text-3xl font-extrabold text-white mt-1">$95 <span class="text-sm font-normal text-gray-400">/ month</span></div>
+        <p class="text-xs text-gray-400 mt-1">Full access • Unlimited voice notes • Cancel anytime</p>
+      </div>
+
+      <!-- Promo Code Field -->
+      <div class="flex space-x-2">
+        <input type="text" id="promoCode" placeholder="Promo code (Optional)" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition" />
+        <button onclick="applyPromo()" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-xs font-bold rounded-xl border border-gray-700 transition">Apply</button>
+      </div>
+
+      <!-- Call To Action Button -->
+      <button onclick="startTrial()" class="w-full glow-button py-4 rounded-2xl font-extrabold text-white text-base tracking-wide flex items-center justify-center space-x-2 mic-pulse hover:opacity-95 transition active:scale-95">
+        <i class="fa-solid fa-bolt"></i>
+        <span>START MY FREE 3-DAY TRIAL</span>
+      </button>
+      
+      <p class="text-[11px] text-gray-500">Includes instant setup with Fresh • Billed via Clean Environment LLC</p>
+    </div>
+  </div>
+
+</main>
+
+<footer class="py-6 text-xs text-gray-500">
+  Powered by <strong>TappyThing</strong>
+</footer>
+
+<script>
+function applyPromo() {
+  var code = document.getElementById('promoCode').value.trim();
+  if (code) {
+    alert('Promo code "' + code + '" applied! Proceeding to setup.');
+  } else {
+    alert('Please enter a promo code.');
+  }
+}
+
+function startTrial() {
+  alert('Welcome to TappyThing! Fresh is preparing your onboarding interview...');
+  window.location.href = '/';
+}
+</script>
+
+</body>
+</html>
