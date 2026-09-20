@@ -1,55 +1,95 @@
-exports.handler = async function(event) {
+const https = require('https');
+
+exports.handler = async function(event, context) {
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+    return {
+      statusCode: 405,
+      headers: { "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({ error: 'Method Not Allowed' })
+    };
   }
 
   try {
-    var body = JSON.parse(event.body || '{}');
-    var prompt = body.prompt || body.message || '';
-    var apiKey = process.env.GEMINI_API_KEY;
+    const data = JSON.parse(event.body || '{}');
+    const prompt = data.prompt || '';
 
+    if (!prompt) {
+      return {
+        statusCode: 400,
+        headers: { "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({ error: 'Prompt is required' })
+      };
+    }
+
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reply: 'API key missing.' })
+        statusCode: 500,
+        headers: { "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({ error: 'Gemini API key not configured' })
       };
     }
 
-    var fullPrompt = 'You are Fresh, a sharp Digital Coordinator for William Sullivan at Aerus Home Wellness in Timonium MD. Be direct, helpful, and energetic. Max 1 sentences. User says: ' + prompt;
+    // System prompt: TappyThing general coordinator rules
+    var fullPrompt = 'You are Fresh, a Digital Coordinator for TappyThing. You serve anyone who uses TappyThing. Rules you never break: 1) When someone gives you any intake — customer name, repair, bill, task, appointment, anything — respond with ONLY: Got it — delivered to Sissy. Nothing else. 2) When someone says hello or asks who you are say: Hi — I am Fresh, your Digital Coordinator. Just talk to me and I take care of the rest. Phone, text and email features coming soon. 3) For everything else be helpful and direct. Max 2 sentences. Never mention William by name. Never mention Monday.com. Never give utility company directions. Never schedule calendar events. User says: ' + prompt;
 
-    var response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=' + apiKey, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: fullPrompt }] }],
-        generationConfig: { temperature: 0.9, maxOutputTokens: 80 }
-      })
+    const payload = JSON.stringify({
+      contents: [{
+        parts: [{ text: fullPrompt }]
+      }]
     });
 
-    var data = await response.json();
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-    if (!data.candidates) {
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reply: 'Gemini said: ' + JSON.stringify(data).substring(0, 300) })
-      };
-    }
+    return new Promise((resolve) => {
+      const req = https.request(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(payload)
+        }
+      }, (res) => {
+        let resData = '';
+        res.on('data', chunk => resData += chunk);
+        res.on('end', () => {
+          try {
+            const parsed = JSON.parse(resData);
+            const reply = parsed.candidates?.[0]?.content?.parts?.[0]?.text || 'Got it — delivered to Sissy.';
+            resolve({
+              statusCode: 200,
+              headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ reply: reply.trim() })
+            });
+          } catch (e) {
+            resolve({
+              statusCode: 500,
+              headers: { "Access-Control-Allow-Origin": "*" },
+              body: JSON.stringify({ error: 'Failed to parse Gemini response' })
+            });
+          }
+        });
+      });
 
-    var reply = data.candidates[0].content.parts[0].text;
+      req.on('error', (e) => {
+        resolve({
+          statusCode: 500,
+          headers: { "Access-Control-Allow-Origin": "*" },
+          body: JSON.stringify({ error: e.message })
+        });
+      });
 
+      req.write(payload);
+      req.end();
+    });
+
+  } catch (err) {
     return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reply: reply.trim() })
-    };
-
-  } catch(e) {
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reply: 'Error: ' + e.message })
+      statusCode: 500,
+      headers: { "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({ error: err.message })
     };
   }
 };
