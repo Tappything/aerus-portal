@@ -15,29 +15,26 @@ exports.handler = async (event, context) => {
 
     const now = new Date();
     
-    // Set timeMin to start of today (00:00:00) and timeMax to end of today (23:59:59)
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+    // Set time boundaries for TODAY only
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
 
     const response = await calendar.events.list({
       calendarId: 'primary',
-      timeMin: startOfToday.toISOString(),
-      timeMax: endOfToday.toISOString(),
+      timeMin: startOfDay.toISOString(),
+      timeMax: endOfDay.toISOString(),
       singleEvents: true,
       orderBy: 'startTime',
     });
 
     const events = (response.data.items || []).map(evt => {
-      const start = new Date(evt.start.dateTime || evt.start.date);
-      const end = new Date(evt.end.dateTime || evt.end.date);
-
-      const isPast = end < now;
-      const isCurrent = start <= now && end >= now;
+      const startTime = new Date(evt.start.dateTime || evt.start.date);
+      const endTime = new Date(evt.end.dateTime || evt.end.date);
 
       return {
         ...evt,
-        isPast,
-        isCurrent
+        isPast: endTime < now,
+        isCurrent: startTime <= now && endTime >= now
       };
     });
 
