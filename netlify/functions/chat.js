@@ -97,7 +97,7 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // NEW BYPASS: ONBOARDING & CONVERSATIONAL INTERACTION
+    // ONBOARDING & CONVERSATIONAL INTERACTION BYPASS
     if (lower.startsWith("i'm") || lower.startsWith("i am") || lower.startsWith("i ") || lower.startsWith("my ") || lower.startsWith("can you") || lower.startsWith("could you") || lower.startsWith("help") || lower.startsWith("tell me")) { 
       return { 
         statusCode: 200, 
@@ -157,8 +157,8 @@ exports.handler = async function(event, context) {
 
     const reply = resData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'Got it — delivered to Sissy.';
 
-    // Server-side Webhook Trigger: If response contains "Got it", fire to Make.com
-    if (reply.indexOf('Got it') !== -1) {
+    // Server-side Webhook Trigger: Only fire to Make.com if "Got it" AND message is under 8 words (Real short intake)
+    if (reply.indexOf('Got it') !== -1 && prompt.split(' ').length < 8) {
       const webhookUrl = 'https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1';
       const webhookPayload = JSON.stringify({ body: prompt });
       
