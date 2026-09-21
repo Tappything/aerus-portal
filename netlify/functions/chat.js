@@ -83,8 +83,9 @@ exports.handler = async function(event, context) {
     // Pull live board items from Monday.com
     const boardContext = await fetchBoardContext(mondayKey);
 
-    // DIRECT CODE INTENT BYPASS: Instant, 100% reliable responses without AI latency
     const lower = prompt.toLowerCase().trim();
+
+    // 1. GREETING BYPASS
     if (lower === 'hello' || lower === 'hi' || lower.startsWith('hey')) {
       return {
         statusCode: 200,
@@ -96,6 +97,19 @@ exports.handler = async function(event, context) {
       };
     }
 
+    // 2. YOGI'S STRESS RELIEF CORNER BYPASS
+    if (lower.includes('stress') || lower.includes('overwhelm') || lower.includes('anxious') || lower.includes('worried') || lower.includes('tired') || lower.includes('i am feeling') || lower.includes('i feel')) {
+      return {
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ reply: 'Take a breath. You have got this. What is the one most urgent thing right now — let Sissy handle the rest.' })
+      };
+    }
+
+    // 3. QUESTION / BOARD STATUS BYPASS
     if (lower.startsWith('who') || lower.startsWith('what') || lower.startsWith('how') || lower.startsWith('show') || lower.startsWith('list') || lower.startsWith('give') || lower.startsWith('status')) {
       return {
         statusCode: 200,
