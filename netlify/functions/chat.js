@@ -141,7 +141,10 @@ exports.handler = async function(event, context) {
       'Content-Length': Buffer.byteLength(payload)
     }, payload);
 
-    const reply = resData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'Tell me more — I am building your world as we talk.';
+    // Diagnostic console trace & updated fallback
+    console.log('Gemini raw response:', JSON.stringify(resData));
+
+    const reply = resData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || resData?.error?.message || resData?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry — Fresh is reconnecting. Try again in a moment.';
 
     return {
       statusCode: 200,
