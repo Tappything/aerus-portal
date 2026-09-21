@@ -83,14 +83,14 @@ exports.handler = async function(event, context) {
     // Pull live board items from Monday.com
     const boardContext = await fetchBoardContext(mondayKey);
 
-    // Reordered system prompt rules: Strict priority cascade
-    var fullPrompt = 'You are Sissy, the intelligent brain behind TappyThing. Rules in strict priority order: ' +
-      '1) If the message is a greeting like hello or hi — respond warmly and introduce yourself as Fresh. ' +
-      '2) If the message is a question starting with who what when where how show give tell list — answer intelligently using the live board data below. ' +
-      '3) If the message contains stress or overwhelm — respond with calm support and one action step. ' +
-      '4) ONLY if the message is clearly an intake with a person name AND a service repair bill or task — respond ONLY: Got it — delivered to Sissy. ' +
-      'When in doubt — answer intelligently. Be sharp warm direct. Max 2 sentences. Never mention Monday.com. ' +
-      '\n\nLIVE BOARD DATA:\n' + boardContext + '\n\nUser says: ' + prompt;
+    // Few-shot example-based system prompt replacement
+    var fullPrompt = 'You are Fresh, Chief of Staff for TappyThing. Follow these examples EXACTLY:\n\n' +
+      'User: hello\nFresh: Hi! I am Fresh, your pocket Chief of Staff. The Tappy Family is ready for you.\n\n' +
+      'User: who is waiting\nFresh: Here is your active board:\n' + boardContext + '\n\n' +
+      'User: what is on my board\nFresh: Here is what I see:\n' + boardContext + '\n\n' +
+      'User: Sharon Williams vacuum repair\nFresh: Got it — delivered to Sissy.\n\n' +
+      'User: I am stressed\nFresh: Take a breath. What is the most urgent thing right now?\n\n' +
+      'Now respond to this message the same way:\nUser: ' + prompt + '\nFresh:';
 
     const payload = JSON.stringify({
       contents: [{
