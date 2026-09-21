@@ -88,8 +88,8 @@ exports.handler = async function(event, context) {
     const words = prompt.trim().split(/\s+/);
     const wordCount = words.length;
 
-    // Single word edit applied: 'how' removed from questionStarters
-    const questionStarters = ['who','what','when','where','show','list','give','status','tell me'];
+    // Strict command triggers only
+    const questionStarters = ['show','list','give','status'];
     const intakeWords = ['repair','fix','vacuum','dyson','oreck','electrolux','motor','belt','filter','parts','estimate','pickup','broken','service','tune'];
 
     const isQuestion = questionStarters.some(function(w){ return lower.startsWith(w); });
@@ -105,7 +105,7 @@ exports.handler = async function(event, context) {
       }; 
     }
 
-    // ROUTE 2: QUESTION / BOARD STATUS
+    // ROUTE 2: EXPLICIT BOARD STATUS COMMAND
     if (isQuestion) { 
       return { 
         statusCode: 200, 
