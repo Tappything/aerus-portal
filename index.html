@@ -86,8 +86,8 @@ details > div { animation: slideDown 0.2s ease-out; } @keyframes slideDown { fro
 </div>
 </section>
 
-<!-- CALENDAR (ALWAYS VISIBLE) -->
-<section class="glow-card glow-card-amber rounded-2xl p-5">
+<!-- CALENDAR SECTION -->
+<section id="calendarSection" class="glow-card glow-card-amber rounded-2xl p-5">
 <div class="flex items-center justify-between mb-3">
 <div class="flex items-center space-x-2">
 <i class="fa-solid fa-calendar-day text-amber-400"></i>
@@ -100,9 +100,10 @@ details > div { animation: slideDown 0.2s ease-out; } @keyframes slideDown { fro
 </div>
 </section>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- WORLDS GRID -->
+<div id="worldsGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-<!-- BUSINESS WORLD (ALWAYS VISIBLE) -->
+<!-- BUSINESS WORLD -->
 <details class="glow-card rounded-2xl border border-blue-500/20 group">
 <summary class="p-5 flex items-center justify-between cursor-pointer hover:bg-gray-800/30 rounded-2xl transition">
 <div class="flex items-center space-x-3">
@@ -349,11 +350,11 @@ const urlParams = new URLSearchParams(window.location.search);
 const activeBoardId = urlParams.get('board') || '18424728273';
 const activeName = urlParams.get('name') || 'Aerus Home Wellness';
 
-// Hide personal elements if a custom board parameter exists
-if (urlParams.get('board')) {
-  document.querySelectorAll('.personal-only').forEach(function(el) {
-    el.style.display = 'none';
-  });
+// Surgical Visibility Toggle based on ?board= parameter
+if (urlParams.get('board')) { 
+  document.querySelectorAll('.personal-only').forEach(function(el) { el.style.display = 'none'; }); 
+  document.getElementById('calendarSection').style.display = 'none'; 
+  document.getElementById('worldsGrid').style.display = 'none'; 
 }
 
 var lastReply = '';
