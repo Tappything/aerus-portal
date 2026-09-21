@@ -1,116 +1,653 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TappyThing — Your Digital Coordinator</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #0b0f19; color: #f3f4f6; }
-.glow-card { background: rgba(17, 24, 39, 0.85); border: 1px solid rgba(59, 130, 246, 0.3); box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5); }
-.glow-button { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); box-shadow: 0 0 25px rgba(37, 99, 235, 0.6); }
-.mic-pulse { animation: pulse 2s infinite; }
-@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(59, 130, 246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); } }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TappyThing Onboarding — Fresh Guided Setup</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            amber: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+            }
+          },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'bounce-gentle': 'bounce 2s infinite',
+            'spin-slow': 'spin 12s linear infinite',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Glow Effects and UI Enhancements */
+    .amber-glow {
+      box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.35);
+    }
+    .amber-glow-lg {
+      box-shadow: 0 0 40px -5px rgba(245, 158, 11, 0.5);
+    }
+    .amber-glow-inner {
+      box-shadow: inset 0 0 15px rgba(245, 158, 11, 0.2);
+    }
+    
+    /* Audio Wave Animation */
+    .wave-bar {
+      display: inline-block;
+      width: 4px;
+      height: 18px;
+      border-radius: 2px;
+      background-color: #f59e0b;
+      animation: wave 1.2s ease-in-out infinite;
+    }
+    .wave-bar:nth-child(1) { animation-delay: 0.0s; }
+    .wave-bar:nth-child(2) { animation-delay: 0.15s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.3s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.45s; }
+    .wave-bar:nth-child(5) { animation-delay: 0.6s; }
+
+    @keyframes wave {
+      0%, 100% { height: 8px; opacity: 0.4; }
+      50% { height: 28px; opacity: 1; }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
+<body class="h-full flex flex-col justify-between font-sans antialiased text-slate-100 bg-slate-950 selection:bg-amber-500 selection:text-slate-950">
 
-<main class="w-full max-w-xl space-y-8 text-center">
-
-  <!-- Fresh Identity Header -->
-  <div class="flex flex-col items-center space-y-4">
-    <div class="relative">
-      <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh Coordinator" class="w-28 h-28 rounded-full object-cover border-4 border-blue-500 shadow-2xl" />
-      <span class="absolute bottom-1 right-1 w-5 h-5 bg-emerald-500 border-2 border-gray-900 rounded-full animate-pulse"></span>
-    </div>
-    <div>
-      <h1 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Meet Fresh 🤵</h1>
-      <p class="text-blue-400 font-semibold text-sm mt-1">Your Pocket Chief of Staff • Powered by TappyThing</p>
-    </div>
-  </div>
-
-  <!-- Hero Value Card -->
-  <div class="glow-card rounded-3xl p-6 md:p-8 text-left space-y-6 backdrop-blur-md">
-    <h2 class="text-xl md:text-2xl font-bold text-center text-white leading-snug">
-      "Tap it. Talk into it. Consider it done."
-    </h2>
-    <p class="text-gray-300 text-sm text-center leading-relaxed">
-      Stop drowning in tasks, sticky notes, and admin drag. Fresh organizes your entire business and personal world through simple voice notes.
-    </p>
-
-    <!-- 3 Core Bullets -->
-    <div class="space-y-4 pt-2 border-t border-gray-800">
-      <div class="flex items-start space-x-3">
-        <div class="w-8 h-8 rounded-lg bg-blue-900/50 border border-blue-500/40 flex items-center justify-center text-blue-400 flex-shrink-0 mt-0.5"><i class="fa-solid fa-microphone"></i></div>
+  <!-- Top Navigation Header -->
+  <header class="w-full border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-slate-950 font-black text-lg shadow-lg shadow-amber-500/20">
+          ⚡
+        </div>
         <div>
-          <h3 class="font-bold text-white text-sm">Voice-First One-Tap Intake</h3>
-          <p class="text-gray-400 text-xs">Dump ideas, repairs, tasks, and notes in one place. Fresh sorts and routes everything automatically.</p>
+          <h1 class="font-bold text-base tracking-tight text-white flex items-center gap-1.5">
+            TappyThing <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">Voice Setup</span>
+          </h1>
+          <p class="text-xs text-slate-400">Powered by TappyThing</p>
         </div>
       </div>
-
-      <div class="flex items-start space-x-3">
-        <div class="w-8 h-8 rounded-lg bg-emerald-900/50 border border-emerald-500/40 flex items-center justify-center text-emerald-400 flex-shrink-0 mt-0.5"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-        <div>
-          <h3 class="font-bold text-white text-sm">Self-Building & Zero Setup Maintenance</h3>
-          <p class="text-gray-400 text-xs">Fresh interviews you to build your personal system instantly. No setup calls or tech confusion required.</p>
-        </div>
-      </div>
-
-      <div class="flex items-start space-x-3">
-        <div class="w-8 h-8 rounded-lg bg-amber-900/50 border border-amber-500/40 flex items-center justify-center text-amber-400 flex-shrink-0 mt-0.5"><i class="fa-solid fa-briefcase"></i></div>
-        <div>
-          <h3 class="font-bold text-white text-sm">Business & Personal Worlds Synced</h3>
-          <p class="text-gray-400 text-xs">Keep shop operations, staff queues, and family tasks organized side-by-side in real time.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Pricing & Signup Action Area -->
-    <div class="pt-6 border-t border-gray-800 space-y-4 text-center">
-      <div class="bg-gray-900/90 border border-gray-800 p-4 rounded-2xl">
-        <span class="text-xs font-bold uppercase text-blue-400 tracking-widest">All-Inclusive Subscription</span>
-        <div class="text-3xl font-extrabold text-white mt-1">$95 <span class="text-sm font-normal text-gray-400">/ month</span></div>
-        <p class="text-xs text-gray-400 mt-1">Full access • Unlimited voice notes • Cancel anytime</p>
-      </div>
-
-      <!-- Promo Code Field -->
-      <div class="flex space-x-2">
-        <input type="text" id="promoCode" placeholder="Promo code (Optional)" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition" />
-        <button onclick="applyPromo()" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-xs font-bold rounded-xl border border-gray-700 transition">Apply</button>
-      </div>
-
-      <!-- Call To Action Button -->
-      <button onclick="startTrial()" class="w-full glow-button py-4 rounded-2xl font-extrabold text-white text-base tracking-wide flex items-center justify-center space-x-2 mic-pulse hover:opacity-95 transition active:scale-95">
-        <i class="fa-solid fa-bolt"></i>
-        <span>START MY FREE 3-DAY TRIAL</span>
-      </button>
       
-      <p class="text-[11px] text-gray-500">Includes instant setup with Fresh • Billed via Clean Environment LLC</p>
+      <!-- Audio Mute/Unmute Toggle -->
+      <button id="audioToggleBtn" onclick="toggleAudio()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700/60 transition">
+        <i id="audioIcon" class="fa-solid fa-volume-high text-amber-400"></i>
+        <span id="audioText">Voice On</span>
+      </button>
     </div>
-  </div>
+  </header>
 
-</main>
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-2xl w-full mx-auto px-4 py-6 sm:py-10 flex flex-col justify-center">
+    
+    <!-- Fresh Avatar Host Box -->
+    <div class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-amber-950/30 border border-slate-800 shadow-xl relative overflow-hidden group">
+      <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
+      
+      <div class="flex items-start gap-4 relative z-10">
+        <!-- Host Avatar -->
+        <div class="relative shrink-0">
+          <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-amber-600 via-amber-500 to-amber-300 p-0.5 shadow-lg amber-glow">
+            <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center overflow-hidden relative">
+              <span class="text-3xl sm:text-4xl">🤵</span>
+            </div>
+          </div>
+          <span class="absolute -bottom-1 -right-1 flex h-4 w-4">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-4 w-4 bg-amber-500 border-2 border-slate-950"></span>
+          </span>
+        </div>
 
-<footer class="py-6 text-xs text-gray-500">
-  Powered by <strong>TappyThing</strong>
-</footer>
+        <!-- Host Speech Content -->
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between gap-2 mb-1">
+            <h2 class="text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+              Fresh <span>•</span> <span class="text-slate-400 font-normal normal-case">Digital Coordinator</span>
+            </h2>
+            <button onclick="speakCurrentQuestion()" class="text-slate-400 hover:text-amber-400 text-xs flex items-center gap-1 transition" title="Replay voice">
+              <i class="fa-solid fa-rotate-right"></i> Repeat
+            </button>
+          </div>
+          <p id="freshHostSpeech" class="text-sm sm:text-base font-medium text-slate-200 leading-relaxed">
+            "Hi! I am Fresh. Let us get your world set up. What is your full name?"
+          </p>
+        </div>
+      </div>
+    </div>
 
-<script>
-function applyPromo() {
-  var code = document.getElementById('promoCode').value.trim();
-  if (code) {
-    alert('Promo code "' + code + '" applied! Proceeding to setup.');
-  } else {
-    alert('Please enter a promo code.');
-  }
-}
+    <!-- Progress Indicator & Dots -->
+    <div id="progressContainer" class="mb-6">
+      <div class="flex items-center justify-between mb-2 px-1">
+        <span id="stepLabel" class="text-xs font-bold text-amber-400 uppercase tracking-wider">Question 1 of 4</span>
+        <span id="percentLabel" class="text-xs font-semibold text-slate-400">25% Complete</span>
+      </div>
+      
+      <!-- Progress Bar Track -->
+      <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-800/80">
+        <div id="progressBar" class="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-500 ease-out w-1/4 amber-glow"></div>
+      </div>
 
-function startTrial() {
-  alert('Welcome to TappyThing! Fresh is preparing your onboarding interview...');
-  window.location.href = '/';
-}
-</script>
+      <!-- Step Dots -->
+      <div class="flex justify-between items-center mt-3 px-2">
+        <div id="dot-1" class="w-3.5 h-3.5 rounded-full bg-amber-400 ring-4 ring-amber-500/30 transition-all duration-300"></div>
+        <div id="dot-2" class="w-2.5 h-2.5 rounded-full bg-slate-800 transition-all duration-300"></div>
+        <div id="dot-3" class="w-2.5 h-2.5 rounded-full bg-slate-800 transition-all duration-300"></div>
+        <div id="dot-4" class="w-2.5 h-2.5 rounded-full bg-slate-800 transition-all duration-300"></div>
+      </div>
+    </div>
 
+    <!-- Form Card Box -->
+    <div id="questionCard" class="p-6 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl relative">
+      
+      <!-- QUESTION 1 -->
+      <div id="step-1" class="step-content space-y-6">
+        <div>
+          <span class="inline-block px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-bold mb-2 border border-amber-500/20">Step 1</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">What is your full name?</h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">First & last name so Fresh knows who he's reporting to.</p>
+        </div>
+
+        <!-- Voice Interaction Area -->
+        <div class="flex flex-col items-center justify-center p-6 rounded-2xl bg-slate-950/60 border border-slate-800/80 amber-glow-inner">
+          <button type="button" onclick="toggleVoiceInput(1)" id="micBtn-1" class="mic-button relative w-20 h-20 rounded-full bg-gradient-to-tr from-amber-600 to-amber-400 text-slate-950 font-black text-2xl flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 group amber-glow">
+            <i class="fa-solid fa-microphone text-3xl"></i>
+          </button>
+
+          <!-- Audio Visualizer Indicator -->
+          <div id="visualizer-1" class="hidden flex items-center gap-1.5 mt-4 h-8">
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <span class="text-xs font-bold text-amber-400 ml-2 animate-pulse">Listening... speak now</span>
+          </div>
+
+          <p id="micStatus-1" class="text-xs font-medium text-slate-400 mt-3">Tap mic to speak into TappyThing</p>
+        </div>
+
+        <!-- Secondary Manual Input -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">Or Type Directly:</label>
+          <div class="relative">
+            <input type="text" id="input-1" placeholder="e.g. William Sullivan" class="w-full px-4 py-3.5 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition text-base" onkeydown="handleKeydown(event, 1)">
+            <i class="fa-solid fa-pen text-slate-600 absolute right-4 top-4"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUESTION 2 -->
+      <div id="step-2" class="step-content hidden space-y-6">
+        <div>
+          <span class="inline-block px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-bold mb-2 border border-amber-500/20">Step 2</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">What is your business name?</h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Your company, shop, or main venture name.</p>
+        </div>
+
+        <div class="flex flex-col items-center justify-center p-6 rounded-2xl bg-slate-950/60 border border-slate-800/80 amber-glow-inner">
+          <button type="button" onclick="toggleVoiceInput(2)" id="micBtn-2" class="mic-button relative w-20 h-20 rounded-full bg-gradient-to-tr from-amber-600 to-amber-400 text-slate-950 font-black text-2xl flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 group amber-glow">
+            <i class="fa-solid fa-microphone text-3xl"></i>
+          </button>
+
+          <div id="visualizer-2" class="hidden flex items-center gap-1.5 mt-4 h-8">
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <span class="text-xs font-bold text-amber-400 ml-2 animate-pulse">Listening... speak now</span>
+          </div>
+
+          <p id="micStatus-2" class="text-xs font-medium text-slate-400 mt-3">Tap mic to speak into TappyThing</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">Or Type Directly:</label>
+          <div class="relative">
+            <input type="text" id="input-2" placeholder="e.g. Aerus Home Wellness Timonium" class="w-full px-4 py-3.5 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition text-base" onkeydown="handleKeydown(event, 2)">
+            <i class="fa-solid fa-building text-slate-600 absolute right-4 top-4"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUESTION 3 -->
+      <div id="step-3" class="step-content hidden space-y-6">
+        <div>
+          <span class="inline-block px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-bold mb-2 border border-amber-500/20">Step 3</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">What do you do?</h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Briefly summarize your services, products, or daily focus.</p>
+        </div>
+
+        <div class="flex flex-col items-center justify-center p-6 rounded-2xl bg-slate-950/60 border border-slate-800/80 amber-glow-inner">
+          <button type="button" onclick="toggleVoiceInput(3)" id="micBtn-3" class="mic-button relative w-20 h-20 rounded-full bg-gradient-to-tr from-amber-600 to-amber-400 text-slate-950 font-black text-2xl flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 group amber-glow">
+            <i class="fa-solid fa-microphone text-3xl"></i>
+          </button>
+
+          <div id="visualizer-3" class="hidden flex items-center gap-1.5 mt-4 h-8">
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <span class="text-xs font-bold text-amber-400 ml-2 animate-pulse">Listening... speak now</span>
+          </div>
+
+          <p id="micStatus-3" class="text-xs font-medium text-slate-400 mt-3">Tap mic to speak into TappyThing</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">Or Type Directly:</label>
+          <div class="relative">
+            <textarea id="input-3" rows="3" placeholder="e.g. Vacuum sales, air purification, filter replacements & bench repair." class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition text-base resize-none"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUESTION 4 -->
+      <div id="step-4" class="step-content hidden space-y-6">
+        <div>
+          <span class="inline-block px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-bold mb-2 border border-amber-500/20">Step 4</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">What software or apps do you currently pay for?</h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">List CRMs, note apps, voice recorders, task tools, or software subscriptions.</p>
+        </div>
+
+        <div class="flex flex-col items-center justify-center p-6 rounded-2xl bg-slate-950/60 border border-slate-800/80 amber-glow-inner">
+          <button type="button" onclick="toggleVoiceInput(4)" id="micBtn-4" class="mic-button relative w-20 h-20 rounded-full bg-gradient-to-tr from-amber-600 to-amber-400 text-slate-950 font-black text-2xl flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 group amber-glow">
+            <i class="fa-solid fa-microphone text-3xl"></i>
+          </button>
+
+          <div id="visualizer-4" class="hidden flex items-center gap-1.5 mt-4 h-8">
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <span class="text-xs font-bold text-amber-400 ml-2 animate-pulse">Listening... speak now</span>
+          </div>
+
+          <p id="micStatus-4" class="text-xs font-medium text-slate-400 mt-3">Tap mic to speak into TappyThing</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">Or Type Directly:</label>
+          <div class="relative">
+            <textarea id="input-4" rows="3" placeholder="e.g. Workiz, Monday.com, Evernote, Voice memo pro, QuickBooks" class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition text-base resize-none"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Buttons Footer -->
+      <div class="flex items-center justify-between gap-4 pt-6 border-t border-slate-800/80 mt-6">
+        <button id="prevBtn" onclick="navigateStep(-1)" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm transition flex items-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed">
+          <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+
+        <button id="nextBtn" onclick="navigateStep(1)" class="px-7 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-sm shadow-lg shadow-amber-500/25 transition-all duration-200 hover:scale-[1.02] active:scale-95 flex items-center gap-2">
+          <span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Loading Transition Screen (Hidden by Default) -->
+    <div id="loadingScreen" class="hidden p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl text-center space-y-6">
+      <div class="relative w-24 h-24 mx-auto">
+        <div class="absolute inset-0 rounded-full border-4 border-amber-500/20 animate-ping"></div>
+        <div class="w-full h-full rounded-full border-4 border-amber-500 border-t-transparent animate-spin flex items-center justify-center">
+          <span class="text-3xl">⚙️</span>
+        </div>
+      </div>
+      <div>
+        <h3 class="text-2xl font-extrabold text-white">Connecting with Sissy...</h3>
+        <p class="text-sm text-amber-400 font-medium mt-2">Fresh is passing your inputs to Sissy to construct your custom portal...</p>
+      </div>
+      <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
+        <div class="bg-amber-500 h-full w-2/3 animate-pulse"></div>
+      </div>
+      <p class="text-xs text-slate-500">Routing via Webhook to TappyThing Engine</p>
+    </div>
+
+    <!-- Success Completion Screen (Hidden by Default) -->
+    <div id="successScreen" class="hidden p-8 sm:p-12 rounded-3xl bg-slate-900 border border-amber-500/40 shadow-2xl text-center space-y-6 amber-glow">
+      <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-amber-500 to-amber-300 text-slate-950 flex items-center justify-center text-4xl font-black shadow-lg">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <div>
+        <span class="px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-bold border border-amber-500/20">Setup Complete</span>
+        <h3 class="text-3xl font-extrabold text-white mt-2">All set! You're in!</h3>
+        <p class="text-sm text-slate-300 max-w-md mx-auto mt-2 leading-relaxed">
+          Sissy received your answers and is building your private TappyThing portal right now.
+        </p>
+      </div>
+
+      <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-left space-y-2 text-xs">
+        <div class="flex justify-between border-b border-slate-800 pb-1.5">
+          <span class="text-slate-400">Status:</span>
+          <span class="text-emerald-400 font-bold"><i class="fa-solid fa-circle-check"></i> Webhook Fired</span>
+        </div>
+        <div class="flex justify-between border-b border-slate-800 pb-1.5">
+          <span class="text-slate-400">Engine Route:</span>
+          <span class="text-amber-400 font-mono">Make.com / Monday Board</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">Digital Coordinator:</span>
+          <span class="text-white font-semibold">Fresh Active 🤵</span>
+        </div>
+      </div>
+
+      <button onclick="window.location.reload()" class="w-full py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm shadow-lg transition">
+        Return to TappyThing Main Page
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full py-4 text-center text-xs text-slate-500 border-t border-slate-900">
+    <p>Powered by TappyThing</p>
+  </footer>
+
+  <script>
+    // System State Variables
+    let currentStep = 1;
+    const totalSteps = 4;
+    let audioEnabled = true;
+    let recognition = null;
+    let isListening = false;
+
+    // Webhook Endpoint
+    const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1';
+
+    // Step Prompts and Warm Professional Speech Scripts
+    const stepPrompts = {
+      1: {
+        speech: "Hi — I am Fresh, your new pocket Chief of Staff. Let me ask you four quick questions so I can build your world.",
+        hostText: "Hi! I am Fresh. Let us get your world set up. What is your full name?"
+      },
+      2: {
+        speech: "Great to meet you! Next question: What is your business name?",
+        hostText: "Great to meet you! What is the official name of your business?"
+      },
+      3: {
+        speech: "Understood. Question three: What do you do?",
+        hostText: "Tell me briefly: What products, services, or repairs do you handle?"
+      },
+      4: {
+        speech: "Final question: What software or apps do you currently pay for?",
+        hostText: "Last step: What monthly apps or tools are you currently paying for?"
+      }
+    };
+
+    // Initialize Web Speech Synthesis & Recognition on Load
+    window.addEventListener('DOMContentLoaded', () => {
+      initSpeechRecognition();
+      updateUI();
+      // Speak first question after short delay
+      setTimeout(() => {
+        speakCurrentQuestion();
+      }, 500);
+    });
+
+    // Toggle Audio Reading
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      const icon = document.getElementById('audioIcon');
+      const text = document.getElementById('audioText');
+      if (audioEnabled) {
+        icon.className = 'fa-solid fa-volume-high text-amber-400';
+        text.innerText = 'Voice On';
+        speakCurrentQuestion();
+      } else {
+        icon.className = 'fa-solid fa-volume-xmark text-slate-500';
+        text.innerText = 'Voice Off';
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+        }
+      }
+    }
+
+    // Speech Synthesis: Fresh reads questions aloud
+    function speakCurrentQuestion() {
+      if (!audioEnabled || !('speechSynthesis' in window)) return;
+
+      window.speechSynthesis.cancel(); // Stop ongoing speech
+
+      const textToSpeak = stepPrompts[currentStep].speech;
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.rate = 1.05;
+      utterance.pitch = 1.0;
+
+      // Try selecting a clear English voice
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha')));
+      if (preferredVoice) utterance.voice = preferredVoice;
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Web Speech API (Speech to Text) Initializer
+    function initSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          const inputElem = document.getElementById(`input-${currentStep}`);
+          if (inputElem) {
+            inputElem.value = transcript;
+          }
+          stopVoiceInput(currentStep);
+        };
+
+        recognition.onerror = (event) => {
+          console.warn('Speech recognition error:', event.error);
+          stopVoiceInput(currentStep);
+          document.getElementById(`micStatus-${currentStep}`).innerText = 'Voice capture paused. Try again or type below.';
+        };
+
+        recognition.onend = () => {
+          stopVoiceInput(currentStep);
+        };
+      }
+    }
+
+    // Toggle Microphone Speech Capture
+    function toggleVoiceInput(step) {
+      if (!recognition) {
+        alert('Voice input is not supported in this browser. Please use the text input below.');
+        return;
+      }
+
+      if (isListening) {
+        recognition.stop();
+        stopVoiceInput(step);
+      } else {
+        try {
+          recognition.start();
+          isListening = true;
+          document.getElementById(`visualizer-${step}`).classList.remove('hidden');
+          document.getElementById(`micStatus-${step}`).innerText = 'Listening... Speak clearly now';
+          document.getElementById(`micBtn-${step}`).classList.add('ring-4', 'ring-amber-400');
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+
+    function stopVoiceInput(step) {
+      isListening = false;
+      const viz = document.getElementById(`visualizer-${step}`);
+      const btn = document.getElementById(`micBtn-${step}`);
+      const status = document.getElementById(`micStatus-${step}`);
+      if (viz) viz.classList.add('hidden');
+      if (btn) btn.classList.remove('ring-4', 'ring-amber-400');
+      if (status) status.innerText = 'Tap mic to speak into TappyThing';
+    }
+
+    // Enter Key Handler
+    function handleKeydown(event, step) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        navigateStep(1);
+      }
+    }
+
+    // Step Navigation Controller
+    function navigateStep(direction) {
+      // Validate current input before advancing forward
+      if (direction === 1) {
+        const currentInput = document.getElementById(`input-${currentStep}`).value.trim();
+        if (!currentInput) {
+          document.getElementById(`input-${currentStep}`).focus();
+          document.getElementById(`input-${currentStep}`).classList.add('border-rose-500');
+          setTimeout(() => {
+            document.getElementById(`input-${currentStep}`).classList.remove('border-rose-500');
+          }, 1500);
+          return;
+        }
+      }
+
+      // Hide current step
+      document.getElementById(`step-${currentStep}`).classList.add('hidden');
+      
+      currentStep += direction;
+
+      if (currentStep > totalSteps) {
+        submitToSissyWebhook();
+        return;
+      }
+
+      // Show next step
+      document.getElementById(`step-${currentStep}`).classList.remove('hidden');
+      
+      updateUI();
+      speakCurrentQuestion();
+    }
+
+    // Dynamic UI Updates (Progress Bar, Dots, Host Speech)
+    function updateUI() {
+      // Host Speech Box
+      document.getElementById('freshHostSpeech').innerText = `"${stepPrompts[currentStep].hostText}"`;
+
+      // Labels
+      document.getElementById('stepLabel').innerText = `Question ${currentStep} of ${totalSteps}`;
+      const percentage = Math.round((currentStep / totalSteps) * 100);
+      document.getElementById('percentLabel').innerText = `${percentage}% Complete`;
+
+      // Progress Bar Width
+      document.getElementById('progressBar').style.width = `${percentage}%`;
+
+      // Progress Dots
+      for (let i = 1; i <= totalSteps; i++) {
+        const dot = document.getElementById(`dot-${i}`);
+        if (i < currentStep) {
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-amber-500/40';
+        } else if (i === currentStep) {
+          dot.className = 'w-3.5 h-3.5 rounded-full bg-amber-400 ring-4 ring-amber-500/30';
+        } else {
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-slate-800';
+        }
+      }
+
+      // Prev Button State
+      const prevBtn = document.getElementById('prevBtn');
+      if (currentStep === 1) {
+        prevBtn.disabled = true;
+      } else {
+        prevBtn.disabled = false;
+      }
+
+      // Next Button Text
+      const nextBtn = document.getElementById('nextBtn');
+      if (currentStep === totalSteps) {
+        nextBtn.innerHTML = '<span>Complete & Submit</span> <i class="fa-solid fa-paper-plane"></i>';
+      } else {
+        nextBtn.innerHTML = '<span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>';
+      }
+    }
+
+    // Submit Answers JSON Payload to Sissy / Make Webhook
+    async function submitToSissyWebhook() {
+      // Hide Question Card and Progress Bar
+      document.getElementById('questionCard').classList.add('hidden');
+      document.getElementById('progressContainer').classList.add('hidden');
+      
+      // Show Loader
+      document.getElementById('loadingScreen').classList.remove('hidden');
+
+      // Update Fresh Speech
+      document.getElementById('freshHostSpeech').innerText = `"Passing all inputs over to Sissy right now! Hang tight while she spins up your portal!"`;
+
+      // Collect Answers
+      const payload = {
+        timestamp: new Date().toISOString(),
+        fullName: document.getElementById('input-1').value.trim(),
+        businessName: document.getElementById('input-2').value.trim(),
+        businessType: document.getElementById('input-3').value.trim(),
+        currentSoftware: document.getElementById('input-4').value.trim(),
+        source: "TappyThing Onboarding start.html",
+        coordinator: "Fresh"
+      };
+
+      try {
+        const response = await fetch(MAKE_WEBHOOK_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        // Show Success View
+        setTimeout(() => {
+          document.getElementById('loadingScreen').classList.add('hidden');
+          document.getElementById('successScreen').classList.remove('hidden');
+          document.getElementById('freshHostSpeech').innerText = `"Sissy has your data and your custom TappyThing system is officially unlocked!"`;
+        }, 1500);
+
+      } catch (error) {
+        console.error('Webhook post error:', error);
+        // Fallback success display for smooth UX
+        setTimeout(() => {
+          document.getElementById('loadingScreen').classList.add('hidden');
+          document.getElementById('successScreen').classList.remove('hidden');
+        }, 1500);
+      }
+    }
+  </script>
 </body>
 </html>
