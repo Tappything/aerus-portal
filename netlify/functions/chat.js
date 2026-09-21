@@ -156,6 +156,25 @@ exports.handler = async function(event, context) {
       reply = 'Parse error: ' + e.message; 
     }
 
+    // AUTOMATIC KEYWORD DETECT & GROUP CREATION TRIGGER
+    const boardId = data.board_id || '18424728273'; 
+    const keywordGroups = [
+      { keywords:['bill','bank','money','finance','financ'], group:'💰 Banking & Finance'},
+      { keywords:['family','kids','children','husband','wife','son','daughter'], group:'👨‍👩‍👧 Family'},
+      { keywords:['health','doctor','medicine','nurse','hospital','sick'], group:'🏥 Health'},
+      { keywords:['home','house','chore','clean','repair home'], group:'🏠 Home Tasks'},
+      { keywords:['work','job','business','client','customer','studio'], group:'💼 Business World'},
+      { keywords:['private','personal','secret','vault'], group:'🔒 Private Vault'}
+    ]; 
+
+    keywordGroups.forEach(function(kg){ 
+      const matched = kg.keywords.some(function(kw){ return lower.includes(kw); }); 
+      if(matched){ 
+        const gpPayload = JSON.stringify({ boardId: boardId, groupName: kg.group }); 
+        makePostRequest('https://freshtappything.com/.netlify/functions/create-group', {'Content-Type':'application/json','Content-Length':Buffer.byteLength(gpPayload)}, gpPayload).catch(function(e){ console.log('Group create error:',e); }); 
+      } 
+    });
+
     return {
       statusCode: 200,
       headers: {
