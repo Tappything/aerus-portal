@@ -97,6 +97,18 @@ exports.handler = async function(event, context) {
       };
     }
 
+    // NEW BYPASS: ONBOARDING & CONVERSATIONAL INTERACTION
+    if (lower.startsWith("i'm") || lower.startsWith("i am") || lower.startsWith("i ") || lower.startsWith("my ") || lower.startsWith("can you") || lower.startsWith("could you") || lower.startsWith("help") || lower.startsWith("tell me")) { 
+      return { 
+        statusCode: 200, 
+        headers: { 
+          "Access-Control-Allow-Origin": "*", 
+          "Content-Type": "application/json" 
+        }, 
+        body: JSON.stringify({ reply: 'Tell me more — I am building your world as we talk.' }) 
+      }; 
+    }
+
     // 2. YOGI'S STRESS RELIEF CORNER BYPASS
     if (lower.includes('stress') || lower.includes('overwhelm') || lower.includes('anxious') || lower.includes('worried') || lower.includes('tired') || lower.includes('i am feeling') || lower.includes('i feel')) {
       return {
