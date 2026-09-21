@@ -83,7 +83,31 @@ exports.handler = async function(event, context) {
     // Pull live board items from Monday.com
     const boardContext = await fetchBoardContext(mondayKey);
 
-    // Few-shot example-based system prompt replacement
+    // DIRECT CODE INTENT BYPASS: Instant, 100% reliable responses without AI latency
+    const lower = prompt.toLowerCase().trim();
+    if (lower === 'hello' || lower === 'hi' || lower.startsWith('hey')) {
+      return {
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ reply: 'Hi! I am Fresh, your pocket Chief of Staff. The Tappy Family is ready for you. Just talk to me.' })
+      };
+    }
+
+    if (lower.startsWith('who') || lower.startsWith('what') || lower.startsWith('how') || lower.startsWith('show') || lower.startsWith('list') || lower.startsWith('give') || lower.startsWith('status')) {
+      return {
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ reply: 'Here is your active board:\n' + boardContext })
+      };
+    }
+
+    // Few-shot example-based system prompt replacement for remaining AI intakes
     var fullPrompt = 'You are Fresh, Chief of Staff for TappyThing. Follow these examples EXACTLY:\n\n' +
       'User: hello\nFresh: Hi! I am Fresh, your pocket Chief of Staff. The Tappy Family is ready for you.\n\n' +
       'User: who is waiting\nFresh: Here is your active board:\n' + boardContext + '\n\n' +
