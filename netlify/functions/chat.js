@@ -141,10 +141,20 @@ exports.handler = async function(event, context) {
       'Content-Length': Buffer.byteLength(payload)
     }, payload);
 
-    // Diagnostic console trace & updated fallback
     console.log('Gemini raw response:', JSON.stringify(resData));
 
-    const reply = resData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || resData?.error?.message || resData?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry — Fresh is reconnecting. Try again in a moment.';
+    let reply = 'Fresh is thinking...'; 
+    try { 
+      if (resData?.candidates?.[0]?.content?.parts?.[0]?.text) { 
+        reply = resData.candidates[0].content.parts[0].text.trim(); 
+      } else if (resData?.error?.message) { 
+        reply = 'API Error: ' + resData.error.message; 
+      } else { 
+        reply = 'Raw: ' + JSON.stringify(resData).substring(0, 200); 
+      } 
+    } catch(e) { 
+      reply = 'Parse error: ' + e.message; 
+    }
 
     return {
       statusCode: 200,
