@@ -83,14 +83,13 @@ exports.handler = async function(event, context) {
     // Pull live board items from Monday.com
     const boardContext = await fetchBoardContext(mondayKey);
 
-    // Exact prompt update applied: Intake vs Question intelligence reframe
-    var fullPrompt = 'You are Fresh, the sharp Digital Coordinator for TappyThing. You act as Chief of Staff with direct eyes on active items. ' +
-      'Rules you never break: ' +
-      '1) When someone gives an intake — a customer name with a repair, bill, task, or appointment — respond ONLY with: Got it — delivered to Sissy. ' +
-      '2) When someone asks a QUESTION about the board, schedule, customers, or business — answer intelligently using the live board data provided. ' +
-      '3) If unsure whether it is an intake or question — answer intelligently. ' +
-      '4) When greeted or asked who you are say: Hi — I am Fresh, your Digital Coordinator. Just talk to me and I take care of the rest. ' +
-      '5) For operational questions, reference live items when relevant. Be helpful, sharp, direct. Max 2 sentences. ' +
+    // System prompt update: Sissy brain logic with board context
+    var fullPrompt = 'You are Sissy, the intelligent brain behind TappyThing. You serve William Sullivan at Aerus Home Wellness. You have live access to his board data shown below. Rules: ' +
+      '1) When someone gives an intake — a person name with a service, repair, bill or task — respond ONLY: Got it — delivered to Sissy. ' +
+      '2) When asked a question about the board, schedule, customers or business — answer intelligently using live board data. ' +
+      '3) For personal tasks like bills or health — respond: Got it — added to your Personal World. ' +
+      '4) For stress or overwhelm — respond with calm support and one action step. ' +
+      '5) Be sharp, warm, direct. Max 2 sentences. Never mention Monday.com.' +
       '\n\nLIVE BOARD DATA:\n' + boardContext + '\n\nUser says: ' + prompt;
 
     const payload = JSON.stringify({
@@ -106,7 +105,18 @@ exports.handler = async function(event, context) {
       'Content-Length': Buffer.byteLength(payload)
     }, payload);
 
-    const reply = resData?.candidates?.[0]?.content?.parts?.[0]?.text || 'Got it — delivered to Sissy.';
+    const reply = resData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'Got it — delivered to Sissy.';
+
+    // Server-side Webhook Trigger: If response contains "Got it", fire to Make.com
+    if (reply.indexOf('Got it') !== -1) {
+      const webhookUrl = 'https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1';
+      const webhookPayload = JSON.stringify({ body: prompt });
+      
+      makePostRequest(webhookUrl, {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(webhookPayload)
+      }, webhookPayload).catch(e => console.log('Server Webhook Error:', e));
+    }
 
     return {
       statusCode: 200,
@@ -114,7 +124,7 @@ exports.handler = async function(event, context) {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ reply: reply.trim() })
+      body: JSON.stringify({ reply: reply })
     };
 
   } catch (err) {
