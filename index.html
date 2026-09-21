@@ -44,7 +44,7 @@ details > div { animation: slideDown 0.2s ease-out; } @keyframes slideDown { fro
 
 <main class="max-w-7xl mx-auto px-4 pt-6 space-y-6">
 
-<!-- FRESH INTAKE SECTION -->
+<!-- FRESH INTAKE SECTION (ALWAYS VISIBLE) -->
 <section class="glow-card rounded-3xl p-8 text-center border-2 border-blue-500/40 relative overflow-hidden">
 <div class="flex flex-col items-center justify-center max-w-3xl mx-auto">
   
@@ -86,6 +86,7 @@ details > div { animation: slideDown 0.2s ease-out; } @keyframes slideDown { fro
 </div>
 </section>
 
+<!-- CALENDAR (ALWAYS VISIBLE) -->
 <section class="glow-card glow-card-amber rounded-2xl p-5">
 <div class="flex items-center justify-between mb-3">
 <div class="flex items-center space-x-2">
@@ -101,12 +102,12 @@ details > div { animation: slideDown 0.2s ease-out; } @keyframes slideDown { fro
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-<!-- Collapsible Business World -->
+<!-- BUSINESS WORLD (ALWAYS VISIBLE) -->
 <details class="glow-card rounded-2xl border border-blue-500/20 group">
 <summary class="p-5 flex items-center justify-between cursor-pointer hover:bg-gray-800/30 rounded-2xl transition">
 <div class="flex items-center space-x-3">
 <div class="w-9 h-9 rounded-xl bg-blue-900/50 border border-blue-700/50 flex items-center justify-center text-blue-400"><i class="fa-solid fa-briefcase"></i></div>
-<div><h3 class="font-bold text-gray-100">Business World</h3><p class="text-xs text-gray-400">Live Shop Ops and Workbench Queue</p></div>
+<div><h3 class="font-bold text-gray-100">Business World</h3><p class="text-xs text-gray-400">Live Operations and Board Queue</p></div>
 </div>
 <span class="w-3 h-3 rounded-full border-2 border-gray-600 group-open:border-blue-400 group-open:bg-blue-400 group-open:shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-all duration-300 flex-shrink-0"></span>
 </summary>
@@ -153,8 +154,8 @@ details > div { animation: slideDown 0.2s ease-out; } @keyframes slideDown { fro
 </div>
 </details>
 
-<!-- Collapsible Personal World -->
-<details class="glow-card glow-card-emerald rounded-2xl border border-emerald-500/20 group">
+<!-- PERSONAL WORLD (PERSONAL ONLY) -->
+<details class="personal-only glow-card glow-card-emerald rounded-2xl border border-emerald-500/20 group">
 <summary class="p-5 flex items-center justify-between cursor-pointer hover:bg-gray-800/30 rounded-2xl transition">
 <div class="flex items-center space-x-3">
 <div class="w-9 h-9 rounded-xl bg-emerald-900/50 border border-emerald-700/50 flex items-center justify-center text-emerald-400"><i class="fa-solid fa-user"></i></div>
@@ -200,7 +201,8 @@ details > div { animation: slideDown 0.2s ease-out; } @keyframes slideDown { fro
 
 <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-<div class="glow-card glow-card-amber rounded-2xl p-5">
+<!-- COORDINATOR HUB (PERSONAL ONLY) -->
+<div class="personal-only glow-card glow-card-amber rounded-2xl p-5">
 <div class="flex items-center space-x-3 mb-4">
 <div class="w-9 h-9 rounded-xl bg-amber-900/50 border border-amber-700/50 flex items-center justify-center text-amber-400"><i class="fa-solid fa-headset"></i></div>
 <div><h3 class="font-bold text-gray-100">Coordinator Hub</h3><p class="text-xs text-gray-400">Direct Team Communications</p></div>
@@ -225,7 +227,8 @@ details > div { animation: slideDown 0.2s ease-out; } @keyframes slideDown { fro
 </div>
 </div>
 
-<div class="glow-card glow-card-purple rounded-2xl p-5">
+<!-- INVOICES & PAYMENTS (PERSONAL ONLY) -->
+<div class="personal-only glow-card glow-card-purple rounded-2xl p-5">
 <details class="group" open>
 <summary class="flex items-center justify-between cursor-pointer">
 <div class="flex items-center space-x-3">
@@ -254,6 +257,7 @@ details > div { animation: slideDown 0.2s ease-out; } @keyframes slideDown { fro
 </details>
 </div>
 
+<!-- TRACKING & ORDERS (ALWAYS VISIBLE) -->
 <div class="glow-card rounded-2xl p-5 border border-blue-500/20">
 <details class="group">
 <summary class="flex items-center justify-between cursor-pointer">
@@ -272,6 +276,7 @@ details > div { animation: slideDown 0.2s ease-out; } @keyframes slideDown { fro
 </details>
 </div>
 
+<!-- QUICK PAY (ALWAYS VISIBLE) -->
 <div class="glow-card glow-card-emerald rounded-2xl p-5">
 <details class="group">
 <summary class="flex items-center justify-between cursor-pointer">
@@ -289,7 +294,8 @@ details > div { animation: slideDown 0.2s ease-out; } @keyframes slideDown { fro
 </details>
 </div>
 
-<div class="glow-card glow-card-amber rounded-2xl p-5">
+<!-- MY WORLD (PERSONAL ONLY) -->
+<div class="personal-only glow-card glow-card-amber rounded-2xl p-5">
 <details class="group">
 <summary class="flex items-center justify-between cursor-pointer">
 <div class="flex items-center space-x-3">
@@ -308,7 +314,8 @@ details > div { animation: slideDown 0.2s ease-out; } @keyframes slideDown { fro
 </details>
 </div>
 
-<div class="glow-card rounded-2xl p-5 border border-purple-500/30">
+<!-- BECOME A REP (PERSONAL ONLY) -->
+<div class="personal-only glow-card rounded-2xl p-5 border border-purple-500/30">
 <details class="group">
 <summary class="flex items-center justify-between cursor-pointer">
 <div class="flex items-center space-x-3">
@@ -337,10 +344,17 @@ details > div { animation: slideDown 0.2s ease-out; } @keyframes slideDown { fro
 </footer>
 
 <script>
-// CHANGE 1 — Extract URL parameters for dynamic routing
+// Extract URL parameters for dynamic routing
 const urlParams = new URLSearchParams(window.location.search);
 const activeBoardId = urlParams.get('board') || '18424728273';
 const activeName = urlParams.get('name') || 'Aerus Home Wellness';
+
+// Hide personal elements if a custom board parameter exists
+if (urlParams.get('board')) {
+  document.querySelectorAll('.personal-only').forEach(function(el) {
+    el.style.display = 'none';
+  });
+}
 
 var lastReply = '';
 
@@ -443,7 +457,6 @@ function loadCalendarData() {
     });
 }
 
-// CHANGE 2 — Use activeBoardId parameter dynamically
 function loadMondayData() {
   var drawers = {
     intake: document.getElementById('drawer-intake'),
@@ -523,7 +536,6 @@ function closeCard() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  // CHANGE 3 — Update nav header dynamically on load
   document.getElementById('navBusinessName').textContent = decodeURIComponent(activeName);
   
   loadMondayData();
