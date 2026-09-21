@@ -83,58 +83,49 @@ exports.handler = async function(event, context) {
     // Pull live board items from Monday.com
     const boardContext = await fetchBoardContext(mondayKey);
 
+    // Pure-code Router
     const lower = prompt.toLowerCase().trim();
+    const words = prompt.trim().split(/\s+/);
+    const wordCount = words.length;
 
-    // 1. GREETING BYPASS
-    if (lower === 'hello' || lower === 'hi' || lower.startsWith('hey')) {
-      return {
-        statusCode: 200,
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ reply: 'Hi! I am Fresh, your pocket Chief of Staff. The Tappy Family is ready for you. Just talk to me.' })
-      };
-    }
+    const questionStarters = ['who','what','when','where','how','show','list','give','status','tell me'];
+    const intakeWords = ['repair','fix','vacuum','dyson','oreck','electrolux','motor','belt','filter','parts','estimate','pickup','broken','service','tune'];
 
-    // ONBOARDING & CONVERSATIONAL INTERACTION BYPASS
-    if (lower.startsWith("i'm") || lower.startsWith("i am") || lower.startsWith("i ") || lower.startsWith("my ") || lower.startsWith("can you") || lower.startsWith("could you") || lower.startsWith("help") || lower.startsWith("tell me")) { 
+    const isQuestion = questionStarters.some(function(w){ return lower.startsWith(w); });
+    const isIntake = wordCount <= 7 && intakeWords.some(function(w){ return lower.includes(w); });
+    const isGreeting = lower === 'hello' || lower === 'hi' || lower.startsWith('hey');
+
+    // ROUTE 1: GREETING
+    if (isGreeting) { 
       return { 
         statusCode: 200, 
-        headers: { 
-          "Access-Control-Allow-Origin": "*", 
-          "Content-Type": "application/json" 
-        }, 
-        body: JSON.stringify({ reply: 'Tell me more — I am building your world as we talk.' }) 
+        headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, 
+        body: JSON.stringify({ reply: 'Hi! I am Fresh, your pocket Chief of Staff. Just talk to me.' }) 
       }; 
     }
 
-    // 2. YOGI'S STRESS RELIEF CORNER BYPASS
-    if (lower.includes('stress') || lower.includes('overwhelm') || lower.includes('anxious') || lower.includes('worried') || lower.includes('tired') || lower.includes('i am feeling') || lower.includes('i feel')) {
-      return {
-        statusCode: 200,
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ reply: 'Take a breath. You have got this. What is the one most urgent thing right now — let Sissy handle the rest.' })
-      };
+    // ROUTE 2: QUESTION / BOARD STATUS
+    if (isQuestion) { 
+      return { 
+        statusCode: 200, 
+        headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, 
+        body: JSON.stringify({ reply: 'Here is your active board:\n' + boardContext }) 
+      }; 
     }
 
-    // 3. QUESTION / BOARD STATUS BYPASS
-    if (lower.startsWith('who') || lower.startsWith('what') || lower.startsWith('how') || lower.startsWith('show') || lower.startsWith('list') || lower.startsWith('give') || lower.startsWith('status')) {
-      return {
-        statusCode: 200,
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ reply: 'Here is your active board:\n' + boardContext })
-      };
+    // ROUTE 3: SHORT FIELD INTAKE
+    if (isIntake) { 
+      const webhookPayload = JSON.stringify({ body: prompt }); 
+      makePostRequest('https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1', {'Content-Type':'application/json','Content-Length':Buffer.byteLength(webhookPayload)}, webhookPayload).catch(function(e){ console.log('Webhook error:',e); }); 
+      return { 
+        statusCode: 200, 
+        headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, 
+        body: JSON.stringify({ reply: 'Got it — delivered to Sissy.' }) 
+      }; 
     }
 
-    // System prompt replacement with 3-mode intelligence logic
-    var fullPrompt = 'You are Sissy — the intelligent brain behind TappyThing. You serve William Sullivan who runs Aerus Home Wellness in Timonium MD, a vacuum and air purifier repair shop. His team: Mona (front desk), Chris (bench repairs), Mike (field tech), Norby (virtual assistant). TappyThing costs $95/month and replaces all business software.\n\nYou have three modes:\n\nMODE 1 — INTAKE: If someone says a customer name + repair or service (example: Sharon Williams vacuum repair, Bobby Johnson Dyson fix) respond ONLY with: Got it — delivered to Sissy.\n\nMODE 2 — QUESTION: If someone asks about the board, schedule, customers or business respond with the live board data below.\n\nMODE 3 — BRAIN DUMP: If someone is introducing themselves or describing their life or business (example: I am a yoga teacher, I run a pizza shop, I have three kids) respond warmly and ask one smart follow-up question to learn more and build their world. Be warm, sharp and personal. Max 2 sentences.\n\nLIVE BOARD DATA:\n' + boardContext + '\n\nUser says: ' + prompt;
+    // ROUTE 4: BRAIN DUMP / CONVERSATION (Passed to Gemini AI)
+    var fullPrompt = 'You are Sissy — the intelligent brain behind TappyThing. You serve William Sullivan who runs Aerus Home Wellness in Timonium MD, a vacuum and air purifier repair shop. His team: Mona (front desk), Chris (bench repairs), Mike (field tech), Norby (virtual assistant). TappyThing costs $95/month and replaces all business software.\n\nMODE 3 — BRAIN DUMP: Respond warmly to introductions, descriptions of life, or business ideas (example: I am a yoga teacher, I run a pizza shop). Ask one smart follow-up question to learn more and build their world. Be warm, sharp and personal. Max 2 sentences.\n\nLIVE BOARD DATA:\n' + boardContext + '\n\nUser says: ' + prompt;
 
     const payload = JSON.stringify({
       contents: [{
@@ -149,18 +140,7 @@ exports.handler = async function(event, context) {
       'Content-Length': Buffer.byteLength(payload)
     }, payload);
 
-    const reply = resData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'Got it — delivered to Sissy.';
-
-    // Server-side Webhook Trigger: Only fire to Make.com if "Got it" AND message is under 8 words (Real short intake)
-    if (reply.indexOf('Got it') !== -1 && prompt.split(' ').length < 8) {
-      const webhookUrl = 'https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1';
-      const webhookPayload = JSON.stringify({ body: prompt });
-      
-      makePostRequest(webhookUrl, {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(webhookPayload)
-      }, webhookPayload).catch(e => console.log('Server Webhook Error:', e));
-    }
+    const reply = resData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'Tell me more — I am building your world as we talk.';
 
     return {
       statusCode: 200,
