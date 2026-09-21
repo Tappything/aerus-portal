@@ -88,7 +88,8 @@ exports.handler = async function(event, context) {
     const words = prompt.trim().split(/\s+/);
     const wordCount = words.length;
 
-    const questionStarters = ['who','what','when','where','how','show','list','give','status','tell me'];
+    // Single word edit applied: 'how' removed from questionStarters
+    const questionStarters = ['who','what','when','where','show','list','give','status','tell me'];
     const intakeWords = ['repair','fix','vacuum','dyson','oreck','electrolux','motor','belt','filter','parts','estimate','pickup','broken','service','tune'];
 
     const isQuestion = questionStarters.some(function(w){ return lower.startsWith(w); });
