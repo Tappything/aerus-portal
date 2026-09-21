@@ -86,6 +86,19 @@ details > div { animation: slideDown 0.2s ease-out; } @keyframes slideDown { fro
 </div>
 </section>
 
+<!-- DYNAMIC MY WORLD SECTION (SUBSCRIBER/CUSTOMER PORTALS) -->
+<section id="myWorldSection" class="glow-card rounded-2xl border border-blue-500/20 group" style="display:none">
+<div class="p-5">
+<div class="flex items-center justify-between mb-3">
+<h3 class="font-bold text-gray-100">My World</h3>
+<button onclick="loadMondayData()" class="text-xs text-blue-400 px-2 py-1 rounded border border-blue-800/50 hover:bg-blue-900/30 transition"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+</div>
+<div id="dynamicDrawers" class="space-y-3 text-xs">
+<p class="text-gray-500 text-center py-1">Talk to Fresh to build your world.</p>
+</div>
+</div>
+</section>
+
 <!-- CALENDAR SECTION -->
 <section id="calendarSection" class="glow-card glow-card-amber rounded-2xl p-5">
 <div class="flex items-center justify-between mb-3">
@@ -355,6 +368,7 @@ if (urlParams.get('board')) {
   document.querySelectorAll('.personal-only').forEach(function(el) { el.style.display = 'none'; }); 
   document.getElementById('calendarSection').style.display = 'none'; 
   document.getElementById('worldsGrid').style.display = 'none'; 
+  document.getElementById('myWorldSection').style.display = 'block';
 }
 
 var lastReply = '';
@@ -459,7 +473,7 @@ function loadCalendarData() {
 }
 
 function loadMondayData() {
-  var container = document.getElementById('drawer-intake').parentElement.parentElement;
+  var container = urlParams.get('board') ? document.getElementById('dynamicDrawers') : document.getElementById('drawer-intake').parentElement.parentElement;
   fetch('/.netlify/functions/monday?board=' + activeBoardId + '&t=' + new Date().getTime())
     .then(function(res) { return res.json(); })
     .then(function(data) {
