@@ -351,11 +351,18 @@ function sendToFresh() {
   .catch(function(err) {
     replyEl.textContent = 'Error connecting to Fresh.';
   });
-  fetch('https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ body: prompt })
-  }).catch(function(e) { console.log('Webhook error:', e); });
+
+  // Intent check: Only route actionable intakes to Make.com, skip for board questions
+  var intakeKeywords = ['repair','vacuum','customer','estimate','pickup','service','machine','order','parts','invoice','payment','pay','bill','bank','doctor','dentist','appointment','schedule','meeting','call at','visit at','tomorrow','today','monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+  var isIntake = intakeKeywords.some(function(kw) { return prompt.toLowerCase().indexOf(kw) !== -1; });
+  if (isIntake) {
+    fetch('https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ body: prompt })
+    }).catch(function(e) { console.log('Webhook error:', e); });
+  }
+
   document.getElementById('promptInput').value = '';
 }
 
