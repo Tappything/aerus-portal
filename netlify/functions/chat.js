@@ -23,12 +23,13 @@ function makePostRequest(url, headers, payload) {
   });
 }
 
-// Helper to fetch live items from Monday.com
-async function fetchBoardContext(mondayKey) {
+// Helper to fetch live items from Monday.com with dynamic boardId target
+async function fetchBoardContext(mondayKey, boardId) {
   if (!mondayKey) return "No live board context available.";
   
+  const targetBoard = boardId || '18424728273';
   const query = JSON.stringify({
-    query: `{ boards(ids: [18424728273]) { items_page(limit: 10) { items { name group { title } } } } }`
+    query: `{ boards(ids: [${targetBoard}]) { items_page(limit: 10) { items { name group { title } } } } }`
   });
 
   try {
@@ -80,8 +81,10 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // Pull live board items from Monday.com
-    const boardContext = await fetchBoardContext(mondayKey);
+    const targetBoardId = data.board_id || '18424728273';
+
+    // Pull dynamic live board items from Monday.com
+    const boardContext = await fetchBoardContext(mondayKey, targetBoardId);
 
     // Pure-code Router
     const lower = prompt.toLowerCase().trim();
@@ -125,8 +128,8 @@ exports.handler = async function(event, context) {
       }; 
     }
 
-    // ROUTE 4: BRAIN DUMP / CONVERSATION (Passed to Gemini AI)
-    var fullPrompt = 'You are Sissy — the intelligent brain behind TappyThing. You serve William Sullivan who runs Aerus Home Wellness in Timonium MD, a vacuum and air purifier repair shop. His team: Mona (front desk), Chris (bench repairs), Mike (field tech), Norby (virtual assistant). TappyThing costs $95/month and replaces all business software.\n\nMODE 3 — BRAIN DUMP: Respond warmly to introductions, descriptions of life, or business ideas (example: I am a yoga teacher, I run a pizza shop). Ask one smart follow-up question to learn more and build their world. Be warm, sharp and personal. Max 2 sentences.\n\nLIVE BOARD DATA:\n' + boardContext + '\n\nUser says: ' + prompt;
+    // ROUTE 4: BRAIN DUMP / CONVERSATION (Clean, personal prompt — board data excluded)
+    var fullPrompt = 'You are Fresh — a warm intelligent Chief of Staff for TappyThing. When someone brain dumps about their life or business respond warmly and ask ONE smart follow up question. Be personal and sharp. Max 2 sentences. Never show board data in conversation. User says: ' + prompt;
 
     const payload = JSON.stringify({
       contents: [{
@@ -157,7 +160,6 @@ exports.handler = async function(event, context) {
     }
 
     // AUTOMATIC KEYWORD DETECT & GROUP CREATION TRIGGER
-    const boardId = data.board_id || '18424728273'; 
     const keywordGroups = [
       { keywords:['bill','bank','money','finance','financ'], group:'💰 Banking & Finance'},
       { keywords:['family','kids','children','husband','wife','son','daughter'], group:'👨‍👩‍👧 Family'},
@@ -170,7 +172,7 @@ exports.handler = async function(event, context) {
     keywordGroups.forEach(function(kg){ 
       const matched = kg.keywords.some(function(kw){ return lower.includes(kw); }); 
       if(matched){ 
-        const gpPayload = JSON.stringify({ boardId: boardId, groupName: kg.group }); 
+        const gpPayload = JSON.stringify({ boardId: targetBoardId, groupName: kg.group }); 
         makePostRequest('https://freshtappything.com/.netlify/functions/create-group', {'Content-Type':'application/json','Content-Length':Buffer.byteLength(gpPayload)}, gpPayload).catch(function(e){ console.log('Group create error:',e); }); 
       } 
     });
