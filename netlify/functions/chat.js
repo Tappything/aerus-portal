@@ -120,7 +120,7 @@ exports.handler = async function(event, context) {
     // ROUTE 3: SHORT FIELD INTAKE
     if (isIntake) { 
       const webhookPayload = JSON.stringify({ rawDump: prompt }); 
-      makePostRequest('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei', {'Content-Type':'application/json','Content-Length':Buffer.byteLength(webhookPayload)}, webhookPayload).catch(function(e){ console.log('Webhook error:',e); }); 
+      makePostRequest('https://hook.us2.make.com/g6aw7r8759ar5jr5c7lnb6nvwnuuz67t', {'Content-Type':'application/json','Content-Length':Buffer.byteLength(webhookPayload)}, webhookPayload).catch(function(e){ console.log('Webhook error:',e); }); 
       return { 
         statusCode: 200, 
         headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, 
@@ -175,7 +175,7 @@ exports.handler = async function(event, context) {
         const clean = line.replace(/^[-•*🔧✅📋📦🏠]\s*/,'').trim();
         if(clean.length > 3){
           const wpLoad = JSON.stringify({ rawDump: clean });
-          makePostRequest('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei',{'Content-Type':'application/json','Content-Length':Buffer.byteLength(wpLoad)},wpLoad).catch(function(e){ console.log('Dump webhook error:',e); });
+          makePostRequest('https://hook.us2.make.com/g6aw7r8759ar5jr5c7lnb6nvwnuuz67t',{'Content-Type':'application/json','Content-Length':Buffer.byteLength(wpLoad)},wpLoad).catch(function(e){ console.log('Dump webhook error:',e); });
         }
       });
     }
