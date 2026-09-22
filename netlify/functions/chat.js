@@ -128,13 +128,23 @@ exports.handler = async function(event, context) {
       }; 
     }
 
-    // ROUTE 4: BRAIN DUMP / CONVERSATION (Clean, personal prompt — board data excluded)
-    var fullPrompt = 'You are Fresh — a warm intelligent Chief of Staff for TappyThing. When someone brain dumps about their life or business respond warmly and ask ONE smart follow up question. Be personal and sharp. Max 2 sentences. Never show board data in conversation. User says: ' + prompt;
+    // ROUTE 4: BRAIN DUMP / CONVERSATION (With full conversation memory)
+    var systemInstruction = 'You are Fresh — a warm intelligent Chief of Staff for TappyThing. When someone brain dumps about their life or business respond warmly and ask ONE smart follow up question. Be personal and sharp. Max 2 sentences. Never show board data in conversation.';
+    var fullPrompt = systemInstruction + ' User says: ' + prompt;
+
+    const history = data.history || [];
+    const contents = [
+      ...history.map(function(h) {
+        return {
+          role: h.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: h.text }]
+        };
+      }),
+      { role: 'user', parts: [{ text: fullPrompt }] }
+    ];
 
     const payload = JSON.stringify({
-      contents: [{
-        parts: [{ text: fullPrompt }]
-      }]
+      contents: contents
     });
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
