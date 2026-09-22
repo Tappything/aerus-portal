@@ -154,9 +154,9 @@ exports.handler = async function(event, context) {
       }; 
     }
 
-    // ROUTE 3: SHORT FIELD INTAKE
+    // ROUTE 3: SHORT FIELD INTAKE (UPDATED TO rawDump)
     if (isIntake) { 
-      const webhookPayload = JSON.stringify({ body: prompt }); 
+      const webhookPayload = JSON.stringify({ rawDump: prompt }); 
       makePostRequest('https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1', {'Content-Type':'application/json','Content-Length':Buffer.byteLength(webhookPayload)}, webhookPayload).catch(function(e){ console.log('Webhook error:',e); }); 
       return { 
         statusCode: 200, 
@@ -166,7 +166,7 @@ exports.handler = async function(event, context) {
     }
 
     // ROUTE 4: BRAIN DUMP / CONVERSATION
-    var systemInstruction = 'You are Fresh — the warm, confident Chief of Staff powering TappyThing. FIRST MESSAGE RULE: If the conversation history is empty, always open with this exact script before anything else: "Hi [use their name if given, or just Hi]! I am Fresh — your one place for everything. Work tasks, personal reminders, family stuff, follow ups — all in one spot. No more sticky notes, no more forgotten things. I am going to ask you a few things about your life. The more you tell me, the better I build your world. Let us start simple — what is your biggest daily headache right now?" AFTER FIRST MESSAGE: Respond with bold coach energy, under 3 sentences, ultra-punchy. Never auto-create drawers. Always ask permission first. Never mention Monday.com or board IDs.';
+    var systemInstruction = 'You are Fresh — the warm, confident Chief of Staff powering TappyThing. FIRST MESSAGE RULE: If the conversation history is empty and boardId is not master, open with onboarding. AFTER FIRST MESSAGE: Respond with bold coach energy, under 3 sentences, ultra-punchy. Never auto-create drawers. Always ask permission first.';
     var fullPrompt = systemInstruction + ' User says: ' + prompt;
 
     const contents = [
@@ -203,13 +203,13 @@ exports.handler = async function(event, context) {
       reply = 'Parse error: ' + e.message; 
     }
 
-    // BRAIN DUMP PARSER & INDIVIDUAL ITEM WEBHOOK TRIGGER
+    // BRAIN DUMP PARSER & INDIVIDUAL ITEM WEBHOOK TRIGGER (UPDATED TO rawDump)
     const lines = prompt.split('\n').filter(function(l){ return l.trim().length > 5; });
     if(lines.length > 2){
       lines.forEach(function(line){
         const clean = line.replace(/^[-•*🔧✅📋📦🏠]\s*/,'').trim();
         if(clean.length > 5){
-          const wpLoad = JSON.stringify({ body: clean });
+          const wpLoad = JSON.stringify({ rawDump: clean });
           makePostRequest('https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1',{'Content-Type':'application/json','Content-Length':Buffer.byteLength(wpLoad)},wpLoad).catch(function(e){ console.log('Dump webhook error:',e); });
         }
       });
@@ -225,14 +225,6 @@ exports.handler = async function(event, context) {
       { keywords:['private','personal','secret','vault'], group:'🔒 Private Vault'}
     ]; 
 
-    const industryTemplates = [
-      { keywords:['restaurant','cafe','food','kitchen','menu','table','waiter','dine'], groups:['🍽️ Tables & Reservations','📋 Orders & Kitchen','💰 Payments & Tips','🧑‍🍳 Staff Schedule','📦 Inventory & Supplies'] },
-      { keywords:['property','landlord','tenant','rent','lease','apartment','unit','maintenance'], groups:['🏠 Properties','🔧 Maintenance Requests','💳 Rent Ledger','📞 Tenant Communications','📋 Lease Tracker'] },
-      { keywords:['yoga','fitness','gym','trainer','class','studio','students','workout'], groups:['📅 Class Schedule','👥 Students','💰 Billing & Memberships','🧘 Curriculum','📣 Marketing'] },
-      { keywords:['salon','hair','nails','beauty','spa','appointment','stylist'], groups:['📅 Appointments','💇 Services Menu','💰 Payments','👥 Client Cards','🛒 Product Inventory'] },
-      { keywords:['retail','store','shop','inventory','product','sales','customer'], groups:['📦 Inventory','💰 Sales','👥 Customers','🚚 Orders & Shipping','📣 Marketing'] }
-    ];
-
     let suggestedGroup = null;
 
     keywordGroups.forEach(function(kg){
@@ -242,16 +234,6 @@ exports.handler = async function(event, context) {
         suggestedGroup = kg.group;
       }
     });
-
-    if(!suggestedGroup){
-      industryTemplates.forEach(function(it){
-        if(suggestedGroup) return;
-        const matched = it.keywords.some(function(kw){ return lower.includes(kw); });
-        if(matched){
-          suggestedGroup = it.groups[0];
-        }
-      });
-    }
 
     if(suggestedGroup){
       reply = reply + ' I can create a ' + suggestedGroup + ' section just for that — want me to add it now?';
