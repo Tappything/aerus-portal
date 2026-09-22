@@ -360,18 +360,19 @@ details > div { animation: slideDown 0.2s ease-out; } @keyframes slideDown { fro
 <script>
 // Extract URL parameters for dynamic routing
 const urlParams = new URLSearchParams(window.location.search);
-const activeBoardId = urlParams.get('board') || '18424728273';
-const activeName = urlParams.get('name') || 'Aerus Home Wellness';
+let activeBoardId = urlParams.get('board') || '18424728273';
+let activeName = urlParams.get('name') || 'Aerus Home Wellness';
+const activeToken = urlParams.get('token') || '';
 
-// Surgical Visibility Toggle based on ?board= parameter
-if (urlParams.get('board')) { 
+var lastReply = '';
+var conversationHistory = []; // Stores last 5 exchanges (max 10 items)
+
+function applySubscriberLayout() {
   document.querySelectorAll('.personal-only').forEach(function(el) { el.style.display = 'none'; }); 
   document.getElementById('calendarSection').style.display = 'none'; 
   document.getElementById('worldsGrid').style.display = 'none'; 
   document.getElementById('myWorldSection').style.display = 'block';
 }
-
-var lastReply = '';
 
 function previewPhoto(input) { if (input.files && input.files[0]) { var reader = new FileReader(); reader.onload = function(e) { document.getElementById('promptInput').style.backgroundImage = 'none'; }; reader.readAsDataURL(input.files[0]); } }
 
@@ -380,15 +381,25 @@ function sendToFresh() {
   if (!prompt) return;
   var replyEl = document.getElementById('freshReply');
   replyEl.textContent = 'Fresh is thinking...';
+
+  // Add user prompt to conversation history array
+  conversationHistory.push({ role: 'user', text: prompt });
+  if (conversationHistory.length > 10) { conversationHistory = conversationHistory.slice(-10); }
+
   fetch('/.netlify/functions/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt: prompt, board_id: activeBoardId })
+    body: JSON.stringify({ prompt: prompt, board_id: activeBoardId, history: conversationHistory })
   })
   .then(function(res) { return res.json(); })
   .then(function(data) {
     lastReply = data.reply || 'Fresh had nothing to say!';
     replyEl.textContent = lastReply;
+
+    // Add assistant response to conversation history array
+    conversationHistory.push({ role: 'assistant', text: lastReply });
+    if (conversationHistory.length > 10) { conversationHistory = conversationHistory.slice(-10); }
+
     if (window.speechSynthesis) {
       window.speechSynthesis.cancel();
       var utter = new SpeechSynthesisUtterance(lastReply);
@@ -473,7 +484,7 @@ function loadCalendarData() {
 }
 
 function loadMondayData() {
-  var container = urlParams.get('board') ? document.getElementById('dynamicDrawers') : document.getElementById('drawer-intake').parentElement.parentElement;
+  var container = (urlParams.get('board') || activeToken) ? document.getElementById('dynamicDrawers') : document.getElementById('drawer-intake').parentElement.parentElement;
   fetch('/.netlify/functions/monday?board=' + activeBoardId + '&t=' + new Date().getTime())
     .then(function(res) { return res.json(); })
     .then(function(data) {
@@ -535,11 +546,34 @@ function closeCard() {
 
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('freshReply').textContent = "Hi — I'm Fresh, your new pocket Chief of Staff. Tell me your name and what you do. I'll handle everything from there.";
-  document.getElementById('navBusinessName').textContent = decodeURIComponent(activeName);
-  
-  loadMondayData();
-  loadCalendarData();
-  loadTimoniumWeather();
+
+  // Token Verification Logic
+  if (activeToken) {
+    applySubscriberLayout();
+    fetch('/.netlify/functions/verify-token?token=' + encodeURIComponent(activeToken))
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data.valid) {
+          activeBoardId = data.boardId;
+          activeName = data.name;
+          document.getElementById('navBusinessName').textContent = activeName;
+          loadMondayData();
+        } else {
+          document.getElementById('navBusinessName').textContent = 'Invalid Access Token';
+          document.getElementById('dynamicDrawers').innerHTML = '<p class="text-red-400 text-center py-2 font-bold">Invalid or expired portal token.</p>';
+        }
+      })
+      .catch(function() {
+        document.getElementById('navBusinessName').textContent = 'Token Verification Error';
+      });
+  } else {
+    if (urlParams.get('board')) { applySubscriberLayout(); }
+    document.getElementById('navBusinessName').textContent = decodeURIComponent(activeName);
+    loadMondayData();
+    loadCalendarData();
+    loadTimoniumWeather();
+  }
+
   document.getElementById('promptInput').addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendToFresh(); }
   });
