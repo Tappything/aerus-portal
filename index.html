@@ -400,6 +400,9 @@ function sendToFresh() {
     conversationHistory.push({ role: 'assistant', text: lastReply });
     if (conversationHistory.length > 10) { conversationHistory = conversationHistory.slice(-10); }
 
+    // Auto-refresh My World board drawers after Fresh responds
+    setTimeout(function() { loadMondayData(); }, 1500);
+
     if (window.speechSynthesis) {
       window.speechSynthesis.cancel();
       var utter = new SpeechSynthesisUtterance(lastReply);
