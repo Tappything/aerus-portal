@@ -1,6 +1,5 @@
 const https = require('https');
 
-// Helper function for HTTPS POST requests
 function makePostRequest(url, headers, payload) {
   return new Promise((resolve, reject) => {
     const req = https.request(url, {
@@ -23,15 +22,12 @@ function makePostRequest(url, headers, payload) {
   });
 }
 
-// Helper to fetch live items from Monday.com with dynamic boardId target
 async function fetchBoardContext(mondayKey, boardId) {
   if (!mondayKey) return "No live board context available.";
-  
   const targetBoard = boardId || '18424728273';
   const query = JSON.stringify({
     query: `{ boards(ids: [${targetBoard}]) { items_page(limit: 10) { items { name group { title } } } } }`
   });
-
   try {
     const resData = await makePostRequest('https://api.monday.com/v2', {
       'Content-Type': 'application/json',
@@ -39,10 +35,8 @@ async function fetchBoardContext(mondayKey, boardId) {
       'API-Version': '2023-10',
       'Content-Length': Buffer.byteLength(query)
     }, query);
-
     const items = resData?.data?.boards?.[0]?.items_page?.items || [];
     if (items.length === 0) return "Board is currently empty.";
-
     return items.map(item => `- ${item.name} (Group: ${item.group?.title || 'General'})`).join('\n');
   } catch (err) {
     return "Error fetching board context.";
@@ -51,81 +45,58 @@ async function fetchBoardContext(mondayKey, boardId) {
 
 exports.handler = async function(event, context) {
   if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers: { "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({ error: 'Method Not Allowed' })
-    };
+    return { statusCode: 405, headers: { "Access-Control-Allow-Origin": "*" }, body: JSON.stringify({ error: 'Method Not Allowed' }) };
   }
 
   try {
     const data = JSON.parse(event.body || '{}');
     const prompt = data.prompt || '';
-
     if (!prompt) {
-      return {
-        statusCode: 400,
-        headers: { "Access-Control-Allow-Origin": "*" },
-        body: JSON.stringify({ error: 'Prompt is required' })
-      };
+      return { statusCode: 400, headers: { "Access-Control-Allow-Origin": "*" }, body: JSON.stringify({ error: 'Prompt is required' }) };
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
     const mondayKey = process.env.MONDAY_API_KEY;
-
     if (!apiKey) {
-      return {
-        statusCode: 500,
-        headers: { "Access-Control-Allow-Origin": "*" },
-        body: JSON.stringify({ error: 'Gemini API key not configured' })
-      };
+      return { statusCode: 500, headers: { "Access-Control-Allow-Origin": "*" }, body: JSON.stringify({ error: 'Gemini API key not configured' }) };
     }
 
     const targetBoardId = data.board_id || '18424728273';
-
-    // Pull dynamic live board items from Monday.com
     const boardContext = await fetchBoardContext(mondayKey, targetBoardId);
-
-    // Pure-code Router
     const lower = prompt.toLowerCase().trim();
     const words = prompt.trim().split(/\s+/);
     const wordCount = words.length;
 
-    // Strict command triggers only
+    // YES DETECTION — Permission-based group creation
+    const isYes = lower === 'yes' || lower === 'yeah' || lower === 'add it' || lower === 'do it' || lower === 'sure';
+    if(isYes && data.history && data.history.length > 0){
+      const lastReply = data.history[data.history.length-1].text || '';
+      const groupMatch = lastReply.match(/I can create a (.+?) section/);
+      if(groupMatch){
+        const groupToCreate = groupMatch[1];
+        const gpPayload = JSON.stringify({ boardId: targetBoardId, groupName: groupToCreate });
+        makePostRequest('https://freshtappything.com/.netlify/functions/create-group',{'Content-Type':'application/json','Content-Length':Buffer.byteLength(gpPayload)},gpPayload).catch(function(e){ console.log('Group error:',e); });
+        return { statusCode: 200, headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, body: JSON.stringify({ reply: 'Done! Your ' + groupToCreate + ' section is live — check My World right now. What else is on your mind?' }) };
+      }
+    }
+
     const questionStarters = ['show','list','give','status'];
     const intakeWords = ['repair','fix','vacuum','dyson','oreck','electrolux','motor','belt','filter','parts','estimate','pickup','broken','service','tune'];
-
     const isQuestion = questionStarters.some(function(w){ return lower.startsWith(w); });
     const isIntake = wordCount <= 7 && intakeWords.some(function(w){ return lower.includes(w); });
     const isGreeting = lower === 'hello' || lower === 'hi' || lower.startsWith('hey');
 
     // ROUTE 1: GREETING
-    if (isGreeting) { 
-      return { 
-        statusCode: 200, 
-        headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, 
-        body: JSON.stringify({ reply: 'Hi! I am Fresh, your pocket Chief of Staff. Just talk to me.' }) 
-      }; 
-    }
+    if (isGreeting) { return { statusCode: 200, headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, body: JSON.stringify({ reply: 'Hi! I am Fresh, your pocket Chief of Staff. Just talk to me.' }) }; }
 
-    // ROUTE 2: EXPLICIT BOARD STATUS COMMAND
-    if (isQuestion) { 
-      return { 
-        statusCode: 200, 
-        headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, 
-        body: JSON.stringify({ reply: 'Here is your active board:\n' + boardContext }) 
-      }; 
-    }
+    // ROUTE 2: BOARD STATUS
+    if (isQuestion) { return { statusCode: 200, headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, body: JSON.stringify({ reply: 'Here is your active board:\n' + boardContext }) }; }
 
-    // ROUTE 3: SHORT FIELD INTAKE
+    // ROUTE 3: SHORT INTAKE
     if (isIntake) { 
       const webhookPayload = JSON.stringify({ body: prompt }); 
       makePostRequest('https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1', {'Content-Type':'application/json','Content-Length':Buffer.byteLength(webhookPayload)}, webhookPayload).catch(function(e){ console.log('Webhook error:',e); }); 
-      return { 
-        statusCode: 200, 
-        headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, 
-        body: JSON.stringify({ reply: 'Got it — delivered to Sissy.' }) 
-      }; 
+      return { statusCode: 200, headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, body: JSON.stringify({ reply: 'Got it — delivered to Sissy.' }) }; 
     }
 
     // ROUTE 4: BRAIN DUMP / CONVERSATION
@@ -134,40 +105,22 @@ exports.handler = async function(event, context) {
 
     const history = data.history || [];
     const contents = [
-      ...history.map(function(h) {
-        return {
-          role: h.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: h.text }]
-        };
-      }),
+      ...history.map(function(h) { return { role: h.role === 'assistant' ? 'model' : 'user', parts: [{ text: h.text }] }; }),
       { role: 'user', parts: [{ text: fullPrompt }] }
     ];
 
-    const payload = JSON.stringify({
-      contents: contents
-    });
-
+    const payload = JSON.stringify({ contents: contents });
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
-
-    const resData = await makePostRequest(url, {
-      'Content-Type': 'application/json',
-      'Content-Length': Buffer.byteLength(payload)
-    }, payload);
+    const resData = await makePostRequest(url, { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) }, payload);
 
     let reply = 'Fresh is thinking...'; 
     try { 
-      if (resData?.candidates?.[0]?.content?.parts?.[0]?.text) { 
-        reply = resData.candidates[0].content.parts[0].text.trim(); 
-      } else if (resData?.error?.message) { 
-        reply = 'API Error: ' + resData.error.message; 
-      } else { 
-        reply = 'Raw: ' + JSON.stringify(resData).substring(0, 200); 
-      } 
-    } catch(e) { 
-      reply = 'Parse error: ' + e.message; 
-    }
+      if (resData?.candidates?.[0]?.content?.parts?.[0]?.text) { reply = resData.candidates[0].content.parts[0].text.trim(); } 
+      else if (resData?.error?.message) { reply = 'API Error: ' + resData.error.message; } 
+      else { reply = 'Raw: ' + JSON.stringify(resData).substring(0, 200); } 
+    } catch(e) { reply = 'Parse error: ' + e.message; }
 
-    // CHANGE 3: BRAIN DUMP PARSER & INDIVIDUAL ITEM WEBHOOK TRIGGER
+    // BRAIN DUMP PARSER
     const lines = prompt.split('\n').filter(function(l){ return l.trim().length > 5; });
     if(lines.length > 2){
       lines.forEach(function(line){
@@ -179,7 +132,7 @@ exports.handler = async function(event, context) {
       });
     }
 
-    // CHANGE 1: KEYWORD DETECT & GROUP CREATION TRIGGER (THROTTLED TO 1 GROUP)
+    // PERMISSION-FIRST GROUP SUGGESTION
     const keywordGroups = [
       { keywords:['bill','bank','money','finance','financ'], group:'💰 Banking & Finance'},
       { keywords:['family','kids','children','husband','wife','son','daughter'], group:'👨‍👩‍👧 Family'},
@@ -189,51 +142,22 @@ exports.handler = async function(event, context) {
       { keywords:['private','personal','secret','vault'], group:'🔒 Private Vault'}
     ]; 
 
-    let groupsCreated = 0;
-    keywordGroups.forEach(function(kg){
-      if(groupsCreated >= 1) return;
-      const matched = kg.keywords.some(function(kw){ return lower.includes(kw); });
-      if(matched){
-        const gpPayload = JSON.stringify({ boardId: targetBoardId, groupName: kg.group });
-        makePostRequest('https://freshtappything.com/.netlify/functions/create-group',{'Content-Type':'application/json','Content-Length':Buffer.byteLength(gpPayload)},gpPayload).catch(function(e){ console.log('Group create error:',e); });
-        groupsCreated++;
-      }
-    });
-
-    // CHANGE 2: INDUSTRY TEMPLATES AUTO-CASCADE (THROTTLED TO 1 PRIMARY GROUP)
     const industryTemplates = [
-      { keywords:['restaurant','cafe','food','kitchen','menu','table','waiter','dine'], groups:['🍽️ Tables & Reservations','📋 Orders & Kitchen','💰 Payments & Tips','🧑‍🍳 Staff Schedule','📦 Inventory & Supplies'] },
-      { keywords:['property','landlord','tenant','rent','lease','apartment','unit','maintenance'], groups:['🏠 Properties','🔧 Maintenance Requests','💳 Rent Ledger','📞 Tenant Communications','📋 Lease Tracker'] },
-      { keywords:['yoga','fitness','gym','trainer','class','studio','students','workout'], groups:['📅 Class Schedule','👥 Students','💰 Billing & Memberships','🧘 Curriculum','📣 Marketing'] },
-      { keywords:['salon','hair','nails','beauty','spa','appointment','stylist'], groups:['📅 Appointments','💇 Services Menu','💰 Payments','👥 Client Cards','🛒 Product Inventory'] },
-      { keywords:['retail','store','shop','inventory','product','sales','customer'], groups:['📦 Inventory','💰 Sales','👥 Customers','🚚 Orders & Shipping','📣 Marketing'] }
+      { keywords:['restaurant','cafe','food','kitchen','menu','table','waiter','dine'], groups:['🍽️ Tables & Reservations'] },
+      { keywords:['property','landlord','tenant','rent','lease','apartment','unit','maintenance'], groups:['🏠 Properties'] },
+      { keywords:['yoga','fitness','gym','trainer','class','studio','students','workout'], groups:['📅 Class Schedule'] },
+      { keywords:['salon','hair','nails','beauty','spa','appointment','stylist'], groups:['📅 Appointments'] },
+      { keywords:['retail','store','shop','inventory','product','sales','customer'], groups:['📦 Inventory'] }
     ];
 
-    let industryGroupsCreated = 0;
-    industryTemplates.forEach(function(it){
-      if(industryGroupsCreated >= 1) return;
-      const matched = it.keywords.some(function(kw){ return lower.includes(kw); });
-      if(matched){
-        const gpPayload = JSON.stringify({ boardId: targetBoardId, groupName: it.groups[0] });
-        makePostRequest('https://freshtappything.com/.netlify/functions/create-group',{'Content-Type':'application/json','Content-Length':Buffer.byteLength(gpPayload)},gpPayload).catch(function(e){ console.log('Industry group error:',e); });
-        industryGroupsCreated++;
-      }
-    });
+    let suggestedGroup = null;
+    keywordGroups.forEach(function(kg){ if(suggestedGroup) return; if(kg.keywords.some(function(kw){ return lower.includes(kw); })){ suggestedGroup = kg.group; } });
+    if(!suggestedGroup){ industryTemplates.forEach(function(it){ if(suggestedGroup) return; if(it.keywords.some(function(kw){ return lower.includes(kw); })){ suggestedGroup = it.groups[0]; } }); }
+    if(suggestedGroup){ reply = reply + ' I can create a ' + suggestedGroup + ' section just for that — want me to add it now?'; }
 
-    return {
-      statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ reply: reply })
-    };
+    return { statusCode: 200, headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" }, body: JSON.stringify({ reply: reply }) };
 
   } catch (err) {
-    return {
-      statusCode: 500,
-      headers: { "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({ error: err.message })
-    };
+    return { statusCode: 500, headers: { "Access-Control-Allow-Origin": "*" }, body: JSON.stringify({ error: err.message }) };
   }
 };
