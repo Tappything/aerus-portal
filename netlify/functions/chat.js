@@ -1,5 +1,8 @@
 const https = require('https');
 
+// Constant Webhook URL
+const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/g6aw7r8759ar5jr5c7lnb6nvwnuuz67t';
+
 // Helper function for HTTPS POST requests
 function makePostRequest(url, headers, payload) {
   return new Promise((resolve, reject) => {
@@ -91,7 +94,7 @@ exports.handler = async function(event, context) {
     const words = prompt.trim().split(/\s+/);
     const wordCount = words.length;
 
-    // Strict command triggers only
+    // Strict command triggers
     const questionStarters = ['show','list','give','status'];
     const intakeWords = ['repair','fix','vacuum','dyson','oreck','electrolux','motor','belt','filter','parts','estimate','pickup','broken','service','tune'];
 
@@ -120,17 +123,17 @@ exports.handler = async function(event, context) {
     // ROUTE 3: SHORT FIELD INTAKE
     if (isIntake) { 
       const webhookPayload = JSON.stringify({ rawDump: prompt }); 
-      makePostRequest('https://hook.us2.make.com/g6aw7r8759ar5jr5c7lnb6nvwnuuz67t', {'Content-Type':'application/json','Content-Length':Buffer.byteLength(webhookPayload)}, webhookPayload).catch(function(e){ console.log('Webhook error:',e); }); 
+      makePostRequest(MAKE_WEBHOOK_URL, {'Content-Type':'application/json','Content-Length':Buffer.byteLength(webhookPayload)}, webhookPayload).catch(function(e){ console.log('Webhook error:',e); }); 
       return { 
         statusCode: 200, 
         headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, 
-        body: JSON.stringify({ reply: 'Got it — delivered to Sissy.' }) 
+        body: JSON.stringify({ reply: 'Logged and firing to your board! Next?' }) 
       }; 
     }
 
     // ROUTE 4: BRAIN DUMP / CONVERSATION
-    var systemInstruction = 'You are Fresh — the bold, decisive Chief of Staff powering TappyThing. Your job is to ACT not ask. When someone gives you anything — a task, an errand, a thought, a name — just confirm you logged it and move on. NEVER ask permission. NEVER offer to create sections. NEVER ask if they want something set up. Just say what you did in one punchy sentence and challenge them to give you more. Example: User says Home Depot. Fresh says: Logged. What else? You decide where everything goes. The user trusts you. Act like it. Max 1-2 sentences always.';
-    var fullPrompt = systemInstruction + ' User says: ' + prompt;
+    const systemInstruction = 'You are Fresh — the bold, decisive Chief of Staff powering TappyThing. Your job is to ACT not ask. When someone gives you anything — a task, an errand, a thought, a name — just confirm you logged it and move on. NEVER ask permission. NEVER offer to create sections. NEVER ask if they want something set up. Just say what you did in one punchy sentence and challenge them to give you more. Rotate your closing phrase between: What else? / Hit me. / Next? / Keep going! You decide where everything goes. The user trusts you. Act like it. Max 1-2 sentences always.';
+    const fullPrompt = systemInstruction + ' User says: ' + prompt;
 
     const history = data.history || [];
 
@@ -155,7 +158,7 @@ exports.handler = async function(event, context) {
       'Content-Length': Buffer.byteLength(payload)
     }, payload);
 
-    let reply = 'Fresh is thinking...'; 
+    let reply = 'Fresh is on it...'; 
     try { 
       if (resData?.candidates?.[0]?.content?.parts?.[0]?.text) { 
         reply = resData.candidates[0].content.parts[0].text.trim(); 
@@ -168,14 +171,14 @@ exports.handler = async function(event, context) {
       reply = 'Parse error: ' + e.message; 
     }
 
-    // BRAIN DUMP PARSER & INDIVIDUAL ITEM WEBHOOK TRIGGER (SPLITS ON NEWLINE OR COMMA)
-    const lines = prompt.split(/[\n,]+/).filter(function(l){ return l.trim().length > 3; });
-    if(lines.length > 1){
-      lines.forEach(function(line){
-        const clean = line.replace(/^[-•*🔧✅📋📦🏠]\s*/,'').trim();
-        if(clean.length > 3){
+    // BRAIN DUMP PARSER — SPLITS ON COMMAS ONLY
+    const commaPieces = prompt.split(',').map(function(item){ return item.trim(); }).filter(function(item){ return item.length > 2; });
+    if (commaPieces.length > 1) {
+      commaPieces.forEach(function(piece) {
+        const clean = piece.replace(/^[-•*🔧✅📋📦🏠]\s*/,'').trim();
+        if (clean.length > 2) {
           const wpLoad = JSON.stringify({ rawDump: clean });
-          makePostRequest('https://hook.us2.make.com/g6aw7r8759ar5jr5c7lnb6nvwnuuz67t',{'Content-Type':'application/json','Content-Length':Buffer.byteLength(wpLoad)},wpLoad).catch(function(e){ console.log('Dump webhook error:',e); });
+          makePostRequest(MAKE_WEBHOOK_URL, {'Content-Type':'application/json','Content-Length':Buffer.byteLength(wpLoad)}, wpLoad).catch(function(e){ console.log('Dump webhook error:',e); });
         }
       });
     }
