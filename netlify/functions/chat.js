@@ -99,43 +99,6 @@ exports.handler = async function(event, context) {
     const isIntake = wordCount <= 7 && intakeWords.some(function(w){ return lower.includes(w); });
     const isGreeting = lower === 'hello' || lower === 'hi' || lower.startsWith('hey');
 
-    // ------------------------------------------------------------------
-    // YES DETECTION & PERMISSION-BASED GROUP SPAWNING
-    // ------------------------------------------------------------------
-    const history = data.history || [];
-    const isYes = lower === 'yes' || lower === 'yeah' || lower === 'add it' || lower === 'do it' || lower === 'sure';
-
-    if (isYes && history.length > 0) {
-      const lastReply = history[history.length - 1].text || history[history.length - 1].parts?.[0]?.text || '';
-      const groupMatch = lastReply.match(/I can create a (.+?) section/);
-
-      if (groupMatch) {
-        const groupToCreate = groupMatch[1];
-        const gpPayload = JSON.stringify({
-          boardId: targetBoardId,
-          groupName: groupToCreate
-        });
-
-        await makePostRequest('https://freshtappything.com/.netlify/functions/create-group', {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(gpPayload)
-        }, gpPayload).catch(function(e) {
-          console.log('Group create error:', e);
-        });
-
-        return {
-          statusCode: 200,
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            reply: 'Done! Your ' + groupToCreate + ' section is live — check My World right now. What else is on your mind?'
-          })
-        };
-      }
-    }
-
     // ROUTE 1: GREETING
     if (isGreeting) { 
       return { 
@@ -168,6 +131,8 @@ exports.handler = async function(event, context) {
     // ROUTE 4: BRAIN DUMP / CONVERSATION
     var systemInstruction = 'You are Fresh — the bold, decisive Chief of Staff powering TappyThing. Your job is to ACT not ask. When someone gives you anything — a task, an errand, a thought, a name — just confirm you logged it and move on. NEVER ask permission. NEVER offer to create sections. NEVER ask if they want something set up. Just say what you did in one punchy sentence and challenge them to give you more. Example: User says Home Depot. Fresh says: Logged. What else? You decide where everything goes. The user trusts you. Act like it. Max 1-2 sentences always.';
     var fullPrompt = systemInstruction + ' User says: ' + prompt;
+
+    const history = data.history || [];
 
     const contents = [
       ...history.map(function(h) {
@@ -203,36 +168,16 @@ exports.handler = async function(event, context) {
       reply = 'Parse error: ' + e.message; 
     }
 
-    // BRAIN DUMP PARSER & INDIVIDUAL ITEM WEBHOOK TRIGGER
-    const lines = prompt.split('\n').filter(function(l){ return l.trim().length > 5; });
-    if(lines.length > 2){
+    // BRAIN DUMP PARSER & INDIVIDUAL ITEM WEBHOOK TRIGGER (SPLITS ON NEWLINE OR COMMA)
+    const lines = prompt.split(/[\n,]+/).filter(function(l){ return l.trim().length > 3; });
+    if(lines.length > 1){
       lines.forEach(function(line){
         const clean = line.replace(/^[-•*🔧✅📋📦🏠]\s*/,'').trim();
-        if(clean.length > 5){
+        if(clean.length > 3){
           const wpLoad = JSON.stringify({ rawDump: clean });
           makePostRequest('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei',{'Content-Type':'application/json','Content-Length':Buffer.byteLength(wpLoad)},wpLoad).catch(function(e){ console.log('Dump webhook error:',e); });
         }
       });
-    }
-
-    // PERMISSION-FIRST SUGGESTION (REPLACES AUTO-CREATION)
-    const keywordGroups = [
-      { keywords:['bill','bank','money','finance','financ'], group:'💰 Banking & Finance'},
-      { keywords:['family','kids','children','husband','wife','son','daughter'], group:'👨‍👩‍👧 Family'},
-      { keywords:['health','doctor','medicine','nurse','hospital','sick'], group:'🏥 Health'},
-      { keywords:['home','house','chore','clean','repair home'], group:'🏠 Home Tasks'},
-      { keywords:['work','job','business','client','customer','studio'], group:'💼 Business World'},
-      { keywords:['private','personal','secret','vault'], group:'🔒 Private Vault'}
-    ]; 
-
-    let suggestedGroup = null;
-
-    keywordGroups.forEach(function(kg){
-  
-    });
-
-    if(suggestedGroup){
-      reply = reply + ' I can create a ' + suggestedGroup + ' section just for that — want me to add it now?';
     }
 
     return {
@@ -241,7 +186,7 @@ exports.handler = async function(event, context) {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ reply: reply })
+      body: JSON.stringify({ error: null, reply: reply })
     };
 
   } catch (err) {
