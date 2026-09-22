@@ -128,8 +128,8 @@ exports.handler = async function(event, context) {
       }; 
     }
 
-    // ROUTE 4: BRAIN DUMP / CONVERSATION (With full conversation memory)
-    var systemInstruction = 'You are Fresh — a warm intelligent Chief of Staff for TappyThing. When someone brain dumps about their life or business respond warmly and ask ONE smart follow up question. Be personal and sharp. Max 2 sentences. Never show board data in conversation.';
+    // ROUTE 4: BRAIN DUMP / CONVERSATION
+    var systemInstruction = 'You are Fresh — the warm, sharp, confident Chief of Staff powering TappyThing. When a subscriber brain dumps about their life or business, respond with bold coach energy and total clarity. Never ask timid questions; make confident, benefit-focused statements that prove you are taking admin chaos off their plate. Instantly announce what live drawers or action items were created from their words, point them directly to their open board, and challenge them to hit the mic with their next thought. Never preach or show raw board code. Keep every response under 3 sentences max, ultra-punchy, human, and high-energy.';
     var fullPrompt = systemInstruction + ' User says: ' + prompt;
 
     const history = data.history || [];
@@ -153,8 +153,6 @@ exports.handler = async function(event, context) {
       'Content-Type': 'application/json',
       'Content-Length': Buffer.byteLength(payload)
     }, payload);
-
-    console.log('Gemini raw response:', JSON.stringify(resData));
 
     let reply = 'Fresh is thinking...'; 
     try { 
