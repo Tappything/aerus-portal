@@ -167,7 +167,19 @@ exports.handler = async function(event, context) {
       reply = 'Parse error: ' + e.message; 
     }
 
-    // AUTOMATIC KEYWORD DETECT & GROUP CREATION TRIGGER
+    // CHANGE 3: BRAIN DUMP PARSER & INDIVIDUAL ITEM WEBHOOK TRIGGER
+    const lines = prompt.split('\n').filter(function(l){ return l.trim().length > 5; });
+    if(lines.length > 2){
+      lines.forEach(function(line){
+        const clean = line.replace(/^[-•*🔧✅📋📦🏠]\s*/,'').trim();
+        if(clean.length > 5){
+          const wpLoad = JSON.stringify({ body: clean });
+          makePostRequest('https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1',{'Content-Type':'application/json','Content-Length':Buffer.byteLength(wpLoad)},wpLoad).catch(function(e){ console.log('Dump webhook error:',e); });
+        }
+      });
+    }
+
+    // CHANGE 1: KEYWORD DETECT & GROUP CREATION TRIGGER (THROTTLED TO 1 GROUP)
     const keywordGroups = [
       { keywords:['bill','bank','money','finance','financ'], group:'💰 Banking & Finance'},
       { keywords:['family','kids','children','husband','wife','son','daughter'], group:'👨‍👩‍👧 Family'},
@@ -177,15 +189,18 @@ exports.handler = async function(event, context) {
       { keywords:['private','personal','secret','vault'], group:'🔒 Private Vault'}
     ]; 
 
-    keywordGroups.forEach(function(kg){ 
-      const matched = kg.keywords.some(function(kw){ return lower.includes(kw); }); 
-      if(matched){ 
-        const gpPayload = JSON.stringify({ boardId: targetBoardId, groupName: kg.group }); 
-        makePostRequest('https://freshtappything.com/.netlify/functions/create-group', {'Content-Type':'application/json','Content-Length':Buffer.byteLength(gpPayload)}, gpPayload).catch(function(e){ console.log('Group create error:',e); }); 
-      } 
+    let groupsCreated = 0;
+    keywordGroups.forEach(function(kg){
+      if(groupsCreated >= 1) return;
+      const matched = kg.keywords.some(function(kw){ return lower.includes(kw); });
+      if(matched){
+        const gpPayload = JSON.stringify({ boardId: targetBoardId, groupName: kg.group });
+        makePostRequest('https://freshtappything.com/.netlify/functions/create-group',{'Content-Type':'application/json','Content-Length':Buffer.byteLength(gpPayload)},gpPayload).catch(function(e){ console.log('Group create error:',e); });
+        groupsCreated++;
+      }
     });
 
-    // INDUSTRY TEMPLATES AUTO-CASCADE BLOCK
+    // CHANGE 2: INDUSTRY TEMPLATES AUTO-CASCADE (THROTTLED TO 1 PRIMARY GROUP)
     const industryTemplates = [
       { keywords:['restaurant','cafe','food','kitchen','menu','table','waiter','dine'], groups:['🍽️ Tables & Reservations','📋 Orders & Kitchen','💰 Payments & Tips','🧑‍🍳 Staff Schedule','📦 Inventory & Supplies'] },
       { keywords:['property','landlord','tenant','rent','lease','apartment','unit','maintenance'], groups:['🏠 Properties','🔧 Maintenance Requests','💳 Rent Ledger','📞 Tenant Communications','📋 Lease Tracker'] },
@@ -194,13 +209,14 @@ exports.handler = async function(event, context) {
       { keywords:['retail','store','shop','inventory','product','sales','customer'], groups:['📦 Inventory','💰 Sales','👥 Customers','🚚 Orders & Shipping','📣 Marketing'] }
     ];
 
+    let industryGroupsCreated = 0;
     industryTemplates.forEach(function(it){
+      if(industryGroupsCreated >= 1) return;
       const matched = it.keywords.some(function(kw){ return lower.includes(kw); });
       if(matched){
-        it.groups.forEach(function(grpName){
-          const gpPayload = JSON.stringify({ boardId: targetBoardId, groupName: grpName });
-          makePostRequest('https://freshtappything.com/.netlify/functions/create-group',{'Content-Type':'application/json','Content-Length':Buffer.byteLength(gpPayload)},gpPayload).catch(function(e){ console.log('Industry group error:',e); });
-        });
+        const gpPayload = JSON.stringify({ boardId: targetBoardId, groupName: it.groups[0] });
+        makePostRequest('https://freshtappything.com/.netlify/functions/create-group',{'Content-Type':'application/json','Content-Length':Buffer.byteLength(gpPayload)},gpPayload).catch(function(e){ console.log('Industry group error:',e); });
+        industryGroupsCreated++;
       }
     });
 
