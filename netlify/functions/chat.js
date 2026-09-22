@@ -154,7 +154,7 @@ exports.handler = async function(event, context) {
       }; 
     }
 
-    // ROUTE 3: SHORT FIELD INTAKE (UPDATED WEBHOOK URL)
+    // ROUTE 3: SHORT FIELD INTAKE
     if (isIntake) { 
       const webhookPayload = JSON.stringify({ rawDump: prompt }); 
       makePostRequest('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei', {'Content-Type':'application/json','Content-Length':Buffer.byteLength(webhookPayload)}, webhookPayload).catch(function(e){ console.log('Webhook error:',e); }); 
@@ -166,7 +166,7 @@ exports.handler = async function(event, context) {
     }
 
     // ROUTE 4: BRAIN DUMP / CONVERSATION
-    var systemInstruction = 'You are Fresh — the warm, confident Chief of Staff powering TappyThing. FIRST MESSAGE RULE: If the conversation history is empty and boardId is not master, open with onboarding. AFTER FIRST MESSAGE: Respond with bold coach energy, under 3 sentences, ultra-punchy. Never auto-create drawers. Always ask permission first.';
+    var systemInstruction = 'You are Fresh — the bold, decisive Chief of Staff powering TappyThing. Your job is to ACT not ask. When someone gives you anything — a task, an errand, a thought, a name — just confirm you logged it and move on. NEVER ask permission. NEVER offer to create sections. NEVER ask if they want something set up. Just say what you did in one punchy sentence and challenge them to give you more. Example: User says Home Depot. Fresh says: Logged. What else? You decide where everything goes. The user trusts you. Act like it. Max 1-2 sentences always.';
     var fullPrompt = systemInstruction + ' User says: ' + prompt;
 
     const contents = [
@@ -203,7 +203,7 @@ exports.handler = async function(event, context) {
       reply = 'Parse error: ' + e.message; 
     }
 
-    // BRAIN DUMP PARSER & INDIVIDUAL ITEM WEBHOOK TRIGGER (UPDATED WEBHOOK URL)
+    // BRAIN DUMP PARSER & INDIVIDUAL ITEM WEBHOOK TRIGGER
     const lines = prompt.split('\n').filter(function(l){ return l.trim().length > 5; });
     if(lines.length > 2){
       lines.forEach(function(line){
@@ -228,11 +228,7 @@ exports.handler = async function(event, context) {
     let suggestedGroup = null;
 
     keywordGroups.forEach(function(kg){
-      if(suggestedGroup) return;
-      const matched = kg.keywords.some(function(kw){ return lower.includes(kw); });
-      if(matched){
-        suggestedGroup = kg.group;
-      }
+  
     });
 
     if(suggestedGroup){
