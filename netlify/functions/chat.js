@@ -154,10 +154,10 @@ exports.handler = async function(event, context) {
       }; 
     }
 
-    // ROUTE 3: SHORT FIELD INTAKE (UPDATED TO rawDump)
+    // ROUTE 3: SHORT FIELD INTAKE (UPDATED WEBHOOK URL)
     if (isIntake) { 
       const webhookPayload = JSON.stringify({ rawDump: prompt }); 
-      makePostRequest('https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1', {'Content-Type':'application/json','Content-Length':Buffer.byteLength(webhookPayload)}, webhookPayload).catch(function(e){ console.log('Webhook error:',e); }); 
+      makePostRequest('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei', {'Content-Type':'application/json','Content-Length':Buffer.byteLength(webhookPayload)}, webhookPayload).catch(function(e){ console.log('Webhook error:',e); }); 
       return { 
         statusCode: 200, 
         headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, 
@@ -203,14 +203,14 @@ exports.handler = async function(event, context) {
       reply = 'Parse error: ' + e.message; 
     }
 
-    // BRAIN DUMP PARSER & INDIVIDUAL ITEM WEBHOOK TRIGGER (UPDATED TO rawDump)
+    // BRAIN DUMP PARSER & INDIVIDUAL ITEM WEBHOOK TRIGGER (UPDATED WEBHOOK URL)
     const lines = prompt.split('\n').filter(function(l){ return l.trim().length > 5; });
     if(lines.length > 2){
       lines.forEach(function(line){
         const clean = line.replace(/^[-•*🔧✅📋📦🏠]\s*/,'').trim();
         if(clean.length > 5){
           const wpLoad = JSON.stringify({ rawDump: clean });
-          makePostRequest('https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1',{'Content-Type':'application/json','Content-Length':Buffer.byteLength(wpLoad)},wpLoad).catch(function(e){ console.log('Dump webhook error:',e); });
+          makePostRequest('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei',{'Content-Type':'application/json','Content-Length':Buffer.byteLength(wpLoad)},wpLoad).catch(function(e){ console.log('Dump webhook error:',e); });
         }
       });
     }
