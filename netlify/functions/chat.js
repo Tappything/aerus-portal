@@ -187,6 +187,25 @@ exports.handler = async function(event, context) {
       } 
     });
 
+    // INDUSTRY TEMPLATES AUTO-CASCADE BLOCK
+    const industryTemplates = [
+      { keywords:['restaurant','cafe','food','kitchen','menu','table','waiter','dine'], groups:['🍽️ Tables & Reservations','📋 Orders & Kitchen','💰 Payments & Tips','🧑‍🍳 Staff Schedule','📦 Inventory & Supplies'] },
+      { keywords:['property','landlord','tenant','rent','lease','apartment','unit','maintenance'], groups:['🏠 Properties','🔧 Maintenance Requests','💳 Rent Ledger','📞 Tenant Communications','📋 Lease Tracker'] },
+      { keywords:['yoga','fitness','gym','trainer','class','studio','students','workout'], groups:['📅 Class Schedule','👥 Students','💰 Billing & Memberships','🧘 Curriculum','📣 Marketing'] },
+      { keywords:['salon','hair','nails','beauty','spa','appointment','stylist'], groups:['📅 Appointments','💇 Services Menu','💰 Payments','👥 Client Cards','🛒 Product Inventory'] },
+      { keywords:['retail','store','shop','inventory','product','sales','customer'], groups:['📦 Inventory','💰 Sales','👥 Customers','🚚 Orders & Shipping','📣 Marketing'] }
+    ];
+
+    industryTemplates.forEach(function(it){
+      const matched = it.keywords.some(function(kw){ return lower.includes(kw); });
+      if(matched){
+        it.groups.forEach(function(grpName){
+          const gpPayload = JSON.stringify({ boardId: targetBoardId, groupName: grpName });
+          makePostRequest('https://freshtappything.com/.netlify/functions/create-group',{'Content-Type':'application/json','Content-Length':Buffer.byteLength(gpPayload)},gpPayload).catch(function(e){ console.log('Industry group error:',e); });
+        });
+      }
+    });
+
     return {
       statusCode: 200,
       headers: {
