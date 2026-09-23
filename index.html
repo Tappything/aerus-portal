@@ -389,7 +389,7 @@ function sendToFresh() {
   fetch('/.netlify/functions/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt: prompt, board_id: activeBoardId, history: conversationHistory })
+    body: JSON.stringify({ prompt: prompt, board_id: activeBoardId, group: urlParams.get('groups'), history: conversationHistory })
   })
   .then(function(res) { return res.json(); })
   .then(function(data) {
