@@ -26,13 +26,13 @@ function makePostRequest(url, headers, payload) {
   });
 }
 
-// Helper to fetch live items from Monday.com with dynamic boardId target
-async function fetchBoardContext(mondayKey, boardId) {
+// Helper to fetch live items from Monday.com with dynamic boardId target and optional group filtering
+async function fetchBoardContext(mondayKey, boardId, groupFilter) {
   if (!mondayKey) return "No live board context available.";
   
   const targetBoard = boardId || '18424728273';
   const query = JSON.stringify({
-    query: `{ boards(ids: [${targetBoard}]) { items_page(limit: 10) { items { name group { title } } } } }`
+    query: `{ boards(ids: [${targetBoard}]) { items_page(limit: 50) { items { name group { title } } } } }`
   });
 
   try {
@@ -43,8 +43,15 @@ async function fetchBoardContext(mondayKey, boardId) {
       'Content-Length': Buffer.byteLength(query)
     }, query);
 
-    const items = resData?.data?.boards?.[0]?.items_page?.items || [];
-    if (items.length === 0) return "Board is currently empty.";
+    let items = resData?.data?.boards?.[0]?.items_page?.items || [];
+    
+    // Apply Group Filter if provided via URL/payload
+    if (groupFilter) {
+      const cleanGroup = groupFilter.toLowerCase().trim();
+      items = items.filter(item => item.group?.title && item.group.title.toLowerCase().trim() === cleanGroup);
+    }
+
+    if (items.length === 0) return groupFilter ? `No items found in group: ${groupFilter}` : "Board is currently empty.";
 
     return items.map(item => `- ${item.name} (Group: ${item.group?.title || 'General'})`).join('\n');
   } catch (err) {
@@ -85,9 +92,10 @@ exports.handler = async function(event, context) {
     }
 
     const targetBoardId = data.board_id || '18424728273';
+    const groupFilter = data.group || null; // Parses ?groups= parameter passed from client
 
-    // Pull dynamic live board items from Monday.com
-    const boardContext = await fetchBoardContext(mondayKey, targetBoardId);
+    // Pull dynamic live board items from Monday.com (Filtered by group if specified)
+    const boardContext = await fetchBoardContext(mondayKey, targetBoardId, groupFilter);
 
     // Pure-code Router
     const lower = prompt.toLowerCase().trim();
