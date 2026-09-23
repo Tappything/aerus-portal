@@ -97,9 +97,13 @@ async function executeMondayCommand(mondayKey, boardId, line) {
       return;
     }
 
-    // ACTION: MOVE GROUP
-    if (lowerLine.includes('move') && targetItem) {
-      const targetGroup = groups.find(g => lowerLine.includes(g.title.toLowerCase()));
+    // ACTION: MOVE GROUP / ARCHIVE
+    if ((lowerLine.includes('move') || lowerLine.includes('archive')) && targetItem) {
+      // Default archive group if explicitly archiving
+      let targetGroup = lowerLine.includes('archive') 
+        ? { id: 'group_mm6xs2fx' }
+        : groups.find(g => lowerLine.includes(g.title.toLowerCase()));
+
       if (targetGroup) {
         const moveMutation = JSON.stringify({
           query: `mutation { move_item_to_group (item_id: ${targetItem.id}, group_id: "${targetGroup.id}") { id } }`
@@ -114,8 +118,8 @@ async function executeMondayCommand(mondayKey, boardId, line) {
       }
     }
 
-    // ACTION: ADD NOTE / UPDATE
-    if ((lowerLine.includes('note') || lowerLine.includes('call') || lowerLine.includes('tag')) && targetItem) {
+    // ACTION: ADD NOTE / UPDATE / CALL / TAG / MARK AS
+    if ((lowerLine.includes('note') || lowerLine.includes('call') || lowerLine.includes('tag') || lowerLine.includes('mark as')) && targetItem) {
       const cleanNote = line.replace(/"/g, '\\"').replace(/\n/g, '\\n');
       const updateMutation = JSON.stringify({
         query: `mutation { create_update (item_id: ${targetItem.id}, body: "${cleanNote}") { id } }`
@@ -286,13 +290,25 @@ exports.handler = async function(event, context) {
 
     archiveConversationToMonday(mondayKey, prompt, reply).catch(e => console.log('Archive task error:', e));
 
-    // PROCESS COMMAND DUMP - DIRECT EXECUTIONS
+    // PROCESS COMMAND DUMP - DIRECT EXECUTIONS VS MAKE.COM ROUTING
     const lineItems = prompt.split(/\n|,/).map(item => item.trim()).filter(item => item.length > 2);
+    const actionKeywords = ['delete', 'archive', 'move', 'add note', 'mark as', 'call', 'tag', 'remove'];
+    const hasCommands = lineItems.some(line => actionKeywords.some(kw => line.toLowerCase().includes(kw)));
+
     if (lineItems.length > 0) {
       lineItems.forEach(line => {
         const clean = line.replace(/^[-•*🔧✅📋📦🏠]\s*/,'').trim();
         if (clean.length > 2) {
-          executeMondayCommand(mondayKey, targetBoardId, clean).catch(e => console.log('Command exec error:', e));
+          const isCommandLine = actionKeywords.some(kw => clean.toLowerCase().includes(kw));
+
+          if (isCommandLine) {
+            // Execute command directly against Monday.com API (Skip Make.com)
+            executeMondayCommand(mondayKey, targetBoardId, clean).catch(e => console.log('Command exec error:', e));
+          } else if (!hasCommands) {
+            // Only fire Make.com webhook if NO action commands exist in the dump
+            const wpLoad = JSON.stringify({ rawDump: clean });
+            makePostRequest(MAKE_WEBHOOK_URL, {'Content-Type':'application/json','Content-Length':Buffer.byteLength(wpLoad)}, wpLoad).catch(e => console.log('Dump webhook error:', e));
+          }
         }
       });
     }
