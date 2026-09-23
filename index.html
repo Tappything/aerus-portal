@@ -182,9 +182,9 @@
   </div>
 
   <script>
-    // Extract query parameters or set default board target
+    // Extract query parameters or set default board target (Supports both ?board= and ?board_id=)
     const urlParams = new URLSearchParams(window.location.search);
-    const activeBoardId = urlParams.get('board_id') || '18424728273';
+    const activeBoardId = urlParams.get('board') || urlParams.get('board_id') || '18424728273';
 
     // Set dynamic welcome text based on active board ID
     document.getElementById('freshReply').textContent = (activeBoardId === '18424728273') ? "Back at it Chief — what do we have?" : "Welcome to TappyThing — tap the mic or type below to get started!";
