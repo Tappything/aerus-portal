@@ -32,7 +32,7 @@ async function fetchBoardContext(mondayKey, boardId, groupFilter) {
   
   const targetBoard = boardId || '18424728273';
   const query = JSON.stringify({
-    query: `{ boards(ids: [${targetBoard}]) { items_page(limit: 50) { items { name group { title } } } } }`
+    query: `{ boards(ids: [${targetBoard}]) { items_page(limit: 50) { items { id name group { id title } } } } }`
   });
 
   try {
@@ -45,7 +45,6 @@ async function fetchBoardContext(mondayKey, boardId, groupFilter) {
 
     let items = resData?.data?.boards?.[0]?.items_page?.items || [];
     
-    // Apply Group Filter if provided via URL/payload
     if (groupFilter) {
       const cleanGroup = groupFilter.toLowerCase().trim();
       items = items.filter(item => item.group?.title && item.group.title.toLowerCase().trim() === cleanGroup);
@@ -59,14 +58,88 @@ async function fetchBoardContext(mondayKey, boardId, groupFilter) {
   }
 }
 
+// Helper to execute direct Monday.com actions based on dump commands
+async function executeMondayCommand(mondayKey, boardId, line) {
+  if (!mondayKey || !line) return;
+  const lowerLine = line.toLowerCase();
+  
+  try {
+    // 1. Fetch current board items to locate matching target item ID
+    const query = JSON.stringify({
+      query: `{ boards(ids: [${boardId}]) { items_page(limit: 100) { items { id name group { id title } } } groups { id title } } }`
+    });
+
+    const resData = await makePostRequest('https://api.monday.com/v2', {
+      'Content-Type': 'application/json',
+      'Authorization': mondayKey,
+      'API-Version': '2023-10',
+      'Content-Length': Buffer.byteLength(query)
+    }, query);
+
+    const board = resData?.data?.boards?.[0];
+    const items = board?.items_page?.items || [];
+    const groups = board?.groups || [];
+
+    // Find target item by matching name in the command string
+    const targetItem = items.find(item => lowerLine.includes(item.name.toLowerCase()));
+
+    // ACTION: DELETE / REMOVE
+    if ((lowerLine.includes('delete') || lowerLine.includes('remove')) && targetItem) {
+      const deleteMutation = JSON.stringify({
+        query: `mutation { delete_item (item_id: ${targetItem.id}) { id } }`
+      });
+      await makePostRequest('https://api.monday.com/v2', {
+        'Content-Type': 'application/json',
+        'Authorization': mondayKey,
+        'API-Version': '2023-10',
+        'Content-Length': Buffer.byteLength(deleteMutation)
+      }, deleteMutation);
+      return;
+    }
+
+    // ACTION: MOVE GROUP
+    if (lowerLine.includes('move') && targetItem) {
+      const targetGroup = groups.find(g => lowerLine.includes(g.title.toLowerCase()));
+      if (targetGroup) {
+        const moveMutation = JSON.stringify({
+          query: `mutation { move_item_to_group (item_id: ${targetItem.id}, group_id: "${targetGroup.id}") { id } }`
+        });
+        await makePostRequest('https://api.monday.com/v2', {
+          'Content-Type': 'application/json',
+          'Authorization': mondayKey,
+          'API-Version': '2023-10',
+          'Content-Length': Buffer.byteLength(moveMutation)
+        }, moveMutation);
+        return;
+      }
+    }
+
+    // ACTION: ADD NOTE / UPDATE
+    if ((lowerLine.includes('note') || lowerLine.includes('call') || lowerLine.includes('tag')) && targetItem) {
+      const cleanNote = line.replace(/"/g, '\\"').replace(/\n/g, '\\n');
+      const updateMutation = JSON.stringify({
+        query: `mutation { create_update (item_id: ${targetItem.id}, body: "${cleanNote}") { id } }`
+      });
+      await makePostRequest('https://api.monday.com/v2', {
+        'Content-Type': 'application/json',
+        'Authorization': mondayKey,
+        'API-Version': '2023-10',
+        'Content-Length': Buffer.byteLength(updateMutation)
+      }, updateMutation);
+      return;
+    }
+  } catch (err) {
+    console.log('Command execution error:', err);
+  }
+}
+
 // Helper to archive Route 4 conversations to Monday.com
 async function archiveConversationToMonday(mondayKey, prompt, reply) {
   if (!mondayKey) return;
   const boardId = 18424728273;
-  const groupId = "group_mm6b65k2"; // Emailed items / archive group
+  const groupId = "group_mm6b65k2";
   const itemName = prompt.substring(0, 80).replace(/"/g, '\\"').replace(/\n/g, ' ');
 
-  // Mutation to create item in specified group
   const createItemMutation = JSON.stringify({
     query: `mutation { create_item (board_id: ${boardId}, group_id: "${groupId}", item_name: "${itemName}") { id } }`
   });
@@ -132,17 +205,14 @@ exports.handler = async function(event, context) {
     }
 
     const targetBoardId = data.board_id || '18424728273';
-    const groupFilter = data.group || null; // Parses ?groups= parameter passed from client
+    const groupFilter = data.group || null;
 
-    // Pull dynamic live board items from Monday.com (Filtered by group if specified)
     const boardContext = await fetchBoardContext(mondayKey, targetBoardId, groupFilter);
 
-    // Pure-code Router
     const lower = prompt.toLowerCase().trim();
     const words = prompt.trim().split(/\s+/);
     const wordCount = words.length;
 
-    // Strict command triggers
     const questionStarters = ['show','list','give','status'];
     const intakeWords = ['repair','fix','vacuum','dyson','oreck','electrolux','motor','belt','filter','parts','estimate','pickup','broken','service','tune'];
 
@@ -150,7 +220,6 @@ exports.handler = async function(event, context) {
     const isIntake = wordCount <= 7 && intakeWords.some(function(w){ return lower.includes(w); });
     const isGreeting = lower === 'hello' || lower === 'hi' || lower.startsWith('hey');
 
-    // ROUTE 1: GREETING
     if (isGreeting) { 
       return { 
         statusCode: 200, 
@@ -159,7 +228,6 @@ exports.handler = async function(event, context) {
       }; 
     }
 
-    // ROUTE 2: EXPLICIT BOARD STATUS COMMAND
     if (isQuestion) { 
       return { 
         statusCode: 200, 
@@ -168,7 +236,6 @@ exports.handler = async function(event, context) {
       }; 
     }
 
-    // ROUTE 3: SHORT FIELD INTAKE
     if (isIntake) { 
       const webhookPayload = JSON.stringify({ rawDump: prompt }); 
       makePostRequest(MAKE_WEBHOOK_URL, {'Content-Type':'application/json','Content-Length':Buffer.byteLength(webhookPayload)}, webhookPayload).catch(function(e){ console.log('Webhook error:',e); }); 
@@ -179,13 +246,11 @@ exports.handler = async function(event, context) {
       }; 
     }
 
-    // ROUTE 4: BRAIN DUMP / CONVERSATION
     const ownerBypass = (targetBoardId === '18424728273') ? 'If the board_id is 18424728273 you are talking to William — the owner and founder. Skip all onboarding. Never introduce yourself. Never ask his name or what he does. Just respond as his trusted Chief of Staff who knows everything. Treat every message as a continuation of an ongoing conversation. ' : '';
     
     const systemInstruction = ownerBypass + 'You are Fresh — the bold, decisive Chief of Staff powering TappyThing. Your job is to ACT not ask. When someone gives you anything — a task, an errand, a thought, a name — just confirm you logged it and move on. NEVER ask permission. NEVER offer to create sections. NEVER ask if they want something set up. Just say what you did in one punchy sentence and challenge them to give you more. Rotate your closing phrase between: What else? / Hit me. / Next? / Keep going! You decide where everything goes. The user trusts you. Act like it. Max 1-2 sentences always.';
     
     const fullPrompt = systemInstruction + ' User says: ' + prompt;
-
     const history = data.history || [];
 
     const contents = [
@@ -198,10 +263,7 @@ exports.handler = async function(event, context) {
       { role: 'user', parts: [{ text: fullPrompt }] }
     ];
 
-    const payload = JSON.stringify({
-      contents: contents
-    });
-
+    const payload = JSON.stringify({ contents: contents });
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
     const resData = await makePostRequest(url, {
@@ -222,17 +284,15 @@ exports.handler = async function(event, context) {
       reply = 'Parse error: ' + e.message; 
     }
 
-    // ARCHIVE CONVERSATION TO MONDAY.COM (ASYNC BACKGROUND FIRE)
     archiveConversationToMonday(mondayKey, prompt, reply).catch(e => console.log('Archive task error:', e));
 
-    // BRAIN DUMP PARSER — SPLITS ON COMMAS ONLY
-    const commaPieces = prompt.split(',').map(function(item){ return item.trim(); }).filter(function(item){ return item.length > 2; });
-    if (commaPieces.length > 1) {
-      commaPieces.forEach(function(piece) {
-        const clean = piece.replace(/^[-•*🔧✅📋📦🏠]\s*/,'').trim();
+    // PROCESS COMMAND DUMP - DIRECT EXECUTIONS
+    const lineItems = prompt.split(/\n|,/).map(item => item.trim()).filter(item => item.length > 2);
+    if (lineItems.length > 0) {
+      lineItems.forEach(line => {
+        const clean = line.replace(/^[-•*🔧✅📋📦🏠]\s*/,'').trim();
         if (clean.length > 2) {
-          const wpLoad = JSON.stringify({ rawDump: clean });
-          makePostRequest(MAKE_WEBHOOK_URL, {'Content-Type':'application/json','Content-Length':Buffer.byteLength(wpLoad)}, wpLoad).catch(function(e){ console.log('Dump webhook error:',e); });
+          executeMondayCommand(mondayKey, targetBoardId, clean).catch(e => console.log('Command exec error:', e));
         }
       });
     }
