@@ -115,9 +115,10 @@ async function getTodayEventsForCalendar(accessToken, calendarId, timeMin, timeM
 
 exports.handler = async function(event, context) {
   try {
-    const clientId = process.env.GOOGLE_CLIENT_ID;
-    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-    const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
+    // Exactly matches Netlify environment variable names
+    const clientId = process.env.GOOGLE_CALENDAR_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CALENDAR_CLIENT_SECRET;
+    const refreshToken = process.env.GOOGLE_CALENDAR_REFRESH_TOKEN;
 
     if (!clientId || !clientSecret || !refreshToken) {
       return {
