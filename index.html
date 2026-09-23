@@ -1,285 +1,492 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>TappyThing — Digital Coordinator</title>
-  <style>
-    :root {
-      --bg-dark: #090d16;
-      --card-bg: #131b2e;
-      --accent-blue: #38bdf8;
-      --accent-green: #22c55e;
-      --accent-gold: #f59e0b;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --border-color: #1e293b;
-    }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-    }
+<meta charset="UTF-8">
 
-    header {
-      padding: 16px;
-      text-align: center;
-      background: #0f172a;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    header h1 {
-      font-size: 1.4rem;
-      color: var(--accent-blue);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+<title>TappyThing — Digital Coordinator</title>
 
-    .qol-badge {
-      font-size: 0.75rem;
-      background: rgba(34, 197, 94, 0.15);
-      color: var(--accent-green);
-      padding: 4px 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      font-weight: bold;
-    }
+<style>
 
-    .chat-container {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
+:root {
 
-    .chat-bubble {
-      max-width: 85%;
-      padding: 14px 18px;
-      border-radius: 16px;
-      font-size: 1rem;
-      line-height: 1.4;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
+--bg-dark: #090d16;
 
-    .bubble-fresh {
-      align-self: flex-start;
-      background: var(--card-bg);
-      border: 1px solid var(--accent-blue);
-      color: var(--text-main);
-      border-bottom-left-radius: 4px;
-    }
+--card-bg: #131b2e;
 
-    .bubble-user {
-      align-self: flex-end;
-      background: linear-gradient(135deg, #0284c7, #2563eb);
-      color: white;
-      border-bottom-right-radius: 4px;
-    }
+--accent-blue: #38bdf8;
 
-    .controls-panel {
-      padding: 16px;
-      background: #0f172a;
-      border-top: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+--accent-green: #22c55e;
 
-    .input-row {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
+--accent-gold: #f59e0b;
 
-    input[type="text"] {
-      flex: 1;
-      background: var(--bg-dark);
-      border: 1px solid var(--border-color);
-      color: white;
-      padding: 14px;
-      border-radius: 12px;
-      font-size: 1rem;
-      outline: none;
-    }
+--text-main: #f8fafc;
 
-    input[type="text"]:focus {
-      border-color: var(--accent-blue);
-    }
+--text-muted: #94a3b8;
 
-    .btn-mic {
-      width: 54px;
-      height: 54px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      border: none;
-      color: white;
-      font-size: 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
-      transition: transform 0.1s, box-shadow 0.2s;
-    }
+--border-color: #1e293b;
 
-    .btn-mic.recording {
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-      box-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
-      animation: pulse 1.2s infinite;
-    }
+}
 
-    .btn-send {
-      background: var(--accent-blue);
-      color: #0f172a;
-      border: none;
-      padding: 0 20px;
-      height: 48px;
-      border-radius: 12px;
-      font-weight: bold;
-      font-size: 1rem;
-      cursor: pointer;
-    }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-      100% { transform: scale(1); }
-    }
-  </style>
+
+body {
+
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+background-color: var(--bg-dark);
+
+color: var(--text-main);
+
+display: flex;
+
+flex-direction: column;
+
+height: 100vh;
+
+overflow: hidden;
+
+}
+
+header {
+
+padding: 16px;
+
+text-align: center;
+
+background: #0f172a;
+
+border-bottom: 1px solid var(--border-color);
+
+display: flex;
+
+align-items: center;
+
+justify-content: space-between;
+
+}
+
+header h1 {
+
+font-size: 1.4rem;
+
+color: var(--accent-blue);
+
+display: flex;
+
+align-items: center;
+
+gap: 8px;
+
+}
+
+.qol-badge {
+
+font-size: 0.75rem;
+
+background: rgba(34, 197, 94, 0.15);
+
+color: var(--accent-green);
+
+padding: 4px 10px;
+
+border-radius: 12px;
+
+border: 1px solid rgba(34, 197, 94, 0.3);
+
+font-weight: bold;
+
+}
+
+.chat-container {
+
+flex: 1;
+
+overflow-y: auto;
+
+padding: 16px;
+
+display: flex;
+
+flex-direction: column;
+
+gap: 16px;
+
+}
+
+.chat-bubble {
+
+max-width: 85%;
+
+padding: 14px 18px;
+
+border-radius: 16px;
+
+font-size: 1rem;
+
+line-height: 1.4;
+
+box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+
+}
+
+.bubble-fresh {
+
+align-self: flex-start;
+
+background: var(--card-bg);
+
+border: 1px solid var(--accent-blue);
+
+color: var(--text-main);
+
+border-bottom-left-radius: 4px;
+
+}
+
+.bubble-user {
+
+align-self: flex-end;
+
+background: linear-gradient(135deg, #0284c7, #2563eb);
+
+color: white;
+
+border-bottom-right-radius: 4px;
+
+}
+
+.controls-panel {
+
+padding: 16px;
+
+background: #0f172a;
+
+border-top: 1px solid var(--border-color);
+
+display: flex;
+
+flex-direction: column;
+
+gap: 12px;
+
+}
+
+.input-row {
+
+display: flex;
+
+gap: 10px;
+
+align-items: center;
+
+}
+
+input[type="text"] {
+
+flex: 1;
+
+background: var(--bg-dark);
+
+border: 1px solid var(--border-color);
+
+color: white;
+
+padding: 14px;
+
+border-radius: 12px;
+
+font-size: 1rem;
+
+outline: none;
+
+}
+
+input[type="text"]:focus {
+
+border-color: var(--accent-blue);
+
+}
+
+.btn-mic {
+
+width: 54px;
+
+height: 54px;
+
+border-radius: 50%;
+
+background: linear-gradient(135deg, #22c55e, #16a34a);
+
+border: none;
+
+color: white;
+
+font-size: 1.5rem;
+
+display: flex;
+
+align-items: center;
+
+justify-content: center;
+
+cursor: pointer;
+
+box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
+
+transition: transform 0.1s, box-shadow 0.2s;
+
+}
+
+.btn-mic.recording {
+
+background: linear-gradient(135deg, #ef4444, #dc2626);
+
+box-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+
+animation: pulse 1.2s infinite;
+
+}
+
+.btn-send {
+
+background: var(--accent-blue);
+
+color: #0f172a;
+
+border: none;
+
+padding: 0 20px;
+
+height: 48px;
+
+border-radius: 12px;
+
+font-weight: bold;
+
+font-size: 1rem;
+
+cursor: pointer;
+
+}
+
+@keyframes pulse {
+
+0% { transform: scale(1); }
+
+50% { transform: scale(1.08); }
+
+100% { transform: scale(1); }
+
+}
+
+</style>
+
 </head>
+
 <body>
 
-  <header>
-    <h1>🎩 TappyThing</h1>
-    <span class="qol-badge">QOL Mode Active</span>
-  </header>
+<header>
 
-  <div class="chat-container" id="chatContainer">
-    <div class="chat-bubble bubble-fresh" id="freshReply">
-      <!-- Dynamic greeting handled via JavaScript below -->
-    </div>
-  </div>
+<h1>🎩 TappyThing</h1>
 
-  <div class="controls-panel">
-    <div class="input-row">
-      <button class="btn-mic" id="micBtn" onclick="toggleSpeech()">🎙️</button>
-      <input type="text" id="userInput" placeholder="Tap mic or type here..." onkeypress="handleKeyPress(event)">
-      <button class="btn-send" onclick="sendPrompt()">Send</button>
-    </div>
-  </div>
+<span class="qol-badge">QOL Mode Active</span>
 
-  <script>
-    // Extract query parameters or set default board target (Supports both ?board= and ?board_id=)
-    const urlParams = new URLSearchParams(window.location.search);
-    const activeBoardId = urlParams.get('board') || urlParams.get('board_id') || '18424728273';
+</header>
 
-    // Set dynamic welcome text based on active board ID
-    document.getElementById('freshReply').textContent = (activeBoardId === '18424728273') ? "Back at it Chief — what do we have?" : "Welcome to TappyThing — tap the mic or type below to get started!";
+<div class="chat-container" id="chatContainer">
 
-    let recognition = null;
-    let isRecording = false;
+<div class="chat-bubble bubble-fresh" id="freshReply">
 
-    // Speech Recognition Setup
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
+<!-- Dynamic greeting handled via JavaScript below -->
 
-      recognition.onstart = () => {
-        isRecording = true;
-        document.getElementById('micBtn').classList.add('recording');
-      };
+</div>
 
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        document.getElementById('userInput').value = transcript;
-        sendPrompt();
-      };
+</div>
 
-      recognition.onerror = () => {
-        stopRecording();
-      };
+<div class="controls-panel">
 
-      recognition.onend = () => {
-        stopRecording();
-      };
-    }
+<div class="input-row">
 
-    function toggleSpeech() {
-      if (!recognition) {
-        alert("Voice input is not supported on this browser. Please type your message.");
-        return;
-      }
-      if (isRecording) {
-        recognition.stop();
-      } else {
-        recognition.start();
-      }
-    }
+<button class="btn-mic" id="micBtn" onclick="toggleSpeech()">🎙️</button>
 
-    function stopRecording() {
-      isRecording = false;
-      document.getElementById('micBtn').classList.remove('recording');
-    }
+<input type="text" id="userInput" placeholder="Tap mic or type here..." onkeypress="handleKeyPress(event)">
 
-    function handleKeyPress(e) {
-      if (e.key === 'Enter') {
-        sendPrompt();
-      }
-    }
+<button class="btn-send" onclick="sendPrompt()">Send</button>
 
-    async function sendPrompt() {
-      const inputElem = document.getElementById('userInput');
-      const text = inputElem.value.trim();
-      if (!text) return;
+</div>
 
-      const chatContainer = document.getElementById('chatContainer');
+</div>
 
-      // Append User Bubble
-      const userBubble = document.createElement('div');
-      userBubble.className = 'chat-bubble bubble-user';
-      userBubble.textContent = text;
-      chatContainer.appendChild(userBubble);
+<script>
 
-      inputElem.value = '';
-      chatContainer.scrollTop = chatContainer.scrollHeight;
+// Extract query parameters or set default board target
 
-      // Append Pending Fresh Bubble
-      const freshBubble = document.createElement('div');
-      freshBubble.className = 'chat-bubble bubble-fresh';
-      freshBubble.textContent = 'Fresh is on it...';
-      chatContainer.appendChild(freshBubble);
-      chatContainer.scrollTop = chatContainer.scrollHeight;
+const urlParams = new URLSearchParams(window.location.search);
 
-      try {
-        const response = await fetch('/.netlify/functions/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: text, board_id: activeBoardId })
-        });
+const activeBoardId = urlParams.get('board_id') || '18424728273';
 
-        const data = await response.json();
-        freshBubble.textContent = data.reply || "Logged and firing! Next?";
-      } catch (err) {
-        freshBubble.textContent = "Got it, Chief! Logged and firing to your board.";
-      }
+// Set dynamic welcome text based on active board ID
 
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-  </script>
+document.getElementById('freshReply').textContent = (activeBoardId === '18424728273') ? "Back at it Chief — what do we have?" : "Welcome to TappyThing — tap the mic or type below to get started!";
+
+let recognition = null;
+
+let isRecording = false;
+
+// Speech Recognition Setup
+
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+recognition = new SpeechRecognition();
+
+recognition.continuous = false;
+
+recognition.interimResults = false;
+
+recognition.onstart = () => {
+
+isRecording = true;
+
+document.getElementById('micBtn').classList.add('recording');
+
+};
+
+recognition.onresult = (event) => {
+
+const transcript = event.results[0][0].transcript;
+
+document.getElementById('userInput').value = transcript;
+
+sendPrompt();
+
+};
+
+recognition.onerror = () => {
+
+stopRecording();
+
+};
+
+recognition.onend = () => {
+
+stopRecording();
+
+};
+
+}
+
+function toggleSpeech() {
+
+if (!recognition) {
+
+alert("Voice input is not supported on this browser. Please type your message.");
+
+return;
+
+}
+
+if (isRecording) {
+
+recognition.stop();
+
+} else {
+
+recognition.start();
+
+}
+
+}
+
+function stopRecording() {
+
+isRecording = false;
+
+document.getElementById('micBtn').classList.remove('recording');
+
+}
+
+function handleKeyPress(e) {
+
+if (e.key === 'Enter') {
+
+sendPrompt();
+
+}
+
+}
+
+async function sendPrompt() {
+
+const inputElem = document.getElementById('userInput');
+
+const text = inputElem.value.trim();
+
+if (!text) return;
+
+const chatContainer = document.getElementById('chatContainer');
+
+// Append User Bubble
+
+const userBubble = document.createElement('div');
+
+userBubble.className = 'chat-bubble bubble-user';
+
+userBubble.textContent = text;
+
+chatContainer.appendChild(userBubble);
+
+inputElem.value = '';
+
+chatContainer.scrollTop = chatContainer.scrollHeight;
+
+// Append Pending Fresh Bubble
+
+const freshBubble = document.createElement('div');
+
+freshBubble.className = 'chat-bubble bubble-fresh';
+
+freshBubble.textContent = 'Fresh is on it...';
+
+chatContainer.appendChild(freshBubble);
+
+chatContainer.scrollTop = chatContainer.scrollHeight;
+
+try {
+
+const response = await fetch('/.netlify/functions/chat', {
+
+method: 'POST',
+
+headers: { 'Content-Type': 'application/json' },
+
+body: JSON.stringify({ prompt: text, board_id: activeBoardId })
+
+});
+
+const data = await response.json();
+
+freshBubble.textContent = data.reply || "Logged and firing! Next?";
+
+} catch (err) {
+
+freshBubble.textContent = "Got it, Chief! Logged and firing to your board.";
+
+}
+
+chatContainer.scrollTop = chatContainer.scrollHeight;
+
+}
+
+</script>
+
 </body>
+
 </html>
