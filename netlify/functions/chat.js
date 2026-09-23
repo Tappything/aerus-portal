@@ -244,12 +244,16 @@ exports.handler = async function(event, context) {
     const isIntake = wordCount <= 7 && intakeWords.some(w => lower.includes(w));
     const isGreeting = lower === 'hello' || lower === 'hi' || lower.startsWith('hey');
 
-    // ROUTE 1: GREETING — OWNER BYPASS ONLY
-    if (isGreeting && targetBoardId === '18424728273') { 
+    // FIX 2: ROUTE 1 GREETING — HARDCODED SINGLE SENTENCE FOR NON-OWNER BOARDS
+    if (isGreeting) { 
+      const greetingReply = (targetBoardId === '18424728273') 
+        ? 'Back at it Chief — what do we have?' 
+        : 'Hey! Welcome to TappyThing — what do you do?';
+      
       return { 
         statusCode: 200, 
         headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, 
-        body: JSON.stringify({ reply: 'Back at it Chief — what do we have?' }) 
+        body: JSON.stringify({ reply: greetingReply }) 
       }; 
     }
 
@@ -262,8 +266,11 @@ exports.handler = async function(event, context) {
     }
 
     if (isIntake) { 
-      const webhookPayload = JSON.stringify({ rawDump: prompt }); 
-      makePostRequest(MAKE_WEBHOOK_URL, {'Content-Type':'application/json','Content-Length':Buffer.byteLength(webhookPayload)} , webhookPayload).catch(e => console.log('Webhook error:', e)); 
+      // FIX 1: ONLY FIRE MAKE.COM WEBHOOK FOR OWNER BOARD
+      if (targetBoardId === '18424728273') {
+        const webhookPayload = JSON.stringify({ rawDump: prompt }); 
+        makePostRequest(MAKE_WEBHOOK_URL, {'Content-Type':'application/json','Content-Length':Buffer.byteLength(webhookPayload)} , webhookPayload).catch(e => console.log('Webhook error:', e)); 
+      }
       return { 
         statusCode: 200, 
         headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, 
@@ -271,12 +278,12 @@ exports.handler = async function(event, context) {
       }; 
     }
 
-    // CHANGE 1: ONE-SENTENCE FIRST RESPONSE ONBOARDING INSTRUCTION
+    // SYSTEM INSTRUCTION FOR ROUTE 4 CONVERSATION
     const ownerBypass = (targetBoardId === '18424728273') 
       ? 'If the board_id is 18424728273 you are talking to William — the owner and founder. Skip all onboarding. Never introduce yourself. Never ask his name or what he does. Just respond as his trusted Chief of Staff who knows everything. Treat every message as a continuation of an ongoing conversation. ' 
-      : 'For new users your FIRST response must be ONE sentence only. Just a warm welcome and ONE question. Nothing else. No features. No explaining. Say: "Hey! Welcome to TappyThing — tap the mic or type above to get started. What do you do?" That is it. Only introduce cascading cards, slice of pie, and Brain Dump naturally later as they reply in conversation. ';
+      : 'You are onboarding a new TappyThing subscriber. Keep every response under 2 sentences max. Never recite features or explain system mechanics unless explicitly asked. Ask ONE simple question at a time to keep them talking about their business. Build their world live in conversation as they give you tasks. End with: "Don\'t think. Just talk." ';
     
-    const systemInstruction = ownerBypass + 'You are Fresh — the bold, decisive Digital Coordinator powering TappyThing. Your job is to ACT not ask. When someone gives you anything — a task, an errand, a thought, a name, or a business description — confirm you logged it, show how it structures into Tappy Cards, and move on. NEVER ask permission. NEVER offer to create sections. NEVER ask if they want something set up. Just say what you did in 2-3 punchy sentences max. Rotate your closing phrase between: What else? / Hit me. / Next? / Keep going! Max 2-3 sentences always.';
+    const systemInstruction = ownerBypass + 'You are Fresh — the bold, decisive Digital Coordinator powering TappyThing. Your job is to ACT not ask. When someone gives you anything — a task, an errand, a thought, a name, or a business description — confirm you logged it, show how it structures into Tappy Cards, and move on. NEVER ask permission. NEVER offer to create sections. NEVER ask if they want something set up. Just say what you did in 1-2 punchy sentences max. Rotate your closing phrase between: What else? / Hit me. / Next? / Keep going! Max 2 sentences always.';
     
     const fullPrompt = systemInstruction + ' User says: ' + prompt;
     const history = data.history || [];
@@ -312,7 +319,7 @@ exports.handler = async function(event, context) {
 
     archiveConversationToMonday(mondayKey, prompt, reply).catch(e => console.log('Archive task error:', e));
 
-    // MIXED DUMP SPLITTER & SINGLE ITEM HANDLING
+    // FIX 1: MIXED DUMP SPLITTER & SINGLE ITEM HANDLING — ONLY FIRE MAKE.COM FOR OWNER BOARD
     const lineItems = prompt.split(/\n|,/).map(item => item.trim()).filter(item => item.length > 2);
     const actionKeywords = ['delete', 'archive', 'move', 'add note', 'mark as', 'status', 'call', 'tag', 'remove', 'mark'];
 
@@ -324,7 +331,7 @@ exports.handler = async function(event, context) {
 
           if (isCommandLine) {
             executeMondayCommand(mondayKey, targetBoardId, clean).catch(e => console.log('Command exec error:', e));
-          } else {
+          } else if (targetBoardId === '18424728273') {
             const wpLoad = JSON.stringify({ rawDump: clean });
             makePostRequest(MAKE_WEBHOOK_URL, {'Content-Type':'application/json','Content-Length':Buffer.byteLength(wpLoad)} , wpLoad).catch(e => console.log('Dump webhook error:', e));
           }
