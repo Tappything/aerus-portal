@@ -64,7 +64,7 @@ async function executeMondayCommand(mondayKey, boardId, line) {
   const lowerLine = line.toLowerCase();
   
   try {
-    // 1. Fetch current board items to locate matching target item ID
+    // Fetch current board items and groups to locate matching target item ID
     const query = JSON.stringify({
       query: `{ boards(ids: [${boardId}]) { items_page(limit: 100) { items { id name group { id title } } } groups { id title } } }`
     });
@@ -80,8 +80,12 @@ async function executeMondayCommand(mondayKey, boardId, line) {
     const items = board?.items_page?.items || [];
     const groups = board?.groups || [];
 
-    // Find target item by matching name in the command string
-    const targetItem = items.find(item => lowerLine.includes(item.name.toLowerCase()));
+    // FIX 1: Partial word match — find items containing any word from line longer than 4 characters
+    const lineWords = lowerLine.split(/\s+/).filter(w => w.length > 4);
+    const targetItem = items.find(item => {
+      const itemNameLower = item.name.toLowerCase();
+      return lowerLine.includes(itemNameLower) || lineWords.some(word => itemNameLower.includes(word));
+    });
 
     // ACTION: DELETE / REMOVE
     if ((lowerLine.includes('delete') || lowerLine.includes('remove')) && targetItem) {
@@ -99,7 +103,6 @@ async function executeMondayCommand(mondayKey, boardId, line) {
 
     // ACTION: MOVE GROUP / ARCHIVE
     if ((lowerLine.includes('move') || lowerLine.includes('archive')) && targetItem) {
-      // Default archive group if explicitly archiving
       let targetGroup = lowerLine.includes('archive') 
         ? { id: 'group_mm6xs2fx' }
         : groups.find(g => lowerLine.includes(g.title.toLowerCase()));
@@ -118,8 +121,27 @@ async function executeMondayCommand(mondayKey, boardId, line) {
       }
     }
 
-    // ACTION: ADD NOTE / UPDATE / CALL / TAG / MARK AS
-    if ((lowerLine.includes('note') || lowerLine.includes('call') || lowerLine.includes('tag') || lowerLine.includes('mark as')) && targetItem) {
+    // FIX 3 & 4: MARK AS / STATUS UPDATE
+    if ((lowerLine.includes('mark as') || lowerLine.includes('status')) && targetItem) {
+      const statusParts = line.split(/as|status/i);
+      const newStatus = statusParts.length > 1 ? statusParts[1].trim() : 'Done';
+      const columnValues = JSON.stringify({ project_status: { label: newStatus } });
+
+      const statusMutation = JSON.stringify({
+        query: `mutation { change_column_values (board_id: ${boardId}, item_id: ${targetItem.id}, column_values: ${JSON.stringify(columnValues)}) { id } }`
+      });
+
+      await makePostRequest('https://api.monday.com/v2', {
+        'Content-Type': 'application/json',
+        'Authorization': mondayKey,
+        'API-Version': '2023-10',
+        'Content-Length': Buffer.byteLength(statusMutation)
+      }, statusMutation);
+      return;
+    }
+
+    // ACTION: ADD NOTE / UPDATE / CALL / TAG
+    if ((lowerLine.includes('note') || lowerLine.includes('call') || lowerLine.includes('tag')) && targetItem) {
       const cleanNote = line.replace(/"/g, '\\"').replace(/\n/g, '\\n');
       const updateMutation = JSON.stringify({
         query: `mutation { create_update (item_id: ${targetItem.id}, body: "${cleanNote}") { id } }`
@@ -224,11 +246,16 @@ exports.handler = async function(event, context) {
     const isIntake = wordCount <= 7 && intakeWords.some(function(w){ return lower.includes(w); });
     const isGreeting = lower === 'hello' || lower === 'hi' || lower.startsWith('hey');
 
+    // FIX 2: ROUTE 1 GREETING WITH OWNER BYPASS
     if (isGreeting) { 
+      const greetingReply = (targetBoardId === '18424728273') 
+        ? 'Back at it Chief — what do we have?' 
+        : 'Hi! I am Fresh, your pocket Chief of Staff. Just talk to me.';
+      
       return { 
         statusCode: 200, 
         headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, 
-        body: JSON.stringify({ reply: 'Hi! I am Fresh, your pocket Chief of Staff. Just talk to me.' }) 
+        body: JSON.stringify({ reply: greetingReply }) 
       }; 
     }
 
@@ -290,10 +317,9 @@ exports.handler = async function(event, context) {
 
     archiveConversationToMonday(mondayKey, prompt, reply).catch(e => console.log('Archive task error:', e));
 
-    // PROCESS COMMAND DUMP - DIRECT EXECUTIONS VS MAKE.COM ROUTING
+    // FIX 5 & 6: MIXED DUMP SPLITTER & SINGLE ITEM HANDLING
     const lineItems = prompt.split(/\n|,/).map(item => item.trim()).filter(item => item.length > 2);
-    const actionKeywords = ['delete', 'archive', 'move', 'add note', 'mark as', 'call', 'tag', 'remove'];
-    const hasCommands = lineItems.some(line => actionKeywords.some(kw => line.toLowerCase().includes(kw)));
+    const actionKeywords = ['delete', 'archive', 'move', 'add note', 'mark as', 'status', 'call', 'tag', 'remove', 'mark'];
 
     if (lineItems.length > 0) {
       lineItems.forEach(line => {
@@ -302,10 +328,10 @@ exports.handler = async function(event, context) {
           const isCommandLine = actionKeywords.some(kw => clean.toLowerCase().includes(kw));
 
           if (isCommandLine) {
-            // Execute command directly against Monday.com API (Skip Make.com)
+            // Command lines fire directly to Monday.com API
             executeMondayCommand(mondayKey, targetBoardId, clean).catch(e => console.log('Command exec error:', e));
-          } else if (!hasCommands) {
-            // Only fire Make.com webhook if NO action commands exist in the dump
+          } else {
+            // Non-command lines in mixed or single dumps fire straight to Make.com
             const wpLoad = JSON.stringify({ rawDump: clean });
             makePostRequest(MAKE_WEBHOOK_URL, {'Content-Type':'application/json','Content-Length':Buffer.byteLength(wpLoad)}, wpLoad).catch(e => console.log('Dump webhook error:', e));
           }
