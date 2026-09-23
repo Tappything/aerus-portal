@@ -59,6 +59,46 @@ async function fetchBoardContext(mondayKey, boardId, groupFilter) {
   }
 }
 
+// Helper to archive Route 4 conversations to Monday.com
+async function archiveConversationToMonday(mondayKey, prompt, reply) {
+  if (!mondayKey) return;
+  const boardId = 18424728273;
+  const groupId = "group_mm6b65k2"; // Emailed items / archive group
+  const itemName = prompt.substring(0, 80).replace(/"/g, '\\"').replace(/\n/g, ' ');
+
+  // Mutation to create item in specified group
+  const createItemMutation = JSON.stringify({
+    query: `mutation { create_item (board_id: ${boardId}, group_id: "${groupId}", item_name: "${itemName}") { id } }`
+  });
+
+  try {
+    const resData = await makePostRequest('https://api.monday.com/v2', {
+      'Content-Type': 'application/json',
+      'Authorization': mondayKey,
+      'API-Version': '2023-10',
+      'Content-Length': Buffer.byteLength(createItemMutation)
+    }, createItemMutation);
+
+    const newItemId = resData?.data?.create_item?.id;
+
+    if (newItemId && reply) {
+      const cleanReply = reply.replace(/"/g, '\\"').replace(/\n/g, '\\n');
+      const addUpdateMutation = JSON.stringify({
+        query: `mutation { create_update (item_id: ${newItemId}, body: "${cleanReply}") { id } }`
+      });
+
+      await makePostRequest('https://api.monday.com/v2', {
+        'Content-Type': 'application/json',
+        'Authorization': mondayKey,
+        'API-Version': '2023-10',
+        'Content-Length': Buffer.byteLength(addUpdateMutation)
+      }, addUpdateMutation);
+    }
+  } catch (err) {
+    console.log('Conversation archive error:', err);
+  }
+}
+
 exports.handler = async function(event, context) {
   if (event.httpMethod !== 'POST') {
     return {
@@ -178,6 +218,9 @@ exports.handler = async function(event, context) {
     } catch(e) { 
       reply = 'Parse error: ' + e.message; 
     }
+
+    // ARCHIVE CONVERSATION TO MONDAY.COM (ASYNC BACKGROUND FIRE)
+    archiveConversationToMonday(mondayKey, prompt, reply).catch(e => console.log('Archive task error:', e));
 
     // BRAIN DUMP PARSER — SPLITS ON COMMAS ONLY
     const commaPieces = prompt.split(',').map(function(item){ return item.trim(); }).filter(function(item){ return item.length > 2; });
