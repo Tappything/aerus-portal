@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TappyThing — White-Glove Onboarding Experience</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        tappy: {
+                            navy: '#0b1120',
+                            card: '#1e293b',
+                            border: '#334155',
+                            cyan: '#06b6d4',
+                            amber: '#f59e0b',
+                            emerald: '#10b981',
+                            purple: '#8b5cf6'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b1120;
+            color: #f8fafc;
+        }
+        .glow-cyan {
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);
+        }
+        .glow-amber {
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
+        }
+        .cascade-depth-1 { margin-left: 0rem; border-left: 3px solid #06b6d4; }
+        .cascade-depth-2 { margin-left: 1.25rem; border-left: 3px solid #8b5cf6; }
+        .cascade-depth-3 { margin-left: 2.5rem; border-left: 3px solid #10b981; }
+        
+        .pulse-mic {
+            animation: pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 14px rgba(6, 182, 212, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(6, 182, 212, 0); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0b1120; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased selection:bg-cyan-500 selection:text-slate-950">
+
+    <!-- TOP CONTROL BAR / HEADER -->
+    <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 sm:px-8 shadow-xl">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            
+            <!-- Persona Identification -->
+            <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+                <div class="flex items-center gap-3">
+                    <div class="relative">
+                        <div class="w-11 h-11 rounded-full bg-gradient-to-tr from-cyan-500 to-amber-500 p-[2px] flex items-center justify-center">
+                            <div class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center text-xl">
+                                🤵
+                            </div>
+                        </div>
+                        <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-slate-900 rounded-full"></span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-cyan-400 via-amber-200 to-cyan-200 bg-clip-text text-transparent">
+                                Fresh
+                            </h1>
+                            <span class="bg-cyan-950 text-cyan-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-cyan-800/50 uppercase tracking-wider">
+                                Pocket Chief of Staff
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-400 flex items-center gap-1.5">
+                            <span class="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                            TappyThing White-Glove Onboarding Engine
+                        </p>
+                    </div>
+                </div>
+
+                <div class="md:hidden flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
+                    <i class="fa-solid fa-clock flex text-amber-400 text-xs"></i>
+                    <span class="text-xs font-bold text-amber-300" id="reclaimedHoursMobile">10 hrs/wk</span>
+                </div>
+            </div>
+
+            <!-- Value Metric & Active Mode Controls -->
+            <div class="flex items-center gap-4 w-full md:w-auto justify-end">
+                <!-- Reclaimed Hours Counter -->
+                <div class="hidden md:flex items-center gap-3 bg-slate-800/90 border border-amber-500/30 px-4 py-2 rounded-xl shadow-inner">
+                    <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                        <i class="fa-solid fa-bolt text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Admin Reclaimed</div>
+                        <div class="text-sm font-extrabold text-amber-400 flex items-center gap-1">
+                            <span id="reclaimedHoursCount">10</span> <span class="text-xs font-medium text-amber-200">hrs / week</span>
+                            <button onclick="adjustHours()" class="ml-1 text-slate-500 hover:text-amber-400 text-xs transition" title="Adjust estimated weekly manual admin hours saved">
+                                <i class="fa-solid fa-[pen-to-square]"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step Progress Quick Jumps -->
+                <div class="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-1 text-xs">
+                    <button onclick="scrollToSection('step-intro')" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 transition flex items-center gap-1">
+                        <span class="w-4 h-4 rounded-full bg-cyan-900 text-cyan-300 text-[10px] font-bold inline-flex items-center justify-center">1</span>
+                        <span class="hidden sm:inline">Intro</span>
+                    </button>
+                    <button onclick="scrollToSection('step-learning')" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 transition flex items-center gap-1">
+                        <span class="w-4 h-4 rounded-full bg-cyan-900 text-cyan-300 text-[10px] font-bold inline-flex items-center justify-center">2</span>
+                        <span class="hidden sm:inline">Floor</span>
+                    </button>
+                    <button onclick="scrollToSection('step-mirror')" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 transition flex items-center gap-1">
+                        <span class="w-4 h-4 rounded-full bg-amber-900 text-amber-300 text-[10px] font-bold inline-flex items-center justify-center">3</span>
+                        <span class="hidden sm:inline">Mirror</span>
+                    </button>
+                    <button onclick="scrollToSection('step-demo')" class="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 transition flex items-center gap-1">
+                        <span class="w-4 h-4 rounded-full bg-cyan-900 text-cyan-300 text-[10px] font-bold inline-flex items-center justify-center">4</span>
+                        <span class="hidden sm:inline">Hubs</span>
+                    </button>
+                    <button onclick="scrollToSection('step-braindump')" class="px-2.5 py-1.5 rounded-lg hover:bg-emerald-900/60 text-emerald-300 transition flex items-center gap-1 font-semibold">
+                        <span class="w-4 h-4 rounded-full bg-emerald-500 text-slate-950 text-[10px] font-extrabold inline-flex items-center justify-center">5</span>
+                        <span class="hidden sm:inline">Dump</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+
+        <!-- FRESH VOICE/TEXT DIALOGUE BANNER -->
+        <section class="bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-cyan-500/30 rounded-2xl p-5 sm:p-6 shadow-2xl relative overflow-hidden glow-cyan">
+            <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="flex flex-col md:flex-row items-start md:items-center gap-5">
+                <div class="relative shrink-0">
+                    <button id="mainVoiceBtn" onclick="toggleVoiceSim()" class="w-16 h-16 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-2xl flex items-center justify-center transition shadow-lg shadow-cyan-500/30 pulse-mic group">
+                        <i class="fa-solid fa-microphone group-hover:scale-110 transition"></i>
+                    </button>
+                    <span class="absolute -top-2 -right-2 bg-amber-500 text-slate-950 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full border border-slate-900 uppercase">
+                        TAP
+                    </span>
+                </div>
+
+                <div class="flex-1 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <div class="text-xs font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-2">
+                            <span>Fresh's Voice Stream</span>
+                            <span class="text-slate-600">•</span>
+                            <span class="text-slate-400 font-normal normal-case">Pause Rule Active (2-3 Sentences)</span>
+                        </div>
+                        <div id="freshStatusTag" class="text-[11px] bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-md border border-slate-700">
+                            Awaiting Interaction
+                        </div>
+                    </div>
+                    <p id="freshSpeechBox" class="text-base sm:text-lg text-slate-100 font-medium leading-relaxed italic">
+                        "You don't need to learn us. We learn you. And the little you do need? Just ask — Fresh answers. Two moves: Brain Dump and Tap. That's the whole system."
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 1: INTRODUCTION - CASCADING TAPPY CARDS & SLICE OF THE PIE -->
+        <section id="step-intro" class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-lg space-y-6 scroll-mt-24">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div>
+                    <div class="inline-flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider mb-1">
+                        <span class="w-6 h-6 rounded-lg bg-cyan-950 border border-cyan-800 flex items-center justify-center text-cyan-300">01</span>
+                        Step One — The System Core
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-white">Cascading Tappy Cards & Selective Data Sharing</h2>
+                    <p class="text-sm text-slate-400">Cards inside cards, infinitely deep. Shared selectively without exposing private data.</p>
+                </div>
+
+                <!-- SLICE OF THE PIE TOGGLE BUTTONS -->
+                <div class="bg-slate-950 p-1 rounded-xl border border-slate-800 flex flex-wrap items-center gap-1">
+                    <span class="text-[11px] font-bold text-slate-400 px-2 uppercase tracking-wider hidden lg:inline">Slice of Pie:</span>
+                    <button onclick="setViewRole('owner')" id="roleBtn-owner" class="role-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 shadow transition">
+                        <i class="fa-solid fa-crown mr-1"></i> Owner View
+                    </button>
+                    <button onclick="setViewRole('vendor')" id="roleBtn-vendor" class="role-btn px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition">
+                        <i class="fa-solid fa-truck-field mr-1"></i> Vendor View
+                    </button>
+                    <button onclick="setViewRole('tech')" id="roleBtn-tech" class="role-btn px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition">
+                        <i class="fa-solid fa-wrench mr-1"></i> Tech View
+                    </button>
+                    <button onclick="setViewRole('customer')" id="roleBtn-customer" class="role-btn px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition">
+                        <i class="fa-solid fa-user mr-1"></i> Customer View
+                    </button>
+                </div>
+            </div>
+
+            <!-- INTERACTIVE CASCADING CARD PREVIEW -->
+            <div class="space-y-3">
+                <div class="flex items-center justify-between text-xs text-slate-400 px-1">
+                    <span>Live Cascading Card Demonstration</span>
+                    <span id="activeRoleIndicator" class="text-cyan-400 font-semibold">Currently Showing: Full Master Owner View</span>
+                </div>
+
+                <!-- LEVEL 1: Master Job Card -->
+                <div class="cascade-card bg-slate-800/90 border border-slate-700 rounded-xl p-4 shadow-md cascade-depth-1 space-y-3 transition-all duration-300">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-cyan-950 text-cyan-400 text-xs font-bold px-2.5 py-1 rounded-md border border-cyan-800">Master Card #1049</span>
+                            <h3 class="font-bold text-slate-100">Aerus Hydro Clean Unit #8839 Diagnostic & Maintenance</h3>
+                        </div>
+                        <div class="text-xs font-semibold text-amber-400 bg-amber-950/60 px-2.5 py-1 rounded-md border border-amber-800/50">
+                            In Progress
+                        </div>
+                    </div>
+
+                    <!-- Owner Only Financial Slice -->
+                    <div class="role-slice role-owner bg-slate-900/80 p-3 rounded-lg border border-cyan-500/30 flex items-center justify-between text-xs">
+                        <span class="text-slate-400"><i class="fa-solid fa-lock text-cyan-400 mr-2"></i><strong>Owner Slice:</strong> Total Ticket Revenue & Margin</span>
+                        <span class="font-mono text-emerald-400 font-bold text-sm">$485.00 EST (64% Margin)</span>
+                    </div>
+
+                    <!-- LEVEL 2: Vendor Slice Sub-Card -->
+                    <div class="role-slice role-owner role-vendor cascade-card bg-slate-900/90 border border-slate-700 rounded-xl p-3.5 shadow-sm cascade-depth-2 space-y-2 transition-all duration-300">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-bold text-purple-300 flex items-center gap-2">
+                                <i class="fa-solid fa-box-open text-purple-400"></i> Vendor Order Card — Timonium Parts Supply
+                            </span>
+                            <span class="text-[10px] bg-purple-950 text-purple-300 px-2 py-0.5 rounded border border-purple-800">Shared Slice</span>
+                        </div>
+                        <p class="text-xs text-slate-300">Required: 1x HEPA Motor Seal Ring (Part #AER-902), 1x Carbon Pre-Filter Pack.</p>
+                        <div class="text-[11px] text-slate-400 flex items-center gap-4">
+                            <span><i class="fa-solid fa-truck text-slate-500 mr-1"></i> Delivery: Drop-ship to Bench</span>
+                            <span class="role-owner text-emerald-400"><i class="fa-solid fa-tag text-slate-500 mr-1"></i> Cost: $34.20</span>
+                        </div>
+                    </div>
+
+                    <!-- LEVEL 2: Tech Slice Sub-Card -->
+                    <div class="role-slice role-owner role-tech cascade-card bg-slate-900/90 border border-slate-700 rounded-xl p-3.5 shadow-sm cascade-depth-2 space-y-2 transition-all duration-300">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-bold text-cyan-300 flex items-center gap-2">
+                                <i class="fa-solid fa-wrench text-cyan-400"></i> Bench Tech Instructions — Chris
+                            </span>
+                            <span class="text-[10px] bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded border border-cyan-800">Shared Slice</span>
+                        </div>
+                        <p class="text-xs text-slate-300">Audio note logged by Mike: "Suction head making high-pitched whine. Replaced intake gasket. Test motor pressure."</p>
+                        
+                        <!-- LEVEL 3: Tech Action Item -->
+                        <div class="role-slice role-owner role-tech cascade-card bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs cascade-depth-3 flex items-center justify-between">
+                            <span class="text-slate-300"><i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i> 1-Minute Bench Pressure Test</span>
+                            <button class="bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 px-2 py-1 rounded text-[11px] transition">Mark Done</button>
+                        </div>
+                    </div>
+
+                    <!-- LEVEL 2: Customer Portal Slice -->
+                    <div class="role-slice role-owner role-customer cascade-card bg-slate-900/90 border border-slate-700 rounded-xl p-3.5 shadow-sm cascade-depth-2 space-y-2 transition-all duration-300">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-bold text-emerald-300 flex items-center gap-2">
+                                <i class="fa-solid fa-shield-halved text-emerald-400"></i> Customer Tracker Slice — Mrs. Sullivan
+                            </span>
+                            <span class="text-[10px] bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded border border-emerald-800">Public Link</span>
+                        </div>
+                        <p class="text-xs text-slate-300">Status: Repair active on bench. Estimated completion: Today at 3:30 PM.</p>
+                        <div class="text-[10px] text-slate-500 italic border-t border-slate-800 pt-1">
+                            Powered by TappyThing • Clean Environment LLC
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 2: LEARNING CURVE & OPEN FLOOR -->
+        <section id="step-learning" class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-lg space-y-6 scroll-mt-24">
+            <div class="border-b border-slate-800 pb-4">
+                <div class="inline-flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider mb-1">
+                    <span class="w-6 h-6 rounded-lg bg-cyan-950 border border-cyan-800 flex items-center justify-center text-cyan-300">02</span>
+                    Step Two — Honesty & Open Floor
+                </div>
+                <h2 class="text-xl sm:text-2xl font-bold text-white">"Our learning curve is bigger than yours. We learn you."</h2>
+                <p class="text-sm text-slate-400">You don't study a manual. Ask anything right now before we jump in.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Learning Curve Callout Card -->
+                <div class="bg-gradient-to-br from-slate-950 to-slate-900 border border-slate-800 p-5 rounded-xl space-y-3">
+                    <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-lg">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-100 text-base">Zero Manuals. Zero Classes.</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Most software makes you adapt to its clunky menus. We flipped that upside down. 
+                        <strong>Fresh and Sissy learn your business daily</strong> — your terms, your clients, your suppliers. 
+                        You talk into the button like a friend, and we handle the rest.
+                    </p>
+                    <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 text-xs text-amber-300/90 font-medium italic">
+                        "If we put something in the wrong place, just tell us once. Next time it goes to the exact right spot automatically."
+                    </div>
+                </div>
+
+                <!-- Open Floor Interaction Box -->
+                <div class="bg-slate-950 border border-slate-800 p-5 rounded-xl space-y-4 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-slate-100 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-comments text-cyan-400"></i> Open Floor — Any Questions?
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-1">
+                            Before we move forward, what's on your mind? Push back, ask a question, or test Fresh.
+                        </p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="relative">
+                            <textarea id="openFloorInput" rows="2" placeholder="e.g., How does Fresh handle multiple phone calls at once?" 
+                                class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 resize-none"></textarea>
+                            <button onclick="submitOpenFloor()" class="absolute bottom-3 right-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold px-3 py-1.5 rounded-lg transition">
+                                Ask Fresh
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-2 text-[11px] text-slate-500">
+                            <i class="fa-solid fa-circle-info text-cyan-500"></i>
+                            <span>Fresh will pause, answer naturally, and keep our flow moving.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 3: LIVE MIRROR WOW MOMENT -->
+        <section id="step-mirror" class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-6 shadow-xl space-y-6 glow-amber scroll-mt-24">
+            <div class="border-b border-slate-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                    <div class="inline-flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">
+                        <span class="w-6 h-6 rounded-lg bg-amber-950 border border-amber-800 flex items-center justify-center text-amber-300">03</span>
+                        Step Three — The Live Mirror
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-white">Your Voice $\rightarrow$ Live Cascading Card</h2>
+                    <p class="text-sm text-slate-400">Don't take our word for it. Send a test brain dump right now and watch it build.</p>
+                </div>
+                <span class="bg-amber-500/20 text-amber-300 text-xs font-extrabold px-3 py-1 rounded-full border border-amber-500/40 w-fit">
+                    Instant Conversion Engine
+                </span>
+            </div>
+
+            <!-- Input Simulator & Live Creation -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Input Box -->
+                <div class="lg:col-span-5 bg-slate-950 border border-slate-800 p-5 rounded-xl space-y-4">
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                        Quick Voice / Text Dump:
+                    </label>
+
+                    <div class="space-y-2">
+                        <button onclick="presetMirrorDump('Order 2 HEPA filter kits for John on Friday and notify Chris on the bench')" 
+                            class="w-full text-left bg-slate-900 hover:bg-slate-850 p-2.5 rounded-lg border border-slate-800 text-xs text-slate-300 hover:border-cyan-500/50 transition">
+                            <i class="fa-solid fa-bolt text-amber-400 mr-2"></i> Preset: <em>"Order 2 HEPA filter kits for John on Friday..."</em>
+                        </button>
+                        <button onclick="presetMirrorDump('Schedule HVAC preventative maintenance for 400 Towson Plaza next Tuesday')" 
+                            class="w-full text-left bg-slate-900 hover:bg-slate-850 p-2.5 rounded-lg border border-slate-800 text-xs text-slate-300 hover:border-cyan-500/50 transition">
+                            <i class="fa-solid fa-bolt text-amber-400 mr-2"></i> Preset: <em>"Schedule HVAC maintenance for 400 Towson..."</em>
+                        </button>
+                    </div>
+
+                    <div class="relative">
+                        <textarea id="mirrorInput" rows="3" placeholder="Type or simulate voice dump here..." 
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 resize-none"></textarea>
+                    </div>
+
+                    <button onclick="executeLiveMirror()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold py-3 rounded-xl shadow-lg shadow-amber-500/20 text-sm transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        Execute Live Mirror Transformation
+                    </button>
+                </div>
+
+                <!-- Live Render Target -->
+                <div class="lg:col-span-7 bg-slate-950 border border-slate-800 p-5 rounded-xl space-y-3 flex flex-col justify-center min-h-[220px]">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Mirror Output Canvas</span>
+                        <span id="mirrorStatus" class="text-[11px] text-slate-500">Waiting for input...</span>
+                    </div>
+
+                    <div id="mirrorCanvas" class="flex-1 flex items-center justify-center text-center p-6 border-2 border-dashed border-slate-800 rounded-lg">
+                        <div class="text-slate-500 space-y-2">
+                            <i class="fa-solid fa-microchip text-3xl text-slate-700"></i>
+                            <p class="text-xs">Your voice dump will render into a fully structured, multi-tier Cascading Tappy Card instantly right here.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 4: THESIS & 3-INDUSTRY MULTI-HUB DEMO -->
+        <section id="step-demo" class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-lg space-y-6 scroll-mt-24">
+            <div class="border-b border-slate-800 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <div class="inline-flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider mb-1">
+                        <span class="w-6 h-6 rounded-lg bg-cyan-950 border border-cyan-800 flex items-center justify-center text-cyan-300">04</span>
+                        Step Four — The Thesis & Multi-Hub Power
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-white">Quality of Life Back — Single Hand Command</h2>
+                    <p class="text-sm text-slate-400">See how three totally different operations spin up from single cascading cards.</p>
+                </div>
+
+                <!-- Industry Selector Buttons -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+                    <button onclick="loadIndustryHub('auto')" id="hubBtn-auto" class="hub-btn px-3 py-2 rounded-xl text-xs font-bold bg-cyan-500 text-slate-950 shadow transition shrink-0">
+                        <i class="fa-solid fa-car mr-1"></i> Auto Repair
+                    </button>
+                    <button onclick="loadIndustryHub('property')" id="hubBtn-property" class="hub-btn px-3 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition shrink-0">
+                        <i class="fa-solid fa-building mr-1"></i> Property Mgr
+                    </button>
+                    <button onclick="loadIndustryHub('salon')" id="hubBtn-salon" class="hub-btn px-3 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition shrink-0">
+                        <i class="fa-solid fa-scissors mr-1"></i> High-End Salon
+                    </button>
+                </div>
+            </div>
+
+            <!-- Industry Display Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5" id="industryHubContainer">
+                <!-- Dynamically populated via JS -->
+            </div>
+
+            <!-- Serial Entrepreneur Multi-Hub Pitch Card -->
+            <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border border-cyan-500/30 p-5 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <h4 class="font-extrabold text-sm text-cyan-300 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-globe"></i> The Multi-Hub Master Command
+                    </h4>
+                    <p class="text-xs text-slate-300">
+                        If you own an auto shop, rental properties, and a salon, you don't buy three systems. TappyThing ties all three hubs directly into one screen in your hand.
+                    </p>
+                </div>
+                <div class="text-right shrink-0">
+                    <span class="text-xs font-bold text-amber-400 bg-amber-950/80 px-3 py-1.5 rounded-lg border border-amber-800">
+                        1 Palm • Infinite Operations
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 5: THE CLEAN SWEEP & BRAIN DUMP CONCLUSION -->
+        <section id="step-braindump" class="bg-gradient-to-b from-slate-900 to-slate-950 border border-emerald-500/40 rounded-2xl p-6 shadow-2xl space-y-6 scroll-mt-24">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div>
+                    <div class="inline-flex items-center gap-2 text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">
+                        <span class="w-6 h-6 rounded-lg bg-emerald-950 border border-emerald-800 flex items-center justify-center text-emerald-300">05</span>
+                        Step Five — Conclusion & Onboarding Launch
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-white">"Don't think. Just talk. Calm the chaos."</h2>
+                    <p class="text-sm text-slate-400">Clear all demo noise and build your custom business Tappy Card right now.</p>
+                </div>
+
+                <!-- BAM! Clean Sweep Button -->
+                <button onclick="cleanSweepDemo()" class="bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-black text-sm px-5 py-3 rounded-xl shadow-lg transition flex items-center justify-center gap-2 group">
+                    <i class="fa-solid fa-broom group-hover:rotate-12 transition"></i>
+                    BAM! Clear The Board
+                </button>
+            </div>
+
+            <!-- Brain Dump Live Sandbox -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Sandbox Input Form -->
+                <div class="lg:col-span-5 bg-slate-950 border border-slate-800 p-5 rounded-xl space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-slate-100 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-microphone text-emerald-400"></i>
+                            Your Live Business Brain Dump
+                        </h3>
+                        <span class="text-[10px] bg-emerald-950 text-emerald-300 font-bold px-2 py-0.5 rounded border border-emerald-800">
+                            Zero Forms
+                        </span>
+                    </div>
+
+                    <p class="text-xs text-slate-400">
+                        Tell Fresh what kind of business you run and what you need off your plate right now.
+                    </p>
+
+                    <div class="space-y-2">
+                        <textarea id="customBrainDumpText" rows="4" placeholder="e.g., I run a commercial plumbing company in Maryland. We have 4 field trucks, 12 active jobs, and parts invoices scattered in my truck..." 
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 resize-none"></textarea>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="submitCustomBrainDump()" class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-3 rounded-xl text-xs transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-rocket"></i> Build My First Card Live
+                        </button>
+                    </div>
+
+                    <div class="text-[11px] text-slate-500 flex items-center gap-1.5 justify-center">
+                        <i class="fa-solid fa-shield text-slate-600"></i>
+                        <span>You're already using TappyThing before signing up.</span>
+                    </div>
+                </div>
+
+                <!-- Custom Card Live Output Board -->
+                <div class="lg:col-span-7 bg-slate-950 border border-slate-800 p-5 rounded-xl space-y-3 flex flex-col justify-start min-h-[260px]">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Your Live Business Board</span>
+                        <span id="customCardCount" class="text-[11px] text-slate-400">0 Active Cards</span>
+                    </div>
+
+                    <div id="customBoardCanvas" class="space-y-3 flex-1">
+                        <div class="h-full flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-slate-800 rounded-lg text-slate-500 space-y-2">
+                            <i class="fa-solid fa-layer-group text-3xl text-slate-700"></i>
+                            <p class="text-xs">Your custom business Tappy Cards will cascade here when you submit your brain dump above.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-6 px-4 text-center text-xs text-slate-500 space-y-2">
+        <p>TappyThing Digital Coordinator System • Clean Environment LLC • Timonium, MD</p>
+        <p class="text-[11px] text-slate-600">
+            Powered by Fresh 🤵 — Pocket Chief of Staff. "You don't need to learn us. We learn you."
+        </p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC ENGINE -->
+    <script>
+        // Core State
+        let currentRole = 'owner';
+        let reclaimedHours = 10;
+        let activeIndustry = 'auto';
+        let isVoiceSimActive = false;
+        let customCards = [];
+
+        // Industry Hub Pre-built Data
+        const industryData = {
+            auto: {
+                title: 'Auto Repair & Service Shop',
+                cards: [
+                    {
+                        id: 'AUTO-101',
+                        title: '2019 Ford F-150 Brake Job & Rotor Resurface',
+                        status: 'Bench Active',
+                        revenue: '$620.00 EST',
+                        cost: '$142.00',
+                        vendor: 'NAPA Auto Parts — Pad & Rotor Kit',
+                        tech: 'Chris: Replace front pads, resurface rotors, pressure test line.',
+                        customer: 'Vehicle in bay. Estimated pickup today at 4:30 PM.'
+                    },
+                    {
+                        id: 'AUTO-102',
+                        title: '2021 Chevy Silverado Transmission Flush',
+                        status: 'Parts Pending',
+                        revenue: '$380.00 EST',
+                        cost: '$85.00',
+                        vendor: 'ACDelco Direct Order #8821',
+                        tech: 'Bench awaiting fluid shipment.',
+                        customer: 'Parts ordered. Service scheduled for tomorrow morning.'
+                    }
+                ]
+            },
+            property: {
+                title: 'Commercial Property Management',
+                cards: [
+                    {
+                        id: 'PROP-201',
+                        title: 'Unit 4B Executive Suite Plumbing Leak',
+                        status: 'Urgent Dispatch',
+                        revenue: '$1,200 Contract',
+                        cost: '$320 Contractor',
+                        vendor: 'Towson Emergency Plumbing Dispatch',
+                        tech: 'Field Tech Mike: Shut main valve, assess water damage.',
+                        customer: 'Contractor dispatched. Tenant notified.'
+                    },
+                    {
+                        id: 'PROP-202',
+                        title: 'HVAC Seasonal Filter Replacement — 8 Units',
+                        status: 'Scheduled',
+                        revenue: '$2,400 Retainer',
+                        cost: '$450 Materials',
+                        vendor: 'Carrier Bulk Supply Order',
+                        tech: 'Norby: Confirm email notification to all tenants.',
+                        customer: 'Filter updates scheduled for Thursday 9 AM.'
+                    }
+                ]
+            },
+            salon: {
+                title: 'High-End Salon & Spa',
+                cards: [
+                    {
+                        id: 'SALON-301',
+                        title: 'VIP Client Full Color & Balayage Service',
+                        status: 'Stylist Prepped',
+                        revenue: '$350 Service',
+                        cost: '$42 Products',
+                        vendor: 'Olaplex Professional Care Supply',
+                        tech: 'Stylist Notes: Formula #4B Gold Tint, double process.',
+                        customer: 'Appointment confirmed for 2:00 PM today.'
+                    }
+                ]
+            }
+        };
+
+        window.onload = function() {
+            // Initializing default hub view
+            loadIndustryHub('auto');
+            updateFreshSpeech("You don't need to learn us. We learn you. And the little you do need? Just ask — Fresh answers. Two moves: Brain Dump and Tap. That's the whole system.");
+        };
+
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function updateFreshSpeech(text) {
+            const speechBox = document.getElementById('freshSpeechBox');
+            if (speechBox) {
+                speechBox.style.opacity = '0';
+                setTimeout(() => {
+                    speechBox.innerText = `"${text}"`;
+                    speechBox.style.opacity = '1';
+                }, 200);
+            }
+        }
+
+        function adjustHours() {
+            const input = prompt("Enter your estimated weekly manual admin hours:", reclaimedHours);
+            if (input !== null && !isNaN(parseInt(input))) {
+                reclaimedHours = parseInt(input);
+                document.getElementById('reclaimedHoursCount').innerText = reclaimedHours;
+                document.getElementById('reclaimedHoursMobile').innerText = `${reclaimedHours} hrs/wk`;
+                updateFreshSpeech(`Got it! Adjusting your reclaimed target to ${reclaimedHours} hours a week. That's real time back on your calendar!`);
+            }
+        }
+
+        function setViewRole(role) {
+            currentRole = role;
+            
+            // Update button styles
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.className = "role-btn px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition";
+            });
+
+            const activeBtn = document.getElementById(`roleBtn-${role}`);
+            if (activeBtn) {
+                activeBtn.className = "role-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 shadow transition";
+            }
+
+            const roleNames = {
+                owner: 'Full Master Owner View (All Data Visible)',
+                vendor: 'Vendor View (Parts & Orders Only)',
+                tech: 'Bench Tech View (Repair Instructions Only)',
+                customer: 'Customer View (Status & Pickup Times Only)'
+            };
+
+            document.getElementById('activeRoleIndicator').innerText = `Currently Showing: ${roleNames[role]}`;
+
+            // Filter visibility on screen
+            document.querySelectorAll('.role-slice').forEach(slice => {
+                if (role === 'owner') {
+                    slice.style.display = 'block';
+                } else {
+                    if (slice.classList.contains(`role-${role}`)) {
+                        slice.style.display = 'block';
+                    } else {
+                        slice.style.display = 'none';
+                    }
+                }
+            });
+
+            updateFreshSpeech(`Toggled view to ${role.toUpperCase()}. Notice how sensitive financial slices stay private while staff and vendors get only what they need.`);
+        }
+
+        function submitOpenFloor() {
+            const input = document.getElementById('openFloorInput').value.trim();
+            if (!input) return;
+
+            document.getElementById('freshStatusTag').innerText = 'Answering Question...';
+            document.getElementById('freshStatusTag').className = 'text-[11px] bg-cyan-950 text-cyan-300 px-2.5 py-0.5 rounded-md border border-cyan-800';
+
+            setTimeout(() => {
+                updateFreshSpeech(`Great question! You asked: "${input}". Here's the deal — Fresh handles all inbound routing automatically. Zero manual sorting. What else is on your mind?`);
+                document.getElementById('openFloorInput').value = '';
+                document.getElementById('freshStatusTag').innerText = 'Awaiting Interaction';
+                document.getElementById('freshStatusTag').className = 'text-[11px] bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-md border border-slate-700';
+            }, 600);
+        }
+
+        function presetMirrorDump(text) {
+            document.getElementById('mirrorInput').value = text;
+        }
+
+        function executeLiveMirror() {
+            const text = document.getElementById('mirrorInput').value.trim();
+            if (!text) {
+                alert("Please type or select a preset voice dump first.");
+                return;
+            }
+
+            const canvas = document.getElementById('mirrorCanvas');
+            const status = document.getElementById('mirrorStatus');
+
+            status.innerText = "Transforming voice dump...";
+            status.className = "text-[11px] text-amber-400 font-bold animate-pulse";
+
+            setTimeout(() => {
+                canvas.innerHTML = `
+                    <div class="w-full text-left space-y-3">
+                        <div class="bg-slate-900 border border-amber-500/40 rounded-xl p-4 shadow-lg space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-amber-950 text-amber-400 text-xs font-bold px-2.5 py-0.5 rounded border border-amber-800">
+                                    Live Mirror Tappy Card #1050
+                                </span>
+                                <span class="text-[10px] text-slate-400">Created Instantly</span>
+                            </div>
+                            <h4 class="font-bold text-sm text-slate-100 font-mono">"${text}"</h4>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs border-t border-slate-800 pt-2 mt-2">
+                                <div class="bg-slate-950 p-2 rounded border border-slate-800">
+                                    <span class="text-slate-400 block text-[10px]">PARTS / VENDOR:</span>
+                                    <span class="text-purple-300 font-semibold">2x HEPA Filter Kits Logged</span>
+                                </div>
+                                <div class="bg-slate-950 p-2 rounded border border-slate-800">
+                                    <span class="text-slate-400 block text-[10px]">ASSIGNMENT:</span>
+                                    <span class="text-cyan-300 font-semibold">Chris (Bench Tech)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                status.innerText = "Transformation Complete!";
+                status.className = "text-[11px] text-emerald-400 font-bold";
+
+                updateFreshSpeech("BAM! Look at that. Your raw words instantly transformed into a structured Cascading Tappy Card with tech and vendor assignments attached!");
+            }, 500);
+        }
+
+        function loadIndustryHub(industryKey) {
+            activeIndustry = industryKey;
+
+            // Button styling
+            document.querySelectorAll('.hub-btn').forEach(btn => {
+                btn.className = "hub-btn px-3 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition shrink-0";
+            });
+
+            const activeBtn = document.getElementById(`hubBtn-${industryKey}`);
+            if (activeBtn) {
+                activeBtn.className = "hub-btn px-3 py-2 rounded-xl text-xs font-bold bg-cyan-500 text-slate-950 shadow transition shrink-0";
+            }
+
+            const container = document.getElementById('industryHubContainer');
+            const data = industryData[industryKey];
+
+            let html = '';
+            data.cards.forEach(card => {
+                html += `
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3 shadow-md hover:border-cyan-500/40 transition">
+                        <div class="flex items-center justify-between">
+                            <span class="bg-cyan-950 text-cyan-400 text-[10px] font-bold px-2 py-0.5 rounded border border-cyan-800">
+                                ${card.id}
+                            </span>
+                            <span class="text-[11px] font-semibold text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800/40">
+                                ${card.status}
+                            </span>
+                        </div>
+
+                        <h4 class="font-bold text-sm text-slate-100">${card.title}</h4>
+
+                        <div class="space-y-1.5 text-xs">
+                            <div class="bg-slate-900/80 p-2 rounded border border-slate-800 text-slate-300">
+                                <strong class="text-purple-400 block text-[10px]">VENDOR SLICE:</strong>
+                                ${card.vendor}
+                            </div>
+                            <div class="bg-slate-900/80 p-2 rounded border border-slate-800 text-slate-300">
+                                <strong class="text-cyan-400 block text-[10px]">TECH SLICE:</strong>
+                                ${card.tech}
+                            </div>
+                            <div class="bg-slate-900/80 p-2 rounded border border-slate-800 text-slate-300">
+                                <strong class="text-emerald-400 block text-[10px]">CUSTOMER SLICE:</strong>
+                                ${card.customer}
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between text-[11px] border-t border-slate-800 pt-2 text-slate-400">
+                            <span>Est. Revenue: <strong class="text-emerald-400">${card.revenue}</strong></span>
+                            <span>Est. Cost: <strong class="text-slate-200">${card.cost}</strong></span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            setViewRole(currentRole); // Re-apply view permissions
+        }
+
+        function cleanSweepDemo() {
+            // Animate clearing out items
+            const container = document.getElementById('industryHubContainer');
+            container.style.opacity = '0';
+            
+            setTimeout(() => {
+                container.innerHTML = `
+                    <div class="col-span-full bg-slate-950/80 border border-slate-800 rounded-xl p-8 text-center space-y-3">
+                        <div class="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto text-xl">
+                            <i class="fa-solid fa-sparkles"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-100 text-base">Board Swept Clean!</h4>
+                        <p class="text-xs text-slate-400 max-w-md mx-auto">
+                            Demo noise removed. The screen is clear and ready for your custom business configuration.
+                        </p>
+                    </div>
+                `;
+                container.style.opacity = '1';
+                updateFreshSpeech("BAM! Board swept clean. No clutter, no leftover demo cards. Now give me YOUR brain dump. Tell me about your business. Don't think. Just talk.");
+                scrollToSection('step-braindump');
+            }, 300);
+        }
+
+        function submitCustomBrainDump() {
+            const input = document.getElementById('customBrainDumpText').value.trim();
+            if (!input) {
+                alert("Please type or dump some details about your business first.");
+                return;
+            }
+
+            customCards.push({
+                id: `CUSTOM-${100 + customCards.length}`,
+                text: input,
+                time: 'Just now'
+            });
+
+            renderCustomBoard();
+            document.getElementById('customBrainDumpText').value = '';
+
+            updateFreshSpeech("Look at that! You're officially using TappyThing right now. Your business brain dump is converted into a live action board item!");
+        }
+
+        function renderCustomBoard() {
+            const canvas = document.getElementById('customBoardCanvas');
+            const countTag = document.getElementById('customCardCount');
+
+            countTag.innerText = `${customCards.length} Active Card${customCards.length === 1 ? '' : 's'}`;
+
+            let html = '';
+            customCards.forEach(card => {
+                html += `
+                    <div class="bg-slate-900 border border-emerald-500/30 rounded-xl p-4 space-y-2 shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <span class="bg-emerald-950 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-800">
+                                ${card.id}
+                            </span>
+                            <span class="text-[10px] text-slate-500">${card.time}</span>
+                        </div>
+                        <p class="text-xs text-slate-200 font-medium">${card.text}</p>
+                        <div class="flex items-center justify-between text-[11px] border-t border-slate-800 pt-2 text-slate-400">
+                            <span class="text-cyan-400 font-semibold"><i class="fa-solid fa-robot mr-1"></i> Fresh Auto-Routing</span>
+                            <span class="text-emerald-400 font-bold"><i class="fa-solid fa-check-double mr-1"></i> Active</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            canvas.innerHTML = html;
+        }
+
+        function toggleVoiceSim() {
+            const btn = document.getElementById('mainVoiceBtn');
+            isVoiceSimActive = !isVoiceSimActive;
+
+            if (isVoiceSimActive) {
+                btn.className = "w-16 h-16 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-2xl flex items-center justify-center transition shadow-lg shadow-amber-500/40 pulse-mic group";
+                document.getElementById('freshStatusTag').innerText = 'Listening to Brain Dump...';
+                document.getElementById('freshStatusTag').className = 'text-[11px] bg-amber-950 text-amber-300 px-2.5 py-0.5 rounded-md border border-amber-800 animate-pulse';
+                updateFreshSpeech("Listening... Go ahead! Speak your mind, give me a raw brain dump, and I'll route it directly to Sissy!");
+            } else {
+                btn.className = "w-16 h-16 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-2xl flex items-center justify-center transition shadow-lg shadow-cyan-500/30 pulse-mic group";
+                document.getElementById('freshStatusTag').innerText = 'Awaiting Interaction';
+                document.getElementById('freshStatusTag').className = 'text-[11px] bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-md border border-slate-700';
+                updateFreshSpeech("Paused. Tap the button anytime you want to drop a 10-second audio dump!");
+            }
+        }
+    </script>
+</body>
+</html>
