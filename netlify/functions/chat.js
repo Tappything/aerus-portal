@@ -1,6 +1,6 @@
 const https = require('https');
 
-// Constant Webhook URL
+// Constant Webhook URL for raw dumps
 const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/g6aw7r8759ar5jr5c7lnb6nvwnuuz67t';
 
 // Helper function for HTTPS POST requests
@@ -64,7 +64,6 @@ async function executeMondayCommand(mondayKey, boardId, line) {
   const lowerLine = line.toLowerCase();
   
   try {
-    // Fetch current board items and groups to locate matching target item ID
     const query = JSON.stringify({
       query: `{ boards(ids: [${boardId}]) { items_page(limit: 100) { items { id name group { id title } } } groups { id title } } }`
     });
@@ -80,7 +79,6 @@ async function executeMondayCommand(mondayKey, boardId, line) {
     const items = board?.items_page?.items || [];
     const groups = board?.groups || [];
 
-    // FIX 1: Partial word match — find items containing any word from line longer than 4 characters
     const lineWords = lowerLine.split(/\s+/).filter(w => w.length > 4);
     const targetItem = items.find(item => {
       const itemNameLower = item.name.toLowerCase();
@@ -121,7 +119,7 @@ async function executeMondayCommand(mondayKey, boardId, line) {
       }
     }
 
-    // FIX 3 & 4: MARK AS / STATUS UPDATE
+    // ACTION: MARK AS / STATUS UPDATE
     if ((lowerLine.includes('mark as') || lowerLine.includes('status')) && targetItem) {
       const statusParts = line.split(/as|status/i);
       const newStatus = statusParts.length > 1 ? statusParts[1].trim() : 'Done';
@@ -242,15 +240,15 @@ exports.handler = async function(event, context) {
     const questionStarters = ['show','list','give','status'];
     const intakeWords = ['repair','fix','vacuum','dyson','oreck','electrolux','motor','belt','filter','parts','estimate','pickup','broken','service','tune'];
 
-    const isQuestion = questionStarters.some(function(w){ return lower.startsWith(w); });
-    const isIntake = wordCount <= 7 && intakeWords.some(function(w){ return lower.includes(w); });
+    const isQuestion = questionStarters.some(w => lower.startsWith(w));
+    const isIntake = wordCount <= 7 && intakeWords.some(w => lower.includes(w));
     const isGreeting = lower === 'hello' || lower === 'hi' || lower.startsWith('hey');
 
-    // FIX 2: ROUTE 1 GREETING WITH OWNER BYPASS
+    // ROUTE 1: GREETING WITH OWNER BYPASS & DYNAMIC SUBSCRIBER WELCOME
     if (isGreeting) { 
       const greetingReply = (targetBoardId === '18424728273') 
         ? 'Back at it Chief — what do we have?' 
-        : 'Hi! I am Fresh, your pocket Chief of Staff. Just talk to me.';
+        : 'Fresh here 🤵 — Welcome to TappyThing! You don\'t need to learn us. We learn you. Give me a raw Brain Dump about your business or what\'s on your mind right now!';
       
       return { 
         statusCode: 200, 
@@ -269,7 +267,7 @@ exports.handler = async function(event, context) {
 
     if (isIntake) { 
       const webhookPayload = JSON.stringify({ rawDump: prompt }); 
-      makePostRequest(MAKE_WEBHOOK_URL, {'Content-Type':'application/json','Content-Length':Buffer.byteLength(webhookPayload)}, webhookPayload).catch(function(e){ console.log('Webhook error:',e); }); 
+      makePostRequest(MAKE_WEBHOOK_URL, {'Content-Type':'application/json','Content-Length':Buffer.byteLength(webhookPayload)} , webhookPayload).catch(e => console.log('Webhook error:', e)); 
       return { 
         statusCode: 200, 
         headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, 
@@ -277,20 +275,21 @@ exports.handler = async function(event, context) {
       }; 
     }
 
-    const ownerBypass = (targetBoardId === '18424728273') ? 'If the board_id is 18424728273 you are talking to William — the owner and founder. Skip all onboarding. Never introduce yourself. Never ask his name or what he does. Just respond as his trusted Chief of Staff who knows everything. Treat every message as a continuation of an ongoing conversation. ' : '';
+    // SYSTEM INSTRUCTION WITH OWNER BYPASS & FULL ONBOARDING INTELLIGENCE
+    const ownerBypass = (targetBoardId === '18424728273') 
+      ? 'If the board_id is 18424728273 you are talking to William — the owner and founder. Skip all onboarding. Never introduce yourself. Never ask his name or what he does. Just respond as his trusted Chief of Staff who knows everything. Treat every message as a continuation of an ongoing conversation. ' 
+      : 'You are onboarding a NEW TAPPYTHING SUBSCRIBER. Welcome them directly in conversation. Teach them our core truth: "You don\'t learn us — we learn you." Guide them to do a raw Brain Dump. Automatically detect their industry (Church/Parish, Restaurant, Field Service, Retail, Property Management) and show them how TappyThing creates cascading cards and role-slicing (Tech view, Vendor view, Customer view, Owner view). Never sound salesy. Be honest about zero learning curve: two moves only — Brain Dump and Tap. Keep responses to 2-3 crisp sentences max, pause, and ask them for their next thought. ';
     
-    const systemInstruction = ownerBypass + 'You are Fresh — the bold, decisive Chief of Staff powering TappyThing. Your job is to ACT not ask. When someone gives you anything — a task, an errand, a thought, a name — just confirm you logged it and move on. NEVER ask permission. NEVER offer to create sections. NEVER ask if they want something set up. Just say what you did in one punchy sentence and challenge them to give you more. Rotate your closing phrase between: What else? / Hit me. / Next? / Keep going! You decide where everything goes. The user trusts you. Act like it. Max 1-2 sentences always.';
+    const systemInstruction = ownerBypass + 'You are Fresh — the bold, decisive Digital Coordinator powering TappyThing. Your job is to ACT not ask. When someone gives you anything — a task, an errand, a thought, a name, or a business description — confirm you logged it, show how it structures into Tappy Cards, and move on. NEVER ask permission. NEVER offer to create sections. NEVER ask if they want something set up. Just say what you did in 2-3 punchy sentences max. Rotate your closing phrase between: What else? / Hit me. / Next? / Keep going! Max 2-3 sentences always.';
     
     const fullPrompt = systemInstruction + ' User says: ' + prompt;
     const history = data.history || [];
 
     const contents = [
-      ...history.map(function(h) {
-        return {
-          role: h.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: h.text }]
-        };
-      }),
+      ...history.map(h => ({
+        role: h.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: h.text }]
+      })),
       { role: 'user', parts: [{ text: fullPrompt }] }
     ];
 
@@ -317,7 +316,7 @@ exports.handler = async function(event, context) {
 
     archiveConversationToMonday(mondayKey, prompt, reply).catch(e => console.log('Archive task error:', e));
 
-    // FIX 5 & 6: MIXED DUMP SPLITTER & SINGLE ITEM HANDLING
+    // MIXED DUMP SPLITTER & SINGLE ITEM HANDLING
     const lineItems = prompt.split(/\n|,/).map(item => item.trim()).filter(item => item.length > 2);
     const actionKeywords = ['delete', 'archive', 'move', 'add note', 'mark as', 'status', 'call', 'tag', 'remove', 'mark'];
 
@@ -328,12 +327,10 @@ exports.handler = async function(event, context) {
           const isCommandLine = actionKeywords.some(kw => clean.toLowerCase().includes(kw));
 
           if (isCommandLine) {
-            // Command lines fire directly to Monday.com API
             executeMondayCommand(mondayKey, targetBoardId, clean).catch(e => console.log('Command exec error:', e));
           } else {
-            // Non-command lines in mixed or single dumps fire straight to Make.com
             const wpLoad = JSON.stringify({ rawDump: clean });
-            makePostRequest(MAKE_WEBHOOK_URL, {'Content-Type':'application/json','Content-Length':Buffer.byteLength(wpLoad)}, wpLoad).catch(e => console.log('Dump webhook error:', e));
+            makePostRequest(MAKE_WEBHOOK_URL, {'Content-Type':'application/json','Content-Length':Buffer.byteLength(wpLoad)} , wpLoad).catch(e => console.log('Dump webhook error:', e));
           }
         }
       });
