@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to TappyThing — A World of Wicked Communication</title>
+  <title>TappyThing — Welcome</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <style>
@@ -20,10 +20,10 @@
 </head>
 <body class="min-h-screen pb-12">
 
-  <!-- TOP HEADER WITH DUAL BRANDING -->
+  <!-- TOP HEADER WITH DUAL BRANDING & FRESH AVATAR PHOTO -->
   <header class="p-6 border-b border-slate-800 flex justify-between items-center max-w-5xl mx-auto">
     <div class="flex items-center space-x-3">
-      <img src="fresh_logo.png" alt="Fresh Logo" class="w-10 h-10 rounded-full border border-blue-400 shadow-md object-cover" onerror="this.style.display='none'">
+      <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-16 h-16 rounded-full border-4 border-blue-400 shadow-xl object-cover">
       <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xl shadow-lg">T</div>
       <span class="text-xl font-extrabold tracking-wide text-white">TappyThing <span class="text-xs text-blue-400 font-normal">with Fresh</span></span>
     </div>
@@ -98,8 +98,8 @@
         <!-- FRESH CONVERSATION INTERACTION HUB -->
         <div id="cardsGrid" class="space-y-4"></div>
 
-        <!-- TRIAL CONFIRMATION BANNER (NO UPFRONT PAYMENT) -->
-        <div id="trialBanner" class="p-6 bg-gradient-to-r from-blue-900/80 to-indigo-900/80 rounded-xl border border-blue-500/40 space-y-3">
+        <!-- TRIAL CONFIRMATION BANNER WITH ENTER PORTAL BUTTON -->
+        <div id="trialBanner" class="p-6 bg-gradient-to-r from-blue-900/80 to-indigo-900/80 rounded-xl border border-blue-500/40 space-y-4">
           <div class="flex items-center space-x-2 text-green-400 font-bold text-sm">
             <i class="fas fa-check-circle"></i>
             <span>Your 3-Day Free Trial Starts Right Now!</span>
@@ -108,6 +108,12 @@
           <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
             Take 3 full days to put Fresh to work. Zero credit card needed upfront. When you decide to activate your permanent subscription ($95/mo), you are completely protected by our <strong>30-Day Money-Back Guarantee</strong> — no questions asked!
           </p>
+          <div class="pt-2">
+            <a href="index.html" class="inline-flex items-center space-x-2 px-6 py-3 bg-green-500 hover:bg-green-400 text-slate-950 font-black rounded-xl text-sm transition shadow-lg">
+              <span>Enter My TappyThing</span>
+              <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -121,7 +127,7 @@
         <div class="text-xs font-bold text-blue-400 uppercase tracking-wider">Unlimited Subscription</div>
         <div class="text-4xl font-black text-white">$95 <span class="text-base font-normal text-slate-400">/ mo</span></div>
         
-        <!-- STEP 6: WHY ONLY $95/MONTH? ZIG ZIGLAR REFRAME -->
+        <!-- WHY ONLY $95/MONTH? ZIG ZIGLAR REFRAME -->
         <div class="p-3 bg-slate-900/90 rounded-lg border border-indigo-500/30 space-y-2">
           <p class="text-xs font-bold text-white">Why only $95/month?</p>
           <blockquote class="text-[11px] text-slate-300 italic border-l-2 border-indigo-400 pl-2 leading-relaxed">
@@ -201,7 +207,6 @@
   </div>
 
   <script>
-    // STEP 5: DEMO BOARD ID LOCKED AT 00000000 TO PREVENT POLLUTING PRODUCTION OPS
     const LIVE_BOARD_ID = "00000000";
     const DEMO_BOARD_ID = "00000000";
     let isListening = false;
@@ -265,7 +270,6 @@
       micStatus.textContent = "Your world is ready — tap the mic and fill your first drawer!";
     }
 
-    // STEP 1 — QUESTION CARD: MY BUSINESS VS JUST BROWSING
     async function generateIndustryDrawer() {
       const input = document.getElementById('industryInput').value.trim();
       const output = document.getElementById('drawerOutput');
@@ -278,7 +282,7 @@
       cardsGrid.innerHTML = `
         <div class="card rounded-2xl p-6 md:p-8 space-y-6 border-blue-500/40 shadow-2xl">
           <div class="flex items-center space-x-4">
-            <img src="fresh_logo.png" alt="Fresh" class="w-12 h-12 rounded-full border border-blue-400 object-cover" onerror="this.style.display='none'">
+            <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh" class="w-12 h-12 rounded-full border border-blue-400 object-cover">
             <div>
               <span class="text-xs text-blue-400 font-bold uppercase tracking-wider">Fresh Digital Coordinator</span>
               <h3 class="text-xl font-bold text-white">Before I build your ${currentBusiness} world...</h3>
@@ -335,19 +339,15 @@
         ];
       }
 
-      // STEP 7: UPDATE MIC STATUS TEXT
       document.getElementById('micStatus').textContent = "Your world is ready — tap the mic and fill your first drawer!";
 
       if (choice === 'browsing') {
-        // STEP 2A — JUST BROWSING DEMO WORLD
         renderSampleWorld();
       } else {
-        // STEP 2B — IT'S MY BUSINESS DRAWER SELECTION
         renderDrawerSelection();
       }
     }
 
-    // STEP 2A — SAMPLE WORLD RENDER
     function renderSampleWorld() {
       const cardsGrid = document.getElementById('cardsGrid');
       const icons = ["fa-concierge-bell", "fa-tasks", "fa-microphone-alt", "fa-star", "fa-credit-card"];
@@ -379,7 +379,6 @@
       `;
     }
 
-    // STEP 2B — SELECT WHICH DRAWER TO WORK ON FIRST
     function renderDrawerSelection() {
       const cardsGrid = document.getElementById('cardsGrid');
 
@@ -399,7 +398,7 @@
       cardsGrid.innerHTML = `
         <div class="card rounded-2xl p-6 md:p-8 space-y-6 border-blue-500/40">
           <div class="flex items-center space-x-4">
-            <img src="fresh_logo.png" alt="Fresh" class="w-12 h-12 rounded-full border border-blue-400 object-cover" onerror="this.style.display='none'">
+            <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh" class="w-12 h-12 rounded-full border border-blue-400 object-cover">
             <div>
               <span class="text-xs text-blue-400 font-bold uppercase tracking-wider">Fresh Digital Coordinator</span>
               <h3 class="text-xl font-bold text-white">Perfect. Here are the 5 drawers I recommend for your ${currentBusiness}.</h3>
@@ -413,14 +412,13 @@
       `;
     }
 
-    // STEP 3 — DUMP 3 THINGS INTO SELECTED DRAWER
     function selectDrawerToWork(drawerName) {
       const cardsGrid = document.getElementById('cardsGrid');
 
       cardsGrid.innerHTML = `
         <div class="card rounded-2xl p-6 md:p-8 space-y-6 border-blue-500/40">
           <div class="flex items-center space-x-4">
-            <img src="fresh_logo.png" alt="Fresh" class="w-12 h-12 rounded-full border border-blue-400 object-cover" onerror="this.style.display='none'">
+            <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh" class="w-12 h-12 rounded-full border border-blue-400 object-cover">
             <div>
               <span class="text-xs text-blue-400 font-bold uppercase tracking-wider">Fresh Digital Coordinator</span>
               <h3 class="text-xl font-bold text-white">Active Drawer: ${drawerName}</h3>
@@ -440,7 +438,6 @@
       `;
     }
 
-    // STEP 4 — POPULATE ITEMS LIVE & SHOW REFINEMENT PROMPT
     function submitThreeThings(drawerName) {
       const rawText = document.getElementById('threeThingsInput').value.trim();
       if (!rawText) return alert("Dump 3 quick items or thoughts before submitting!");
@@ -479,7 +476,7 @@
 
           <div class="p-4 bg-slate-900/80 rounded-xl border border-blue-500/30 space-y-3">
             <div class="flex items-center space-x-3">
-              <img src="fresh_logo.png" alt="Fresh" class="w-8 h-8 rounded-full border border-blue-400 object-cover" onerror="this.style.display='none'">
+              <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh" class="w-8 h-8 rounded-full border border-blue-400 object-cover">
               <p class="text-sm font-bold text-white">See how that works?</p>
             </div>
             <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
