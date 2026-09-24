@@ -244,11 +244,11 @@ exports.handler = async function(event, context) {
     const isIntake = wordCount <= 7 && intakeWords.some(w => lower.includes(w));
     const isGreeting = lower === 'hello' || lower === 'hi' || lower.startsWith('hey');
 
-    // FIX 2: ROUTE 1 GREETING — HARDCODED SINGLE SENTENCE FOR NON-OWNER BOARDS
+    // ROUTE 1 GREETING — DYNAMIC RESPONSE BASED ON BOARD ID
     if (isGreeting) { 
       const greetingReply = (targetBoardId === '18424728273') 
         ? 'Back at it Chief — what do we have?' 
-        : 'Hey! Welcome to TappyThing — what do you do?';
+        : "Welcome to YOUR TappyThing! Give me 2 or 3 things on your mind right now — a task, a name, anything. Don't think. Just talk. I'll show you something cool.";
       
       return { 
         statusCode: 200, 
@@ -266,7 +266,7 @@ exports.handler = async function(event, context) {
     }
 
     if (isIntake) { 
-      // FIX 1: ONLY FIRE MAKE.COM WEBHOOK FOR OWNER BOARD
+      // ONLY FIRE MAKE.COM WEBHOOK FOR OWNER BOARD (18424728273)
       if (targetBoardId === '18424728273') {
         const webhookPayload = JSON.stringify({ rawDump: prompt }); 
         makePostRequest(MAKE_WEBHOOK_URL, {'Content-Type':'application/json','Content-Length':Buffer.byteLength(webhookPayload)} , webhookPayload).catch(e => console.log('Webhook error:', e)); 
@@ -281,7 +281,7 @@ exports.handler = async function(event, context) {
     // SYSTEM INSTRUCTION FOR ROUTE 4 CONVERSATION
     const ownerBypass = (targetBoardId === '18424728273') 
       ? 'If the board_id is 18424728273 you are talking to William — the owner and founder. Skip all onboarding. Never introduce yourself. Never ask his name or what he does. Just respond as his trusted Chief of Staff who knows everything. Treat every message as a continuation of an ongoing conversation. ' 
-      : 'You are onboarding a new TappyThing subscriber. Keep every response under 2 sentences max. Never recite features or explain system mechanics unless explicitly asked. Ask ONE simple question at a time to keep them talking about their business. Build their world live in conversation as they give you tasks. End with: "Don\'t think. Just talk." ';
+      : 'You are onboarding a new TappyThing subscriber. Show them how easy voice-first organization is. After they share their initial tasks, say: "See those cards? I just organized everything you said. Now watch — you can share any card with your staff, your customers, even your family. One tap. They see their piece. You see everything. This card could become 15 cards. Your whole customer list. Your team. Your wife. All connected. All organized. Just from talking." Keep responses punchy and inspiring. ';
     
     const systemInstruction = ownerBypass + 'You are Fresh — the bold, decisive Digital Coordinator powering TappyThing. Your job is to ACT not ask. When someone gives you anything — a task, an errand, a thought, a name, or a business description — confirm you logged it, show how it structures into Tappy Cards, and move on. NEVER ask permission. NEVER offer to create sections. NEVER ask if they want something set up. Just say what you did in 1-2 punchy sentences max. Rotate your closing phrase between: What else? / Hit me. / Next? / Keep going! Max 2 sentences always.';
     
@@ -319,7 +319,7 @@ exports.handler = async function(event, context) {
 
     archiveConversationToMonday(mondayKey, prompt, reply).catch(e => console.log('Archive task error:', e));
 
-    // FIX 1: MIXED DUMP SPLITTER & SINGLE ITEM HANDLING — ONLY FIRE MAKE.COM FOR OWNER BOARD
+    // MIXED DUMP SPLITTER & SINGLE ITEM HANDLING — ONLY FIRE MAKE.COM FOR OWNER BOARD
     const lineItems = prompt.split(/\n|,/).map(item => item.trim()).filter(item => item.length > 2);
     const actionKeywords = ['delete', 'archive', 'move', 'add note', 'mark as', 'status', 'call', 'tag', 'remove', 'mark'];
 
