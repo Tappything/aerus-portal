@@ -1,574 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TappyThing — Welcome</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-  <style>
-    body { background-color: #0f172a; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    .card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
-    .btn-glow { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
-    .btn-glow:hover { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
-    .portal-glow { box-shadow: 0 0 25px rgba(99, 102, 241, 0.4); border: 1px solid rgba(99, 102, 241, 0.6); }
-    .pulse-ring { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
-    #industryInput { color: #f1f5f9 !important; background-color: #0f172a !important; }
-    #pinInput { color: #f1f5f9 !important; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TappyThing — Digital Coordinator</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background-color:#0b0f19;color:#f3f4f6}
+.glow-card{background:rgba(17,24,39,0.75);border:1px solid rgba(59,130,246,0.25);box-shadow:0 8px 32px 0 rgba(0,0,0,0.45)}
+.glow-card-emerald{border-color:rgba(16,185,129,0.25)}
+.glow-card-purple{border-color:rgba(168,85,247,0.25)}
+.glow-card-amber{border-color:rgba(245,158,11,0.25)}
+.glow-button{background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);box-shadow:0 0 15px rgba(37,99,235,0.5)}
+.mic-pulse{animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(59,130,246,0.7)}70%{box-shadow:0 0 0 22px rgba(59,130,246,0)}100%{box-shadow:0 0 0 0 rgba(59,130,246,0)}}
+details > summary { list-style: none; }
+details > summary::-webkit-details-marker { display: none; }
+details > div { animation: slideDown 0.2s ease-out; } @keyframes slideDown { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+.portal-glow { box-shadow: 0 0 25px rgba(99, 102, 241, 0.4); border: 1px solid rgba(99, 102, 241, 0.6); }
+</style>
 </head>
-<body class="min-h-screen pb-12">
+<body class="min-h-screen pb-16">
 
-  <!-- 1. HEADER WITH FRESH AVATAR & ATTORNEY VAULT -->
-  <header class="p-6 border-b border-slate-800 flex justify-between items-center max-w-5xl mx-auto">
-    <div class="flex items-center space-x-3">
-      <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-16 h-16 rounded-full border-4 border-blue-400 shadow-xl object-cover">
-      <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xl shadow-lg">T</div>
-      <span class="text-xl font-extrabold tracking-wide text-white">TappyThing <span class="text-xs text-blue-400 font-normal">with Fresh</span></span>
-    </div>
-    <button onclick="togglePinModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-semibold rounded-lg border border-slate-700 transition flex items-center space-x-2">
-      <i class="fas fa-user-shield text-blue-400"></i>
-      <span>Attorney Vault</span>
-    </button>
-  </header>
+<nav class="border-b border-gray-800 bg-gray-900/90 sticky top-0 z-50 backdrop-blur-md">
+<div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-10 h-10 rounded-full border-2 border-blue-400 shadow-md object-cover">
+<div>
+<h1 class="font-extrabold text-lg text-white flex items-center gap-2">
+  <span id="navBusinessName">Aerus Home Wellness</span>
+  <span class="text-xs px-2 py-0.5 rounded bg-blue-900/80 text-blue-300 font-normal border border-blue-700">Digital Coordinator</span>
+</h1>
+</div>
+</div>
+<div class="flex items-center space-x-2">
+  <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+  <span class="text-xs text-emerald-400 font-semibold tracking-wide uppercase hidden sm:inline">System Active</span>
+</div>
+</div>
+</nav>
 
-  <main class="max-w-4xl mx-auto px-4 mt-8 space-y-8">
+<div id="cardPanel" onclick="closeCard()" class="fixed inset-0 bg-black/60 z-50 hidden backdrop-blur-sm"><div onclick="event.stopPropagation()" class="absolute right-0 top-0 h-full w-full max-w-sm bg-gray-900 border-l border-gray-700 p-6 overflow-y-auto shadow-2xl"><div class="flex items-center justify-between mb-6"><h2 class="font-bold text-white text-lg">Customer Card</h2><button onclick="closeCard()" class="text-gray-400 hover:text-white text-3xl leading-none">×</button></div><div id="cardContent" class="space-y-4"></div></div></div>
 
-    <!-- 2. HERO SECTION & REALIZATION LINE -->
-    <section class="card rounded-2xl p-8 text-center space-y-6 relative overflow-hidden">
-      <div class="inline-block px-4 py-1.5 bg-blue-500/10 border border-blue-500/30 rounded-full text-blue-400 font-semibold text-xs uppercase tracking-widest mb-2">
-        Live Portal Active
-      </div>
-      <h1 class="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
-        Welcome to TappyThing <br/>
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">A World of Wicked Communication & Unlimited Resources</span>
-      </h1>
-      
-      <p class="text-slate-300 text-base md:text-lg font-medium max-w-3xl mx-auto leading-relaxed">
-        TappyThing turns raw voice or quick text into live, shareable communication cards. Embed a card on your website, or text a simple link to a customer, vendor, partner, or family member—they tap one button to speak or type, and their update drops straight into their card in real time without messy group text threads or buried emails.
-      </p>
+<main class="max-w-7xl mx-auto px-4 pt-6 space-y-6">
 
-      <div class="p-4 bg-slate-900/80 rounded-xl border border-blue-500/20 text-blue-200 text-sm md:text-base font-semibold">
-        ⚡ Look around. You aren't reading a brochure — <span class="text-white underline decoration-blue-400">you are standing inside an active TappyThing portal right now.</span>
-      </div>
-
-      <!-- VOICE ENGINE BUTTON -->
-      <div class="pt-4 flex flex-col items-center justify-center space-y-4">
-        <button id="micBtn" onclick="toggleMic()" class="w-24 h-24 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex flex-col items-center justify-center btn-glow transition transform active:scale-95 cursor-pointer relative">
-          <i class="fas fa-microphone text-3xl"></i>
-          <span class="text-xs font-bold mt-1">TAP TO TALK</span>
-        </button>
-        <p id="micStatus" class="text-slate-400 text-xs font-mono uppercase tracking-wider">Tap button to dump thoughts or talk with Fresh live</p>
-      </div>
-
-      <div id="responseBox" class="hidden p-4 bg-slate-800/90 rounded-xl border border-slate-700 text-left space-y-2">
-        <p class="text-xs text-blue-400 font-bold uppercase tracking-wider">Fresh Response:</p>
-        <p id="responseText" class="text-slate-200 text-sm leading-relaxed"></p>
-      </div>
-    </section>
-
-    <!-- 3. TAPPYTHING PREVIEW SECTION (PRODUCT MOCKUP) -->
-    <section class="card rounded-2xl p-6 md:p-8 space-y-4 border-indigo-500/30">
-      <div class="text-center space-y-1">
-        <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">Product Preview</span>
-        <h2 class="text-2xl font-black text-white">Here's what your world looks like:</h2>
-      </div>
-
-      <!-- MOCKUP CARD -->
-      <div class="bg-slate-950 rounded-2xl p-6 border border-slate-800 shadow-2xl space-y-6 max-w-xl mx-auto">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div class="flex items-center space-x-3">
-            <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-10 h-10 rounded-full border border-blue-400 object-cover">
-            <div>
-              <h4 class="font-bold text-white text-sm">Your Business Portal</h4>
-              <p class="text-[10px] text-green-400 font-mono">⚡ System Active</p>
-            </div>
-          </div>
-          <span class="text-[10px] px-2 py-1 bg-blue-600/20 text-blue-300 rounded border border-blue-500/30">Digital Coordinator</span>
-        </div>
-
-        <div class="flex flex-col items-center justify-center py-2 space-y-2">
-          <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center text-xl shadow-lg btn-glow">
-            <i class="fas fa-microphone"></i>
-          </div>
-          <p class="text-[10px] text-slate-400 font-mono">TAP MICROPHONE TO SPEAK</p>
-        </div>
-
-        <div class="grid grid-cols-3 gap-2">
-          <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 text-center space-y-1">
-            <i class="fas fa-briefcase text-blue-400 text-sm"></i>
-            <p class="text-[11px] font-bold text-white leading-tight">Business World</p>
-          </div>
-          <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 text-center space-y-1">
-            <i class="fas fa-user text-green-400 text-sm"></i>
-            <p class="text-[11px] font-bold text-white leading-tight">Personal World</p>
-          </div>
-          <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 text-center space-y-1">
-            <i class="fas fa-calendar-alt text-amber-400 text-sm"></i>
-            <p class="text-[11px] font-bold text-white leading-tight">Active Calendar</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CORE PHILOSOPHY -->
-    <section class="card rounded-xl p-6 space-y-3">
-      <div class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xl">
-        <i class="fas fa-brain"></i>
-      </div>
-      <h3 class="text-lg font-bold text-white">Brain Dumps & Tapping Out Tasks</h3>
-      <p class="text-slate-400 text-sm leading-relaxed">
-        Brains are for thinking, not holding tasks. Tap one button, talk out loud, and dump raw audio while driving or working. Fresh sorts, logs, and routes it invisibly so you never fill out a bunch of form fields again.
-      </p>
-    </section>
-
-    <!-- 4. BUILD YOUR CUSTOM WORLD SECTION (FULL 5-STEP INTERACTIVE FLOW) -->
-    <section class="card rounded-2xl p-6 md:p-8 space-y-6">
-      <div class="border-b border-slate-700/60 pb-4">
-        <h2 class="text-2xl font-bold text-white">Build Your Custom World</h2>
-        <p class="text-slate-400 text-sm mt-1">Type your business, shop, or home hub below. Fresh will guide you step-by-step.</p>
-      </div>
-
-      <div class="flex flex-col sm:flex-row gap-3">
-        <input type="text" id="industryInput" placeholder="e.g. Donut Shop, Real Estate Agent, Roofing Contractor, Family Home..." class="flex-grow px-4 py-3 rounded-lg border border-slate-700 placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm font-medium">
-        <button onclick="generateIndustryDrawer()" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-sm transition flex items-center justify-center space-x-2">
-          <i class="fas fa-magic"></i>
-          <span>Build My Drawer</span>
-        </button>
-      </div>
-
-      <div id="drawerOutput" class="hidden space-y-6">
-        <div id="cardsGrid" class="space-y-4"></div>
-
-        <!-- 7. ENTER MY TAPPYTHING BUTTON SECTION -->
-        <div id="trialBanner" class="p-6 bg-gradient-to-r from-blue-900/80 to-indigo-900/80 rounded-xl border border-blue-500/40 space-y-4">
-          <div class="flex items-center space-x-2 text-green-400 font-bold text-sm">
-            <i class="fas fa-check-circle"></i>
-            <span>Your 3-Day Free Trial Starts Right Now!</span>
-          </div>
-          <h3 class="text-base md:text-lg font-bold text-white">No payment required today. Explore and test your live world freely.</h3>
-          <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
-            Take 3 full days to put Fresh to work. Zero credit card needed upfront. When you decide to activate your permanent subscription ($95/mo), you are completely protected by our <strong>30-Day Money-Back Guarantee</strong> — no questions asked!
-          </p>
-          <div class="pt-2">
-            <button id="enterPortalBtn" onclick="createBoardAndRedirect()" class="inline-flex items-center space-x-2 px-6 py-3 bg-green-500 hover:bg-green-400 text-slate-950 font-black rounded-xl text-sm transition shadow-lg cursor-pointer">
-              <span>Enter My TappyThing</span>
-              <i class="fas fa-arrow-right"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 5. PRICING & 6. ROADMAP -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="card rounded-xl p-6 space-y-4 md:col-span-1 border-blue-500/40 relative">
-        <div class="absolute -top-3 right-4 px-3 py-1 bg-green-500 text-slate-950 font-black text-[10px] uppercase tracking-wider rounded-full shadow-lg">
-          3-Day Free Trial Active
-        </div>
-        <div class="text-xs font-bold text-blue-400 uppercase tracking-wider">Unlimited Subscription</div>
-        <div class="text-4xl font-black text-white">$95 <span class="text-base font-normal text-slate-400">/ mo</span></div>
-        
-        <!-- ZIG ZIGLAR REFRAME -->
-        <div class="p-3 bg-slate-900/90 rounded-lg border border-indigo-500/30 space-y-2">
-          <p class="text-xs font-bold text-white">Why only $95/month?</p>
-          <blockquote class="text-[11px] text-slate-300 italic border-l-2 border-indigo-400 pl-2 leading-relaxed">
-            "You can have everything in life you want, if you will just help enough other people get what they want."
-          </blockquote>
-          <p class="text-[10px] text-indigo-300 font-medium">— Zig Ziglar Philosophy</p>
-        </div>
-
-        <div class="p-2.5 bg-blue-500/10 rounded-lg border border-blue-500/20 text-[11px] text-blue-300 font-medium leading-tight">
-          🛡️ <strong>30-Day Money-Back Guarantee:</strong> Zero risk. Try it free for 3 days. Not 100% satisfied after 30 days? Full refund. No questions asked.
-        </div>
-        <ul class="text-xs text-slate-300 space-y-2 pt-1">
-          <li class="flex items-center space-x-2"><i class="fas fa-check text-blue-400"></i><span>Unlimited Voice Brain Dumps</span></li>
-          <li class="flex items-center space-x-2"><i class="fas fa-check text-blue-400"></i><span>Unlimited Shareable Portals</span></li>
-          <li class="flex items-center space-x-2"><i class="fas fa-check text-blue-400"></i><span>Fresh Digital Coordinator</span></li>
-          <li class="flex items-center space-x-2"><i class="fas fa-check text-blue-400"></i><span>Clean Environment LLC Billing</span></li>
-        </ul>
-      </div>
-
-      <!-- ROADMAP -->
-      <div class="card rounded-xl p-6 space-y-4 md:col-span-2">
-        <div class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Coming Soon Roadmap</div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-          <div class="p-3 bg-slate-900/60 rounded-lg border border-slate-800 space-y-1">
-            <i class="fas fa-phone-alt text-blue-400 text-lg"></i>
-            <h4 class="text-xs font-bold text-white">Integrated Phone</h4>
-            <p class="text-[11px] text-slate-400">Live call routing & voice card logging.</p>
-          </div>
-          <div class="p-3 bg-slate-900/60 rounded-lg border border-slate-800 space-y-1">
-            <i class="fas fa-file-invoice-dollar text-green-400 text-lg"></i>
-            <h4 class="text-xs font-bold text-white">1-Tap Invoicing</h4>
-            <p class="text-[11px] text-slate-400">Voice-generated invoice & payment links.</p>
-          </div>
-          <div class="p-3 bg-slate-900/60 rounded-lg border border-slate-800 space-y-1">
-            <i class="fas fa-truck text-amber-400 text-lg"></i>
-            <h4 class="text-xs font-bold text-white">Automated Dispatch</h4>
-            <p class="text-[11px] text-slate-400">Field task routing for techs & drivers.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- ATTORNEY PIN VAULT MODAL (PIN 7777) -->
-  <div id="pinModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
-    <div class="card max-w-md w-full rounded-2xl p-6 space-y-6 relative border-blue-500/30">
-      <button onclick="togglePinModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
-        <i class="fas fa-times"></i>
-      </button>
-      
-      <div class="text-center space-y-2">
-        <div class="w-12 h-12 bg-blue-600/20 text-blue-400 rounded-full flex items-center justify-center mx-auto text-xl border border-blue-500/30">
-          <i class="fas fa-lock"></i>
-        </div>
-        <h3 class="text-xl font-bold text-white">Attorney Vault Access</h3>
-        <p class="text-xs text-slate-400">Enter 4-digit PIN to unlock patent-pending technical secrets.</p>
-      </div>
-
-      <div class="space-y-4">
-        <input type="password" id="pinInput" maxlength="4" placeholder="Enter PIN" class="w-full py-3 text-center text-2xl font-mono tracking-widest bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
-        <button onclick="checkPin()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 font-bold text-sm uppercase tracking-wider rounded-lg text-white transition">Unlock Vault</button>
-      </div>
-
-      <div id="vaultContent" class="hidden p-4 bg-slate-900/90 rounded-xl border border-blue-500/40 space-y-3 text-left">
-        <div class="text-xs font-bold text-green-400 uppercase tracking-wider flex items-center space-x-2">
-          <i class="fas fa-shield-alt"></i>
-          <span>Patent Briefing Unlocked</span>
-        </div>
-        <p class="text-xs text-slate-300 leading-relaxed">
-          <strong>Inverse Voice UX Architecture:</strong> Core claims cover 1-tap unstructured audio ingestion, automatic categorization, and dynamic card routing without form inputs.
-        </p>
-        <p class="text-xs text-slate-400 italic">
-          Note: System is in live daily operational use while specialized legal toolsets are actively under development.
-        </p>
-      </div>
-    </div>
+<!-- WELCOME WORLD DRAWER (EMBEDDED IFRAME) -->
+<section id="welcomeDrawerSection" class="glow-card rounded-3xl border-2 border-indigo-500/60 portal-glow overflow-hidden">
+<details class="group" open>
+<summary class="p-6 bg-gradient-to-r from-blue-900/40 to-indigo-900/40 flex items-center justify-between cursor-pointer hover:bg-gray-800/50 transition">
+<div class="flex items-center space-x-4">
+  <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-xl shadow-lg border border-indigo-400/40">
+    <i class="fa-solid fa-star"></i>
   </div>
+  <div>
+    <h2 class="text-xl font-black text-white tracking-tight">🌟 Welcome World — Start Here</h2>
+    <p class="text-xs text-indigo-300">Tap to build your custom world and start your live trial</p>
+  </div>
+</div>
+<span class="w-4 h-4 rounded-full border-2 border-indigo-400 group-open:bg-indigo-400 transition-all duration-300"></span>
+</summary>
+<div class="p-2 border-t border-indigo-500/30 bg-slate-950">
+  <iframe src="welcome.html" class="w-full h-[800px] rounded-2xl border-0"></iframe>
+</div>
+</details>
+</section>
 
-  <script>
-    const LIVE_BOARD_ID = "00000000";
-    const DEMO_BOARD_ID = "00000000";
-    let isListening = false;
-    let currentBusiness = "Custom World";
-    let currentDrawers = [];
+<!-- LOCKED PORTAL OVERLAY CONTAINER -->
+<div id="lockedWorldOverlay" class="space-y-6 opacity-60">
 
-    function toggleMic() {
-      const micBtn = document.getElementById('micBtn');
-      const micStatus = document.getElementById('micStatus');
-      const responseBox = document.getElementById('responseBox');
-      const responseText = document.getElementById('responseText');
+<!-- FRESH INTAKE SECTION -->
+<section onclick="showLockedNotice()" class="glow-card rounded-3xl p-8 text-center border-2 border-gray-800 cursor-pointer relative overflow-hidden">
+<div class="flex flex-col items-center justify-center max-w-3xl mx-auto">
+  <div class="relative mb-4">
+    <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-36 h-36 rounded-full object-cover border-4 border-gray-700 shadow-2xl opacity-70" />
+  </div>
+  <h2 class="text-3xl font-black text-gray-400 tracking-tight mb-1">FRESH</h2>
+  <p class="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-6">Your Pocket Chief of Staff</p>
+  <div class="p-4 bg-gray-900/90 rounded-2xl border border-gray-800 text-amber-400 font-bold text-sm">
+    🔒 Complete your Welcome World above to unlock live voice intake!
+  </div>
+</div>
+</section>
 
-      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        alert("Speech recognition is not supported on this browser. Please use Chrome or Safari.");
-        return;
-      }
+<!-- WORLDS GRID -->
+<div id="worldsGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-6 opacity-50">
+<div onclick="showLockedNotice()" class="glow-card rounded-2xl p-6 border border-gray-800 cursor-pointer">
+  <h3 class="font-bold text-gray-400">💼 Business World</h3>
+  <p class="text-xs text-gray-500 mt-1">🔒 Locked — Complete Welcome World first!</p>
+</div>
+<div onclick="showLockedNotice()" class="glow-card rounded-2xl p-6 border border-gray-800 cursor-pointer">
+  <h3 class="font-bold text-gray-400">👤 Personal World</h3>
+  <p class="text-xs text-gray-500 mt-1">🔒 Locked — Complete Welcome World first!</p>
+</div>
+</div>
 
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const recognition = new SpeechRecognition();
-      recognition.lang = 'en-US';
+</div>
 
-      if (!isListening) {
-        recognition.start();
-        isListening = true;
-        micBtn.classList.add('bg-red-600', 'pulse-ring');
-        micStatus.textContent = "Listening... Speak now!";
+</main>
 
-        recognition.onresult = async (event) => {
-          const transcript = event.results[0][0].transcript;
-          micStatus.textContent = `Processing: "${transcript}"...`;
-          
-          try {
-            const res = await fetch('/.netlify/functions/chat', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ prompt: transcript, board_id: LIVE_BOARD_ID })
-            });
-            const data = await res.json();
-            responseText.textContent = data.reply || data.response || "Fresh processed your demo request!";
-            responseBox.classList.remove('hidden');
-          } catch (err) {
-            responseText.textContent = "Fresh here! Audio received in demo mode.";
-            responseBox.classList.remove('hidden');
-          }
-          resetMic();
-        };
+<footer class="text-center py-6 text-xs text-gray-500 border-t border-gray-800/80 mt-12">
+<p>Powered by <strong>TappyThing</strong></p>
+</footer>
 
-        recognition.onerror = () => resetMic();
-        recognition.onend = () => resetMic();
-      } else {
-        resetMic();
-      }
-    }
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+let activeBoardId = urlParams.get('board') || urlParams.get('board_id') || null;
+let activeName = urlParams.get('name') || '';
 
-    function resetMic() {
-      isListening = false;
-      const micBtn = document.getElementById('micBtn');
-      const micStatus = document.getElementById('micStatus');
-      micBtn.classList.remove('bg-red-600', 'pulse-ring');
-      micBtn.classList.add('bg-gradient-to-tr', 'from-blue-600', 'to-indigo-500');
-      micStatus.textContent = "Your world is ready — tap the mic and fill your first drawer!";
-    }
+function showLockedNotice() {
+  if (!activeBoardId) {
+    alert('Complete your Welcome World first! Build your drawer above to unlock your full portal.');
+  }
+}
 
-    async function generateIndustryDrawer() {
-      const input = document.getElementById('industryInput').value.trim();
-      const output = document.getElementById('drawerOutput');
-      const cardsGrid = document.getElementById('cardsGrid');
+document.addEventListener('DOMContentLoaded', function() {
+  const welcomeDrawer = document.getElementById('welcomeDrawerSection');
+  const lockedOverlay = document.getElementById('lockedWorldOverlay');
+  const navName = document.getElementById('navBusinessName');
 
-      if (!input) return alert('Please enter a business, home, or industry name!');
-
-      currentBusiness = input;
-
-      cardsGrid.innerHTML = `
-        <div class="card rounded-2xl p-6 md:p-8 space-y-6 border-blue-500/40 shadow-2xl">
-          <div class="flex items-center space-x-4">
-            <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh" class="w-12 h-12 rounded-full border border-blue-400 object-cover">
-            <div>
-              <span class="text-xs text-blue-400 font-bold uppercase tracking-wider">Fresh Digital Coordinator</span>
-              <h3 class="text-xl font-bold text-white">Before I build your ${currentBusiness} world...</h3>
-            </div>
-          </div>
-          <p class="text-slate-300 text-sm md:text-base leading-relaxed">
-            Quick question: Is this for <strong>YOUR business</strong> or are you just checking us out today?
-          </p>
-          <div class="flex flex-col sm:flex-row gap-4 pt-2">
-            <button onclick="handleFlowChoice('business')" class="flex-1 py-3 px-6 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition shadow-lg flex items-center justify-center space-x-2">
-              <i class="fas fa-briefcase"></i>
-              <span>It's My Business</span>
-            </button>
-            <button onclick="handleFlowChoice('browsing')" class="flex-1 py-3 px-6 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-sm border border-slate-700 transition flex items-center justify-center space-x-2">
-              <i class="fas fa-eye"></i>
-              <span>Just Browsing</span>
-            </button>
-          </div>
-        </div>
-      `;
-      output.classList.remove('hidden');
-    }
-
-    async function handleFlowChoice(choice) {
-      const cardsGrid = document.getElementById('cardsGrid');
-
-      cardsGrid.innerHTML = `
-        <div class="p-8 text-center text-slate-400 font-medium animate-pulse card rounded-2xl">
-          <i class="fas fa-spinner fa-spin text-2xl text-blue-400 mb-2"></i><br/>
-          Fresh is fetching the 5 recommended drawers for ${currentBusiness}...
-        </div>`;
-
-      try {
-        const res = await fetch('/.netlify/functions/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            prompt: `List exactly 5 drawer category names for a ${currentBusiness} separated by commas. Do not include numbers or markdown.`,
-            board_id: DEMO_BOARD_ID
-          })
-        });
-        const data = await res.json();
-        const responseString = data.reply || data.response || "";
-        currentDrawers = responseString.split(',').map(s => s.trim()).filter(Boolean);
-      } catch (err) {}
-
-      if (currentDrawers.length < 5) {
-        currentDrawers = [
-          "Customer Intakes & Orders",
-          "Daily Dispatch & Tasks",
-          "Voice Inventory Logs",
-          "VIP Priority Routing",
-          "1-Tap Billing & Links"
-        ];
-      }
-
-      document.getElementById('micStatus').textContent = "Your world is ready — tap the mic and fill your first drawer!";
-
-      if (choice === 'browsing') {
-        renderSampleWorld();
-      } else {
-        renderDrawerSelection();
-      }
-    }
-
-    function renderSampleWorld() {
-      const cardsGrid = document.getElementById('cardsGrid');
-      const icons = ["fa-concierge-bell", "fa-tasks", "fa-microphone-alt", "fa-star", "fa-credit-card"];
-
-      let subCardsHtml = "";
-      currentDrawers.slice(0, 5).forEach((cat, index) => {
-        subCardsHtml += `
-          <div class="p-4 bg-slate-900/90 rounded-xl border border-slate-700/80 space-y-2">
-            <div class="w-8 h-8 rounded-lg bg-blue-600/20 border border-blue-500/30 text-blue-400 flex items-center justify-center text-sm">
-              <i class="fas ${icons[index] || 'fa-folder'}"></i>
-            </div>
-            <h5 class="text-sm font-bold text-white">${cat}</h5>
-            <p class="text-[11px] text-slate-400">Sample Drawer Demo</p>
-          </div>
-        `;
+  if (activeBoardId) {
+    if (welcomeDrawer) welcomeDrawer.style.display = 'none';
+    if (lockedOverlay) {
+      lockedOverlay.classList.remove('opacity-60', 'opacity-50');
+      lockedOverlay.querySelectorAll('[onclick="showLockedNotice()"]').forEach(el => {
+        el.removeAttribute('onclick');
       });
-
-      cardsGrid.innerHTML = `
-        <div class="card rounded-2xl p-6 md:p-8 space-y-6 portal-glow">
-          <div class="flex items-center space-x-3">
-            <span class="px-3 py-1 bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold text-xs uppercase tracking-wider rounded-full">Sample Demo World</span>
-            <h3 class="text-xl md:text-2xl font-black text-white">${currentBusiness.toUpperCase()} PORTAL</h3>
-          </div>
-          <p class="text-slate-300 text-sm">Here is a sample world with 5 recommended drawers built out as a demo:</p>
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            ${subCardsHtml}
-          </div>
-        </div>
-      `;
     }
 
-    function renderDrawerSelection() {
-      const cardsGrid = document.getElementById('cardsGrid');
-
-      let buttonsHtml = "";
-      currentDrawers.slice(0, 5).forEach((drawer, index) => {
-        buttonsHtml += `
-          <button onclick="selectDrawerToWork('${drawer.replace(/'/g, "\\'")}')" class="w-full text-left p-4 bg-slate-900/80 hover:bg-blue-600/20 border border-slate-700 hover:border-blue-400 rounded-xl text-sm font-bold text-white transition flex items-center justify-between group">
-            <span class="flex items-center space-x-3">
-              <span class="w-7 h-7 rounded-lg bg-blue-600/30 text-blue-400 flex items-center justify-center text-xs group-hover:bg-blue-500 group-hover:text-white transition">${index + 1}</span>
-              <span>${drawer}</span>
-            </span>
-            <i class="fas fa-chevron-right text-slate-500 group-hover:text-blue-400 transition"></i>
-          </button>
-        `;
-      });
-
-      cardsGrid.innerHTML = `
-        <div class="card rounded-2xl p-6 md:p-8 space-y-6 border-blue-500/40">
-          <div class="flex items-center space-x-4">
-            <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh" class="w-12 h-12 rounded-full border border-blue-400 object-cover">
-            <div>
-              <span class="text-xs text-blue-400 font-bold uppercase tracking-wider">Fresh Digital Coordinator</span>
-              <h3 class="text-xl font-bold text-white">Perfect. Here are the 5 drawers I recommend for your ${currentBusiness}.</h3>
-            </div>
-          </div>
-          <p class="text-slate-300 text-sm">Which drawer do you want to work on first?</p>
-          <div class="space-y-3">
-            ${buttonsHtml}
-          </div>
-        </div>
-      `;
+    if (activeBoardId === '18424728273') {
+      document.getElementById('freshReply').textContent = 'Back at it Chief — what do we have?';
+      if (navName) navName.textContent = decodeURIComponent(activeName) || 'Aerus Home Wellness';
+    } else {
+      if (navName) navName.textContent = decodeURIComponent(activeName) || 'Custom World';
     }
-
-    function selectDrawerToWork(drawerName) {
-      const cardsGrid = document.getElementById('cardsGrid');
-
-      cardsGrid.innerHTML = `
-        <div class="card rounded-2xl p-6 md:p-8 space-y-6 border-blue-500/40">
-          <div class="flex items-center space-x-4">
-            <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh" class="w-12 h-12 rounded-full border border-blue-400 object-cover">
-            <div>
-              <span class="text-xs text-blue-400 font-bold uppercase tracking-wider">Fresh Digital Coordinator</span>
-              <h3 class="text-xl font-bold text-white">Active Drawer: ${drawerName}</h3>
-            </div>
-          </div>
-          <p class="text-slate-300 text-sm font-medium">
-            Give me 3 things that go in your <strong>[${drawerName}]</strong> drawer. Don't think. Just talk or type!
-          </p>
-          <div class="space-y-4">
-            <textarea id="threeThingsInput" rows="3" placeholder="e.g. 1. Order #104 needs pickup, 2. Call Sarah back about invoice, 3. Reorder coffee supplies" class="w-full p-4 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm font-medium"></textarea>
-            <button onclick="submitThreeThings('${drawerName.replace(/'/g, "\\'")}')" class="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition shadow-lg flex items-center justify-center space-x-2">
-              <i class="fas fa-paper-plane"></i>
-              <span>Submit 3 Things To Fresh</span>
-            </button>
-          </div>
-        </div>
-      `;
-    }
-
-    function submitThreeThings(drawerName) {
-      const rawText = document.getElementById('threeThingsInput').value.trim();
-      if (!rawText) return alert("Dump 3 quick items or thoughts before submitting!");
-
-      const items = rawText.split('\n').filter(Boolean);
-      const cardsGrid = document.getElementById('cardsGrid');
-
-      let itemsListHtml = "";
-      items.forEach((item, idx) => {
-        itemsListHtml += `
-          <div class="p-3 bg-slate-900/90 rounded-lg border border-slate-700 flex items-center space-x-3 text-sm text-slate-200">
-            <span class="w-6 h-6 rounded-full bg-green-500/20 text-green-400 text-xs font-bold flex items-center justify-center">${idx + 1}</span>
-            <span>${item}</span>
-          </div>
-        `;
-      });
-
-      cardsGrid.innerHTML = `
-        <div class="card rounded-2xl p-6 md:p-8 space-y-6 portal-glow">
-          <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl bg-green-500/20 border border-green-500/30 text-green-400 flex items-center justify-center text-lg">
-              <i class="fas fa-check"></i>
-            </div>
-            <div>
-              <span class="text-xs text-green-400 font-bold uppercase tracking-wider">Drawer Live & Populated</span>
-              <h3 class="text-xl font-bold text-white">${drawerName}</h3>
-            </div>
-          </div>
-
-          <div class="space-y-2">
-            <p class="text-xs text-slate-400 uppercase tracking-wider font-bold">Items Logged Inside Drawer:</p>
-            <div class="space-y-2">
-              ${itemsListHtml}
-            </div>
-          </div>
-
-          <div class="p-4 bg-slate-900/80 rounded-xl border border-blue-500/30 space-y-3">
-            <div class="flex items-center space-x-3">
-              <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh" class="w-8 h-8 rounded-full border border-blue-400 object-cover">
-              <p class="text-sm font-bold text-white">See how that works?</p>
-            </div>
-            <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
-              Pick your next drawer to work on or dump all 3 things at once into the mic above and I'll sort them invisibly into your portal!
-            </p>
-            <button onclick="renderDrawerSelection()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-lg transition">
-              Pick Next Drawer
-            </button>
-          </div>
-        </div>
-      `;
-    }
-
-    async function createBoardAndRedirect() {
-      const btn = document.getElementById('enterPortalBtn');
-      btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Spinning up your world...`;
-      btn.disabled = true;
-
-      try {
-        const res = await fetch('/.netlify/functions/create-board', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ business_name: currentBusiness })
-        });
-        const data = await res.json();
-        const boardId = data.board_id || '18424728273';
-        
-        // BREAK OUT OF IFRAME TO REDIRECT PARENT WINDOW
-        window.parent.location.href = `index.html?board=${boardId}&name=${encodeURIComponent(currentBusiness)}`;
-      } catch (err) {
-        window.parent.location.href = `index.html?board=18424728273&name=${encodeURIComponent(currentBusiness)}`;
-      }
-    }
-
-    function togglePinModal() {
-      const modal = document.getElementById('pinModal');
-      modal.classList.toggle('hidden');
-    }
-
-    function checkPin() {
-      const pin = document.getElementById('pinInput').value;
-      const content = document.getElementById('vaultContent');
-      if (pin === '7777') {
-        content.classList.remove('hidden');
-      } else {
-        alert('Invalid PIN. Hint: 7777');
-      }
-    }
-  </script>
+  } else {
+    if (navName) navName.textContent = 'TappyThing';
+  }
+});
+</script>
 </body>
 </html>
