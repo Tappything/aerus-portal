@@ -68,34 +68,22 @@
       </div>
     </section>
 
-    <!-- CORE PHILOSOPHY & CAPABILITIES -->
-    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="card rounded-xl p-6 space-y-3">
-        <div class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xl">
-          <i class="fas fa-brain"></i>
-        </div>
-        <h3 class="text-lg font-bold text-white">Brain Dumps & Tapping Out Tasks</h3>
-        <p class="text-slate-400 text-sm leading-relaxed">
-          Brains are for thinking, not holding tasks. Tap one button, talk out loud, and dump raw audio while driving or working. Fresh sorts, logs, and routes it invisibly so you never fill out a bunch of form fields again.
-        </p>
+    <!-- CORE PHILOSOPHY -->
+    <section class="card rounded-xl p-6 space-y-3">
+      <div class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xl">
+        <i class="fas fa-brain"></i>
       </div>
-
-      <div class="card rounded-xl p-6 space-y-3">
-        <div class="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center text-xl">
-          <i class="fas fa-hands-helping"></i>
-        </div>
-        <h3 class="text-lg font-bold text-white">The Zig Ziglar Philosophy</h3>
-        <p class="text-slate-400 text-sm leading-relaxed">
-          "You can have everything in life you want, if you will just help enough other people get what they want." TappyThing gives you your time back so you can serve your clients better.
-        </p>
-      </div>
+      <h3 class="text-lg font-bold text-white">Brain Dumps & Tapping Out Tasks</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">
+        Brains are for thinking, not holding tasks. Tap one button, talk out loud, and dump raw audio while driving or working. Fresh sorts, logs, and routes it invisibly so you never fill out a bunch of form fields again.
+      </p>
     </section>
 
-    <!-- DYNAMIC INDUSTRY DRAWER SETUP (NESTED MASTER CARD) -->
+    <!-- DYNAMIC INDUSTRY DRAWER SETUP (INTERACTIVE FRESH FLOW) -->
     <section class="card rounded-2xl p-6 md:p-8 space-y-6">
       <div class="border-b border-slate-700/60 pb-4">
         <h2 class="text-2xl font-bold text-white">Build Your Custom World</h2>
-        <p class="text-slate-400 text-sm mt-1">Type your business, shop, or home hub below. Fresh builds ONE clean Master Card that expands into your world.</p>
+        <p class="text-slate-400 text-sm mt-1">Type your business, shop, or home hub below. Fresh will guide you step-by-step.</p>
       </div>
 
       <div class="flex flex-col sm:flex-row gap-3">
@@ -107,7 +95,7 @@
       </div>
 
       <div id="drawerOutput" class="hidden space-y-6">
-        <!-- NESTED MASTER CARD CONTAINER -->
+        <!-- FRESH CONVERSATION INTERACTION HUB -->
         <div id="cardsGrid" class="space-y-4"></div>
 
         <!-- TRIAL CONFIRMATION BANNER (NO UPFRONT PAYMENT) -->
@@ -124,7 +112,7 @@
       </div>
     </section>
 
-    <!-- PRICING & ROADMAP -->
+    <!-- PRICING & ROADMAP WITH ZIG ZIGLAR REFRAME -->
     <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div class="card rounded-xl p-6 space-y-4 md:col-span-1 border-blue-500/40 relative">
         <div class="absolute -top-3 right-4 px-3 py-1 bg-green-500 text-slate-950 font-black text-[10px] uppercase tracking-wider rounded-full shadow-lg">
@@ -132,6 +120,16 @@
         </div>
         <div class="text-xs font-bold text-blue-400 uppercase tracking-wider">Unlimited Subscription</div>
         <div class="text-4xl font-black text-white">$95 <span class="text-base font-normal text-slate-400">/ mo</span></div>
+        
+        <!-- STEP 6: WHY ONLY $95/MONTH? ZIG ZIGLAR REFRAME -->
+        <div class="p-3 bg-slate-900/90 rounded-lg border border-indigo-500/30 space-y-2">
+          <p class="text-xs font-bold text-white">Why only $95/month?</p>
+          <blockquote class="text-[11px] text-slate-300 italic border-l-2 border-indigo-400 pl-2 leading-relaxed">
+            "You can have everything in life you want, if you will just help enough other people get what they want."
+          </blockquote>
+          <p class="text-[10px] text-indigo-300 font-medium">— Zig Ziglar Philosophy</p>
+        </div>
+
         <div class="p-2.5 bg-blue-500/10 rounded-lg border border-blue-500/20 text-[11px] text-blue-300 font-medium leading-tight">
           🛡️ <strong>30-Day Money-Back Guarantee:</strong> Zero risk. Try it free for 3 days. Not 100% satisfied after 30 days? Full refund. No questions asked.
         </div>
@@ -203,9 +201,12 @@
   </div>
 
   <script>
-    const LIVE_BOARD_ID = "18424728273";
+    // STEP 5: DEMO BOARD ID LOCKED AT 00000000 TO PREVENT POLLUTING PRODUCTION OPS
+    const LIVE_BOARD_ID = "00000000";
     const DEMO_BOARD_ID = "00000000";
     let isListening = false;
+    let currentBusiness = "";
+    let currentDrawers = [];
 
     function toggleMic() {
       const micBtn = document.getElementById('micBtn');
@@ -239,10 +240,10 @@
               body: JSON.stringify({ prompt: transcript, board_id: LIVE_BOARD_ID })
             });
             const data = await res.json();
-            responseText.textContent = data.reply || data.response || "Fresh processed your request!";
+            responseText.textContent = data.reply || data.response || "Fresh processed your demo request!";
             responseBox.classList.remove('hidden');
           } catch (err) {
-            responseText.textContent = "Fresh here! Audio received and logged to the board.";
+            responseText.textContent = "Fresh here! Audio received in demo mode.";
             responseBox.classList.remove('hidden');
           }
           resetMic();
@@ -261,9 +262,10 @@
       const micStatus = document.getElementById('micStatus');
       micBtn.classList.remove('bg-red-600', 'pulse-ring');
       micBtn.classList.add('bg-gradient-to-tr', 'from-blue-600', 'to-indigo-500');
-      micStatus.textContent = "Tap button to dump thoughts or talk with Fresh live";
+      micStatus.textContent = "Your world is ready — tap the mic and fill your first drawer!";
     }
 
+    // STEP 1 — QUESTION CARD: MY BUSINESS VS JUST BROWSING
     async function generateIndustryDrawer() {
       const input = document.getElementById('industryInput').value.trim();
       const output = document.getElementById('drawerOutput');
@@ -271,31 +273,60 @@
 
       if (!input) return alert('Please enter a business, home, or industry name!');
 
+      currentBusiness = input;
+
+      cardsGrid.innerHTML = `
+        <div class="card rounded-2xl p-6 md:p-8 space-y-6 border-blue-500/40 shadow-2xl">
+          <div class="flex items-center space-x-4">
+            <img src="fresh_logo.png" alt="Fresh" class="w-12 h-12 rounded-full border border-blue-400 object-cover" onerror="this.style.display='none'">
+            <div>
+              <span class="text-xs text-blue-400 font-bold uppercase tracking-wider">Fresh Digital Coordinator</span>
+              <h3 class="text-xl font-bold text-white">Before I build your ${currentBusiness} world...</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 text-sm md:text-base leading-relaxed">
+            Quick question: Is this for <strong>YOUR business</strong> or are you just checking us out today?
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 pt-2">
+            <button onclick="handleFlowChoice('business')" class="flex-1 py-3 px-6 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition shadow-lg flex items-center justify-center space-x-2">
+              <i class="fas fa-briefcase"></i>
+              <span>It's My Business</span>
+            </button>
+            <button onclick="handleFlowChoice('browsing')" class="flex-1 py-3 px-6 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-sm border border-slate-700 transition flex items-center justify-center space-x-2">
+              <i class="fas fa-eye"></i>
+              <span>Just Browsing</span>
+            </button>
+          </div>
+        </div>
+      `;
+      output.classList.remove('hidden');
+    }
+
+    async function handleFlowChoice(choice) {
+      const cardsGrid = document.getElementById('cardsGrid');
+
       cardsGrid.innerHTML = `
         <div class="p-8 text-center text-slate-400 font-medium animate-pulse card rounded-2xl">
           <i class="fas fa-spinner fa-spin text-2xl text-blue-400 mb-2"></i><br/>
-          Fresh is building your custom TappyThing portal for ${input}...
+          Fresh is fetching the 5 recommended drawers for ${currentBusiness}...
         </div>`;
-      output.classList.remove('hidden');
-
-      let rawCategories = [];
 
       try {
         const res = await fetch('/.netlify/functions/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            prompt: `Build me a custom TappyThing drawer for a ${input} business. List exactly 5 specific drawer category names separated by commas. Do not include numbers or markdown.`,
+            prompt: `List exactly 5 drawer category names for a ${currentBusiness} separated by commas. Do not include numbers or markdown.`,
             board_id: DEMO_BOARD_ID
           })
         });
         const data = await res.json();
         const responseString = data.reply || data.response || "";
-        rawCategories = responseString.split(',').map(s => s.trim()).filter(Boolean);
+        currentDrawers = responseString.split(',').map(s => s.trim()).filter(Boolean);
       } catch (err) {}
 
-      if (rawCategories.length < 5) {
-        rawCategories = [
+      if (currentDrawers.length < 5) {
+        currentDrawers = [
           "Customer Intakes & Orders",
           "Daily Dispatch & Tasks",
           "Voice Inventory Logs",
@@ -304,92 +335,162 @@
         ];
       }
 
+      // STEP 7: UPDATE MIC STATUS TEXT
+      document.getElementById('micStatus').textContent = "Your world is ready — tap the mic and fill your first drawer!";
+
+      if (choice === 'browsing') {
+        // STEP 2A — JUST BROWSING DEMO WORLD
+        renderSampleWorld();
+      } else {
+        // STEP 2B — IT'S MY BUSINESS DRAWER SELECTION
+        renderDrawerSelection();
+      }
+    }
+
+    // STEP 2A — SAMPLE WORLD RENDER
+    function renderSampleWorld() {
+      const cardsGrid = document.getElementById('cardsGrid');
       const icons = ["fa-concierge-bell", "fa-tasks", "fa-microphone-alt", "fa-star", "fa-credit-card"];
 
-      const masterTitle = `${input.toUpperCase()} PORTAL WORLD`;
-
       let subCardsHtml = "";
-      rawCategories.slice(0, 5).forEach((cat, index) => {
+      currentDrawers.slice(0, 5).forEach((cat, index) => {
         subCardsHtml += `
-          <div class="p-4 bg-slate-900/90 rounded-xl border border-slate-700/80 hover:border-blue-400 transition space-y-3 shadow-lg flex flex-col justify-between">
-            <div class="space-y-2">
-              <div class="w-8 h-8 rounded-lg bg-blue-600/20 border border-blue-500/30 text-blue-400 flex items-center justify-center text-sm">
-                <i class="fas ${icons[index] || 'fa-folder'}"></i>
-              </div>
-              <h5 class="text-sm font-bold text-white leading-snug">${cat}</h5>
-              <p class="text-[11px] text-slate-400">1-Tap Voice or Text Ingestion</p>
+          <div class="p-4 bg-slate-900/90 rounded-xl border border-slate-700/80 space-y-2">
+            <div class="w-8 h-8 rounded-lg bg-blue-600/20 border border-blue-500/30 text-blue-400 flex items-center justify-center text-sm">
+              <i class="fas ${icons[index] || 'fa-folder'}"></i>
             </div>
-            <button onclick="openLiveDrawer('${cat}', ${index})" class="w-full py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-[11px] rounded transition">
-              Open Drawer
-            </button>
-            <div id="liveArea_${index}" class="hidden pt-2 border-t border-slate-800 text-[11px] text-green-400 font-mono">
-              <i class="fas fa-check"></i> Drawer unlocked & active!
-            </div>
+            <h5 class="text-sm font-bold text-white">${cat}</h5>
+            <p class="text-[11px] text-slate-400">Sample Drawer Demo</p>
           </div>
         `;
       });
 
       cardsGrid.innerHTML = `
-        <!-- ONE MASTER CARD PORTAL DOOR -->
-        <div class="card rounded-2xl p-6 md:p-8 portal-glow transition space-y-6 cursor-pointer" onclick="toggleNestedWorld()">
-          <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="flex items-center space-x-4">
-              <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-2xl shadow-lg border border-blue-400/40">
-                <i class="fas fa-door-open"></i>
-              </div>
-              <div>
-                <div class="flex items-center space-x-2">
-                  <span class="text-xs text-blue-400 font-bold uppercase tracking-widest">Master Tappy Card</span>
-                  <span class="text-[10px] text-green-400 font-semibold px-2 py-0.5 bg-green-500/10 border border-green-500/30 rounded-full">⚡ Live Hub</span>
-                </div>
-                <h3 class="text-xl md:text-2xl font-black text-white tracking-tight">${masterTitle}</h3>
-                <p class="text-xs text-slate-300 mt-1">Tap this Master Card to expand your nested world drawers below</p>
-              </div>
-            </div>
-            <div class="flex items-center space-x-2 text-sm font-bold text-blue-400 bg-blue-900/40 px-4 py-2 rounded-xl border border-blue-500/30">
-              <span id="expandLabel">Tap to Expand World</span>
-              <i id="expandIcon" class="fas fa-chevron-down transition-transform duration-300"></i>
-            </div>
+        <div class="card rounded-2xl p-6 md:p-8 space-y-6 portal-glow">
+          <div class="flex items-center space-x-3">
+            <span class="px-3 py-1 bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold text-xs uppercase tracking-wider rounded-full">Sample Demo World</span>
+            <h3 class="text-xl md:text-2xl font-black text-white">${currentBusiness.toUpperCase()} PORTAL</h3>
           </div>
-
-          <!-- SLIDE-OPEN NESTED SUB-DRAWERS -->
-          <div id="nestedSubDrawers" class="hidden pt-6 border-t border-slate-700/80 space-y-4 cursor-default" onclick="event.stopPropagation()">
-            <div class="flex items-center justify-between text-xs text-slate-400 uppercase tracking-wider font-bold">
-              <span>Nested Sub-Drawers inside ${input}</span>
-              <span>5 Active Ports</span>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              ${subCardsHtml}
-            </div>
+          <p class="text-slate-300 text-sm">Here is a sample world with 5 recommended drawers built out as a demo:</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            ${subCardsHtml}
           </div>
         </div>
       `;
     }
 
-    function toggleNestedWorld() {
-      const drawers = document.getElementById('nestedSubDrawers');
-      const icon = document.getElementById('expandIcon');
-      const label = document.getElementById('expandLabel');
+    // STEP 2B — SELECT WHICH DRAWER TO WORK ON FIRST
+    function renderDrawerSelection() {
+      const cardsGrid = document.getElementById('cardsGrid');
 
-      if (drawers) {
-        if (drawers.classList.contains('hidden')) {
-          drawers.classList.remove('hidden');
-          if (icon) icon.style.transform = "rotate(180deg)";
-          if (label) label.textContent = "Click to Collapse";
-        } else {
-          drawers.classList.add('hidden');
-          if (icon) icon.style.transform = "rotate(0deg)";
-          if (label) label.textContent = "Tap to Expand World";
-        }
-      }
+      let buttonsHtml = "";
+      currentDrawers.slice(0, 5).forEach((drawer, index) => {
+        buttonsHtml += `
+          <button onclick="selectDrawerToWork('${drawer.replace(/'/g, "\\'")}')" class="w-full text-left p-4 bg-slate-900/80 hover:bg-blue-600/20 border border-slate-700 hover:border-blue-400 rounded-xl text-sm font-bold text-white transition flex items-center justify-between group">
+            <span class="flex items-center space-x-3">
+              <span class="w-7 h-7 rounded-lg bg-blue-600/30 text-blue-400 flex items-center justify-center text-xs group-hover:bg-blue-500 group-hover:text-white transition">${index + 1}</span>
+              <span>${drawer}</span>
+            </span>
+            <i class="fas fa-chevron-right text-slate-500 group-hover:text-blue-400 transition"></i>
+          </button>
+        `;
+      });
+
+      cardsGrid.innerHTML = `
+        <div class="card rounded-2xl p-6 md:p-8 space-y-6 border-blue-500/40">
+          <div class="flex items-center space-x-4">
+            <img src="fresh_logo.png" alt="Fresh" class="w-12 h-12 rounded-full border border-blue-400 object-cover" onerror="this.style.display='none'">
+            <div>
+              <span class="text-xs text-blue-400 font-bold uppercase tracking-wider">Fresh Digital Coordinator</span>
+              <h3 class="text-xl font-bold text-white">Perfect. Here are the 5 drawers I recommend for your ${currentBusiness}.</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 text-sm">Which drawer do you want to work on first?</p>
+          <div class="space-y-3">
+            ${buttonsHtml}
+          </div>
+        </div>
+      `;
     }
 
-    function openLiveDrawer(categoryName, index) {
-      const liveArea = document.getElementById(`liveArea_${index}`);
-      if (liveArea) {
-        liveArea.classList.remove('hidden');
-      }
-      alert(`Fresh here! Your "${categoryName}" drawer is active inside your Master World. Your 3-day trial is triggered — zero credit card needed!`);
+    // STEP 3 — DUMP 3 THINGS INTO SELECTED DRAWER
+    function selectDrawerToWork(drawerName) {
+      const cardsGrid = document.getElementById('cardsGrid');
+
+      cardsGrid.innerHTML = `
+        <div class="card rounded-2xl p-6 md:p-8 space-y-6 border-blue-500/40">
+          <div class="flex items-center space-x-4">
+            <img src="fresh_logo.png" alt="Fresh" class="w-12 h-12 rounded-full border border-blue-400 object-cover" onerror="this.style.display='none'">
+            <div>
+              <span class="text-xs text-blue-400 font-bold uppercase tracking-wider">Fresh Digital Coordinator</span>
+              <h3 class="text-xl font-bold text-white">Active Drawer: ${drawerName}</h3>
+            </div>
+          </div>
+          <p class="text-slate-300 text-sm font-medium">
+            Give me 3 things that go in your <strong>[${drawerName}]</strong> drawer. Don't think. Just talk or type!
+          </p>
+          <div class="space-y-4">
+            <textarea id="threeThingsInput" rows="3" placeholder="e.g. 1. Order #104 needs pickup, 2. Call Sarah back about invoice, 3. Reorder coffee supplies" class="w-full p-4 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm font-medium"></textarea>
+            <button onclick="submitThreeThings('${drawerName.replace(/'/g, "\\'")}')" class="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition shadow-lg flex items-center justify-center space-x-2">
+              <i class="fas fa-paper-plane"></i>
+              <span>Submit 3 Things To Fresh</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // STEP 4 — POPULATE ITEMS LIVE & SHOW REFINEMENT PROMPT
+    function submitThreeThings(drawerName) {
+      const rawText = document.getElementById('threeThingsInput').value.trim();
+      if (!rawText) return alert("Dump 3 quick items or thoughts before submitting!");
+
+      const items = rawText.split('\n').filter(Boolean);
+      const cardsGrid = document.getElementById('cardsGrid');
+
+      let itemsListHtml = "";
+      items.forEach((item, idx) => {
+        itemsListHtml += `
+          <div class="p-3 bg-slate-900/90 rounded-lg border border-slate-700 flex items-center space-x-3 text-sm text-slate-200">
+            <span class="w-6 h-6 rounded-full bg-green-500/20 text-green-400 text-xs font-bold flex items-center justify-center">${idx + 1}</span>
+            <span>${item}</span>
+          </div>
+        `;
+      });
+
+      cardsGrid.innerHTML = `
+        <div class="card rounded-2xl p-6 md:p-8 space-y-6 portal-glow">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-green-500/20 border border-green-500/30 text-green-400 flex items-center justify-center text-lg">
+              <i class="fas fa-check"></i>
+            </div>
+            <div>
+              <span class="text-xs text-green-400 font-bold uppercase tracking-wider">Drawer Live & Populated</span>
+              <h3 class="text-xl font-bold text-white">${drawerName}</h3>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <p class="text-xs text-slate-400 uppercase tracking-wider font-bold">Items Logged Inside Drawer:</p>
+            <div class="space-y-2">
+              ${itemsListHtml}
+            </div>
+          </div>
+
+          <div class="p-4 bg-slate-900/80 rounded-xl border border-blue-500/30 space-y-3">
+            <div class="flex items-center space-x-3">
+              <img src="fresh_logo.png" alt="Fresh" class="w-8 h-8 rounded-full border border-blue-400 object-cover" onerror="this.style.display='none'">
+              <p class="text-sm font-bold text-white">See how that works?</p>
+            </div>
+            <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
+              Pick your next drawer to work on or dump all 3 things at once into the mic above and I'll sort them invisibly into your portal!
+            </p>
+            <button onclick="renderDrawerSelection()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-lg transition">
+              Pick Next Drawer
+            </button>
+          </div>
+        </div>
+      `;
     }
 
     function togglePinModal() {
