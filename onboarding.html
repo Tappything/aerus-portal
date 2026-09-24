@@ -1,363 +1,561 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TappyThing — White-Glove Onboarding Experience</title>
-  <style>
-    :root {
-      --bg-dark: #0f172a;
-      --card-bg: #1e293b;
-      --accent-blue: #38bdf8;
-      --accent-green: #22c55e;
-      --accent-gold: #f59e0b;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --border-color: #334155;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to TappyThing — Wicked Communication & Unlimited Resources</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            900: '#134e4a',
+                            gold: '#fbbf24'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar and glassmorphism design tokens */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+        
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      padding: 20px;
-      line-height: 1.5;
-    }
+        .pulse-ring {
+            box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.6);
+            animation: pulse-ring-anim 2s infinite cubic-bezier(0.66, 0, 0, 1);
+        }
 
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 24px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    header h1 {
-      font-size: 2.2rem;
-      color: var(--accent-blue);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .qol-banner {
-      background: linear-gradient(135deg, #1e1b4b, #312e81);
-      border: 1px solid #6366f1;
-      border-radius: 12px;
-      padding: 16px 24px;
-      margin-bottom: 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
-    }
-
-    .qol-metric {
-      font-size: 1.6rem;
-      font-weight: bold;
-      color: var(--accent-green);
-    }
-
-    .fresh-box {
-      background: #111827;
-      border: 2px solid var(--accent-blue);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 28px;
-      box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
-    }
-
-    .fresh-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
-      font-weight: bold;
-      color: var(--accent-blue);
-    }
-
-    .speech-output {
-      font-size: 1.15rem;
-      color: #e2e8f0;
-      min-height: 60px;
-    }
-
-    .section-step {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 24px;
-    }
-
-    .section-title {
-      font-size: 1.3rem;
-      color: var(--accent-gold);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* Slice of the Pie Toggle */
-    .toggle-bar {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-      background: #0f172a;
-      padding: 6px;
-      border-radius: 8px;
-      width: fit-content;
-    }
-
-    .toggle-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.2s;
-    }
-
-    .toggle-btn.active {
-      background: var(--accent-blue);
-      color: #0f172a;
-    }
-
-    .card-nested {
-      background: #0f172a;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 16px;
-      margin-top: 12px;
-    }
-
-    .card-inner {
-      background: #1e293b;
-      border-left: 4px solid var(--accent-blue);
-      padding: 12px;
-      margin-top: 8px;
-      border-radius: 4px;
-    }
-
-    .btn-action {
-      background: linear-gradient(135deg, #0284c7, #2563eb);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: transform 0.1s, opacity 0.2s;
-    }
-
-    .btn-action:hover { opacity: 0.9; transform: translateY(-1px); }
-
-    .btn-clear {
-      background: linear-gradient(135deg, #dc2626, #b91c1c);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    input[type="text"], textarea {
-      width: 100%;
-      background: #0f172a;
-      border: 1px solid var(--border-color);
-      color: white;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 12px;
-      font-size: 1rem;
-    }
-
-    .hidden { display: none !important; }
-  </style>
+        @keyframes pulse-ring-anim {
+            to {
+                box-shadow: 0 0 0 24px rgba(20, 184, 166, 0);
+            }
+        }
+    </style>
 </head>
-<body>
+<body class="h-full font-sans antialiased bg-slate-950 text-slate-100 flex flex-col justify-between selection:bg-brand-500 selection:text-white">
 
-<div class="container">
-  <header>
-    <h1>🎩 TappyWorld Onboarding</h1>
-    <p style="color: var(--text-muted)">The White-Glove Pocket Chief of Staff Experience</p>
-  </header>
-
-  <!-- Quality of Life Banner -->
-  <div class="qol-banner">
-    <div>
-      <div style="font-size: 0.9rem; color: #a5b4fc; font-weight: 600; text-transform: uppercase;">System Goal</div>
-      <div style="font-size: 1.2rem; font-weight: bold;">Quality of Life Back</div>
-    </div>
-    <div class="qol-metric" id="qolDisplay">Admin Hours Reclaimed: 10 hrs/wk</div>
-  </div>
-
-  <!-- Fresh Voice Box -->
-  <div class="fresh-box">
-    <div class="fresh-header">
-      <span>🤵 Fresh (Digital Coordinator):</span>
-    </div>
-    <div class="speech-output" id="freshSpeechBox">
-      "Welcome to TappyWorld! You don't need to learn us. We learn you. And the little you do need? Just ask — Fresh answers. Two moves: Brain Dump and Tap. That's the whole system."
-    </div>
-  </div>
-
-  <!-- Step 1: Open Floor Questioning -->
-  <div class="section-step">
-    <div class="section-title">💬 Step 1: Open Floor</div>
-    <p style="color: var(--text-muted); margin-bottom: 12px;">Before we get started — anything on your mind? Any questions? Anything you want me to know?</p>
-    <input type="text" id="openFloorInput" placeholder="Type or ask any initial question here...">
-    <button class="btn-action" onclick="submitOpenFloor()">Ask Fresh</button>
-  </div>
-
-  <!-- Step 2: The Live Mirror Demo -->
-  <div class="section-step">
-    <div class="section-title">🪞 Step 2: The Live Mirror</div>
-    <p style="color: var(--text-muted); margin-bottom: 12px;">Give Fresh a test voice or text dump. Watch your words instantly become a structured Tappy Card.</p>
-    <input type="text" id="mirrorInput" placeholder="e.g., Table 4 needs extra napkins and we are out of ribeyes for tonight.">
-    <button class="btn-action" onclick="executeLiveMirror()">Mirror My Words</button>
-    <div id="mirrorCardContainer"></div>
-  </div>
-
-  <!-- Step 3: Slice of the Pie (Cascading Cards) -->
-  <div class="section-step">
-    <div class="section-title">🍰 Step 3: Cascading Cards & "Slice of the Pie"</div>
-    <p style="color: var(--text-muted); margin-bottom: 12px;">One card cascades into deeper tasks. Toggle views below to see how everyone gets only their slice while the owner sees everything.</p>
-    
-    <div class="toggle-bar">
-      <button class="toggle-btn active" onclick="setRoleView('owner', this)">Owner View</button>
-      <button class="toggle-btn" onclick="setRoleView('vendor', this)">Vendor View</button>
-      <button class="toggle-btn" onclick="setRoleView('tech', this)">Tech View</button>
-      <button class="toggle-btn" onclick="setRoleView('customer', this)">Customer View</button>
-    </div>
-
-    <div class="card-nested">
-      <div style="font-weight: bold; color: var(--accent-blue);">📦 Job #1042: Commercial HVAC Repair</div>
-      <div class="role-slice role-owner role-tech">🔧 <strong>Tech Slice:</strong> Replace compressor motor on rooftop unit B.</div>
-      <div class="role-slice role-owner role-vendor">🚚 <strong>Vendor Slice:</strong> Order Part #HVAC-9942 - Delivery requested by 2 PM.</div>
-      <div class="role-slice role-owner role-customer">📲 <strong>Customer Slice:</strong> Technician en route. Estimated completion 4:30 PM.</div>
-      <div class="role-slice role-owner" style="color: var(--accent-gold); margin-top: 8px;">💼 <strong>Owner Slice Only:</strong> Job Value $2,450 | Margin: 62% | Invoiced via Workiz.</div>
-    </div>
-  </div>
-
-  <!-- Step 4: BAM! Reset & Custom Brain Dump -->
-  <div class="section-step">
-    <div class="section-title">⚡ Step 4: Your Turn — Real Setup</div>
-    <p style="color: var(--text-muted); margin-bottom: 12px;">"Okay, let me build yours right now. Give me a brain dump. Tell me about your business. Don't think. Just talk."</p>
-    
-    <button class="btn-clear" onclick="clearDemoBoard()" style="margin-bottom: 16px;">BAM! Clear The Board</button>
-    
-    <textarea id="customBrainDumpText" rows="3" placeholder="Tell Fresh what you run, what you handle daily, or what's on your mind..."></textarea>
-    <button class="btn-action" onclick="submitCustomBrainDump()">Build My TappyWorld</button>
-    
-    <div id="userBoardContainer" style="margin-top: 16px;"></div>
-  </div>
-</div>
-
-<script>
-  const BOARD_ID = '18424728273';
-
-  // Helper for Netlify fetch to Fresh
-  async function callFreshAPI(promptText) {
-    try {
-      const response = await fetch('/.netlify/functions/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: promptText, board_id: BOARD_ID })
-      });
-      const data = await response.json();
-      return data.reply || "Got it, Chief! Live and logged.";
-    } catch (err) {
-      console.warn("API direct call fallback active:", err);
-      return "Fresh here 🤵 — Got your input! We're routing it straight to your Tappy Cards now!";
-    }
-  }
-
-  // 1. Open Floor Submit
-  async function submitOpenFloor() {
-    const input = document.getElementById('openFloorInput').value;
-    if (!input) return;
-    
-    document.getElementById('freshSpeechBox').innerText = "Fresh is listening and processing...";
-    const reply = await callFreshAPI(input);
-    document.getElementById('freshSpeechBox').innerText = reply;
-  }
-
-  // 2. Live Mirror Submit
-  async function executeLiveMirror() {
-    const mirrorText = document.getElementById('mirrorInput').value;
-    if (!mirrorText) return;
-
-    document.getElementById('freshSpeechBox').innerText = "Fresh is creating your live mirror card...";
-    
-    const reply = await callFreshAPI("LIVE MIRROR DUMP: " + mirrorText);
-    document.getElementById('freshSpeechBox').innerText = reply;
-
-    const container = document.getElementById('mirrorCardContainer');
-    container.innerHTML = `
-      <div class="card-nested" style="border-left: 4px solid var(--accent-green);">
-        <div style="font-weight: bold; color: var(--accent-green);">🪞 Mirrored Tappy Card</div>
-        <div class="card-inner">${mirrorText}</div>
-        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">Status: Cascaded & Dispatched to Monday.com Board</div>
-      </div>
-    `;
-  }
-
-  // 3. Custom Brain Dump Submit
-  async function submitCustomBrainDump() {
-    const dumpText = document.getElementById('customBrainDumpText').value;
-    if (!dumpText) return;
-
-    document.getElementById('freshSpeechBox').innerText = "Fresh is structuring your business world...";
-
-    const reply = await callFreshAPI("BUSINESS BRAIN DUMP: " + dumpText);
-    document.getElementById('freshSpeechBox').innerText = reply;
-
-    const userBoard = document.getElementById('userBoardContainer');
-    userBoard.innerHTML = `
-      <div class="card-nested" style="border-left: 4px solid var(--accent-gold);">
-        <div style="font-weight: bold; color: var(--accent-gold);">🚀 Your Primary Industry Hub</div>
-        <div class="card-inner">${dumpText}</div>
-        <div style="margin-top: 10px; font-size: 0.9rem; color: var(--accent-blue);">
-          ✓ System Configured | ✓ Card Manager (Sissy) Alerted | ✓ 10 Hours/Wk Reclaimed
+    <header class="w-full border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-md sticky top-0 z-40 px-4 py-3">
+        <div class="max-w-5xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-teal-700 flex items-center justify-center font-bold text-white text-xl shadow-lg shadow-brand-500/20">
+                    🎙️
+                </div>
+                <div>
+                    <span class="text-lg font-bold tracking-tight text-white block leading-none">TappyThing</span>
+                    <span class="text-xs text-brand-500 font-medium tracking-wide uppercase">Digital Coordinator System</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <button onclick="openModal('vaultModal')" class="px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold flex items-center space-x-1.5 border border-slate-700/50 transition">
+                    <span>🔒 Attorney Vault</span>
+                </button>
+                <button onclick="scrollToPortal()" class="px-3.5 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold text-xs shadow-md shadow-brand-500/20 transition">
+                    Tap Mic Now
+                </button>
+            </div>
         </div>
-      </div>
-    `;
-  }
+    </header>
 
-  // Role Slicing Toggle Logic
-  function setRoleView(role, btn) {
-    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    <main class="flex-grow max-w-5xl w-full mx-auto px-4 py-8 space-y-8">
 
-    const slices = document.querySelectorAll('.role-slice');
-    slices.forEach(slice => {
-      if (slice.classList.contains('role-' + role)) {
-        slice.classList.remove('hidden');
-      } else {
-        slice.classList.add('hidden');
-      }
-    });
-  }
+        <section class="glass-panel rounded-3xl p-6 sm:p-10 relative overflow-hidden shadow-2xl border border-slate-800">
+            <!-- Background Glow Elements -->
+            <div class="absolute -top-24 -right-24 w-72 h-72 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-  // BAM Clear Board
-  function clearDemoBoard() {
-    document.getElementById('mirrorCardContainer').innerHTML = '';
-    document.getElementById('userBoardContainer').innerHTML = '';
-    document.getElementById('freshSpeechBox').innerText = "BAM! Board cleared! Screen reset to zero friction. Give me your brain dump below!";
-  }
-</script>
+            <div class="relative z-10 space-y-6">
+                <!-- Live Operating System Badge -->
+                <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-slate-300 text-xs font-medium">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Live Portal Operating System</span>
+                </div>
 
+                <!-- Main Title -->
+                <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
+                    Welcome to TappyThing — <br class="hidden sm:inline"/>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 via-brand-500 to-amber-300">
+                        A World of Wicked Communication & Unlimited Resources
+                    </span>
+                </h1>
+
+                <!-- Realization Banner -->
+                <div class="p-4 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 border-l-4 border-brand-500 shadow-md">
+                    <p class="text-base sm:text-lg font-bold text-teal-200">
+                        💡 Look around. You aren't looking at a website demo — you are standing inside an active TappyThing portal right now.
+                    </p>
+                </div>
+
+                <!-- Personality Duo Hook -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <div class="glass-card p-4 rounded-2xl border border-slate-800 flex items-start space-x-3">
+                        <div class="text-3xl">🤵</div>
+                        <div>
+                            <h3 class="font-bold text-white text-sm">Fresh</h3>
+                            <p class="text-xs text-brand-500 font-semibold uppercase">Pocket Chief of Staff</p>
+                            <p class="text-slate-300 text-xs mt-1">Takes your raw voice dumps and turns them into clean, structured action instantly.</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-4 rounded-2xl border border-slate-800 flex items-start space-x-3">
+                        <div class="text-3xl">⚙️</div>
+                        <div>
+                            <h3 class="font-bold text-white text-sm">Sissy</h3>
+                            <p class="text-xs text-amber-400 font-semibold uppercase">The Backend Workhorse</p>
+                            <p class="text-slate-300 text-xs mt-1">Runs the invisible engine behind the scenes, keeping your business on track.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Core Duo Mantra Callout -->
+                <div class="text-center py-3 px-4 bg-slate-900/80 rounded-xl border border-slate-800/80 shadow-inner">
+                    <p class="text-teal-300 font-bold text-sm sm:text-base italic">
+                        "Fresh takes your order. Sissy makes it happen. Together they run your world."
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Philosophy Card -->
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl space-y-4">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold text-xl border border-amber-500/20">
+                    🧠
+                </div>
+                <h2 class="text-xl font-bold text-white">The Tappy Philosophy</h2>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    Human brains are designed to <strong>generate ideas</strong>, not hold onto endless tasks. Storing lists in your head causes stress, fatigue, and slow admin drag.
+                </p>
+                <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-2">
+                    <p class="font-semibold text-brand-500">How it works (5th-Grade Simple):</p>
+                    <ul class="list-disc pl-4 space-y-1">
+                        <li>Tap the mic button once.</li>
+                        <li>Talk out loud. Dump your raw thought or task.</li>
+                        <li>The system sorts it out invisibly. Done.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Dynamic Industry Setup -->
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl space-y-4 border border-brand-500/20">
+                <div class="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-500 flex items-center justify-center font-bold text-xl border border-brand-500/20">
+                    ⚡
+                </div>
+                <h2 class="text-xl font-bold text-white">Zero Template Traps</h2>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    Static software templates fail because <strong>your business is unique</strong>. We don't force you into rigid pre-made boxes.
+                </p>
+                <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-2">
+                    <p class="font-semibold text-teal-400">On-Demand Custom Drawers:</p>
+                    <p>Tap the mic, state your business (e.g., <em>"I run a vacuum shop," "I manage a law practice," "I run a salon"</em>), and Fresh builds your custom drawer live on the spot!</p>
+                </div>
+                <button onclick="openIndustryDemo()" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition">
+                    Test Industry Generator Simulation
+                </button>
+            </div>
+        </section>
+
+        <section class="glass-panel p-6 sm:p-8 rounded-3xl space-y-6">
+            <div class="border-b border-slate-800 pb-4">
+                <h2 class="text-2xl font-bold text-white">System Capabilities & Unlimited Power</h2>
+                <p class="text-slate-400 text-xs mt-1">One subscription. Zero hidden friction. Everything runs by voice.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <!-- Feature 1 -->
+                <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-2">
+                    <div class="text-2xl">🎙️</div>
+                    <h3 class="font-bold text-white text-sm">1-Tap Voice Control</h3>
+                    <p class="text-slate-400 text-xs">No forms, no typing. Talk naturally and get instant structured logs.</p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-2">
+                    <div class="text-2xl">🔗</div>
+                    <h3 class="font-bold text-white text-sm">Unlimited Shared Hubs</h3>
+                    <p class="text-slate-400 text-xs">Share live cascading cards with clients or family. No apps required for them.</p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-2">
+                    <div class="text-2xl">🌐</div>
+                    <h3 class="font-bold text-white text-sm">Instant Landing Pages</h3>
+                    <p class="text-slate-400 text-xs">Turn any Tappy Card into a public or private shareable webpage in seconds.</p>
+                </div>
+            </div>
+
+            <!-- Pricing Callout: $95 / month -->
+            <div class="p-5 rounded-2xl bg-gradient-to-r from-teal-950/40 to-slate-900 border border-brand-500/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                    <span class="text-xs font-bold text-brand-500 uppercase tracking-widest block">Simple Subscription</span>
+                    <span class="text-2xl font-extrabold text-white">Unlimited Business Hub Plan</span>
+                    <p class="text-slate-400 text-xs">Unlimited voice dumps, unlimited cards, and zero data entry drag.</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-3xl font-black text-white">$95</span>
+                    <span class="text-slate-400 text-xs">/ month</span>
+                </div>
+            </div>
+
+            <!-- Coming Soon Roadmap -->
+            <div class="space-y-3 pt-2">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">🚀 Coming Soon Roadmap</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="p-3 rounded-xl bg-slate-900/40 border border-slate-800/50 text-xs text-slate-300 flex items-center space-x-2">
+                        <span>📞</span>
+                        <span>Integrated Phone System</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-900/40 border border-slate-800/50 text-xs text-slate-300 flex items-center space-x-2">
+                        <span>💳</span>
+                        <span>1-Tap Voice Invoicing</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-900/40 border border-slate-800/50 text-xs text-slate-300 flex items-center space-x-2">
+                        <span>🚚</span>
+                        <span>Automated Dispatch Routing</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="portalSection" class="glass-panel p-8 rounded-3xl text-center space-y-6 border-2 border-brand-500/30 shadow-2xl relative">
+            <div class="space-y-2">
+                <span class="px-3 py-1 rounded-full bg-brand-500/10 text-brand-500 border border-brand-500/20 text-xs font-bold uppercase tracking-wider">
+                    Interactive Live Engine
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-black text-white">Tap The Button & Talk</h2>
+                <p class="text-slate-400 text-xs sm:text-sm max-w-lg mx-auto">
+                    Experience the real system now. Tap the button, speak into your microphone, and Fresh will process your voice note live.
+                </p>
+            </div>
+
+            <!-- LIVE DIGITAL COORDINATOR MIC BUTTON -->
+            <div class="py-6 flex flex-col items-center justify-center">
+                <button id="micBtn" onclick="toggleMic()" class="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-gradient-to-tr from-brand-600 via-brand-500 to-teal-300 flex flex-col items-center justify-center shadow-2xl shadow-brand-500/40 hover:scale-105 active:scale-95 transition-all duration-300 group relative cursor-pointer">
+                    <div id="micRing" class="absolute inset-0 rounded-full pointer-events-none"></div>
+                    <span id="micIcon" class="text-4xl sm:text-5xl transition-transform group-hover:scale-110">🎙️</span>
+                    <span id="micLabel" class="text-slate-950 font-black text-xs uppercase tracking-widest mt-2">TAP TO TALK</span>
+                </button>
+            </div>
+
+            <!-- SPEECH TRANSCRIPTION PREVIEW -->
+            <div id="transcriptionBox" class="hidden max-w-xl mx-auto p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-400 italic">
+                Hearing: "<span id="transcriptText" class="text-teal-300 font-medium">...</span>"
+            </div>
+
+            <!-- LIVE AUDIO RESPONSE DISPLAY CARD -->
+            <div id="responseCard" class="hidden max-w-xl mx-auto p-5 rounded-2xl bg-slate-900/90 border border-slate-800 text-left space-y-3 shadow-xl">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-lg">🤵</span>
+                        <span class="text-xs font-bold text-white">Fresh (Digital Coordinator)</span>
+                    </div>
+                    <span id="responseStatus" class="text-[10px] text-emerald-400 font-mono uppercase tracking-wider">LIVE BACKEND CONNECTED</span>
+                </div>
+                <p id="responseText" class="text-slate-200 text-xs sm:text-sm leading-relaxed italic">
+                    Awaiting your input...
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="vaultModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 space-y-6 border border-slate-700 shadow-2xl relative">
+            <button onclick="closeModal('vaultModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
+
+            <div class="text-center space-y-2">
+                <div class="w-12 h-12 rounded-2xl bg-slate-800 text-amber-400 flex items-center justify-center text-2xl mx-auto border border-slate-700">
+                    🔒
+                </div>
+                <h3 class="text-xl font-bold text-white">Attorney & VIP Briefing Vault</h3>
+                <p class="text-slate-400 text-xs">Enter PIN code to unlock legal claims & architecture briefing.</p>
+            </div>
+
+            <!-- PIN ENTRY DISPLAY -->
+            <div id="pinView" class="space-y-4">
+                <div class="flex justify-center space-x-2">
+                    <input type="password" id="pinInput" maxlength="4" readonly class="w-40 text-center text-2xl tracking-widest font-mono py-2 rounded-xl bg-slate-900 border border-slate-700 text-brand-500 focus:outline-none" placeholder="••••">
+                </div>
+
+                <!-- KEYPAD -->
+                <div class="grid grid-cols-3 gap-2 max-w-xs mx-auto">
+                    <button onclick="pressPin('1')" class="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 font-bold text-white text-base">1</button>
+                    <button onclick="pressPin('2')" class="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 font-bold text-white text-base">2</button>
+                    <button onclick="pressPin('3')" class="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 font-bold text-white text-base">3</button>
+                    <button onclick="pressPin('4')" class="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 font-bold text-white text-base">4</button>
+                    <button onclick="pressPin('5')" class="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 font-bold text-white text-base">5</button>
+                    <button onclick="pressPin('6')" class="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 font-bold text-white text-base">6</button>
+                    <button onclick="pressPin('7')" class="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 font-bold text-white text-base">7</button>
+                    <button onclick="pressPin('8')" class="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 font-bold text-white text-base">8</button>
+                    <button onclick="pressPin('9')" class="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 font-bold text-white text-base">9</button>
+                    <button onclick="clearPin()" class="py-3 rounded-xl bg-rose-900/40 hover:bg-rose-800/60 text-rose-300 font-bold text-xs">CLEAR</button>
+                    <button onclick="pressPin('0')" class="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 font-bold text-white text-base">0</button>
+                    <button onclick="verifyPin()" class="py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold text-xs">ENTER</button>
+                </div>
+                <p id="pinError" class="text-center text-xs text-rose-400 hidden">Invalid PIN. Hint: 7777</p>
+            </div>
+
+            <!-- UNLOCKED ATTORNEY DRAWER CONTENT -->
+            <div id="unlockedVault" class="hidden space-y-4 text-left max-h-96 overflow-y-auto pr-1">
+                <div class="p-3 bg-brand-500/10 border border-brand-500/30 rounded-xl">
+                    <span class="text-xs font-bold text-brand-500 block uppercase">UNLOCKED: Attorney Briefing Drawer</span>
+                    <p class="text-xs text-slate-300 mt-1">
+                        <strong>Operational Status Note for Counsel:</strong> William uses this exact system daily for Aerus Home Wellness/Clean Environment LLC operations. Core voice engine, card network, and 1-tap sharing work right now, while continuing to refine specialized attorney features.
+                    </p>
+                </div>
+
+                <div class="space-y-3 text-xs text-slate-300">
+                    <h4 class="font-bold text-white text-sm border-b border-slate-800 pb-1">Patent-Pending Core Intellectual Property:</h4>
+                    
+                    <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+                        <strong class="text-amber-400">1. Inverse Voice UX Architecture:</strong>
+                        <p class="mt-1">Replaces complex multi-screen app navigation with single-tap raw audio intake, automatically categorized, parsed, and logged across system boards without manual data entry.</p>
+                    </div>
+
+                    <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+                        <strong class="text-amber-400">2. Networked Cascading Cards:</strong>
+                        <p class="mt-1">Real-time dynamic card distribution that presents actionable views to external stakeholders (clients, sub-contractors, family) without forcing recipient account creation or app installation.</p>
+                    </div>
+
+                    <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+                        <strong class="text-amber-400">3. Confidential Client Security Cabinets:</strong>
+                        <p class="mt-1">Client-isolated data vaults accessible only via 4-digit tokenized PIN access, insulating legal and medical records from open search queues.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="industryModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-6 space-y-4 border border-slate-700 shadow-2xl relative">
+            <button onclick="closeModal('industryModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
+            <h3 class="text-lg font-bold text-white">Live Industry Setup Demo</h3>
+            <p class="text-slate-300 text-xs">Enter any industry or job type below to see Fresh generate your custom Tappy Drawer instantly:</p>
+            
+            <input type="text" id="industryInput" class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-brand-500" placeholder="e.g. Commercial Roofing, Law Firm, Pet Salon...">
+            
+            <button onclick="generateIndustryDrawer()" class="w-full py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold text-xs transition">
+                Build My Custom Industry Drawer
+            </button>
+
+            <div id="industryOutput" class="hidden p-4 bg-slate-900/90 rounded-xl border border-slate-800 space-y-2 text-xs">
+                <span class="text-brand-500 font-bold uppercase block" id="outTitle">Custom Drawer Generated</span>
+                <p class="text-slate-300" id="outBody"></p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="w-full border-t border-slate-800/80 bg-slate-950 py-6 px-4 mt-12 text-center text-slate-500 text-xs space-y-2">
+        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+            <p>© Clean Environment LLC. Powered by TappyThing Digital Coordinator System.</p>
+            <p class="text-slate-400 font-medium">Timonium, MD — Operating Live Case Study</p>
+        </div>
+    </footer>
+
+    <script>
+        let recognition = null;
+        let isListening = false;
+
+        // Initialize SpeechRecognition
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = function() {
+                isListening = true;
+                updateMicUI(true, 'LISTENING...', '🛑');
+                document.getElementById('transcriptionBox').classList.remove('hidden');
+                document.getElementById('transcriptText').innerText = 'Listening... speak now';
+            };
+
+            recognition.onresult = function(event) {
+                let currentTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    currentTranscript += event.results[i][0].transcript;
+                }
+                document.getElementById('transcriptText').innerText = currentTranscript;
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+                isListening = false;
+                updateMicUI(false, 'TAP TO TALK', '🎙️');
+                document.getElementById('transcriptText').innerText = 'Voice error: ' + event.error;
+            };
+
+            recognition.onend = function() {
+                isListening = false;
+                updateMicUI(false, 'PROCESSING...', '⚙️');
+                const finalTranscript = document.getElementById('transcriptText').innerText;
+                
+                if (finalTranscript && finalTranscript !== 'Listening... speak now') {
+                    sendToFreshAPI(finalTranscript);
+                } else {
+                    updateMicUI(false, 'TAP TO TALK', '🎙️');
+                }
+            };
+        }
+
+        function toggleMic() {
+            if (!recognition) {
+                alert("Speech recognition is not supported in this browser. Please use Google Chrome or Safari.");
+                return;
+            }
+
+            if (!isListening) {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.error("Recognition start error:", e);
+                }
+            } else {
+                recognition.stop();
+            }
+        }
+
+        function updateMicUI(listening, labelText, iconText) {
+            const btn = document.getElementById('micBtn');
+            const icon = document.getElementById('micIcon');
+            const label = document.getElementById('micLabel');
+            const ring = document.getElementById('micRing');
+
+            label.innerText = labelText;
+            icon.innerText = iconText;
+
+            if (listening) {
+                btn.classList.add('ring-4', 'ring-teal-400');
+                ring.classList.add('pulse-ring');
+            } else {
+                btn.classList.remove('ring-4', 'ring-teal-400');
+                ring.classList.remove('pulse-ring');
+            }
+        }
+
+        async function sendToFreshAPI(userTranscript) {
+            const responseCard = document.getElementById('responseCard');
+            const responseText = document.getElementById('responseText');
+            const responseStatus = document.getElementById('responseStatus');
+
+            responseCard.classList.remove('hidden');
+            responseText.innerText = "Fresh is processing your request...";
+            responseStatus.innerText = "CONNECTING TO FRESH API...";
+
+            try {
+                const response = await fetch('/.netlify/functions/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        prompt: userTranscript,
+                        board_id: "18424728273"
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server returned HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                const freshReply = data.reply || data.response || data.message || "Fresh here 🤵 — BOOM! Received and logged your voice dump directly to the system board!";
+
+                responseText.innerText = `"${freshReply}"`;
+                responseStatus.innerText = "LIVE BACKEND CONNECTED";
+            } catch (err) {
+                console.warn("API Call fallback note:", err);
+                // Graceful fallback for offline testing or pre-deployment endpoint check
+                responseText.innerText = `"Fresh here 🤵 — BOOM! Hearing you loud and clear ("${userTranscript}")! I've logged your voice entry directly to system queue #18424728273. Sissy is routing it now!"`;
+                responseStatus.innerText = "DEMO QUEUE CONNECTED";
+            } finally {
+                updateMicUI(false, 'TAP TO TALK', '🎙️');
+            }
+        }
+
+        function scrollToPortal() {
+            document.getElementById('portalSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        let currentPin = '';
+
+        function pressPin(num) {
+            if (currentPin.length < 4) {
+                currentPin += num;
+                document.getElementById('pinInput').value = currentPin;
+            }
+        }
+
+        function clearPin() {
+            currentPin = '';
+            document.getElementById('pinInput').value = '';
+            document.getElementById('pinError').classList.add('hidden');
+        }
+
+        function verifyPin() {
+            if (currentPin === '7777') {
+                document.getElementById('pinView').classList.add('hidden');
+                document.getElementById('unlockedVault').classList.remove('hidden');
+            } else {
+                document.getElementById('pinError').classList.remove('hidden');
+                clearPin();
+            }
+        }
+
+        function openIndustryDemo() {
+            openModal('industryModal');
+        }
+
+        function generateIndustryDrawer() {
+            const input = document.getElementById('industryInput').value.trim();
+            if (!input) return;
+
+            const out = document.getElementById('industryOutput');
+            const outTitle = document.getElementById('outTitle');
+            const outBody = document.getElementById('outBody');
+
+            outTitle.innerText = `⚡ ${input.toUpperCase()} DRAWER GENERATED!`;
+            outBody.innerText = `Fresh here 🤵 — Generated your custom workflow for ${input}! Loaded 1-tap voice intake tags for job logging, dynamic client sharing, and automated task routing. Zero static templates needed!`;
+            
+            out.classList.remove('hidden');
+        }
+    </script>
 </body>
 </html>
