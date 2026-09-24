@@ -13,6 +13,7 @@
     .btn-glow:hover { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
     .pulse-ring { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+    #industryInput { color: #f1f5f9 !important; background-color: #0f172a !important; }
   </style>
 </head>
 <body class="min-h-screen pb-12">
@@ -95,7 +96,7 @@
       </div>
 
       <div class="flex flex-col sm:flex-row gap-3">
-        <input type="text" id="industryInput" placeholder="e.g. Donut Shop, Real Estate Agent, Roofing Contractor..." class="flex-grow px-4 py-3 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm font-medium">
+        <input type="text" id="industryInput" placeholder="e.g. Donut Shop, Real Estate Agent, Roofing Contractor..." class="flex-grow px-4 py-3 rounded-lg border border-slate-700 placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm font-medium">
         <button onclick="generateIndustryDrawer()" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-sm transition flex items-center justify-center space-x-2">
           <i class="fas fa-magic"></i>
           <span>Build My Drawer</span>
@@ -113,16 +114,22 @@
 
     <!-- PRICING & ROADMAP -->
     <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="card rounded-xl p-6 space-y-4 md:col-span-1 border-blue-500/40">
+      <div class="card rounded-xl p-6 space-y-4 md:col-span-1 border-blue-500/40 relative">
+        <div class="absolute -top-3 right-4 px-3 py-1 bg-green-500 text-slate-950 font-black text-[10px] uppercase tracking-wider rounded-full shadow-lg">
+          3-Day Free Trial
+        </div>
         <div class="text-xs font-bold text-blue-400 uppercase tracking-wider">Unlimited Subscription</div>
         <div class="text-4xl font-black text-white">$95 <span class="text-base font-normal text-slate-400">/ mo</span></div>
-        <ul class="text-xs text-slate-300 space-y-2">
+        <div class="p-2.5 bg-blue-500/10 rounded-lg border border-blue-500/20 text-[11px] text-blue-300 font-medium leading-tight">
+          🛡️ <strong>30-Day Money-Back Guarantee:</strong> Try it free for 3 days. Not happy after 30 days? Full refund. No questions asked.
+        </div>
+        <ul class="text-xs text-slate-300 space-y-2 pt-1">
           <li class="flex items-center space-x-2"><i class="fas fa-check text-blue-400"></i><span>Unlimited Voice Brain Dumps</span></li>
           <li class="flex items-center space-x-2"><i class="fas fa-check text-blue-400"></i><span>Unlimited Shareable Portals</span></li>
           <li class="flex items-center space-x-2"><i class="fas fa-check text-blue-400"></i><span>Fresh Digital Coordinator</span></li>
           <li class="flex items-center space-x-2"><i class="fas fa-check text-blue-400"></i><span>Clean Environment LLC Billing</span></li>
         </ul>
-        <button class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 font-bold text-xs uppercase tracking-wider rounded-lg text-white transition">Get Started</button>
+        <button class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 font-bold text-xs uppercase tracking-wider rounded-lg text-white transition">Start Free Trial</button>
       </div>
 
       <div class="card rounded-xl p-6 space-y-4 md:col-span-2">
