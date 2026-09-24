@@ -22,7 +22,7 @@ details > div { animation: slideDown 0.2s ease-out; } @keyframes slideDown { fro
 </head>
 <body class="min-h-screen pb-16">
 
-<!-- Clean Nav Bar with Dynamic Business Name -->
+<!-- Clean Nav Bar with Dynamic Business Name & Onboarding Link -->
 <nav class="border-b border-gray-800 bg-gray-900/90 sticky top-0 z-50 backdrop-blur-md">
 <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
 <div class="flex items-center space-x-3">
@@ -33,9 +33,15 @@ details > div { animation: slideDown 0.2s ease-out; } @keyframes slideDown { fro
 </h1>
 </div>
 </div>
-<div class="flex items-center space-x-2">
-<span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-<span class="text-xs text-emerald-400 font-semibold tracking-wide uppercase hidden sm:inline">System Active</span>
+<div class="flex items-center space-x-4">
+  <a href="onboarding.html" class="text-xs bg-blue-900/40 hover:bg-blue-800/60 text-blue-300 font-semibold px-3 py-1.5 rounded-lg border border-blue-700/60 transition flex items-center space-x-1.5">
+    <i class="fa-solid fa-circle-info text-blue-400"></i>
+    <span>About TappyThing</span>
+  </a>
+  <div class="flex items-center space-x-2">
+    <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+    <span class="text-xs text-emerald-400 font-semibold tracking-wide uppercase hidden sm:inline">System Active</span>
+  </div>
 </div>
 </div>
 </nav>
@@ -382,7 +388,6 @@ function sendToFresh() {
   var replyEl = document.getElementById('freshReply');
   replyEl.textContent = 'Fresh is thinking...';
 
-  // Add user prompt to conversation history array
   conversationHistory.push({ role: 'user', text: prompt });
   if (conversationHistory.length > 10) { conversationHistory = conversationHistory.slice(-10); }
 
@@ -396,11 +401,9 @@ function sendToFresh() {
     lastReply = data.reply || 'Fresh had nothing to say!';
     replyEl.textContent = lastReply;
 
-    // Add assistant response to conversation history array
     conversationHistory.push({ role: 'assistant', text: lastReply });
     if (conversationHistory.length > 10) { conversationHistory = conversationHistory.slice(-10); }
 
-    // Auto-refresh My World board drawers after Fresh responds
     setTimeout(function() { loadMondayData(); }, 1500);
 
     if (window.speechSynthesis) {
@@ -550,7 +553,6 @@ function closeCard() {
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('freshReply').textContent = (activeBoardId === '18424728273') ? "Back at it Chief — what do we have?" : "Welcome to TappyThing — tap the mic or type below to get started!";
 
-  // Token Verification Logic
   if (activeToken) {
     applySubscriberLayout();
     fetch('/.netlify/functions/verify-token?token=' + encodeURIComponent(activeToken))
