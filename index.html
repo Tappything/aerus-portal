@@ -72,11 +72,32 @@ details > div { animation: slideDown 0.2s ease-out; }
 
 <main class="max-w-4xl mx-auto px-4 pt-6 space-y-8">
 
-<!-- THESIS — always visible -->
-<section id="thesisSection" class="text-center space-y-2 pt-2">
+<!-- THESIS -->
+<section class="text-center space-y-2 pt-2">
   <p class="text-base text-gray-300 max-w-2xl mx-auto leading-relaxed font-medium">
     TappyThing turns your voice into live cards. Cards inside cards. Share one card with one person or thousands — by text or email. Two way communication. Forever saved. Your world. Your business. Your life. Organized just by talking.
   </p>
+</section>
+
+<!-- VALUE POINTS -->
+<section class="glow-card rounded-2xl p-6 border border-blue-500/20">
+  <div class="space-y-3">
+    <div class="flex items-center gap-3 text-sm text-gray-300 font-medium">
+      <span class="text-xl">⚡</span> Brain dump anything — Fresh organizes it instantly.
+    </div>
+    <div class="flex items-center gap-3 text-sm text-gray-300 font-medium">
+      <span class="text-xl">🔗</span> Share any card with anyone — one tap.
+    </div>
+    <div class="flex items-center gap-3 text-sm text-gray-300 font-medium">
+      <span class="text-xl">💬</span> They talk back through the card — two way, forever saved.
+    </div>
+    <div class="flex items-center gap-3 text-sm text-gray-300 font-medium">
+      <span class="text-xl">💳</span> Invoicing on the fly.
+    </div>
+    <div class="flex items-center gap-3 text-sm text-gray-300 font-medium">
+      <span class="text-xl">🚫</span> Kill email chains forever.
+    </div>
+  </div>
 </section>
 
 <!-- FRESH SECTION -->
@@ -107,7 +128,7 @@ details > div { animation: slideDown 0.2s ease-out; }
   </div>
 
   <button onclick="sendToFresh()" class="w-full glow-button py-4 rounded-2xl font-black text-white flex items-center justify-center space-x-2 text-base hover:opacity-95 active:scale-[0.99] transition-all">
-    <i class="fa-solid fa-paper-plane"></i><span>SEND TO FRESH</span>
+    <i class="fa-solid fa-paper-plane"></i><span>Meet Fresh — Tap to Talk</span>
   </button>
 
   <div class="w-full bg-blue-950/60 border border-blue-700/60 rounded-2xl p-5 text-left mt-6 shadow-xl">
@@ -115,7 +136,7 @@ details > div { animation: slideDown 0.2s ease-out; }
       <span class="flex items-center gap-2"><i class="fa-solid fa-headset text-sm"></i> Fresh Response</span>
       <button onclick="repeatSpeech()" class="text-gray-400 text-xs hover:text-white transition"><i class="fa-solid fa-volume-high"></i> Play Again</button>
     </div>
-    <p id="freshReply" class="text-lg text-white font-extrabold leading-snug">Connecting to Fresh...</p>
+    <p id="freshReply" class="text-lg text-white font-extrabold leading-snug">Read above — then tap to talk to Fresh.</p>
   </div>
 
 </div>
@@ -182,7 +203,6 @@ function sendToFresh(customPrompt) {
   conversationHistory.push({ role: 'user', text: prompt });
   if (conversationHistory.length > 10) { conversationHistory = conversationHistory.slice(-10); }
 
-  // If no board yet — create one first then talk
   if (!activeBoardId && !boardCreated) {
     boardCreated = true;
     var shortName = prompt.split(/\s+/).slice(0, 3).join(' ');
@@ -317,16 +337,14 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('navBusinessName').textContent = decodeURIComponent(activeName);
 
   if (activeBoardId) {
-    // Returning user — load their world
     if (activeBoardId === '18424728273') {
       document.getElementById('freshReply').textContent = "Back at it Chief — what do we have?";
     } else {
-      sendToFresh('introduce yourself');
+      document.getElementById('freshReply').textContent = "Read above — then tap to talk to Fresh.";
     }
     loadMondayData();
   } else {
-    // New visitor — Fresh greets immediately
-    sendToFresh('introduce yourself');
+    document.getElementById('freshReply').textContent = "Read above — then tap to talk to Fresh.";
   }
 
   document.getElementById('promptInput').addEventListener('keydown', function(e) {
