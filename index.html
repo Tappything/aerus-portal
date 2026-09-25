@@ -58,6 +58,11 @@ details > div { animation: slideDown 0.2s ease-out; }
 <!-- 1. TOP: FRESH INTAKE ENGINE -->
 <section class="glow-card rounded-3xl p-6 sm:p-8 text-center border-2 border-blue-500/40 relative overflow-hidden">
 <div class="flex flex-col items-center justify-center max-w-2xl mx-auto">
+
+  <!-- Thesis Paragraph Moved Above Avatar -->
+  <p class="text-sm text-gray-300 leading-relaxed font-medium max-w-lg mb-6">
+    TappyThing turns your voice into live cards. Cards inside cards. Share one card with one person or thousands — by text or email. Two way communication. Forever saved. Your world. Your business. Your life. Organized just by talking.
+  </p>
   
   <div class="relative mb-4">
     <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-32 h-32 sm:w-36 sm:h-36 rounded-full object-cover border-4 border-blue-400 shadow-2xl shadow-blue-500/30 ring-4 ring-blue-900/50" />
@@ -66,12 +71,7 @@ details > div { animation: slideDown 0.2s ease-out; }
   </div>
 
   <h2 class="text-3xl font-black text-white tracking-tight mb-1">FRESH</h2>
-  <p class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-4">Your Digital Coordinator</p>
-
-  <!-- Value Paragraph Above Mic Button -->
-  <p class="text-sm text-gray-300 leading-relaxed font-medium max-w-lg mb-6">
-    TappyThing turns your voice into live cards. Cards inside cards. Share one card with one person or thousands — by text or email. Two way communication. Forever saved. Your world. Your business. Your life. Organized just by talking.
-  </p>
+  <p class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-6">Your Digital Coordinator</p>
 
   <div class="flex items-center justify-center space-x-4 mb-6">
     <button id="micBtn" onclick="toggleVoiceIntake()" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-tr from-blue-600 to-blue-400 text-white flex items-center justify-center text-4xl shadow-2xl mic-pulse hover:scale-105 active:scale-95 transition-all duration-200">
@@ -260,9 +260,9 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('navBusinessName').textContent = decodeURIComponent(activeName);
   loadMondayData();
 
-  // If new subscriber board, automatically send 'hello' to fire Fresh's greeting
+  // If new subscriber board, automatically send 'introduce yourself' to fire Fresh's greeting
   if (activeBoardId !== '18424728273') {
-    sendToFresh('hello');
+    sendToFresh('introduce yourself');
   } else {
     document.getElementById('freshReply').textContent = "Back at it Chief — what do we have?";
   }
