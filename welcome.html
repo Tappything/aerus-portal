@@ -162,7 +162,7 @@ function sendToFresh() {
   .then(function(res) { return res.json(); })
   .then(function(data) {
     if (data.board_id) {
-      window.location.href = 'https://freshtappything.com/?board=' + data.board_id;
+      window.location.href = 'https://freshtappything.com/?board=' + data.board_id + '&name=' + encodeURIComponent(prompt);
     } else {
       window.location.href = 'https://freshtappything.com/?board=18424728273';
     }
