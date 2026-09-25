@@ -292,7 +292,7 @@ exports.handler = async function(event, context) {
     if (isGreeting) { 
       const greetingReply = (targetBoardId === '18424728273') 
         ? 'Back at it Chief — what do we have?' 
-        : "Welcome! Let's build your world. What is the first thing you deal with every morning at work?";
+        : "Welcome to TappyThing! Your world is ready to build. What is the first thing you deal with every morning at work? Just say it — I will build your first drawer right now.";
       
       return { 
         statusCode: 200, 
@@ -324,7 +324,6 @@ exports.handler = async function(event, context) {
 
     // SUBSCRIBER SELF-BUILDING ONBOARDING vs OWNER ROUTE (CASTLE BUILDING AT USER'S PACE)
     if (targetBoardId !== '18424728273' && mondayKey) {
-      // 1. Fetch board groups and items to determine current state
       const boardQuery = JSON.stringify({
         query: `{ boards(ids: [${targetBoardId}]) { groups { id title } items_page(limit: 50) { items { id name group { id } } } } }`
       });
