@@ -57,7 +57,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Ar
     <span class="text-xs font-black bg-blue-900/80 text-blue-300 border border-blue-700 px-3 py-1 rounded-full uppercase tracking-wider">Voice-First Operations</span>
     <h2 class="text-4xl sm:text-5xl font-black text-white tracking-tight">Talk. Tap. Grow.</h2>
     <p class="text-base text-gray-300 max-w-2xl mx-auto">
-      Stop managing sticky notes and complex software. Tap the button, dump your raw thoughts, and let Fresh build your live operational cards in seconds.
+      TappyThing turns your voice into live cards. Cards inside cards. Share one card with one person or thousands — by text or email. Two way communication. Forever saved. Your world. Your business. Your life.
     </p>
   </section>
 
@@ -72,7 +72,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Ar
       </div>
 
       <h3 class="text-2xl font-black text-white tracking-tight mb-1">Talk to Fresh — Tell Him About Your Business</h3>
-      <p class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-6">Don't think. Just talk.</p>
+      <p class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-6">Tap the mic and introduce yourself to Fresh.</p>
 
       <div class="flex items-center justify-center space-x-4 mb-6">
         <button id="micBtn" onclick="toggleVoiceIntake()" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-tr from-blue-600 to-blue-400 text-white flex items-center justify-center text-4xl shadow-2xl mic-pulse hover:scale-105 active:scale-95 transition-all duration-200">
@@ -227,7 +227,6 @@ function toggleVoiceIntake() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  sendToFresh('introduce yourself');
   document.getElementById('promptInput').addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); createBoardAndRedirect(); }
   });
