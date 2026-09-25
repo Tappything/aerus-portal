@@ -80,6 +80,28 @@ async function createMondayGroup(mondayKey, boardId, groupName) {
   }
 }
 
+// Helper to create a new item inside a specific Monday.com group
+async function createMondayItemInGroup(mondayKey, boardId, groupId, itemName) {
+  if (!mondayKey || !boardId || !groupId || !itemName) return null;
+  const cleanName = itemName.replace(/"/g, '\\"').replace(/\n/g, ' ');
+  const mutation = JSON.stringify({
+    query: `mutation { create_item (board_id: ${boardId}, group_id: "${groupId}", item_name: "${cleanName}") { id } }`
+  });
+
+  try {
+    const resData = await makePostRequest('https://api.monday.com/v2', {
+      'Content-Type': 'application/json',
+      'Authorization': mondayKey,
+      'API-Version': '2023-10',
+      'Content-Length': Buffer.byteLength(mutation)
+    }, mutation);
+    return resData?.data?.create_item;
+  } catch (err) {
+    console.log('Error creating item in group:', err);
+    return null;
+  }
+}
+
 // Helper to execute direct Monday.com actions based on dump commands
 async function executeMondayCommand(mondayKey, boardId, line) {
   if (!mondayKey || !line) return;
@@ -270,7 +292,7 @@ exports.handler = async function(event, context) {
     if (isGreeting) { 
       const greetingReply = (targetBoardId === '18424728273') 
         ? 'Back at it Chief — what do we have?' 
-        : "Welcome to TappyThing! Let's build your world. First question: What's the first thing you deal with every morning at work?";
+        : "Welcome! Let's build your world. What is the first thing you deal with every morning at work?";
       
       return { 
         statusCode: 200, 
@@ -300,11 +322,11 @@ exports.handler = async function(event, context) {
       }; 
     }
 
-    // SUBSCRIBER SELF-BUILDING ONBOARDING vs OWNER ROUTE
+    // SUBSCRIBER SELF-BUILDING ONBOARDING vs OWNER ROUTE (CASTLE BUILDING AT USER'S PACE)
     if (targetBoardId !== '18424728273' && mondayKey) {
-      // 1. Fetch group count to see where they are in the 5-question sequence
+      // 1. Fetch board groups and items to determine current state
       const boardQuery = JSON.stringify({
-        query: `{ boards(ids: [${targetBoardId}]) { groups { id title } } }`
+        query: `{ boards(ids: [${targetBoardId}]) { groups { id title } items_page(limit: 50) { items { id name group { id } } } } }`
       });
 
       const boardRes = await makePostRequest('https://api.monday.com/v2', {
@@ -314,28 +336,35 @@ exports.handler = async function(event, context) {
         'Content-Length': Buffer.byteLength(boardQuery)
       }, boardQuery);
 
-      const existingGroups = boardRes?.data?.boards?.[0]?.groups || [];
-      const currentDrawerCount = existingGroups.length;
-
-      // 2. Create group from user's response
-      if (currentDrawerCount < 5) {
-        await createMondayGroup(mondayKey, targetBoardId, prompt);
-      }
-
-      // 3. Ask next question based on updated drawer count
-      const updatedCount = currentDrawerCount + 1;
+      const boardData = boardRes?.data?.boards?.[0];
+      const existingGroups = boardData?.groups || [];
+      const existingItems = boardData?.items_page?.items || [];
+      
       let onboardingReply = "";
 
-      if (updatedCount === 1) {
-        onboardingReply = "Got it, created that drawer on your board! Question 2: What's the second core activity or bucket of work in your day?";
-      } else if (updatedCount === 2) {
-        onboardingReply = "Boom! Second drawer added. Question 3: What's the third type of task or job you manage?";
-      } else if (updatedCount === 3) {
-        onboardingReply = "Solid! Third drawer live. Question 4: What is the fourth drawer we need for your team, orders, or follow-ups?";
-      } else if (updatedCount === 4) {
-        onboardingReply = "Almost there! Question 5: What's the final drawer for ready items, pickups, or completed jobs?";
-      } else {
-        onboardingReply = "BOOM! Your 5 core drawers are live! Your world is officially built. Tap the button anytime to drop raw voice notes, customers, or tasks into your cards. Hit me!";
+      // STATE A: Board is completely empty -> create first drawer
+      if (existingGroups.length === 0) {
+        await createMondayGroup(mondayKey, targetBoardId, prompt);
+        onboardingReply = "Your first drawer is live! Drop something into it — a task, a name, anything. I will put it right inside that drawer for you.";
+      } 
+      // STATE B: First drawer exists but has no items -> create item inside first drawer
+      else if (existingItems.length === 0) {
+        const firstGroupId = existingGroups[0].id;
+        await createMondayItemInGroup(mondayKey, targetBoardId, firstGroupId, prompt);
+        onboardingReply = "See that? Everything you just said is now inside your drawer. Now here is the magic — that drawer and everything inside it can be shared with anyone in the world. One tap. Send it to a customer, your staff, a partner, your family — as many people as you want. They get their own window into that card. They can talk back through it. You see everything. They see only what you share. Want to share this drawer with someone right now?";
+      } 
+      // STATE C: User explicitly asks for another drawer or drops new items
+      else {
+        const lowerPrompt = prompt.toLowerCase();
+        if (lowerPrompt.includes('drawer') || lowerPrompt.includes('add') || lowerPrompt.includes('create') || lowerPrompt.includes('new group')) {
+          await createMondayGroup(mondayKey, targetBoardId, prompt);
+          onboardingReply = "Boom! New drawer added to your world! Drop whatever you need inside it — I am ready. Hit me!";
+        } else {
+          // Drop item into the most recently created drawer
+          const latestGroupId = existingGroups[existingGroups.length - 1].id;
+          await createMondayItemInGroup(mondayKey, targetBoardId, latestGroupId, prompt);
+          onboardingReply = "Logged and locked right inside your drawer! Want to add another drawer to your world? Just tell me what it is.";
+        }
       }
 
       return {
