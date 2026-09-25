@@ -322,8 +322,9 @@ exports.handler = async function(event, context) {
       }; 
     }
 
-    // SUBSCRIBER SELF-BUILDING ONBOARDING vs OWNER ROUTE (CASTLE BUILDING AT USER'S PACE)
+    // SUBSCRIBER ONBOARDING ROUTE (AI-POWERED DYNAMIC WORLD BUILDING)
     if (targetBoardId !== '18424728273' && mondayKey) {
+      // 1. Fetch current board state
       const boardQuery = JSON.stringify({
         query: `{ boards(ids: [${targetBoardId}]) { groups { id title } items_page(limit: 50) { items { id name group { id } } } } }`
       });
@@ -338,32 +339,48 @@ exports.handler = async function(event, context) {
       const boardData = boardRes?.data?.boards?.[0];
       const existingGroups = boardData?.groups || [];
       const existingItems = boardData?.items_page?.items || [];
-      
-      let onboardingReply = "";
 
-      // STATE A: Board is completely empty -> create first drawer
+      // 2. Perform actions based on user input
       if (existingGroups.length === 0) {
         await createMondayGroup(mondayKey, targetBoardId, prompt);
-        onboardingReply = "Your first drawer is live! Drop something into it — a task, a name, anything. I will put it right inside that drawer for you.";
-      } 
-      // STATE B: First drawer exists but has no items -> create item inside first drawer
-      else if (existingItems.length === 0) {
+      } else if (existingItems.length === 0) {
         const firstGroupId = existingGroups[0].id;
         await createMondayItemInGroup(mondayKey, targetBoardId, firstGroupId, prompt);
-        onboardingReply = "See that? Everything you just said is now inside your drawer. Now here is the magic — that drawer and everything inside it can be shared with anyone in the world. One tap. Send it to a customer, your staff, a partner, your family — as many people as you want. They get their own window into that card. They can talk back through it. You see everything. They see only what you share. Want to share this drawer with someone right now?";
-      } 
-      // STATE C: User explicitly asks for another drawer or drops new items
-      else {
+      } else {
         const lowerPrompt = prompt.toLowerCase();
         if (lowerPrompt.includes('drawer') || lowerPrompt.includes('add') || lowerPrompt.includes('create') || lowerPrompt.includes('new group')) {
           await createMondayGroup(mondayKey, targetBoardId, prompt);
-          onboardingReply = "Boom! New drawer added to your world! Drop whatever you need inside it — I am ready. Hit me!";
         } else {
-          // Drop item into the most recently created drawer
           const latestGroupId = existingGroups[existingGroups.length - 1].id;
           await createMondayItemInGroup(mondayKey, targetBoardId, latestGroupId, prompt);
-          onboardingReply = "Logged and locked right inside your drawer! Want to add another drawer to your world? Just tell me what it is.";
         }
+      }
+
+      // 3. Gemini System Instruction for dynamic onboarding conversational response
+      const nonOwnerSystemInstruction = "You are Fresh — a bold, energetic Digital Coordinator. You are talking to a new TappyThing subscriber. Listen to what they say and respond with energy and excitement. When they describe their business or daily tasks call createMondayGroup to build a drawer for them. When they give you specific tasks or items call createMondayItemInGroup to add them. After their first item is created tell them: See that card? You can share it with anyone — staff, customers, family. One tap. Two way. Forever saved. Keep responses short, punchy, conversational. Never robotic. Build their world naturally.";
+
+      const fullPrompt = nonOwnerSystemInstruction + ' User says: ' + prompt;
+      const history = data.history || [];
+
+      const contents = [
+        ...history.map(h => ({
+          role: h.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: h.text }]
+        })),
+        { role: 'user', parts: [{ text: fullPrompt }] }
+      ];
+
+      const payload = JSON.stringify({ contents: contents });
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+
+      const resData = await makePostRequest(url, {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload)
+      }, payload);
+
+      let onboardingReply = 'Fresh is on it...';
+      if (resData?.candidates?.[0]?.content?.parts?.[0]?.text) {
+        onboardingReply = resData.candidates[0].content.parts[0].text.trim();
       }
 
       return {
