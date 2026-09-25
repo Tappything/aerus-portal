@@ -157,7 +157,7 @@ function sendToFresh() {
   fetch('/.netlify/functions/create-board', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ businessName: prompt })
+    body: JSON.stringify({ business_name: prompt })
   })
   .then(function(res) { return res.json(); })
   .then(function(data) {
