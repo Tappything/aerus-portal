@@ -286,13 +286,13 @@ exports.handler = async function(event, context) {
 
     const isQuestion = questionStarters.some(w => lower.startsWith(w));
     const isIntake = wordCount <= 7 && intakeWords.some(w => lower.includes(w));
-    const isGreeting = lower === 'hello' || lower === 'hi' || lower.startsWith('hey');
+    const isGreeting = lower === 'hello' || lower === 'hi' || lower.startsWith('hey') || lower === 'introduce yourself';
 
     // ROUTE 1 GREETING — DYNAMIC RESPONSE BASED ON BOARD ID
     if (isGreeting) { 
       const greetingReply = (targetBoardId === '18424728273') 
         ? 'Back at it Chief — what do we have?' 
-        : "Welcome to TappyThing! Your world is ready to build. What is the first thing you deal with every morning at work? Just say it — I will build your first drawer right now.";
+        : "Hey! I am Fresh — your Digital Coordinator. I organize everything you say into live cards you can share with anyone. Your staff. Your customers. Your family. Two way. Forever saved. Now — tell me your name and what you do. Don't think. Just talk.";
       
       return { 
         statusCode: 200, 
