@@ -154,6 +154,9 @@ function sendToFresh() {
   var replyEl = document.getElementById('freshReply');
   replyEl.textContent = 'Fresh is creating your world...';
 
+  // Short Name Extractor: Take first 3 words max for clean URL parameter
+  var shortName = prompt.split(/\s+/).slice(0, 3).join(' ');
+
   fetch('/.netlify/functions/create-board', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -162,7 +165,7 @@ function sendToFresh() {
   .then(function(res) { return res.json(); })
   .then(function(data) {
     if (data.board_id) {
-      window.location.href = 'https://freshtappything.com/?board=' + data.board_id + '&name=' + encodeURIComponent(prompt);
+      window.location.href = 'https://freshtappything.com/?board=' + data.board_id + '&name=' + encodeURIComponent(shortName);
     } else {
       window.location.href = 'https://freshtappything.com/?board=18424728273';
     }
