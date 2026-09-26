@@ -18,7 +18,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 .flash-banner { animation: flash-banner 1.5s infinite; }
 </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="min-h-screen flex items-center justify-center p-4 pb-24">
 
 <div class="max-w-md w-full tapulator-face rounded-3xl p-6 relative overflow-hidden space-y-6">
 
@@ -34,23 +34,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     Tap. Talk. Your world organizes itself.
   </div>
 
-  <!-- CENTER BIG TAP BUTTON -->
-  <div class="flex flex-col items-center justify-center space-y-2">
-    <button id="micBtn" onclick="toggleVoiceIntake()" class="tap-button w-36 h-36 rounded-full text-white flex flex-col items-center justify-center shadow-2xl transition-all duration-200">
-      <i class="fa-solid fa-microphone text-4xl mb-1"></i>
-      <span class="font-black text-xl tracking-wider">TAP</span>
-    </button>
-    <span id="voiceStatus" class="text-xs font-bold text-gray-400 uppercase tracking-wider pt-2">Tap button to speak to Fresh</span>
-  </div>
-
   <!-- FLASHING ONBOARDING BANNER -->
   <button onclick="triggerOnboarding()" class="w-full bg-blue-900/80 hover:bg-blue-800 text-blue-200 font-black py-3 rounded-xl text-xs border border-blue-500 uppercase tracking-widest transition flex items-center justify-center gap-2 flash-banner">
     <i class="fa-solid fa-bolt text-amber-400"></i>
     <span>[ BUILD PERSONAL WORLD FIRST ]</span>
   </button>
-
-  <!-- HIDDEN PROMPT TEXTAREA FOR FALLBACK -->
-  <textarea id="promptInput" rows="1" class="w-full bg-gray-900 border border-gray-800 rounded-xl p-2 text-xs text-gray-200 focus:outline-none placeholder-gray-600 hidden" placeholder="Type prompt fallback..."></textarea>
 
   <!-- 6 WORLD DRAWERS GRID -->
   <div class="grid grid-cols-2 gap-3">
@@ -97,24 +85,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </button>
   </div>
 
-  <!-- PERSISTENT CARD DRAWER MODAL WITH IN-CARD TAP KEY -->
+  <!-- PERSISTENT CARD DRAWER MODAL -->
   <div id="drawerModal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col p-4 backdrop-blur-md">
     <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
       <h3 id="drawerTitle" class="text-lg font-black text-white flex items-center gap-2">
         <i class="fa-solid fa-folder-open text-blue-400"></i> Drawer
       </h3>
       <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-sm bg-gray-800 px-3 py-1 rounded-lg">Close</button>
-    </div>
-
-    <!-- IN-CARD PERSISTENT TAP KEY -->
-    <div class="bg-gray-900 border border-blue-900/60 rounded-2xl p-4 text-center mb-4 flex items-center justify-between">
-      <div class="text-left">
-        <div class="text-xs font-bold text-blue-400 uppercase">In-Card Speak</div>
-        <div class="text-[10px] text-gray-400">Talk directly into this drawer</div>
-      </div>
-      <button onclick="toggleVoiceIntake()" class="tap-button px-4 py-2 rounded-xl text-white font-black text-xs flex items-center gap-2">
-        <i class="fa-solid fa-microphone"></i> TAP
-      </button>
     </div>
 
     <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300">
@@ -124,35 +101,75 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
 </div>
 
+<!-- UNIFIED BOTTOM INPUT BAR -->
+<div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-40">
+  <div class="max-w-md mx-auto flex items-center gap-2">
+    <!-- 1. CAMERA / PHOTO BUTTON -->
+    <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0">
+      <i class="fa-solid fa-camera text-lg"></i>
+      <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoInput(this)">
+    </label>
+
+    <!-- 2. TEXT INPUT FIELD -->
+    <input type="text" id="unifiedInput" placeholder="Talk or type here..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') submitUnifiedInput()">
+
+    <!-- 3. MICROPHONE VOICE BUTTON -->
+    <button id="micBtn" onclick="toggleVoiceIntake()" class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-11 h-11 rounded-xl flex items-center justify-center border border-gray-700 transition shrink-0">
+      <i class="fa-solid fa-microphone text-lg"></i>
+    </button>
+
+    <!-- SEND BUTTON -->
+    <button onclick="submitUnifiedInput()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1">
+      <i class="fa-solid fa-paper-plane"></i>
+    </button>
+  </div>
+</div>
+
 <script>
 function toggleVoiceIntake() {
   var btn = document.getElementById('micBtn');
-  var status = document.getElementById('voiceStatus');
+  var input = document.getElementById('unifiedInput');
   var output = document.getElementById('ledOutput');
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { status.textContent = 'Voice not supported.'; return; }
+  if (!SR) { alert('Voice not supported.'); return; }
   
   var recognition = new SR();
   recognition.continuous = false;
   recognition.interimResults = false;
   recognition.lang = 'en-US';
   
-  status.textContent = 'Listening... Speak now!';
+  btn.classList.add('text-red-500');
   output.textContent = 'LISTENING...';
   recognition.start();
 
   recognition.onresult = function(e) {
     var transcript = e.results[0][0].transcript;
-    document.getElementById('promptInput').value = transcript;
-    status.textContent = 'Processing...';
+    input.value = transcript;
+    btn.classList.remove('text-red-500');
     output.textContent = 'PROCESSING...';
     sendToFresh(transcript);
   };
 
   recognition.onerror = function() {
-    status.textContent = 'Mic error. Try again.';
+    btn.classList.remove('text-red-500');
     output.textContent = 'MIC ERROR';
   };
+}
+
+function handlePhotoInput(fileInput) {
+  if (fileInput.files && fileInput.files[0]) {
+    var fileName = fileInput.files[0].name;
+    document.getElementById('ledOutput').textContent = 'PHOTO LOGGED: ' + fileName;
+    sendToFresh('Photo attached: ' + fileName);
+  }
+}
+
+function submitUnifiedInput() {
+  var text = document.getElementById('unifiedInput').value.trim();
+  if (text) {
+    sendToFresh(text);
+    document.getElementById('unifiedInput').value = '';
+  }
 }
 
 function sendToFresh(promptText) {
@@ -164,17 +181,15 @@ function sendToFresh(promptText) {
   .then(res => res.json())
   .then(data => {
     document.getElementById('ledOutput').textContent = data.reply || 'Schwing! Logged! ⚡';
-    document.getElementById('voiceStatus').textContent = 'Tap button to speak to Fresh';
   })
   .catch(err => {
     document.getElementById('ledOutput').textContent = 'Schwing! Logged! ⚡';
-    document.getElementById('voiceStatus').textContent = 'Tap button to speak to Fresh';
   });
 }
 
 function openDrawer(name) {
   document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + name + ' Drawer';
-  document.getElementById('drawerContent').innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800"><p class="font-bold text-white mb-1">Drawer Active: ' + name + '</p><p class="text-gray-400">Tap the in-card button above to add notes or updates directly.</p></div>';
+  document.getElementById('drawerContent').innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800"><p class="font-bold text-white mb-1">Drawer Active: ' + name + '</p><p class="text-gray-400">Use the unified bar at the bottom to add notes or snap photos directly into this drawer.</p></div>';
   document.getElementById('drawerModal').classList.remove('hidden');
 }
 
