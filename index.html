@@ -34,7 +34,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     <div class="text-[11px] text-gray-400 font-medium">Tap. Talk. Operations live in seconds.</div>
   </div>
 
-  <!-- SUBTLE FEATURES & BENEFITS BUTTON (NON-FLASHING) -->
+  <!-- SUBTLE FEATURES & BENEFITS BUTTON -->
   <button onclick="toggleFeaturesModal()" class="w-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 font-semibold py-1.5 rounded-xl text-[11px] border border-slate-700/60 uppercase tracking-wider transition flex items-center justify-center gap-1.5">
     <i class="fa-solid fa-list-check text-slate-400 text-xs"></i>
     <span>[ FEATURES & BENEFITS ]</span>
@@ -265,7 +265,22 @@ function sendToFresh(promptText) {
 
 function openDrawer(name) {
   document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + name + ' Drawer';
-  document.getElementById('drawerContent').innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800"><p class="font-bold text-white mb-1">Drawer Active: ' + name + '</p><p class="text-gray-400">Use the unified bottom bar to speak notes, record intakes, or attach photos directly into this drawer.</p></div>';
+  document.getElementById('drawerContent').innerHTML = `
+    <div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">
+      <p class="font-bold text-white text-sm">Drawer Active: ${name}</p>
+      <p class="text-gray-400">Speak commands or upload photos directly into this card:</p>
+      <div class="flex items-center gap-2 pt-2 border-t border-gray-800">
+        <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 p-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center font-bold flex items-center justify-center gap-2">
+          <i class="fa-solid fa-camera"></i>
+          <span>Snap Photo</span>
+          <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoInput(this)">
+        </label>
+        <button onclick="toggleVoiceIntake()" class="bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl border border-blue-500 flex-1 font-bold flex items-center justify-center gap-2">
+          <i class="fa-solid fa-microphone"></i>
+          <span>Talk to Card</span>
+        </button>
+      </div>
+    </div>`;
   document.getElementById('drawerModal').classList.remove('hidden');
 }
 
