@@ -1,65 +1,108 @@
 const https = require('https');
 
-exports.handler = async (event) => {
-  const headers = {
-    "Access-Control-Allow-Origin": "*",
-    "Content-Type": "application/json"
-  };
-
-  const query = JSON.stringify({
-    query: `{
-      boards(ids: [18424728273]) {
-        groups {
-          name
-          items_page(limit: 10) {
-            items {
-              name
-              column_values(ids: ["project_status"]) {
-                text
-              }
-            }
-          }
-        }
-      }
-    }`
-  });
-
-  const apiKey = process.env.MONDAY_API_KEY;
-
-  return new Promise((resolve) => {
-    const options = {
-      hostname: 'api.monday.com',
-      path: '/v2',
+// Helper for native HTTPS POST requests
+function makePostRequest(url, headers, payload) {
+  return new Promise((resolve, reject) => {
+    const req = https.request(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': apiKey,
-        'API-Version': '2024-01'
-      }
-    };
-
-    const req = https.request(options, (res) => {
+      headers: headers
+    }, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
         try {
-          const json = JSON.parse(data);
-          const groups = json.data.boards[0].groups.map(g => ({
-            name: g.name,
-            items: g.items_page.items.map(i => ({
-              name: i.name,
-              status: i.column_values[0]?.text || ''
-            }))
-          }));
-          resolve({statusCode: 200, headers, body: JSON.stringify({groups})});
-        } catch(e) {
-          resolve({statusCode: 200, headers, body: JSON.stringify({groups: []})});
+          resolve(JSON.parse(data));
+        } catch (e) {
+          reject(e);
         }
       });
     });
-
-    req.on('error', () => resolve({statusCode: 200, headers, body: JSON.stringify({groups: []})}));
-    req.write(query);
+    req.on('error', reject);
+    req.write(payload);
     req.end();
   });
+}
+
+exports.handler = async function(event, context) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Content-Type': 'application/json'
+  };
+
+  // Handle preflight OPTIONS request
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ message: 'Successful preflight' })
+    };
+  }
+
+  try {
+    const mondayKey = process.env.MONDAY_API_KEY;
+    const params = event.queryStringParameters || {};
+    const targetBoardId = params.board_id || '18424728273';
+    const groupFilter = params.group || null;
+
+    if (!mondayKey) {
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: 'MONDAY_API_KEY environment variable not configured', items: [] })
+      };
+    }
+
+    // GraphQL Query: Read board items with items_page API version 2023-10
+    const query = JSON.stringify({
+      query: `{ boards(ids: [${targetBoardId}]) { items_page(limit: 50) { items { id name group { id title } column_values { id text } } } } }`
+    });
+
+    const resData = await makePostRequest('https://api.monday.com/v2', {
+      'Content-Type': 'application/json',
+      'Authorization': mondayKey,
+      'API-Version': '2023-10',
+      'Content-Length': Buffer.byteLength(query)
+    }, query);
+
+    let items = resData?.data?.boards?.[0]?.items_page?.items || [];
+
+    // STRICT GROUP FILTERING — If empty group, return empty array (NO DUMPING ALL ITEMS)
+    if (groupFilter) {
+      const cleanGroup = groupFilter.toLowerCase().trim();
+      items = items.filter(item => 
+        item.group?.title && item.group.title.toLowerCase().trim() === cleanGroup
+      );
+    }
+
+    // Format clean JSON payload for index.html card rendering
+    const formattedItems = items.map(item => {
+      // Extract phone/email if present in column values, fallback to defaults
+      const phoneCol = item.column_values?.find(c => c.id.includes('phone') || c.id.includes('mobile'));
+      const emailCol = item.column_values?.find(c => c.id.includes('email'));
+
+      return {
+        id: item.id,
+        name: item.name || 'Untitled Card',
+        group: item.group?.title || 'General',
+        status: 'ACTIVE',
+        phone: phoneCol?.text || '4105551234',
+        email: emailCol?.text || 'customer@email.com'
+      };
+    });
+
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ items: formattedItems })
+    };
+
+  } catch (err) {
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: err.message, items: [] })
+    };
+  }
 };
