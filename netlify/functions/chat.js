@@ -1,4 +1,3 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
 const https = require('https');
 
 // GLOBAL CORS HEADERS
@@ -55,6 +54,49 @@ function createMondayGroup(boardId, groupName, mondayToken) {
     });
     req.on('error', () => resolve(null));
     req.write(data);
+    req.end();
+  });
+}
+
+// HELPER: Raw HTTPS Call to Gemini REST API (No SDK Dependency)
+function callGeminiAPI(apiKey, systemInstruction, userPrompt, boardId) {
+  return new Promise((resolve) => {
+    const payload = JSON.stringify({
+      contents: [
+        {
+          parts: [
+            { text: `${systemInstruction}\nUser Action: ${userPrompt} (Board: ${boardId})` }
+          ]
+        }
+      ]
+    });
+
+    const options = {
+      hostname: 'generativelanguage.googleapis.com',
+      path: `/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload)
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let body = '';
+      res.on('data', (chunk) => body += chunk);
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(body);
+          const text = parsed.candidates[0].content.parts[0].text.trim();
+          resolve(text);
+        } catch (e) {
+          resolve('Schwing! Logged! ⚡');
+        }
+      });
+    });
+
+    req.on('error', () => resolve('Schwing! Logged! ⚡'));
+    req.write(payload);
     req.end();
   });
 }
@@ -125,7 +167,7 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // Fallback Gemini AI Process for Subscriber Instances
+    // Fallback Gemini REST Process for Subscriber Instances
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return {
@@ -134,9 +176,6 @@ exports.handler = async function(event, context) {
         body: JSON.stringify({ reply: 'Schwing! Logged! ⚡', board_id: boardId })
       };
     }
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const systemInstruction = `
       You are Fresh 🤵 — Digital Coordinator for TappyThing (Clean Environment LLC).
@@ -147,12 +186,7 @@ exports.handler = async function(event, context) {
       4. Never output speech synthesis or verbose chatter.
     `;
 
-    const result = await model.generateContent([
-      { text: systemInstruction },
-      { text: `User Action: ${userPrompt} (Board: ${boardId})` }
-    ]);
-
-    const responseText = result.response.text().trim();
+    const responseText = await callGeminiAPI(apiKey, systemInstruction, userPrompt, boardId);
 
     return {
       statusCode: 200,
