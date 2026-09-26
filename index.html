@@ -10,17 +10,15 @@
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05070e; color: #f3f4f6; }
 .tapulator-face { background: #0f172a; border: 2px solid #1e293b; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8); }
 .led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; }
-.tap-button { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); box-shadow: 0 0 30px rgba(37, 99, 235, 0.6); }
-.tap-button:active { transform: scale(0.95); }
 .drawer-btn { background: #1e293b; border: 1px solid #334155; }
 .drawer-btn:hover { background: #334155; }
 @keyframes flash-banner { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 .flash-banner { animation: flash-banner 1.5s infinite; }
 </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 pb-24">
+<body class="min-h-screen flex items-center justify-center p-4 pb-28">
 
-<div class="max-w-md w-full tapulator-face rounded-3xl p-6 relative overflow-hidden space-y-6">
+<div class="max-w-md w-full tapulator-face rounded-3xl p-6 relative overflow-hidden space-y-5">
 
   <!-- TOP LED DISPLAY SCREEN -->
   <div class="led-display rounded-2xl p-4 text-center border border-blue-900/50 min-h-[70px] flex items-center justify-center">
@@ -29,24 +27,25 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </div>
   </div>
 
-  <!-- CLEAN SUB-HEADER TAGLINE -->
-  <div class="text-center text-xs text-white font-medium tracking-wide">
-    Tap. Talk. Your world organizes itself.
+  <!-- POCKET CHIEF OF STAFF TAGLINE -->
+  <div class="text-center space-y-1">
+    <div class="text-xs font-bold text-blue-400 uppercase tracking-widest">Your Pocket Chief of Staff</div>
+    <div class="text-[11px] text-gray-300 font-medium">Tap. Talk. Operations live in seconds.</div>
   </div>
 
-  <!-- FLASHING ONBOARDING BANNER -->
-  <button onclick="triggerOnboarding()" class="w-full bg-blue-900/80 hover:bg-blue-800 text-blue-200 font-black py-3 rounded-xl text-xs border border-blue-500 uppercase tracking-widest transition flex items-center justify-center gap-2 flash-banner">
-    <i class="fa-solid fa-bolt text-amber-400"></i>
-    <span>[ BUILD PERSONAL WORLD FIRST ]</span>
+  <!-- HOW IT WORKS START BUTTON -->
+  <button onclick="toggleHowItWorks()" class="w-full bg-blue-900/80 hover:bg-blue-800 text-blue-200 font-black py-3 rounded-xl text-xs border border-blue-500 uppercase tracking-widest transition flex items-center justify-center gap-2 flash-banner">
+    <i class="fa-solid fa-circle-info text-amber-400"></i>
+    <span>[ HOW IT WORKS — START HERE ]</span>
   </button>
 
-  <!-- 6 WORLD DRAWERS GRID -->
-  <div class="grid grid-cols-2 gap-3">
+  <!-- DYNAMIC WORLD DRAWERS CONTAINER -->
+  <div id="drawersContainer" class="grid grid-cols-2 gap-3">
     <button onclick="openDrawer('Personal')" class="drawer-btn rounded-xl p-3 text-left transition space-y-1">
       <div class="text-xs font-extrabold text-blue-400 flex items-center justify-between">
         <span>1. Personal</span> <i class="fa-solid fa-user text-gray-500"></i>
       </div>
-      <div class="text-[10px] text-gray-400">Tasks & Dumps</div>
+      <div class="text-[10px] text-gray-400">Tasks & Brain Dumps</div>
     </button>
 
     <button onclick="openDrawer('Business')" class="drawer-btn rounded-xl p-3 text-left transition space-y-1">
@@ -69,20 +68,37 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       </div>
       <div class="text-[10px] text-gray-400">Bench & Repairs</div>
     </button>
+  </div>
 
-    <button onclick="openDrawer('Invoices')" class="drawer-btn rounded-xl p-3 text-left transition space-y-1">
-      <div class="text-xs font-extrabold text-blue-400 flex items-center justify-between">
-        <span>5. Invoices</span> <i class="fa-solid fa-credit-card text-gray-500"></i>
+  <!-- HOW IT WORKS EXPLANATION MODAL -->
+  <div id="howItWorksModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-6 backdrop-blur-md justify-center">
+    <div class="bg-gray-900 border border-blue-500/40 rounded-3xl p-6 max-w-sm mx-auto space-y-4 text-left shadow-2xl">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+        <h3 class="text-base font-black text-white flex items-center gap-2">
+          <i class="fa-solid fa-robot text-blue-400"></i> Pocket Chief of Staff
+        </h3>
+        <button onclick="toggleHowItWorks()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
       </div>
-      <div class="text-[10px] text-gray-400">Stripe Billing</div>
-    </button>
 
-    <button onclick="openDrawer('Shared Cards')" class="drawer-btn rounded-xl p-3 text-left transition space-y-1">
-      <div class="text-xs font-extrabold text-blue-400 flex items-center justify-between">
-        <span>6. Shared</span> <i class="fa-solid fa-share-nodes text-gray-500"></i>
+      <div class="space-y-3 text-xs text-gray-300">
+        <div class="p-3 bg-gray-800/80 rounded-xl border border-gray-700">
+          <div class="font-bold text-blue-400 mb-0.5">1. Like a Handheld Label Maker</div>
+          <div>Press the mic, photo, or text button at the bottom and speak your raw thoughts.</div>
+        </div>
+        <div class="p-3 bg-gray-800/80 rounded-xl border border-gray-700">
+          <div class="font-bold text-emerald-400 mb-0.5">2. Self-Building Drawers</div>
+          <div>Fresh instantly sorts your voice dumps into dynamic, self-expanding drawers.</div>
+        </div>
+        <div class="p-3 bg-gray-800/80 rounded-xl border border-gray-700">
+          <div class="font-bold text-amber-400 mb-0.5">3. Live Operational Cards</div>
+          <div>Share live cards with customers, track bench repairs, and run your business on the fly.</div>
+        </div>
       </div>
-      <div class="text-[10px] text-gray-400">Public Links</div>
-    </button>
+
+      <button onclick="toggleHowItWorks(); triggerOnboarding();" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider transition">
+        Build My Pocket World Now
+      </button>
+    </div>
   </div>
 
   <!-- PERSISTENT CARD DRAWER MODAL -->
@@ -104,21 +120,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 <!-- UNIFIED BOTTOM INPUT BAR -->
 <div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-40">
   <div class="max-w-md mx-auto flex items-center gap-2">
-    <!-- 1. CAMERA / PHOTO BUTTON -->
     <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0">
       <i class="fa-solid fa-camera text-lg"></i>
       <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoInput(this)">
     </label>
 
-    <!-- 2. TEXT INPUT FIELD -->
     <input type="text" id="unifiedInput" placeholder="Talk or type here..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') submitUnifiedInput()">
 
-    <!-- 3. MICROPHONE VOICE BUTTON -->
     <button id="micBtn" onclick="toggleVoiceIntake()" class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-11 h-11 rounded-xl flex items-center justify-center border border-gray-700 transition shrink-0">
       <i class="fa-solid fa-microphone text-lg"></i>
     </button>
 
-    <!-- SEND BUTTON -->
     <button onclick="submitUnifiedInput()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1">
       <i class="fa-solid fa-paper-plane"></i>
     </button>
@@ -180,10 +192,25 @@ function sendToFresh(promptText) {
   })
   .then(res => res.json())
   .then(data => {
-    document.getElementById('ledOutput').textContent = data.reply || 'Schwing! Logged! ⚡';
+    document.getElementById('ledOutput').textContent = data.reply || 'Logged! ⚡';
+    if (data.drawers && Array.isArray(data.drawers)) {
+      renderCustomDrawers(data.drawers);
+    }
   })
   .catch(err => {
-    document.getElementById('ledOutput').textContent = 'Schwing! Logged! ⚡';
+    document.getElementById('ledOutput').textContent = 'Logged! ⚡';
+  });
+}
+
+function renderCustomDrawers(drawers) {
+  var container = document.getElementById('drawersContainer');
+  container.innerHTML = '';
+  drawers.forEach((name, index) => {
+    var btn = document.createElement('button');
+    btn.className = 'drawer-btn rounded-xl p-3 text-left transition space-y-1';
+    btn.onclick = function() { openDrawer(name); };
+    btn.innerHTML = `<div class="text-xs font-extrabold text-blue-400 flex items-center justify-between"><span>${index + 1}. ${name}</span> <i class="fa-solid fa-folder text-gray-500"></i></div><div class="text-[10px] text-gray-400">Pocket World Drawer</div>`;
+    container.appendChild(btn);
   });
 }
 
@@ -195,6 +222,10 @@ function openDrawer(name) {
 
 function closeDrawer() {
   document.getElementById('drawerModal').classList.add('hidden');
+}
+
+function toggleHowItWorks() {
+  document.getElementById('howItWorksModal').classList.toggle('hidden');
 }
 
 function triggerOnboarding() {
