@@ -15,6 +15,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 .key-secondary { background: #1e293b; border: 1px solid #334155; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
 .key-secondary:hover { background: #273549; }
 .key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; }
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+.mic-pulsing {
+  animation: pulse-red 1.5s infinite;
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
+}
 </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 pb-28">
@@ -197,36 +208,71 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
 <script>
 var activeDrawerContext = '';
+var isListening = false;
+var activeRecognition = null;
 
-function toggleVoiceIntake(drawerContext) {
+function toggleVoiceIntake(drawerContext, targetInputId, targetBtnId) {
   var targetDrawer = drawerContext || activeDrawerContext;
-  var btn = document.getElementById('micBtn');
-  var input = document.getElementById('unifiedInput');
+  var input = document.getElementById(targetInputId || 'unifiedInput');
+  var btn = document.getElementById(targetBtnId || 'micBtn');
   var output = document.getElementById('ledOutput');
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) { alert('Voice not supported.'); return; }
   
-  var recognition = new SR();
-  recognition.continuous = true;
-  recognition.interimResults = false;
-  recognition.lang = 'en-US';
-  
-  btn.classList.add('text-red-500');
-  output.textContent = 'LISTENING...';
-  recognition.start();
+  if (isListening && activeRecognition) {
+    activeRecognition.stop();
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+    output.textContent = 'POCKET CHIEF OF STAFF READY';
+    return;
+  }
 
-  recognition.onresult = function(e) {
-    var transcript = e.results[e.results.length - 1][0].transcript.trim();
-    input.value = transcript;
-    btn.classList.remove('text-red-500');
-    output.textContent = 'PROCESSING...';
-    sendToFresh(transcript, targetDrawer);
+  activeRecognition = new SR();
+  activeRecognition.continuous = true;
+  activeRecognition.interimResults = true;
+  activeRecognition.lang = 'en-US';
+  
+  if (btn) btn.classList.add('mic-pulsing');
+  output.textContent = 'LISTENING...';
+  isListening = true;
+
+  activeRecognition.onresult = function(e) {
+    var interimTranscript = '';
+    var finalTranscript = '';
+
+    for (var i = e.resultIndex; i < e.results.length; ++i) {
+      if (e.results[i].isFinal) {
+        finalTranscript += e.results[i][0].transcript;
+      } else {
+        interimTranscript += e.results[i][0].transcript;
+      }
+    }
+
+    if (input) {
+      input.value = finalTranscript || interimTranscript;
+    }
+
+    if (finalTranscript.trim().length > 0) {
+      output.textContent = 'PROCESSING...';
+      sendToFresh(finalTranscript.trim(), targetDrawer);
+      activeRecognition.stop();
+      isListening = false;
+      if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+    }
   };
 
-  recognition.onerror = function() {
-    btn.classList.remove('text-red-500');
+  activeRecognition.onerror = function() {
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
     output.textContent = 'MIC ERROR';
   };
+
+  activeRecognition.onend = function() {
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+  };
+
+  activeRecognition.start();
 }
 
 function handlePhotoInput(fileInput) {
@@ -237,11 +283,13 @@ function handlePhotoInput(fileInput) {
   }
 }
 
-function submitUnifiedInput() {
-  var text = document.getElementById('unifiedInput').value.trim();
+function submitUnifiedInput(inputId) {
+  var targetId = inputId || 'unifiedInput';
+  var inputEl = document.getElementById(targetId);
+  var text = inputEl ? inputEl.value.trim() : '';
   if (text) {
     sendToFresh(text, activeDrawerContext);
-    document.getElementById('unifiedInput').value = '';
+    if (inputEl) inputEl.value = '';
   }
 }
 
@@ -283,10 +331,13 @@ function sendToFresh(promptText, drawerName) {
 
 function loadDrawerItems(drawerName) {
   var contentDiv = document.getElementById('drawerContent');
-  fetch('/.netlify/functions/monday?drawer=' + encodeURIComponent(drawerName) + '&board_id=18424728273')
+  fetch('/.netlify/functions/monday?board=18424728273&group=' + encodeURIComponent(drawerName))
     .then(res => res.json())
     .then(data => {
-      var items = data.items || [];
+      var groups = data.groups || (data.data && data.data.boards && data.data.boards[0] && data.data.boards[0].groups) || [];
+      var matchingGroup = groups.find(g => (g.title || g.name || '').toLowerCase() === drawerName.toLowerCase()) || groups[0];
+      var items = matchingGroup ? (matchingGroup.items || matchingGroup.items_page?.items || []) : [];
+      
       var itemsHtml = items.map(item => `
         <div class="p-3 bg-gray-800 rounded-xl border border-gray-700 flex justify-between items-center">
           <div>
@@ -303,16 +354,27 @@ function loadDrawerItems(drawerName) {
           <div class="space-y-2 max-h-60 overflow-y-auto">
             ${itemsHtml || '<p class="text-gray-500 text-center py-4">No cards in this drawer yet. Speak to add one!</p>'}
           </div>
-          <div class="flex items-center gap-2 pt-2 border-t border-gray-800">
-            <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 p-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center font-bold flex items-center justify-center gap-2">
-              <i class="fa-solid fa-camera"></i>
-              <span>Snap Photo</span>
-              <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoInput(this)">
-            </label>
-            <button onclick="toggleVoiceIntake('${drawerName}')" class="bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl border border-blue-500 flex-1 font-bold flex items-center justify-center gap-2">
-              <i class="fa-solid fa-microphone"></i>
-              <span>Talk to Card</span>
-            </button>
+          
+          <!-- COMBINED INPUT BOX WITH EMBEDDED MIC & SNAP PHOTO -->
+          <div class="pt-2 border-t border-gray-800 space-y-3">
+            <div class="relative flex items-center">
+              <input type="text" id="drawerInput_${drawerName}" placeholder="Type or dictate to card..." class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-4 pr-10 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') submitUnifiedInput('drawerInput_${drawerName}')">
+              <button id="drawerMicBtn_${drawerName}" onclick="toggleVoiceIntake('${drawerName}', 'drawerInput_${drawerName}', 'drawerMicBtn_${drawerName}')" class="absolute right-2 text-blue-400 hover:text-blue-300 p-1.5 transition">
+                <i class="fa-solid fa-microphone text-sm"></i>
+              </button>
+            </div>
+            
+            <div class="flex gap-2">
+              <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">
+                <i class="fa-solid fa-camera"></i>
+                <span>Snap Photo</span>
+                <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoInput(this)">
+              </label>
+              <button onclick="submitUnifiedInput('drawerInput_${drawerName}')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shrink-0">
+                <span>Send</span>
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+            </div>
           </div>
         </div>`;
     })
@@ -321,16 +383,27 @@ function loadDrawerItems(drawerName) {
         <div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">
           <p class="font-bold text-white text-sm">Drawer Active: ${drawerName}</p>
           <p class="text-gray-400">Speak commands or upload photos directly into this card:</p>
-          <div class="flex items-center gap-2 pt-2 border-t border-gray-800">
-            <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 p-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center font-bold flex items-center justify-center gap-2">
-              <i class="fa-solid fa-camera"></i>
-              <span>Snap Photo</span>
-              <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoInput(this)">
-            </label>
-            <button onclick="toggleVoiceIntake('${drawerName}')" class="bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl border border-blue-500 flex-1 font-bold flex items-center justify-center gap-2">
-              <i class="fa-solid fa-microphone"></i>
-              <span>Talk to Card</span>
-            </button>
+
+          <!-- COMBINED INPUT BOX WITH EMBEDDED MIC & SNAP PHOTO -->
+          <div class="pt-2 border-t border-gray-800 space-y-3">
+            <div class="relative flex items-center">
+              <input type="text" id="drawerInput_${drawerName}" placeholder="Type or dictate to card..." class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-4 pr-10 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') submitUnifiedInput('drawerInput_${drawerName}')">
+              <button id="drawerMicBtn_${drawerName}" onclick="toggleVoiceIntake('${drawerName}', 'drawerInput_${drawerName}', 'drawerMicBtn_${drawerName}')" class="absolute right-2 text-blue-400 hover:text-blue-300 p-1.5 transition">
+                <i class="fa-solid fa-microphone text-sm"></i>
+              </button>
+            </div>
+            
+            <div class="flex gap-2">
+              <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">
+                <i class="fa-solid fa-camera"></i>
+                <span>Snap Photo</span>
+                <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoInput(this)">
+              </label>
+              <button onclick="submitUnifiedInput('drawerInput_${drawerName}')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shrink-0">
+                <span>Send</span>
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+            </div>
           </div>
         </div>`;
     });
