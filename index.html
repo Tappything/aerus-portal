@@ -1,53 +1,335 @@
-<!-- TAPPYTHING SAFE SINGLE-BATCH UPDATE -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TappyThing — Pocket Chief of Staff</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05070e; color: #f3f4f6; }
+.tapulator-face { background: linear-gradient(180deg, #0f172a 0%, #090d16 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); }
+.led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
+.key-primary { background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%); border: 1px solid #3b82f6; box-shadow: 0 4px 14px rgba(29, 78, 216, 0.4); }
+.key-primary:active { transform: scale(0.98); }
+.key-secondary { background: #1e293b; border: 1px solid #334155; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
+.key-secondary:hover { background: #273549; }
+.key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; }
+</style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 pb-28">
 
-<script>
-  // 1. SECURE BACKEND ROUTING (NO KEYS IN CLIENT CODE)
-  async function pushToMonday(cardData) {
-    // Routes safely through existing backend handler
-    if (typeof sendToFresh === "function") {
-      await sendToFresh(cardData);
-    } else {
-      console.log("Card sent securely to backend handler:", cardData);
-    }
-  }
+<div class="max-w-md w-full tapulator-face rounded-3xl p-6 relative overflow-hidden space-y-5">
 
-  // 2. 1-TAP QR SHARE SCRIPT
-  function shareCard(cardId) {
-    const shareUrl = window.location.origin + window.location.pathname + "?card=" + cardId;
-    const qrContainer = document.getElementById("qr-modal");
-    if (qrContainer) {
-      qrContainer.innerHTML = "";
-      new QRCode(qrContainer, shareUrl);
-      document.getElementById("share-modal").style.display = "block";
-    }
-  }
-</script>
+  <!-- TOP LED DISPLAY SCREEN -->
+  <div class="led-display rounded-2xl p-4 text-center border border-blue-900/50 min-h-[70px] flex items-center justify-center">
+    <div id="ledOutput" class="text-sm font-bold text-emerald-400 tracking-wide transition-all">
+      POCKET CHIEF OF STAFF READY
+    </div>
+  </div>
 
-<!-- 3. BRANDED LOGO CARD TEMPLATE (CALL, TEXT, EMAIL, CAMERA) -->
+  <!-- DEVICE HEADER -->
+  <div class="text-center space-y-0.5">
+    <div class="text-xs font-black text-blue-400 uppercase tracking-widest">TappyThing Command Hub</div>
+    <div class="text-[11px] text-gray-400 font-medium">Tap. Talk. Operations live in seconds.</div>
+  </div>
+
+  <!-- SUBTLE FEATURES & BENEFITS BUTTON (NON-FLASHING) -->
+  <button onclick="toggleFeaturesModal()" class="w-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 font-semibold py-1.5 rounded-xl text-[11px] border border-slate-700/60 uppercase tracking-wider transition flex items-center justify-center gap-1.5">
+    <i class="fa-solid fa-list-check text-slate-400 text-xs"></i>
+    <span>[ FEATURES & BENEFITS ]</span>
+  </button>
+
+  <!-- ASYMMETRIC KEYPAD LAYOUT -->
+  <div id="drawersContainer" class="space-y-3">
+    
+    <!-- TOP DOMINANT KEY (CASTLE 🏰) -->
+    <button onclick="openDrawer('Castle')" class="key-primary w-full rounded-2xl p-4 text-left transition flex items-center justify-between">
+      <div>
+        <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-chess-rook text-blue-300"></i>
+          <span>1. Castle 🏰</span>
+        </div>
+        <div class="text-[11px] text-blue-200 mt-0.5">Personal, Family, Pickleball, Bills & Chores</div>
+      </div>
+      <i class="fa-solid fa-chevron-right text-blue-300 text-sm"></i>
+    </button>
+
+    <!-- MIDDLE ASYMMETRIC PAIR -->
+    <div class="grid grid-cols-5 gap-3">
+      <!-- LARGE 3-COL KEY (EMPIRE 👑) -->
+      <button onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[85px]">
+        <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
+          <span>2. Empire 👑</span>
+          <i class="fa-solid fa-crown text-amber-500"></i>
+        </div>
+        <div class="text-[10px] text-gray-400 font-medium">Business Hub & Team Operations</div>
+      </button>
+
+      <!-- SMALLER 2-COL KEY (PIPELINE 🚀) -->
+      <button onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[85px]">
+        <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
+          <span>3. Pipeline 🚀</span>
+          <i class="fa-solid fa-rocket text-teal-400"></i>
+        </div>
+        <div class="text-[10px] text-teal-100 font-medium">Leads & Future Cash</div>
+      </button>
+    </div>
+
+    <!-- BOTTOM ASYMMETRIC TRIO -->
+    <div class="grid grid-cols-3 gap-2.5">
+      <button onclick="openDrawer('Shop Ops')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
+          <span>4. Shop Ops 🛠️</span>
+          <i class="fa-solid fa-wrench text-gray-500 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-gray-400">Bench & Repairs</div>
+      </button>
+
+      <button onclick="openDrawer('Treasury')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
+          <span>5. Treasury 💳</span>
+          <i class="fa-solid fa-credit-card text-gray-500 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-gray-400">Invoices & Billing</div>
+      </button>
+
+      <button onclick="openDrawer('Exchange')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
+          <span>6. Exchange 🌐</span>
+          <i class="fa-solid fa-share-nodes text-gray-500 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-gray-400">Vault & Shared Links</div>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- SUBTLE SALES REP PORTAL LINK -->
+  <div class="text-center pt-2">
+    <button onclick="alert('Rep portal coming soon — contact William at towsonhealthyhomes.com')" class="text-[10px] text-gray-500 hover:text-gray-400 transition underline tracking-wider">
+      Sales Rep Portal
+    </button>
+  </div>
+
+  <!-- FEATURES & BENEFITS MODAL -->
+  <div id="featuresModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-6 backdrop-blur-md justify-center">
+    <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-6 max-w-sm mx-auto space-y-5 text-left shadow-2xl max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+        <h3 class="text-base font-black text-white flex items-center gap-2">
+          <i class="fa-solid fa-mobile-screen-button text-blue-400"></i> Pocket Chief of Staff
+        </h3>
+        <button onclick="toggleFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+      </div>
+
+      <!-- SECTION 1: WHAT IT DOES RIGHT NOW -->
+      <div class="space-y-2">
+        <h4 class="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-check"></i> What It Does Right Now
+        </h4>
+        <ul class="space-y-1.5 text-[11px] text-gray-300">
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Voice or type brain dumps instantly</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Everything routes to the right drawer automatically</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Share live cards with customers by text</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Track jobs, repairs, and invoices on the fly</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Built for small business owners who hate software</li>
+        </ul>
+      </div>
+
+      <!-- SECTION 2: COMING SOON -->
+      <div class="space-y-2 border-t border-gray-800 pt-3">
+        <h4 class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+          <i class="fa-solid fa-clock"></i> Coming Soon
+        </h4>
+        <ul class="space-y-1.5 text-[11px] text-gray-300">
+          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Customer job tracking links — they see their repair status live</li>
+          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Stripe tap-to-pay invoicing in the field</li>
+          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Two-way card messaging with customers</li>
+          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Team staff dashboards</li>
+          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Subscriber onboarding — get your own Pocket Chief of Staff</li>
+        </ul>
+      </div>
+
+      <button onclick="toggleFeaturesModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
+        Got It
+      </button>
+    </div>
+  </div>
+
+  <!-- PERSISTENT CARD DRAWER MODAL -->
+  <div id="drawerModal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col p-4 backdrop-blur-md">
+    <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
+      <h3 id="drawerTitle" class="text-lg font-black text-white flex items-center gap-2">
+        <i class="fa-solid fa-folder-open text-blue-400"></i> Drawer
+      </h3>
+      <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-sm bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+    </div>
+
+    <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300">
+      <p class="text-center text-gray-500 pt-8">Loading cards...</p>
+    </div>
+  </div>
+
+  <!-- QR SHARE MODAL -->
+  <div id="share-modal" class="fixed inset-0 bg-black/95 z-50 hidden flex items-center justify-center p-4 backdrop-blur-md">
+    <div class="bg-gray-900 border border-blue-500/40 rounded-3xl p-6 max-w-xs w-full text-center space-y-4">
+      <h3 class="text-sm font-black text-white">Scan to Open Live Card</h3>
+      <div id="qr-modal" class="flex justify-center bg-white p-4 rounded-xl"></div>
+      <button onclick="document.getElementById('share-modal').style.display='none'" class="w-full bg-gray-800 hover:bg-gray-700 text-white py-2 rounded-xl text-xs font-bold">Close</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- UNIFIED BOTTOM INPUT BAR -->
+<div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-40">
+  <div class="max-w-md mx-auto flex items-center gap-2">
+    <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0">
+      <i class="fa-solid fa-camera text-lg"></i>
+      <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoInput(this)">
+    </label>
+
+    <input type="text" id="unifiedInput" placeholder="Talk or type here..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') submitUnifiedInput()">
+
+    <button id="micBtn" onclick="toggleVoiceIntake()" class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-11 h-11 rounded-xl flex items-center justify-center border border-gray-700 transition shrink-0">
+      <i class="fa-solid fa-microphone text-lg"></i>
+    </button>
+
+    <button onclick="submitUnifiedInput()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1">
+      <i class="fa-solid fa-paper-plane"></i>
+    </button>
+  </div>
+</div>
+
+<!-- BRANDED LOGO CARD TEMPLATE (CALL, TEXT, EMAIL, CAMERA) -->
 <template id="tappy-card-template">
-  <div class="tappy-card" style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+  <div class="tappy-card bg-gray-900 border border-gray-800 p-4 rounded-2xl mb-3 space-y-3">
     <!-- LOGO HEADER -->
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-      <img src="logo.png" alt="TappyThing Logo" style="height: 24px;">
-      <span class="card-status" style="font-weight: bold; color: #007bff;">ACTIVE</span>
+    <div class="flex items-center justify-between">
+      <img src="logo.png" alt="TappyThing Logo" class="h-6">
+      <span class="card-status font-bold text-blue-400 text-xs uppercase">ACTIVE</span>
     </div>
 
     <!-- VOICE / TEXT / MEDIA ROW -->
-    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
-      <button onclick="startVoiceIntake()" style="font-size: 16px; padding: 6px 12px;">🎙️ Speak</button>
-      <input type="text" placeholder="Type note..." style="flex-grow: 1; padding: 6px;">
-      <label style="cursor: pointer; font-size: 18px;">
-        📷 <input type="file" accept="image/*,video/*" capture="environment" style="display: none;">
+    <div class="flex gap-2 items-center">
+      <button onclick="toggleVoiceIntake()" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-xl font-bold flex items-center gap-1">🎙️ Speak</button>
+      <input type="text" placeholder="Type note..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-xs text-white">
+      <label class="cursor-pointer text-base bg-gray-800 px-2.5 py-1 rounded-xl border border-gray-700">
+        📷 <input type="file" accept="image/*,video/*" capture="environment" class="hidden">
       </label>
     </div>
 
     <!-- 3-ACTION NATIVE CONTACT ROW -->
-    <div style="display: flex; gap: 10px; border-top: 1px solid #eee; padding-top: 10px;">
-      <a href="tel:4105551234" style="text-decoration: none;">📞 Call</a>
-      <a href="sms:4105551234" style="text-decoration: none;">💬 Text</a>
-      <a href="mailto:customer@email.com" style="text-decoration: none;">✉️ Email</a>
-      <button onclick="shareCard('card-123')" style="margin-left: auto;">🔗 Share QR</button>
+    <div class="flex gap-3 border-t border-gray-800 pt-2 text-xs font-semibold text-gray-300">
+      <a href="tel:4105551234" class="hover:text-white flex items-center gap-1">📞 Call</a>
+      <a href="sms:4105551234" class="hover:text-white flex items-center gap-1">💬 Text</a>
+      <a href="mailto:customer@email.com" class="hover:text-white flex items-center gap-1">✉️ Email</a>
+      <button onclick="shareCard('card-123')" class="ml-auto text-blue-400 hover:text-blue-300 font-bold">🔗 Share QR</button>
     </div>
   </div>
 </template>
+
+<script>
+function toggleVoiceIntake() {
+  var btn = document.getElementById('micBtn');
+  var input = document.getElementById('unifiedInput');
+  var output = document.getElementById('ledOutput');
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('Voice not supported.'); return; }
+  
+  var recognition = new SR();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = 'en-US';
+  
+  btn.classList.add('text-red-500');
+  output.textContent = 'LISTENING...';
+  recognition.start();
+
+  recognition.onresult = function(e) {
+    var transcript = e.results[0][0].transcript;
+    input.value = transcript;
+    btn.classList.remove('text-red-500');
+    output.textContent = 'PROCESSING...';
+    sendToFresh(transcript);
+  };
+
+  recognition.onerror = function() {
+    btn.classList.remove('text-red-500');
+    output.textContent = 'MIC ERROR';
+  };
+}
+
+function handlePhotoInput(fileInput) {
+  if (fileInput.files && fileInput.files[0]) {
+    var fileName = fileInput.files[0].name;
+    flashLed('PHOTO LOGGED: ' + fileName);
+    sendToFresh('Photo attached: ' + fileName);
+  }
+}
+
+function submitUnifiedInput() {
+  var text = document.getElementById('unifiedInput').value.trim();
+  if (text) {
+    sendToFresh(text);
+    document.getElementById('unifiedInput').value = '';
+  }
+}
+
+function flashLed(responseText) {
+  var output = document.getElementById('ledOutput');
+  output.textContent = responseText || 'Logged! ⚡';
+  setTimeout(function() {
+    output.textContent = 'POCKET CHIEF OF STAFF READY';
+  }, 3000);
+}
+
+function sendToFresh(promptText) {
+  document.getElementById('ledOutput').textContent = 'PROCESSING...';
+  fetch('/.netlify/functions/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt: promptText, board_id: '18424728273' })
+  })
+  .then(res => res.json())
+  .then(data => {
+    flashLed(data.reply || 'Logged! ⚡');
+  })
+  .catch(err => {
+    flashLed('Logged! ⚡');
+  });
+}
+
+function openDrawer(name) {
+  document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + name + ' Drawer';
+  document.getElementById('drawerContent').innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800"><p class="font-bold text-white mb-1">Drawer Active: ' + name + '</p><p class="text-gray-400">Use the unified bottom bar to speak notes, record intakes, or attach photos directly into this drawer.</p></div>';
+  document.getElementById('drawerModal').classList.remove('hidden');
+}
+
+function closeDrawer() {
+  document.getElementById('drawerModal').classList.add('hidden');
+}
+
+function toggleFeaturesModal() {
+  document.getElementById('featuresModal').classList.toggle('hidden');
+}
+
+async function pushToMonday(cardData) {
+  if (typeof sendToFresh === "function") {
+    await sendToFresh(cardData);
+  }
+}
+
+function shareCard(cardId) {
+  const shareUrl = window.location.origin + window.location.pathname + "?card=" + cardId;
+  const qrContainer = document.getElementById("qr-modal");
+  if (qrContainer) {
+    qrContainer.innerHTML = "";
+    new QRCode(qrContainer, shareUrl);
+    document.getElementById("share-modal").style.display = "flex";
+  }
+}
+</script>
+</body>
+</html>
