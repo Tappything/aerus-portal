@@ -193,7 +193,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 </div>
 
 <script>
-function toggleVoiceIntake() {
+var activeDrawerContext = '';
+
+function toggleVoiceIntake(drawerContext) {
+  var targetDrawer = drawerContext || activeDrawerContext;
   var btn = document.getElementById('micBtn');
   var input = document.getElementById('unifiedInput');
   var output = document.getElementById('ledOutput');
@@ -201,7 +204,7 @@ function toggleVoiceIntake() {
   if (!SR) { alert('Voice not supported.'); return; }
   
   var recognition = new SR();
-  recognition.continuous = false;
+  recognition.continuous = true;
   recognition.interimResults = false;
   recognition.lang = 'en-US';
   
@@ -210,11 +213,11 @@ function toggleVoiceIntake() {
   recognition.start();
 
   recognition.onresult = function(e) {
-    var transcript = e.results[0][0].transcript;
+    var transcript = e.results[e.results.length - 1][0].transcript.trim();
     input.value = transcript;
     btn.classList.remove('text-red-500');
     output.textContent = 'PROCESSING...';
-    sendToFresh(transcript);
+    sendToFresh(transcript, targetDrawer);
   };
 
   recognition.onerror = function() {
@@ -227,14 +230,14 @@ function handlePhotoInput(fileInput) {
   if (fileInput.files && fileInput.files[0]) {
     var fileName = fileInput.files[0].name;
     flashLed('PHOTO LOGGED: ' + fileName);
-    sendToFresh('Photo attached: ' + fileName);
+    sendToFresh('Photo attached: ' + fileName, activeDrawerContext);
   }
 }
 
 function submitUnifiedInput() {
   var text = document.getElementById('unifiedInput').value.trim();
   if (text) {
-    sendToFresh(text);
+    sendToFresh(text, activeDrawerContext);
     document.getElementById('unifiedInput').value = '';
   }
 }
@@ -247,12 +250,14 @@ function flashLed(responseText) {
   }, 3000);
 }
 
-function sendToFresh(promptText) {
+function sendToFresh(promptText, drawerName) {
   document.getElementById('ledOutput').textContent = 'PROCESSING...';
+  var fullPrompt = drawerName ? '[' + drawerName + ' Drawer] ' + promptText : promptText;
+
   fetch('/.netlify/functions/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt: promptText, board_id: '18424728273' })
+    body: JSON.stringify({ prompt: fullPrompt, board_id: '18424728273' })
   })
   .then(res => res.json())
   .then(data => {
@@ -264,6 +269,7 @@ function sendToFresh(promptText) {
 }
 
 function openDrawer(name) {
+  activeDrawerContext = name;
   document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + name + ' Drawer';
   document.getElementById('drawerContent').innerHTML = `
     <div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">
@@ -275,7 +281,7 @@ function openDrawer(name) {
           <span>Snap Photo</span>
           <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoInput(this)">
         </label>
-        <button onclick="toggleVoiceIntake()" class="bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl border border-blue-500 flex-1 font-bold flex items-center justify-center gap-2">
+        <button onclick="toggleVoiceIntake('${name}')" class="bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl border border-blue-500 flex-1 font-bold flex items-center justify-center gap-2">
           <i class="fa-solid fa-microphone"></i>
           <span>Talk to Card</span>
         </button>
@@ -285,6 +291,7 @@ function openDrawer(name) {
 }
 
 function closeDrawer() {
+  activeDrawerContext = '';
   document.getElementById('drawerModal').classList.add('hidden');
 }
 
