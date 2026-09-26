@@ -68,16 +68,12 @@ exports.handler = async function(event, context) {
 
     let items = resData?.data?.boards?.[0]?.items_page?.items || [];
 
-    // Filter by group title if requested
+    // STRICT Group filtering — NO FALLBACK to all items if empty
     if (groupFilter) {
       const cleanGroup = groupFilter.toLowerCase().trim();
-      const filtered = items.filter(item => 
+      items = items.filter(item => 
         item.group?.title && item.group.title.toLowerCase().trim() === cleanGroup
       );
-      // Fallback to all items if filtered group returns empty
-      if (filtered.length > 0) {
-        items = filtered;
-      }
     }
 
     // Format clean JSON payload for index.html card rendering
