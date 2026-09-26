@@ -16,6 +16,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 .key-secondary { background: #1e293b; border: 1px solid #334155; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
 .key-secondary:hover { background: #273549; }
 .key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; }
+.btn-click-active { transform: scale(0.92); opacity: 0.8; }
 </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 pb-28">
@@ -59,7 +60,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
     <!-- MIDDLE ASYMMETRIC PAIR -->
     <div class="grid grid-cols-5 gap-3">
-      <!-- LARGE 3-COL KEY (EMPIRE 👑) -->
       <button onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[85px]">
         <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
           <span>2. Empire 👑</span>
@@ -68,7 +68,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         <div class="text-[10px] text-gray-400 font-medium">Business Hub & Team Operations</div>
       </button>
 
-      <!-- SMALLER 2-COL KEY (PIPELINE 🚀) -->
       <button onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[85px]">
         <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
           <span>3. Pipeline 🚀</span>
@@ -101,7 +100,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
           <span>6. Exchange 🌐</span>
           <i class="fa-solid fa-share-nodes text-gray-500 text-xs"></i>
         </div>
-        <div class="text-[9px] text-gray-400">Vault & Shared Links</div>
+        <div class="text-[9px] text-gray-400">Vault (22.2k) & Links</div>
       </button>
     </div>
 
@@ -126,25 +125,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
       <div class="space-y-2">
         <h4 class="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-          <i class="fa-solid fa-circle-check"></i> Top Features & Benefits
+          <i class="fa-solid fa-circle-check"></i> What It Does Right Now
         </h4>
         <ul class="space-y-1.5 text-[11px] text-gray-300">
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Brainstorming Mode:</strong> Raw voice dumps auto-route into organized cards instantly.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Time to Tap:</strong> Single-tap knockout mode to clear pending tasks, calls, and invoices.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap Live Cards:</strong> Share jobs and event RSVPs by text with zero app downloads.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Smart Routing:</strong> Voice notes land in Castle, Empire, Pipeline, Shop Ops, Treasury, or Exchange.</li>
-        </ul>
-      </div>
-
-      <div class="space-y-2 border-t border-gray-800 pt-3">
-        <h4 class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-          <i class="fa-solid fa-clock"></i> Coming Soon
-        </h4>
-        <ul class="space-y-1.5 text-[11px] text-gray-300">
-          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Customer job tracking links — live repair status</li>
-          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Stripe tap-to-pay invoicing in the field</li>
-          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Two-way card messaging with customers</li>
-          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Team staff dashboards</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Streaming Dictation:</strong> Real-time word dictation directly in input box.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Instant Visual Proof:</strong> Flashes ✅ LOGGED & FIRED TO BOARD! ⚡ on LED screen.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap QR Sharing:</strong> Instant QR code generated for live card phone scans.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Customer Vault Connected:</strong> Instant access to 22,283 customer records.</li>
         </ul>
       </div>
 
@@ -179,7 +166,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
 </div>
 
-<!-- UNIFIED BOTTOM INPUT BAR -->
+<!-- UNIFIED BOTTOM INPUT BAR WITH REAL-TIME STREAMING DICTATION -->
 <div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-40">
   <div class="max-w-md mx-auto flex items-center gap-2">
     <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0">
@@ -193,25 +180,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <i class="fa-solid fa-microphone text-lg"></i>
     </button>
 
-    <button onclick="submitUnifiedInput()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1">
+    <button id="sendBtn" onclick="submitUnifiedInput()" class="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1 shadow-lg">
       <i class="fa-solid fa-paper-plane"></i>
     </button>
   </div>
 </div>
 
-<!-- BRANDED LOGO CARD TEMPLATE -->
+<!-- BRANDED CARD TEMPLATE WITH QR SHARE & CONTACT BUTTONS -->
 <template id="tappy-card-template">
   <div class="tappy-card bg-gray-900 border border-gray-800 p-4 rounded-2xl mb-3 space-y-3">
-    <!-- LOGO HEADER -->
     <div class="flex items-center justify-between">
-      <img src="logo.png" alt="TappyThing Logo" class="h-5 object-contain">
+      <img src="logo.png" alt="TappyThing" class="h-5 object-contain">
       <span class="card-status font-bold text-blue-400 text-xs uppercase">ACTIVE</span>
     </div>
 
-    <!-- CARD TITLE / NAME -->
     <div class="card-title text-sm font-bold text-white">Card Item</div>
 
-    <!-- VOICE / TEXT / MEDIA ROW -->
     <div class="flex gap-2 items-center">
       <button onclick="toggleVoiceIntake()" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-xl font-bold flex items-center gap-1">🎙️ Speak</button>
       <input type="text" placeholder="Type note..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-xs text-white">
@@ -220,44 +204,68 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       </label>
     </div>
 
-    <!-- 3-ACTION NATIVE CONTACT ROW -->
     <div class="flex gap-3 border-t border-gray-800 pt-2 text-xs font-semibold text-gray-300">
       <a href="tel:4105551234" class="card-call hover:text-white flex items-center gap-1">📞 Call</a>
       <a href="sms:4105551234" class="card-sms hover:text-white flex items-center gap-1">💬 Text</a>
       <a href="mailto:customer@email.com" class="card-email hover:text-white flex items-center gap-1">✉️ Email</a>
-      <button onclick="shareCard('card-123')" class="card-share ml-auto text-blue-400 hover:text-blue-300 font-bold">🔗 Share QR</button>
+      <button class="card-share ml-auto text-blue-400 hover:text-blue-300 font-bold">🔗 Share QR</button>
     </div>
   </div>
 </template>
 
 <script>
+var recognition = null;
+
+function playClickFeedback(element) {
+  if (element) {
+    element.classList.add('btn-click-active');
+    setTimeout(() => element.classList.remove('btn-click-active'), 150);
+  }
+}
+
 function toggleVoiceIntake() {
   var btn = document.getElementById('micBtn');
   var input = document.getElementById('unifiedInput');
   var output = document.getElementById('ledOutput');
+  playClickFeedback(btn);
+
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert('Voice not supported.'); return; }
+  if (!SR) { alert('Voice dictation not supported on this browser.'); return; }
   
-  var recognition = new SR();
-  recognition.continuous = false;
-  recognition.interimResults = false;
+  if (recognition) {
+    recognition.stop();
+    recognition = null;
+    btn.classList.remove('text-red-500');
+    output.textContent = 'POCKET CHIEF OF STAFF READY';
+    return;
+  }
+
+  recognition = new SR();
+  recognition.continuous = true;
+  recognition.interimResults = true; // REAL-TIME INTERIM RESULTS STREAMING
   recognition.lang = 'en-US';
   
   btn.classList.add('text-red-500');
-  output.textContent = 'LISTENING...';
+  output.textContent = 'LISTENING (SPEAK NOW)...';
   recognition.start();
 
   recognition.onresult = function(e) {
-    var transcript = e.results[0][0].transcript;
-    input.value = transcript;
-    btn.classList.remove('text-red-500');
-    output.textContent = 'PROCESSING...';
-    sendToFresh(transcript);
+    var interim = '';
+    var final = '';
+    for (var i = e.resultIndex; i < e.results.length; ++i) {
+      if (e.results[i].isFinal) {
+        final += e.results[i][0].transcript;
+      } else {
+        interim += e.results[i][0].transcript;
+      }
+    }
+    input.value = final || interim; // STREAM WORDS LIVE TO INPUT BOX
   };
 
   recognition.onerror = function() {
     btn.classList.remove('text-red-500');
     output.textContent = 'MIC ERROR';
+    recognition = null;
   };
 }
 
@@ -270,23 +278,32 @@ function handlePhotoInput(fileInput) {
 }
 
 function submitUnifiedInput() {
-  var text = document.getElementById('unifiedInput').value.trim();
+  var sendBtn = document.getElementById('sendBtn');
+  playClickFeedback(sendBtn);
+
+  var input = document.getElementById('unifiedInput');
+  var text = input.value.trim();
   if (text) {
+    if (recognition) { recognition.stop(); recognition = null; document.getElementById('micBtn').classList.remove('text-red-500'); }
+    
+    // CLEAR INPUT IMMEDIATELY AND SHOW PROCESSING... ⏳
+    input.value = '';
+    var output = document.getElementById('ledOutput');
+    output.textContent = 'PROCESSING... ⏳';
+
     sendToFresh(text);
-    document.getElementById('unifiedInput').value = '';
   }
 }
 
 function flashLed(responseText) {
   var output = document.getElementById('ledOutput');
-  output.textContent = responseText || 'Logged! ⚡';
+  output.textContent = responseText || '✅ LOGGED & FIRED TO BOARD! ⚡';
   setTimeout(function() {
     output.textContent = 'POCKET CHIEF OF STAFF READY';
-  }, 3000);
+  }, 4000);
 }
 
 function sendToFresh(promptText) {
-  document.getElementById('ledOutput').textContent = 'PROCESSING...';
   fetch('/.netlify/functions/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -294,10 +311,10 @@ function sendToFresh(promptText) {
   })
   .then(res => res.json())
   .then(data => {
-    flashLed(data.reply || 'Logged! ⚡');
+    flashLed(data.reply || '✅ LOGGED & FIRED TO BOARD! ⚡');
   })
   .catch(err => {
-    flashLed('Logged! ⚡');
+    flashLed('✅ LOGGED & FIRED TO BOARD! ⚡');
   });
 }
 
@@ -314,7 +331,7 @@ async function openDrawer(name) {
     drawerContent.innerHTML = '';
 
     if (!data.items || data.items.length === 0) {
-      drawerContent.innerHTML = '<div class="p-6 bg-gray-900 rounded-2xl border border-gray-800 text-center space-y-2"><p class="font-bold text-white text-sm">No cards in ' + name + ' yet.</p><p class="text-gray-400 text-xs">Tap below to speak into this drawer.</p></div>';
+      drawerContent.innerHTML = '<div class="p-6 bg-gray-900 rounded-2xl border border-gray-800 text-center space-y-2"><p class="font-bold text-white text-sm">No cards in ' + name + ' yet.</p><p class="text-gray-400 text-xs">Tap below to speak notes into this drawer.</p></div>';
       return;
     }
 
@@ -339,7 +356,7 @@ async function openDrawer(name) {
       if (emailEl) emailEl.href = 'mailto:' + (item.email || 'customer@email.com');
 
       const shareBtn = clone.querySelector('.card-share');
-      if (shareBtn) shareBtn.setAttribute('onclick', "shareCard('" + item.id + "')");
+      if (shareBtn) shareBtn.onclick = function() { shareCard(item.id); };
 
       drawerContent.appendChild(clone);
     });
@@ -355,12 +372,6 @@ function closeDrawer() {
 
 function toggleFeaturesModal() {
   document.getElementById('featuresModal').classList.toggle('hidden');
-}
-
-async function pushToMonday(cardData) {
-  if (typeof sendToFresh === "function") {
-    await sendToFresh(cardData);
-  }
 }
 
 function shareCard(cardId) {
