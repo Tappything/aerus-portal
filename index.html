@@ -21,6 +21,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
 <div class="max-w-md w-full tapulator-face rounded-3xl p-6 relative overflow-hidden space-y-5">
 
+  <!-- FRESH AVATAR LOGO -->
+  <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-16 h-16 rounded-full border-2 border-blue-400 mx-auto mb-3 block shadow-lg object-cover">
+
   <!-- TOP LED DISPLAY SCREEN -->
   <div class="led-display rounded-2xl p-4 text-center border border-blue-900/50 min-h-[70px] flex items-center justify-center">
     <div id="ledOutput" class="text-sm font-bold text-emerald-400 tracking-wide transition-all">
@@ -262,32 +265,82 @@ function sendToFresh(promptText, drawerName) {
   .then(res => res.json())
   .then(data => {
     flashLed(data.reply || 'Logged! ⚡');
+    if (activeDrawerContext) {
+      setTimeout(function() {
+        loadDrawerItems(activeDrawerContext);
+      }, 2000);
+    }
   })
   .catch(err => {
     flashLed('Logged! ⚡');
+    if (activeDrawerContext) {
+      setTimeout(function() {
+        loadDrawerItems(activeDrawerContext);
+      }, 2000);
+    }
   });
+}
+
+function loadDrawerItems(drawerName) {
+  var contentDiv = document.getElementById('drawerContent');
+  fetch('/.netlify/functions/monday?drawer=' + encodeURIComponent(drawerName) + '&board_id=18424728273')
+    .then(res => res.json())
+    .then(data => {
+      var items = data.items || [];
+      var itemsHtml = items.map(item => `
+        <div class="p-3 bg-gray-800 rounded-xl border border-gray-700 flex justify-between items-center">
+          <div>
+            <p class="font-bold text-white text-xs">${item.name || 'Untitled Card'}</p>
+            <p class="text-[10px] text-gray-400">${item.updated_at || 'Just now'}</p>
+          </div>
+          <span class="text-[10px] bg-blue-900 text-blue-300 px-2 py-0.5 rounded-full font-bold">Active</span>
+        </div>
+      `).join('');
+
+      contentDiv.innerHTML = `
+        <div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">
+          <p class="font-bold text-white text-sm">Drawer Active: ${drawerName}</p>
+          <div class="space-y-2 max-h-60 overflow-y-auto">
+            ${itemsHtml || '<p class="text-gray-500 text-center py-4">No cards in this drawer yet. Speak to add one!</p>'}
+          </div>
+          <div class="flex items-center gap-2 pt-2 border-t border-gray-800">
+            <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 p-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center font-bold flex items-center justify-center gap-2">
+              <i class="fa-solid fa-camera"></i>
+              <span>Snap Photo</span>
+              <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoInput(this)">
+            </label>
+            <button onclick="toggleVoiceIntake('${drawerName}')" class="bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl border border-blue-500 flex-1 font-bold flex items-center justify-center gap-2">
+              <i class="fa-solid fa-microphone"></i>
+              <span>Talk to Card</span>
+            </button>
+          </div>
+        </div>`;
+    })
+    .catch(() => {
+      contentDiv.innerHTML = `
+        <div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">
+          <p class="font-bold text-white text-sm">Drawer Active: ${drawerName}</p>
+          <p class="text-gray-400">Speak commands or upload photos directly into this card:</p>
+          <div class="flex items-center gap-2 pt-2 border-t border-gray-800">
+            <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 p-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center font-bold flex items-center justify-center gap-2">
+              <i class="fa-solid fa-camera"></i>
+              <span>Snap Photo</span>
+              <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoInput(this)">
+            </label>
+            <button onclick="toggleVoiceIntake('${drawerName}')" class="bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl border border-blue-500 flex-1 font-bold flex items-center justify-center gap-2">
+              <i class="fa-solid fa-microphone"></i>
+              <span>Talk to Card</span>
+            </button>
+          </div>
+        </div>`;
+    });
 }
 
 function openDrawer(name) {
   activeDrawerContext = name;
   document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + name + ' Drawer';
-  document.getElementById('drawerContent').innerHTML = `
-    <div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">
-      <p class="font-bold text-white text-sm">Drawer Active: ${name}</p>
-      <p class="text-gray-400">Speak commands or upload photos directly into this card:</p>
-      <div class="flex items-center gap-2 pt-2 border-t border-gray-800">
-        <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 p-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center font-bold flex items-center justify-center gap-2">
-          <i class="fa-solid fa-camera"></i>
-          <span>Snap Photo</span>
-          <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoInput(this)">
-        </label>
-        <button onclick="toggleVoiceIntake('${name}')" class="bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl border border-blue-500 flex-1 font-bold flex items-center justify-center gap-2">
-          <i class="fa-solid fa-microphone"></i>
-          <span>Talk to Card</span>
-        </button>
-      </div>
-    </div>`;
   document.getElementById('drawerModal').classList.remove('hidden');
+  loadDrawerItems(name);
 }
 
 function closeDrawer() {
