@@ -60,14 +60,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
     <!-- MIDDLE ASYMMETRIC PAIR -->
     <div class="grid grid-cols-5 gap-3">
+      <!-- LARGE 3-COL KEY (EMPIRE 👑 - INCLUDES SHOP OPS) -->
       <button onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[85px]">
         <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
           <span>2. Empire 👑</span>
           <i class="fa-solid fa-crown text-amber-500"></i>
         </div>
-        <div class="text-[10px] text-gray-400 font-medium">Business Hub & Team Operations</div>
+        <div class="text-[10px] text-gray-400 font-medium">Business Operations & Shop Bench</div>
       </button>
 
+      <!-- SMALLER 2-COL KEY (PIPELINE 🚀) -->
       <button onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[85px]">
         <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
           <span>3. Pipeline 🚀</span>
@@ -78,18 +80,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </div>
 
     <!-- BOTTOM ASYMMETRIC TRIO -->
-    <div class="grid grid-cols-3 gap-2.5">
-      <button onclick="openDrawer('Shop Ops')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
-        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
-          <span>4. Shop Ops 🛠️</span>
-          <i class="fa-solid fa-wrench text-gray-500 text-xs"></i>
-        </div>
-        <div class="text-[9px] text-gray-400">Bench & Repairs</div>
-      </button>
-
+    <div class="grid grid-cols-2 gap-2.5">
       <button onclick="openDrawer('Treasury')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
         <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
-          <span>5. Treasury 💳</span>
+          <span>4. Treasury 💳</span>
           <i class="fa-solid fa-credit-card text-gray-500 text-xs"></i>
         </div>
         <div class="text-[9px] text-gray-400">Invoices & Billing</div>
@@ -97,10 +91,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
       <button onclick="openDrawer('Exchange')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
         <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
-          <span>6. Exchange 🌐</span>
+          <span>5. Exchange 🌐</span>
           <i class="fa-solid fa-share-nodes text-gray-500 text-xs"></i>
         </div>
-        <div class="text-[9px] text-gray-400">Vault (22.2k) & Links</div>
+        <div class="text-[9px] text-gray-400">Vault Search (22.2k)</div>
       </button>
     </div>
 
@@ -128,10 +122,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
           <i class="fa-solid fa-circle-check"></i> What It Does Right Now
         </h4>
         <ul class="space-y-1.5 text-[11px] text-gray-300">
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Streaming Dictation:</strong> Real-time word dictation directly in input box.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Streaming Dictation:</strong> Words dictate live inside input box as you speak.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Instant Visual Proof:</strong> Flashes ✅ LOGGED & FIRED TO BOARD! ⚡ on LED screen.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap QR Sharing:</strong> Instant QR code generated for live card phone scans.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Customer Vault Connected:</strong> Instant access to 22,283 customer records.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap QR Sharing:</strong> Instant QR pops up for customer phone scans.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Nested Empire & Shop Ops:</strong> Business and repair bench combined cleanly.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Customer Vault Connected:</strong> On-demand search across 22,283 customer records.</li>
         </ul>
       </div>
 
@@ -143,11 +138,29 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
   <!-- PERSISTENT CARD DRAWER MODAL -->
   <div id="drawerModal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col p-4 backdrop-blur-md">
-    <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
-      <h3 id="drawerTitle" class="text-lg font-black text-white flex items-center gap-2">
+    <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-3">
+      <h3 id="drawerTitle" class="text-base font-black text-white flex items-center gap-2">
         <i class="fa-solid fa-folder-open text-blue-400"></i> Drawer
       </h3>
-      <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-sm bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+      <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+    </div>
+
+    <!-- SUB-NAV FOR EMPIRE DRAWER (INCLUDES SHOP OPS) -->
+    <div id="empireSubNav" class="hidden mb-3 grid grid-cols-2 gap-2">
+      <button onclick="fetchDrawerItems('Empire')" class="bg-amber-900/40 hover:bg-amber-800/60 text-amber-200 border border-amber-700/50 py-1.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1">
+        <i class="fa-solid fa-crown text-amber-400"></i> Empire Operations
+      </button>
+      <button onclick="fetchDrawerItems('Shop Ops')" class="bg-blue-900/40 hover:bg-blue-800/60 text-blue-200 border border-blue-700/50 py-1.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1">
+        <i class="fa-solid fa-wrench text-blue-400"></i> Shop Ops 🛠️
+      </button>
+    </div>
+
+    <!-- VAULT SEARCH BAR FOR EXCHANGE DRAWER -->
+    <div id="exchangeSearchBar" class="hidden mb-3">
+      <div class="flex gap-2">
+        <input type="text" id="vaultQuery" placeholder="Search 22,283 customer vault records..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+        <button onclick="searchVault()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-xl text-xs font-bold">Search</button>
+      </div>
     </div>
 
     <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300">
@@ -242,7 +255,7 @@ function toggleVoiceIntake() {
 
   recognition = new SR();
   recognition.continuous = true;
-  recognition.interimResults = true; // REAL-TIME INTERIM RESULTS STREAMING
+  recognition.interimResults = true;
   recognition.lang = 'en-US';
   
   btn.classList.add('text-red-500');
@@ -259,7 +272,7 @@ function toggleVoiceIntake() {
         interim += e.results[i][0].transcript;
       }
     }
-    input.value = final || interim; // STREAM WORDS LIVE TO INPUT BOX
+    input.value = final || interim;
   };
 
   recognition.onerror = function() {
@@ -285,12 +298,9 @@ function submitUnifiedInput() {
   var text = input.value.trim();
   if (text) {
     if (recognition) { recognition.stop(); recognition = null; document.getElementById('micBtn').classList.remove('text-red-500'); }
-    
-    // CLEAR INPUT IMMEDIATELY AND SHOW PROCESSING... ⏳
     input.value = '';
     var output = document.getElementById('ledOutput');
     output.textContent = 'PROCESSING... ⏳';
-
     sendToFresh(text);
   }
 }
@@ -318,17 +328,34 @@ function sendToFresh(promptText) {
   });
 }
 
-async function openDrawer(name) {
+function openDrawer(name) {
   document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + name + ' Drawer';
+  
+  // Toggle Empire Sub-Nav & Exchange Search Bar
+  const empireNav = document.getElementById('empireSubNav');
+  const exchangeBar = document.getElementById('exchangeSearchBar');
+
+  if (empireNav) empireNav.classList.toggle('hidden', name !== 'Empire');
+  if (exchangeBar) exchangeBar.classList.toggle('hidden', name !== 'Exchange');
+
+  document.getElementById('drawerModal').classList.remove('hidden');
+  fetchDrawerItems(name);
+}
+
+async function fetchDrawerItems(name) {
   const drawerContent = document.getElementById('drawerContent');
   drawerContent.innerHTML = '<p class="text-center text-gray-500 pt-8">Loading live cards...</p>';
-  document.getElementById('drawerModal').classList.remove('hidden');
 
   try {
     const res = await fetch('/.netlify/functions/getBoard?board_id=18424728273&group=' + encodeURIComponent(name));
     const data = await res.json();
     
     drawerContent.innerHTML = '';
+
+    if (data.message) {
+      drawerContent.innerHTML = '<div class="p-6 bg-gray-900 rounded-2xl border border-gray-800 text-center space-y-2"><p class="font-bold text-white text-sm">' + data.message + '</p></div>';
+      return;
+    }
 
     if (!data.items || data.items.length === 0) {
       drawerContent.innerHTML = '<div class="p-6 bg-gray-900 rounded-2xl border border-gray-800 text-center space-y-2"><p class="font-bold text-white text-sm">No cards in ' + name + ' yet.</p><p class="text-gray-400 text-xs">Tap below to speak notes into this drawer.</p></div>';
@@ -363,6 +390,13 @@ async function openDrawer(name) {
 
   } catch (err) {
     drawerContent.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 text-center"><p class="text-red-400">Unable to load cards. Check connection.</p></div>';
+  }
+}
+
+function searchVault() {
+  const query = document.getElementById('vaultQuery').value.trim();
+  if (query) {
+    fetchDrawerItems('Exchange&query=' + encodeURIComponent(query));
   }
 }
 
