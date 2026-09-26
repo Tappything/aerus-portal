@@ -54,6 +54,18 @@ exports.handler = async function(event, context) {
       };
     }
 
+    // EXCHANGE / VAULT RULE: Do not dump archive items by default
+    if (groupFilter && groupFilter.toLowerCase().trim() === 'exchange') {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ 
+          items: [], 
+          message: '22,283 Customer Vault Connected. Use the search bar below to look up any customer.' 
+        })
+      };
+    }
+
     // GraphQL Query: Read board items with items_page API version 2023-10
     const query = JSON.stringify({
       query: `{ boards(ids: [${targetBoardId}]) { items_page(limit: 50) { items { id name group { id title } column_values { id text } } } } }`
@@ -68,17 +80,15 @@ exports.handler = async function(event, context) {
 
     let items = resData?.data?.boards?.[0]?.items_page?.items || [];
 
-    // KEYWORD MAPPING: MAP PORTAL DRAWERS TO REAL MONDAY.COM BOARD GROUPS
+    // STRICT GROUP MAPPING: KEEP ACTIVE VIEWS CLEAN
     const groupMapping = {
-      'shop ops': ['staff intake', 'pending review', 'mike', 'bench', 'ready wall', 'bagdons', 'waiting for parts', 'repair', 'shop'],
-      'castle': ['personal', 'car', 'vehicle', 'family', 'home'],
-      'empire': ['showroom', 'announcements', 'lounge', 'business', 'team'],
-      'pipeline': ['private', 'leads', 'prospect', 'sales', 'cash'],
-      'treasury': ['parts needed', 'awaiting install', 'billing', 'invoices', 'payment'],
-      'exchange': ['archive', 'storage', 'cage', 'vault', 'closed']
+      'shop ops': ['staff intake — pending review', 'bench log'],
+      'castle': ['personal', 'car', 'vehicle', 'family'],
+      'empire': ['showroom', 'announcements', 'lounge', 'business', 'team', 'operations', 'shop ops'],
+      'pipeline': ['private', 'leads', 'prospect', 'sales'],
+      'treasury': ['parts needed', 'awaiting install', 'billing', 'invoices']
     };
 
-    // STRICT MULTI-KEYWORD GROUP FILTERING
     if (groupFilter) {
       const cleanGroup = groupFilter.toLowerCase().trim();
       const mappedKeywords = groupMapping[cleanGroup] || [cleanGroup];
