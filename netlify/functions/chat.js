@@ -23,6 +23,28 @@ function makePostRequest(url, headers, payload) {
   });
 }
 
+// Helper: DIRECT MONDAY.COM ITEM CREATION (Bypasses Make.com 520 errors)
+async function createMondayItemDirect(mondayKey, boardId, itemName) {
+  if (!mondayKey || !itemName) return null;
+  const cleanName = itemName.replace(/"/g, '\\"').replace(/\n/g, ' ');
+  // Default target group: Staff Intake — Pending Review (group_mm6b77as)
+  const targetGroupId = 'group_mm6b77as';
+  const query = JSON.stringify({
+    query: `mutation { create_item (board_id: ${boardId}, group_id: "${targetGroupId}", item_name: "${cleanName}") { id } }`
+  });
+  try {
+    return await makePostRequest('https://api.monday.com/v2', {
+      'Content-Type': 'application/json',
+      'Authorization': mondayKey,
+      'API-Version': '2023-10',
+      'Content-Length': Buffer.byteLength(query)
+    }, query);
+  } catch (err) {
+    console.error('Direct Monday creation error:', err);
+    return null;
+  }
+}
+
 exports.handler = async function(event, context) {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -61,22 +83,23 @@ exports.handler = async function(event, context) {
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
+    const mondayKey = process.env.MONDAY_API_KEY;
     const targetBoardId = data.board_id || '18424728273';
     const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1';
 
-    // INTENT DETECTION ENGINE
+    // INTENT DETECTION
     const lower = prompt.toLowerCase();
-    const words = prompt.split(/\s+/);
-    const wordCount = words.length;
-
     const questionStarters = ['show', 'list', 'give', 'status', 'what', 'how', 'why', 'who', 'where', 'when', 'can', 'could', 'should', 'is', 'are', 'tell'];
-    const intakeKeywords = ['repair', 'fix', 'vacuum', 'dyson', 'oreck', 'electrolux', 'motor', 'belt', 'filter', 'parts', 'estimate', 'pickup', 'picked up', 'drop off', 'dropped off', 'broken', 'service', 'tune', 'rebuild', 'customer', 'invoice', 'paid', 'call', 'note', 'task', 'dave', 'peterson', 'mike', 'monday', 'belair', 'bel air'];
+    const isQuestionOrBrainstorm = (questionStarters.some(w => lower.startsWith(w)) || lower.includes('?')) && !lower.includes('repair') && !lower.includes('picked up') && !lower.includes('dropped off') && !lower.includes('rebuild');
 
-    const isQuestionOrBrainstorm = (questionStarters.some(w => lower.startsWith(w)) || lower.includes('?')) && !intakeKeywords.some(w => lower.includes(w));
-    const isIntake = !isQuestionOrBrainstorm || wordCount <= 45 || intakeKeywords.some(w => lower.includes(w));
+    // ROUTE 1: FAST TASK / INTAKE -> DIRECT MONDAY.COM CREATION + MAKE.COM BACKUP
+    if (!isQuestionOrBrainstorm) {
+      // 1. Direct Monday API creation (Instant & Guaranteed)
+      if (mondayKey) {
+        await createMondayItemDirect(mondayKey, targetBoardId, prompt);
+      }
 
-    // ROUTE 1: FAST SILENT INTAKE -> MAKE.COM WEBHOOK (UNIVERSAL PAYLOAD)
-    if (isIntake) {
+      // 2. Make.com Webhook (Parallel backup)
       const webhookPayload = JSON.stringify({
         prompt: prompt,
         rawDump: prompt,
@@ -85,20 +108,15 @@ exports.handler = async function(event, context) {
         board_id: targetBoardId,
         timestamp: new Date().toISOString()
       });
-
-      try {
-        await makePostRequest(MAKE_WEBHOOK_URL, {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(webhookPayload)
-        }, webhookPayload);
-      } catch (err) {
-        console.error('Webhook dispatch error:', err);
-      }
+      makePostRequest(MAKE_WEBHOOK_URL, {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(webhookPayload)
+      }, webhookPayload).catch(e => console.error('Make backup error:', e));
 
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify({ reply: 'Logged! ⚡' })
+        body: JSON.stringify({ reply: 'LOGGED & FIRED TO BOARD! ⚡' })
       };
     }
 
@@ -107,23 +125,16 @@ exports.handler = async function(event, context) {
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify({ reply: 'Logged! ⚡' })
+        body: JSON.stringify({ reply: 'LOGGED & FIRED TO BOARD! ⚡' })
       };
     }
 
     const isOwner = (targetBoardId === '18424728273');
-
     const systemInstruction = isOwner 
-      ? `You are Fresh 🤵 — the Digital Coordinator powering TappyThing for William Sullivan. Direct, punchy, ultra-concise. Zero fluff. Respond ONLY to the specific task or question. Motivational, fun, direct, and energetic coach energy. Draw from Ogilvy, Ziglar, Girard, Cardone as natural instinct. Never mention Dan. Never ask "Are we hanging up now?".`
-      : `You are Fresh 🤵 — the Digital Coordinator for TappyThing. Energetic, helpful, direct. Guide subscribers to build their world in TappyThing. One card at a time, zero friction.`;
+      ? `You are Fresh 🤵 — the Digital Coordinator powering TappyThing for William Sullivan. Direct, punchy, ultra-concise. Zero fluff. Motivational coach energy. Never mention Dan.`
+      : `You are Fresh 🤵 — the Digital Coordinator for TappyThing. Energetic, helpful, direct. Guide subscribers to build their world.`;
 
-    const contents = [
-      {
-        role: 'user',
-        parts: [{ text: `${systemInstruction}\n\nUser says: ${prompt}` }]
-      }
-    ];
-
+    const contents = [{ role: 'user', parts: [{ text: `${systemInstruction}\n\nUser says: ${prompt}` }] }];
     const geminiPayload = JSON.stringify({ contents });
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
@@ -132,7 +143,7 @@ exports.handler = async function(event, context) {
       'Content-Length': Buffer.byteLength(geminiPayload)
     }, geminiPayload);
 
-    let reply = 'Logged! ⚡';
+    let reply = 'LOGGED & FIRED TO BOARD! ⚡';
     if (geminiRes?.candidates?.[0]?.content?.parts?.[0]?.text) {
       reply = geminiRes.candidates[0].content.parts[0].text.trim();
     }
@@ -151,6 +162,3 @@ exports.handler = async function(event, context) {
     };
   }
 };
-🚀 Your 1 Action:
-Open GitHub: Tappything/aerus-portal ➔ netlify/functions/chat.js
-Replace everything with this code and commit to main.
