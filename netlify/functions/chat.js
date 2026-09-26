@@ -90,12 +90,12 @@ function callGeminiAPI(apiKey, systemInstruction, userPrompt, boardId) {
           const text = parsed.candidates[0].content.parts[0].text.trim();
           resolve(text);
         } catch (e) {
-          resolve('Schwing! Logged! ⚡');
+          resolve('Logged! ⚡');
         }
       });
     });
 
-    req.on('error', () => resolve('Schwing! Logged! ⚡'));
+    req.on('error', () => resolve('Logged! ⚡'));
     req.write(payload);
     req.end();
   });
@@ -133,7 +133,7 @@ exports.handler = async function(event, context) {
         return {
           statusCode: 200,
           headers,
-          body: JSON.stringify({ reply: 'Schwing! Logged! ⚡', board_id: boardId })
+          body: JSON.stringify({ reply: 'Logged! ⚡', board_id: boardId })
         };
       }
       if (isGreeting) {
@@ -160,7 +160,7 @@ exports.handler = async function(event, context) {
         statusCode: 200,
         headers,
         body: JSON.stringify({
-          reply: 'Schwing! World built with 3 default drawers! ⚡',
+          reply: 'World built with 3 default drawers! ⚡',
           board_id: boardId,
           drawers: defaultDrawers
         })
@@ -173,7 +173,7 @@ exports.handler = async function(event, context) {
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify({ reply: 'Schwing! Logged! ⚡', board_id: boardId })
+        body: JSON.stringify({ reply: 'Logged! ⚡', board_id: boardId })
       };
     }
 
@@ -182,7 +182,7 @@ exports.handler = async function(event, context) {
       Rules:
       1. Direct, punchy, 5th-grade clarity bullet point outputs.
       2. Return ultra-concise, silent confirmations under 6 words for board actions.
-      3. Bake in Zig Ziglar sales warmth and Wayne's World retro humor.
+      3. Bake in motivational coach energy, sales wisdom, and sharp execution.
       4. Never output speech synthesis or verbose chatter.
     `;
 
@@ -192,7 +192,7 @@ exports.handler = async function(event, context) {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        reply: responseText || 'Schwing! Logged! ⚡',
+        reply: responseText || 'Logged! ⚡',
         board_id: boardId
       })
     };
@@ -201,7 +201,7 @@ exports.handler = async function(event, context) {
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ reply: 'Schwing! Logged! ⚡' })
+      body: JSON.stringify({ reply: 'Logged! ⚡' })
     };
   }
 };
