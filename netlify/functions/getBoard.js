@@ -1,6 +1,6 @@
 const https = require('https');
 
-// Helper for HTTPS POST requests
+// Helper for native HTTPS POST requests
 function makePostRequest(url, headers, payload) {
   return new Promise((resolve, reject) => {
     const req = https.request(url, {
@@ -56,7 +56,7 @@ exports.handler = async function(event, context) {
 
     // GraphQL Query: Read board items with items_page API version 2023-10
     const query = JSON.stringify({
-      query: `{ boards(ids: [${targetBoardId}]) { items_page(limit: 50) { items { id name group { id title } } } } }`
+      query: `{ boards(ids: [${targetBoardId}]) { items_page(limit: 50) { items { id name group { id title } column_values { id text } } } } }`
     });
 
     const resData = await makePostRequest('https://api.monday.com/v2', {
@@ -68,21 +68,42 @@ exports.handler = async function(event, context) {
 
     let items = resData?.data?.boards?.[0]?.items_page?.items || [];
 
-    // STRICT Group filtering — NO FALLBACK to all items if empty
+    // KEYWORD MAPPING: MAP PORTAL DRAWERS TO REAL MONDAY.COM BOARD GROUPS
+    const groupMapping = {
+      'shop ops': ['staff intake', 'pending review', 'mike', 'bench', 'ready wall', 'bagdons', 'waiting for parts', 'repair', 'shop'],
+      'castle': ['personal', 'car', 'vehicle', 'family', 'home'],
+      'empire': ['showroom', 'announcements', 'lounge', 'business', 'team'],
+      'pipeline': ['private', 'leads', 'prospect', 'sales', 'cash'],
+      'treasury': ['parts needed', 'awaiting install', 'billing', 'invoices', 'payment'],
+      'exchange': ['archive', 'storage', 'cage', 'vault', 'closed']
+    };
+
+    // STRICT MULTI-KEYWORD GROUP FILTERING
     if (groupFilter) {
       const cleanGroup = groupFilter.toLowerCase().trim();
-      items = items.filter(item => 
-        item.group?.title && item.group.title.toLowerCase().trim() === cleanGroup
-      );
+      const mappedKeywords = groupMapping[cleanGroup] || [cleanGroup];
+
+      items = items.filter(item => {
+        if (!item.group?.title) return false;
+        const itemGroupTitle = item.group.title.toLowerCase().trim();
+        return mappedKeywords.some(keyword => itemGroupTitle.includes(keyword));
+      });
     }
 
     // Format clean JSON payload for index.html card rendering
-    const formattedItems = items.map(item => ({
-      id: item.id,
-      name: item.name,
-      group: item.group?.title || 'General',
-      status: 'ACTIVE'
-    }));
+    const formattedItems = items.map(item => {
+      const phoneCol = item.column_values?.find(c => c.id.includes('phone') || c.id.includes('mobile'));
+      const emailCol = item.column_values?.find(c => c.id.includes('email'));
+
+      return {
+        id: item.id,
+        name: item.name || 'Untitled Card',
+        group: item.group?.title || 'General',
+        status: 'ACTIVE',
+        phone: phoneCol?.text || '4105551234',
+        email: emailCol?.text || 'customer@email.com'
+      };
+    });
 
     return {
       statusCode: 200,
