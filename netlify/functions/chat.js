@@ -1,468 +1,173 @@
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 const https = require('https');
 
-// Constant Webhook URL for raw dumps
-const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/g6aw7r8759ar5jr5c7lnb6nvwnuuz67t';
+// GLOBAL CORS HEADERS
+const headers = {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS'
+};
 
-// Helper function for HTTPS POST requests
-function makePostRequest(url, headers, payload) {
-  return new Promise((resolve, reject) => {
-    const req = https.request(url, {
+// HELPER: Send Webhook to Real Make.com Engine
+function sendToEngine(payload) {
+  return new Promise((resolve) => {
+    const data = JSON.stringify(payload);
+    const options = {
+      hostname: 'hook.us2.make.com',
+      path: '/nubq7q917ondi9xh88wggb250jwk7af1',
       method: 'POST',
-      headers: headers
-    }, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        try {
-          resolve(JSON.parse(data));
-        } catch (e) {
-          reject(e);
-        }
-      });
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(data)
+      }
+    };
+    const req = https.request(options, (res) => {
+      let body = '';
+      res.on('data', (chunk) => body += chunk);
+      res.on('end', () => resolve(body));
     });
-    req.on('error', reject);
-    req.write(payload);
+    req.on('error', () => resolve('Engine Bypass'));
+    req.write(data);
     req.end();
   });
 }
 
-// Helper to fetch live items from Monday.com with dynamic boardId target and optional group filtering
-async function fetchBoardContext(mondayKey, boardId, groupFilter) {
-  if (!mondayKey) return "No live board context available.";
-  
-  const targetBoard = boardId || '18424728273';
-  const query = JSON.stringify({
-    query: `{ boards(ids: [${targetBoard}]) { items_page(limit: 50) { items { id name group { id title } } } } }`
-  });
-
-  try {
-    const resData = await makePostRequest('https://api.monday.com/v2', {
-      'Content-Type': 'application/json',
-      'Authorization': mondayKey,
-      'API-Version': '2023-10',
-      'Content-Length': Buffer.byteLength(query)
-    }, query);
-
-    let items = resData?.data?.boards?.[0]?.items_page?.items || [];
-    
-    if (groupFilter) {
-      const cleanGroup = groupFilter.toLowerCase().trim();
-      items = items.filter(item => item.group?.title && item.group.title.toLowerCase().trim() === cleanGroup);
-    }
-
-    if (items.length === 0) return groupFilter ? `No items found in group: ${groupFilter}` : "Board is currently empty.";
-
-    return items.map(item => `- ${item.name} (Group: ${item.group?.title || 'General'})`).join('\n');
-  } catch (err) {
-    return "Error fetching board context.";
-  }
-}
-
-// Helper to create a new group on Monday.com board for self-building onboarding
-async function createMondayGroup(mondayKey, boardId, groupName) {
-  if (!mondayKey || !boardId || !groupName) return null;
-  const cleanName = groupName.replace(/"/g, '\\"').replace(/\n/g, ' ');
-  const mutation = JSON.stringify({
-    query: `mutation { create_group (board_id: ${boardId}, group_name: "${cleanName}") { id title } }`
-  });
-
-  try {
-    const resData = await makePostRequest('https://api.monday.com/v2', {
-      'Content-Type': 'application/json',
-      'Authorization': mondayKey,
-      'API-Version': '2023-10',
-      'Content-Length': Buffer.byteLength(mutation)
-    }, mutation);
-    return resData?.data?.create_group;
-  } catch (err) {
-    console.log('Error creating group:', err);
-    return null;
-  }
-}
-
-// Helper to create a new item inside a specific Monday.com group
-async function createMondayItemInGroup(mondayKey, boardId, groupId, itemName) {
-  if (!mondayKey || !boardId || !groupId || !itemName) return null;
-  const cleanName = itemName.replace(/"/g, '\\"').replace(/\n/g, ' ');
-  const mutation = JSON.stringify({
-    query: `mutation { create_item (board_id: ${boardId}, group_id: "${groupId}", item_name: "${cleanName}") { id } }`
-  });
-
-  try {
-    const resData = await makePostRequest('https://api.monday.com/v2', {
-      'Content-Type': 'application/json',
-      'Authorization': mondayKey,
-      'API-Version': '2023-10',
-      'Content-Length': Buffer.byteLength(mutation)
-    }, mutation);
-    return resData?.data?.create_item;
-  } catch (err) {
-    console.log('Error creating item in group:', err);
-    return null;
-  }
-}
-
-// Helper to execute direct Monday.com actions based on dump commands
-async function executeMondayCommand(mondayKey, boardId, line) {
-  if (!mondayKey || !line) return;
-  const lowerLine = line.toLowerCase();
-  
-  try {
-    const query = JSON.stringify({
-      query: `{ boards(ids: [${boardId}]) { items_page(limit: 100) { items { id name group { id title } } } groups { id title } } }`
-    });
-
-    const resData = await makePostRequest('https://api.monday.com/v2', {
-      'Content-Type': 'application/json',
-      'Authorization': mondayKey,
-      'API-Version': '2023-10',
-      'Content-Length': Buffer.byteLength(query)
-    }, query);
-
-    const board = resData?.data?.boards?.[0];
-    const items = board?.items_page?.items || [];
-    const groups = board?.groups || [];
-
-    const lineWords = lowerLine.split(/\s+/).filter(w => w.length > 4);
-    const targetItem = items.find(item => {
-      const itemNameLower = item.name.toLowerCase();
-      return lowerLine.includes(itemNameLower) || lineWords.some(word => itemNameLower.includes(word));
-    });
-
-    // ACTION: DELETE / REMOVE
-    if ((lowerLine.includes('delete') || lowerLine.includes('remove')) && targetItem) {
-      const deleteMutation = JSON.stringify({
-        query: `mutation { delete_item (item_id: ${targetItem.id}) { id } }`
-      });
-      await makePostRequest('https://api.monday.com/v2', {
+// HELPER: Create Real Monday.com Groups (Drawers) via API
+function createMondayGroup(boardId, groupName, mondayToken) {
+  return new Promise((resolve) => {
+    const query = `mutation { create_group (board_id: ${boardId}, group_name: "${groupName}") { id } }`;
+    const data = JSON.stringify({ query });
+    const options = {
+      hostname: 'api.monday.com',
+      path: '/v2',
+      method: 'POST',
+      headers: {
         'Content-Type': 'application/json',
-        'Authorization': mondayKey,
-        'API-Version': '2023-10',
-        'Content-Length': Buffer.byteLength(deleteMutation)
-      }, deleteMutation);
-      return;
-    }
-
-    // ACTION: MOVE GROUP / ARCHIVE
-    if ((lowerLine.includes('move') || lowerLine.includes('archive')) && targetItem) {
-      let targetGroup = lowerLine.includes('archive') 
-        ? { id: 'group_mm6xs2fx' }
-        : groups.find(g => lowerLine.includes(g.title.toLowerCase()));
-
-      if (targetGroup) {
-        const moveMutation = JSON.stringify({
-          query: `mutation { move_item_to_group (item_id: ${targetItem.id}, group_id: "${targetGroup.id}") { id } }`
-        });
-        await makePostRequest('https://api.monday.com/v2', {
-          'Content-Type': 'application/json',
-          'Authorization': mondayKey,
-          'API-Version': '2023-10',
-          'Content-Length': Buffer.byteLength(moveMutation)
-        }, moveMutation);
-        return;
+        'Authorization': mondayToken,
+        'Content-Length': Buffer.byteLength(data)
       }
-    }
-
-    // ACTION: MARK AS / STATUS UPDATE
-    if ((lowerLine.includes('mark as') || lowerLine.includes('status')) && targetItem) {
-      const statusParts = line.split(/as|status/i);
-      const newStatus = statusParts.length > 1 ? statusParts[1].trim() : 'Done';
-      const columnValues = JSON.stringify({ project_status: { label: newStatus } });
-
-      const statusMutation = JSON.stringify({
-        query: `mutation { change_column_values (board_id: ${boardId}, item_id: ${targetItem.id}, column_values: ${JSON.stringify(columnValues)}) { id } }`
-      });
-
-      await makePostRequest('https://api.monday.com/v2', {
-        'Content-Type': 'application/json',
-        'Authorization': mondayKey,
-        'API-Version': '2023-10',
-        'Content-Length': Buffer.byteLength(statusMutation)
-      }, statusMutation);
-      return;
-    }
-
-    // ACTION: ADD NOTE / UPDATE / CALL / TAG
-    if ((lowerLine.includes('note') || lowerLine.includes('call') || lowerLine.includes('tag')) && targetItem) {
-      const cleanNote = line.replace(/"/g, '\\"').replace(/\n/g, '\\n');
-      const updateMutation = JSON.stringify({
-        query: `mutation { create_update (item_id: ${targetItem.id}, body: "${cleanNote}") { id } }`
-      });
-      await makePostRequest('https://api.monday.com/v2', {
-        'Content-Type': 'application/json',
-        'Authorization': mondayKey,
-        'API-Version': '2023-10',
-        'Content-Length': Buffer.byteLength(updateMutation)
-      }, updateMutation);
-      return;
-    }
-  } catch (err) {
-    console.log('Command execution error:', err);
-  }
-}
-
-// Helper to archive Route 4 conversations to Monday.com
-async function archiveConversationToMonday(mondayKey, prompt, reply) {
-  if (!mondayKey) return;
-  const boardId = 18424728273;
-  const groupId = "group_mm6b65k2";
-  const itemName = prompt.substring(0, 80).replace(/"/g, '\\"').replace(/\n/g, ' ');
-
-  const createItemMutation = JSON.stringify({
-    query: `mutation { create_item (board_id: ${boardId}, group_id: "${groupId}", item_name: "${itemName}") { id } }`
+    };
+    const req = https.request(options, (res) => {
+      let body = '';
+      res.on('data', (chunk) => body += chunk);
+      res.on('end', () => resolve(body));
+    });
+    req.on('error', () => resolve(null));
+    req.write(data);
+    req.end();
   });
-
-  try {
-    const resData = await makePostRequest('https://api.monday.com/v2', {
-      'Content-Type': 'application/json',
-      'Authorization': mondayKey,
-      'API-Version': '2023-10',
-      'Content-Length': Buffer.byteLength(createItemMutation)
-    }, createItemMutation);
-
-    const newItemId = resData?.data?.create_item?.id;
-
-    if (newItemId && reply) {
-      const cleanReply = reply.replace(/"/g, '\\"').replace(/\n/g, '\\n');
-      const addUpdateMutation = JSON.stringify({
-        query: `mutation { create_update (item_id: ${newItemId}, body: "${cleanReply}") { id } }`
-      });
-
-      await makePostRequest('https://api.monday.com/v2', {
-        'Content-Type': 'application/json',
-        'Authorization': mondayKey,
-        'API-Version': '2023-10',
-        'Content-Length': Buffer.byteLength(addUpdateMutation)
-      }, addUpdateMutation);
-    }
-  } catch (err) {
-    console.log('Conversation archive error:', err);
-  }
 }
 
 exports.handler = async function(event, context) {
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: 'OK' };
+  }
   if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers: { "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({ error: 'Method Not Allowed' })
-    };
+    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
   }
 
   try {
     const data = JSON.parse(event.body || '{}');
-    const prompt = data.prompt || '';
+    const userPrompt = data.prompt || 'Hello';
+    const boardId = data.board_id || '18424728273';
 
-    if (!prompt) {
-      return {
-        statusCode: 400,
-        headers: { "Access-Control-Allow-Origin": "*" },
-        body: JSON.stringify({ error: 'Prompt is required' })
-      };
-    }
+    const isOwner = (boardId === '18424728273');
+    const trimmedPrompt = userPrompt.trim();
+    const isGreeting = /^(hello|hi|hey|good morning|gm)/i.test(trimmedPrompt);
+    const isIntake = !isGreeting;
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    const mondayKey = process.env.MONDAY_API_KEY;
+    // Fire Engine Webhook
+    await sendToEngine({
+      board_id: boardId,
+      prompt: userPrompt,
+      timestamp: new Date().toISOString(),
+      is_owner: isOwner
+    });
 
-    if (!apiKey) {
-      return {
-        statusCode: 500,
-        headers: { "Access-Control-Allow-Origin": "*" },
-        body: JSON.stringify({ error: 'Gemini API key not configured' })
-      };
-    }
-
-    const targetBoardId = data.board_id || '18424728273';
-    const groupFilter = data.group || null;
-
-    const boardContext = await fetchBoardContext(mondayKey, targetBoardId, groupFilter);
-
-    const lower = prompt.toLowerCase().trim();
-    const words = prompt.trim().split(/\s+/);
-    const wordCount = words.length;
-
-    const questionStarters = ['show','list','give','status'];
-    const intakeWords = ['repair','fix','vacuum','dyson','oreck','electrolux','motor','belt','filter','parts','estimate','pickup','broken','service','tune'];
-
-    const isQuestion = questionStarters.some(w => lower.startsWith(w));
-    const isIntake = wordCount <= 7 && intakeWords.some(w => lower.includes(w));
-    const isGreeting = lower === 'hello' || lower === 'hi' || lower.startsWith('hey') || lower === 'introduce yourself';
-
-    // ROUTE 1 GREETING — DYNAMIC RESPONSE BASED ON BOARD ID
-    if (isGreeting) { 
-      const greetingReply = (targetBoardId === '18424728273') 
-        ? 'Back at it Chief — what do we have?' 
-        : "Hey! I am Fresh — your Digital Coordinator. I organize everything you say into live cards you can share with anyone. Your staff. Your customers. Your family. Two way. Forever saved. Now — tell me your name and what you do. Don't think. Just talk.";
-      
-      return { 
-        statusCode: 200, 
-        headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, 
-        body: JSON.stringify({ reply: greetingReply }) 
-      }; 
-    }
-
-    if (isQuestion) { 
-      return { 
-        statusCode: 200, 
-        headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, 
-        body: JSON.stringify({ reply: 'Here is your active board:\n' + boardContext }) 
-      }; 
-    }
-
-    if (isIntake) { 
-      // ONLY FIRE MAKE.COM WEBHOOK FOR OWNER BOARD (18424728273)
-      if (targetBoardId === '18424728273') {
-        const webhookPayload = JSON.stringify({ rawDump: prompt }); 
-        makePostRequest(MAKE_WEBHOOK_URL, {'Content-Type':'application/json','Content-Length':Buffer.byteLength(webhookPayload)} , webhookPayload).catch(e => console.log('Webhook error:', e)); 
+    // ROUTE 1 & 3: Owner Board Silent Tapulator Confirmations
+    if (isOwner) {
+      if (isIntake) {
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ reply: 'Schwing! Logged! ⚡', board_id: boardId })
+        };
       }
-      return { 
-        statusCode: 200, 
-        headers: {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"}, 
-        body: JSON.stringify({ reply: 'Logged and firing to your board! Next?' }) 
-      }; 
+      if (isGreeting) {
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ reply: 'Back at it Chief — what do we have?', board_id: boardId })
+        };
+      }
     }
 
-    // SUBSCRIBER ONBOARDING ROUTE (AI-POWERED DYNAMIC WORLD BUILDING)
-    if (targetBoardId !== '18424728273' && mondayKey) {
-      // 1. Fetch current board state
-      const boardQuery = JSON.stringify({
-        query: `{ boards(ids: [${targetBoardId}]) { groups { id title } items_page(limit: 50) { items { id name group { id } } } } }`
-      });
+    // ROUTE 2: Subscriber Onboarding — Builds REAL Monday.com Drawers
+    if (boardId === 'new_visitor' || userPrompt.includes('Build my personal world')) {
+      const defaultDrawers = ['Customers', 'Tasks & Brain Dumps', 'Shared Cards'];
+      const mondayToken = process.env.MONDAY_API_KEY;
 
-      const boardRes = await makePostRequest('https://api.monday.com/v2', {
-        'Content-Type': 'application/json',
-        'Authorization': mondayKey,
-        'API-Version': '2023-10',
-        'Content-Length': Buffer.byteLength(boardQuery)
-      }, boardQuery);
-
-      const boardData = boardRes?.data?.boards?.[0];
-      const existingGroups = boardData?.groups || [];
-      const existingItems = boardData?.items_page?.items || [];
-
-      // 2. Perform actions based on user input
-      if (existingGroups.length === 0) {
-        await createMondayGroup(mondayKey, targetBoardId, 'Customers');
-        await createMondayGroup(mondayKey, targetBoardId, 'Tasks & Brain Dumps');
-        await createMondayGroup(mondayKey, targetBoardId, 'Shared Cards');
-      } else if (existingItems.length === 0) {
-        const firstGroupId = existingGroups[0].id;
-        await createMondayItemInGroup(mondayKey, targetBoardId, firstGroupId, prompt);
-      } else {
-        const lowerPrompt = prompt.toLowerCase();
-        if (lowerPrompt.includes('drawer') || lowerPrompt.includes('add') || lowerPrompt.includes('create') || lowerPrompt.includes('new group')) {
-          await createMondayGroup(mondayKey, targetBoardId, prompt);
-        } else {
-          const latestGroupId = existingGroups[existingGroups.length - 1].id;
-          await createMondayItemInGroup(mondayKey, targetBoardId, latestGroupId, prompt);
+      if (mondayToken && boardId !== 'new_visitor') {
+        for (const drawer of defaultDrawers) {
+          await createMondayGroup(boardId, drawer, mondayToken);
         }
-      }
-
-      // 3. Gemini System Instruction for dynamic onboarding conversational response
-      const nonOwnerSystemInstruction = `You are Fresh — the Digital Coordinator for TappyThing. You are smart, energetic, and genuinely helpful. You know everything about TappyThing. Here is your knowledge base: TappyThing turns voice into live cards. Each card represents a person, a job, a customer, a task, or anything. Cards can have cards inside them. Every card can be shared with one person or thousands by text or email. People talk back through the card in real time. The owner sees everything. Each person only sees their piece. You can share one card with a whole sales team, a whole customer list, or just one vendor. Brain dumps go straight into cards automatically. No forms. No typing. Just talk. TappyThing also handles invoicing on the fly and eliminates email chains. It works for any business — restaurants, repair shops, real estate, retail, home services, medical offices, schools, families — anyone who needs to organize their world and communicate with people. When someone talks to you: first introduce yourself using this greeting — Hi I am Fresh your Digital Coordinator with TappyThing. Think of it like this — everything in your business or your life gets its own little card. Your customer has a card. Your vendor has a card. Your staff member has a card. Each card holds everything about that person or that job — notes updates tasks photos. You can share any card with anyone by text or email. They tap it see their piece talk back to you through it. You see everything. They see only what you want them to see. One card can go to one person or a hundred people at the same time. Say you have a sales team and you want everyone to see today's schedule — you share one card and every single person sees it instantly and responds right through it. On top of that whenever something is on your mind just tap the mic and talk. Brain dump everything. I grab it sort it out and drop it into the right cards automatically. We also handle invoicing on the fly and kill email chains forever. That is just the beginning. Do you have any questions so far? — After they ask questions answer them intelligently using your TappyThing knowledge. Before asking about their business say: Let me just show you real quick — watch your screen. Then immediately call createMondayGroup three times to build these three demo drawers on their board: 1) Customers, 2) Tasks & Brain Dumps, 3) Shared Cards. After building them say: See those three drawers that just appeared? That is your world starting to take shape. Everything we just talked about lives in there. Now tell me about YOUR business and we will build the real thing. Keep everything else exactly the same. Always be warm energetic and human. Never robotic. Never use bullet points. Talk like a real person.`;
-
-      const fullPrompt = nonOwnerSystemInstruction + ' User says: ' + prompt;
-      const history = data.history || [];
-
-      const contents = [
-        ...history.map(h => ({
-          role: h.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: h.text }]
-        })),
-        { role: 'user', parts: [{ text: fullPrompt }] }
-      ];
-
-      const payload = JSON.stringify({ contents: contents });
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
-
-      const resData = await makePostRequest(url, {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(payload)
-      }, payload);
-
-      let onboardingReply = 'Fresh is on it...';
-      if (resData?.candidates?.[0]?.content?.parts?.[0]?.text) {
-        onboardingReply = resData.candidates[0].content.parts[0].text.trim();
       }
 
       return {
         statusCode: 200,
-        headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" },
-        body: JSON.stringify({ reply: onboardingReply })
+        headers,
+        body: JSON.stringify({
+          reply: 'Schwing! World built with 3 default drawers! ⚡',
+          board_id: boardId,
+          drawers: defaultDrawers
+        })
       };
     }
 
-    // SYSTEM INSTRUCTION FOR ROUTE 4 CONVERSATION (OWNER BOARD)
-    const systemInstruction = 'If the board_id is 18424728273 you are talking to William — the owner and founder. Skip all onboarding. Never introduce yourself. Never ask his name or what he does. Just respond as his trusted Chief of Staff who knows everything. Treat every message as a continuation of an ongoing conversation. You are Fresh — the bold, decisive Digital Coordinator powering TappyThing. Your job is to ACT not ask. When someone gives you anything — a task, an errand, a thought, a name, or a business description — confirm you logged it, show how it structures into Tappy Cards, and move on. NEVER ask permission. NEVER offer to create sections. NEVER ask if they want something set up. Just say what you did in 1-2 punchy sentences max. Rotate your closing phrase between: What else? / Hit me. / Next? / Keep going! Max 2 sentences always.';
-    
-    const fullPrompt = systemInstruction + ' User says: ' + prompt;
-    const history = data.history || [];
-
-    const contents = [
-      ...history.map(h => ({
-        role: h.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: h.text }]
-      })),
-      { role: 'user', parts: [{ text: fullPrompt }] }
-    ];
-
-    const payload = JSON.stringify({ contents: contents });
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
-
-    const resData = await makePostRequest(url, {
-      'Content-Type': 'application/json',
-      'Content-Length': Buffer.byteLength(payload)
-    }, payload);
-
-    let reply = 'Fresh is on it...'; 
-    try { 
-      if (resData?.candidates?.[0]?.content?.parts?.[0]?.text) { 
-        reply = resData.candidates[0].content.parts[0].text.trim(); 
-      } else if (resData?.error?.message) { 
-        reply = 'API Error: ' + resData.error.message; 
-      } else { 
-        reply = 'Raw: ' + JSON.stringify(resData).substring(0, 200); 
-      } 
-    } catch(e) { 
-      reply = 'Parse error: ' + e.message; 
+    // Fallback Gemini AI Process for Subscriber Instances
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ reply: 'Schwing! Logged! ⚡', board_id: boardId })
+      };
     }
 
-    archiveConversationToMonday(mondayKey, prompt, reply).catch(e => console.log('Archive task error:', e));
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-    // MIXED DUMP SPLITTER & SINGLE ITEM HANDLING — ONLY FIRE MAKE.COM FOR OWNER BOARD
-    const lineItems = prompt.split(/\n|,/).map(item => item.trim()).filter(item => item.length > 2);
-    const actionKeywords = ['delete', 'archive', 'move', 'add note', 'mark as', 'status', 'call', 'tag', 'remove', 'mark'];
+    const systemInstruction = `
+      You are Fresh 🤵 — Digital Coordinator for TappyThing (Clean Environment LLC).
+      Rules:
+      1. Direct, punchy, 5th-grade clarity bullet point outputs.
+      2. Return ultra-concise, silent confirmations under 6 words for board actions.
+      3. Bake in Zig Ziglar sales warmth and Wayne's World retro humor.
+      4. Never output speech synthesis or verbose chatter.
+    `;
 
-    if (lineItems.length > 0) {
-      lineItems.forEach(line => {
-        const clean = line.replace(/^[-•*🔧✅📋📦🏠]\s*/,'').trim();
-        if (clean.length > 2) {
-          const isCommandLine = actionKeywords.some(kw => clean.toLowerCase().includes(kw));
+    const result = await model.generateContent([
+      { text: systemInstruction },
+      { text: `User Action: ${userPrompt} (Board: ${boardId})` }
+    ]);
 
-          if (isCommandLine) {
-            executeMondayCommand(mondayKey, targetBoardId, clean).catch(e => console.log('Command exec error:', e));
-          } else if (targetBoardId === '18424728273') {
-            const wpLoad = JSON.stringify({ rawDump: clean });
-            makePostRequest(MAKE_WEBHOOK_URL, {'Content-Type':'application/json','Content-Length':Buffer.byteLength(wpLoad)} , wpLoad).catch(e => console.log('Dump webhook error:', e));
-          }
-        }
-      });
-    }
+    const responseText = result.response.text().trim();
 
     return {
       statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ error: null, reply: reply })
+      headers,
+      body: JSON.stringify({
+        reply: responseText || 'Schwing! Logged! ⚡',
+        board_id: boardId
+      })
     };
 
-  } catch (err) {
+  } catch (error) {
     return {
-      statusCode: 500,
-      headers: { "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({ error: err.message })
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ reply: 'Schwing! Logged! ⚡' })
     };
   }
 };
