@@ -29,13 +29,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </div>
   </div>
 
-  <!-- DEVICE HEADER -->
+  <!-- DEVICE HEADER WITH BRANDED LOGO -->
   <div class="text-center space-y-0.5">
+    <img src="logo.png" alt="TappyThing Logo" class="h-8 mx-auto mb-1">
     <div class="text-xs font-black text-blue-400 uppercase tracking-widest">TappyThing Command Hub</div>
     <div class="text-[11px] text-gray-400 font-medium">Tap. Talk. Operations live in seconds.</div>
   </div>
 
-  <!-- SUBTLE FEATURES & BENEFITS BUTTON (NON-FLASHING) -->
+  <!-- SUBTLE FEATURES & BENEFITS BUTTON -->
   <button onclick="toggleFeaturesModal()" class="w-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 font-semibold py-1.5 rounded-xl text-[11px] border border-slate-700/60 uppercase tracking-wider transition flex items-center justify-center gap-1.5">
     <i class="fa-solid fa-list-check text-slate-400 text-xs"></i>
     <span>[ FEATURES & BENEFITS ]</span>
@@ -123,7 +124,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         <button onclick="toggleFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
       </div>
 
-      <!-- SECTION 1: WHAT IT DOES RIGHT NOW -->
       <div class="space-y-2">
         <h4 class="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
           <i class="fa-solid fa-circle-check"></i> What It Does Right Now
@@ -137,7 +137,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         </ul>
       </div>
 
-      <!-- SECTION 2: COMING SOON -->
       <div class="space-y-2 border-t border-gray-800 pt-3">
         <h4 class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
           <i class="fa-solid fa-clock"></i> Coming Soon
@@ -211,6 +210,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <span class="card-status font-bold text-blue-400 text-xs uppercase">ACTIVE</span>
     </div>
 
+    <!-- CARD TITLE / NAME -->
+    <div class="card-title text-sm font-bold text-white">Card Item</div>
+
     <!-- VOICE / TEXT / MEDIA ROW -->
     <div class="flex gap-2 items-center">
       <button onclick="toggleVoiceIntake()" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-xl font-bold flex items-center gap-1">🎙️ Speak</button>
@@ -222,10 +224,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
     <!-- 3-ACTION NATIVE CONTACT ROW -->
     <div class="flex gap-3 border-t border-gray-800 pt-2 text-xs font-semibold text-gray-300">
-      <a href="tel:4105551234" class="hover:text-white flex items-center gap-1">📞 Call</a>
-      <a href="sms:4105551234" class="hover:text-white flex items-center gap-1">💬 Text</a>
-      <a href="mailto:customer@email.com" class="hover:text-white flex items-center gap-1">✉️ Email</a>
-      <button onclick="shareCard('card-123')" class="ml-auto text-blue-400 hover:text-blue-300 font-bold">🔗 Share QR</button>
+      <a href="tel:4105551234" class="card-call hover:text-white flex items-center gap-1">📞 Call</a>
+      <a href="sms:4105551234" class="card-sms hover:text-white flex items-center gap-1">💬 Text</a>
+      <a href="mailto:customer@email.com" class="card-email hover:text-white flex items-center gap-1">✉️ Email</a>
+      <button onclick="shareCard('card-123')" class="card-share ml-auto text-blue-400 hover:text-blue-300 font-bold">🔗 Share QR</button>
     </div>
   </div>
 </template>
@@ -301,10 +303,53 @@ function sendToFresh(promptText) {
   });
 }
 
-function openDrawer(name) {
+// WIRED OPEN DRAWER TO FETCH LIVE CARDS FROM GETBOARD.JS
+async function openDrawer(name) {
   document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + name + ' Drawer';
-  document.getElementById('drawerContent').innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800"><p class="font-bold text-white mb-1">Drawer Active: ' + name + '</p><p class="text-gray-400">Use the unified bottom bar to speak notes, record intakes, or attach photos directly into this drawer.</p></div>';
+  const drawerContent = document.getElementById('drawerContent');
+  drawerContent.innerHTML = '<p class="text-center text-gray-500 pt-8">Loading live cards...</p>';
   document.getElementById('drawerModal').classList.remove('hidden');
+
+  try {
+    const res = await fetch('/.netlify/functions/getBoard?board_id=18424728273&group=' + encodeURIComponent(name));
+    const data = await res.json();
+    
+    drawerContent.innerHTML = '';
+
+    if (!data.items || data.items.length === 0) {
+      drawerContent.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 text-center"><p class="font-bold text-white mb-1">Drawer Active: ' + name + '</p><p class="text-gray-400">No active items in this drawer. Use the bottom bar to speak notes directly into this drawer.</p></div>';
+      return;
+    }
+
+    const template = document.getElementById('tappy-card-template');
+
+    data.items.forEach(item => {
+      const clone = template.content.cloneNode(true);
+      
+      const titleEl = clone.querySelector('.card-title');
+      if (titleEl) titleEl.textContent = item.name || 'Untitled Card';
+      
+      const statusEl = clone.querySelector('.card-status');
+      if (statusEl) statusEl.textContent = item.status || 'ACTIVE';
+
+      const callEl = clone.querySelector('.card-call');
+      if (callEl) callEl.href = 'tel:' + (item.phone || '4105551234');
+
+      const smsEl = clone.querySelector('.card-sms');
+      if (smsEl) smsEl.href = 'sms:' + (item.phone || '4105551234');
+
+      const emailEl = clone.querySelector('.card-email');
+      if (emailEl) emailEl.href = 'mailto:' + (item.email || 'customer@email.com');
+
+      const shareBtn = clone.querySelector('.card-share');
+      if (shareBtn) shareBtn.setAttribute('onclick', "shareCard('" + item.id + "')");
+
+      drawerContent.appendChild(clone);
+    });
+
+  } catch (err) {
+    drawerContent.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 text-center"><p class="text-red-400">Unable to load cards. Check connection.</p></div>';
+  }
 }
 
 function closeDrawer() {
