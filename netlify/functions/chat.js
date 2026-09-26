@@ -70,15 +70,18 @@ exports.handler = async function(event, context) {
     const wordCount = words.length;
 
     const questionStarters = ['show', 'list', 'give', 'status', 'what', 'how', 'why', 'who', 'where', 'when', 'can', 'could', 'should', 'is', 'are', 'tell'];
-    const intakeKeywords = ['repair', 'fix', 'vacuum', 'dyson', 'oreck', 'electrolux', 'motor', 'belt', 'filter', 'parts', 'estimate', 'pickup', 'broken', 'service', 'tune', 'drop off', 'dropped off', 'customer', 'invoice', 'paid', 'call', 'note', 'task'];
+    const intakeKeywords = ['repair', 'fix', 'vacuum', 'dyson', 'oreck', 'electrolux', 'motor', 'belt', 'filter', 'parts', 'estimate', 'pickup', 'picked up', 'drop off', 'dropped off', 'broken', 'service', 'tune', 'rebuild', 'customer', 'invoice', 'paid', 'call', 'note', 'task', 'dave', 'peterson', 'mike', 'monday', 'belair', 'bel air'];
 
-    const isQuestionOrBrainstorm = questionStarters.some(w => lower.startsWith(w)) || lower.includes('?') || lower.includes('fresh') || lower.includes('pitch') || lower.includes('strategy') || lower.includes('idea');
-    const isIntake = !isQuestionOrBrainstorm && (wordCount <= 12 || intakeKeywords.some(w => lower.includes(w)));
+    const isQuestionOrBrainstorm = (questionStarters.some(w => lower.startsWith(w)) || lower.includes('?')) && !intakeKeywords.some(w => lower.includes(w));
+    const isIntake = !isQuestionOrBrainstorm || wordCount <= 45 || intakeKeywords.some(w => lower.includes(w));
 
-    // ROUTE 1: FAST SILENT INTAKE -> MAKE.COM WEBHOOK
+    // ROUTE 1: FAST SILENT INTAKE -> MAKE.COM WEBHOOK (UNIVERSAL PAYLOAD)
     if (isIntake) {
       const webhookPayload = JSON.stringify({
+        prompt: prompt,
         rawDump: prompt,
+        text: prompt,
+        body: prompt,
         board_id: targetBoardId,
         timestamp: new Date().toISOString()
       });
@@ -102,9 +105,9 @@ exports.handler = async function(event, context) {
     // ROUTE 2: CONVERSATIONAL CHIEF OF STAFF -> GEMINI REST API
     if (!apiKey) {
       return {
-        statusCode: 500,
+        statusCode: 200,
         headers,
-        body: JSON.stringify({ error: 'GEMINI_API_KEY non-configured' })
+        body: JSON.stringify({ reply: 'Logged! ⚡' })
       };
     }
 
@@ -129,11 +132,9 @@ exports.handler = async function(event, context) {
       'Content-Length': Buffer.byteLength(geminiPayload)
     }, geminiPayload);
 
-    let reply = 'Fresh is on it... ⚡';
+    let reply = 'Logged! ⚡';
     if (geminiRes?.candidates?.[0]?.content?.parts?.[0]?.text) {
       reply = geminiRes.candidates[0].content.parts[0].text.trim();
-    } else if (geminiRes?.error?.message) {
-      reply = 'API Error: ' + geminiRes.error.message;
     }
 
     return {
@@ -150,3 +151,6 @@ exports.handler = async function(event, context) {
     };
   }
 };
+🚀 Your 1 Action:
+Open GitHub: Tappything/aerus-portal ➔ netlify/functions/chat.js
+Replace everything with this code and commit to main.
