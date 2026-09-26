@@ -3,15 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TappyThing — Tapulator</title>
+<title>TappyThing — Pocket Chief of Staff</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05070e; color: #f3f4f6; }
-.tapulator-face { background: #0f172a; border: 2px solid #1e293b; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8); }
-.led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; }
-.drawer-btn { background: #1e293b; border: 1px solid #334155; }
-.drawer-btn:hover { background: #334155; }
+.tapulator-face { background: linear-gradient(180deg, #0f172a 0%, #090d16 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); }
+.led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
+.key-primary { background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%); border: 1px solid #3b82f6; box-shadow: 0 4px 14px rgba(29, 78, 216, 0.4); }
+.key-primary:active { transform: scale(0.98); }
+.key-secondary { background: #1e293b; border: 1px solid #334155; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
+.key-secondary:hover { background: #273549; }
+.key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; }
 @keyframes flash-banner { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 .flash-banner { animation: flash-banner 1.5s infinite; }
 </style>
@@ -22,52 +25,86 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
   <!-- TOP LED DISPLAY SCREEN -->
   <div class="led-display rounded-2xl p-4 text-center border border-blue-900/50 min-h-[70px] flex items-center justify-center">
-    <div id="ledOutput" class="text-sm font-bold text-gray-200 tracking-wide">
-      BUILD PERSONAL WORLD FIRST
+    <div id="ledOutput" class="text-sm font-bold text-emerald-400 tracking-wide">
+      POCKET CHIEF OF STAFF READY
     </div>
   </div>
 
-  <!-- POCKET CHIEF OF STAFF TAGLINE -->
-  <div class="text-center space-y-1">
-    <div class="text-xs font-bold text-blue-400 uppercase tracking-widest">Your Pocket Chief of Staff</div>
-    <div class="text-[11px] text-gray-300 font-medium">Tap. Talk. Operations live in seconds.</div>
+  <!-- DEVICE HEADER -->
+  <div class="text-center space-y-0.5">
+    <div class="text-xs font-black text-blue-400 uppercase tracking-widest">TappyThing Command Hub</div>
+    <div class="text-[11px] text-gray-400 font-medium">Tap. Talk. Operations live in seconds.</div>
   </div>
 
   <!-- HOW IT WORKS START BUTTON -->
-  <button onclick="toggleHowItWorks()" class="w-full bg-blue-900/80 hover:bg-blue-800 text-blue-200 font-black py-3 rounded-xl text-xs border border-blue-500 uppercase tracking-widest transition flex items-center justify-center gap-2 flash-banner">
+  <button id="howItWorksBtn" onclick="toggleHowItWorks()" class="w-full bg-blue-950/80 hover:bg-blue-900 text-blue-200 font-extrabold py-2.5 rounded-xl text-xs border border-blue-700/60 uppercase tracking-widest transition flex items-center justify-center gap-2 flash-banner">
     <i class="fa-solid fa-circle-info text-amber-400"></i>
     <span>[ HOW IT WORKS — START HERE ]</span>
   </button>
 
-  <!-- DYNAMIC WORLD DRAWERS CONTAINER -->
-  <div id="drawersContainer" class="grid grid-cols-2 gap-3">
-    <button onclick="openDrawer('Personal')" class="drawer-btn rounded-xl p-3 text-left transition space-y-1">
-      <div class="text-xs font-extrabold text-blue-400 flex items-center justify-between">
-        <span>1. Personal</span> <i class="fa-solid fa-user text-gray-500"></i>
+  <!-- ASYMMETRIC KEYPAD LAYOUT -->
+  <div id="drawersContainer" class="space-y-3">
+    
+    <!-- TOP DOMINANT KEY (CASTLE 🏰) -->
+    <button onclick="openDrawer('Castle')" class="key-primary w-full rounded-2xl p-4 text-left transition flex items-center justify-between">
+      <div>
+        <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-chess-rook text-blue-300"></i>
+          <span>1. Castle 🏰</span>
+        </div>
+        <div class="text-[11px] text-blue-200 mt-0.5">Personal, Family, Pickleball, Bills & Chores</div>
       </div>
-      <div class="text-[10px] text-gray-400">Tasks & Brain Dumps</div>
+      <i class="fa-solid fa-chevron-right text-blue-300 text-sm"></i>
     </button>
 
-    <button onclick="openDrawer('Business')" class="drawer-btn rounded-xl p-3 text-left transition space-y-1">
-      <div class="text-xs font-extrabold text-blue-400 flex items-center justify-between">
-        <span>2. Business</span> <i class="fa-solid fa-briefcase text-gray-500"></i>
-      </div>
-      <div class="text-[10px] text-gray-400">Operations Hub</div>
-    </button>
+    <!-- MIDDLE ASYMMETRIC PAIR -->
+    <div class="grid grid-cols-5 gap-3">
+      <!-- LARGE 3-COL KEY (EMPIRE 👑) -->
+      <button onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[85px]">
+        <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
+          <span>2. Empire 👑</span>
+          <i class="fa-solid fa-crown text-amber-500"></i>
+        </div>
+        <div class="text-[10px] text-gray-400 font-medium">Business Hub & Team Operations</div>
+      </button>
 
-    <button onclick="openDrawer('Customers')" class="drawer-btn rounded-xl p-3 text-left transition space-y-1">
-      <div class="text-xs font-extrabold text-blue-400 flex items-center justify-between">
-        <span>3. Customers</span> <i class="fa-solid fa-address-book text-gray-500"></i>
-      </div>
-      <div class="text-[10px] text-gray-400">22,283 Vault</div>
-    </button>
+      <!-- SMALLER 2-COL KEY (PIPELINE 🚀) -->
+      <button onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[85px]">
+        <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
+          <span>3. Pipeline 🚀</span>
+          <i class="fa-solid fa-rocket text-teal-400"></i>
+        </div>
+        <div class="text-[10px] text-teal-100 font-medium">Leads & Future Cash</div>
+      </button>
+    </div>
 
-    <button onclick="openDrawer('Jobs')" class="drawer-btn rounded-xl p-3 text-left transition space-y-1">
-      <div class="text-xs font-extrabold text-blue-400 flex items-center justify-between">
-        <span>4. Jobs</span> <i class="fa-solid fa-wrench text-gray-500"></i>
-      </div>
-      <div class="text-[10px] text-gray-400">Bench & Repairs</div>
-    </button>
+    <!-- BOTTOM ASYMMETRIC TRIO -->
+    <div class="grid grid-cols-3 gap-2.5">
+      <button onclick="openDrawer('Shop Ops')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
+          <span>4. Shop Ops 🛠️</span>
+          <i class="fa-solid fa-wrench text-gray-500 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-gray-400">Bench & Repairs</div>
+      </button>
+
+      <button onclick="openDrawer('Treasury')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
+          <span>5. Treasury 💳</span>
+          <i class="fa-solid fa-credit-card text-gray-500 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-gray-400">Invoices & Billing</div>
+      </button>
+
+      <button onclick="openDrawer('Exchange')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
+          <span>6. Exchange 🌐</span>
+          <i class="fa-solid fa-share-nodes text-gray-500 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-gray-400">Vault & Shared Links</div>
+      </button>
+    </div>
+
   </div>
 
   <!-- HOW IT WORKS EXPLANATION MODAL -->
@@ -82,21 +119,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
       <div class="space-y-3 text-xs text-gray-300">
         <div class="p-3 bg-gray-800/80 rounded-xl border border-gray-700">
-          <div class="font-bold text-blue-400 mb-0.5">1. Like a Handheld Label Maker</div>
-          <div>Press the mic, photo, or text button at the bottom and speak your raw thoughts.</div>
+          <div class="font-bold text-blue-400 mb-0.5">1. Pre-Built Handheld Setup</div>
+          <div>Your Castle, Empire, Pipeline, and Shop Ops drawers are ready out of the box.</div>
         </div>
         <div class="p-3 bg-gray-800/80 rounded-xl border border-gray-700">
-          <div class="font-bold text-emerald-400 mb-0.5">2. Self-Building Drawers</div>
-          <div>Fresh instantly sorts your voice dumps into dynamic, self-expanding drawers.</div>
+          <div class="font-bold text-emerald-400 mb-0.5">2. Guided Onboarding</div>
+          <div>Fresh holds your hand step-by-step to fill in your personal and business details.</div>
         </div>
         <div class="p-3 bg-gray-800/80 rounded-xl border border-gray-700">
-          <div class="font-bold text-amber-400 mb-0.5">3. Live Operational Cards</div>
-          <div>Share live cards with customers, track bench repairs, and run your business on the fly.</div>
+          <div class="font-bold text-amber-400 mb-0.5">3. Tap & Talk Operational Power</div>
+          <div>Use the mic or camera below to dump notes, track jobs, send invoices, and run your world.</div>
         </div>
       </div>
 
       <button onclick="toggleHowItWorks(); triggerOnboarding();" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider transition">
-        Build My Pocket World Now
+        Start My Guided Onboarding
       </button>
     </div>
   </div>
@@ -193,30 +230,15 @@ function sendToFresh(promptText) {
   .then(res => res.json())
   .then(data => {
     document.getElementById('ledOutput').textContent = data.reply || 'Logged! ⚡';
-    if (data.drawers && Array.isArray(data.drawers)) {
-      renderCustomDrawers(data.drawers);
-    }
   })
   .catch(err => {
     document.getElementById('ledOutput').textContent = 'Logged! ⚡';
   });
 }
 
-function renderCustomDrawers(drawers) {
-  var container = document.getElementById('drawersContainer');
-  container.innerHTML = '';
-  drawers.forEach((name, index) => {
-    var btn = document.createElement('button');
-    btn.className = 'drawer-btn rounded-xl p-3 text-left transition space-y-1';
-    btn.onclick = function() { openDrawer(name); };
-    btn.innerHTML = `<div class="text-xs font-extrabold text-blue-400 flex items-center justify-between"><span>${index + 1}. ${name}</span> <i class="fa-solid fa-folder text-gray-500"></i></div><div class="text-[10px] text-gray-400">Pocket World Drawer</div>`;
-    container.appendChild(btn);
-  });
-}
-
 function openDrawer(name) {
   document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + name + ' Drawer';
-  document.getElementById('drawerContent').innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800"><p class="font-bold text-white mb-1">Drawer Active: ' + name + '</p><p class="text-gray-400">Use the unified bar at the bottom to add notes or snap photos directly into this drawer.</p></div>';
+  document.getElementById('drawerContent').innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800"><p class="font-bold text-white mb-1">Drawer Active: ' + name + '</p><p class="text-gray-400">Use the unified bottom bar to speak notes, record intakes, or attach photos directly into this drawer.</p></div>';
   document.getElementById('drawerModal').classList.remove('hidden');
 }
 
@@ -229,8 +251,13 @@ function toggleHowItWorks() {
 }
 
 function triggerOnboarding() {
-  document.getElementById('ledOutput').textContent = 'BUILDING PERSONAL WORLD...';
+  document.getElementById('ledOutput').textContent = 'GUIDING ONBOARDING 1-BY-1...';
   sendToFresh('Build my personal world onboarding setup');
+  
+  var howItWorksBtn = document.getElementById('howItWorksBtn');
+  if (howItWorksBtn) {
+    howItWorksBtn.style.display = 'none';
+  }
 }
 </script>
 </body>
