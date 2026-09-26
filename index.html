@@ -15,8 +15,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 .key-secondary { background: #1e293b; border: 1px solid #334155; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
 .key-secondary:hover { background: #273549; }
 .key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; }
-@keyframes flash-banner { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-.flash-banner { animation: flash-banner 1.5s infinite; }
 </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 pb-28">
@@ -25,7 +23,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
   <!-- TOP LED DISPLAY SCREEN -->
   <div class="led-display rounded-2xl p-4 text-center border border-blue-900/50 min-h-[70px] flex items-center justify-center">
-    <div id="ledOutput" class="text-sm font-bold text-emerald-400 tracking-wide">
+    <div id="ledOutput" class="text-sm font-bold text-emerald-400 tracking-wide transition-all">
       POCKET CHIEF OF STAFF READY
     </div>
   </div>
@@ -36,10 +34,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     <div class="text-[11px] text-gray-400 font-medium">Tap. Talk. Operations live in seconds.</div>
   </div>
 
-  <!-- HOW IT WORKS START BUTTON -->
-  <button id="howItWorksBtn" onclick="toggleHowItWorks()" class="w-full bg-blue-950/80 hover:bg-blue-900 text-blue-200 font-extrabold py-2.5 rounded-xl text-xs border border-blue-700/60 uppercase tracking-widest transition flex items-center justify-center gap-2 flash-banner">
-    <i class="fa-solid fa-circle-info text-amber-400"></i>
-    <span>[ HOW IT WORKS — START HERE ]</span>
+  <!-- SUBTLE FEATURES & BENEFITS BUTTON (NON-FLASHING) -->
+  <button onclick="toggleFeaturesModal()" class="w-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 font-semibold py-1.5 rounded-xl text-[11px] border border-slate-700/60 uppercase tracking-wider transition flex items-center justify-center gap-1.5">
+    <i class="fa-solid fa-list-check text-slate-400 text-xs"></i>
+    <span>[ FEATURES & BENEFITS ]</span>
   </button>
 
   <!-- ASYMMETRIC KEYPAD LAYOUT -->
@@ -107,33 +105,53 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
   </div>
 
-  <!-- HOW IT WORKS EXPLANATION MODAL -->
-  <div id="howItWorksModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-6 backdrop-blur-md justify-center">
-    <div class="bg-gray-900 border border-blue-500/40 rounded-3xl p-6 max-w-sm mx-auto space-y-4 text-left shadow-2xl">
+  <!-- SUBTLE SALES REP PORTAL LINK -->
+  <div class="text-center pt-2">
+    <button onclick="alert('Rep portal coming soon — contact William at towsonhealthyhomes.com')" class="text-[10px] text-gray-500 hover:text-gray-400 transition underline tracking-wider">
+      Sales Rep Portal
+    </button>
+  </div>
+
+  <!-- FEATURES & BENEFITS MODAL -->
+  <div id="featuresModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-6 backdrop-blur-md justify-center">
+    <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-6 max-w-sm mx-auto space-y-5 text-left shadow-2xl max-h-[85vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-gray-800 pb-3">
         <h3 class="text-base font-black text-white flex items-center gap-2">
-          <i class="fa-solid fa-robot text-blue-400"></i> Pocket Chief of Staff
+          <i class="fa-solid fa-mobile-screen-button text-blue-400"></i> Pocket Chief of Staff
         </h3>
-        <button onclick="toggleHowItWorks()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+        <button onclick="toggleFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
       </div>
 
-      <div class="space-y-3 text-xs text-gray-300">
-        <div class="p-3 bg-gray-800/80 rounded-xl border border-gray-700">
-          <div class="font-bold text-blue-400 mb-0.5">1. Pre-Built Handheld Setup</div>
-          <div>Your Castle, Empire, Pipeline, and Shop Ops drawers are ready out of the box.</div>
-        </div>
-        <div class="p-3 bg-gray-800/80 rounded-xl border border-gray-700">
-          <div class="font-bold text-emerald-400 mb-0.5">2. Guided Onboarding</div>
-          <div>Fresh holds your hand step-by-step to fill in your personal and business details.</div>
-        </div>
-        <div class="p-3 bg-gray-800/80 rounded-xl border border-gray-700">
-          <div class="font-bold text-amber-400 mb-0.5">3. Tap & Talk Operational Power</div>
-          <div>Use the mic or camera below to dump notes, track jobs, send invoices, and run your world.</div>
-        </div>
+      <!-- SECTION 1: WHAT IT DOES RIGHT NOW -->
+      <div class="space-y-2">
+        <h4 class="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-check"></i> What It Does Right Now
+        </h4>
+        <ul class="space-y-1.5 text-[11px] text-gray-300">
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Voice or type brain dumps instantly</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Everything routes to the right drawer automatically</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Share live cards with customers by text</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Track jobs, repairs, and invoices on the fly</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Built for small business owners who hate software</li>
+        </ul>
       </div>
 
-      <button onclick="toggleHowItWorks(); triggerOnboarding();" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider transition">
-        Start My Guided Onboarding
+      <!-- SECTION 2: COMING SOON -->
+      <div class="space-y-2 border-t border-gray-800 pt-3">
+        <h4 class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+          <i class="fa-solid fa-clock"></i> Coming Soon
+        </h4>
+        <ul class="space-y-1.5 text-[11px] text-gray-300">
+          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Customer job tracking links — they see their repair status live</li>
+          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Stripe tap-to-pay invoicing in the field</li>
+          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Two-way card messaging with customers</li>
+          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Team staff dashboards</li>
+          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Subscriber onboarding — get your own Pocket Chief of Staff</li>
+        </ul>
+      </div>
+
+      <button onclick="toggleFeaturesModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
+        Got It
       </button>
     </div>
   </div>
@@ -208,7 +226,7 @@ function toggleVoiceIntake() {
 function handlePhotoInput(fileInput) {
   if (fileInput.files && fileInput.files[0]) {
     var fileName = fileInput.files[0].name;
-    document.getElementById('ledOutput').textContent = 'PHOTO LOGGED: ' + fileName;
+    flashLed('PHOTO LOGGED: ' + fileName);
     sendToFresh('Photo attached: ' + fileName);
   }
 }
@@ -221,7 +239,16 @@ function submitUnifiedInput() {
   }
 }
 
+function flashLed(responseText) {
+  var output = document.getElementById('ledOutput');
+  output.textContent = responseText || 'Logged! ⚡';
+  setTimeout(function() {
+    output.textContent = 'POCKET CHIEF OF STAFF READY';
+  }, 3000);
+}
+
 function sendToFresh(promptText) {
+  document.getElementById('ledOutput').textContent = 'PROCESSING...';
   fetch('/.netlify/functions/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -229,10 +256,10 @@ function sendToFresh(promptText) {
   })
   .then(res => res.json())
   .then(data => {
-    document.getElementById('ledOutput').textContent = data.reply || 'Logged! ⚡';
+    flashLed(data.reply || 'Logged! ⚡');
   })
   .catch(err => {
-    document.getElementById('ledOutput').textContent = 'Logged! ⚡';
+    flashLed('Logged! ⚡');
   });
 }
 
@@ -246,18 +273,8 @@ function closeDrawer() {
   document.getElementById('drawerModal').classList.add('hidden');
 }
 
-function toggleHowItWorks() {
-  document.getElementById('howItWorksModal').classList.toggle('hidden');
-}
-
-function triggerOnboarding() {
-  document.getElementById('ledOutput').textContent = 'GUIDING ONBOARDING 1-BY-1...';
-  sendToFresh('Build my personal world onboarding setup');
-  
-  var howItWorksBtn = document.getElementById('howItWorksBtn');
-  if (howItWorksBtn) {
-    howItWorksBtn.style.display = 'none';
-  }
+function toggleFeaturesModal() {
+  document.getElementById('featuresModal').classList.toggle('hidden');
 }
 </script>
 </body>
