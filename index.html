@@ -17,7 +17,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 .key-secondary:hover { background: #273549; }
 .key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; }
 .key-pinball { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: 1px solid #8b5cf6; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); }
-.btn-click-active { transform: scale(0.92); opacity: 0.8; }
 textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overflow-y: auto; }
 </style>
 </head>
@@ -25,14 +24,12 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
 
 <div class="max-w-md w-full tapulator-face rounded-3xl p-6 relative overflow-hidden space-y-5">
 
-  <!-- TOP LED DISPLAY SCREEN -->
   <div class="led-display rounded-2xl p-4 text-center border border-blue-900/50 min-h-[70px] flex items-center justify-center">
     <div id="ledOutput" class="text-sm font-bold text-emerald-400 tracking-wide transition-all">
       POCKET CHIEF OF STAFF READY
     </div>
   </div>
 
-  <!-- EMBOSSED OVAL LOGO BADGE HEADER -->
   <div class="text-center space-y-1">
     <div class="inline-block bg-slate-950/90 border-2 border-slate-700/80 rounded-full px-7 py-2.5 shadow-inner">
       <img src="logo.png" alt="TappyThing" class="h-14 max-w-[170px] object-contain mx-auto drop-shadow-md">
@@ -41,16 +38,12 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
     <div class="text-[11px] text-gray-400 font-medium">Tap. Talk. Operations live in seconds.</div>
   </div>
 
-  <!-- FEATURES & BENEFITS BUTTON -->
   <button onclick="toggleFeaturesModal()" class="w-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 font-semibold py-1.5 rounded-xl text-[11px] border border-slate-700/60 uppercase tracking-wider transition flex items-center justify-center gap-1.5">
     <i class="fa-solid fa-list-check text-slate-400 text-xs"></i>
     <span>[ FEATURES & BENEFITS ]</span>
   </button>
 
-  <!-- 6-BUTTON KEYPAD LAYOUT -->
   <div id="drawersContainer" class="space-y-3">
-    
-    <!-- BUTTON 1: CASTLE 🏰 -->
     <button onclick="openDrawer('Castle')" class="key-primary w-full rounded-2xl p-3.5 text-left transition flex items-center justify-between">
       <div>
         <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
@@ -62,9 +55,7 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
       <i class="fa-solid fa-chevron-right text-blue-300 text-sm"></i>
     </button>
 
-    <!-- MIDDLE ASYMMETRIC PAIR -->
     <div class="grid grid-cols-5 gap-3">
-      <!-- BUTTON 2: EMPIRE 👑 -->
       <button onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[80px]">
         <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
           <span>2. Empire 👑</span>
@@ -73,7 +64,6 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
         <div class="text-[10px] text-gray-400 font-medium">Business Hub & Shop Bench 🛠️</div>
       </button>
 
-      <!-- BUTTON 3: PIPELINE 🚀 -->
       <button onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[80px]">
         <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
           <span>3. Pipeline 🚀</span>
@@ -83,9 +73,7 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
       </button>
     </div>
 
-    <!-- BOTTOM ASYMMETRIC PAIR -->
     <div class="grid grid-cols-2 gap-2.5">
-      <!-- BUTTON 4: CALENDAR 📅 -->
       <button onclick="openDrawer('Calendar')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
         <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
           <span>4. Calendar 📅</span>
@@ -94,7 +82,6 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
         <div class="text-[9px] text-gray-400">Schedule & Appointments</div>
       </button>
 
-      <!-- BUTTON 5: EXCHANGE 🌐 -->
       <button onclick="openDrawer('Exchange')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
         <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
           <span>5. Exchange 🌐</span>
@@ -104,7 +91,6 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
       </button>
     </div>
 
-    <!-- BUTTON 6: PINBALL TAP-TO-TASK 🧠⚡ -->
     <button onclick="openDrawer('Pinball')" class="key-pinball w-full rounded-2xl p-3.5 text-left transition flex items-center justify-between">
       <div>
         <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
@@ -115,10 +101,8 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
       </div>
       <i class="fa-solid fa-chevron-right text-purple-200 text-sm"></i>
     </button>
-
   </div>
 
-  <!-- FOOTER WITH CAST ROSTER, ROB ART & SALES REP PORTAL -->
   <div class="text-center pt-2 space-y-2 border-t border-gray-800/80">
     <div class="flex items-center justify-between px-2">
       <button onclick="toggleCastModal()" class="text-[10px] text-amber-400 hover:text-amber-300 font-bold transition flex items-center gap-1">
@@ -136,7 +120,6 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
     </button>
   </div>
 
-  <!-- FEATURES & BENEFITS MODAL -->
   <div id="featuresModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-6 backdrop-blur-md justify-center">
     <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-6 max-w-sm mx-auto space-y-5 text-left shadow-2xl max-h-[85vh] overflow-y-auto relative">
       <div class="flex items-center justify-between border-b border-gray-800 pb-3">
@@ -167,7 +150,6 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
     </div>
   </div>
 
-  <!-- HIDDEN CAST OF CHARACTERS MODAL -->
   <div id="castModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-6 backdrop-blur-md justify-center">
     <div class="bg-gray-900 border border-amber-500/40 rounded-3xl p-6 max-w-sm mx-auto space-y-4 text-left shadow-2xl max-h-[85vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-gray-800 pb-3">
@@ -215,7 +197,6 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
     </div>
   </div>
 
-  <!-- PERSISTENT CARD DRAWER MODAL -->
   <div id="drawerModal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col p-4 pb-24 backdrop-blur-md">
     <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-3">
       <h3 id="drawerTitle" class="text-base font-black text-white flex items-center gap-2">
@@ -224,7 +205,6 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
       <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
     </div>
 
-    <!-- SALES REP SANDBOX HEADER BANNER -->
     <div id="sandboxHeaderBar" class="hidden mb-3 space-y-3 bg-purple-950/40 p-3.5 rounded-2xl border border-purple-800/50">
       <div id="salesTickerText" class="text-xs font-black text-amber-300 border-b border-purple-800/40 pb-2 text-center leading-relaxed">
         ⚡ "Action cures fear. Start now." — Zig Ziglar
@@ -239,21 +219,18 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
         </button>
       </div>
 
-      <!-- IN-DRAWER SILENT TEXT COMMAND ROW FOR LOUD BARS/RESTAURANTS -->
       <div class="flex gap-2">
-        <input type="text" id="sandboxInput" placeholder="Type demo command (e.g. 4 tables, 3 bays) & hit Enter..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500" onkeydown="if(event.key==='Enter') submitSandboxText()">
+        <input type="text" id="sandboxInput" placeholder="Type demo command (e.g. 5 tables of 4, 3 bays) & hit Enter..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500" onkeydown="if(event.key==='Enter') submitSandboxText()">
         <button onclick="submitSandboxText()" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-2 rounded-xl text-xs font-bold shrink-0">📤 Build</button>
       </div>
     </div>
 
-    <!-- IN-DRAWER NEW CARD BUILDER BUTTON -->
     <div id="newCardBar" class="hidden mb-3">
       <button onclick="createNewCard()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-2 rounded-xl text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-lg">
         <i class="fa-solid fa-plus"></i> + NEW CARD
       </button>
     </div>
 
-    <!-- SUB-NAV FOR EMPIRE DRAWER -->
     <div id="empireSubNav" class="hidden mb-3 grid grid-cols-2 gap-2">
       <button onclick="fetchDrawerItems('Empire')" class="bg-amber-900/40 hover:bg-amber-800/60 text-amber-200 border border-amber-700/50 py-1.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1">
         <i class="fa-solid fa-crown text-amber-400"></i> Empire Operations
@@ -263,7 +240,6 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
       </button>
     </div>
 
-    <!-- VAULT SEARCH BAR FOR EXCHANGE DRAWER -->
     <div id="exchangeSearchBar" class="hidden mb-3">
       <div class="flex gap-2">
         <input type="text" id="vaultQuery" placeholder="Search 22,283 customer vault records..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') searchVault()">
@@ -271,7 +247,6 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
       </div>
     </div>
 
-    <!-- PINBALL FEEDBACK CONTAINER FOR DRAWER 6 -->
     <div id="pinballFeedbackContainer" class="hidden mb-3 bg-gray-900 p-3 rounded-2xl border border-gray-800 space-y-2">
       <div class="text-[11px] font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
         <i class="fa-solid fa-comments"></i> Fresh Assistant getter 🤵
@@ -287,13 +262,11 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
       </div>
     </div>
 
-    <!-- DYNAMIC TILE RENDER CONTAINER FRONT AND CENTER -->
     <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300">
       <p class="text-center text-gray-500 pt-8">Loading items...</p>
     </div>
   </div>
 
-  <!-- QR SHARE MODAL -->
   <div id="share-modal" class="fixed inset-0 bg-black/95 z-50 hidden flex items-center justify-center p-4 backdrop-blur-md">
     <div class="bg-gray-900 border border-blue-500/40 rounded-3xl p-6 max-w-xs w-full text-center space-y-4">
       <h3 class="text-sm font-black text-white">Scan to Open Live Card</h3>
@@ -304,7 +277,6 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
 
 </div>
 
-<!-- UNIFIED BOTTOM INPUT BAR (AUTO-EXPANDING TEXTAREA UP TO 5 LINES + LIVE DRAWER HOOK) -->
 <div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-60">
   <div class="max-w-md mx-auto flex items-end gap-2">
     <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0 mb-0.5">
@@ -324,7 +296,6 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
   </div>
 </div>
 
-<!-- BRANDED CARD TEMPLATE -->
 <template id="tappy-card-template">
   <div class="tappy-card bg-gray-900 border border-gray-800 p-4 rounded-2xl mb-3 space-y-3">
     <div class="flex items-center justify-between">
@@ -376,7 +347,7 @@ function toggleVoiceIntake() {
   var output = document.getElementById('ledOutput');
 
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert('Voice dictation not supported.'); return; }
+  if (!SR) { alert('Voice dictation not supported on this browser.'); return; }
   
   if (recognition) {
     recognition.stop();
@@ -522,45 +493,68 @@ function parseAndRenderDynamicTiles(promptText) {
   const drawerContent = document.getElementById('drawerContent');
   
   let text = promptText.toLowerCase()
+    .replace(/\bfive\b/g, '5')
     .replace(/\bfour\b/g, '4')
     .replace(/\bthree\b/g, '3')
     .replace(/\btwo\b/g, '2')
     .replace(/\bone\b/g, '1');
 
-  const numMatch = text.match(/(\d+)/g);
-  let count = numMatch ? parseInt(numMatch[0]) : 4;
-  if (count > 20) count = 20;
+  // Hardened Regex to capture "X tables of Y" or "X tables"
+  let numTables = 5;
+  let partySize = 4;
 
-  let unitType = 'Table';
-  if (text.includes('bay') || text.includes('auto') || text.includes('brake')) unitType = 'Auto Bay';
-  else if (text.includes('chair') || text.includes('salon')) unitType = 'Salon Chair';
-  else if (text.includes('call') || text.includes('hvac') || text.includes('route')) unitType = 'Service Call';
+  const matchComplex = text.match(/(\d+)\s*tables?\s*(?:of\s*(\d+))?/i);
+  if (matchComplex) {
+    if (matchComplex[1]) numTables = parseInt(matchComplex[1]);
+    if (matchComplex[2]) partySize = parseInt(matchComplex[2]);
+  } else {
+    const numbers = text.match(/(\d+)/g);
+    if (numbers && numbers.length > 0) numTables = parseInt(numbers[0]);
+    if (numbers && numbers.length > 1) partySize = parseInt(numbers[1]);
+  }
 
-  let html = `<div class="space-y-3 pb-8">`;
+  if (numTables > 20) numTables = 20;
 
-  for (let i = 1; i <= count; i++) {
-    let sizeLabel = '4-Top Party';
-    if (i === count && count > 2) sizeLabel = '12-Top Party 👑';
-    else if (i % 2 === 1) sizeLabel = '2-Top Party';
+  // OVERHEAD 2D FLOOR PLAN GRAPHICAL GRID LAYOUT
+  let html = `
+    <div class="bg-slate-950 p-4 rounded-2xl border border-purple-800/80 space-y-3">
+      <div class="flex justify-between items-center border-b border-purple-900/60 pb-2">
+        <span class="text-xs font-black text-amber-300 tracking-wider flex items-center gap-1.5">
+          <i class="fa-solid fa-border-all text-purple-400"></i> OVERHEAD 2D FLOOR PLAN
+        </span>
+        <span class="text-[10px] bg-purple-900/60 text-purple-200 px-2 py-0.5 rounded-full font-bold">${numTables} TABLES (${partySize}-TOP)</span>
+      </div>
+      
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
+  `;
 
-    if (unitType !== 'Table') sizeLabel = 'Active Work Order';
-
-    const tileId = `tile-${i}`;
+  for (let i = 1; i <= numTables; i++) {
+    const tileId = `table-${i}`;
     html += `
-      <div id="${tileId}" class="bg-gray-900 border border-purple-800/80 p-3.5 rounded-2xl flex items-center justify-between shadow-lg">
-        <div>
-          <div class="font-black text-amber-300 text-xs uppercase">${unitType} ${i} — ${sizeLabel}</div>
-          <div class="tile-status text-[11px] text-emerald-400 font-bold mt-0.5">Stage: Active & Seated 🟢</div>
+      <div id="${tileId}" class="bg-gray-900/90 border border-purple-600/60 rounded-xl p-2.5 text-center flex flex-col justify-between items-center shadow-md relative group hover:border-purple-400 transition min-h-[95px]">
+        <div class="text-[10px] font-black text-amber-300 uppercase">TBL ${i}</div>
+        
+        <!-- 2D OVERHEAD VISUAL TABLE GRAPHIC -->
+        <div class="my-1.5 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-xl bg-purple-900/80 border-2 border-purple-400 flex items-center justify-center text-white font-bold text-xs shadow-inner">
+            ${partySize}P
+          </div>
         </div>
-        <div class="flex items-center gap-2">
-          <button onclick="turnDynamicTile('${tileId}', '${unitType} ${i}')" class="bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-700/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold transition">🧹 Turn / Clear</button>
-          <button onclick="shareCard('${tileId}')" class="bg-blue-600/60 hover:bg-blue-500 text-blue-100 border border-blue-500 px-2.5 py-1.5 rounded-xl text-[10px] font-bold">🔗 Share QR</button>
-        </div>
+
+        <div class="tile-status text-[9px] text-emerald-400 font-bold mb-1">Seated 🟢</div>
+        
+        <button onclick="turnDynamicTile('${tileId}', 'Table ${i}')" class="w-full bg-purple-950 hover:bg-purple-900 text-purple-200 border border-purple-700/60 rounded-lg py-1 text-[9px] font-bold transition">
+          🧹 Turn
+        </button>
       </div>
     `;
   }
 
-  html += `</div>`;
+  html += `
+      </div>
+    </div>
+  `;
+  
   drawerContent.innerHTML = html;
 }
 
@@ -569,11 +563,11 @@ function turnDynamicTile(tileId, label) {
   if (tile) {
     const statusEl = tile.querySelector('.tile-status');
     if (statusEl) {
-      statusEl.textContent = '✨ Ready for Next Guest / Turned';
-      statusEl.className = 'tile-status text-[11px] text-gray-400 font-bold mt-0.5';
+      statusEl.textContent = 'Ready ✨';
+      statusEl.className = 'tile-status text-[9px] text-gray-400 font-bold mb-1';
     }
     tile.classList.add('opacity-50');
-    flashLed('🧹 ' + label.toUpperCase() + ' TURNED & READY!');
+    flashLed('🧹 ' + label.toUpperCase() + ' TURNED!');
   }
 }
 
