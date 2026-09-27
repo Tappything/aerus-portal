@@ -150,7 +150,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
           <i class="fa-solid fa-circle-check"></i> Active Features
         </h4>
         <ul class="space-y-1.5 text-[11px] text-gray-300">
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Dynamic Room Builder Sandbox:</strong> Speaks layout into existence; dynamic graphical tiles auto-render front and center.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Dynamic Room Builder Sandbox:</strong> Speaks or types layout into existence; dynamic graphical tiles auto-render front and center.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Silent Text Command Input:</strong> In-drawer text builder row for high-noise field environments.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>PIN-Lock Security:</strong> Lock sensitive customer notes, estimates, or job cards with a 4-digit PIN.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Streaming Voice Dictation:</strong> Real-time voice capture directly in input box.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap Outbound SMS Links:</strong> Job tracking links dispatched straight to customer phones.</li>
@@ -235,6 +236,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         <button onclick="vaporizeDemo()" class="bg-red-900/60 hover:bg-red-800 text-red-200 border border-red-700/60 font-bold px-3 py-2.5 rounded-xl text-xs uppercase transition shadow-lg shrink-0">
           💥 VAPORIZE DEMO
         </button>
+      </div>
+
+      <!-- IN-DRAWER SILENT TEXT COMMAND ROW FOR LOUD BARS/RESTAURANTS -->
+      <div class="flex gap-2">
+        <input type="text" id="sandboxInput" placeholder="Type demo command (e.g. 4 tables, 3 bays) & hit Enter..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500" onkeydown="if(event.key==='Enter') submitSandboxText()">
+        <button onclick="submitSandboxText()" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-2 rounded-xl text-xs font-bold shrink-0">📤 Build</button>
       </div>
     </div>
 
@@ -409,6 +416,15 @@ function submitUnifiedInput() {
   if (text) {
     input.value = '';
     flashLed('PROCESSING... ⏳');
+    parseAndExecuteCommand(text);
+  }
+}
+
+function submitSandboxText() {
+  const input = document.getElementById('sandboxInput');
+  const text = input ? input.value.trim() : '';
+  if (text) {
+    input.value = '';
     parseAndExecuteCommand(text);
   }
 }
