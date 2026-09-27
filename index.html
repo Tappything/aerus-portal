@@ -220,7 +220,7 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
       </div>
 
       <div class="flex gap-2">
-        <input type="text" id="sandboxInput" placeholder="Type demo command (e.g. 5 tables of 4, 3 bays) & hit Enter..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500" onkeydown="if(event.key==='Enter') submitSandboxText()">
+        <input type="text" id="sandboxInput" placeholder="Type demo command (e.g. 4 four-tops and a ten-top) & hit Enter..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500" onkeydown="if(event.key==='Enter') submitSandboxText()">
         <button onclick="submitSandboxText()" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-2 rounded-xl text-xs font-bold shrink-0">📤 Build</button>
       </div>
     </div>
@@ -347,7 +347,7 @@ function toggleVoiceIntake() {
   var output = document.getElementById('ledOutput');
 
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert('Voice dictation not supported on this browser.'); return; }
+  if (!SR) { alert('Voice dictation not supported.'); return; }
   
   if (recognition) {
     recognition.stop();
@@ -358,23 +358,26 @@ function toggleVoiceIntake() {
   }
 
   recognition = new SR();
-  recognition.continuous = true;
+  recognition.continuous = false;
   recognition.interimResults = true;
   recognition.lang = 'en-US';
   
   btn.classList.add('text-red-500');
   output.textContent = 'LISTENING (SPEAK NOW)...';
-  recognition.start();
 
   recognition.onresult = function(e) {
-    var interim = '';
-    var final = '';
+    var transcript = '';
     for (var i = e.resultIndex; i < e.results.length; ++i) {
-      if (e.results[i].isFinal) { final += e.results[i][0].transcript; } 
-      else { interim += e.results[i][0].transcript; }
+      transcript += e.results[i][0].transcript;
     }
-    input.value = final || interim;
+    input.value = transcript;
     autoExpandTextarea(input);
+  };
+
+  recognition.onend = function() {
+    btn.classList.remove('text-red-500');
+    output.textContent = 'POCKET CHIEF OF STAFF READY';
+    recognition = null;
   };
 
   recognition.onerror = function() {
@@ -382,6 +385,8 @@ function toggleVoiceIntake() {
     output.textContent = 'MIC ERROR';
     recognition = null;
   };
+
+  recognition.start();
 }
 
 function handlePhotoInput(fileInput) {
@@ -493,62 +498,77 @@ function parseAndRenderDynamicTiles(promptText) {
   const drawerContent = document.getElementById('drawerContent');
   
   let text = promptText.toLowerCase()
+    .replace(/\bten\b/g, '10')
     .replace(/\bfive\b/g, '5')
     .replace(/\bfour\b/g, '4')
     .replace(/\bthree\b/g, '3')
     .replace(/\btwo\b/g, '2')
     .replace(/\bone\b/g, '1');
 
-  // Hardened Regex to capture "X tables of Y" or "X tables"
-  let numTables = 5;
-  let partySize = 4;
+  let tablesList = [];
 
-  const matchComplex = text.match(/(\d+)\s*tables?\s*(?:of\s*(\d+))?/i);
-  if (matchComplex) {
-    if (matchComplex[1]) numTables = parseInt(matchComplex[1]);
-    if (matchComplex[2]) partySize = parseInt(matchComplex[2]);
-  } else {
-    const numbers = text.match(/(\d+)/g);
-    if (numbers && numbers.length > 0) numTables = parseInt(numbers[0]);
-    if (numbers && numbers.length > 1) partySize = parseInt(numbers[1]);
+  // Parse specific party layouts like "4 four-tops and a ten-top"
+  if (text.includes('top') || text.includes('table')) {
+    const parts = text.split(/and|\,/);
+    parts.forEach(part => {
+      let count = 1;
+      let size = 4;
+
+      if (part.includes('ten-top') || part.includes('ten top') || part.includes('10-top') || part.includes('10 top')) {
+        size = 10;
+      } else if (part.includes('four-top') || part.includes('four top') || part.includes('4-top') || part.includes('4 top')) {
+        size = 4;
+      } else if (part.includes('two-top') || part.includes('two top') || part.includes('2-top') || part.includes('2 top')) {
+        size = 2;
+      }
+
+      const numMatch = part.match(/(\d+)/g);
+      if (numMatch && numMatch.length > 0) {
+        count = parseInt(numMatch[0]);
+      }
+
+      for (let i = 0; i < count; i++) {
+        tablesList.push(size);
+      }
+    });
   }
 
-  if (numTables > 20) numTables = 20;
+  if (tablesList.length === 0) {
+    tablesList = [4, 4, 4, 4, 10];
+  }
 
-  // OVERHEAD 2D FLOOR PLAN GRAPHICAL GRID LAYOUT
   let html = `
     <div class="bg-slate-950 p-4 rounded-2xl border border-purple-800/80 space-y-3">
       <div class="flex justify-between items-center border-b border-purple-900/60 pb-2">
         <span class="text-xs font-black text-amber-300 tracking-wider flex items-center gap-1.5">
           <i class="fa-solid fa-border-all text-purple-400"></i> OVERHEAD 2D FLOOR PLAN
         </span>
-        <span class="text-[10px] bg-purple-900/60 text-purple-200 px-2 py-0.5 rounded-full font-bold">${numTables} TABLES (${partySize}-TOP)</span>
+        <span class="text-[10px] bg-purple-900/60 text-purple-200 px-2 py-0.5 rounded-full font-bold">${tablesList.length} TABLES GENERATED</span>
       </div>
       
       <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
   `;
 
-  for (let i = 1; i <= numTables; i++) {
-    const tileId = `table-${i}`;
+  tablesList.forEach((partySize, idx) => {
+    const tileId = `table-${idx + 1}`;
     html += `
-      <div id="${tileId}" class="bg-gray-900/90 border border-purple-600/60 rounded-xl p-2.5 text-center flex flex-col justify-between items-center shadow-md relative group hover:border-purple-400 transition min-h-[95px]">
-        <div class="text-[10px] font-black text-amber-300 uppercase">TBL ${i}</div>
+      <div id="${tileId}" class="bg-gray-900/90 border border-purple-600/60 rounded-xl p-2.5 text-center flex flex-col justify-between items-center shadow-md relative hover:border-purple-400 transition min-h-[95px]">
+        <div class="text-[10px] font-black text-amber-300 uppercase">TBL ${idx + 1}</div>
         
-        <!-- 2D OVERHEAD VISUAL TABLE GRAPHIC -->
         <div class="my-1.5 flex items-center justify-center">
-          <div class="w-10 h-10 rounded-xl bg-purple-900/80 border-2 border-purple-400 flex items-center justify-center text-white font-bold text-xs shadow-inner">
+          <div class="w-12 h-12 rounded-xl bg-purple-900/80 border-2 border-purple-400 flex items-center justify-center text-white font-bold text-xs shadow-inner">
             ${partySize}P
           </div>
         </div>
 
         <div class="tile-status text-[9px] text-emerald-400 font-bold mb-1">Seated 🟢</div>
         
-        <button onclick="turnDynamicTile('${tileId}', 'Table ${i}')" class="w-full bg-purple-950 hover:bg-purple-900 text-purple-200 border border-purple-700/60 rounded-lg py-1 text-[9px] font-bold transition">
+        <button onclick="turnDynamicTile('${tileId}', 'Table ${idx + 1}')" class="w-full bg-purple-950 hover:bg-purple-900 text-purple-200 border border-purple-700/60 rounded-lg py-1 text-[9px] font-bold transition">
           🧹 Turn
         </button>
       </div>
     `;
-  }
+  });
 
   html += `
       </div>
