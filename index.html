@@ -18,14 +18,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 .key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; }
 .key-pinball { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: 1px solid #8b5cf6; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); }
 .btn-click-active { transform: scale(0.92); opacity: 0.8; }
-
-/* 60 FPS SMOOTH TICKER MARQUEE */
-@keyframes ticker {
-  0% { transform: translate3d(100%, 0, 0); }
-  100% { transform: translate3d(-100%, 0, 0); }
-}
-.marquee-wrapper { overflow: hidden; whitespace: nowrap; box-sizing: border-box; }
-.marquee-content { display: inline-block; animation: ticker 22s linear infinite; will-change: transform; }
 </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 pb-28">
@@ -39,10 +31,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </div>
   </div>
 
-  <!-- EMBOSSED OVAL LOGO BADGE -->
+  <!-- EMBOSSED OVAL LOGO BADGE HEADER -->
   <div class="text-center space-y-1">
-    <div class="inline-block bg-slate-950/80 border-2 border-slate-700/80 rounded-full px-6 py-2 shadow-inner">
-      <img src="logo.png" alt="TappyThing" class="h-12 max-w-[160px] object-contain mx-auto drop-shadow-md">
+    <div class="inline-block bg-slate-950/90 border-2 border-slate-700/80 rounded-full px-7 py-2.5 shadow-inner">
+      <img src="logo.png" alt="TappyThing" class="h-14 max-w-[170px] object-contain mx-auto drop-shadow-md">
     </div>
     <div class="text-xs font-black text-blue-400 uppercase tracking-widest pt-1">TappyThing Command Hub</div>
     <div class="text-[11px] text-gray-400 font-medium">Tap. Talk. Operations live in seconds.</div>
@@ -237,12 +229,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
     </div>
 
-    <!-- PINBALL TAP-TO-TASK HEADER BANNER (SALES TICKER + BRAIN DUMP MIC) -->
-    <div id="pinballHeaderBar" class="hidden mb-3 space-y-3 bg-purple-950/40 p-3 rounded-2xl border border-purple-800/50">
-      <div class="marquee-wrapper text-xs font-bold text-amber-300 border-b border-purple-800/40 pb-2">
-        <div class="marquee-content" id="salesTickerText">
-          ⚡ "Action cures fear. You don't have to be great to start, but you have to start to be great." — Zig Ziglar &nbsp;&nbsp;&nbsp;&nbsp; 🔥 "Massive action solves all problems." — Grant Cardone &nbsp;&nbsp;&nbsp;&nbsp; 🎯 "The elevator to success is out of order. Take the stairs." — Joe Girard
-        </div>
+    <!-- PINBALL TAP-TO-TASK HEADER BANNER (CLEAN RANDOMIZED QUOTE + BRAIN DUMP MIC) -->
+    <div id="pinballHeaderBar" class="hidden mb-3 space-y-3 bg-purple-950/40 p-3.5 rounded-2xl border border-purple-800/50">
+      <div id="salesTickerText" class="text-xs font-black text-amber-300 border-b border-purple-800/40 pb-2.5 text-center leading-relaxed">
+        ⚡ "Action cures fear. You don't have to be great to start, but you have to start to be great." — Zig Ziglar
       </div>
       
       <div class="flex gap-2">
@@ -277,21 +267,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       </div>
     </div>
 
-    <!-- PINBALL VISUAL TASK CHECKLIST & 2-WAY FRESH CHAT FEED -->
+    <!-- PINBALL DYNAMIC VISUAL TASK LIST & NEUTRAL FRESH CHAT FEED -->
     <div id="pinballFeedbackContainer" class="hidden mb-3 space-y-3">
       <div class="bg-gray-900 p-3 rounded-2xl border border-gray-800 space-y-2">
         <div class="text-[11px] font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
           <i class="fa-solid fa-list-check"></i> Generated Task List
         </div>
         <div id="pinballTaskList" class="space-y-1.5 text-xs text-gray-300">
-          <label class="flex items-center gap-2 bg-gray-800/60 p-2 rounded-xl border border-gray-700/50">
-            <input type="checkbox" class="accent-purple-500 rounded">
-            <span>Nancy — Carpet Job Friday Sept 11</span>
-          </label>
-          <label class="flex items-center gap-2 bg-gray-800/60 p-2 rounded-xl border border-gray-700/50">
-            <input type="checkbox" class="accent-purple-500 rounded">
-            <span>Aerus Bench Repair Diagnostic check</span>
-          </label>
+          <p class="text-gray-500 text-xs italic text-center py-1">Ready for input. Speak or type below to generate tasks.</p>
         </div>
       </div>
 
@@ -302,12 +285,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         </div>
         <div id="chatFeed" class="space-y-2 text-xs max-h-28 overflow-y-auto">
           <div class="bg-gray-800/80 p-2 rounded-xl border border-gray-700 text-gray-200">
-            <strong class="text-amber-300">Fresh 🤵:</strong> "I've routed Nancy's job to Castle and the bench check to Empire! Want me to text Nancy right now?"
+            <strong class="text-amber-300">Fresh 🤵:</strong> "Pinball active! What tasks are we knocking out right now?"
           </div>
         </div>
         <div class="flex gap-2">
-          <input type="text" id="chatInput" placeholder="Reply to Fresh..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
-          <button onclick="sendFreshChat()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold">📤 Reply</button>
+          <input type="text" id="chatInput" placeholder="Type instruction & hit Enter..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500" onkeydown="if(event.key==='Enter') sendFreshChat()">
+          <button onclick="sendFreshChat()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold shrink-0">📤 Send</button>
         </div>
       </div>
     </div>
@@ -460,6 +443,17 @@ function submitUnifiedInput() {
     input.value = '';
     var output = document.getElementById('ledOutput');
     output.textContent = 'PROCESSING... ⏳';
+    
+    // DYNAMIC TASK GENERATION IF PINBALL IS OPEN
+    const taskList = document.getElementById('pinballTaskList');
+    if (taskList) {
+      if (taskList.querySelector('p')) taskList.innerHTML = '';
+      const newTask = document.createElement('label');
+      newTask.className = 'flex items-center gap-2 bg-gray-800/60 p-2 rounded-xl border border-gray-700/50';
+      newTask.innerHTML = '<input type="checkbox" class="accent-purple-500 rounded"> <span>' + text + '</span>';
+      taskList.prepend(newTask);
+    }
+    
     sendToFresh(text);
   }
 }
@@ -481,18 +475,29 @@ function sendFreshChat() {
   const text = input.value.trim();
   if (text) {
     input.value = '';
+    
     const userMsg = document.createElement('div');
     userMsg.className = 'bg-blue-900/40 p-2 rounded-xl border border-blue-700/50 text-blue-100 text-right';
-    userMsg.innerHTML = '<strong>Boudie:</strong> ' + text;
+    userMsg.innerHTML = '<strong>Me:</strong> ' + text;
     feed.appendChild(userMsg);
+
+    // GENERATE DYNAMIC TASK FROM CHAT INSTRUCTION
+    const taskList = document.getElementById('pinballTaskList');
+    if (taskList) {
+      if (taskList.querySelector('p')) taskList.innerHTML = '';
+      const newTask = document.createElement('label');
+      newTask.className = 'flex items-center gap-2 bg-gray-800/60 p-2 rounded-xl border border-gray-700/50';
+      newTask.innerHTML = '<input type="checkbox" class="accent-purple-500 rounded"> <span>' + text + '</span>';
+      taskList.prepend(newTask);
+    }
 
     setTimeout(() => {
       const freshMsg = document.createElement('div');
       freshMsg.className = 'bg-gray-800/80 p-2 rounded-xl border border-gray-700 text-gray-200';
-      freshMsg.innerHTML = '<strong class="text-amber-300">Fresh 🤵:</strong> "Got it Chief! Executing on that now ⚡"';
+      freshMsg.innerHTML = '<strong class="text-amber-300">Fresh 🤵:</strong> "Logged and generated as an active task! Executing now ⚡"';
       feed.appendChild(freshMsg);
       feed.scrollTop = feed.scrollHeight;
-    }, 600);
+    }, 500);
   }
 }
 
@@ -541,7 +546,7 @@ function openDrawer(name) {
     const tickerEl = document.getElementById('salesTickerText');
     if (tickerEl) {
       const q = salesQuotes[Math.floor(Math.random() * salesQuotes.length)];
-      tickerEl.innerHTML = q + ' &nbsp;&nbsp;&nbsp;&nbsp; ' + q;
+      tickerEl.innerHTML = q;
     }
   }
 
