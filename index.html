@@ -102,21 +102,30 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
   </div>
 
-  <!-- SALES REP PORTAL LINK -->
-  <div class="text-center pt-2">
+  <!-- FOOTER WITH ROB ART EMBLEM -->
+  <div class="text-center pt-2 flex items-center justify-between px-2 border-t border-gray-800/80">
     <button onclick="alert('Rep portal coming soon — contact William at towsonhealthyhomes.com')" class="text-[10px] text-gray-500 hover:text-gray-400 transition underline tracking-wider">
       Sales Rep Portal
     </button>
+    <div class="flex items-center gap-1 opacity-70 hover:opacity-100 transition cursor-default">
+      <span class="text-xs">🐷</span>
+      <span class="text-[10px] font-bold text-pink-400 uppercase tracking-wider">Rob Art</span>
+    </div>
   </div>
 
   <!-- FEATURES & BENEFITS MODAL -->
   <div id="featuresModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-6 backdrop-blur-md justify-center">
-    <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-6 max-w-sm mx-auto space-y-5 text-left shadow-2xl max-h-[85vh] overflow-y-auto">
+    <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-6 max-w-sm mx-auto space-y-5 text-left shadow-2xl max-h-[85vh] overflow-y-auto relative">
+      
       <div class="flex items-center justify-between border-b border-gray-800 pb-3">
         <h3 class="text-base font-black text-white flex items-center gap-2">
           <i class="fa-solid fa-mobile-screen-button text-blue-400"></i> Pocket Chief of Staff
         </h3>
-        <button onclick="toggleFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+        <div class="flex items-center gap-2">
+          <!-- SUBTLE HIDDEN CAST ICON -->
+          <button onclick="toggleCastModal()" class="text-gray-400 hover:text-amber-400 text-xs bg-gray-800 px-2 py-1 rounded-lg transition" title="Cast of Characters">🎭</button>
+          <button onclick="toggleFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+        </div>
       </div>
 
       <div class="space-y-2">
@@ -124,9 +133,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
           <i class="fa-solid fa-circle-check"></i> What It Does Right Now
         </h4>
         <ul class="space-y-1.5 text-[11px] text-gray-300">
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Brain Dump to Tap-to-Task:</strong> Flagship feature converting raw voice notes to structured tasks instantly.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Streaming Dictation:</strong> Real-time word dictation directly in input box.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Instant Visual Proof:</strong> Flashes ✅ LOGGED & FIRED TO BOARD! ⚡ on LED screen.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap QR Sharing:</strong> Instant QR code generated for live card phone scans.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap QR & Job Tracking:</strong> Instant QR codes & live card tracking links generated for customers.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Embedded Google Calendar:</strong> Real internet calendar with Day, Week, and Agenda views.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Customer Vault Connected:</strong> Instant access to 22,283 customer records.</li>
         </ul>
@@ -137,7 +147,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
           <i class="fa-solid fa-clock"></i> Coming Soon
         </h4>
         <ul class="space-y-1.5 text-[11px] text-gray-300">
-          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Customer job tracking links — live repair status</li>
           <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Stripe tap-to-pay invoicing in the field</li>
           <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Two-way card messaging with customers</li>
           <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Team staff dashboards</li>
@@ -150,6 +159,54 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </div>
   </div>
 
+  <!-- HIDDEN CAST OF CHARACTERS MODAL -->
+  <div id="castModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-6 backdrop-blur-md justify-center">
+    <div class="bg-gray-900 border border-amber-500/40 rounded-3xl p-6 max-w-sm mx-auto space-y-4 text-left shadow-2xl max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+        <h3 class="text-sm font-black text-amber-400 flex items-center gap-2">
+          🎭 CAST OF CHARACTERS
+        </h3>
+        <button onclick="toggleCastModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+      </div>
+
+      <div class="space-y-3 text-xs text-gray-300">
+        <div class="bg-gray-800/60 p-2.5 rounded-xl border border-gray-700/60">
+          <div class="font-black text-amber-300">Boudie</div>
+          <div class="text-[11px] text-gray-400">The Creator of TappyThing</div>
+        </div>
+        <div class="bg-gray-800/60 p-2.5 rounded-xl border border-gray-700/60">
+          <div class="font-black text-blue-300">Fresh 🤵</div>
+          <div class="text-[11px] text-gray-400">The Digital Coordinator</div>
+        </div>
+        <div class="bg-gray-800/60 p-2.5 rounded-xl border border-gray-700/60">
+          <div class="font-black text-emerald-300">Sissy</div>
+          <div class="text-[11px] text-gray-400">The Engine</div>
+        </div>
+        <div class="bg-gray-800/60 p-2.5 rounded-xl border border-gray-700/60">
+          <div class="font-black text-purple-300">Noosh</div>
+          <div class="text-[11px] text-gray-400">Sissy's Sidekick</div>
+        </div>
+        <div class="bg-gray-800/60 p-2.5 rounded-xl border border-gray-700/60">
+          <div class="font-black text-red-300">Squash</div>
+          <div class="text-[11px] text-gray-400">Sales Guru & Motivator</div>
+        </div>
+        <div class="bg-gray-800/60 p-2.5 rounded-xl border border-gray-700/60">
+          <div class="font-black text-teal-300">Yogi</div>
+          <div class="text-[11px] text-gray-400">Spirit Lifter</div>
+        </div>
+        <div class="bg-gray-800/60 p-2.5 rounded-xl border border-gray-700/60">
+          <div class="font-black text-yellow-300">L</div>
+          <div class="text-[11px] text-gray-400">Money Man</div>
+        </div>
+      </div>
+
+      <div class="pt-2 border-t border-gray-800 text-center flex items-center justify-center gap-1.5 text-pink-400 text-xs font-bold">
+        <span>🐷</span>
+        <span>Rob Art</span>
+      </div>
+    </div>
+  </div>
+
   <!-- PERSISTENT CARD DRAWER MODAL -->
   <div id="drawerModal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col p-4 backdrop-blur-md">
     <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-3">
@@ -157,6 +214,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         <i class="fa-solid fa-folder-open text-blue-400"></i> Drawer
       </h3>
       <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+    </div>
+
+    <!-- IN-DRAWER NEW CARD BUILDER BUTTON -->
+    <div id="newCardBar" class="hidden mb-3">
+      <button onclick="createNewCard()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-2 rounded-xl text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-lg">
+        <i class="fa-solid fa-plus"></i> + NEW CARD
+      </button>
     </div>
 
     <!-- SUB-NAV FOR EMPIRE DRAWER (INCLUDES SHOP OPS) -->
@@ -233,7 +297,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
     <div class="flex gap-3 border-t border-gray-800 pt-2 text-xs font-semibold text-gray-300">
       <a href="tel:4105551234" class="card-call hover:text-white flex items-center gap-1">📞 Call</a>
-      <a href="sms:4105551234" class="card-sms hover:text-white flex items-center gap-1">💬 Text</a>
+      <a href="sms:4105551234" class="card-sms hover:text-white flex items-center gap-1">💬 Text Link</a>
       <a href="mailto:customer@email.com" class="card-email hover:text-white flex items-center gap-1">✉️ Email</a>
       <button class="card-share ml-auto text-blue-400 hover:text-blue-300 font-bold">🔗 Share QR</button>
     </div>
@@ -347,10 +411,12 @@ function openDrawer(name) {
   
   const empireNav = document.getElementById('empireSubNav');
   const exchangeBar = document.getElementById('exchangeSearchBar');
+  const newCardBar = document.getElementById('newCardBar');
   const drawerContent = document.getElementById('drawerContent');
 
   if (empireNav) empireNav.classList.toggle('hidden', name !== 'Empire');
   if (exchangeBar) exchangeBar.classList.toggle('hidden', name !== 'Exchange');
+  if (newCardBar) newCardBar.classList.toggle('hidden', name !== 'Castle' && name !== 'Empire');
 
   document.getElementById('drawerModal').classList.remove('hidden');
 
@@ -366,6 +432,18 @@ function openDrawer(name) {
   }
 
   fetchDrawerItems(name);
+}
+
+function createNewCard() {
+  const drawerContent = document.getElementById('drawerContent');
+  const template = document.getElementById('tappy-card-template');
+  const clone = template.content.cloneNode(true);
+
+  const titleEl = clone.querySelector('.card-title');
+  if (titleEl) titleEl.textContent = 'New Card Item';
+
+  drawerContent.prepend(clone);
+  flashLed('NEW CARD CREATED! ⚡');
 }
 
 async function fetchDrawerItems(name) {
@@ -403,13 +481,16 @@ async function fetchDrawerItems(name) {
       if (callEl) callEl.href = 'tel:' + (item.phone || '4105551234');
 
       const smsEl = clone.querySelector('.card-sms');
-      if (smsEl) smsEl.href = 'sms:' + (item.phone || '4105551234');
+      const trackUrl = 'https://freshtappything.com/?card=' + (item.id || '101');
+      if (smsEl) {
+        smsEl.href = 'sms:' + (item.phone || '4105551234') + '?body=' + encodeURIComponent('Track your live repair status here: ' + trackUrl);
+      }
 
       const emailEl = clone.querySelector('.card-email');
       if (emailEl) emailEl.href = 'mailto:' + (item.email || 'customer@email.com');
 
       const shareBtn = clone.querySelector('.card-share');
-      if (shareBtn) shareBtn.onclick = function() { shareCard(item.id); };
+      if (shareBtn) shareBtn.onclick = function() { shareCard(item.id || '101'); };
 
       drawerContent.appendChild(clone);
     });
@@ -434,8 +515,12 @@ function toggleFeaturesModal() {
   document.getElementById('featuresModal').classList.toggle('hidden');
 }
 
+function toggleCastModal() {
+  document.getElementById('castModal').classList.toggle('hidden');
+}
+
 function shareCard(cardId) {
-  const shareUrl = window.location.origin + window.location.pathname + "?card=" + cardId;
+  const shareUrl = "https://freshtappything.com/?card=" + cardId;
   const qrContainer = document.getElementById("qr-modal");
   if (qrContainer) {
     qrContainer.innerHTML = "";
