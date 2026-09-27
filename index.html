@@ -521,15 +521,20 @@ function parseAndExecuteCommand(text) {
 function parseAndRenderDynamicTiles(promptText) {
   const drawerContent = document.getElementById('drawerContent');
   
-  const numMatch = promptText.match(/(\d+)/g);
+  let text = promptText.toLowerCase()
+    .replace(/\bfour\b/g, '4')
+    .replace(/\bthree\b/g, '3')
+    .replace(/\btwo\b/g, '2')
+    .replace(/\bone\b/g, '1');
+
+  const numMatch = text.match(/(\d+)/g);
   let count = numMatch ? parseInt(numMatch[0]) : 4;
   if (count > 20) count = 20;
 
   let unitType = 'Table';
-  const lower = promptText.toLowerCase();
-  if (lower.includes('bay') || lower.includes('auto') || lower.includes('brake')) unitType = 'Auto Bay';
-  else if (lower.includes('chair') || lower.includes('salon')) unitType = 'Salon Chair';
-  else if (lower.includes('call') || lower.includes('hvac') || lower.includes('route')) unitType = 'Service Call';
+  if (text.includes('bay') || text.includes('auto') || text.includes('brake')) unitType = 'Auto Bay';
+  else if (text.includes('chair') || text.includes('salon')) unitType = 'Salon Chair';
+  else if (text.includes('call') || text.includes('hvac') || text.includes('route')) unitType = 'Service Call';
 
   let html = `<div class="space-y-3 pb-8">`;
 
