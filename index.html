@@ -127,6 +127,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Streaming Dictation:</strong> Real-time word dictation directly in input box.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Instant Visual Proof:</strong> Flashes ✅ LOGGED & FIRED TO BOARD! ⚡ on LED screen.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap QR Sharing:</strong> Instant QR code generated for live card phone scans.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Embedded Google Calendar:</strong> Real internet calendar with Day, Week, and Agenda views.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Customer Vault Connected:</strong> Instant access to 22,283 customer records.</li>
         </ul>
       </div>
@@ -346,11 +347,24 @@ function openDrawer(name) {
   
   const empireNav = document.getElementById('empireSubNav');
   const exchangeBar = document.getElementById('exchangeSearchBar');
+  const drawerContent = document.getElementById('drawerContent');
 
   if (empireNav) empireNav.classList.toggle('hidden', name !== 'Empire');
   if (exchangeBar) exchangeBar.classList.toggle('hidden', name !== 'Exchange');
 
   document.getElementById('drawerModal').classList.remove('hidden');
+
+  // EMBEDDED GOOGLE CALENDAR IFRAME WITH AGENDA/DAY/WEEK CONTROLS
+  if (name === 'Calendar') {
+    drawerContent.innerHTML = `
+      <div class="w-full h-[70vh] rounded-2xl overflow-hidden border border-gray-800 bg-white">
+        <iframe src="https://calendar.google.com/calendar/embed?src=william%40towsonhealthyhomes.com&ctz=America%2FNew_York&mode=AGENDA" 
+          style="border: 0" width="100%" height="100%" frameborder="0" scrolling="no"></iframe>
+      </div>
+    `;
+    return;
+  }
+
   fetchDrawerItems(name);
 }
 
@@ -361,7 +375,7 @@ async function fetchDrawerItems(name) {
   try {
     const res = await fetch('/.netlify/functions/getBoard?board_id=18424728273&group=' + encodeURIComponent(name));
     const data = await res.json();
-   
+    
     drawerContent.innerHTML = '';
 
     if (data.message) {
@@ -374,34 +388,14 @@ async function fetchDrawerItems(name) {
       return;
     }
 
-    // SPECIAL CLEAN AGENDA FORMAT FOR CALENDAR 📅 DRAWER
-    if (name === 'Calendar') {
-      let agendaHTML = '<div class="space-y-2.5">';
-      data.items.forEach(item => {
-        agendaHTML += `
-          <div class="bg-gray-900 border-l-4 border-blue-500 border-y border-r border-gray-800 p-3 rounded-r-xl flex items-center justify-between">
-            <div class="space-y-1">
-              <div class="text-xs font-bold text-white">${item.name}</div>
-              <div class="text-[10px] text-blue-400 font-semibold uppercase tracking-wider">📅 Scheduled Event</div>
-            </div>
-            <button onclick="shareCard('${item.id}')" class="text-blue-400 hover:text-blue-300 font-bold text-xs bg-gray-800 px-2.5 py-1 rounded-lg">🔗 Share</button>
-          </div>
-        `;
-      });
-      agendaHTML += '</div>';
-      drawerContent.innerHTML = agendaHTML;
-      return;
-    }
-
-    // STANDARD CARD FORMAT FOR OTHER DRAWERS
     const template = document.getElementById('tappy-card-template');
 
     data.items.forEach(item => {
       const clone = template.content.cloneNode(true);
-     
+      
       const titleEl = clone.querySelector('.card-title');
       if (titleEl) titleEl.textContent = item.name || 'Untitled Card';
-     
+      
       const statusEl = clone.querySelector('.card-status');
       if (statusEl) statusEl.textContent = item.status || 'ACTIVE';
 
