@@ -18,6 +18,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 .key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; }
 .key-pinball { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: 1px solid #8b5cf6; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); }
 .btn-click-active { transform: scale(0.92); opacity: 0.8; }
+textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overflow-y: auto; }
 </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 pb-28">
@@ -265,7 +266,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     <!-- VAULT SEARCH BAR FOR EXCHANGE DRAWER -->
     <div id="exchangeSearchBar" class="hidden mb-3">
       <div class="flex gap-2">
-        <input type="text" id="vaultQuery" placeholder="Search 22,283 customer vault records..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+        <input type="text" id="vaultQuery" placeholder="Search 22,283 customer vault records..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') searchVault()">
         <button onclick="searchVault()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-xl text-xs font-bold">Search</button>
       </div>
     </div>
@@ -303,21 +304,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
 </div>
 
-<!-- UNIFIED BOTTOM INPUT BAR (ELEVATED TO Z-60 ABOVE DRAWER MODALS) -->
+<!-- UNIFIED BOTTOM INPUT BAR (AUTO-EXPANDING TEXTAREA UP TO 5 LINES + LIVE DRAWER HOOK) -->
 <div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-60">
-  <div class="max-w-md mx-auto flex items-center gap-2">
-    <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0">
+  <div class="max-w-md mx-auto flex items-end gap-2">
+    <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0 mb-0.5">
       <i class="fa-solid fa-camera text-lg"></i>
       <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoInput(this)">
     </label>
 
-    <input type="text" id="unifiedInput" placeholder="Talk or type here..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') submitUnifiedInput()">
+    <textarea id="unifiedInput" placeholder="Talk or type here..." rows="1" class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" oninput="autoExpandTextarea(this)" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); submitUnifiedInput(); }"></textarea>
 
-    <button id="micBtn" onclick="toggleVoiceIntake()" class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-11 h-11 rounded-xl flex items-center justify-center border border-gray-700 transition shrink-0">
+    <button id="micBtn" onclick="toggleVoiceIntake()" class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-11 h-11 rounded-xl flex items-center justify-center border border-gray-700 transition shrink-0 mb-0.5">
       <i class="fa-solid fa-microphone text-lg"></i>
     </button>
 
-    <button id="sendBtn" onclick="submitUnifiedInput()" class="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1 shadow-lg">
+    <button id="sendBtn" onclick="submitUnifiedInput()" class="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1 shadow-lg mb-0.5">
       <i class="fa-solid fa-paper-plane"></i>
     </button>
   </div>
@@ -360,6 +361,15 @@ const salesQuotes = [
   "🏆 'You can have everything in life you want if you just help enough other people get what they want.' — Zig Ziglar"
 ];
 
+function autoExpandTextarea(field) {
+  field.style.height = 'inherit';
+  const computed = window.getComputedStyle(field);
+  const height = parseInt(computed.getPropertyValue('border-top-width'), 10)
+               + field.scrollHeight
+               + parseInt(computed.getPropertyValue('border-bottom-width'), 10);
+  field.style.height = Math.min(height, 120) + 'px';
+}
+
 function toggleVoiceIntake() {
   var btn = document.getElementById('micBtn');
   var input = document.getElementById('unifiedInput');
@@ -393,6 +403,7 @@ function toggleVoiceIntake() {
       else { interim += e.results[i][0].transcript; }
     }
     input.value = final || interim;
+    autoExpandTextarea(input);
   };
 
   recognition.onerror = function() {
@@ -410,12 +421,41 @@ function handlePhotoInput(fileInput) {
   }
 }
 
+function renderLiveCardInDrawer(text) {
+  const modal = document.getElementById('drawerModal');
+  const drawerContent = document.getElementById('drawerContent');
+  
+  if (modal.classList.contains('hidden')) {
+    if (!currentDrawer) currentDrawer = 'Empire';
+    document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + currentDrawer + ' Drawer';
+    modal.classList.remove('hidden');
+  }
+
+  const template = document.getElementById('tappy-card-template');
+  const clone = template.content.cloneNode(true);
+
+  const titleEl = clone.querySelector('.card-title');
+  if (titleEl) titleEl.textContent = text;
+
+  const statusEl = clone.querySelector('.card-status');
+  if (statusEl) statusEl.textContent = 'LIVE INTAKE 🟢';
+
+  if (drawerContent.querySelector('p')) {
+    drawerContent.innerHTML = '';
+  }
+
+  drawerContent.prepend(clone);
+  drawerContent.scrollTop = 0;
+}
+
 function submitUnifiedInput() {
   var input = document.getElementById('unifiedInput');
   var text = input.value.trim();
   if (text) {
     input.value = '';
+    autoExpandTextarea(input);
     flashLed('PROCESSING... ⏳');
+    renderLiveCardInDrawer(text);
     parseAndExecuteCommand(text);
   }
 }
