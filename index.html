@@ -110,7 +110,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
           <i class="fa-solid fa-vial text-purple-200"></i>
           <span>6. Sales Rep Sandbox 🧠⚡</span>
         </div>
-        <div class="text-[11px] text-purple-200 mt-0.5">Zero-Trace Pitch Demos & Table Turn Sandbox</div>
+        <div class="text-[11px] text-purple-200 mt-0.5">Blank Slate Live Pitch Demos & Table Turns</div>
       </div>
       <i class="fa-solid fa-chevron-right text-purple-200 text-sm"></i>
     </button>
@@ -135,10 +135,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         <h3 class="text-base font-black text-white flex items-center gap-2">
           <i class="fa-solid fa-mobile-screen-button text-blue-400"></i> Pocket Chief of Staff
         </h3>
-        <div class="flex items-center gap-2">
-          <button onclick="toggleCastModal()" class="text-gray-400 hover:text-amber-400 text-xs bg-gray-800 px-2 py-1 rounded-lg transition" title="Cast of Characters">🎭</button>
-          <button onclick="toggleFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
-        </div>
+        <button onclick="toggleFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
       </div>
 
       <div class="space-y-2">
@@ -146,23 +143,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
           <i class="fa-solid fa-circle-check"></i> Active Features
         </h4>
         <ul class="space-y-1.5 text-[11px] text-gray-300">
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Zero-Trace Sales Sandbox:</strong> Isolated demo portal to run live pitch demos for any industry without touching production data.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Zero-Trace Sales Sandbox:</strong> Isolated blank-slate portal to build live room layouts in front of prospects without touching production data.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>PIN-Lock Security:</strong> Lock sensitive customer notes, estimates, or job cards with a 4-digit PIN.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Streaming Voice Dictation:</strong> Real-time voice capture directly in input box.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap Outbound SMS Links:</strong> Job tracking links dispatched straight to customer phones.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Embedded Google Calendar:</strong> Direct agenda and appointment control.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Vault Search:</strong> Instant lookup across 22,283 customer records.</li>
-        </ul>
-      </div>
-
-      <div class="space-y-2 border-t border-gray-800 pt-3">
-        <h4 class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-          <i class="fa-solid fa-clock"></i> Coming Soon
-        </h4>
-        <ul class="space-y-1.5 text-[11px] text-gray-300">
-          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Two-Way Live Card Messaging (via Twilio line hookup)</li>
-          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Stripe tap-to-pay field invoicing</li>
-          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Team staff dashboards</li>
         </ul>
       </div>
 
@@ -278,7 +264,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         </div>
         <div id="chatFeed" class="space-y-2 text-xs max-h-28 overflow-y-auto">
           <div class="bg-gray-800/80 p-2 rounded-xl border border-gray-700 text-gray-200">
-            <strong class="text-amber-300">Fresh 🤵:</strong> "Sandbox active! Speak or type your demo layout (e.g. 'Build Das Bierhalle Section A with 4 tables'). Zero live board impact."
+            <strong class="text-amber-300">Fresh 🤵:</strong> "Clean slate ready! Speak or type your demo command (e.g. 'Das Bierhalle Table 4 — 2-Top, Appetizers, ready for check'). Zero live board impact."
           </div>
         </div>
         <div class="flex gap-2">
@@ -352,6 +338,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 <script>
 var recognition = null;
 let currentDrawer = '';
+let demoCardCounter = 101;
 
 const salesQuotes = [
   "⚡ 'Action cures fear. You don't have to be great to start, but you have to start to be great.' — Zig Ziglar",
@@ -360,18 +347,10 @@ const salesQuotes = [
   "🏆 'You can have everything in life you want if you just help enough other people get what they want.' — Zig Ziglar"
 ];
 
-function playClickFeedback(element) {
-  if (element) {
-    element.classList.add('btn-click-active');
-    setTimeout(() => element.classList.remove('btn-click-active'), 150);
-  }
-}
-
 function toggleVoiceIntake() {
   var btn = document.getElementById('micBtn');
   var input = document.getElementById('unifiedInput');
   var output = document.getElementById('ledOutput');
-  playClickFeedback(btn);
 
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) { alert('Voice dictation not supported.'); return; }
@@ -401,8 +380,7 @@ function toggleVoiceIntake() {
       else { interim += e.results[i][0].transcript; }
     }
     if (currentDrawer === 'Pinball') {
-      const chatInput = document.getElementById('chatInput');
-      if (chatInput) chatInput.value = final || interim;
+      document.getElementById('chatInput').value = final || interim;
     } else {
       input.value = final || interim;
     }
@@ -424,13 +402,9 @@ function handlePhotoInput(fileInput) {
 }
 
 function submitUnifiedInput() {
-  var sendBtn = document.getElementById('sendBtn');
-  playClickFeedback(sendBtn);
-
   var input = document.getElementById('unifiedInput');
   var text = input.value.trim();
   if (text) {
-    if (recognition) { recognition.stop(); recognition = null; document.getElementById('micBtn').classList.remove('text-red-500'); }
     input.value = '';
     flashLed('PROCESSING... ⏳');
     parseAndExecuteCommand(text);
@@ -465,7 +439,7 @@ function sendFreshChat() {
     setTimeout(() => {
       const freshMsg = document.createElement('div');
       freshMsg.className = 'bg-gray-800/80 p-2 rounded-xl border border-gray-700 text-gray-200';
-      freshMsg.innerHTML = '<strong class="text-amber-300">Fresh 🤵:</strong> "Demo layout updated live! ⚡"';
+      freshMsg.innerHTML = '<strong class="text-amber-300">Fresh 🤵:</strong> "Demo card created live on screen! ⚡"';
       feed.appendChild(freshMsg);
       feed.scrollTop = feed.scrollHeight;
     }, 400);
@@ -474,79 +448,75 @@ function sendFreshChat() {
 
 function parseAndExecuteCommand(text) {
   const lower = text.toLowerCase();
-  const drawerContent = document.getElementById('drawerContent');
 
   if (currentDrawer === 'Pinball') {
-    if (lower.includes('build') || lower.includes('bierhalle') || lower.includes('table')) {
-      buildDemoTables(drawerContent);
-      flashLed('✅ 4 DEMO TABLES CREATED! ⚡');
-      return;
-    }
     if (lower.includes('wipe demo') || lower.includes('vaporize')) {
       vaporizeDemo();
       return;
     }
+    createLocalDemoCard(text);
+    flashLed('✅ DEMO CARD CREATED LIVE! ⚡');
+    return;
   }
   
   sendToFresh(text);
 }
 
-function buildDemoTables(container) {
-  container.innerHTML = `
-    <div class="space-y-3">
-      <div id="table-1" class="bg-gray-900 border border-purple-800/60 p-3.5 rounded-2xl flex items-center justify-between">
-        <div>
-          <div class="font-black text-amber-300 text-xs">TABLE 1 — 2-Top Party</div>
-          <div id="status-1" class="text-[11px] text-emerald-400 font-bold mt-0.5">Stage: Appetizers 🥨</div>
-        </div>
-        <button onclick="turnSingleTable('table-1', 'Table 1')" class="bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-700 px-2.5 py-1.5 rounded-xl text-[10px] font-bold">🧹 Turn Table</button>
-      </div>
+function createLocalDemoCard(titleText) {
+  const drawerContent = document.getElementById('drawerContent');
+  
+  const placeholder = drawerContent.querySelector('p');
+  if (placeholder && placeholder.textContent.includes('Clean slate')) {
+    drawerContent.innerHTML = '';
+  }
 
-      <div id="table-2" class="bg-gray-900 border border-purple-800/60 p-3.5 rounded-2xl flex items-center justify-between">
-        <div>
-          <div class="font-black text-amber-300 text-xs">TABLE 2 — 3-Top Party</div>
-          <div id="status-2" class="text-[11px] text-blue-400 font-bold mt-0.5">Stage: Main Course 🥩</div>
-        </div>
-        <button onclick="turnSingleTable('table-2', 'Table 2')" class="bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-700 px-2.5 py-1.5 rounded-xl text-[10px] font-bold">🧹 Turn Table</button>
-      </div>
+  const cardId = 'demo-' + demoCardCounter++;
+  const trackUrl = 'https://freshtappything.com/?card=' + cardId;
+  const smsUrl = 'sms:4105551234?body=' + encodeURIComponent('Track live status here: ' + trackUrl);
 
-      <div id="table-3" class="bg-gray-900 border border-purple-800/60 p-3.5 rounded-2xl flex items-center justify-between">
-        <div>
-          <div class="font-black text-amber-300 text-xs">TABLE 3 — 10-Top Party</div>
-          <div id="status-3" class="text-[11px] text-purple-300 font-bold mt-0.5">Stage: Dessert 🍰</div>
-        </div>
-        <button onclick="turnSingleTable('table-3', 'Table 3')" class="bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-700 px-2.5 py-1.5 rounded-xl text-[10px] font-bold">🧹 Turn Table</button>
-      </div>
+  const card = document.createElement('div');
+  card.className = 'tappy-card bg-gray-900 border border-purple-800/80 p-4 rounded-2xl mb-3 space-y-3';
+  card.id = cardId;
+  card.innerHTML = `
+    <div class="flex items-center justify-between">
+      <img src="logo.png" alt="TappyThing" class="h-5 object-contain">
+      <span class="card-status font-bold text-amber-400 text-xs uppercase">DEMO ACTIVE</span>
+    </div>
 
-      <div id="table-4" class="bg-gray-900 border border-purple-800/60 p-3.5 rounded-2xl flex items-center justify-between">
-        <div>
-          <div class="font-black text-amber-300 text-xs">TABLE 4 — 4-Top Party</div>
-          <div id="status-4" class="text-[11px] text-yellow-400 font-bold mt-0.5">Stage: Ready for Check 💳</div>
-        </div>
-        <button onclick="turnSingleTable('table-4', 'Table 4')" class="bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-700 px-2.5 py-1.5 rounded-xl text-[10px] font-bold">🧹 Turn Table</button>
-      </div>
+    <div class="card-title text-sm font-bold text-white">${titleText}</div>
+
+    <div class="flex gap-2 items-center">
+      <button onclick="toggleVoiceIntake()" class="bg-purple-600 text-white text-xs px-2.5 py-1.5 rounded-xl font-bold flex items-center gap-1 shrink-0">🎙️</button>
+      <input type="text" placeholder="Type note..." class="card-note-input flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
+      <button onclick="submitCardNote(this)" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-2.5 py-1.5 rounded-xl font-bold shrink-0">📤 Send</button>
+    </div>
+
+    <div class="flex gap-2 border-t border-gray-800 pt-2 text-xs font-semibold text-gray-300">
+      <button onclick="turnSingleDemoCard('${cardId}')" class="bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-700/60 px-2 py-1 rounded-xl font-bold text-[10px]">🧹 Turn / Complete</button>
+      <a href="${smsUrl}" class="card-sms hover:text-white flex items-center gap-1 my-auto">💬 Text Link</a>
+      <button onclick="shareCard('${cardId}')" class="card-share ml-auto text-blue-400 hover:text-blue-300 font-bold">🔗 Share QR</button>
     </div>
   `;
+
+  drawerContent.prepend(card);
 }
 
-function turnSingleTable(elementId, tableName) {
-  const tableEl = document.getElementById(elementId);
-  if (tableEl) {
-    tableEl.className = 'bg-gray-900/50 border border-gray-800 p-3 rounded-2xl flex items-center justify-between opacity-60';
-    tableEl.innerHTML = `
-      <div>
-        <div class="font-bold text-gray-400 text-xs">${tableName}</div>
-        <div class="text-[11px] text-emerald-400 font-bold mt-0.5">✨ Ready for Next Guest</div>
-      </div>
-      <span class="text-[10px] text-gray-500 font-bold">WIPED</span>
-    `;
-    flashLed('🧹 ' + tableName.toUpperCase() + ' TURNED & READY!');
+function turnSingleDemoCard(cardId) {
+  const card = document.getElementById(cardId);
+  if (card) {
+    const statusEl = card.querySelector('.card-status');
+    if (statusEl) {
+      statusEl.textContent = 'TURNED / COMPLETE';
+      statusEl.className = 'card-status font-bold text-emerald-400 text-xs uppercase';
+    }
+    card.classList.add('opacity-60');
+    flashLed('🧹 DEMO CARD TURNED & RESET!');
   }
 }
 
 function vaporizeDemo() {
   const drawerContent = document.getElementById('drawerContent');
-  drawerContent.innerHTML = '<p class="text-center text-amber-400 font-bold pt-8">💥 DEMO VAPORIZED! Zero trace remaining.</p>';
+  drawerContent.innerHTML = '<p class="text-center text-gray-500 pt-8">✨ Clean slate ready for demo build...</p>';
   flashLed('💥 DEMO VAPORIZED CLEAN!');
 }
 
@@ -589,7 +559,7 @@ function openDrawer(name) {
   if (name === 'Pinball') {
     const tickerEl = document.getElementById('salesTickerText');
     if (tickerEl) tickerEl.innerHTML = salesQuotes[Math.floor(Math.random() * salesQuotes.length)];
-    buildDemoTables(drawerContent);
+    drawerContent.innerHTML = '<p class="text-center text-gray-500 pt-8">✨ Clean slate ready for demo build...</p>';
     return;
   }
 
@@ -625,7 +595,7 @@ async function fetchDrawerItems(name) {
   try {
     const res = await fetch('/.netlify/functions/getBoard?board_id=18424728273&group=' + encodeURIComponent(name));
     const data = await res.json();
-   
+    
     drawerContent.innerHTML = '';
 
     if (data.message) {
@@ -642,10 +612,10 @@ async function fetchDrawerItems(name) {
 
     data.items.forEach(item => {
       const clone = template.content.cloneNode(true);
-     
+      
       const titleEl = clone.querySelector('.card-title');
       if (titleEl) titleEl.textContent = item.name || 'Untitled Card';
-     
+      
       const statusEl = clone.querySelector('.card-status');
       if (statusEl) statusEl.textContent = item.status || 'ACTIVE';
 
