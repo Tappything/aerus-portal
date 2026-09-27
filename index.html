@@ -30,23 +30,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </div>
   </div>
 
-  <!-- DEVICE HEADER WITH PROMINENT BOLD LOGO -->
+  <!-- DEVICE HEADER -->
   <div class="text-center space-y-1">
     <img src="logo.png" alt="TappyThing" class="h-14 max-w-[180px] object-contain mx-auto mb-2 drop-shadow-md">
     <div class="text-xs font-black text-blue-400 uppercase tracking-widest">TappyThing Command Hub</div>
     <div class="text-[11px] text-gray-400 font-medium">Tap. Talk. Operations live in seconds.</div>
   </div>
 
-  <!-- SUBTLE FEATURES & BENEFITS BUTTON -->
+  <!-- FEATURES & BENEFITS BUTTON -->
   <button onclick="toggleFeaturesModal()" class="w-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 font-semibold py-1.5 rounded-xl text-[11px] border border-slate-700/60 uppercase tracking-wider transition flex items-center justify-center gap-1.5">
     <i class="fa-solid fa-list-check text-slate-400 text-xs"></i>
     <span>[ FEATURES & BENEFITS ]</span>
   </button>
 
-  <!-- ASYMMETRIC KEYPAD LAYOUT -->
+  <!-- 5-BUTTON KEYPAD LAYOUT -->
   <div id="drawersContainer" class="space-y-3">
     
-    <!-- TOP DOMINANT KEY (CASTLE 🏰) -->
+    <!-- BUTTON 1: CASTLE 🏰 -->
     <button onclick="openDrawer('Castle')" class="key-primary w-full rounded-2xl p-4 text-left transition flex items-center justify-between">
       <div>
         <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
@@ -60,16 +60,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
     <!-- MIDDLE ASYMMETRIC PAIR -->
     <div class="grid grid-cols-5 gap-3">
-      <!-- LARGE 3-COL KEY (EMPIRE 👑 - INCLUDES SHOP OPS) -->
+      <!-- BUTTON 2: EMPIRE 👑 (INCLUDES SHOP OPS SUB-TAB) -->
       <button onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[85px]">
         <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
           <span>2. Empire 👑</span>
           <i class="fa-solid fa-crown text-amber-500"></i>
         </div>
-        <div class="text-[10px] text-gray-400 font-medium">Business Operations & Shop Bench</div>
+        <div class="text-[10px] text-gray-400 font-medium">Business Hub & Shop Bench 🛠️</div>
       </button>
 
-      <!-- SMALLER 2-COL KEY (PIPELINE 🚀) -->
+      <!-- BUTTON 3: PIPELINE 🚀 -->
       <button onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[85px]">
         <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
           <span>3. Pipeline 🚀</span>
@@ -79,16 +79,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       </button>
     </div>
 
-    <!-- BOTTOM ASYMMETRIC TRIO -->
+    <!-- BOTTOM ASYMMETRIC PAIR -->
     <div class="grid grid-cols-2 gap-2.5">
-      <button onclick="openDrawer('Treasury')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+      <!-- BUTTON 4: CALENDAR 📅 -->
+      <button onclick="openDrawer('Calendar')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
         <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
-          <span>4. Treasury 💳</span>
-          <i class="fa-solid fa-credit-card text-gray-500 text-xs"></i>
+          <span>4. Calendar 📅</span>
+          <i class="fa-solid fa-calendar-days text-gray-500 text-xs"></i>
         </div>
-        <div class="text-[9px] text-gray-400">Invoices & Billing</div>
+        <div class="text-[9px] text-gray-400">Schedule & Appointments</div>
       </button>
 
+      <!-- BUTTON 5: EXCHANGE 🌐 -->
       <button onclick="openDrawer('Exchange')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
         <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
           <span>5. Exchange 🌐</span>
@@ -100,7 +102,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
   </div>
 
-  <!-- SUBTLE SALES REP PORTAL LINK -->
+  <!-- SALES REP PORTAL LINK -->
   <div class="text-center pt-2">
     <button onclick="alert('Rep portal coming soon — contact William at towsonhealthyhomes.com')" class="text-[10px] text-gray-500 hover:text-gray-400 transition underline tracking-wider">
       Sales Rep Portal
@@ -122,11 +124,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
           <i class="fa-solid fa-circle-check"></i> What It Does Right Now
         </h4>
         <ul class="space-y-1.5 text-[11px] text-gray-300">
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Streaming Dictation:</strong> Words dictate live inside input box as you speak.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Streaming Dictation:</strong> Real-time word dictation directly in input box.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Instant Visual Proof:</strong> Flashes ✅ LOGGED & FIRED TO BOARD! ⚡ on LED screen.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap QR Sharing:</strong> Instant QR pops up for customer phone scans.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Nested Empire & Shop Ops:</strong> Business and repair bench combined cleanly.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Customer Vault Connected:</strong> On-demand search across 22,283 customer records.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap QR Sharing:</strong> Instant QR code generated for live card phone scans.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Customer Vault Connected:</strong> Instant access to 22,283 customer records.</li>
         </ul>
       </div>
 
@@ -179,7 +180,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
 </div>
 
-<!-- UNIFIED BOTTOM INPUT BAR WITH REAL-TIME STREAMING DICTATION -->
+<!-- UNIFIED BOTTOM INPUT BAR -->
 <div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-40">
   <div class="max-w-md mx-auto flex items-center gap-2">
     <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0">
@@ -199,7 +200,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   </div>
 </div>
 
-<!-- BRANDED CARD TEMPLATE WITH QR SHARE & CONTACT BUTTONS -->
+<!-- BRANDED CARD TEMPLATE -->
 <template id="tappy-card-template">
   <div class="tappy-card bg-gray-900 border border-gray-800 p-4 rounded-2xl mb-3 space-y-3">
     <div class="flex items-center justify-between">
@@ -331,7 +332,6 @@ function sendToFresh(promptText) {
 function openDrawer(name) {
   document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + name + ' Drawer';
   
-  // Toggle Empire Sub-Nav & Exchange Search Bar
   const empireNav = document.getElementById('empireSubNav');
   const exchangeBar = document.getElementById('exchangeSearchBar');
 
