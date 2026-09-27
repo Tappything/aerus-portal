@@ -1,6 +1,5 @@
 const https = require('https');
 
-// Helper for native HTTPS POST requests
 function makePostRequest(url, headers, payload) {
   return new Promise((resolve, reject) => {
     const req = https.request(url, {
@@ -31,7 +30,6 @@ exports.handler = async function(event, context) {
     'Content-Type': 'application/json'
   };
 
-  // Handle preflight OPTIONS request
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -54,7 +52,6 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // EXCHANGE / VAULT RULE: Do not dump archive items by default
     if (groupFilter && groupFilter.toLowerCase().trim() === 'exchange') {
       return {
         statusCode: 200,
@@ -66,7 +63,6 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // GraphQL Query: Read board items with items_page API version 2023-10
     const query = JSON.stringify({
       query: `{ boards(ids: [${targetBoardId}]) { items_page(limit: 50) { items { id name group { id title } column_values { id text } } } } }`
     });
@@ -80,13 +76,13 @@ exports.handler = async function(event, context) {
 
     let items = resData?.data?.boards?.[0]?.items_page?.items || [];
 
-    // STRICT GROUP MAPPING: KEEP ACTIVE VIEWS CLEAN
+    // KEYWORD MAPPING INCLUDING CALENDAR APPOINTMENTS
     const groupMapping = {
+      'calendar': ['appointment', 'calendar', 'schedule', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 'delivery', 'visit', 'dentist'],
       'shop ops': ['staff intake — pending review', 'bench log'],
       'castle': ['personal', 'car', 'vehicle', 'family'],
       'empire': ['showroom', 'announcements', 'lounge', 'business', 'team', 'operations', 'shop ops'],
-      'pipeline': ['private', 'leads', 'prospect', 'sales'],
-      'treasury': ['parts needed', 'awaiting install', 'billing', 'invoices']
+      'pipeline': ['private', 'leads', 'prospect', 'sales']
     };
 
     if (groupFilter) {
@@ -94,13 +90,12 @@ exports.handler = async function(event, context) {
       const mappedKeywords = groupMapping[cleanGroup] || [cleanGroup];
 
       items = items.filter(item => {
-        if (!item.group?.title) return false;
-        const itemGroupTitle = item.group.title.toLowerCase().trim();
-        return mappedKeywords.some(keyword => itemGroupTitle.includes(keyword));
+        const itemGroupTitle = (item.group?.title || '').toLowerCase().trim();
+        const itemName = (item.name || '').toLowerCase().trim();
+        return mappedKeywords.some(keyword => itemGroupTitle.includes(keyword) || itemName.includes(keyword));
       });
     }
 
-    // Format clean JSON payload for index.html card rendering
     const formattedItems = items.map(item => {
       const phoneCol = item.column_values?.find(c => c.id.includes('phone') || c.id.includes('mobile'));
       const emailCol = item.column_values?.find(c => c.id.includes('email'));
