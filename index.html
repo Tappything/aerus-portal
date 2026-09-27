@@ -151,7 +151,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         </h4>
         <ul class="space-y-1.5 text-[11px] text-gray-300">
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Dynamic Room Builder Sandbox:</strong> Speaks or types layout into existence; dynamic graphical tiles auto-render front and center.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Silent Text Command Input:</strong> In-drawer text builder row for high-noise field environments.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Universal Bottom Bar (z-60):</strong> Always-on voice & text input across all drawers.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>PIN-Lock Security:</strong> Lock sensitive customer notes, estimates, or job cards with a 4-digit PIN.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Streaming Voice Dictation:</strong> Real-time voice capture directly in input box.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap Outbound SMS Links:</strong> Job tracking links dispatched straight to customer phones.</li>
@@ -215,7 +215,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   </div>
 
   <!-- PERSISTENT CARD DRAWER MODAL -->
-  <div id="drawerModal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col p-4 backdrop-blur-md">
+  <div id="drawerModal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col p-4 pb-24 backdrop-blur-md">
     <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-3">
       <h3 id="drawerTitle" class="text-base font-black text-white flex items-center gap-2">
         <i class="fa-solid fa-folder-open text-blue-400"></i> Drawer
@@ -303,8 +303,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
 </div>
 
-<!-- UNIFIED BOTTOM INPUT BAR -->
-<div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-40">
+<!-- UNIFIED BOTTOM INPUT BAR (ELEVATED TO Z-60 ABOVE DRAWER MODALS) -->
+<div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-60">
   <div class="max-w-md mx-auto flex items-center gap-2">
     <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0">
       <i class="fa-solid fa-camera text-lg"></i>
@@ -491,7 +491,7 @@ function parseAndRenderDynamicTiles(promptText) {
   else if (lower.includes('chair') || lower.includes('salon')) unitType = 'Salon Chair';
   else if (lower.includes('call') || lower.includes('hvac') || lower.includes('route')) unitType = 'Service Call';
 
-  let html = `<div class="space-y-3">`;
+  let html = `<div class="space-y-3 pb-8">`;
 
   for (let i = 1; i <= count; i++) {
     let sizeLabel = '4-Top Party';
@@ -595,7 +595,7 @@ function openDrawer(name) {
 
   if (name === 'Pinball') {
     drawerContent.innerHTML = `
-      <div class="space-y-3">
+      <div class="space-y-3 pb-8">
         <div class="bg-gray-900 border border-purple-800/60 p-3 rounded-2xl flex items-center justify-between">
           <div>
             <div class="font-bold text-white text-xs">Nancy — Carpet Job Friday Sept 11</div>
