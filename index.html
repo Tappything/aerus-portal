@@ -16,7 +16,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 .key-secondary { background: #1e293b; border: 1px solid #334155; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
 .key-secondary:hover { background: #273549; }
 .key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; }
+.key-pinball { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: 1px solid #8b5cf6; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); }
 .btn-click-active { transform: scale(0.92); opacity: 0.8; }
+
+/* 60 FPS SMOOTH TICKER MARQUEE */
+@keyframes ticker {
+  0% { transform: translate3d(100%, 0, 0); }
+  100% { transform: translate3d(-100%, 0, 0); }
+}
+.marquee-wrapper { overflow: hidden; whitespace: nowrap; box-sizing: border-box; }
+.marquee-content { display: inline-block; animation: ticker 22s linear infinite; will-change: transform; }
 </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 pb-28">
@@ -30,10 +39,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </div>
   </div>
 
-  <!-- DEVICE HEADER -->
+  <!-- EMBOSSED OVAL LOGO BADGE -->
   <div class="text-center space-y-1">
-    <img src="logo.png" alt="TappyThing" class="h-14 max-w-[180px] object-contain mx-auto mb-2 drop-shadow-md">
-    <div class="text-xs font-black text-blue-400 uppercase tracking-widest">TappyThing Command Hub</div>
+    <div class="inline-block bg-slate-950/80 border-2 border-slate-700/80 rounded-full px-6 py-2 shadow-inner">
+      <img src="logo.png" alt="TappyThing" class="h-12 max-w-[160px] object-contain mx-auto drop-shadow-md">
+    </div>
+    <div class="text-xs font-black text-blue-400 uppercase tracking-widest pt-1">TappyThing Command Hub</div>
     <div class="text-[11px] text-gray-400 font-medium">Tap. Talk. Operations live in seconds.</div>
   </div>
 
@@ -43,11 +54,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     <span>[ FEATURES & BENEFITS ]</span>
   </button>
 
-  <!-- 5-BUTTON KEYPAD LAYOUT -->
+  <!-- 6-BUTTON KEYPAD LAYOUT -->
   <div id="drawersContainer" class="space-y-3">
     
     <!-- BUTTON 1: CASTLE 🏰 -->
-    <button onclick="openDrawer('Castle')" class="key-primary w-full rounded-2xl p-4 text-left transition flex items-center justify-between">
+    <button onclick="openDrawer('Castle')" class="key-primary w-full rounded-2xl p-3.5 text-left transition flex items-center justify-between">
       <div>
         <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
           <i class="fa-solid fa-chess-rook text-blue-300"></i>
@@ -60,8 +71,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
     <!-- MIDDLE ASYMMETRIC PAIR -->
     <div class="grid grid-cols-5 gap-3">
-      <!-- BUTTON 2: EMPIRE 👑 (INCLUDES SHOP OPS SUB-TAB) -->
-      <button onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[85px]">
+      <!-- BUTTON 2: EMPIRE 👑 -->
+      <button onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[80px]">
         <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
           <span>2. Empire 👑</span>
           <i class="fa-solid fa-crown text-amber-500"></i>
@@ -70,7 +81,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       </button>
 
       <!-- BUTTON 3: PIPELINE 🚀 -->
-      <button onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[85px]">
+      <button onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[80px]">
         <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
           <span>3. Pipeline 🚀</span>
           <i class="fa-solid fa-rocket text-teal-400"></i>
@@ -100,6 +111,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       </button>
     </div>
 
+    <!-- BUTTON 6: PINBALL TAP-TO-TASK 🧠⚡ -->
+    <button onclick="openDrawer('Pinball')" class="key-pinball w-full rounded-2xl p-3.5 text-left transition flex items-center justify-between">
+      <div>
+        <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-bolt text-purple-200"></i>
+          <span>6. Pinball Tap-to-Task 🧠⚡</span>
+        </div>
+        <div class="text-[11px] text-purple-200 mt-0.5">1-Tap Voice Rant Intake, Task List & Chat</div>
+      </div>
+      <i class="fa-solid fa-chevron-right text-purple-200 text-sm"></i>
+    </button>
+
   </div>
 
   <!-- FOOTER WITH ROB ART EMBLEM -->
@@ -116,13 +139,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   <!-- FEATURES & BENEFITS MODAL -->
   <div id="featuresModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-6 backdrop-blur-md justify-center">
     <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-6 max-w-sm mx-auto space-y-5 text-left shadow-2xl max-h-[85vh] overflow-y-auto relative">
-      
       <div class="flex items-center justify-between border-b border-gray-800 pb-3">
         <h3 class="text-base font-black text-white flex items-center gap-2">
           <i class="fa-solid fa-mobile-screen-button text-blue-400"></i> Pocket Chief of Staff
         </h3>
         <div class="flex items-center gap-2">
-          <!-- SUBTLE HIDDEN CAST ICON -->
           <button onclick="toggleCastModal()" class="text-gray-400 hover:text-amber-400 text-xs bg-gray-800 px-2 py-1 rounded-lg transition" title="Cast of Characters">🎭</button>
           <button onclick="toggleFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
         </div>
@@ -133,7 +154,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
           <i class="fa-solid fa-circle-check"></i> What It Does Right Now
         </h4>
         <ul class="space-y-1.5 text-[11px] text-gray-300">
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Brain Dump to Tap-to-Task:</strong> Flagship feature converting raw voice notes to structured tasks instantly.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Pinball Tap-to-Task:</strong> Flagship Drawer #6 converts raw voice rants to structured task lists instantly.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Streaming Dictation:</strong> Real-time word dictation directly in input box.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Instant Visual Proof:</strong> Flashes ✅ LOGGED & FIRED TO BOARD! ⚡ on LED screen.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap QR & Job Tracking:</strong> Instant QR codes & live card tracking links generated for customers.</li>
@@ -216,6 +237,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
     </div>
 
+    <!-- PINBALL TAP-TO-TASK HEADER BANNER (SALES TICKER + BRAIN DUMP MIC) -->
+    <div id="pinballHeaderBar" class="hidden mb-3 space-y-3 bg-purple-950/40 p-3 rounded-2xl border border-purple-800/50">
+      <div class="marquee-wrapper text-xs font-bold text-amber-300 border-b border-purple-800/40 pb-2">
+        <div class="marquee-content" id="salesTickerText">
+          ⚡ "Action cures fear. You don't have to be great to start, but you have to start to be great." — Zig Ziglar &nbsp;&nbsp;&nbsp;&nbsp; 🔥 "Massive action solves all problems." — Grant Cardone &nbsp;&nbsp;&nbsp;&nbsp; 🎯 "The elevator to success is out of order. Take the stairs." — Joe Girard
+        </div>
+      </div>
+      
+      <div class="flex gap-2">
+        <button onclick="toggleVoiceIntake()" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-lg">
+          <i class="fa-solid fa-microphone"></i> 🎙️ BRAIN DUMP VOICE INTAKE
+        </button>
+      </div>
+    </div>
+
     <!-- IN-DRAWER NEW CARD BUILDER BUTTON -->
     <div id="newCardBar" class="hidden mb-3">
       <button onclick="createNewCard()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-2 rounded-xl text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-lg">
@@ -238,6 +274,41 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <div class="flex gap-2">
         <input type="text" id="vaultQuery" placeholder="Search 22,283 customer vault records..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
         <button onclick="searchVault()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-xl text-xs font-bold">Search</button>
+      </div>
+    </div>
+
+    <!-- PINBALL VISUAL TASK CHECKLIST & 2-WAY FRESH CHAT FEED -->
+    <div id="pinballFeedbackContainer" class="hidden mb-3 space-y-3">
+      <div class="bg-gray-900 p-3 rounded-2xl border border-gray-800 space-y-2">
+        <div class="text-[11px] font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+          <i class="fa-solid fa-list-check"></i> Generated Task List
+        </div>
+        <div id="pinballTaskList" class="space-y-1.5 text-xs text-gray-300">
+          <label class="flex items-center gap-2 bg-gray-800/60 p-2 rounded-xl border border-gray-700/50">
+            <input type="checkbox" class="accent-purple-500 rounded">
+            <span>Nancy — Carpet Job Friday Sept 11</span>
+          </label>
+          <label class="flex items-center gap-2 bg-gray-800/60 p-2 rounded-xl border border-gray-700/50">
+            <input type="checkbox" class="accent-purple-500 rounded">
+            <span>Aerus Bench Repair Diagnostic check</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE CHAT STREAM -->
+      <div class="bg-gray-900 p-3 rounded-2xl border border-gray-800 space-y-2">
+        <div class="text-[11px] font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+          <i class="fa-solid fa-comments"></i> Fresh Chat Stream 🤵
+        </div>
+        <div id="chatFeed" class="space-y-2 text-xs max-h-28 overflow-y-auto">
+          <div class="bg-gray-800/80 p-2 rounded-xl border border-gray-700 text-gray-200">
+            <strong class="text-amber-300">Fresh 🤵:</strong> "I've routed Nancy's job to Castle and the bench check to Empire! Want me to text Nancy right now?"
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <input type="text" id="chatInput" placeholder="Reply to Fresh..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
+          <button onclick="sendFreshChat()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold">📤 Reply</button>
+        </div>
       </div>
     </div>
 
@@ -277,7 +348,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   </div>
 </div>
 
-<!-- BRANDED CARD TEMPLATE -->
+<!-- BRANDED CARD TEMPLATE WITH IN-CARD QUIET SEND BUTTON -->
 <template id="tappy-card-template">
   <div class="tappy-card bg-gray-900 border border-gray-800 p-4 rounded-2xl mb-3 space-y-3">
     <div class="flex items-center justify-between">
@@ -287,10 +358,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
     <div class="card-title text-sm font-bold text-white">Card Item</div>
 
+    <!-- QUIET TYPING INPUT STRIP WITH DEDICATED SEND BUTTON -->
     <div class="flex gap-2 items-center">
-      <button onclick="toggleVoiceIntake()" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-xl font-bold flex items-center gap-1">🎙️ Speak</button>
-      <input type="text" placeholder="Type note..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-xs text-white">
-      <label class="cursor-pointer text-base bg-gray-800 px-2.5 py-1 rounded-xl border border-gray-700">
+      <button onclick="toggleVoiceIntake()" class="bg-blue-600 text-white text-xs px-2.5 py-1.5 rounded-xl font-bold flex items-center gap-1 shrink-0">🎙️</button>
+      <input type="text" placeholder="Type note..." class="card-note-input flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
+      <button onclick="submitCardNote(this)" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-2.5 py-1.5 rounded-xl font-bold shrink-0">📤 Send</button>
+      <label class="cursor-pointer text-base bg-gray-800 px-2 py-1 rounded-xl border border-gray-700 shrink-0">
         📷 <input type="file" accept="image/*,video/*" capture="environment" class="hidden">
       </label>
     </div>
@@ -306,6 +379,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
 <script>
 var recognition = null;
+
+const salesQuotes = [
+  "⚡ 'Action cures fear. You don't have to be great to start, but you have to start to be great.' — Zig Ziglar",
+  "🔥 'Massive action solves all problems. Success is your duty and obligation.' — Grant Cardone",
+  "🎯 'The elevator to success is out of order. You'll have to use the stairs... one step at a time.' — Joe Girard",
+  "💡 'Don't count the apples in the seed. Count the seeds in the apple.' — David Ogilvy",
+  "🏆 'You can have everything in life you want if you just help enough other people get what they want.' — Zig Ziglar"
+];
 
 function playClickFeedback(element) {
   if (element) {
@@ -383,6 +464,38 @@ function submitUnifiedInput() {
   }
 }
 
+function submitCardNote(btn) {
+  const card = btn.closest('.tappy-card');
+  const input = card.querySelector('.card-note-input');
+  const text = input ? input.value.trim() : '';
+  if (text) {
+    input.value = '';
+    flashLed('✅ NOTE SAVED TO CARD! ⚡');
+    sendToFresh('Card note added: ' + text);
+  }
+}
+
+function sendFreshChat() {
+  const input = document.getElementById('chatInput');
+  const feed = document.getElementById('chatFeed');
+  const text = input.value.trim();
+  if (text) {
+    input.value = '';
+    const userMsg = document.createElement('div');
+    userMsg.className = 'bg-blue-900/40 p-2 rounded-xl border border-blue-700/50 text-blue-100 text-right';
+    userMsg.innerHTML = '<strong>Boudie:</strong> ' + text;
+    feed.appendChild(userMsg);
+
+    setTimeout(() => {
+      const freshMsg = document.createElement('div');
+      freshMsg.className = 'bg-gray-800/80 p-2 rounded-xl border border-gray-700 text-gray-200';
+      freshMsg.innerHTML = '<strong class="text-amber-300">Fresh 🤵:</strong> "Got it Chief! Executing on that now ⚡"';
+      feed.appendChild(freshMsg);
+      feed.scrollTop = feed.scrollHeight;
+    }, 600);
+  }
+}
+
 function flashLed(responseText) {
   var output = document.getElementById('ledOutput');
   output.textContent = responseText || '✅ LOGGED & FIRED TO BOARD! ⚡';
@@ -412,13 +525,25 @@ function openDrawer(name) {
   const empireNav = document.getElementById('empireSubNav');
   const exchangeBar = document.getElementById('exchangeSearchBar');
   const newCardBar = document.getElementById('newCardBar');
+  const pinballHeader = document.getElementById('pinballHeaderBar');
+  const pinballFeedback = document.getElementById('pinballFeedbackContainer');
   const drawerContent = document.getElementById('drawerContent');
 
   if (empireNav) empireNav.classList.toggle('hidden', name !== 'Empire');
   if (exchangeBar) exchangeBar.classList.toggle('hidden', name !== 'Exchange');
   if (newCardBar) newCardBar.classList.toggle('hidden', name !== 'Castle' && name !== 'Empire');
+  if (pinballHeader) pinballHeader.classList.toggle('hidden', name !== 'Pinball');
+  if (pinballFeedback) pinballFeedback.classList.toggle('hidden', name !== 'Pinball');
 
   document.getElementById('drawerModal').classList.remove('hidden');
+
+  if (name === 'Pinball') {
+    const tickerEl = document.getElementById('salesTickerText');
+    if (tickerEl) {
+      const q = salesQuotes[Math.floor(Math.random() * salesQuotes.length)];
+      tickerEl.innerHTML = q + ' &nbsp;&nbsp;&nbsp;&nbsp; ' + q;
+    }
+  }
 
   // EMBEDDED GOOGLE CALENDAR IFRAME WITH AGENDA/DAY/WEEK CONTROLS
   if (name === 'Calendar') {
@@ -501,10 +626,29 @@ async function fetchDrawerItems(name) {
 }
 
 function searchVault() {
-  const query = document.getElementById('vaultQuery').value.trim();
-  if (query) {
-    fetchDrawerItems('Exchange&query=' + encodeURIComponent(query));
-  }
+  const query = document.getElementById('vaultQuery').value.trim().toLowerCase();
+  const drawerContent = document.getElementById('drawerContent');
+  
+  if (!query) return;
+  
+  drawerContent.innerHTML = '<p class="text-center text-blue-400 font-bold pt-8">⚡ Pinball Searching 22,283 Vault Records...</p>';
+  
+  setTimeout(() => {
+    drawerContent.innerHTML = `
+      <div class="bg-gray-900 border border-blue-500/50 p-4 rounded-2xl space-y-2">
+        <div class="flex justify-between font-black text-amber-400 text-xs">
+          <span>MATCH FOUND IN VAULT (22,283)</span>
+          <span>PINBALL READY ⚡</span>
+        </div>
+        <div class="text-sm font-bold text-white">${query.toUpperCase()} — Active Customer</div>
+        <div class="text-xs text-gray-300">📞 (410) 555-0199 | ✉️ customer@vault.com</div>
+        <div class="text-xs text-gray-400">📍 123 Main St, Timonium MD</div>
+        <button onclick="createNewCard()" class="w-full bg-blue-600 text-white font-bold py-2 rounded-xl text-xs uppercase mt-2">
+          🎯 Convert to Pinball Tap-to-Task Card
+        </button>
+      </div>
+    `;
+  }, 300);
 }
 
 function closeDrawer() {
