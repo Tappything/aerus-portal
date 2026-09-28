@@ -2,20 +2,26 @@ const https = require('https');
 
 function makePostRequest(url, headers, payload) {
   return new Promise((resolve, reject) => {
-    const req = https.request(url, {
+    const parsedUrl = new URL(url);
+    const options = {
+      hostname: parsedUrl.hostname,
+      path: parsedUrl.pathname + parsedUrl.search,
       method: 'POST',
       headers: headers
-    }, (res) => {
+    };
+
+    const req = https.request(options, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
         try {
           resolve(JSON.parse(data));
         } catch (e) {
-          reject(e);
+          resolve({ raw: data });
         }
       });
     });
+
     req.on('error', reject);
     req.write(payload);
     req.end();
@@ -31,36 +37,28 @@ exports.handler = async function(event, context) {
   };
 
   if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ message: 'Successful preflight' })
-    };
+    return { statusCode: 200, headers, body: JSON.stringify({ message: 'OK' }) };
   }
 
   try {
-    const mondayKey = process.env.MONDAY_API_KEY;
+    const mondayKey = process.env.MONDAY_API_TOKEN || process.env.MONDAY_API_KEY;
     const params = event.queryStringParameters || {};
     const targetBoardId = params.board_id || '18424728273';
-    const groupFilter = params.group || null;
+    const groupFilter = (params.group || '').toLowerCase().trim();
 
     if (!mondayKey) {
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ error: 'MONDAY_API_KEY environment variable not configured', items: [] })
+        body: JSON.stringify({ error: 'MONDAY_API_TOKEN not configured', items: [] })
       };
     }
 
-    // Exchange Vault handles search separately
-    if (groupFilter && groupFilter.toLowerCase().trim() === 'exchange') {
+    if (groupFilter === 'exchange') {
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify({ 
-          items: [], 
-          message: '22,283 Customer Vault Connected. Use the search bar below to look up any customer.' 
-        })
+        body: JSON.stringify({ items: [], message: '22,283 Customer Vault Connected.' })
       };
     }
 
@@ -77,23 +75,22 @@ exports.handler = async function(event, context) {
 
     let items = resData?.data?.boards?.[0]?.items_page?.items || [];
 
-    // MAP DRAWERS TO MONDAY GROUPS (WITH INTAKE INCLUDED IN EMPIRE & SHOP OPS)
-    const strictGroupMap = {
+    // MAP DRAWERS TO INCLUDE INTAKE SO LIVE ITEMS SHOW UP
+    const filterMap = {
       'empire': ['empire', 'staff intake', 'intake', 'bench', 'operations'],
       'shop ops': ['staff intake', 'intake', 'bench', 'empire'],
       'castle': ['castle', 'personal', 'car', 'vehicle'],
       'pipeline': ['pipeline', 'lead', 'private'],
-      'calendar': ['calendar'],
-      'pinball': ['pinball']
+      'pinball': ['pinball', 'staff intake', 'intake'],
+      'calendar': ['calendar']
     };
 
     if (groupFilter) {
-      const cleanFilter = groupFilter.toLowerCase().trim();
-      const matchTerms = strictGroupMap[cleanFilter] || [cleanFilter];
+      const matchTerms = filterMap[groupFilter] || [groupFilter];
 
       items = items.filter(item => {
         const itemGroupTitle = (item.group?.title || '').toLowerCase().trim();
-        // Exclude anything in Archive / Holding
+        // Strict exclusion of legacy archive
         if (itemGroupTitle.includes('archive') || itemGroupTitle.includes('holding') || itemGroupTitle.includes('closed')) {
           return false;
         }
