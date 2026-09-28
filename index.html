@@ -134,7 +134,7 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
           <i class="fa-solid fa-circle-check"></i> Active Features
         </h4>
         <ul class="space-y-1.5 text-[11px] text-gray-300">
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>CORS-Bypassing Server Relay:</strong> Relays voice prompts through Netlify to Make.com cleanly.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Explicit Error Logged Intake:</strong> Server relay with immediate alert triggers if POST drops.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Dynamic Room Builder Sandbox:</strong> Speaks layout into existence; graphical 2D tiles render instantly.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap Staff Time Clocks:</strong> Embedded punch cards for Mona, Chris, Mike, and Norby.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Instant Client Vault Search:</strong> High-speed lookup across 22,283 customer records.</li>
@@ -336,7 +336,6 @@ const salesQuotes = [
   "🏆 'You can have everything in life you want if you just help enough other people get what they want.' — Zig Ziglar"
 ];
 
-// CLIENT-SIDE INSTANT VAULT DATABASE INDEX
 const clientVaultData = [
   { name: "Mary Cole", phone: "(410) 661-5988", email: "N/A", address: "1170 Pelham Wood Rd, Parkville, MD 21234" },
   { name: "Mary Cole", phone: "(410) 356-3356", email: "N/A", address: "4 Temblant Ct, Owings Mills, MD 21117" },
@@ -507,16 +506,33 @@ function parseAndExecuteCommand(text) {
   sendToFresh(text);
 }
 
-// SERVER-SIDE NETLIFY RELAY TO BYPASS BROWSER CORS RESTRICTIONS
+// RELIABLE CHAT RELAY POST WITH CONSOLE & ALERT HANDLING
 function sendToFresh(promptText) {
   fetch('/.netlify/functions/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt: promptText, board_id: '18424728273' })
   })
-  .then(res => res.json())
-  .then(data => { flashLed(data.reply || '✅ LOGGED & FIRED TO BOARD! ⚡'); })
-  .catch(err => { flashLed('✅ LOGGED & FIRED TO BOARD! ⚡'); });
+  .then(res => {
+    if (!res.ok) {
+      throw new Error('HTTP Status ' + res.status);
+    }
+    return res.json();
+  })
+  .then(data => { 
+    if (data.error) {
+      console.error('API Error Response:', data.error);
+      alert('Intake Error: ' + data.error);
+      flashLed('❌ INTAKE FAILED');
+    } else {
+      flashLed(data.reply || '✅ LOGGED & FIRED TO BOARD! ⚡'); 
+    }
+  })
+  .catch(err => { 
+    console.error('Network Request Failed:', err);
+    alert('Network Error: ' + err.message);
+    flashLed('❌ NETWORK ERROR'); 
+  });
 }
 
 function parseAndRenderDynamicTiles(promptText) {
@@ -854,7 +870,6 @@ async function fetchDrawerItems(name) {
   }
 }
 
-// CLIENT-SIDE INSTANT VAULT LOOKUP ENGINE
 function searchVault() {
   const query = document.getElementById('vaultQuery').value.trim().toLowerCase();
   const drawerContent = document.getElementById('drawerContent');
