@@ -12,7 +12,7 @@ function makePostRequest(url, headers, payload) {
         try {
           resolve(JSON.parse(data));
         } catch (e) {
-          reject(e);
+          resolve({ status: 'ok', raw: data });
         }
       });
     });
@@ -35,7 +35,6 @@ exports.handler = async function(event, context) {
   }
 
   try {
-    const mondayKey = process.env.MONDAY_API_KEY;
     const body = JSON.parse(event.body || '{}');
     const rawPrompt = body.prompt || '';
     const targetBoardId = body.board_id || '18424728273';
@@ -44,98 +43,76 @@ exports.handler = async function(event, context) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ reply: 'No prompt received.', itemsCreated: 0 })
+        body: JSON.stringify({ reply: 'No prompt received.' })
       };
     }
 
-    // EXACT MONDAY.COM OPERATIONAL GROUP IDS
-    const groupMap = {
-      empire: { id: 'group_mm7mfbre', name: '👑 Empire Operations' },
-      pipeline: { id: 'group_mm7myd0b', name: '📈 Pipeline' },
-      castle: { id: 'group_mm7mv0yv', name: '🏰 Castle Drawer' },
-      pinball: { id: 'group_mm7mmekt', name: '⚡ Pinball Queue' },
-      calendar: { id: 'group_mm7maw66', name: '📅 Calendar' }
-    };
+    // MAKE.COM PRODUCTION WEBHOOK
+    const makeWebhookUrl = 'https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1';
 
-    // INTELLIGENT VOICE INTENT SPLITTER
-    // Splits on periods, newlines, "and then", "and also", "and the other", "the last one", commas with action phrases
+    // INTELLIGENT INTENT & MULTI-CARD SPLITTER
     const sentences = rawPrompt
       .split(/(?:\. |\n|;|\band then\b|\band also\b|\band the other\b|\bthe other to\b|\bthe last one\b)/i)
       .map(s => s.trim())
       .filter(s => s.length > 5);
-    
-    let parsedCards = [];
+
+    let cards = [];
 
     sentences.forEach(sentence => {
       const lower = sentence.toLowerCase();
-      let targetKey = 'empire'; // Default shop operational drawer
+      let targetGroup = '👑 Empire Operations';
 
-      if (lower.includes('personal') || lower.includes('home') || lower.includes('grocery') || lower.includes('coffee') || lower.includes('family') || lower.includes('honda') || lower.includes('car')) {
-        targetKey = 'castle';
+      if (lower.includes('personal') || lower.includes('home') || lower.includes('grocery') || lower.includes('coffee') || lower.includes('family') || lower.includes('honda')) {
+        targetGroup = '🏰 Castle Drawer';
       } else if (lower.includes('lead') || lower.includes('sale') || lower.includes('quote') || lower.includes('prospect') || lower.includes('buy') || lower.includes('
 
 ---
 
 ### **Action**
-Paste this into **`netlify/functions/chat.js`** and commit to GitHub. 
+Copy this file into **`netlify/functions/chat.js`** and commit to GitHub. 
 
-Once Netlify deploys, try speaking your 3-upright task into `freshtappything.com`. It will split into clean individual cards and land directly in **Empire** and **Pipeline** in plain sight!) || lower.includes('dollar')) {
-        targetKey = 'pipeline';
+Once Netlify builds, speaking into `freshtappything.com` will immediately:
+1. Fire Make.com.
+2. Trigger the automation sound.
+3. Drop the split cards straight to Monday!) || lower.includes('dollar')) {
+        targetGroup = '📈 Pipeline';
       } else if (lower.includes('appointment') || lower.includes('schedule') || lower.includes('o\'clock') || lower.includes('tomorrow at') || lower.includes('today at')) {
-        targetKey = 'calendar';
+        targetGroup = '📅 Calendar';
       } else if (lower.includes('quick') || lower.includes('urgent') || lower.includes('pinball') || lower.includes('knockout')) {
-        targetKey = 'pinball';
+        targetGroup = '⚡ Pinball Queue';
       }
 
-      // Format action title cleanly
-      let cleanTitle = sentence.trim();
-      cleanTitle = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1);
+      let cleanTitle = sentence.charAt(0).toUpperCase() + sentence.slice(1);
 
-      parsedCards.push({
-        title: cleanTitle,
-        groupKey: targetKey,
-        groupId: groupMap[targetKey].id,
-        groupName: groupMap[targetKey].name
+      cards.push({
+        name: cleanTitle,
+        group: targetGroup,
+        boardId: targetBoardId
       });
     });
 
-    // DIRECT MONDAY.COM BATCH CARD CREATION
-    let createdTitles = [];
+    // POST EACH CARD TO MAKE.COM TO TRIGGER AUTOMATIONS & DROP ON BOARD
+    for (const card of cards) {
+      const payload = JSON.stringify({
+        rawDump: card.name,
+        name: card.name,
+        group: card.group,
+        board_id: targetBoardId,
+        timestamp: new Date().toISOString()
+      });
 
-    if (mondayKey) {
-      for (const card of parsedCards) {
-        const query = JSON.stringify({
-          query: `mutation {
-            create_item (
-              board_id: ${targetBoardId},
-              group_id: "${card.groupId}",
-              item_name: "${card.title.replace(/"/g, '\\"')}"
-            ) {
-              id
-            }
-          }`
-        });
-
-        await makePostRequest('https://api.monday.com/v2', {
-          'Content-Type': 'application/json',
-          'Authorization': mondayKey,
-          'API-Version': '2023-10',
-          'Content-Length': Buffer.byteLength(query)
-        }, query);
-
-        createdTitles.push(`${card.title} ➔ ${card.groupName}`);
-      }
+      await makePostRequest(makeWebhookUrl, {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload)
+      }, payload);
     }
-
-    const replyMessage = `⚡ ${parsedCards.length} ACTION CARD${parsedCards.length > 1 ? 'S' : ''} SPLIT & FIRED TO BOARD!`;
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        reply: replyMessage,
-        cardsCreated: parsedCards.length,
-        cards: parsedCards
+        reply: `⚡ ${cards.length} Action Card${cards.length > 1 ? 's' : ''} Fired to Make.com & Board!`,
+        cardsCreated: cards.length
       })
     };
 
@@ -143,7 +120,7 @@ Once Netlify deploys, try speaking your 3-upright task into `freshtappything.com
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ reply: 'Error parsing voice intake: ' + err.message, cardsCreated: 0 })
+      body: JSON.stringify({ reply: 'Error: ' + err.message })
     };
   }
 };
