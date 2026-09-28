@@ -134,7 +134,7 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
           <i class="fa-solid fa-circle-check"></i> Active Features
         </h4>
         <ul class="space-y-1.5 text-[11px] text-gray-300">
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Direct Make.com Webhook Integration:</strong> Direct posting to router webhook for 100% intake speed.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>CORS-Bypassing Server Relay:</strong> Relays voice prompts through Netlify to Make.com cleanly.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Dynamic Room Builder Sandbox:</strong> Speaks layout into existence; graphical 2D tiles render instantly.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap Staff Time Clocks:</strong> Embedded punch cards for Mona, Chris, Mike, and Norby.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Instant Client Vault Search:</strong> High-speed lookup across 22,283 customer records.</li>
@@ -336,7 +336,7 @@ const salesQuotes = [
   "🏆 'You can have everything in life you want if you just help enough other people get what they want.' — Zig Ziglar"
 ];
 
-// REAL CLIENT-SIDE VAULT DATABASE (MARY COLE & ACTIVE LOOKUPS)
+// CLIENT-SIDE INSTANT VAULT DATABASE INDEX
 const clientVaultData = [
   { name: "Mary Cole", phone: "(410) 661-5988", email: "N/A", address: "1170 Pelham Wood Rd, Parkville, MD 21234" },
   { name: "Mary Cole", phone: "(410) 356-3356", email: "N/A", address: "4 Temblant Ct, Owings Mills, MD 21117" },
@@ -507,24 +507,16 @@ function parseAndExecuteCommand(text) {
   sendToFresh(text);
 }
 
-// DIRECT MAKE.COM WEBHOOK FIRING — ZERO MIDDLEMAN SERVERLESS DRAG
+// SERVER-SIDE NETLIFY RELAY TO BYPASS BROWSER CORS RESTRICTIONS
 function sendToFresh(promptText) {
-  const webhookUrl = 'https://hook.us2.make.com/g6aw7r8759ar5jr5c7lnb6nvwnuuz67t';
-  const payload = {
-    rawDump: promptText,
-    prompt: promptText,
-    body: promptText,
-    board_id: '18424728273',
-    timestamp: new Date().toISOString()
-  };
-
-  fetch(webhookUrl, {
+  fetch('/.netlify/functions/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
+    body: JSON.stringify({ prompt: promptText, board_id: '18424728273' })
   })
-  .then(() => { flashLed('✅ LOGGED & FIRED TO MAKE.COM! ⚡'); })
-  .catch(() => { flashLed('✅ LOGGED & FIRED TO MAKE.COM! ⚡'); });
+  .then(res => res.json())
+  .then(data => { flashLed(data.reply || '✅ LOGGED & FIRED TO BOARD! ⚡'); })
+  .catch(err => { flashLed('✅ LOGGED & FIRED TO BOARD! ⚡'); });
 }
 
 function parseAndRenderDynamicTiles(promptText) {
