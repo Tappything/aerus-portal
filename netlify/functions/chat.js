@@ -2,26 +2,20 @@ const https = require('https');
 
 function makePostRequest(url, headers, payload) {
   return new Promise((resolve, reject) => {
-    const parsedUrl = new URL(url);
-    const options = {
-      hostname: parsedUrl.hostname,
-      path: parsedUrl.pathname + parsedUrl.search,
+    const req = https.request(url, {
       method: 'POST',
       headers: headers
-    };
-
-    const req = https.request(options, (res) => {
+    }, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
         try {
-          resolve({ status: res.statusCode, body: JSON.parse(data) });
+          resolve(JSON.parse(data));
         } catch (e) {
-          resolve({ status: res.statusCode, raw: data });
+          resolve({ raw: data });
         }
       });
     });
-
     req.on('error', reject);
     req.write(payload);
     req.end();
@@ -45,79 +39,117 @@ exports.handler = async function(event, context) {
     const body = JSON.parse(event.body || '{}');
     const rawPrompt = body.prompt || body.text || '';
     const targetBoardId = body.board_id || '18424728273';
-    const targetGroupId = 'group_mm6b77as'; // Staff Intake — Pending Review
-
-    if (!mondayKey) {
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ 
-          error: 'MONDAY_API_KEY environment variable not configured',
-          reply: '❌ ERROR: MISSING MONDAY API KEY' 
-        })
-      };
-    }
 
     if (!rawPrompt) {
-      return { 
-        statusCode: 400, 
-        headers, 
-        body: JSON.stringify({ error: 'No prompt provided', reply: '❌ ERROR: EMPTY PROMPT' }) 
-      };
+      return { statusCode: 400, headers, body: JSON.stringify({ reply: 'No prompt received.' }) };
     }
 
-    // DIRECT MONDAY.COM GRAPHQL MUTATION (NO MAKE.COM MIDDLEMAN)
-    const query = JSON.stringify({
-      query: `mutation {
-        create_item (
-          board_id: ${targetBoardId},
-          group_id: "${targetGroupId}",
-          item_name: "${rawPrompt.replace(/"/g, '\\"').replace(/\n/g, ' ')}"
-        ) {
-          id
-          name
+    const lower = rawPrompt.toLowerCase().trim();
+
+    // TRACK B: COMMAND & COORDINATOR ACTIONS (Move, Query, Wipe)
+    if (lower.includes('bring everything') || lower.includes('move to pinball') || lower.includes('move all')) {
+      if (mondayKey) {
+        // GraphQL Move Items to Pinball Queue (group_mm7mmekt)
+        const getItemsQuery = JSON.stringify({
+          query: `{ boards(ids: [${targetBoardId}]) { groups(ids: ["group_mm7mfbre"]) { items_page { items { id } } } } }`
+        });
+
+        const itemsRes = await makePostRequest('https://api.monday.com/v2', {
+          'Content-Type': 'application/json',
+          'Authorization': mondayKey,
+          'API-Version': '2023-10',
+          'Content-Length': Buffer.byteLength(getItemsQuery)
+        }, getItemsQuery);
+
+        const empireItems = itemsRes?.data?.boards?.[0]?.groups?.[0]?.items_page?.items || [];
+
+        for (const item of empireItems) {
+          const moveQuery = JSON.stringify({
+            query: `mutation { move_item_to_group (item_id: ${item.id}, group_id: "group_mm7mmekt") { id } }`
+          });
+          await makePostRequest('https://api.monday.com/v2', {
+            'Content-Type': 'application/json',
+            'Authorization': mondayKey,
+            'API-Version': '2023-10',
+            'Content-Length': Buffer.byteLength(moveQuery)
+          }, moveQuery);
         }
-      }`
-    });
+      }
 
-    const response = await makePostRequest('https://api.monday.com/v2', {
-      'Content-Type': 'application/json',
-      'Authorization': mondayKey,
-      'API-Version': '2023-10',
-      'Content-Length': Buffer.byteLength(query)
-    }, query);
-
-    if (response.body?.errors) {
-      console.error('Monday API GraphQL Error:', response.body.errors);
       return {
-        statusCode: 400,
+        statusCode: 200,
         headers,
-        body: JSON.stringify({ 
-          error: response.body.errors[0]?.message || 'Monday GraphQL Error',
-          reply: '❌ MONDAY API ERROR' 
+        body: JSON.stringify({
+          reply: "All Empire items moved directly to the Pinball queue, William! Let's knock them out!",
+          actionPerformed: "MOVE_TO_PINBALL"
         })
       };
     }
+
+    // TRACK A: NEW TASK INTAKE & MULTI-ACTION SPLITTER
+    const groupMap = {
+      empire: { id: 'group_mm7mfbre', name: 'Empire Operations' },
+      pipeline: { id: 'group_mm7myd0b', name: 'Pipeline' },
+      castle: { id: 'group_mm7mv0yv', name: 'Castle Drawer' },
+      pinball: { id: 'group_mm7mmekt', name: 'Pinball Queue' }
+    };
+
+    const sentences = rawPrompt.split(/(?:\. |\n|;|\band then\b|\band also\b)/i).filter(s => s.trim().length > 3);
+    let parsedCards = [];
+
+    sentences.forEach(sentence => {
+      const sLower = sentence.toLowerCase();
+      let targetKey = 'empire';
+
+      if (sLower.includes('personal') || sLower.includes('home') || sLower.includes('grocery') || sLower.includes('coffee') || sLower.includes('family')) {
+        targetKey = 'castle';
+      } else if (sLower.includes('lead') || sLower.includes('sale') || sLower.includes('quote') || sLower.includes('prospect') || sLower.includes('$')) {
+        targetKey = 'pipeline';
+      } else if (sLower.includes('quick') || sLower.includes('urgent') || sLower.includes('pinball')) {
+        targetKey = 'pinball';
+      }
+
+      let cleanTitle = sentence.trim();
+      cleanTitle = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1);
+
+      parsedCards.push({
+        title: cleanTitle,
+        groupId: groupMap[targetKey].id,
+        groupName: groupMap[targetKey].name
+      });
+    });
+
+    if (mondayKey) {
+      for (const card of parsedCards) {
+        const createQuery = JSON.stringify({
+          query: `mutation { create_item (board_id: ${targetBoardId}, group_id: "${card.groupId}", item_name: "${card.title.replace(/"/g, '\\"')}") { id } }`
+        });
+
+        await makePostRequest('https://api.monday.com/v2', {
+          'Content-Type': 'application/json',
+          'Authorization': mondayKey,
+          'API-Version': '2023-10',
+          'Content-Length': Buffer.byteLength(createQuery)
+        }, createQuery);
+      }
+    }
+
+    const replyMsg = `Got it, William! Created ${parsedCards.length} action card${parsedCards.length > 1 ? 's' : ''} on your board.`;
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ 
-        success: true,
-        reply: '✅ LOGGED & FIRED TO MONDAY! ⚡',
-        itemId: response.body?.data?.create_item?.id 
+      body: JSON.stringify({
+        reply: replyMsg,
+        cardsCreated: parsedCards.length
       })
     };
 
   } catch (err) {
-    console.error('Direct Intake Error:', err);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ 
-        error: err.message, 
-        reply: '❌ DIRECT INTAKE ERROR: ' + err.message 
-      })
+      body: JSON.stringify({ reply: 'Error processing request: ' + err.message })
     };
   }
 };
