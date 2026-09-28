@@ -137,7 +137,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
 </div>
 
-<!-- FEATURES & BENEFITS MODAL (MOVED OUTSIDE .tapulator-face DIRECTLY UNDER BODY) -->
+<!-- FEATURES & BENEFITS MODAL -->
 <div id="featuresModal" class="fixed inset-0 bg-black/95 z-50 hidden flex-col p-6 backdrop-blur-md justify-center">
   <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-6 max-w-sm mx-auto space-y-5 text-left shadow-2xl max-h-[85vh] overflow-y-auto">
     <div class="flex items-center justify-between border-b border-gray-800 pb-3">
@@ -179,7 +179,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   </div>
 </div>
 
-<!-- PERSISTENT CARD DRAWER MODAL (MOVED OUTSIDE .tapulator-face DIRECTLY UNDER BODY) -->
+<!-- PERSISTENT CARD DRAWER MODAL -->
 <div id="drawerModal" class="fixed inset-0 bg-black/90 z-50 hidden flex-col p-4 backdrop-blur-md">
   <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
     <h3 id="drawerTitle" class="text-lg font-black text-white flex items-center gap-2">
@@ -350,16 +350,42 @@ function loadDrawerItems(drawerName) {
     .then(res => res.json())
     .then(data => {
       var groups = data.groups || (data.data && data.data.boards && data.data.boards[0] && data.data.boards[0].groups) || [];
-      
+      var target = drawerName.toLowerCase().trim();
+
+      // KEYWORD MAPPING TO MONDAY.COM BOARD GROUPS
       var matchingGroup = groups.find(function(g) {
         var title = (g.title || g.name || '').toLowerCase().trim();
-        var target = drawerName.toLowerCase().trim();
+        
+        if (target.includes('castle')) {
+          return title.includes('personal') || title.includes('william') || title.includes('lounge');
+        }
+        if (target.includes('empire')) {
+          return title.includes('showroom') || title.includes('bagdons') || title.includes('announcements') || title.includes('empire');
+        }
+        if (target.includes('shop') || target.includes('bench')) {
+          return title.includes('workbench') || title.includes('ready wall') || title.includes('bench') || title.includes('parts') || title.includes('waiting');
+        }
+        if (target.includes('pipeline')) {
+          return title.includes('leads') || title.includes('intake') || title.includes('staff');
+        }
+        if (target.includes('treasury') || target.includes('invoice')) {
+          return title.includes('invoices') || title.includes('archive') || title.includes('treasury');
+        }
         return title.includes(target) || target.includes(title);
       });
 
-      var items = matchingGroup ? (matchingGroup.items || (matchingGroup.items_page && matchingGroup.items_page.items) || []) : [];
-      
-      var isInvoice = drawerName.toLowerCase().includes('treasury') || drawerName.toLowerCase().includes('invoice') || drawerName.toLowerCase().includes('shop');
+      // PINBALL OR FALLBACK: SHOW ALL ACTIVE BOARD ITEMS IF NO EXACT GROUP MATCH
+      var items = [];
+      if (target.includes('pinball') || !matchingGroup) {
+        groups.forEach(function(g) {
+          var groupItems = g.items || (g.items_page && g.items_page.items) || [];
+          items = items.concat(groupItems);
+        });
+      } else {
+        items = matchingGroup.items || (matchingGroup.items_page && matchingGroup.items_page.items) || [];
+      }
+
+      var isInvoice = target.includes('treasury') || target.includes('invoice') || target.includes('shop');
 
       var itemsHtml = items.map(function(item) {
         var hasDollar = item.name && (item.name.includes('$') || isInvoice);
