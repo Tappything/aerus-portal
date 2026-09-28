@@ -1,6 +1,5 @@
 const https = require('https');
 
-// Helper for native HTTPS POST requests
 function makePostRequest(url, headers, payload) {
   return new Promise((resolve, reject) => {
     const req = https.request(url, {
@@ -13,7 +12,7 @@ function makePostRequest(url, headers, payload) {
         try {
           resolve(JSON.parse(data));
         } catch (e) {
-          resolve({ raw: data });
+          reject(e);
         }
       });
     });
@@ -21,28 +20,6 @@ function makePostRequest(url, headers, payload) {
     req.write(payload);
     req.end();
   });
-}
-
-// Helper: DIRECT MONDAY.COM ITEM CREATION (Bypasses Make.com 520 errors)
-async function createMondayItemDirect(mondayKey, boardId, itemName) {
-  if (!mondayKey || !itemName) return null;
-  const cleanName = itemName.replace(/"/g, '\\"').replace(/\n/g, ' ');
-  // Default target group: Staff Intake — Pending Review (group_mm6b77as)
-  const targetGroupId = 'group_mm6b77as';
-  const query = JSON.stringify({
-    query: `mutation { create_item (board_id: ${boardId}, group_id: "${targetGroupId}", item_name: "${cleanName}") { id } }`
-  });
-  try {
-    return await makePostRequest('https://api.monday.com/v2', {
-      'Content-Type': 'application/json',
-      'Authorization': mondayKey,
-      'API-Version': '2023-10',
-      'Content-Length': Buffer.byteLength(query)
-    }, query);
-  } catch (err) {
-    console.error('Direct Monday creation error:', err);
-    return null;
-  }
 }
 
 exports.handler = async function(event, context) {
@@ -53,112 +30,120 @@ exports.handler = async function(event, context) {
     'Content-Type': 'application/json'
   };
 
-  // Handle preflight OPTIONS request
   if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ message: 'Successful preflight' })
-    };
-  }
-
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method Not Allowed' })
-    };
+    return { statusCode: 200, headers, body: JSON.stringify({ message: 'Successful preflight' }) };
   }
 
   try {
-    const data = JSON.parse(event.body || '{}');
-    const prompt = (data.prompt || '').trim();
+    const mondayKey = process.env.MONDAY_API_KEY;
+    const body = JSON.parse(event.body || '{}');
+    const rawPrompt = body.prompt || '';
+    const targetBoardId = body.board_id || '18424728273';
 
-    if (!prompt) {
+    if (!rawPrompt) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'Prompt is required' })
+        body: JSON.stringify({ reply: 'No prompt received.', itemsCreated: 0 })
       };
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    const mondayKey = process.env.MONDAY_API_KEY;
-    const targetBoardId = data.board_id || '18424728273';
-    const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1';
+    // EXACT MONDAY.COM OPERATIONAL GROUP IDS
+    const groupMap = {
+      empire: { id: 'group_mm7mfbre', name: '👑 Empire Operations' },
+      pipeline: { id: 'group_mm7myd0b', name: '📈 Pipeline' },
+      castle: { id: 'group_mm7mv0yv', name: '🏰 Castle Drawer' },
+      pinball: { id: 'group_mm7mmekt', name: '⚡ Pinball Queue' },
+      calendar: { id: 'group_mm7maw66', name: '📅 Calendar' }
+    };
 
-    // INTENT DETECTION
-    const lower = prompt.toLowerCase();
-    const questionStarters = ['show', 'list', 'give', 'status', 'what', 'how', 'why', 'who', 'where', 'when', 'can', 'could', 'should', 'is', 'are', 'tell'];
-    const isQuestionOrBrainstorm = (questionStarters.some(w => lower.startsWith(w)) || lower.includes('?')) && !lower.includes('repair') && !lower.includes('picked up') && !lower.includes('dropped off') && !lower.includes('rebuild');
+    // INTELLIGENT VOICE INTENT SPLITTER
+    // Splits on periods, newlines, "and then", "and also", "and the other", "the last one", commas with action phrases
+    const sentences = rawPrompt
+      .split(/(?:\. |\n|;|\band then\b|\band also\b|\band the other\b|\bthe other to\b|\bthe last one\b)/i)
+      .map(s => s.trim())
+      .filter(s => s.length > 5);
+    
+    let parsedCards = [];
 
-    // ROUTE 1: FAST TASK / INTAKE -> DIRECT MONDAY.COM CREATION + MAKE.COM BACKUP
-    if (!isQuestionOrBrainstorm) {
-      // 1. Direct Monday API creation (Instant & Guaranteed)
-      if (mondayKey) {
-        await createMondayItemDirect(mondayKey, targetBoardId, prompt);
+    sentences.forEach(sentence => {
+      const lower = sentence.toLowerCase();
+      let targetKey = 'empire'; // Default shop operational drawer
+
+      if (lower.includes('personal') || lower.includes('home') || lower.includes('grocery') || lower.includes('coffee') || lower.includes('family') || lower.includes('honda') || lower.includes('car')) {
+        targetKey = 'castle';
+      } else if (lower.includes('lead') || lower.includes('sale') || lower.includes('quote') || lower.includes('prospect') || lower.includes('buy') || lower.includes('
+
+---
+
+### **Action**
+Paste this into **`netlify/functions/chat.js`** and commit to GitHub. 
+
+Once Netlify deploys, try speaking your 3-upright task into `freshtappything.com`. It will split into clean individual cards and land directly in **Empire** and **Pipeline** in plain sight!) || lower.includes('dollar')) {
+        targetKey = 'pipeline';
+      } else if (lower.includes('appointment') || lower.includes('schedule') || lower.includes('o\'clock') || lower.includes('tomorrow at') || lower.includes('today at')) {
+        targetKey = 'calendar';
+      } else if (lower.includes('quick') || lower.includes('urgent') || lower.includes('pinball') || lower.includes('knockout')) {
+        targetKey = 'pinball';
       }
 
-      // 2. Make.com Webhook (Parallel backup)
-      const webhookPayload = JSON.stringify({
-        prompt: prompt,
-        rawDump: prompt,
-        text: prompt,
-        body: prompt,
-        board_id: targetBoardId,
-        timestamp: new Date().toISOString()
+      // Format action title cleanly
+      let cleanTitle = sentence.trim();
+      cleanTitle = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1);
+
+      parsedCards.push({
+        title: cleanTitle,
+        groupKey: targetKey,
+        groupId: groupMap[targetKey].id,
+        groupName: groupMap[targetKey].name
       });
-      makePostRequest(MAKE_WEBHOOK_URL, {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(webhookPayload)
-      }, webhookPayload).catch(e => console.error('Make backup error:', e));
+    });
 
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ reply: 'LOGGED & FIRED TO BOARD! ⚡' })
-      };
+    // DIRECT MONDAY.COM BATCH CARD CREATION
+    let createdTitles = [];
+
+    if (mondayKey) {
+      for (const card of parsedCards) {
+        const query = JSON.stringify({
+          query: `mutation {
+            create_item (
+              board_id: ${targetBoardId},
+              group_id: "${card.groupId}",
+              item_name: "${card.title.replace(/"/g, '\\"')}"
+            ) {
+              id
+            }
+          }`
+        });
+
+        await makePostRequest('https://api.monday.com/v2', {
+          'Content-Type': 'application/json',
+          'Authorization': mondayKey,
+          'API-Version': '2023-10',
+          'Content-Length': Buffer.byteLength(query)
+        }, query);
+
+        createdTitles.push(`${card.title} ➔ ${card.groupName}`);
+      }
     }
 
-    // ROUTE 2: CONVERSATIONAL CHIEF OF STAFF -> GEMINI REST API
-    if (!apiKey) {
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ reply: 'LOGGED & FIRED TO BOARD! ⚡' })
-      };
-    }
-
-    const isOwner = (targetBoardId === '18424728273');
-    const systemInstruction = isOwner 
-      ? `You are Fresh 🤵 — the Digital Coordinator powering TappyThing for William Sullivan. Direct, punchy, ultra-concise. Zero fluff. Motivational coach energy. Never mention Dan.`
-      : `You are Fresh 🤵 — the Digital Coordinator for TappyThing. Energetic, helpful, direct. Guide subscribers to build their world.`;
-
-    const contents = [{ role: 'user', parts: [{ text: `${systemInstruction}\n\nUser says: ${prompt}` }] }];
-    const geminiPayload = JSON.stringify({ contents });
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-    const geminiRes = await makePostRequest(geminiUrl, {
-      'Content-Type': 'application/json',
-      'Content-Length': Buffer.byteLength(geminiPayload)
-    }, geminiPayload);
-
-    let reply = 'LOGGED & FIRED TO BOARD! ⚡';
-    if (geminiRes?.candidates?.[0]?.content?.parts?.[0]?.text) {
-      reply = geminiRes.candidates[0].content.parts[0].text.trim();
-    }
+    const replyMessage = `⚡ ${parsedCards.length} ACTION CARD${parsedCards.length > 1 ? 'S' : ''} SPLIT & FIRED TO BOARD!`;
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ reply: reply })
+      body: JSON.stringify({
+        reply: replyMessage,
+        cardsCreated: parsedCards.length,
+        cards: parsedCards
+      })
     };
 
   } catch (err) {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: err.message })
+      body: JSON.stringify({ reply: 'Error parsing voice intake: ' + err.message, cardsCreated: 0 })
     };
   }
 };
