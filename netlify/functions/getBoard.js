@@ -62,8 +62,26 @@ exports.handler = async function(event, context) {
       };
     }
 
+    // QUERY GROUPS DIRECTLY SO ARCHIVE NEVER BLOCKS FRESH ITEMS
     const query = JSON.stringify({
-      query: `{ boards(ids: [${targetBoardId}]) { items_page(limit: 100) { items { id name group { id title } column_values { id text } } } } }`
+      query: `{
+        boards(ids: [${targetBoardId}]) {
+          groups {
+            id
+            title
+            items_page(limit: 50) {
+              items {
+                id
+                name
+                column_values {
+                  id
+                  text
+                }
+              }
+            }
+          }
+        }
+      }`
     });
 
     const resData = await makePostRequest('https://api.monday.com/v2', {
@@ -73,9 +91,9 @@ exports.handler = async function(event, context) {
       'Content-Length': Buffer.byteLength(query)
     }, query);
 
-    let items = resData?.data?.boards?.[0]?.items_page?.items || [];
+    const groups = resData?.data?.boards?.[0]?.groups || [];
+    let matchedItems = [];
 
-    // MAP DRAWERS TO INCLUDE INTAKE SO LIVE ITEMS SHOW UP
     const filterMap = {
       'empire': ['empire', 'staff intake', 'intake', 'bench', 'operations'],
       'shop ops': ['staff intake', 'intake', 'bench', 'empire'],
@@ -85,37 +103,39 @@ exports.handler = async function(event, context) {
       'calendar': ['calendar']
     };
 
-    if (groupFilter) {
-      const matchTerms = filterMap[groupFilter] || [groupFilter];
+    const matchTerms = filterMap[groupFilter] || [groupFilter];
 
-      items = items.filter(item => {
-        const itemGroupTitle = (item.group?.title || '').toLowerCase().trim();
-        // Strict exclusion of legacy archive
-        if (itemGroupTitle.includes('archive') || itemGroupTitle.includes('holding') || itemGroupTitle.includes('closed')) {
-          return false;
-        }
-        return matchTerms.some(term => itemGroupTitle.includes(term));
-      });
-    }
+    groups.forEach(group => {
+      const title = (group.title || '').toLowerCase().trim();
+      
+      // Skip archive
+      if (title.includes('archive') || title.includes('holding') || title.includes('closed') || title.includes('trash')) {
+        return;
+      }
 
-    const formattedItems = items.map(item => {
-      const phoneCol = item.column_values?.find(c => c.id.includes('phone') || c.id.includes('mobile'));
-      const emailCol = item.column_values?.find(c => c.id.includes('email'));
+      // Check if this group matches the requested drawer
+      const isMatch = matchTerms.some(term => title.includes(term));
+      if (isMatch && group.items_page?.items) {
+        group.items_page.items.forEach(item => {
+          const phoneCol = item.column_values?.find(c => c.id.includes('phone') || c.id.includes('mobile'));
+          const emailCol = item.column_values?.find(c => c.id.includes('email'));
 
-      return {
-        id: item.id,
-        name: item.name || 'Untitled Card',
-        group: item.group?.title || 'General',
-        status: 'ACTIVE',
-        phone: phoneCol?.text || '4105551234',
-        email: emailCol?.text || 'customer@email.com'
-      };
+          matchedItems.push({
+            id: item.id,
+            name: item.name || 'Untitled Card',
+            group: group.title,
+            status: 'ACTIVE',
+            phone: phoneCol?.text || '4105551234',
+            email: emailCol?.text || 'customer@email.com'
+          });
+        });
+      }
     });
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ items: formattedItems })
+      body: JSON.stringify({ items: matchedItems })
     };
 
   } catch (err) {
