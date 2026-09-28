@@ -77,27 +77,27 @@ exports.handler = async function(event, context) {
 
     let items = resData?.data?.boards?.[0]?.items_page?.items || [];
 
-    // STRICT GROUP MAPPING WITH INTAKE SAFETY NET
+    // MAP DRAWERS TO MONDAY GROUPS (WITH INTAKE INCLUDED IN EMPIRE & SHOP OPS)
     const strictGroupMap = {
-      'empire': ['empire operations', '👑 empire operations', 'staff intake — pending review', '📥 staff intake — pending review'],
-      'castle': ['castle drawer', '🏰 castle drawer'],
-      'pipeline': ['pipeline', '📈 pipeline'],
-      'calendar': ['calendar', '📅 calendar'],
-      'pinball': ['pinball queue', '⚡ pinball queue'],
-      'shop ops': ['staff intake — pending review', '📥 staff intake — pending review', 'shop ops']
+      'empire': ['empire', 'staff intake', 'intake', 'bench', 'operations'],
+      'shop ops': ['staff intake', 'intake', 'bench', 'empire'],
+      'castle': ['castle', 'personal', 'car', 'vehicle'],
+      'pipeline': ['pipeline', 'lead', 'private'],
+      'calendar': ['calendar'],
+      'pinball': ['pinball']
     };
 
     if (groupFilter) {
       const cleanFilter = groupFilter.toLowerCase().trim();
-      const targetGroups = strictGroupMap[cleanFilter] || [cleanFilter];
+      const matchTerms = strictGroupMap[cleanFilter] || [cleanFilter];
 
       items = items.filter(item => {
         const itemGroupTitle = (item.group?.title || '').toLowerCase().trim();
         // Exclude anything in Archive / Holding
-        if (itemGroupTitle.includes('archive') || itemGroupTitle.includes('holding')) {
+        if (itemGroupTitle.includes('archive') || itemGroupTitle.includes('holding') || itemGroupTitle.includes('closed')) {
           return false;
         }
-        return targetGroups.some(target => itemGroupTitle === target || itemGroupTitle.includes(target));
+        return matchTerms.some(term => itemGroupTitle.includes(term));
       });
     }
 
