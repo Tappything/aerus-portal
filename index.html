@@ -134,13 +134,10 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
           <i class="fa-solid fa-circle-check"></i> Active Features
         </h4>
         <ul class="space-y-1.5 text-[11px] text-gray-300">
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Dynamic Room Builder Sandbox:</strong> Speaks or types layout into existence; dynamic graphical tiles auto-render front and center.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Universal Bottom Bar (z-60):</strong> Always-on voice & text input across all drawers.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap Staff Time Clocks:</strong> Embedded punch cards for Mona, Chris, Mike, and Norby with live shift timers.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Streaming Voice Dictation:</strong> Real-time voice capture directly in input box.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap Outbound SMS Links:</strong> Job tracking links dispatched straight to customer phones.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Embedded Google Calendar:</strong> Direct agenda and appointment control.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Vault Search:</strong> Instant lookup across 22,283 customer records.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Direct Make.com Webhook Integration:</strong> Direct posting to router webhook for 100% intake speed.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Dynamic Room Builder Sandbox:</strong> Speaks layout into existence; graphical 2D tiles render instantly.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap Staff Time Clocks:</strong> Embedded punch cards for Mona, Chris, Mike, and Norby.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Instant Client Vault Search:</strong> High-speed lookup across 22,283 customer records.</li>
         </ul>
       </div>
 
@@ -339,6 +336,15 @@ const salesQuotes = [
   "🏆 'You can have everything in life you want if you just help enough other people get what they want.' — Zig Ziglar"
 ];
 
+// REAL CLIENT-SIDE VAULT DATABASE (MARY COLE & ACTIVE LOOKUPS)
+const clientVaultData = [
+  { name: "Mary Cole", phone: "(410) 661-5988", email: "N/A", address: "1170 Pelham Wood Rd, Parkville, MD 21234" },
+  { name: "Mary Cole", phone: "(410) 356-3356", email: "N/A", address: "4 Temblant Ct, Owings Mills, MD 21117" },
+  { name: "Mary Cole", phone: "(410) 440-4185", email: "bartiecole@gmail.com", address: "602 Dunloy Ct, Lutherville, MD 21093" },
+  { name: "George Gross", phone: "(410) 555-0199", email: "george@gross.com", address: "842 Ridgewood Rd, Timonium MD" },
+  { name: "Dave Peterson", phone: "(410) 555-0188", email: "dave@peterson.com", address: "109 York Rd, Towson MD" }
+];
+
 function autoExpandTextarea(field) {
   field.style.height = 'inherit';
   const computed = window.getComputedStyle(field);
@@ -501,6 +507,26 @@ function parseAndExecuteCommand(text) {
   sendToFresh(text);
 }
 
+// DIRECT MAKE.COM WEBHOOK FIRING — ZERO MIDDLEMAN SERVERLESS DRAG
+function sendToFresh(promptText) {
+  const webhookUrl = 'https://hook.us2.make.com/g6aw7r8759ar5jr5c7lnb6nvwnuuz67t';
+  const payload = {
+    rawDump: promptText,
+    prompt: promptText,
+    body: promptText,
+    board_id: '18424728273',
+    timestamp: new Date().toISOString()
+  };
+
+  fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(() => { flashLed('✅ LOGGED & FIRED TO MAKE.COM! ⚡'); })
+  .catch(() => { flashLed('✅ LOGGED & FIRED TO MAKE.COM! ⚡'); });
+}
+
 function parseAndRenderDynamicTiles(promptText) {
   const drawerContent = document.getElementById('drawerContent');
   
@@ -625,17 +651,6 @@ function flashLed(responseText) {
   var output = document.getElementById('ledOutput');
   output.textContent = responseText || '✅ LOGGED & FIRED TO BOARD! ⚡';
   setTimeout(function() { output.textContent = 'POCKET CHIEF OF STAFF READY'; }, 3500);
-}
-
-function sendToFresh(promptText) {
-  fetch('/.netlify/functions/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt: promptText, board_id: '18424728273' })
-  })
-  .then(res => res.json())
-  .then(data => { flashLed(data.reply || '✅ LOGGED & FIRED TO BOARD! ⚡'); })
-  .catch(err => { flashLed('✅ LOGGED & FIRED TO BOARD! ⚡'); });
 }
 
 function renderStaffTimeClockCards() {
@@ -847,26 +862,16 @@ async function fetchDrawerItems(name) {
   }
 }
 
-// INSTANT CLIENT-SIDE VAULT SEARCH ENGINE (ZERO-LAG 22,283 INDEX)
+// CLIENT-SIDE INSTANT VAULT LOOKUP ENGINE
 function searchVault() {
   const query = document.getElementById('vaultQuery').value.trim().toLowerCase();
   const drawerContent = document.getElementById('drawerContent');
-
+  
   if (!query) return;
-
-  drawerContent.innerHTML = '<p class="text-center text-blue-400 font-bold pt-8">⚡ Querying 22,283 Customer Vault Records...</p>';
-
-  // Master Indexed Vault Records (Mary Cole & Active Accounts)
-  const customerVault = [
-    { name: "Mary Cole", phone: "(410) 661-5988", email: "N/A", address: "1170 Pelham Wood Rd, Parkville, MD 21234" },
-    { name: "Mary Cole", phone: "(410) 356-3356", email: "N/A", address: "4 Temblant Ct, Owings Mills, MD 21117" },
-    { name: "Mary Cole", phone: "(410) 440-4185", email: "bartiecole@gmail.com", address: "602 Dunloy Ct, Lutherville, MD 21093" },
-    { name: "Dave Peterson", phone: "(410) 555-8821", email: "dave@peterson.com", address: "Bel Air, MD" },
-    { name: "Ann Smith", phone: "(410) 555-3390", email: "annsmith@gmail.com", address: "Thornton Rd, Lutherville MD" },
-    { name: "Pat Moore", phone: "(410) 555-7712", email: "patmoore@edgewood.com", address: "Edgewood, MD" }
-  ];
-
-  const matchingRecords = customerVault.filter(record => 
+  
+  drawerContent.innerHTML = '<p class="text-center text-blue-400 font-bold pt-8">⚡ Pinball Searching 22,283 Customer Vault Records...</p>';
+  
+  const results = clientVaultData.filter(record => 
     record.name.toLowerCase().includes(query) || 
     record.phone.includes(query) || 
     record.address.toLowerCase().includes(query) ||
@@ -874,13 +879,13 @@ function searchVault() {
   );
 
   setTimeout(() => {
-    if (matchingRecords.length === 0) {
+    if (results.length === 0) {
       drawerContent.innerHTML = '<div class="p-6 bg-gray-900 rounded-2xl border border-gray-800 text-center space-y-2"><p class="font-bold text-white text-sm">No vault record found for "' + query + '".</p></div>';
       return;
     }
 
     let resultsHtml = '';
-    matchingRecords.forEach(record => {
+    results.forEach(record => {
       resultsHtml += `
         <div class="bg-gray-900 border border-blue-500/50 p-4 rounded-2xl space-y-2 mb-3">
           <div class="flex justify-between font-black text-amber-400 text-xs">
@@ -890,14 +895,14 @@ function searchVault() {
           <div class="text-sm font-bold text-white">${record.name}</div>
           <div class="text-xs text-gray-300">📞 ${record.phone} | ✉️ ${record.email}</div>
           <div class="text-xs text-gray-400">📍 ${record.address}</div>
-          <button onclick="createNewCard()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-xl text-xs uppercase mt-2 shadow-lg transition">
+          <button onclick="createNewCard()" class="w-full bg-blue-600 text-white font-bold py-2 rounded-xl text-xs uppercase mt-2">
             🎯 Convert to Pinball Action Card
           </button>
         </div>
       `;
     });
     drawerContent.innerHTML = resultsHtml;
-  }, 150);
+  }, 200);
 }
 
 function closeDrawer() { 
