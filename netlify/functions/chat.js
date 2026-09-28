@@ -1,22 +1,30 @@
 const https = require('https');
 
-function makePostRequest(url, headers, payload) {
+function makePostRequest(url, payload) {
   return new Promise((resolve, reject) => {
-    const req = https.request(url, {
+    const parsedUrl = new URL(url);
+    const options = {
+      hostname: parsedUrl.hostname,
+      path: parsedUrl.pathname + parsedUrl.search,
       method: 'POST',
-      headers: headers
-    }, (res) => {
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload)
+      }
+    };
+
+    const req = https.request(options, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
-        try {
-          resolve(JSON.parse(data));
-        } catch (e) {
-          resolve({ status: 'ok', raw: data });
-        }
+        resolve({ status: res.statusCode, data: data });
       });
     });
-    req.on('error', reject);
+
+    req.on('error', (err) => {
+      reject(err);
+    });
+
     req.write(payload);
     req.end();
   });
@@ -36,7 +44,7 @@ exports.handler = async function(event, context) {
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const rawPrompt = body.prompt || '';
+    const rawPrompt = body.prompt || body.text || '';
     const targetBoardId = body.board_id || '18424728273';
 
     if (!rawPrompt) {
@@ -47,72 +55,24 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // MAKE.COM PRODUCTION WEBHOOK
-    const makeWebhookUrl = 'https://hook.us2.make.com/nubq7q917ondi9xh88wggb250jwk7af1';
+    // THE BIG ROUTER MAKE.COM WEBHOOK
+    const makeWebhookUrl = 'https://hook.us2.make.com/g6aw7r8759ar5jr5c7lnb6nvwnuuz67t';
 
-    // INTELLIGENT INTENT & MULTI-CARD SPLITTER
-    const sentences = rawPrompt
-      .split(/(?:\. |\n|;|\band then\b|\band also\b|\band the other\b|\bthe other to\b|\bthe last one\b)/i)
-      .map(s => s.trim())
-      .filter(s => s.length > 5);
-
-    let cards = [];
-
-    sentences.forEach(sentence => {
-      const lower = sentence.toLowerCase();
-      let targetGroup = '👑 Empire Operations';
-
-      if (lower.includes('personal') || lower.includes('home') || lower.includes('grocery') || lower.includes('coffee') || lower.includes('family') || lower.includes('honda')) {
-        targetGroup = '🏰 Castle Drawer';
-      } else if (lower.includes('lead') || lower.includes('sale') || lower.includes('quote') || lower.includes('prospect') || lower.includes('buy') || lower.includes('
-
----
-
-### **Action**
-Copy this file into **`netlify/functions/chat.js`** and commit to GitHub. 
-
-Once Netlify builds, speaking into `freshtappything.com` will immediately:
-1. Fire Make.com.
-2. Trigger the automation sound.
-3. Drop the split cards straight to Monday!) || lower.includes('dollar')) {
-        targetGroup = '📈 Pipeline';
-      } else if (lower.includes('appointment') || lower.includes('schedule') || lower.includes('o\'clock') || lower.includes('tomorrow at') || lower.includes('today at')) {
-        targetGroup = '📅 Calendar';
-      } else if (lower.includes('quick') || lower.includes('urgent') || lower.includes('pinball') || lower.includes('knockout')) {
-        targetGroup = '⚡ Pinball Queue';
-      }
-
-      let cleanTitle = sentence.charAt(0).toUpperCase() + sentence.slice(1);
-
-      cards.push({
-        name: cleanTitle,
-        group: targetGroup,
-        boardId: targetBoardId
-      });
+    const payload = JSON.stringify({
+      rawDump: rawPrompt,
+      prompt: rawPrompt,
+      body: rawPrompt,
+      board_id: targetBoardId,
+      timestamp: new Date().toISOString()
     });
 
-    // POST EACH CARD TO MAKE.COM TO TRIGGER AUTOMATIONS & DROP ON BOARD
-    for (const card of cards) {
-      const payload = JSON.stringify({
-        rawDump: card.name,
-        name: card.name,
-        group: card.group,
-        board_id: targetBoardId,
-        timestamp: new Date().toISOString()
-      });
-
-      await makePostRequest(makeWebhookUrl, {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(payload)
-      }, payload);
-    }
+    await makePostRequest(makeWebhookUrl, payload);
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        reply: `⚡ ${cards.length} Action Card${cards.length > 1 ? 's' : ''} Fired to Make.com & Board!`,
-        cardsCreated: cards.length
+        reply: '✅ LOGGED & FIRED TO MAKE ROUTER! ⚡'
       })
     };
 
