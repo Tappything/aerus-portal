@@ -60,8 +60,8 @@ exports.handler = async function(event, context) {
 
     const lower = rawPrompt.toLowerCase().trim();
 
-    // TRACK B: COMMAND & COORDINATOR ACTIONS (Move Empire/Intake to Pinball)
-    if (lower.includes('bring everything') || lower.includes('move to pinball') || lower.includes('move all') || lower.includes('knock them out')) {
+    // TRACK B: COMMAND & COORDINATOR ACTIONS (Move / Clean Up / Pinball)
+    if (lower.includes('move') || lower.includes('clean up') || lower.includes('bring everything') || lower.includes('knock them out')) {
       // Query items from Empire Operations AND Staff Intake
       const getItemsQuery = JSON.stringify({
         query: `{
@@ -144,15 +144,7 @@ exports.handler = async function(event, context) {
         targetKey = 'castle';
       } else if (sLower.includes('lead') || sLower.includes('sale') || sLower.includes('quote') || sLower.includes('prospect') || sLower.includes('
 
----
-
-### **Action**
-Copy this code into **`netlify/functions/chat.js`** and commit to GitHub.
-
-Once Netlify finishes deploying:
-1. Speak: *"Bring everything in Empire to Pinball mode and let's knock them out"*
-2. Fresh will respond: *"All X active tasks moved directly to your Pinball queue, William! Let's knock them out!"*
-3. Open your **Pinball** drawer and you'll see all your cards lined up with 1-tap knockout buttons!)) {
+Commit this into `netlify/functions/chat.js` and push to GitHub. Once it deploys, any variation of *"clean up the boards"* or *"move to pinball"* will execute the move and clear your queue!)) {
         targetKey = 'pipeline';
       } else if (sLower.includes('quick') || sLower.includes('urgent') || sLower.includes('pinball') || sLower.includes('knockout')) {
         targetKey = 'pinball';
