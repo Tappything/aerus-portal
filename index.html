@@ -29,7 +29,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 }
 </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 pb-28">
+<body class="min-h-screen flex items-center justify-center p-4 pb-28 relative">
 
 <div class="max-w-md w-full tapulator-face rounded-3xl p-6 relative overflow-hidden space-y-5">
 
@@ -135,68 +135,68 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </button>
   </div>
 
-  <!-- FEATURES & BENEFITS MODAL -->
-  <div id="featuresModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-6 backdrop-blur-md justify-center">
-    <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-6 max-w-sm mx-auto space-y-5 text-left shadow-2xl max-h-[85vh] overflow-y-auto">
-      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-        <h3 class="text-base font-black text-white flex items-center gap-2">
-          <i class="fa-solid fa-mobile-screen-button text-blue-400"></i> Pocket Chief of Staff
-        </h3>
-        <button onclick="toggleFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
-      </div>
+</div>
 
-      <div class="space-y-2">
-        <h4 class="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-          <i class="fa-solid fa-circle-check"></i> What It Does Right Now
-        </h4>
-        <ul class="space-y-1.5 text-[11px] text-gray-300">
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Voice or type brain dumps instantly</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Everything routes to the right drawer automatically</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Share live cards with customers by text</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Track jobs, repairs, and invoices on the fly</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Built for small business owners who hate software</li>
-        </ul>
-      </div>
-
-      <div class="space-y-2 border-t border-gray-800 pt-3">
-        <h4 class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-          <i class="fa-solid fa-clock"></i> Coming Soon
-        </h4>
-        <ul class="space-y-1.5 text-[11px] text-gray-300">
-          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Customer job tracking links — they see their repair status live</li>
-          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Stripe tap-to-pay invoicing in the field</li>
-          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Two-way card messaging with customers</li>
-          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Team staff dashboards</li>
-          <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Subscriber onboarding — get your own Pocket Chief of Staff</li>
-        </ul>
-      </div>
-
-      <button onclick="toggleFeaturesModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
-        Got It
-      </button>
-    </div>
-  </div>
-
-  <!-- PERSISTENT CARD DRAWER MODAL -->
-  <div id="drawerModal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col p-4 backdrop-blur-md">
-    <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
-      <h3 id="drawerTitle" class="text-lg font-black text-white flex items-center gap-2">
-        <i class="fa-solid fa-folder-open text-blue-400"></i> Drawer
+<!-- FEATURES & BENEFITS MODAL (MOVED OUTSIDE .tapulator-face DIRECTLY UNDER BODY) -->
+<div id="featuresModal" class="fixed inset-0 bg-black/95 z-50 hidden flex-col p-6 backdrop-blur-md justify-center">
+  <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-6 max-w-sm mx-auto space-y-5 text-left shadow-2xl max-h-[85vh] overflow-y-auto">
+    <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+      <h3 class="text-base font-black text-white flex items-center gap-2">
+        <i class="fa-solid fa-mobile-screen-button text-blue-400"></i> Pocket Chief of Staff
       </h3>
-      <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-sm bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+      <button onclick="toggleFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
     </div>
 
-    <!-- SUB-NAV FOR EMPIRE (SHOP OPS TOGGLE) -->
-    <div id="empireSubNav" class="hidden flex items-center gap-2 mb-3">
-      <button onclick="switchEmpireView('main')" id="subEmpireMain" class="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg">Empire Hub</button>
-      <button onclick="switchEmpireView('shop_ops')" id="subEmpireShop" class="bg-gray-800 text-gray-300 hover:bg-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg">🛠️ Shop Ops Bench</button>
+    <div class="space-y-2">
+      <h4 class="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+        <i class="fa-solid fa-circle-check"></i> What It Does Right Now
+      </h4>
+      <ul class="space-y-1.5 text-[11px] text-gray-300">
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Voice or type brain dumps instantly</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Everything routes to the right drawer automatically</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Share live cards with customers by text</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Track jobs, repairs, and invoices on the fly</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Built for small business owners who hate software</li>
+      </ul>
     </div>
 
-    <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300">
-      <p class="text-center text-gray-500 pt-8">Loading cards...</p>
+    <div class="space-y-2 border-t border-gray-800 pt-3">
+      <h4 class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+        <i class="fa-solid fa-clock"></i> Coming Soon
+      </h4>
+      <ul class="space-y-1.5 text-[11px] text-gray-300">
+        <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Customer job tracking links — they see their repair status live</li>
+        <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Stripe tap-to-pay invoicing in the field</li>
+        <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Two-way card messaging with customers</li>
+        <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Team staff dashboards</li>
+        <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Subscriber onboarding — get your own Pocket Chief of Staff</li>
+      </ul>
     </div>
+
+    <button onclick="toggleFeaturesModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
+      Got It
+    </button>
+  </div>
+</div>
+
+<!-- PERSISTENT CARD DRAWER MODAL (MOVED OUTSIDE .tapulator-face DIRECTLY UNDER BODY) -->
+<div id="drawerModal" class="fixed inset-0 bg-black/90 z-50 hidden flex-col p-4 backdrop-blur-md">
+  <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
+    <h3 id="drawerTitle" class="text-lg font-black text-white flex items-center gap-2">
+      <i class="fa-solid fa-folder-open text-blue-400"></i> Drawer
+    </h3>
+    <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-sm bg-gray-800 px-3 py-1 rounded-lg">Close</button>
   </div>
 
+  <!-- SUB-NAV FOR EMPIRE (SHOP OPS TOGGLE) -->
+  <div id="empireSubNav" class="hidden flex items-center gap-2 mb-3">
+    <button onclick="switchEmpireView('main')" id="subEmpireMain" class="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg">Empire Hub</button>
+    <button onclick="switchEmpireView('shop_ops')" id="subEmpireShop" class="bg-gray-800 text-gray-300 hover:bg-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg">🛠️ Shop Ops Bench</button>
+  </div>
+
+  <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300">
+    <p class="text-center text-gray-500 pt-8">Loading cards...</p>
+  </div>
 </div>
 
 <!-- UNIFIED BOTTOM INPUT BAR -->
@@ -362,9 +362,7 @@ function loadDrawerItems(drawerName) {
       var isInvoice = drawerName.toLowerCase().includes('treasury') || drawerName.toLowerCase().includes('invoice') || drawerName.toLowerCase().includes('shop');
 
       var itemsHtml = items.map(function(item) {
-        var hasDollar = item.name && (item.name.includes('
-
-Paste that straight into `index.html` on GitHub, hit **Commit**, and you are set! 💙🎩🔥) || isInvoice);
+        var hasDollar = item.name && (item.name.includes('$') || isInvoice);
         var payButton = hasDollar ? '<a href="' + STRIPE_CHECKOUT_URL + '" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow"><i class="fa-solid fa-credit-card"></i> Pay Now</a>' : '';
 
         return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 flex justify-between items-center">' +
@@ -449,7 +447,8 @@ function openDrawer(name) {
     empireSub.classList.add('hidden');
   }
 
-  document.getElementById('drawerModal').classList.remove('hidden');
+  var drawerModal = document.getElementById('drawerModal');
+  drawerModal.classList.remove('hidden');
   loadDrawerItems(name);
 }
 
