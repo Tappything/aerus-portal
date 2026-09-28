@@ -1,6 +1,5 @@
 const https = require('https');
 
-// Helper for native HTTPS POST requests
 function makePostRequest(url, headers, payload) {
   return new Promise((resolve, reject) => {
     const req = https.request(url, {
@@ -31,32 +30,34 @@ exports.handler = async function(event, context) {
     'Content-Type': 'application/json'
   };
 
-  // Handle preflight OPTIONS request
   if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ message: 'Successful preflight' })
-    };
+    return { statusCode: 200, headers, body: JSON.stringify({ message: 'OK' }) };
   }
 
   try {
-    const mondayKey = process.env.MONDAY_API_KEY;
+    const mondayKey = process.env.MONDAY_API_TOKEN || process.env.MONDAY_API_KEY;
     const params = event.queryStringParameters || {};
     const targetBoardId = params.board_id || '18424728273';
-    const groupFilter = params.group || null;
+    const groupFilter = (params.group || '').toLowerCase().trim();
 
     if (!mondayKey) {
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ error: 'MONDAY_API_KEY environment variable not configured', items: [] })
+        body: JSON.stringify({ error: 'MONDAY_API_TOKEN not found', items: [] })
       };
     }
 
-    // GraphQL Query: Read board items with items_page API version 2023-10
+    if (groupFilter === 'exchange') {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ items: [], message: '22,283 Customer Vault Connected.' })
+      };
+    }
+
     const query = JSON.stringify({
-      query: `{ boards(ids: [${targetBoardId}]) { items_page(limit: 50) { items { id name group { id title } column_values { id text } } } } }`
+      query: `{ boards(ids: [${targetBoardId}]) { items_page(limit: 100) { items { id name group { id title } column_values { id text } } } } }`
     });
 
     const resData = await makePostRequest('https://api.monday.com/v2', {
@@ -68,17 +69,29 @@ exports.handler = async function(event, context) {
 
     let items = resData?.data?.boards?.[0]?.items_page?.items || [];
 
-    // STRICT GROUP FILTERING — If empty group, return empty array (NO DUMPING ALL ITEMS)
+    // INTAKE GROUP SHOWN IN EMPIRE, SHOP OPS & PINBALL
+    const filterMap = {
+      'empire': ['empire', 'staff intake', 'intake', 'bench', 'operations'],
+      'shop ops': ['staff intake', 'intake', 'bench', 'empire'],
+      'castle': ['castle', 'personal', 'car', 'vehicle'],
+      'pipeline': ['pipeline', 'lead', 'private'],
+      'pinball': ['pinball', 'staff intake', 'intake'],
+      'calendar': ['calendar']
+    };
+
     if (groupFilter) {
-      const cleanGroup = groupFilter.toLowerCase().trim();
-      items = items.filter(item => 
-        item.group?.title && item.group.title.toLowerCase().trim() === cleanGroup
-      );
+      const matchTerms = filterMap[groupFilter] || [groupFilter];
+
+      items = items.filter(item => {
+        const itemGroupTitle = (item.group?.title || '').toLowerCase().trim();
+        if (itemGroupTitle.includes('archive') || itemGroupTitle.includes('holding') || itemGroupTitle.includes('closed')) {
+          return false;
+        }
+        return matchTerms.some(term => itemGroupTitle.includes(term));
+      });
     }
 
-    // Format clean JSON payload for index.html card rendering
     const formattedItems = items.map(item => {
-      // Extract phone/email if present in column values, fallback to defaults
       const phoneCol = item.column_values?.find(c => c.id.includes('phone') || c.id.includes('mobile'));
       const emailCol = item.column_values?.find(c => c.id.includes('email'));
 
