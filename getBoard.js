@@ -69,7 +69,7 @@ exports.handler = async function(event, context) {
 
     let items = resData?.data?.boards?.[0]?.items_page?.items || [];
 
-    // INTAKE GROUP SHOWN IN EMPIRE, SHOP OPS & PINBALL
+    // MAP DRAWERS TO INCLUDE INCOMING INTAKE ITEMS
     const filterMap = {
       'empire': ['empire', 'staff intake', 'intake', 'bench', 'operations'],
       'shop ops': ['staff intake', 'intake', 'bench', 'empire'],
@@ -84,6 +84,7 @@ exports.handler = async function(event, context) {
 
       items = items.filter(item => {
         const itemGroupTitle = (item.group?.title || '').toLowerCase().trim();
+        // Exclude legacy archives
         if (itemGroupTitle.includes('archive') || itemGroupTitle.includes('holding') || itemGroupTitle.includes('closed')) {
           return false;
         }
