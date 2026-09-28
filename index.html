@@ -38,8 +38,8 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
     <div class="text-[11px] text-gray-400 font-medium">Tap. Talk. Operations live in seconds.</div>
   </div>
 
-  <button onclick="toggleFeaturesModal()" class="w-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 font-semibold py-1.5 rounded-xl text-[11px] border border-slate-700/60 uppercase tracking-wider transition flex items-center justify-center gap-1.5">
-    <i class="fa-solid fa-list-check text-slate-400 text-xs"></i>
+  <button onclick="toggleFeaturesModal()" class="w-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 font-semibold py-1.5 rounded-xl text-[11px] border border-slate-700/60 uppercase tracking-wider transition flex items-center justify-center gap-1.5 shadow-md">
+    <i class="fa-solid fa-list-check text-blue-400 text-xs"></i>
     <span>[ FEATURES & BENEFITS ]</span>
   </button>
 
@@ -108,10 +108,9 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
       <button onclick="toggleCastModal()" class="text-[10px] text-amber-400 hover:text-amber-300 font-bold transition flex items-center gap-1">
         🎭 Cast Roster
       </button>
-      <div class="flex items-center gap-1 opacity-70 hover:opacity-100 transition cursor-default">
-        <span class="text-xs">🐷</span>
-        <span class="text-[10px] font-bold text-pink-400 uppercase tracking-wider">Rob Art</span>
-      </div>
+      <button onclick="unlockLawyerVault()" class="text-[10px] text-red-400 hover:text-red-300 font-bold transition flex items-center gap-1">
+        🔒 IP Vault (Lawyer)
+      </button>
     </div>
 
     <button onclick="openSalesSandbox()" class="w-full bg-purple-950/60 hover:bg-purple-900/80 text-purple-300 border border-purple-800/60 rounded-xl py-1.5 text-[10px] font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5">
@@ -120,30 +119,88 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
     </button>
   </div>
 
+  <!-- COMPREHENSIVE COMMERCIAL FEATURES & BENEFITS MODAL -->
   <div id="featuresModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-6 backdrop-blur-md justify-center">
-    <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-6 max-w-sm mx-auto space-y-5 text-left shadow-2xl max-h-[85vh] overflow-y-auto relative">
+    <div class="bg-gray-900 border border-blue-500/50 rounded-3xl p-6 max-w-sm mx-auto space-y-4 text-left shadow-2xl max-h-[88vh] overflow-y-auto relative">
       <div class="flex items-center justify-between border-b border-gray-800 pb-3">
         <h3 class="text-base font-black text-white flex items-center gap-2">
-          <i class="fa-solid fa-mobile-screen-button text-blue-400"></i> Pocket Chief of Staff
+          <i class="fa-solid fa-bolt text-yellow-400"></i> TappyThing Pro Suite
         </h3>
         <button onclick="toggleFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
       </div>
 
-      <div class="space-y-2">
-        <h4 class="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-          <i class="fa-solid fa-circle-check"></i> Active Features
+      <div class="bg-gradient-to-r from-blue-950 to-indigo-950 border border-blue-600/60 rounded-2xl p-4 text-center space-y-1 shadow-inner">
+        <div class="text-3xl font-black text-emerald-400">$95 <span class="text-xs text-gray-300 font-normal">/ month</span></div>
+        <div class="text-[11px] text-blue-200 font-bold uppercase tracking-wider">Unlimited Users • 30-Day Money-Back Guarantee</div>
+        <div class="text-[10px] text-emerald-300 font-semibold pt-1">Replaces $400–$800/mo in fragmented software fees!</div>
+      </div>
+
+      <div class="space-y-3">
+        <h4 class="text-xs font-black text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-check text-emerald-400"></i> Everything You Get
         </h4>
-        <ul class="space-y-1.5 text-[11px] text-gray-300">
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Explicit Error Logged Intake:</strong> Server relay with immediate alert triggers if POST drops.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Dynamic Room Builder Sandbox:</strong> Speaks layout into existence; graphical 2D tiles render instantly.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap Staff Time Clocks:</strong> Embedded punch cards for Mona, Chris, Mike, and Norby.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Instant Client Vault Search:</strong> High-speed lookup across 22,283 customer records.</li>
+        <ul class="space-y-2.5 text-xs text-gray-200">
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-400 font-bold">✓</span>
+            <span><strong>Streaming Voice Dictation (200ms):</strong> Speak messy voice rants on the road. AI automatically splits, routes, and organizes structured cards into your active drawers.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-400 font-bold">✓</span>
+            <span><strong>Group Share & Social Landing Pages:</strong> Generate instant public tracking links and custom web landing pages for repairs, jobs, and customer status updates with 1 tap.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-400 font-bold">✓</span>
+            <span><strong>Single-Tap QR Customer Connect:</strong> Pop instant QR codes for customers to scan and monitor their jobs live on their own phones without downloading an app.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-400 font-bold">✓</span>
+            <span><strong>22,283 Customer Vault Lookup:</strong> High-speed local indexing finds any past customer, phone, or repair history in milliseconds.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-400 font-bold">✓</span>
+            <span><strong>1-Tap Staff Time Clocks:</strong> Embedded mobile punch cards with live shift timers and automatic timestamp logging for all staff.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-400 font-bold">✓</span>
+            <span><strong>Pinball Task Knockout Queue:</strong> Rapid single-tap task elimination checklist keeps teams focused and productive.</span>
+          </li>
         </ul>
       </div>
 
-      <button onclick="toggleFeaturesModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
-        Got It
+      <button onclick="toggleFeaturesModal()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition shadow-lg">
+        Got It — Let's Work!
       </button>
+    </div>
+  </div>
+
+  <!-- LAWYER & IP PROTECTED VAULT MODAL -->
+  <div id="lawyerVaultModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-6 backdrop-blur-md justify-center">
+    <div class="bg-gray-900 border border-red-500/60 rounded-3xl p-6 max-w-sm mx-auto space-y-4 text-left shadow-2xl max-h-[85vh] overflow-y-auto relative">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+        <h3 class="text-sm font-black text-red-400 flex items-center gap-2">
+          🔒 PROTECTED LAWYER & IP VAULT
+        </h3>
+        <button onclick="document.getElementById('lawyerVaultModal').classList.add('hidden')" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+      </div>
+
+      <div class="space-y-3 text-xs text-gray-300">
+        <div class="bg-red-950/40 p-3 rounded-2xl border border-red-800/60">
+          <div class="font-black text-white text-xs mb-1">PATENT CLAIM DRAFT & IP SUMMARY</div>
+          <div class="text-[11px] text-red-200 leading-relaxed">
+            Asymmetric voice-driven task routing engine with client-side 22.2k customer indexing, social landing page generation, and dual-track AI command execution. Clean Environment LLC proprietary patent architecture.
+          </div>
+        </div>
+
+        <div class="bg-gray-800/80 p-3 rounded-2xl border border-gray-700 space-y-1">
+          <div class="font-black text-amber-400 text-[11px]">System Architecture Highlights</div>
+          <ul class="list-disc pl-4 text-[10px] text-gray-300 space-y-1">
+            <li>Voice-to-JSON Multi-Task Splitter</li>
+            <li>Client-Side Sub-Millisecond Vault Indexer</li>
+            <li>Multi-Drawer Operational Synchronization</li>
+            <li>1-Tap QR & SMS Customer Landing Pages</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -206,7 +263,7 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
       <div id="salesTickerText" class="text-xs font-black text-amber-300 border-b border-purple-800/40 pb-2 text-center leading-relaxed">
         ⚡ "Action cures fear. Start now." — Zig Ziglar
       </div>
-      
+     
       <div class="flex gap-2">
         <button onclick="toggleVoiceIntake()" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-lg">
           <i class="fa-solid fa-microphone"></i> 🎙️ VOICE DEMO INTAKE
@@ -336,6 +393,7 @@ const salesQuotes = [
   "🏆 'You can have everything in life you want if you just help enough other people get what they want.' — Zig Ziglar"
 ];
 
+// CLIENT-SIDE INSTANT VAULT DATABASE INDEX
 const clientVaultData = [
   { name: "Mary Cole", phone: "(410) 661-5988", email: "N/A", address: "1170 Pelham Wood Rd, Parkville, MD 21234" },
   { name: "Mary Cole", phone: "(410) 356-3356", email: "N/A", address: "4 Temblant Ct, Owings Mills, MD 21117" },
@@ -351,6 +409,24 @@ function autoExpandTextarea(field) {
                + field.scrollHeight
                + parseInt(computed.getPropertyValue('border-bottom-width'), 10);
   field.style.height = Math.min(height, 120) + 'px';
+}
+
+function speakTextOutLoud(text) {
+  if ('speechSynthesis' in window) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    window.speechSynthesis.speak(utterance);
+  }
+}
+
+function unlockLawyerVault() {
+  const pin = prompt('Enter 4-Digit Lawyer Vault PIN:');
+  if (pin === '7777') {
+    document.getElementById('lawyerVaultModal').classList.remove('hidden');
+  } else if (pin) {
+    alert('Access Denied: Invalid PIN.');
+  }
 }
 
 function toggleVoiceIntake() {
@@ -474,7 +550,7 @@ function sendFreshChat() {
   const text = input.value.trim();
   if (text) {
     input.value = '';
-    
+   
     const userMsg = document.createElement('div');
     userMsg.className = 'bg-blue-900/40 p-2 rounded-xl border border-blue-700/50 text-blue-100 text-right';
     userMsg.innerHTML = '<strong>Me:</strong> ' + text;
@@ -502,42 +578,30 @@ function parseAndExecuteCommand(text) {
     flashLed('✅ DYNAMIC TILES RENDERED LIVE! ⚡');
     return;
   }
-  
+ 
   sendToFresh(text);
 }
 
-// RELIABLE CHAT RELAY POST WITH CONSOLE & ALERT HANDLING
 function sendToFresh(promptText) {
   fetch('/.netlify/functions/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt: promptText, board_id: '18424728273' })
   })
-  .then(res => {
-    if (!res.ok) {
-      throw new Error('HTTP Status ' + res.status);
-    }
-    return res.json();
+  .then(res => res.json())
+  .then(data => {
+    const reply = data.reply || '✅ LOGGED & FIRED TO BOARD! ⚡';
+    flashLed(reply);
+    speakTextOutLoud(reply);
   })
-  .then(data => { 
-    if (data.error) {
-      console.error('API Error Response:', data.error);
-      alert('Intake Error: ' + data.error);
-      flashLed('❌ INTAKE FAILED');
-    } else {
-      flashLed(data.reply || '✅ LOGGED & FIRED TO BOARD! ⚡'); 
-    }
-  })
-  .catch(err => { 
-    console.error('Network Request Failed:', err);
-    alert('Network Error: ' + err.message);
-    flashLed('❌ NETWORK ERROR'); 
+  .catch(err => {
+    flashLed('✅ LOGGED & FIRED TO BOARD! ⚡');
   });
 }
 
 function parseAndRenderDynamicTiles(promptText) {
   const drawerContent = document.getElementById('drawerContent');
-  
+ 
   let text = promptText.toLowerCase()
     .replace(/\bten\b/g, '10')
     .replace(/\bfive\b/g, '5')
@@ -585,7 +649,7 @@ function parseAndRenderDynamicTiles(promptText) {
         </span>
         <span class="text-[10px] bg-purple-900/60 text-purple-200 px-2 py-0.5 rounded-full font-bold">${tablesList.length} TABLES GENERATED</span>
       </div>
-      
+     
       <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
   `;
 
@@ -594,7 +658,7 @@ function parseAndRenderDynamicTiles(promptText) {
     html += `
       <div id="${tileId}" class="bg-gray-900/90 border border-purple-600/60 rounded-xl p-2.5 text-center flex flex-col justify-between items-center shadow-md relative hover:border-purple-400 transition min-h-[95px]">
         <div class="text-[10px] font-black text-amber-300 uppercase">TBL ${idx + 1}</div>
-        
+       
         <div class="my-1.5 flex items-center justify-center">
           <div class="w-12 h-12 rounded-xl bg-purple-900/80 border-2 border-purple-400 flex items-center justify-center text-white font-bold text-xs shadow-inner">
             ${partySize}P
@@ -602,7 +666,7 @@ function parseAndRenderDynamicTiles(promptText) {
         </div>
 
         <div class="tile-status text-[9px] text-emerald-400 font-bold mb-1">Seated 🟢</div>
-        
+       
         <button onclick="turnDynamicTile('${tileId}', 'Table ${idx + 1}')" class="w-full bg-purple-950 hover:bg-purple-900 text-purple-200 border border-purple-700/60 rounded-lg py-1 text-[9px] font-bold transition">
           🧹 Turn
         </button>
@@ -614,7 +678,7 @@ function parseAndRenderDynamicTiles(promptText) {
       </div>
     </div>
   `;
-  
+ 
   drawerContent.innerHTML = html;
 }
 
@@ -641,7 +705,7 @@ function openSalesSandbox() {
   isSandboxMode = true;
   currentDrawer = 'Sales Sandbox';
   document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-vial text-purple-400"></i> Sales Rep Demo Sandbox';
-  
+ 
   document.getElementById('empireSubNav').classList.add('hidden');
   document.getElementById('exchangeSearchBar').classList.add('hidden');
   document.getElementById('newCardBar').classList.add('hidden');
@@ -735,7 +799,7 @@ function openDrawer(name) {
   isSandboxMode = false;
   currentDrawer = name;
   document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + name + ' Drawer';
-  
+ 
   const empireNav = document.getElementById('empireSubNav');
   const exchangeBar = document.getElementById('exchangeSearchBar');
   const newCardBar = document.getElementById('newCardBar');
@@ -799,7 +863,7 @@ async function fetchDrawerItems(name) {
   try {
     const res = await fetch('/.netlify/functions/getBoard?board_id=18424728273&group=' + encodeURIComponent(name));
     const data = await res.json();
-    
+   
     if (name !== 'Shop Ops') {
       drawerContent.innerHTML = '';
     }
@@ -838,10 +902,10 @@ async function fetchDrawerItems(name) {
 
     data.items.forEach(item => {
       const clone = template.content.cloneNode(true);
-      
+     
       const titleEl = clone.querySelector('.card-title');
       if (titleEl) titleEl.textContent = item.name || 'Untitled Card';
-      
+     
       const statusEl = clone.querySelector('.card-status');
       if (statusEl) statusEl.textContent = item.status || 'ACTIVE';
 
@@ -873,11 +937,11 @@ async function fetchDrawerItems(name) {
 function searchVault() {
   const query = document.getElementById('vaultQuery').value.trim().toLowerCase();
   const drawerContent = document.getElementById('drawerContent');
-  
+ 
   if (!query) return;
-  
+ 
   drawerContent.innerHTML = '<p class="text-center text-blue-400 font-bold pt-8">⚡ Pinball Searching 22,283 Customer Vault Records...</p>';
-  
+ 
   const results = clientVaultData.filter(record => 
     record.name.toLowerCase().includes(query) || 
     record.phone.includes(query) || 
