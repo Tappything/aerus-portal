@@ -52,6 +52,7 @@ exports.handler = async function(event, context) {
       };
     }
 
+    // Exchange Vault handles search separately
     if (groupFilter && groupFilter.toLowerCase().trim() === 'exchange') {
       return {
         statusCode: 200,
@@ -64,7 +65,7 @@ exports.handler = async function(event, context) {
     }
 
     const query = JSON.stringify({
-      query: `{ boards(ids: [${targetBoardId}]) { items_page(limit: 50) { items { id name group { id title } column_values { id text } } } } }`
+      query: `{ boards(ids: [${targetBoardId}]) { items_page(limit: 100) { items { id name group { id title } column_values { id text } } } } }`
     });
 
     const resData = await makePostRequest('https://api.monday.com/v2', {
@@ -76,23 +77,27 @@ exports.handler = async function(event, context) {
 
     let items = resData?.data?.boards?.[0]?.items_page?.items || [];
 
-    // KEYWORD MAPPING INCLUDING CALENDAR APPOINTMENTS
-    const groupMapping = {
-      'calendar': ['appointment', 'calendar', 'schedule', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 'delivery', 'visit', 'dentist'],
-      'shop ops': ['staff intake — pending review', 'bench log'],
-      'castle': ['personal', 'car', 'vehicle', 'family'],
-      'empire': ['showroom', 'announcements', 'lounge', 'business', 'team', 'operations', 'shop ops'],
-      'pipeline': ['private', 'leads', 'prospect', 'sales']
+    // STRICT EXACT GROUP NAME TARGETING — NO FALLBACK LEAKS
+    const strictGroupMap = {
+      'empire': ['empire operations', '👑 empire operations'],
+      'castle': ['castle drawer', '🏰 castle drawer'],
+      'pipeline': ['pipeline', '📈 pipeline'],
+      'calendar': ['calendar', '📅 calendar'],
+      'pinball': ['pinball queue', '⚡ pinball queue'],
+      'shop ops': ['staff intake — pending review', '📥 staff intake — pending review', 'shop ops']
     };
 
     if (groupFilter) {
-      const cleanGroup = groupFilter.toLowerCase().trim();
-      const mappedKeywords = groupMapping[cleanGroup] || [cleanGroup];
+      const cleanFilter = groupFilter.toLowerCase().trim();
+      const targetGroups = strictGroupMap[cleanFilter] || [cleanFilter];
 
       items = items.filter(item => {
         const itemGroupTitle = (item.group?.title || '').toLowerCase().trim();
-        const itemName = (item.name || '').toLowerCase().trim();
-        return mappedKeywords.some(keyword => itemGroupTitle.includes(keyword) || itemName.includes(keyword));
+        // Exclude anything in Archive / Holding
+        if (itemGroupTitle.includes('archive') || itemGroupTitle.includes('holding')) {
+          return false;
+        }
+        return targetGroups.some(target => itemGroupTitle === target || itemGroupTitle.includes(target));
       });
     }
 
