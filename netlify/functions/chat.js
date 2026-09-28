@@ -35,7 +35,8 @@ exports.handler = async function(event, context) {
   }
 
   try {
-    const mondayKey = process.env.MONDAY_API_KEY;
+    // SUPPORT BOTH MONDAY_API_TOKEN AND MONDAY_API_KEY
+    const mondayKey = process.env.MONDAY_API_TOKEN || process.env.MONDAY_API_KEY;
     const body = JSON.parse(event.body || '{}');
     const rawPrompt = body.prompt || '';
     const targetBoardId = body.board_id || '18424728273';
@@ -45,6 +46,14 @@ exports.handler = async function(event, context) {
         statusCode: 400,
         headers,
         body: JSON.stringify({ reply: 'No prompt received.', itemsCreated: 0 })
+      };
+    }
+
+    if (!mondayKey) {
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ reply: 'Server Error: MONDAY_API_TOKEN not found in Netlify.', itemsCreated: 0 })
       };
     }
 
@@ -58,9 +67,9 @@ exports.handler = async function(event, context) {
 
     // INTELLIGENT MULTI-ACTION VOICE SPLITTER
     const sentences = rawPrompt
-      .split(/(?:\. |\n|;|\band then\b|\band also\b|\band the other to\b|\band the other\b|\bthe other to\b|\bthe last one\b)/i)
+      .split(/(?:\. |\n|;|\band then\b|\band also\b|\band the other to\b|\band the other\b|\bthe other to\b|\bthe last one\b|, (?=[a-zA-Z]{3,}))/i)
       .map(s => s.trim())
-      .filter(s => s.length > 5);
+      .filter(s => s.length > 3);
 
     let parsedCards = [];
 
@@ -75,9 +84,12 @@ exports.handler = async function(event, context) {
 ---
 
 ### **Action**
-Copy this code into **`netlify/functions/chat.js`** and commit to GitHub. 
+Copy and paste this into **`netlify/functions/chat.js`** and commit to GitHub. 
 
-Once Netlify builds, speak the 3-upright task into `freshtappything.com`. It will split into clean cards, drop directly onto Monday, and show up immediately inside your **Empire** and **Pipeline** drawers!) || lower.includes('dollar')) {
+Once Netlify finishes deploying (takes ~15 seconds), test your voice drop again:
+* It will read your `MONDAY_API_TOKEN` token.
+* Create the cards directly in **`👑 Empire Operations`**, **`🏰 Castle Drawer`**, and **`📈 Pipeline`**.
+* The cards will immediately appear inside your TappyThing drawers!) || lower.includes('dollar')) {
         targetKey = 'pipeline';
       } else if (lower.includes('quick') || lower.includes('urgent') || lower.includes('pinball') || lower.includes('now') || lower.includes('knockout')) {
         targetKey = 'pinball';
@@ -95,29 +107,27 @@ Once Netlify builds, speak the 3-upright task into `freshtappything.com`. It wil
 
     let createdTitles = [];
 
-    if (mondayKey) {
-      for (const card of parsedCards) {
-        const query = JSON.stringify({
-          query: `mutation {
-            create_item (
-              board_id: ${targetBoardId},
-              group_id: "${card.groupId}",
-              item_name: "${card.title.replace(/"/g, '\\"')}"
-            ) {
-              id
-            }
-          }`
-        });
+    for (const card of parsedCards) {
+      const query = JSON.stringify({
+        query: `mutation {
+          create_item (
+            board_id: ${targetBoardId},
+            group_id: "${card.groupId}",
+            item_name: "${card.title.replace(/"/g, '\\"')}"
+          ) {
+            id
+          }
+        }`
+      });
 
-        await makePostRequest('https://api.monday.com/v2', {
-          'Content-Type': 'application/json',
-          'Authorization': mondayKey,
-          'API-Version': '2023-10',
-          'Content-Length': Buffer.byteLength(query)
-        }, query);
+      await makePostRequest('https://api.monday.com/v2', {
+        'Content-Type': 'application/json',
+        'Authorization': mondayKey,
+        'API-Version': '2023-10',
+        'Content-Length': Buffer.byteLength(query)
+      }, query);
 
-        createdTitles.push(`${card.title} ➔ ${card.groupName}`);
-      }
+      createdTitles.push(`${card.title} ➔ ${card.groupName}`);
     }
 
     const replyMessage = `⚡ ${parsedCards.length} ACTION CARD${parsedCards.length > 1 ? 'S' : ''} FIRED DIRECTLY TO BOARD!\n` + 
@@ -137,7 +147,7 @@ Once Netlify builds, speak the 3-upright task into `freshtappything.com`. It wil
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ reply: 'Error parsing voice intake: ' + err.message, cardsCreated: 0 })
+      body: JSON.stringify({ reply: 'Error: ' + err.message, cardsCreated: 0 })
     };
   }
 };
