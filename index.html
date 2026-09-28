@@ -15,6 +15,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 .key-secondary { background: #1e293b; border: 1px solid #334155; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
 .key-secondary:hover { background: #273549; }
 .key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; }
+.key-pinball { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: 1px solid #8b5cf6; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); }
 
 @keyframes pulse-red {
   0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
@@ -54,10 +55,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     <span>[ FEATURES & BENEFITS ]</span>
   </button>
 
-  <!-- ASYMMETRIC KEYPAD LAYOUT -->
+  <!-- 6-BUTTON ASYMMETRIC KEYPAD LAYOUT -->
   <div id="drawersContainer" class="space-y-3">
     
-    <!-- TOP DOMINANT KEY (CASTLE 🏰) -->
+    <!-- 1. TOP DOMINANT KEY (CASTLE 🏰) -->
     <button onclick="openDrawer('Castle')" class="key-primary w-full rounded-2xl p-4 text-left transition flex items-center justify-between">
       <div>
         <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
@@ -69,19 +70,24 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <i class="fa-solid fa-chevron-right text-blue-300 text-sm"></i>
     </button>
 
-    <!-- MIDDLE ASYMMETRIC PAIR -->
+    <!-- 2 & 3. MIDDLE ASYMMETRIC PAIR (EMPIRE w/ SHOP OPS + PIPELINE) -->
     <div class="grid grid-cols-5 gap-3">
-      <!-- LARGE 3-COL KEY (EMPIRE 👑) -->
-      <button onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[85px]">
-        <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
-          <span>2. Empire 👑</span>
-          <i class="fa-solid fa-crown text-amber-500"></i>
+      <!-- 2. LARGE 3-COL KEY (EMPIRE 👑 + Shop Ops) -->
+      <button onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[90px]">
+        <div>
+          <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
+            <span>2. Empire 👑</span>
+            <i class="fa-solid fa-crown text-amber-500"></i>
+          </div>
+          <div class="text-[10px] text-gray-400 font-medium mt-0.5">Business Hub & Operations</div>
         </div>
-        <div class="text-[10px] text-gray-400 font-medium">Business Hub & Team Operations</div>
+        <div class="text-[9px] text-amber-300/80 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/40 inline-block w-fit">
+          🛠️ Shop Ops Bench Inside
+        </div>
       </button>
 
-      <!-- SMALLER 2-COL KEY (PIPELINE 🚀) -->
-      <button onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[85px]">
+      <!-- 3. SMALLER 2-COL KEY (PIPELINE 🚀) -->
+      <button onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[90px]">
         <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
           <span>3. Pipeline 🚀</span>
           <i class="fa-solid fa-rocket text-teal-400"></i>
@@ -90,30 +96,33 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       </button>
     </div>
 
-    <!-- BOTTOM ASYMMETRIC TRIO -->
+    <!-- 4, 5, 6. BOTTOM TRIO (CALENDAR, VAULT EXCHANGE, PINBALL TAP-TO-TASK) -->
     <div class="grid grid-cols-3 gap-2.5">
-      <button onclick="openDrawer('Shop Ops')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+      <!-- 4. CALENDAR 📅 -->
+      <button onclick="openDrawer('Calendar')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
         <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
-          <span>4. Shop Ops 🛠️</span>
-          <i class="fa-solid fa-wrench text-gray-500 text-xs"></i>
+          <span>4. Calendar 📅</span>
+          <i class="fa-solid fa-calendar-day text-gray-500 text-xs"></i>
         </div>
-        <div class="text-[9px] text-gray-400">Bench & Repairs</div>
+        <div class="text-[9px] text-gray-400">Schedule & Appts</div>
       </button>
 
-      <button onclick="openDrawer('Treasury')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
-        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
-          <span>5. Treasury 💳</span>
-          <i class="fa-solid fa-credit-card text-gray-500 text-xs"></i>
-        </div>
-        <div class="text-[9px] text-gray-400">Invoices & Billing</div>
-      </button>
-
+      <!-- 5. EXCHANGE VAULT 🌐 -->
       <button onclick="openDrawer('Exchange')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
         <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
-          <span>6. Exchange 🌐</span>
+          <span>5. Vault 🌐</span>
           <i class="fa-solid fa-share-nodes text-gray-500 text-xs"></i>
         </div>
-        <div class="text-[9px] text-gray-400">Vault & Shared Links</div>
+        <div class="text-[9px] text-gray-400">Shared Links & Cust</div>
+      </button>
+
+      <!-- 6. PINBALL TAP-TO-TASK 🎯 -->
+      <button onclick="openDrawer('Pinball')" class="key-pinball rounded-xl p-3 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-purple-200 flex items-center justify-between">
+          <span>6. Pinball 🎯</span>
+          <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-purple-200/80">Tap-to-Task Knockout</div>
       </button>
     </div>
 
@@ -136,7 +145,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         <button onclick="toggleFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
       </div>
 
-      <!-- SECTION 1: WHAT IT DOES RIGHT NOW -->
       <div class="space-y-2">
         <h4 class="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
           <i class="fa-solid fa-circle-check"></i> What It Does Right Now
@@ -150,7 +158,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         </ul>
       </div>
 
-      <!-- SECTION 2: COMING SOON -->
       <div class="space-y-2 border-t border-gray-800 pt-3">
         <h4 class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
           <i class="fa-solid fa-clock"></i> Coming Soon
@@ -177,6 +184,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         <i class="fa-solid fa-folder-open text-blue-400"></i> Drawer
       </h3>
       <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-sm bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+    </div>
+
+    <!-- SUB-NAV FOR EMPIRE (SHOP OPS TOGGLE) -->
+    <div id="empireSubNav" class="hidden flex items-center gap-2 mb-3">
+      <button onclick="switchEmpireView('main')" id="subEmpireMain" class="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg">Empire Hub</button>
+      <button onclick="switchEmpireView('shop_ops')" id="subEmpireShop" class="bg-gray-800 text-gray-300 hover:bg-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg">🛠️ Shop Ops Bench</button>
     </div>
 
     <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300">
@@ -211,8 +224,7 @@ var activeDrawerContext = '';
 var isListening = false;
 var activeRecognition = null;
 
-// Replace this with your actual Stripe Payment Link if needed, or set dynamically
-var STRIPE_CHECKOUT_URL = window.STRIPE_PAYMENT_LINK || 'https://buy.stripe.com/test_placeholder';
+var STRIPE_CHECKOUT_URL = window.STRIPE_PAYMENT_LINK || 'https://buy.stripe.com/test_tappything';
 
 function toggleVoiceIntake(drawerContext, targetInputId, targetBtnId) {
   var targetDrawer = drawerContext || activeDrawerContext;
@@ -339,7 +351,6 @@ function loadDrawerItems(drawerName) {
     .then(data => {
       var groups = data.groups || (data.data && data.data.boards && data.data.boards[0] && data.data.boards[0].groups) || [];
       
-      // Strict group matching by title/name
       var matchingGroup = groups.find(function(g) {
         var title = (g.title || g.name || '').toLowerCase().trim();
         var target = drawerName.toLowerCase().trim();
@@ -348,10 +359,12 @@ function loadDrawerItems(drawerName) {
 
       var items = matchingGroup ? (matchingGroup.items || (matchingGroup.items_page && matchingGroup.items_page.items) || []) : [];
       
-      var isTreasury = drawerName.toLowerCase().includes('treasury') || drawerName.toLowerCase().includes('invoice');
+      var isInvoice = drawerName.toLowerCase().includes('treasury') || drawerName.toLowerCase().includes('invoice') || drawerName.toLowerCase().includes('shop');
 
       var itemsHtml = items.map(function(item) {
-        var hasDollar = item.name && (item.name.includes('$') || isTreasury);
+        var hasDollar = item.name && (item.name.includes('
+
+Paste that straight into `index.html` on GitHub, hit **Commit**, and you are set! 💙🎩🔥) || isInvoice);
         var payButton = hasDollar ? '<a href="' + STRIPE_CHECKOUT_URL + '" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow"><i class="fa-solid fa-credit-card"></i> Pay Now</a>' : '';
 
         return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 flex justify-between items-center">' +
@@ -428,8 +441,32 @@ function loadDrawerItems(drawerName) {
 function openDrawer(name) {
   activeDrawerContext = name;
   document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + name + ' Drawer';
+  
+  var empireSub = document.getElementById('empireSubNav');
+  if (name.toLowerCase() === 'empire' || name.toLowerCase() === 'shop ops') {
+    empireSub.classList.remove('hidden');
+  } else {
+    empireSub.classList.add('hidden');
+  }
+
   document.getElementById('drawerModal').classList.remove('hidden');
   loadDrawerItems(name);
+}
+
+function switchEmpireView(viewType) {
+  var btnMain = document.getElementById('subEmpireMain');
+  var btnShop = document.getElementById('subEmpireShop');
+  if (viewType === 'shop_ops') {
+    btnShop.className = 'bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg';
+    btnMain.className = 'bg-gray-800 text-gray-300 hover:bg-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg';
+    activeDrawerContext = 'Shop Ops';
+    loadDrawerItems('Shop Ops');
+  } else {
+    btnMain.className = 'bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg';
+    btnShop.className = 'bg-gray-800 text-gray-300 hover:bg-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg';
+    activeDrawerContext = 'Empire';
+    loadDrawerItems('Empire');
+  }
 }
 
 function closeDrawer() {
