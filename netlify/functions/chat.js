@@ -40,9 +40,14 @@ exports.handler = async function(event, context) {
   try {
     const body = JSON.parse(event.body || '{}');
     const rawPrompt = body.prompt || body.text || '';
+    const targetBoardId = body.board_id || '18424728273';
 
     if (!rawPrompt) {
-      return { statusCode: 400, headers, body: JSON.stringify({ reply: 'No prompt' }) };
+      return { 
+        statusCode: 400, 
+        headers, 
+        body: JSON.stringify({ error: 'No prompt provided', reply: '❌ ERROR: EMPTY PROMPT' }) 
+      };
     }
 
     const makeWebhookUrl = 'https://hook.us2.make.com/g6aw7r8759ar5jr5c7lnb6nvwnuuz67t';
@@ -50,22 +55,30 @@ exports.handler = async function(event, context) {
       rawDump: rawPrompt,
       prompt: rawPrompt,
       body: rawPrompt,
-      board_id: '18424728273',
+      board_id: targetBoardId,
       timestamp: new Date().toISOString()
     });
 
-    await makePostRequest(makeWebhookUrl, payload);
+    const response = await makePostRequest(makeWebhookUrl, payload);
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ reply: '✅ LOGGED & FIRED TO MAKE! ⚡' })
+      body: JSON.stringify({ 
+        success: true,
+        reply: '✅ LOGGED & FIRED TO MAKE! ⚡',
+        makeStatus: response.status 
+      })
     };
   } catch (err) {
+    console.error('Chat Relay Function Error:', err);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ reply: 'Error: ' + err.message })
+      body: JSON.stringify({ 
+        error: err.message, 
+        reply: '❌ BACKEND RELAY ERROR: ' + err.message 
+      })
     };
   }
 };
