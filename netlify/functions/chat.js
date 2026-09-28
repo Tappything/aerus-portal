@@ -60,22 +60,10 @@ exports.handler = async function(event, context) {
 
     const lower = rawPrompt.toLowerCase().trim();
 
-    // TRACK B: COMMAND & COORDINATOR ACTIONS (Move / Clean Up / Pinball)
-    if (lower.includes('move') || lower.includes('clean up') || lower.includes('bring everything') || lower.includes('knock them out')) {
-      // Query items from Empire Operations AND Staff Intake
+    // TRACK B: ACTION COMMANDS (Move Items from Empire/Intake to Pinball)
+    if (lower.includes('bring everything') || lower.includes('move to pinball') || lower.includes('move all') || lower.includes('clean up') || lower.includes('knock them out')) {
       const getItemsQuery = JSON.stringify({
-        query: `{
-          boards(ids: [${targetBoardId}]) {
-            groups(ids: ["group_mm7mfbre", "group_mm6b77as"]) {
-              items_page(limit: 50) {
-                items {
-                  id
-                  name
-                }
-              }
-            }
-          }
-        }`
+        query: `{ boards(ids: [${targetBoardId}]) { groups(ids: ["group_mm7mfbre", "group_mm6b77as"]) { items_page(limit: 50) { items { id } } } } }`
       });
 
       const itemsRes = await makePostRequest('https://api.monday.com/v2', {
@@ -86,27 +74,21 @@ exports.handler = async function(event, context) {
       }, getItemsQuery);
 
       const groups = itemsRes?.data?.boards?.[0]?.groups || [];
-      let movedCount = 0;
+      let moveCount = 0;
 
       for (const group of groups) {
         const items = group.items_page?.items || [];
         for (const item of items) {
           const moveQuery = JSON.stringify({
-            query: `mutation {
-              move_item_to_group (item_id: "${item.id}", group_id: "group_mm7mmekt") {
-                id
-              }
-            }`
+            query: `mutation { move_item_to_group (item_id: "${item.id}", group_id: "group_mm7mmekt") { id } }`
           });
-
           await makePostRequest('https://api.monday.com/v2', {
             'Content-Type': 'application/json',
             'Authorization': mondayKey,
             'API-Version': '2023-10',
             'Content-Length': Buffer.byteLength(moveQuery)
           }, moveQuery);
-
-          movedCount++;
+          moveCount++;
         }
       }
 
@@ -114,19 +96,20 @@ exports.handler = async function(event, context) {
         statusCode: 200,
         headers,
         body: JSON.stringify({
-          reply: `All ${movedCount} active tasks moved to your Pinball queue, William! Let's knock them out!`,
+          reply: `All ${moveCount} active tasks moved directly to the Pinball queue, William! Let's knock them out!`,
           actionPerformed: "MOVE_TO_PINBALL",
-          count: movedCount
+          count: moveCount
         })
       };
     }
 
-    // TRACK A: NEW TASK INTAKE & MULTI-ACTION SPLITTER
+    // TRACK A: TASK INTAKE & MULTI-CARD SPLITTER
     const groupMap = {
       empire: { id: 'group_mm7mfbre', name: 'Empire Operations' },
       pipeline: { id: 'group_mm7myd0b', name: 'Pipeline' },
       castle: { id: 'group_mm7mv0yv', name: 'Castle Drawer' },
-      pinball: { id: 'group_mm7mmekt', name: 'Pinball Queue' }
+      pinball: { id: 'group_mm7mmekt', name: 'Pinball Queue' },
+      intake: { id: 'group_mm6b77as', name: 'Staff Intake' }
     };
 
     const sentences = rawPrompt
@@ -138,13 +121,16 @@ exports.handler = async function(event, context) {
 
     sentences.forEach(sentence => {
       const sLower = sentence.toLowerCase();
-      let targetKey = 'empire';
+      let targetKey = 'empire'; // Default to Empire for shop operations
 
       if (sLower.includes('personal') || sLower.includes('home') || sLower.includes('grocery') || sLower.includes('coffee') || sLower.includes('family')) {
         targetKey = 'castle';
       } else if (sLower.includes('lead') || sLower.includes('sale') || sLower.includes('quote') || sLower.includes('prospect') || sLower.includes('
 
-Commit this into `netlify/functions/chat.js` and push to GitHub. Once it deploys, any variation of *"clean up the boards"* or *"move to pinball"* will execute the move and clear your queue!)) {
+---
+
+### **Action**
+Copy and commit this file to **`netlify/functions/chat.js`** when you sit down at your desk in Timonium. This will make the direct GraphQL link work properly!) || sLower.includes('dollar')) {
         targetKey = 'pipeline';
       } else if (sLower.includes('quick') || sLower.includes('urgent') || sLower.includes('pinball') || sLower.includes('knockout')) {
         targetKey = 'pinball';
@@ -161,15 +147,7 @@ Commit this into `netlify/functions/chat.js` and push to GitHub. Once it deploys
 
     for (const card of parsedCards) {
       const createQuery = JSON.stringify({
-        query: `mutation {
-          create_item (
-            board_id: ${targetBoardId},
-            group_id: "${card.groupId}",
-            item_name: "${card.title.replace(/"/g, '\\"')}"
-          ) {
-            id
-          }
-        }`
+        query: `mutation { create_item (board_id: ${targetBoardId}, group_id: "${card.groupId}", item_name: "${card.title.replace(/"/g, '\\"')}") { id } }`
       });
 
       await makePostRequest('https://api.monday.com/v2', {
@@ -180,7 +158,7 @@ Commit this into `netlify/functions/chat.js` and push to GitHub. Once it deploys
       }, createQuery);
     }
 
-    const replyMsg = `Got it, William! Created ${parsedCards.length} action card${parsedCards.length > 1 ? 's' : ''} on your board.`;
+    const replyMsg = `Got it, William! Logged ${parsedCards.length} action card${parsedCards.length > 1 ? 's' : ''} directly to Monday.`;
 
     return {
       statusCode: 200,
@@ -195,7 +173,7 @@ Commit this into `netlify/functions/chat.js` and push to GitHub. Once it deploys
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ reply: 'Error processing request: ' + err.message })
+      body: JSON.stringify({ reply: 'Error processing intake: ' + err.message })
     };
   }
 };
