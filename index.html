@@ -98,8 +98,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
     <!-- 4, 5, 6. BOTTOM TRIO (CALENDAR, VAULT EXCHANGE, PINBALL TAP-TO-TASK) -->
     <div class="grid grid-cols-3 gap-2.5">
-      <!-- 4. CALENDAR 📅 -->
-      <button onclick="openDrawer('Calendar')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+      <!-- 4. CALENDAR 📅 (DIRECT GOOGLE CALENDAR LINK) -->
+      <button onclick="openCalendarView()" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
         <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
           <span>4. Calendar 📅</span>
           <i class="fa-solid fa-calendar-day text-gray-500 text-xs"></i>
@@ -344,6 +344,10 @@ function sendToFresh(promptText, drawerName) {
   });
 }
 
+function openCalendarView() {
+  window.open('https://calendar.google.com', '_blank');
+}
+
 function loadDrawerItems(drawerName) {
   var contentDiv = document.getElementById('drawerContent');
   fetch('/.netlify/functions/monday?board=18424728273&t=' + new Date().getTime())
@@ -352,36 +356,44 @@ function loadDrawerItems(drawerName) {
       var groups = data.groups || (data.data && data.data.boards && data.data.boards[0] && data.data.boards[0].groups) || [];
       var target = drawerName.toLowerCase().trim();
 
-      // KEYWORD MAPPING TO MONDAY.COM BOARD GROUPS
-      var matchingGroup = groups.find(function(g) {
+      // FILTER OUT ALL ARCHIVED, COMPLETED, TRASH, AND DELETED GROUPS
+      var activeGroups = groups.filter(function(g) {
+        var title = (g.title || g.name || '').toLowerCase().trim();
+        return !title.includes('archive') && !title.includes('completed') && !title.includes('trash') && !title.includes('deleted');
+      });
+
+      // STRICT EXACT GROUP MATCHING
+      var matchingGroup = activeGroups.find(function(g) {
         var title = (g.title || g.name || '').toLowerCase().trim();
         
         if (target.includes('castle')) {
-          return title.includes('personal') || title.includes('william') || title.includes('lounge');
+          return title.includes('william — private / leads') || title.includes('personal');
         }
         if (target.includes('empire')) {
-          return title.includes('showroom') || title.includes('bagdons') || title.includes('announcements') || title.includes('empire');
+          return title.includes('showroom') || title.includes('shop announcements');
         }
         if (target.includes('shop') || target.includes('bench')) {
-          return title.includes('workbench') || title.includes('ready wall') || title.includes('bench') || title.includes('parts') || title.includes('waiting');
+          return title.includes("mike's workbench") || title.includes('ready wall — live machine tracker') || title.includes('parts needed');
         }
         if (target.includes('pipeline')) {
-          return title.includes('leads') || title.includes('intake') || title.includes('staff');
+          return title.includes('staff intake — pending review');
         }
-        if (target.includes('treasury') || target.includes('invoice')) {
-          return title.includes('invoices') || title.includes('archive') || title.includes('treasury');
+        if (target.includes('exchange') || target.includes('vault')) {
+          return title.includes('vault') || title.includes('shared');
         }
-        return title.includes(target) || target.includes(title);
+        return false;
       });
 
-      // PINBALL OR FALLBACK: SHOW ALL ACTIVE BOARD ITEMS IF NO EXACT GROUP MATCH
       var items = [];
-      if (target.includes('pinball') || !matchingGroup) {
-        groups.forEach(function(g) {
-          var groupItems = g.items || (g.items_page && g.items_page.items) || [];
-          items = items.concat(groupItems);
+      if (target.includes('pinball')) {
+        // PINBALL SHOWS ONLY PENDING ITEMS FROM STAFF INTAKE
+        var intakeGroup = activeGroups.find(function(g) {
+          return (g.title || g.name || '').toLowerCase().includes('staff intake');
         });
-      } else {
+        if (intakeGroup) {
+          items = intakeGroup.items || (intakeGroup.items_page && intakeGroup.items_page.items) || [];
+        }
+      } else if (matchingGroup) {
         items = matchingGroup.items || (matchingGroup.items_page && matchingGroup.items_page.items) || [];
       }
 
@@ -409,7 +421,7 @@ function loadDrawerItems(drawerName) {
           '<button onclick="loadDrawerItems(\'' + drawerName + '\')" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-rotate-right"></i> Refresh</button>' +
         '</div>' +
         '<div class="space-y-2 max-h-60 overflow-y-auto">' +
-          (itemsHtml || '<p class="text-gray-500 text-center py-4">No cards in this drawer yet. Speak or type below to add one!</p>') +
+          (itemsHtml || '<p class="text-gray-500 text-center py-4">No active cards in this drawer. Tap the mic to add one!</p>') +
         '</div>' +
         
         '<!-- COMBINED INPUT BOX WITH EMBEDDED MIC & SNAP PHOTO -->' +
