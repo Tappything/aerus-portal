@@ -2,10 +2,15 @@ const https = require('https');
 
 function makePostRequest(url, headers, payload) {
   return new Promise((resolve, reject) => {
-    const req = https.request(url, {
+    const parsedUrl = new URL(url);
+    const options = {
+      hostname: parsedUrl.hostname,
+      path: parsedUrl.pathname + parsedUrl.search,
       method: 'POST',
       headers: headers
-    }, (res) => {
+    };
+
+    const req = https.request(options, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
@@ -16,6 +21,7 @@ function makePostRequest(url, headers, payload) {
         }
       });
     });
+
     req.on('error', reject);
     req.write(payload);
     req.end();
@@ -44,35 +50,63 @@ exports.handler = async function(event, context) {
       return { statusCode: 400, headers, body: JSON.stringify({ reply: 'No prompt received.' }) };
     }
 
+    if (!mondayKey) {
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ reply: '❌ MONDAY_API_TOKEN not configured in Netlify.' })
+      };
+    }
+
     const lower = rawPrompt.toLowerCase().trim();
 
-    // TRACK B: COMMAND & COORDINATOR ACTIONS (Move, Query, Wipe)
-    if (lower.includes('bring everything') || lower.includes('move to pinball') || lower.includes('move all')) {
-      if (mondayKey) {
-        // GraphQL Move Items to Pinball Queue (group_mm7mmekt)
-        const getItemsQuery = JSON.stringify({
-          query: `{ boards(ids: [${targetBoardId}]) { groups(ids: ["group_mm7mfbre"]) { items_page { items { id } } } } }`
-        });
+    // TRACK B: COMMAND & COORDINATOR ACTIONS (Move Empire/Intake to Pinball)
+    if (lower.includes('bring everything') || lower.includes('move to pinball') || lower.includes('move all') || lower.includes('knock them out')) {
+      // Query items from Empire Operations AND Staff Intake
+      const getItemsQuery = JSON.stringify({
+        query: `{
+          boards(ids: [${targetBoardId}]) {
+            groups(ids: ["group_mm7mfbre", "group_mm6b77as"]) {
+              items_page(limit: 50) {
+                items {
+                  id
+                  name
+                }
+              }
+            }
+          }
+        }`
+      });
 
-        const itemsRes = await makePostRequest('https://api.monday.com/v2', {
-          'Content-Type': 'application/json',
-          'Authorization': mondayKey,
-          'API-Version': '2023-10',
-          'Content-Length': Buffer.byteLength(getItemsQuery)
-        }, getItemsQuery);
+      const itemsRes = await makePostRequest('https://api.monday.com/v2', {
+        'Content-Type': 'application/json',
+        'Authorization': mondayKey,
+        'API-Version': '2023-10',
+        'Content-Length': Buffer.byteLength(getItemsQuery)
+      }, getItemsQuery);
 
-        const empireItems = itemsRes?.data?.boards?.[0]?.groups?.[0]?.items_page?.items || [];
+      const groups = itemsRes?.data?.boards?.[0]?.groups || [];
+      let movedCount = 0;
 
-        for (const item of empireItems) {
+      for (const group of groups) {
+        const items = group.items_page?.items || [];
+        for (const item of items) {
           const moveQuery = JSON.stringify({
-            query: `mutation { move_item_to_group (item_id: ${item.id}, group_id: "group_mm7mmekt") { id } }`
+            query: `mutation {
+              move_item_to_group (item_id: "${item.id}", group_id: "group_mm7mmekt") {
+                id
+              }
+            }`
           });
+
           await makePostRequest('https://api.monday.com/v2', {
             'Content-Type': 'application/json',
             'Authorization': mondayKey,
             'API-Version': '2023-10',
             'Content-Length': Buffer.byteLength(moveQuery)
           }, moveQuery);
+
+          movedCount++;
         }
       }
 
@@ -80,8 +114,9 @@ exports.handler = async function(event, context) {
         statusCode: 200,
         headers,
         body: JSON.stringify({
-          reply: "All Empire items moved directly to the Pinball queue, William! Let's knock them out!",
-          actionPerformed: "MOVE_TO_PINBALL"
+          reply: `All ${movedCount} active tasks moved to your Pinball queue, William! Let's knock them out!`,
+          actionPerformed: "MOVE_TO_PINBALL",
+          count: movedCount
         })
       };
     }
@@ -94,7 +129,11 @@ exports.handler = async function(event, context) {
       pinball: { id: 'group_mm7mmekt', name: 'Pinball Queue' }
     };
 
-    const sentences = rawPrompt.split(/(?:\. |\n|;|\band then\b|\band also\b)/i).filter(s => s.trim().length > 3);
+    const sentences = rawPrompt
+      .split(/(?:\. |\n|;|\band then\b|\band also\b|\band the other to\b|\band the other\b|\bthe other to\b|\bthe last one\b|, (?=[a-zA-Z]{3,}))/i)
+      .map(s => s.trim())
+      .filter(s => s.length > 3);
+
     let parsedCards = [];
 
     sentences.forEach(sentence => {
@@ -103,14 +142,23 @@ exports.handler = async function(event, context) {
 
       if (sLower.includes('personal') || sLower.includes('home') || sLower.includes('grocery') || sLower.includes('coffee') || sLower.includes('family')) {
         targetKey = 'castle';
-      } else if (sLower.includes('lead') || sLower.includes('sale') || sLower.includes('quote') || sLower.includes('prospect') || sLower.includes('$')) {
+      } else if (sLower.includes('lead') || sLower.includes('sale') || sLower.includes('quote') || sLower.includes('prospect') || sLower.includes('
+
+---
+
+### **Action**
+Copy this code into **`netlify/functions/chat.js`** and commit to GitHub.
+
+Once Netlify finishes deploying:
+1. Speak: *"Bring everything in Empire to Pinball mode and let's knock them out"*
+2. Fresh will respond: *"All X active tasks moved directly to your Pinball queue, William! Let's knock them out!"*
+3. Open your **Pinball** drawer and you'll see all your cards lined up with 1-tap knockout buttons!)) {
         targetKey = 'pipeline';
-      } else if (sLower.includes('quick') || sLower.includes('urgent') || sLower.includes('pinball')) {
+      } else if (sLower.includes('quick') || sLower.includes('urgent') || sLower.includes('pinball') || sLower.includes('knockout')) {
         targetKey = 'pinball';
       }
 
-      let cleanTitle = sentence.trim();
-      cleanTitle = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1);
+      let cleanTitle = sentence.charAt(0).toUpperCase() + sentence.slice(1);
 
       parsedCards.push({
         title: cleanTitle,
@@ -119,19 +167,25 @@ exports.handler = async function(event, context) {
       });
     });
 
-    if (mondayKey) {
-      for (const card of parsedCards) {
-        const createQuery = JSON.stringify({
-          query: `mutation { create_item (board_id: ${targetBoardId}, group_id: "${card.groupId}", item_name: "${card.title.replace(/"/g, '\\"')}") { id } }`
-        });
+    for (const card of parsedCards) {
+      const createQuery = JSON.stringify({
+        query: `mutation {
+          create_item (
+            board_id: ${targetBoardId},
+            group_id: "${card.groupId}",
+            item_name: "${card.title.replace(/"/g, '\\"')}"
+          ) {
+            id
+          }
+        }`
+      });
 
-        await makePostRequest('https://api.monday.com/v2', {
-          'Content-Type': 'application/json',
-          'Authorization': mondayKey,
-          'API-Version': '2023-10',
-          'Content-Length': Buffer.byteLength(createQuery)
-        }, createQuery);
-      }
+      await makePostRequest('https://api.monday.com/v2', {
+        'Content-Type': 'application/json',
+        'Authorization': mondayKey,
+        'API-Version': '2023-10',
+        'Content-Length': Buffer.byteLength(createQuery)
+      }, createQuery);
     }
 
     const replyMsg = `Got it, William! Created ${parsedCards.length} action card${parsedCards.length > 1 ? 's' : ''} on your board.`;
