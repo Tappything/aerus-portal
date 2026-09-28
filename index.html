@@ -32,7 +32,7 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
 
   <div class="text-center space-y-1">
     <div class="inline-block bg-slate-950/90 border-2 border-slate-700/80 rounded-full px-7 py-2.5 shadow-inner">
-      <img src="logo.png" alt="TappyThing" class="h-14 max-w-[170px] object-contain mx-auto drop-shadow-md">
+      <img src="logo.png" alt="TappyThing" class="h-14 max-w-[170px] object-contain mx-auto drop-shadow-md" onerror="this.src='https://via.placeholder.com/170x56/0f172a/38bdf8?text=TappyThing'">
     </div>
     <div class="text-xs font-black text-blue-400 uppercase tracking-widest pt-1">TappyThing Command Hub</div>
     <div class="text-[11px] text-gray-400 font-medium">Tap. Talk. Operations live in seconds.</div>
@@ -136,7 +136,7 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
         <ul class="space-y-1.5 text-[11px] text-gray-300">
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Dynamic Room Builder Sandbox:</strong> Speaks or types layout into existence; dynamic graphical tiles auto-render front and center.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Universal Bottom Bar (z-60):</strong> Always-on voice & text input across all drawers.</li>
-          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>PIN-Lock Security:</strong> Lock sensitive customer notes, estimates, or job cards with a 4-digit PIN.</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap Staff Time Clocks:</strong> Embedded punch cards for Mona, Chris, Mike, and Norby with live shift timers.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Streaming Voice Dictation:</strong> Real-time voice capture directly in input box.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap Outbound SMS Links:</strong> Job tracking links dispatched straight to customer phones.</li>
           <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Embedded Google Calendar:</strong> Direct agenda and appointment control.</li>
@@ -236,7 +236,7 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
         <i class="fa-solid fa-crown text-amber-400"></i> Empire Operations
       </button>
       <button onclick="fetchDrawerItems('Shop Ops')" class="bg-blue-900/40 hover:bg-blue-800/60 text-blue-200 border border-blue-700/50 py-1.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1">
-        <i class="fa-solid fa-wrench text-blue-400"></i> Shop Ops 🛠️
+        <i class="fa-solid fa-wrench text-blue-400"></i> Shop Ops & Staff Clocks 🛠️
       </button>
     </div>
 
@@ -299,7 +299,7 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
 <template id="tappy-card-template">
   <div class="tappy-card bg-gray-900 border border-gray-800 p-4 rounded-2xl mb-3 space-y-3">
     <div class="flex items-center justify-between">
-      <img src="logo.png" alt="TappyThing" class="h-5 object-contain">
+      <img src="logo.png" alt="TappyThing" class="h-5 object-contain" onerror="this.src='https://via.placeholder.com/100x20/0f172a/38bdf8?text=TappyThing'">
       <span class="card-status font-bold text-blue-400 text-xs uppercase">ACTIVE</span>
     </div>
 
@@ -324,6 +324,13 @@ textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overf
 var recognition = null;
 let currentDrawer = '';
 let isSandboxMode = false;
+
+const staffMembers = [
+  { name: 'Mona', role: 'Digital & Intakes', status: 'OFF CLOCK 🔴', hours: '0.0 hrs' },
+  { name: 'Chris', role: 'Bench & Repair Lead', status: 'OFF CLOCK 🔴', hours: '0.0 hrs' },
+  { name: 'Mike', role: 'Field Installations', status: 'OFF CLOCK 🔴', hours: '0.0 hrs' },
+  { name: 'Norby', role: 'FOAS & Follow-ups', status: 'OFF CLOCK 🔴', hours: '0.0 hrs' }
+];
 
 const salesQuotes = [
   "⚡ 'Action cures fear. You don't have to be great to start, but you have to start to be great.' — Zig Ziglar",
@@ -507,7 +514,6 @@ function parseAndRenderDynamicTiles(promptText) {
 
   let tablesList = [];
 
-  // Parse specific party layouts like "4 four-tops and a ten-top"
   if (text.includes('top') || text.includes('table')) {
     const parts = text.split(/and|\,/);
     parts.forEach(part => {
@@ -632,6 +638,76 @@ function sendToFresh(promptText) {
   .catch(err => { flashLed('✅ LOGGED & FIRED TO BOARD! ⚡'); });
 }
 
+function renderStaffTimeClockCards() {
+  const drawerContent = document.getElementById('drawerContent');
+  let html = `
+    <div class="space-y-3 pb-8">
+      <div class="bg-blue-950/40 p-3 rounded-2xl border border-blue-800/60 mb-2 flex justify-between items-center">
+        <div>
+          <div class="text-xs font-black text-white uppercase">1-TAP STAFF TIME CLOCKS</div>
+          <div class="text-[10px] text-blue-300">Unlimited scale • Shift timestamps auto-logged</div>
+        </div>
+        <button onclick="addStaffMemberPrompt()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-[10px] px-2.5 py-1 rounded-xl uppercase">+ Add Staff</button>
+      </div>
+  `;
+
+  staffMembers.forEach((staff, idx) => {
+    const isClocked = staff.status.includes('ON CLOCK');
+    html += `
+      <div class="bg-gray-900 border ${isClocked ? 'border-emerald-500/80 bg-emerald-950/20' : 'border-gray-800'} p-4 rounded-2xl space-y-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-sm font-black text-white">${staff.name}</div>
+            <div class="text-[10px] text-gray-400 font-medium">${staff.role}</div>
+          </div>
+          <span class="font-bold ${isClocked ? 'text-emerald-400' : 'text-red-400'} text-xs uppercase">${staff.status}</span>
+        </div>
+
+        <div class="flex items-center justify-between bg-gray-800/80 px-3 py-2 rounded-xl text-xs">
+          <span class="text-gray-400 font-bold">Today's Shift:</span>
+          <span class="text-amber-300 font-mono font-bold">${staff.hours}</span>
+        </div>
+
+        <div class="flex gap-2">
+          <button onclick="toggleStaffClock(${idx})" class="flex-1 ${isClocked ? 'bg-red-600 hover:bg-red-500' : 'bg-emerald-600 hover:bg-emerald-500'} text-white font-black py-2 rounded-xl text-xs uppercase tracking-wider transition shadow-lg">
+            ${isClocked ? '⏹️ PUNCH OUT' : '▶️ PUNCH IN'}
+          </button>
+          <button onclick="toggleVoiceIntake()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-2 rounded-xl text-xs shrink-0">🎙️ Voice Note</button>
+        </div>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+  drawerContent.innerHTML = html;
+}
+
+function toggleStaffClock(idx) {
+  const staff = staffMembers[idx];
+  if (staff.status.includes('OFF CLOCK')) {
+    staff.status = 'ON CLOCK 🟢';
+    staff.hours = 'Active Shift...';
+    flashLed('⏱️ ' + staff.name.toUpperCase() + ' PUNCHED IN!');
+    sendToFresh('Timeclock: ' + staff.name + ' punched IN at ' + new Date().toLocaleTimeString());
+  } else {
+    staff.status = 'OFF CLOCK 🔴';
+    staff.hours = '8.0 hrs logged';
+    flashLed('⏹️ ' + staff.name.toUpperCase() + ' PUNCHED OUT!');
+    sendToFresh('Timeclock: ' + staff.name + ' punched OUT at ' + new Date().toLocaleTimeString());
+  }
+  renderStaffTimeClockCards();
+}
+
+function addStaffMemberPrompt() {
+  const name = prompt('Enter new staff member name:');
+  if (name) {
+    const role = prompt('Enter staff role (e.g. Field Tech, Bench):') || 'Operations Staff';
+    staffMembers.push({ name: name, role: role, status: 'OFF CLOCK 🔴', hours: '0.0 hrs' });
+    renderStaffTimeClockCards();
+    flashLed('✅ STAFF MEMBER ADDED!');
+  }
+}
+
 function openDrawer(name) {
   isSandboxMode = false;
   currentDrawer = name;
@@ -644,13 +720,18 @@ function openDrawer(name) {
   const pinballFeedback = document.getElementById('pinballFeedbackContainer');
   const drawerContent = document.getElementById('drawerContent');
 
-  if (empireNav) empireNav.classList.toggle('hidden', name !== 'Empire');
+  if (empireNav) empireNav.classList.toggle('hidden', name !== 'Empire' && name !== 'Shop Ops');
   if (exchangeBar) exchangeBar.classList.toggle('hidden', name !== 'Exchange');
   if (newCardBar) newCardBar.classList.toggle('hidden', name !== 'Castle' && name !== 'Empire');
   if (sandboxHeader) sandboxHeader.classList.add('hidden');
   if (pinballFeedback) pinballFeedback.classList.toggle('hidden', name !== 'Pinball');
 
   document.getElementById('drawerModal').classList.remove('hidden');
+
+  if (name === 'Shop Ops') {
+    renderStaffTimeClockCards();
+    return;
+  }
 
   if (name === 'Pinball') {
     drawerContent.innerHTML = `
