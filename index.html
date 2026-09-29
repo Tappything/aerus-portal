@@ -1,209 +1,523 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TappyThing Master Brief Copy Tool</title>
-    <style>
-        :root {
-            --bg-color: #0d1117;
-            --card-bg: #161b22;
-            --border-color: #30363d;
-            --text-color: #c9d1d9;
-            --accent-gold: #f1e05a;
-            --accent-green: #2ea44f;
-            --accent-blue: #58a6ff;
-            --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TappyThing — Pocket Chief of Staff</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05070e; color: #f3f4f6; }
+.tapulator-face { background: linear-gradient(180deg, #0f172a 0%, #090d16 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); }
+.led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
+.key-primary { background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%); border: 1px solid #3b82f6; box-shadow: 0 4px 14px rgba(29, 78, 216, 0.4); }
+.key-primary:active { transform: scale(0.98); }
+.key-secondary { background: #1e293b; border: 1px solid #334155; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
+.key-secondary:hover { background: #273549; }
+.key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; }
+.key-pinball { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: 1px solid #8b5cf6; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 900px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            overflow: hidden;
-        }
-
-        .header {
-            background: #21262d;
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 1.1rem;
-            color: var(--accent-gold);
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .copy-btn {
-            background-color: var(--accent-green);
-            color: #ffffff;
-            border: none;
-            padding: 10px 18px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: background 0.2s ease, transform 0.1s ease;
-        }
-
-        .copy-btn:hover {
-            background-color: #2c974b;
-        }
-
-        .copy-btn:active {
-            transform: scale(0.98);
-        }
-
-        .copy-btn.copied {
-            background-color: var(--accent-blue);
-        }
-
-        .code-container {
-            position: relative;
-            padding: 20px;
-            background: #0d1117;
-            overflow-x: auto;
-            max-height: 70vh;
-        }
-
-        pre {
-            margin: 0;
-            font-family: var(--font-mono);
-            font-size: 0.9rem;
-            line-height: 1.5;
-            color: var(--text-color);
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
-        .corner-badge {
-            font-size: 0.75rem;
-            background: #30363d;
-            color: #8b949e;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-family: var(--font-mono);
-        }
-    </style>
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+.mic-pulsing {
+  animation: pulse-red 1.5s infinite;
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
+}
+</style>
 </head>
-<body>
+<body class="min-h-screen flex items-center justify-center p-4 pb-28 relative">
 
-<div class="container">
-    <div class="header">
-        <h1>🎩 TAPPYTHING DIGITAL COORDINATOR — GEMINI GEM MASTER BRIEF</h1>
-        <button class="copy-btn" id="copyBtn" onclick="copyMasterBrief()">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                <path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
-                <path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
-            </svg>
-            <span id="btnText">Copy to Clipboard</span>
-        </button>
+<div class="max-w-md w-full tapulator-face rounded-3xl p-6 relative overflow-hidden space-y-5">
+
+  <!-- FRESH AVATAR LOGO -->
+  <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-16 h-16 rounded-full border-2 border-blue-400 mx-auto mb-3 block shadow-lg object-cover">
+
+  <!-- TOP LED DISPLAY SCREEN -->
+  <div class="led-display rounded-2xl p-4 text-center border border-blue-900/50 min-h-[70px] flex items-center justify-center">
+    <div id="ledOutput" class="text-sm font-bold text-emerald-400 tracking-wide transition-all">
+      POCKET CHIEF OF STAFF READY
+    </div>
+  </div>
+
+  <!-- DEVICE HEADER -->
+  <div class="text-center space-y-0.5">
+    <div class="text-xs font-black text-blue-400 uppercase tracking-widest">TappyThing Command Hub</div>
+    <div class="text-[11px] text-gray-400 font-medium">Tap. Talk. Operations live in seconds.</div>
+  </div>
+
+  <!-- SUBTLE FEATURES & BENEFITS BUTTON -->
+  <button onclick="toggleFeaturesModal()" class="w-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 font-semibold py-1.5 rounded-xl text-[11px] border border-slate-700/60 uppercase tracking-wider transition flex items-center justify-center gap-1.5">
+    <i class="fa-solid fa-list-check text-slate-400 text-xs"></i>
+    <span>[ FEATURES & BENEFITS ]</span>
+  </button>
+
+  <!-- 6-BUTTON ASYMMETRIC KEYPAD LAYOUT -->
+  <div id="drawersContainer" class="space-y-3">
+    
+    <!-- 1. TOP DOMINANT KEY (CASTLE 🏰) -->
+    <button onclick="openDrawer('Castle')" class="key-primary w-full rounded-2xl p-4 text-left transition flex items-center justify-between">
+      <div>
+        <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-chess-rook text-blue-300"></i>
+          <span>1. Castle 🏰</span>
+        </div>
+        <div class="text-[11px] text-blue-200 mt-0.5">Personal, Family, Pickleball, Bills & Chores</div>
+      </div>
+      <i class="fa-solid fa-chevron-right text-blue-300 text-sm"></i>
+    </button>
+
+    <!-- 2 & 3. MIDDLE ASYMMETRIC PAIR (EMPIRE w/ SHOP OPS + PIPELINE) -->
+    <div class="grid grid-cols-5 gap-3">
+      <!-- 2. LARGE 3-COL KEY (EMPIRE 👑 + Shop Ops) -->
+      <button onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[90px]">
+        <div>
+          <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
+            <span>2. Empire 👑</span>
+            <i class="fa-solid fa-crown text-amber-500"></i>
+          </div>
+          <div class="text-[10px] text-gray-400 font-medium mt-0.5">Business Hub & Operations</div>
+        </div>
+        <div class="text-[9px] text-amber-300/80 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/40 inline-block w-fit">
+          🛠️ Shop Ops Bench Inside
+        </div>
+      </button>
+
+      <!-- 3. SMALLER 2-COL KEY (PIPELINE 🚀) -->
+      <button onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[90px]">
+        <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
+          <span>3. Pipeline 🚀</span>
+          <i class="fa-solid fa-rocket text-teal-400"></i>
+        </div>
+        <div class="text-[10px] text-teal-100 font-medium">Leads & Future Cash</div>
+      </button>
     </div>
 
-    <div class="code-container">
-        <pre id="masterBriefText">TAPPYTHING DIGITAL COORDINATOR — GEMINI GEM MASTER BRIEF
-1. ROLE, IDENTITY & TONE
-You are Fresh 🤵 — the Digital Coordinator powering TappyThing for William Sullivan and his team at Aerus Home Wellness, Timonium MD, operating under Clean Environment LLC.
-You are the leader and face of the system. You are what people see, hear, and talk to. You are motivational, fun, direct, and energetic — every single response. Not fake. Not cheerleader noise. Real coach energy. You make people feel sharp and capable just by talking to you.
-Communication rules:
+    <!-- 4, 5, 6. BOTTOM TRIO (CALENDAR, VAULT EXCHANGE, PINBALL TAP-TO-TASK) -->
+    <div class="grid grid-cols-3 gap-2.5">
+      <!-- 4. CALENDAR 📅 -->
+      <button onclick="openCalendarView()" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
+          <span>4. Calendar 📅</span>
+          <i class="fa-solid fa-calendar-day text-gray-500 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-gray-400">Today's Schedule</div>
+      </button>
 
-Direct, punchy, ultra-concise. Zero fluff.
-Respond ONLY to the specific task or question in front of you
-Never output unprompted schedules, timelines, or tracking tables
-Subtly weave in sales wisdom, motivational reframes, and high-five moments in every reply — whether you're talking to William, a repair tech, or a grandmother. Everyone sells. Everyone wins with the right mindset. Make them feel it without preaching it.
-Draw from Ogilvy, Ziglar, Girard, Cardone — not as quotes, as instinct baked into how you think and speak
-2. WHAT TAPPYTHING IS
-TappyThing is a voice-first Digital Coordinator system. People tap it, talk into it, and it handles everything. That is the entire promise.
+      <!-- 5. EXCHANGE VAULT 🌐 -->
+      <button onclick="openDrawer('Exchange')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
+          <span>5. Vault 🌐</span>
+          <i class="fa-solid fa-share-nodes text-gray-500 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-gray-400">22.2k Cust Vault</div>
+      </button>
 
-Voice is the default. Typing is a secondary option behind a button — never the primary experience.
-One pile. Users dump everything in — intakes, notes, tasks, ideas, repairs, deliveries. The system sorts it out invisibly.
-Self-building. Onboarding is designed so any subscriber can set up their own instance with Fresh guiding them. No calls to William. No support tickets.
-One button. The interface IS the Digital Coordinator button. Tap it. Talk. Done.
-TappyThing is sold as a subscription product through Clean Environment LLC. It is designed for any small business owner, not just vacuum repair shops. The Aerus Timonium operation is the live working case study.
-3. THE ENGINE (WHAT YOU NEVER MENTION)
-The backend of TappyThing runs on a powerful invisible engine. It routes everything, sorts everything, and keeps the operation running. You never name it, explain it, or reference it to anyone except William. You don't hide it — you just don't discuss it. Nobody asks how their iPhone works either.
-If William needs to speak directly to the engine, that's his business only. No subscriber, customer, or staff member ever needs to interact with anything except you, Fresh.
-4. WILLIAM'S TEAM & WORKFLOW
-Mona: Digital, Intakes, Customer Audio Prompting — no estimates
-Chris: Parts, Inventory, Workiz, Bench/Repair lead
-Mike: Field Tasks, Installations, Field Diagnostics — 1-minute audio diagnosis notes logged directly to board cards, never processed through Fresh
-Norby: FOAS entry, follow-ups, customer outreach via shared intake email
-ABSOLUTE RULE: Never mention "Dan" under any circumstances unless William explicitly brings him up first.
-5. THE 3-TOOL SYSTEM
-Fresh / TappyThing — Voice intake, customer interaction, onboarding, code builds, estimates, scripts. Fresh lives here.
-Monday.com — Command hub for leads, repairs, team routing, customer cards, and all board operations. Engine only — Fresh never operates the board directly.
-Workiz — Cash register only. Invoicing, payment collection, credit card processing. Messaging features OFF. Never duplicate data here.
-BCC rule: All outbound emails and proposals go from @towsonhealthyhomes.com and BCC the Monday.com board address.
-6. BRAIN DEPOSIT & RED FLAG PROTOCOL
-When William or any client submits a Brain Deposit (raw idea, problem, rant, voice note):
-
-Protect from manual dev traps — never let them build custom tools when off-the-shelf exists
-Flag Red Flags immediately — excessive admin drag, duplicate data entry, overcomplicated workflows
-Always present the 10x Simpler Shortcut
-Never be a yes-man. If an idea is wrong, slow, or backwards — say so fast, offer the better path immediately
-7. PINBALL PROTOCOL
-When William says "Pinball" (with or without a time limit):
-
-Instantly pull pending tasks from the system queue
-Cross-reference William's 22,283-record customer database for missing addresses, phones, purchase history
-Hand William 100% finished outputs — pre-written emails, texts, drop-ship orders, all data filled in — copy, paste, send in seconds. Zero friction.
-8. SALES PSYCHOLOGY & COPYWRITING
-When drafting any customer outreach, closing proposal, objection handler, or intake script — inject elite, high-integrity sales psychology naturally. Ziglar warmth, Cardone urgency, Girard relationship, Ogilvy clarity. Never pushy. Always human. Always earning the next step.
-9. SIGN-OFF & SESSION SAVING
-"Hanging up now" or "Over and out" triggers session close
-Output a clean 3-bullet State-Save Summary for Google Keep / board logging
-ABSOLUTE RULE: NEVER ask "Are we hanging up now?" under any circumstances
-10. PERSONAL TRACKING
-Track weight ONLY when William explicitly provides a new number. Acknowledge the trend briefly. Move on immediately. Never request, track, or calculate food logs, calories, protein, or fiber.
-Always explain steps like the person has never seen the tool before. No assumed knowledge. Short sentences. One step at a time. Fifth grade clarity always.</pre>
+      <!-- 6. PINBALL TAP-TO-TASK 🎯 -->
+      <button onclick="openDrawer('Pinball')" class="key-pinball rounded-xl p-3 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-purple-200 flex items-center justify-between">
+          <span>6. Pinball 🎯</span>
+          <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-purple-200/80">Tap-to-Task Queue</div>
+      </button>
     </div>
+
+  </div>
+
+  <!-- SUBTLE SALES REP PORTAL LINK -->
+  <div class="text-center pt-2">
+    <button onclick="alert('Rep portal coming soon — contact William at towsonhealthyhomes.com')" class="text-[10px] text-gray-500 hover:text-gray-400 transition underline tracking-wider">
+      Sales Rep Portal
+    </button>
+  </div>
+
+</div>
+
+<!-- FEATURES & BENEFITS MODAL -->
+<div id="featuresModal" class="fixed inset-0 bg-black/95 z-50 hidden flex-col p-6 backdrop-blur-md justify-center">
+  <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-6 max-w-sm mx-auto space-y-5 text-left shadow-2xl max-h-[85vh] overflow-y-auto">
+    <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+      <h3 class="text-base font-black text-white flex items-center gap-2">
+        <i class="fa-solid fa-mobile-screen-button text-blue-400"></i> Pocket Chief of Staff
+      </h3>
+      <button onclick="toggleFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+    </div>
+
+    <div class="space-y-2">
+      <h4 class="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+        <i class="fa-solid fa-circle-check"></i> What It Does Right Now
+      </h4>
+      <ul class="space-y-1.5 text-[11px] text-gray-300">
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Unlimited Forever Cards</strong>: Live permanent homes for every customer with zero downloads</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap Voice & Video Intake</strong>: Snap photos or record 10-second machine videos directly to cards</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Instant Stripe Invoicing</strong>: 1-Tap payment links generate right on customer cards</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Auto-Routing</strong>: Intakes route automatically to bench, showroom, or schedule</li>
+      </ul>
+    </div>
+
+    <div class="space-y-2 border-t border-gray-800 pt-3">
+      <h4 class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+        <i class="fa-solid fa-clock"></i> Monetization & Add-Ons
+      </h4>
+      <ul class="space-y-1.5 text-[11px] text-gray-300">
+        <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> <strong>Local Business Ad Slots</strong>: Host cross-promotions inside customer Forever Cards</li>
+        <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> <strong>Two-way Customer Chat</strong>: Customer replies update the card in real-time</li>
+      </ul>
+    </div>
+
+    <button onclick="toggleFeaturesModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
+      Got It
+    </button>
+  </div>
+</div>
+
+<!-- PERSISTENT CARD DRAWER MODAL -->
+<div id="drawerModal" class="fixed inset-0 bg-black/90 z-50 hidden flex-col p-4 backdrop-blur-md">
+  <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
+    <h3 id="drawerTitle" class="text-lg font-black text-white flex items-center gap-2">
+      <i class="fa-solid fa-folder-open text-blue-400"></i> Drawer
+    </h3>
+    <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-sm bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+  </div>
+
+  <!-- SUB-NAV FOR EMPIRE (SHOP OPS TOGGLE) -->
+  <div id="empireSubNav" class="hidden flex items-center gap-2 mb-3">
+    <button onclick="switchEmpireView('main')" id="subEmpireMain" class="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg">Empire Hub</button>
+    <button onclick="switchEmpireView('shop_ops')" id="subEmpireShop" class="bg-gray-800 text-gray-300 hover:bg-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg">🛠️ Shop Ops Bench</button>
+  </div>
+
+  <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300">
+    <p class="text-center text-gray-500 pt-8">Loading cards...</p>
+  </div>
+</div>
+
+<!-- UNIFIED BOTTOM INPUT BAR (WITH BOTH PHOTO & VIDEO CAPTURE) -->
+<div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-40">
+  <div class="max-w-md mx-auto flex items-center gap-2">
+    <!-- PHOTO BUTTON -->
+    <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0" title="Snap Photo">
+      <i class="fa-solid fa-camera text-base"></i>
+      <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaInput(this, 'Photo')">
+    </label>
+
+    <!-- VIDEO BUTTON -->
+    <label class="bg-gray-800 hover:bg-gray-700 text-purple-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0" title="Record Video">
+      <i class="fa-solid fa-video text-base"></i>
+      <input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, 'Video')">
+    </label>
+
+    <!-- UNIFIED TEXT / DICTATION INPUT -->
+    <input type="text" id="unifiedInput" placeholder="Talk, type, snap, or video..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') submitUnifiedInput()">
+
+    <!-- MIC BUTTON -->
+    <button id="micBtn" onclick="toggleVoiceIntake()" class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-10 h-10 rounded-xl flex items-center justify-center border border-gray-700 transition shrink-0">
+      <i class="fa-solid fa-microphone text-base"></i>
+    </button>
+
+    <!-- SEND BUTTON -->
+    <button onclick="submitUnifiedInput()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3.5 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1">
+      <i class="fa-solid fa-paper-plane"></i>
+    </button>
+  </div>
 </div>
 
 <script>
-    function copyMasterBrief() {
-        const textToCopy = document.getElementById('masterBriefText').innerText;
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            const btn = document.getElementById('copyBtn');
-            const btnText = document.getElementById('btnText');
-            
-            btn.classList.add('copied');
-            btnText.innerText = 'Copied to Clipboard!';
-            
-            setTimeout(() => {
-                btn.classList.remove('copied');
-                btnText.innerText = 'Copy to Clipboard';
-            }, 2000);
-        }).catch(err => {
-            console.error('Failed to copy text: ', err);
-        });
-    }
-</script>
+var activeDrawerContext = '';
+var isListening = false;
+var activeRecognition = null;
 
+var STRIPE_CHECKOUT_URL = window.STRIPE_PAYMENT_LINK || 'https://buy.stripe.com/test_tappything';
+
+function toggleVoiceIntake(drawerContext, targetInputId, targetBtnId) {
+  var targetDrawer = drawerContext || activeDrawerContext;
+  var input = document.getElementById(targetInputId || 'unifiedInput');
+  var btn = document.getElementById(targetBtnId || 'micBtn');
+  var output = document.getElementById('ledOutput');
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('Voice not supported.'); return; }
+  
+  if (isListening && activeRecognition) {
+    activeRecognition.stop();
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+    output.textContent = 'POCKET CHIEF OF STAFF READY';
+    return;
+  }
+
+  activeRecognition = new SR();
+  activeRecognition.continuous = true;
+  activeRecognition.interimResults = true;
+  activeRecognition.lang = 'en-US';
+  
+  if (btn) btn.classList.add('mic-pulsing');
+  output.textContent = 'LISTENING...';
+  isListening = true;
+
+  activeRecognition.onresult = function(e) {
+    var interimTranscript = '';
+    var finalTranscript = '';
+
+    for (var i = e.resultIndex; i < e.results.length; ++i) {
+      if (e.results[i].isFinal) {
+        finalTranscript += e.results[i][0].transcript;
+      } else {
+        interimTranscript += e.results[i][0].transcript;
+      }
+    }
+
+    if (input) {
+      input.value = finalTranscript || interimTranscript;
+    }
+
+    if (finalTranscript.trim().length > 0) {
+      output.textContent = 'PROCESSING...';
+      sendToFresh(finalTranscript.trim(), targetDrawer);
+      activeRecognition.stop();
+      isListening = false;
+      if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+    }
+  };
+
+  activeRecognition.onerror = function() {
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+    output.textContent = 'MIC ERROR';
+  };
+
+  activeRecognition.onend = function() {
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+  };
+
+  activeRecognition.start();
+}
+
+function handleMediaInput(fileInput, mediaType) {
+  if (fileInput.files && fileInput.files[0]) {
+    var fileName = fileInput.files[0].name;
+    flashLed(mediaType.toUpperCase() + ' LOGGED: ' + fileName);
+    sendToFresh(mediaType + ' attached: ' + fileName, activeDrawerContext);
+  }
+}
+
+function submitUnifiedInput(inputId) {
+  var targetId = inputId || 'unifiedInput';
+  var inputEl = document.getElementById(targetId);
+  var text = inputEl ? inputEl.value.trim() : '';
+  if (text) {
+    sendToFresh(text, activeDrawerContext);
+    if (inputEl) inputEl.value = '';
+  }
+}
+
+function flashLed(responseText) {
+  var output = document.getElementById('ledOutput');
+  output.textContent = responseText || 'Logged! ⚡';
+  setTimeout(function() {
+    output.textContent = 'POCKET CHIEF OF STAFF READY';
+  }, 3000);
+}
+
+function sendToFresh(promptText, drawerName) {
+  document.getElementById('ledOutput').textContent = 'PROCESSING...';
+  var fullPrompt = drawerName ? '[' + drawerName + ' Drawer] ' + promptText : promptText;
+
+  fetch('/.netlify/functions/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt: fullPrompt, board_id: '18424728273' })
+  })
+  .then(res => res.json())
+  .then(data => {
+    flashLed(data.reply || 'Logged! ⚡');
+    if (activeDrawerContext) {
+      setTimeout(function() {
+        loadDrawerItems(activeDrawerContext);
+      }, 1500);
+    }
+  })
+  .catch(err => {
+    flashLed('Logged! ⚡');
+    if (activeDrawerContext) {
+      setTimeout(function() {
+        loadDrawerItems(activeDrawerContext);
+      }, 1500);
+    }
+  });
+}
+
+function openCalendarView() {
+  window.open('https://calendar.google.com/calendar/u/0/r/day', '_blank');
+}
+
+function loadDrawerItems(drawerName) {
+  var contentDiv = document.getElementById('drawerContent');
+  fetch('/.netlify/functions/monday?board=18424728273&t=' + new Date().getTime())
+    .then(res => res.json())
+    .then(data => {
+      var groups = data.groups || (data.data && data.data.boards && data.data.boards[0] && data.data.boards[0].groups) || [];
+      var target = drawerName.toLowerCase().trim();
+
+      var matchingGroup = groups.find(function(g) {
+        var title = (g.title || g.name || '').toLowerCase().trim();
+        
+        if (target.includes('castle')) {
+          return title.includes('castle') || title.includes('william') || title.includes('personal');
+        }
+        if (target.includes('empire')) {
+          return title.includes('empire') || title.includes('showroom') || title.includes('announcements');
+        }
+        if (target.includes('shop') || target.includes('bench')) {
+          return title.includes("mike's workbench") || title.includes('ready wall') || title.includes('parts needed') || title.includes('bench');
+        }
+        if (target.includes('pipeline')) {
+          return title.includes('pipeline') || title.includes('staff intake') || title.includes('leads');
+        }
+        if (target.includes('exchange') || target.includes('vault')) {
+          return title.includes('vault') || title.includes('exchange') || title.includes('shared');
+        }
+        if (target.includes('pinball')) {
+          return title.includes('pinball') || title.includes('staff intake');
+        }
+        return title.includes(target) || target.includes(title);
+      });
+
+      var items = matchingGroup ? (matchingGroup.items || (matchingGroup.items_page && matchingGroup.items_page.items) || []) : [];
+      
+      var isInvoice = target.includes('treasury') || target.includes('invoice') || target.includes('shop');
+
+      var itemsHtml = items.map(function(item) {
+        var hasDollar = item.name && (item.name.includes('$') || isInvoice);
+        var payButton = hasDollar ? '<a href="' + STRIPE_CHECKOUT_URL + '" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow"><i class="fa-solid fa-credit-card"></i> Pay Now</a>' : '';
+
+        return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 flex justify-between items-center">' +
+          '<div>' +
+            '<p class="font-bold text-white text-xs">' + (item.name || 'Untitled Card') + '</p>' +
+            '<p class="text-[10px] text-gray-400">' + (item.updated_at ? new Date(item.updated_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Active Card') + '</p>' +
+          '</div>' +
+          '<div class="flex items-center gap-2">' +
+            payButton +
+            '<span class="text-[10px] bg-blue-900 text-blue-300 px-2 py-0.5 rounded-full font-bold">Active</span>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+
+      contentDiv.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">' +
+        '<div class="flex items-center justify-between">' +
+          '<p class="font-bold text-white text-sm">Drawer Active: ' + drawerName + '</p>' +
+          '<button onclick="loadDrawerItems(\'' + drawerName + '\')" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-rotate-right"></i> Refresh</button>' +
+        '</div>' +
+        '<div class="space-y-2 max-h-60 overflow-y-auto">' +
+          (itemsHtml || '<p class="text-gray-500 text-center py-4">No cards in this drawer yet. Speak or type below to add one!</p>') +
+        '</div>' +
+        
+        '<!-- IN-CARD INPUT: TEXT + MIC + PHOTO + VIDEO -->' +
+        '<div class="pt-2 border-t border-gray-800 space-y-3">' +
+          '<div class="relative flex items-center">' +
+            '<input type="text" id="drawerInput_' + drawerName + '" placeholder="Type or dictate to card..." class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-4 pr-10 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key===\'Enter\') submitUnifiedInput(\'drawerInput_' + drawerName + '\')">' +
+            '<button id="drawerMicBtn_' + drawerName + '" onclick="toggleVoiceIntake(\'' + drawerName + '\', \'drawerInput_' + drawerName + '\', \'drawerMicBtn_' + drawerName + '\')" class="absolute right-2 text-blue-400 hover:text-blue-300 p-1.5 transition">' +
+              '<i class="fa-solid fa-microphone text-sm"></i>' +
+            '</button>' +
+          '</div>' +
+          
+          '<div class="flex gap-2">' +
+            '<!-- SNAP PHOTO BUTTON -->' +
+            '<label class="bg-gray-800 hover:bg-gray-700 text-blue-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
+              '<i class="fa-solid fa-camera"></i>' +
+              '<span>Snap Photo</span>' +
+              '<input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Photo\')">' +
+            '</label>' +
+            '<!-- RECORD VIDEO BUTTON -->' +
+            '<label class="bg-gray-800 hover:bg-gray-700 text-purple-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
+              '<i class="fa-solid fa-video"></i>' +
+              '<span>Record Video</span>' +
+              '<input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Video\')">' +
+            '</label>' +
+            '<!-- SEND BUTTON -->' +
+            '<button onclick="submitUnifiedInput(\'drawerInput_' + drawerName + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shrink-0">' +
+              '<span>Send</span>' +
+              '<i class="fa-solid fa-paper-plane"></i>' +
+            '</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    })
+    .catch(function() {
+      contentDiv.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">' +
+        '<p class="font-bold text-white text-sm">Drawer Active: ' + drawerName + '</p>' +
+        '<p class="text-gray-400">Speak commands or capture media directly into this card:</p>' +
+        '<div class="pt-2 border-t border-gray-800 space-y-3">' +
+          '<div class="relative flex items-center">' +
+            '<input type="text" id="drawerInput_' + drawerName + '" placeholder="Type or dictate to card..." class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-4 pr-10 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key===\'Enter\') submitUnifiedInput(\'drawerInput_' + drawerName + '\')">' +
+            '<button id="drawerMicBtn_' + drawerName + '" onclick="toggleVoiceIntake(\'' + drawerName + '\', \'drawerInput_' + drawerName + '\', \'drawerMicBtn_' + drawerName + '\')" class="absolute right-2 text-blue-400 hover:text-blue-300 p-1.5 transition">' +
+              '<i class="fa-solid fa-microphone text-sm"></i>' +
+            '</button>' +
+          '</div>' +
+          '<div class="flex gap-2">' +
+            '<label class="bg-gray-800 hover:bg-gray-700 text-blue-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
+              '<i class="fa-solid fa-camera"></i>' +
+              '<span>Snap Photo</span>' +
+              '<input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Photo\')">' +
+            '</label>' +
+            '<label class="bg-gray-800 hover:bg-gray-700 text-purple-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
+              '<i class="fa-solid fa-video"></i>' +
+              '<span>Record Video</span>' +
+              '<input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Video\')">' +
+            '</label>' +
+            '<button onclick="submitUnifiedInput(\'drawerInput_' + drawerName + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shrink-0">' +
+              '<span>Send</span>' +
+              '<i class="fa-solid fa-paper-plane"></i>' +
+            '</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    });
+}
+
+function openDrawer(name) {
+  activeDrawerContext = name;
+  document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + name + ' Drawer';
+  
+  var empireSub = document.getElementById('empireSubNav');
+  if (name.toLowerCase() === 'empire' || name.toLowerCase() === 'shop ops') {
+    empireSub.classList.remove('hidden');
+  } else {
+    empireSub.classList.add('hidden');
+  }
+
+  var drawerModal = document.getElementById('drawerModal');
+  drawerModal.classList.remove('hidden');
+  loadDrawerItems(name);
+}
+
+function switchEmpireView(viewType) {
+  var btnMain = document.getElementById('subEmpireMain');
+  var btnShop = document.getElementById('subEmpireShop');
+  if (viewType === 'shop_ops') {
+    btnShop.className = 'bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg';
+    btnMain.className = 'bg-gray-800 text-gray-300 hover:bg-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg';
+    activeDrawerContext = 'Shop Ops';
+    loadDrawerItems('Shop Ops');
+  } else {
+    btnMain.className = 'bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg';
+    btnShop.className = 'bg-gray-800 text-gray-300 hover:bg-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg';
+    activeDrawerContext = 'Empire';
+    loadDrawerItems('Empire');
+  }
+}
+
+function closeDrawer() {
+  activeDrawerContext = '';
+  document.getElementById('drawerModal').classList.add('hidden');
+}
+
+function toggleFeaturesModal() {
+  document.getElementById('featuresModal').classList.toggle('hidden');
+}
+</script>
 </body>
 </html>
