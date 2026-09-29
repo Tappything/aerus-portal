@@ -3,22 +3,21 @@ const https = require('https');
 function makePostRequest(url, headers, payload) {
   return new Promise((resolve, reject) => {
     const parsedUrl = new URL(url);
-    const req = https.request({
+    const options = {
       hostname: parsedUrl.hostname,
       path: parsedUrl.pathname + parsedUrl.search,
       method: 'POST',
       headers: headers
-    }, (res) => {
+    };
+
+    const req = https.request(options, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
-        try {
-          resolve(JSON.parse(data));
-        } catch (e) {
-          resolve({ raw: data });
-        }
+        try { resolve(JSON.parse(data)); } catch (e) { resolve({ raw: data }); }
       });
     });
+
     req.on('error', reject);
     req.write(payload);
     req.end();
@@ -96,8 +95,8 @@ exports.handler = async function(event, context) {
       'castle': ['castle', 'personal', 'car', 'vehicle'],
       'housekeeping': ['housekeeping', 'chores', 'checklist', 'clean'],
       'pipeline': ['pipeline', 'lead', 'private'],
-      'pinball': ['pinball', 'staff intake', 'intake', 'queue'],
-      'calendar': ['calendar']
+      'calendar': ['calendar', 'schedule'],
+      'pinball': ['pinball', 'queue']
     };
 
     const matchTerms = filterMap[groupFilter] || [groupFilter];
