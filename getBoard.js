@@ -1,30 +1,4 @@
-const https = require('https');
-
-function makePostRequest(url, headers, payload) {
-  return new Promise((resolve, reject) => {
-    const parsedUrl = new URL(url);
-    const options = {
-      hostname: parsedUrl.hostname,
-      path: parsedUrl.pathname + parsedUrl.search,
-      method: 'POST',
-      headers: headers
-    };
-
-    const req = https.request(options, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        try { resolve(JSON.parse(data)); } catch (e) { resolve({ raw: data }); }
-      });
-    });
-
-    req.on('error', reject);
-    req.write(payload);
-    req.end();
-  });
-}
-
-exports.handler = async function(event, context) {
+exports.handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
@@ -33,104 +7,68 @@ exports.handler = async function(event, context) {
   };
 
   if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: JSON.stringify({ message: 'OK' }) };
+    return { statusCode: 200, headers, body: '' };
   }
 
-  try {
-    const mondayKey = process.env.MONDAY_API_TOKEN || process.env.MONDAY_API_KEY;
-    const params = event.queryStringParameters || {};
-    const targetBoardId = params.board_id || '18424728273';
-    const groupFilter = (params.group || '').toLowerCase().trim();
+  const token = process.env.MONDAY_API_TOKEN || process.env.MONDAY_API_KEY || process.env.MONDAY_TOKEN;
+  const boardId = "18424728273";
 
-    if (!mondayKey) {
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'MONDAY_API_TOKEN not configured', items: [] })
-      };
-    }
+  const groupMap = {
+    castle: 'group_mm7mv0yv',
+    empire: 'group_mm7mfbre',
+    pipeline: 'group_mm7myd0b',
+    calendar: 'group_mm7maw66',
+    housekeeping: 'group_mm6b77as',
+    pinball: 'group_mm7mmekt'
+  };
 
-    if (groupFilter === 'exchange') {
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ items: [], message: '22,283 Customer Vault Connected.' })
-      };
-    }
+  const qParams = event.queryStringParameters || {};
+  const rawDrawer = qParams.group || qParams.drawer || 'all';
+  const drawer = rawDrawer.toLowerCase();
+  const targetGroup = groupMap[drawer];
 
-    const query = JSON.stringify({
-      query: `{
-        boards(ids: [${targetBoardId}]) {
-          groups {
-            id
-            title
-            items_page(limit: 50) {
-              items {
-                id
-                name
-                column_values {
-                  id
-                  text
-                }
-              }
+  const query = `
+    query {
+      boards(ids: [${boardId}]) {
+        groups ${targetGroup ? `(ids: ["${targetGroup}"])` : ''} {
+          id
+          title
+          items_page(limit: 50) {
+            items {
+              id
+              name
+              created_at
             }
           }
         }
-      }`
+      }
+    }
+  `;
+
+  try {
+    const response = await fetch('https://api.monday.com/v2', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token
+      },
+      body: JSON.stringify({ query })
     });
 
-    const resData = await makePostRequest('https://api.monday.com/v2', {
-      'Content-Type': 'application/json',
-      'Authorization': mondayKey,
-      'API-Version': '2023-10',
-      'Content-Length': Buffer.byteLength(query)
-    }, query);
-
+    const resData = await response.json();
     const groups = resData?.data?.boards?.[0]?.groups || [];
-    let matchedItems = [];
-
-    const filterMap = {
-      'empire': ['empire', 'staff intake', 'intake', 'bench', 'operations'],
-      'shop ops': ['staff intake', 'intake', 'bench', 'empire'],
-      'castle': ['castle', 'personal', 'car', 'vehicle'],
-      'housekeeping': ['housekeeping', 'chores', 'checklist', 'clean'],
-      'pipeline': ['pipeline', 'lead', 'private'],
-      'calendar': ['calendar', 'schedule'],
-      'pinball': ['pinball', 'queue']
-    };
-
-    const matchTerms = filterMap[groupFilter] || [groupFilter];
-
-    groups.forEach(group => {
-      const title = (group.title || '').toLowerCase().trim();
-      if (title.includes('archive') || title.includes('holding') || title.includes('closed') || title.includes('trash')) {
-        return;
-      }
-
-      const isMatch = matchTerms.some(term => title.includes(term));
-      if (isMatch && group.items_page?.items) {
-        group.items_page.items.forEach(item => {
-          const phoneCol = item.column_values?.find(c => c.id.includes('phone') || c.id.includes('mobile'));
-          const emailCol = item.column_values?.find(c => c.id.includes('email'));
-
-          matchedItems.push({
-            id: item.id,
-            name: item.name || 'Untitled Card',
-            group: group.title,
-            status: 'ACTIVE',
-            phone: phoneCol?.text || '4105551234',
-            email: emailCol?.text || 'customer@email.com'
-          });
-        });
+    let items = [];
+    groups.forEach(g => {
+      if (g.items_page && g.items_page.items) {
+        items = items.concat(g.items_page.items);
       }
     });
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ items: matchedItems })
+      body: JSON.stringify({ items, count: items.length })
     };
-
   } catch (err) {
     return {
       statusCode: 500,
