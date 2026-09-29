@@ -3,22 +3,21 @@ const https = require('https');
 function makePostRequest(url, headers, payload) {
   return new Promise((resolve, reject) => {
     const parsedUrl = new URL(url);
-    const req = https.request({
+    const options = {
       hostname: parsedUrl.hostname,
       path: parsedUrl.pathname + parsedUrl.search,
       method: 'POST',
       headers: headers
-    }, (res) => {
+    };
+
+    const req = https.request(options, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
-        try {
-          resolve(JSON.parse(data));
-        } catch (e) {
-          resolve({ raw: data });
-        }
+        try { resolve(JSON.parse(data)); } catch (e) { resolve({ raw: data }); }
       });
     });
+
     req.on('error', reject);
     req.write(payload);
     req.end();
@@ -40,42 +39,48 @@ exports.handler = async function(event, context) {
   try {
     const mondayKey = process.env.MONDAY_API_TOKEN || process.env.MONDAY_API_KEY;
     const body = JSON.parse(event.body || '{}');
-    const promptText = (body.prompt || body.rawDump || '').trim();
+    const rawPrompt = body.prompt || body.text || '';
+    const targetBoardId = body.board_id || '18424728273';
 
-    if (!promptText) {
-      return { statusCode: 400, headers, body: JSON.stringify({ reply: 'Empty input.' }) };
+    if (!rawPrompt) {
+      return { statusCode: 400, headers, body: JSON.stringify({ reply: 'No prompt received.' }) };
     }
 
-    const lower = promptText.toLowerCase();
+    if (!mondayKey) {
+      return { statusCode: 500, headers, body: JSON.stringify({ reply: '❌ MONDAY_API_TOKEN missing in Netlify.' }) };
+    }
 
-    // TRACK 1: ACTION COMMAND TRACK (Move Active Items to Pinball)
-    if (lower.includes('move') || lower.includes('clean up') || lower.includes('pinball') || lower.includes('clear queue')) {
-      if (mondayKey) {
-        const getItemsQuery = JSON.stringify({
-          query: `{ boards(ids: [18424728273]) { groups(ids: ["group_mm7mfbre", "group_mm6b77as"]) { items_page(limit: 50) { items { id } } } } }`
-        });
+    const lower = rawPrompt.toLowerCase().trim();
 
-        const itemsRes = await makePostRequest('https://api.monday.com/v2', {
-          'Content-Type': 'application/json',
-          'Authorization': mondayKey,
-          'API-Version': '2023-10',
-          'Content-Length': Buffer.byteLength(getItemsQuery)
-        }, getItemsQuery);
+    // TRACK B: ACTION COMMAND TRACK (Move to Pinball Queue)
+    if (lower.includes('bring everything') || lower.includes('move to pinball') || lower.includes('move all') || lower.includes('clean up') || lower.includes('clear board')) {
+      const getItemsQuery = JSON.stringify({
+        query: `{ boards(ids: [${targetBoardId}]) { groups(ids: ["group_mm7mfbre", "group_mm6b77as"]) { items_page(limit: 50) { items { id } } } } }`
+      });
 
-        const groups = itemsRes?.data?.boards?.[0]?.groups || [];
-        for (const group of groups) {
-          const items = group.items_page?.items || [];
-          for (const item of items) {
-            const moveQuery = JSON.stringify({
-              query: `mutation { move_item_to_group (item_id: "${item.id}", group_id: "group_mm7mmekt") { id } }`
-            });
-            await makePostRequest('https://api.monday.com/v2', {
-              'Content-Type': 'application/json',
-              'Authorization': mondayKey,
-              'API-Version': '2023-10',
-              'Content-Length': Buffer.byteLength(moveQuery)
-            }, moveQuery);
-          }
+      const itemsRes = await makePostRequest('https://api.monday.com/v2', {
+        'Content-Type': 'application/json',
+        'Authorization': mondayKey,
+        'API-Version': '2023-10',
+        'Content-Length': Buffer.byteLength(getItemsQuery)
+      }, getItemsQuery);
+
+      const groups = itemsRes?.data?.boards?.[0]?.groups || [];
+      let moveCount = 0;
+
+      for (const group of groups) {
+        const items = group.items_page?.items || [];
+        for (const item of items) {
+          const moveQuery = JSON.stringify({
+            query: `mutation { move_item_to_group (item_id: "${item.id}", group_id: "group_mm7mmekt") { id } }`
+          });
+          await makePostRequest('https://api.monday.com/v2', {
+            'Content-Type': 'application/json',
+            'Authorization': mondayKey,
+            'API-Version': '2023-10',
+            'Content-Length': Buffer.byteLength(moveQuery)
+          }, moveQuery);
+          moveCount++;
         }
       }
 
@@ -83,34 +88,81 @@ exports.handler = async function(event, context) {
         statusCode: 200,
         headers,
         body: JSON.stringify({
-          reply: "⚡ All active tasks moved to your Pinball queue, William! Let's knock them out!"
+          reply: `All ${moveCount} active tasks moved directly to Pinball queue, William! Let's knock them out!`,
+          count: moveCount
         })
       };
     }
 
-    // TRACK 2: INTAKE DUMP TRACK -> CREATE CARD ON MONDAY
-    if (mondayKey) {
-      const createItemQuery = JSON.stringify({
-        query: `mutation {
-          create_item (board_id: 18424728273, group_id: "group_mm6b77as", item_name: "${promptText.replace(/"/g, '\\"')}") {
-            id
-          }
-        }`
+    // TRACK A: MULTI-CARD INTAKE SPLITTER & ROUTER
+    const groupMap = {
+      empire: { id: 'group_mm7mfbre', name: 'Empire Operations' },
+      pipeline: { id: 'group_mm7myd0b', name: 'Pipeline' },
+      castle: { id: 'group_mm7mv0yv', name: 'Castle Drawer' },
+      pinball: { id: 'group_mm7mmekt', name: 'Pinball Queue' },
+      housekeeping: { id: 'group_mm6b77as', name: 'Housekeeping' },
+      intake: { id: 'group_mm6b77as', name: 'Staff Intake' }
+    };
+
+    const sentences = rawPrompt
+      .split(/(?:\. |\n|;|\band then\b|\band also\b|\band the other to\b|\band the other\b|\bthe last one\b|, (?=[a-zA-Z]{3,}))/i)
+      .map(s => s.trim())
+      .filter(s => s.length > 3);
+
+    let parsedCards = [];
+
+    sentences.forEach(sentence => {
+      const sLower = sentence.toLowerCase();
+      let targetKey = 'intake';
+
+      if (sLower.includes('personal') || sLower.includes('home') || sLower.includes('family')) {
+        targetKey = 'castle';
+      } else if (sLower.includes('lead') || sLower.includes('sale') || sLower.includes('quote') || sLower.includes('
+
+---
+
+### **Action:**
+1. Commit this into **`netlify/functions/chat.js`** on GitHub.
+2. Ensure **`index.html`** and **`netlify/functions/getBoard.js`** are pushed.
+3. Wait 20 seconds for Netlify to publish the build.
+
+Once deployed, open `freshtappything.com`—your live 2-track voice intake and Pinball queue are ready!) || sLower.includes('dollar')) {
+        targetKey = 'pipeline';
+      } else if (sLower.includes('clean') || sLower.includes('trash') || sLower.includes('chore') || sLower.includes('housekeeping')) {
+        targetKey = 'housekeeping';
+      } else if (sLower.includes('quick') || sLower.includes('urgent') || sLower.includes('pinball')) {
+        targetKey = 'pinball';
+      } else if (sLower.includes('shop') || sLower.includes('bench') || sLower.includes('repair')) {
+        targetKey = 'empire';
+      }
+
+      let cleanTitle = sentence.charAt(0).toUpperCase() + sentence.slice(1);
+
+      parsedCards.push({
+        title: cleanTitle,
+        groupId: groupMap[targetKey].id
+      });
+    });
+
+    for (const card of parsedCards) {
+      const createQuery = JSON.stringify({
+        query: `mutation { create_item (board_id: ${targetBoardId}, group_id: "${card.groupId}", item_name: "${card.title.replace(/"/g, '\\"')}") { id } }`
       });
 
       await makePostRequest('https://api.monday.com/v2', {
         'Content-Type': 'application/json',
         'Authorization': mondayKey,
         'API-Version': '2023-10',
-        'Content-Length': Buffer.byteLength(createItemQuery)
-      }, createItemQuery);
+        'Content-Length': Buffer.byteLength(createQuery)
+      }, createQuery);
     }
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        reply: `✅ INTAKE LOGGED TO QUEUE: "${promptText.substring(0, 45)}..."`
+        reply: `Got it, William! Logged ${parsedCards.length} action card${parsedCards.length > 1 ? 's' : ''} directly to Monday.`,
+        cardsCreated: parsedCards.length
       })
     };
 
@@ -118,7 +170,7 @@ exports.handler = async function(event, context) {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ reply: '✅ LOGGED & STAGED IN QUEUE! ⚡' })
+      body: JSON.stringify({ reply: 'Error processing intake: ' + err.message })
     };
   }
 };
