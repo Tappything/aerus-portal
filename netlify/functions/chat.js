@@ -52,10 +52,10 @@ exports.handler = async function(event, context) {
 
     const lower = rawPrompt.toLowerCase().trim();
 
-    // TRACK 1: WIPE / CLEAR QUEUE COMMAND (Moves items to Archive)
-    if (lower.includes('clear board') || lower.includes('clear queue') || lower.includes('wipe queue') || lower.includes('clear out the temporary queue') || lower.includes('clear temporary queue')) {
+    // TRACK 1: WIPE / CLEAR QUEUE COMMAND
+    if (lower.includes('clear board') || lower.includes('clear queue') || lower.includes('wipe queue') || lower.includes('clear out the temporary queue')) {
       const getItemsQuery = JSON.stringify({
-        query: `{ boards(ids: [${targetBoardId}]) { groups(ids: ["group_mm7mfbre", "group_mm6b77as"]) { items_page(limit: 50) { items { id } } } } }`
+        query: `{ boards(ids: [${targetBoardId}]) { groups(ids: ["group_mm7mfbre", "group_mm6b77as", "group_mm7mmekt"]) { items_page(limit: 50) { items { id } } } } }`
       });
 
       const itemsRes = await makePostRequest('https://api.monday.com/v2', {
@@ -136,18 +136,28 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // TRACK 3: MULTI-TASK SPLITTER & INTAKE ROUTER
+    // TRACK 3: MULTI-TASK SPLITTER WITH HONORIFIC PROTECTOR
+    let cleanPrompt = rawPrompt.replace(/^(fresh,?\s*process\s*this\s*run:?\s*|fresh,?\s*)/i, '');
+
+    // PROTECT HONORIFICS SO PERIODS DO NOT SPLIT NAMES
+    cleanPrompt = cleanPrompt
+      .replace(/\bMrs\./gi, 'Mrs___')
+      .replace(/\bMr\./gi, 'Mr___')
+      .replace(/\bMs\./gi, 'Ms___')
+      .replace(/\bDr\./gi, 'Dr___');
+
     const groupMap = {
       empire: { id: 'group_mm7mfbre', name: 'Empire Operations' },
       pipeline: { id: 'group_mm7myd0b', name: 'Pipeline' },
       castle: { id: 'group_mm7mv0yv', name: 'Castle Drawer' },
       pinball: { id: 'group_mm7mmekt', name: 'Pinball Queue' },
+      housekeeping: { id: 'group_mm6b77as', name: 'Housekeeping' },
       intake: { id: 'group_mm6b77as', name: 'Staff Intake' }
     };
 
-    const sentences = rawPrompt
+    const sentences = cleanPrompt
       .split(/(?:\. |\n|;|\band then\b|\band also\b|\band the other to\b|\band the other\b|\bthe last one\b|, (?=[a-zA-Z]{3,}))/i)
-      .map(s => s.trim())
+      .map(s => s.replace(/___/g, '.').trim())
       .filter(s => s.length > 3);
 
     let parsedCards = [];
@@ -160,6 +170,8 @@ exports.handler = async function(event, context) {
         targetKey = 'castle';
       } else if (sLower.includes('lead') || sLower.includes('sale') || sLower.includes('quote')) {
         targetKey = 'pipeline';
+      } else if (sLower.includes('clean') || sLower.includes('trash') || sLower.includes('chore') || sLower.includes('housekeeping')) {
+        targetKey = 'housekeeping';
       } else if (sLower.includes('quick') || sLower.includes('urgent') || sLower.includes('pinball')) {
         targetKey = 'pinball';
       } else if (sLower.includes('shop') || sLower.includes('bench') || sLower.includes('repair')) {
@@ -191,7 +203,7 @@ exports.handler = async function(event, context) {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        reply: `Got it, William! Logged ${parsedCards.length} action card${parsedCards.length > 1 ? 's' : ''} directly to Monday.`,
+        reply: `✅ LOGGED ${parsedCards.length} CLEAN TASKS TO EMPIRE & PINBALL! ⚡`,
         cardsCreated: parsedCards.length
       })
     };
