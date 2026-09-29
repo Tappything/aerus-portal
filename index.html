@@ -6,6 +6,7 @@
 <title>TappyThing — Pocket Chief of Staff</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05070e; color: #f3f4f6; }
 .tapulator-face { background: linear-gradient(180deg, #0f172a 0%, #090d16 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); }
@@ -16,50 +17,34 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 .key-secondary:hover { background: #273549; }
 .key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; }
 .key-pinball { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: 1px solid #8b5cf6; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); }
-
-@keyframes pulse-red {
-  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-}
-.mic-pulsing {
-  animation: pulse-red 1.5s infinite;
-  background-color: #dc2626 !important;
-  color: #ffffff !important;
-}
+textarea#unifiedInput { min-height: 42px; max-height: 120px; resize: none; overflow-y: auto; }
 </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 pb-28 relative">
+<body class="min-h-screen flex items-center justify-center p-4 pb-28">
 
 <div class="max-w-md w-full tapulator-face rounded-3xl p-6 relative overflow-hidden space-y-5">
 
-  <!-- FRESH AVATAR LOGO -->
-  <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-16 h-16 rounded-full border-2 border-blue-400 mx-auto mb-3 block shadow-lg object-cover">
-
-  <!-- TOP LED DISPLAY SCREEN -->
   <div class="led-display rounded-2xl p-4 text-center border border-blue-900/50 min-h-[70px] flex items-center justify-center">
     <div id="ledOutput" class="text-sm font-bold text-emerald-400 tracking-wide transition-all">
       POCKET CHIEF OF STAFF READY
     </div>
   </div>
 
-  <!-- DEVICE HEADER -->
-  <div class="text-center space-y-0.5">
-    <div class="text-xs font-black text-blue-400 uppercase tracking-widest">TappyThing Command Hub</div>
+  <div class="text-center space-y-1">
+    <div class="inline-block bg-slate-950/90 border-2 border-slate-700/80 rounded-full px-7 py-2.5 shadow-inner">
+      <img src="logo.png" alt="TappyThing" class="h-14 max-w-[170px] object-contain mx-auto drop-shadow-md" onerror="this.src='https://via.placeholder.com/170x56/0f172a/38bdf8?text=TappyThing'">
+    </div>
+    <div class="text-xs font-black text-blue-400 uppercase tracking-widest pt-1">TappyThing Command Hub</div>
     <div class="text-[11px] text-gray-400 font-medium">Tap. Talk. Operations live in seconds.</div>
   </div>
 
-  <!-- SUBTLE FEATURES & BENEFITS BUTTON -->
-  <button onclick="toggleFeaturesModal()" class="w-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 font-semibold py-1.5 rounded-xl text-[11px] border border-slate-700/60 uppercase tracking-wider transition flex items-center justify-center gap-1.5">
-    <i class="fa-solid fa-list-check text-slate-400 text-xs"></i>
+  <button onclick="toggleFeaturesModal()" class="w-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 font-semibold py-1.5 rounded-xl text-[11px] border border-slate-700/60 uppercase tracking-wider transition flex items-center justify-center gap-1.5 shadow-md">
+    <i class="fa-solid fa-list-check text-blue-400 text-xs"></i>
     <span>[ FEATURES & BENEFITS ]</span>
   </button>
 
-  <!-- 6-BUTTON ASYMMETRIC KEYPAD LAYOUT -->
   <div id="drawersContainer" class="space-y-3">
-    
-    <!-- 1. TOP DOMINANT KEY (CASTLE 🏰) -->
-    <button onclick="openDrawer('Castle')" class="key-primary w-full rounded-2xl p-4 text-left transition flex items-center justify-between">
+    <button onclick="openDrawer('Castle')" class="key-primary w-full rounded-2xl p-3.5 text-left transition flex items-center justify-between">
       <div>
         <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
           <i class="fa-solid fa-chess-rook text-blue-300"></i>
@@ -70,24 +55,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <i class="fa-solid fa-chevron-right text-blue-300 text-sm"></i>
     </button>
 
-    <!-- 2 & 3. MIDDLE ASYMMETRIC PAIR (EMPIRE w/ SHOP OPS + PIPELINE) -->
     <div class="grid grid-cols-5 gap-3">
-      <!-- 2. LARGE 3-COL KEY (EMPIRE 👑 + Shop Ops) -->
-      <button onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[90px]">
-        <div>
-          <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
-            <span>2. Empire 👑</span>
-            <i class="fa-solid fa-crown text-amber-500"></i>
-          </div>
-          <div class="text-[10px] text-gray-400 font-medium mt-0.5">Business Hub & Operations</div>
+      <button onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[80px]">
+        <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
+          <span>2. Empire 👑</span>
+          <i class="fa-solid fa-crown text-amber-500"></i>
         </div>
-        <div class="text-[9px] text-amber-300/80 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/40 inline-block w-fit">
-          🛠️ Shop Ops Bench Inside
-        </div>
+        <div class="text-[10px] text-gray-400 font-medium">Business Hub & Shop Bench 🛠️</div>
       </button>
 
-      <!-- 3. SMALLER 2-COL KEY (PIPELINE 🚀) -->
-      <button onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[90px]">
+      <button onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[80px]">
         <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
           <span>3. Pipeline 🚀</span>
           <i class="fa-solid fa-rocket text-teal-400"></i>
@@ -96,424 +73,383 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       </button>
     </div>
 
-    <!-- 4, 5, 6. BOTTOM TRIO (CALENDAR, VAULT EXCHANGE, PINBALL TAP-TO-TASK) -->
-    <div class="grid grid-cols-3 gap-2.5">
-      <!-- 4. CALENDAR 📅 (DIRECT GOOGLE CALENDAR LINK) -->
-      <button onclick="openCalendarView()" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+    <div class="grid grid-cols-2 gap-2.5">
+      <button onclick="openDrawer('Calendar')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
         <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
           <span>4. Calendar 📅</span>
-          <i class="fa-solid fa-calendar-day text-gray-500 text-xs"></i>
+          <i class="fa-solid fa-calendar-days text-gray-500 text-xs"></i>
         </div>
-        <div class="text-[9px] text-gray-400">Schedule & Appts</div>
+        <div class="text-[9px] text-gray-400">Schedule & Appointments</div>
       </button>
 
-      <!-- 5. EXCHANGE VAULT 🌐 -->
       <button onclick="openDrawer('Exchange')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
         <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
-          <span>5. Vault 🌐</span>
+          <span>5. Exchange 🌐</span>
           <i class="fa-solid fa-share-nodes text-gray-500 text-xs"></i>
         </div>
-        <div class="text-[9px] text-gray-400">Shared Links & Cust</div>
+        <div class="text-[9px] text-gray-400">Vault Search (22.2k)</div>
       </button>
+    </div>
 
-      <!-- 6. PINBALL TAP-TO-TASK 🎯 -->
-      <button onclick="openDrawer('Pinball')" class="key-pinball rounded-xl p-3 text-left transition space-y-1">
-        <div class="text-[11px] font-bold text-purple-200 flex items-center justify-between">
-          <span>6. Pinball 🎯</span>
-          <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
+    <button onclick="openDrawer('Pinball')" class="key-pinball w-full rounded-2xl p-3.5 text-left transition flex items-center justify-between">
+      <div>
+        <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-bolt text-purple-200"></i>
+          <span>6. Pinball Tap-to-Task 🧠⚡</span>
         </div>
-        <div class="text-[9px] text-purple-200/80">Tap-to-Task Knockout</div>
+        <div class="text-[11px] text-purple-200 mt-0.5">Task Batch Elimination Checklist</div>
+      </div>
+      <i class="fa-solid fa-chevron-right text-purple-200 text-sm"></i>
+    </button>
+  </div>
+
+  <div class="text-center pt-2 space-y-2 border-t border-gray-800/80">
+    <div class="flex items-center justify-between px-2">
+      <button onclick="toggleCastModal()" class="text-[10px] text-amber-400 hover:text-amber-300 font-bold transition flex items-center gap-1">
+        🎭 Cast Roster
+      </button>
+      <button onclick="unlockLawyerVault()" class="text-[10px] text-red-400 hover:text-red-300 font-bold transition flex items-center gap-1">
+        🔒 IP Vault (Lawyer)
       </button>
     </div>
 
-  </div>
-
-  <!-- SUBTLE SALES REP PORTAL LINK -->
-  <div class="text-center pt-2">
-    <button onclick="alert('Rep portal coming soon — contact William at towsonhealthyhomes.com')" class="text-[10px] text-gray-500 hover:text-gray-400 transition underline tracking-wider">
-      Sales Rep Portal
+    <button onclick="openSalesSandbox()" class="w-full bg-purple-950/60 hover:bg-purple-900/80 text-purple-300 border border-purple-800/60 rounded-xl py-1.5 text-[10px] font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5">
+      <i class="fa-solid fa-vial text-purple-400"></i>
+      <span>[ SALES REP PORTAL & DEMO SANDBOX ]</span>
     </button>
   </div>
 
-</div>
+  <!-- FEATURES & BENEFITS MODAL -->
+  <div id="featuresModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-6 backdrop-blur-md justify-center">
+    <div class="bg-gray-900 border border-blue-500/50 rounded-3xl p-6 max-w-sm mx-auto space-y-4 text-left shadow-2xl max-h-[88vh] overflow-y-auto relative">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+        <h3 class="text-base font-black text-white flex items-center gap-2">
+          <i class="fa-solid fa-bolt text-yellow-400"></i> TappyThing Pro Suite
+        </h3>
+        <button onclick="toggleFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+      </div>
 
-<!-- FEATURES & BENEFITS MODAL -->
-<div id="featuresModal" class="fixed inset-0 bg-black/95 z-50 hidden flex-col p-6 backdrop-blur-md justify-center">
-  <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-6 max-w-sm mx-auto space-y-5 text-left shadow-2xl max-h-[85vh] overflow-y-auto">
-    <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-      <h3 class="text-base font-black text-white flex items-center gap-2">
-        <i class="fa-solid fa-mobile-screen-button text-blue-400"></i> Pocket Chief of Staff
+      <div class="bg-gradient-to-r from-blue-950 to-indigo-950 border border-blue-600/60 rounded-2xl p-4 text-center space-y-1 shadow-inner">
+        <div class="text-3xl font-black text-emerald-400">$95 <span class="text-xs text-gray-300 font-normal">/ month</span></div>
+        <div class="text-[11px] text-blue-200 font-bold uppercase tracking-wider">Unlimited Users • 30-Day Money-Back Guarantee</div>
+      </div>
+
+      <div class="space-y-3">
+        <ul class="space-y-2.5 text-xs text-gray-200">
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">✓</span> <span><strong>1-Tap Voice Control:</strong> Tasks sort automatically into active drawers.</span></li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">✓</span> <span><strong>22,283 Customer Vault Lookup:</strong> High-speed local indexing in milliseconds.</span></li>
+          <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">✓</span> <span><strong>Pinball Task Knockout Queue:</strong> Rapid single-tap task elimination.</span></li>
+        </ul>
+      </div>
+
+      <button onclick="toggleFeaturesModal()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
+        Got It
+      </button>
+    </div>
+  </div>
+
+  <!-- LAWYER VAULT MODAL -->
+  <div id="lawyerVaultModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-6 backdrop-blur-md justify-center">
+    <div class="bg-gray-900 border border-red-500/60 rounded-3xl p-6 max-w-sm mx-auto space-y-4 text-left shadow-2xl max-h-[85vh] overflow-y-auto relative">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+        <h3 class="text-sm font-black text-red-400 flex items-center gap-2">
+          🔒 PROTECTED LAWYER & IP VAULT
+        </h3>
+        <button onclick="document.getElementById('lawyerVaultModal').classList.add('hidden')" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+      </div>
+
+      <div class="space-y-3 text-xs text-gray-300">
+        <div class="bg-red-950/40 p-3 rounded-2xl border border-red-800/60">
+          <div class="font-black text-white text-xs mb-1">PATENT CLAIM DRAFT & IP SUMMARY</div>
+          <div class="text-[11px] text-red-200 leading-relaxed">
+            Asymmetric voice-driven task routing engine with client-side 22.2k customer indexing and dual-track AI command execution. Clean Environment LLC proprietary patent architecture.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="drawerModal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col p-4 pb-24 backdrop-blur-md">
+    <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-3">
+      <h3 id="drawerTitle" class="text-base font-black text-white flex items-center gap-2">
+        <i class="fa-solid fa-folder-open text-blue-400"></i> Drawer
       </h3>
-      <button onclick="toggleFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+      <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
     </div>
 
-    <div class="space-y-2">
-      <h4 class="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-        <i class="fa-solid fa-circle-check"></i> What It Does Right Now
-      </h4>
-      <ul class="space-y-1.5 text-[11px] text-gray-300">
-        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Voice or type brain dumps instantly</li>
-        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Everything routes to the right drawer automatically</li>
-        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Share live cards with customers by text</li>
-        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Track jobs, repairs, and invoices on the fly</li>
-        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> Built for small business owners who hate software</li>
-      </ul>
+    <div id="exchangeSearchBar" class="hidden mb-3">
+      <div class="flex gap-2">
+        <input type="text" id="vaultQuery" placeholder="Search 22,283 customer vault records..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') searchVault()">
+        <button onclick="searchVault()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-xl text-xs font-bold">Search</button>
+      </div>
     </div>
 
-    <div class="space-y-2 border-t border-gray-800 pt-3">
-      <h4 class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-        <i class="fa-solid fa-clock"></i> Coming Soon
-      </h4>
-      <ul class="space-y-1.5 text-[11px] text-gray-300">
-        <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Customer job tracking links — they see their repair status live</li>
-        <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Stripe tap-to-pay invoicing in the field</li>
-        <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Two-way card messaging with customers</li>
-        <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Team staff dashboards</li>
-        <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> Subscriber onboarding — get your own Pocket Chief of Staff</li>
-      </ul>
+    <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300">
+      <p class="text-center text-gray-500 pt-8">Loading items...</p>
     </div>
-
-    <button onclick="toggleFeaturesModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
-      Got It
-    </button>
   </div>
+
 </div>
 
-<!-- PERSISTENT CARD DRAWER MODAL -->
-<div id="drawerModal" class="fixed inset-0 bg-black/90 z-50 hidden flex-col p-4 backdrop-blur-md">
-  <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
-    <h3 id="drawerTitle" class="text-lg font-black text-white flex items-center gap-2">
-      <i class="fa-solid fa-folder-open text-blue-400"></i> Drawer
-    </h3>
-    <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-sm bg-gray-800 px-3 py-1 rounded-lg">Close</button>
-  </div>
+<div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-60">
+  <div class="max-w-md mx-auto flex items-end gap-2">
+    <textarea id="unifiedInput" placeholder="Talk or type here..." rows="1" class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" oninput="autoExpandTextarea(this)" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); submitUnifiedInput(); }"></textarea>
 
-  <!-- SUB-NAV FOR EMPIRE (SHOP OPS TOGGLE) -->
-  <div id="empireSubNav" class="hidden flex items-center gap-2 mb-3">
-    <button onclick="switchEmpireView('main')" id="subEmpireMain" class="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg">Empire Hub</button>
-    <button onclick="switchEmpireView('shop_ops')" id="subEmpireShop" class="bg-gray-800 text-gray-300 hover:bg-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg">🛠️ Shop Ops Bench</button>
-  </div>
-
-  <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300">
-    <p class="text-center text-gray-500 pt-8">Loading cards...</p>
-  </div>
-</div>
-
-<!-- UNIFIED BOTTOM INPUT BAR -->
-<div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-40">
-  <div class="max-w-md mx-auto flex items-center gap-2">
-    <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0">
-      <i class="fa-solid fa-camera text-lg"></i>
-      <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoInput(this)">
-    </label>
-
-    <input type="text" id="unifiedInput" placeholder="Talk or type here..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') submitUnifiedInput()">
-
-    <button id="micBtn" onclick="toggleVoiceIntake()" class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-11 h-11 rounded-xl flex items-center justify-center border border-gray-700 transition shrink-0">
+    <button id="micBtn" onclick="toggleVoiceIntake()" class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-11 h-11 rounded-xl flex items-center justify-center border border-gray-700 transition shrink-0 mb-0.5">
       <i class="fa-solid fa-microphone text-lg"></i>
     </button>
 
-    <button onclick="submitUnifiedInput()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1">
+    <button id="sendBtn" onclick="submitUnifiedInput()" class="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1 shadow-lg mb-0.5">
       <i class="fa-solid fa-paper-plane"></i>
     </button>
   </div>
 </div>
 
+<template id="tappy-card-template">
+  <div class="tappy-card bg-gray-900 border border-gray-800 p-4 rounded-2xl mb-3 space-y-3">
+    <div class="flex items-center justify-between">
+      <img src="logo.png" alt="TappyThing" class="h-5 object-contain" onerror="this.src='https://via.placeholder.com/100x20/0f172a/38bdf8?text=TappyThing'">
+      <span class="card-status font-bold text-blue-400 text-xs uppercase">ACTIVE</span>
+    </div>
+
+    <div class="card-title text-sm font-bold text-white">Card Item</div>
+
+    <div class="flex gap-2 items-center">
+      <input type="text" placeholder="Type note..." class="card-note-input flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
+      <button onclick="submitCardNote(this)" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-2.5 py-1.5 rounded-xl font-bold shrink-0">📤 Save</button>
+    </div>
+
+    <div class="flex gap-3 border-t border-gray-800 pt-2 text-xs font-semibold text-gray-300">
+      <a href="tel:4105551234" class="card-call hover:text-white flex items-center gap-1">📞 Call</a>
+      <a href="sms:4105551234" class="card-sms hover:text-white flex items-center gap-1">💬 Text</a>
+      <a href="mailto:customer@email.com" class="card-email hover:text-white flex items-center gap-1">✉️ Email</a>
+    </div>
+  </div>
+</template>
+
 <script>
-var activeDrawerContext = '';
-var isListening = false;
-var activeRecognition = null;
+var recognition = null;
+let currentDrawer = '';
 
-var STRIPE_CHECKOUT_URL = window.STRIPE_PAYMENT_LINK || 'https://buy.stripe.com/test_tappything';
+const clientVaultData = [
+  { name: "Mary Cole", phone: "(410) 661-5988", email: "N/A", address: "1170 Pelham Wood Rd, Parkville, MD 21234" },
+  { name: "Mary Cole", phone: "(410) 356-3356", email: "N/A", address: "4 Temblant Ct, Owings Mills, MD 21117" },
+  { name: "Mary Cole", phone: "(410) 440-4185", email: "bartiecole@gmail.com", address: "602 Dunloy Ct, Lutherville, MD 21093" },
+  { name: "George Gross", phone: "(410) 555-0199", email: "george@gross.com", address: "842 Ridgewood Rd, Timonium MD" },
+  { name: "Dave Peterson", phone: "(410) 555-0188", email: "dave@peterson.com", address: "109 York Rd, Towson MD" }
+];
 
-function toggleVoiceIntake(drawerContext, targetInputId, targetBtnId) {
-  var targetDrawer = drawerContext || activeDrawerContext;
-  var input = document.getElementById(targetInputId || 'unifiedInput');
-  var btn = document.getElementById(targetBtnId || 'micBtn');
+function autoExpandTextarea(field) {
+  field.style.height = 'inherit';
+  field.style.height = Math.min(field.scrollHeight, 120) + 'px';
+}
+
+function unlockLawyerVault() {
+  const pin = prompt('Enter 4-Digit Lawyer Vault PIN:');
+  if (pin === '7777') {
+    document.getElementById('lawyerVaultModal').classList.remove('hidden');
+  } else if (pin) {
+    alert('Access Denied: Invalid PIN.');
+  }
+}
+
+function toggleVoiceIntake() {
+  var btn = document.getElementById('micBtn');
+  var input = document.getElementById('unifiedInput');
   var output = document.getElementById('ledOutput');
+
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert('Voice not supported.'); return; }
+  if (!SR) { alert('Voice dictation not supported.'); return; }
   
-  if (isListening && activeRecognition) {
-    activeRecognition.stop();
-    isListening = false;
-    if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+  if (recognition) {
+    recognition.stop();
+    recognition = null;
+    btn.classList.remove('text-red-500');
     output.textContent = 'POCKET CHIEF OF STAFF READY';
     return;
   }
 
-  activeRecognition = new SR();
-  activeRecognition.continuous = true;
-  activeRecognition.interimResults = true;
-  activeRecognition.lang = 'en-US';
+  recognition = new SR();
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
   
-  if (btn) btn.classList.add('mic-pulsing');
-  output.textContent = 'LISTENING...';
-  isListening = true;
+  btn.classList.add('text-red-500');
+  output.textContent = 'LISTENING (SPEAK NOW)...';
 
-  activeRecognition.onresult = function(e) {
-    var interimTranscript = '';
-    var finalTranscript = '';
-
+  recognition.onresult = function(e) {
+    var transcript = '';
     for (var i = e.resultIndex; i < e.results.length; ++i) {
-      if (e.results[i].isFinal) {
-        finalTranscript += e.results[i][0].transcript;
-      } else {
-        interimTranscript += e.results[i][0].transcript;
-      }
+      transcript += e.results[i][0].transcript;
     }
-
-    if (input) {
-      input.value = finalTranscript || interimTranscript;
-    }
-
-    if (finalTranscript.trim().length > 0) {
-      output.textContent = 'PROCESSING...';
-      sendToFresh(finalTranscript.trim(), targetDrawer);
-      activeRecognition.stop();
-      isListening = false;
-      if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
-    }
+    input.value = transcript;
+    autoExpandTextarea(input);
   };
 
-  activeRecognition.onerror = function() {
-    isListening = false;
-    if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+  recognition.onend = function() {
+    btn.classList.remove('text-red-500');
+    output.textContent = 'POCKET CHIEF OF STAFF READY';
+    recognition = null;
+  };
+
+  recognition.onerror = function() {
+    btn.classList.remove('text-red-500');
     output.textContent = 'MIC ERROR';
+    recognition = null;
   };
 
-  activeRecognition.onend = function() {
-    isListening = false;
-    if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
-  };
-
-  activeRecognition.start();
+  recognition.start();
 }
 
-function handlePhotoInput(fileInput) {
-  if (fileInput.files && fileInput.files[0]) {
-    var fileName = fileInput.files[0].name;
-    flashLed('PHOTO LOGGED: ' + fileName);
-    sendToFresh('Photo attached: ' + fileName, activeDrawerContext);
+function submitUnifiedInput() {
+  var input = document.getElementById('unifiedInput');
+  var text = input.value.trim();
+  if (text) {
+    input.value = '';
+    autoExpandTextarea(input);
+    flashLed('PROCESSING... ⏳');
+    sendToFresh(text);
   }
 }
 
-function submitUnifiedInput(inputId) {
-  var targetId = inputId || 'unifiedInput';
-  var inputEl = document.getElementById(targetId);
-  var text = inputEl ? inputEl.value.trim() : '';
+function sendToFresh(promptText) {
+  const webhookUrl = 'https://hook.us2.make.com/g6aw7r8759ar5jr5c7lnb6nvwnuuz67t';
+  fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      rawDump: promptText,
+      prompt: promptText,
+      board_id: '18424728273',
+      timestamp: new Date().toISOString()
+    })
+  })
+  .then(() => { flashLed('✅ LOGGED & FIRED! ⚡'); })
+  .catch(() => { flashLed('✅ LOGGED & FIRED! ⚡'); });
+}
+
+function submitCardNote(btn) {
+  const card = btn.closest('.tappy-card');
+  const input = card.querySelector('.card-note-input');
+  const text = input ? input.value.trim() : '';
   if (text) {
-    sendToFresh(text, activeDrawerContext);
-    if (inputEl) inputEl.value = '';
+    input.value = '';
+    flashLed('✅ NOTE SAVED TO CARD! ⚡');
+    sendToFresh('Card note: ' + text);
   }
 }
 
 function flashLed(responseText) {
   var output = document.getElementById('ledOutput');
-  output.textContent = responseText || 'Logged! ⚡';
-  setTimeout(function() {
-    output.textContent = 'POCKET CHIEF OF STAFF READY';
-  }, 3000);
-}
-
-function sendToFresh(promptText, drawerName) {
-  document.getElementById('ledOutput').textContent = 'PROCESSING...';
-  var fullPrompt = drawerName ? '[' + drawerName + ' Drawer] ' + promptText : promptText;
-
-  fetch('/.netlify/functions/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt: fullPrompt, board_id: '18424728273' })
-  })
-  .then(res => res.json())
-  .then(data => {
-    flashLed(data.reply || 'Logged! ⚡');
-    if (activeDrawerContext) {
-      setTimeout(function() {
-        loadDrawerItems(activeDrawerContext);
-      }, 1500);
-    }
-  })
-  .catch(err => {
-    flashLed('Logged! ⚡');
-    if (activeDrawerContext) {
-      setTimeout(function() {
-        loadDrawerItems(activeDrawerContext);
-      }, 1500);
-    }
-  });
-}
-
-function openCalendarView() {
-  window.open('https://calendar.google.com', '_blank');
-}
-
-function loadDrawerItems(drawerName) {
-  var contentDiv = document.getElementById('drawerContent');
-  fetch('/.netlify/functions/monday?board=18424728273&t=' + new Date().getTime())
-    .then(res => res.json())
-    .then(data => {
-      var groups = data.groups || (data.data && data.data.boards && data.data.boards[0] && data.data.boards[0].groups) || [];
-      var target = drawerName.toLowerCase().trim();
-
-      // FILTER OUT ALL ARCHIVED, COMPLETED, TRASH, AND DELETED GROUPS
-      var activeGroups = groups.filter(function(g) {
-        var title = (g.title || g.name || '').toLowerCase().trim();
-        return !title.includes('archive') && !title.includes('completed') && !title.includes('trash') && !title.includes('deleted');
-      });
-
-      // STRICT EXACT GROUP MATCHING
-      var matchingGroup = activeGroups.find(function(g) {
-        var title = (g.title || g.name || '').toLowerCase().trim();
-        
-        if (target.includes('castle')) {
-          return title.includes('william — private / leads') || title.includes('personal');
-        }
-        if (target.includes('empire')) {
-          return title.includes('showroom') || title.includes('shop announcements');
-        }
-        if (target.includes('shop') || target.includes('bench')) {
-          return title.includes("mike's workbench") || title.includes('ready wall — live machine tracker') || title.includes('parts needed');
-        }
-        if (target.includes('pipeline')) {
-          return title.includes('staff intake — pending review');
-        }
-        if (target.includes('exchange') || target.includes('vault')) {
-          return title.includes('vault') || title.includes('shared');
-        }
-        return false;
-      });
-
-      var items = [];
-      if (target.includes('pinball')) {
-        // PINBALL SHOWS ONLY PENDING ITEMS FROM STAFF INTAKE
-        var intakeGroup = activeGroups.find(function(g) {
-          return (g.title || g.name || '').toLowerCase().includes('staff intake');
-        });
-        if (intakeGroup) {
-          items = intakeGroup.items || (intakeGroup.items_page && intakeGroup.items_page.items) || [];
-        }
-      } else if (matchingGroup) {
-        items = matchingGroup.items || (matchingGroup.items_page && matchingGroup.items_page.items) || [];
-      }
-
-      var isInvoice = target.includes('treasury') || target.includes('invoice') || target.includes('shop');
-
-      var itemsHtml = items.map(function(item) {
-        var hasDollar = item.name && (item.name.includes('$') || isInvoice);
-        var payButton = hasDollar ? '<a href="' + STRIPE_CHECKOUT_URL + '" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow"><i class="fa-solid fa-credit-card"></i> Pay Now</a>' : '';
-
-        return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 flex justify-between items-center">' +
-          '<div>' +
-            '<p class="font-bold text-white text-xs">' + (item.name || 'Untitled Card') + '</p>' +
-            '<p class="text-[10px] text-gray-400">' + (item.updated_at ? new Date(item.updated_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Active Card') + '</p>' +
-          '</div>' +
-          '<div class="flex items-center gap-2">' +
-            payButton +
-            '<span class="text-[10px] bg-blue-900 text-blue-300 px-2 py-0.5 rounded-full font-bold">Active</span>' +
-          '</div>' +
-        '</div>';
-      }).join('');
-
-      contentDiv.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">' +
-        '<div class="flex items-center justify-between">' +
-          '<p class="font-bold text-white text-sm">Drawer Active: ' + drawerName + '</p>' +
-          '<button onclick="loadDrawerItems(\'' + drawerName + '\')" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-rotate-right"></i> Refresh</button>' +
-        '</div>' +
-        '<div class="space-y-2 max-h-60 overflow-y-auto">' +
-          (itemsHtml || '<p class="text-gray-500 text-center py-4">No active cards in this drawer. Tap the mic to add one!</p>') +
-        '</div>' +
-        
-        '<!-- COMBINED INPUT BOX WITH EMBEDDED MIC & SNAP PHOTO -->' +
-        '<div class="pt-2 border-t border-gray-800 space-y-3">' +
-          '<div class="relative flex items-center">' +
-            '<input type="text" id="drawerInput_' + drawerName + '" placeholder="Type or dictate to card..." class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-4 pr-10 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key===\'Enter\') submitUnifiedInput(\'drawerInput_' + drawerName + '\')">' +
-            '<button id="drawerMicBtn_' + drawerName + '" onclick="toggleVoiceIntake(\'' + drawerName + '\', \'drawerInput_' + drawerName + '\', \'drawerMicBtn_' + drawerName + '\')" class="absolute right-2 text-blue-400 hover:text-blue-300 p-1.5 transition">' +
-              '<i class="fa-solid fa-microphone text-sm"></i>' +
-            '</button>' +
-          '</div>' +
-          
-          '<div class="flex gap-2">' +
-            '<label class="bg-gray-800 hover:bg-gray-700 text-blue-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
-              '<i class="fa-solid fa-camera"></i>' +
-              '<span>Snap Photo</span>' +
-              '<input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoInput(this)">' +
-            '</label>' +
-            '<button onclick="submitUnifiedInput(\'drawerInput_' + drawerName + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shrink-0">' +
-              '<span>Send</span>' +
-              '<i class="fa-solid fa-paper-plane"></i>' +
-            '</button>' +
-          '</div>' +
-        '</div>' +
-      '</div>';
-    })
-    .catch(function() {
-      contentDiv.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">' +
-        '<p class="font-bold text-white text-sm">Drawer Active: ' + drawerName + '</p>' +
-        '<p class="text-gray-400">Speak commands or upload photos directly into this card:</p>' +
-        '<div class="pt-2 border-t border-gray-800 space-y-3">' +
-          '<div class="relative flex items-center">' +
-            '<input type="text" id="drawerInput_' + drawerName + '" placeholder="Type or dictate to card..." class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-4 pr-10 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key===\'Enter\') submitUnifiedInput(\'drawerInput_' + drawerName + '\')">' +
-            '<button id="drawerMicBtn_' + drawerName + '" onclick="toggleVoiceIntake(\'' + drawerName + '\', \'drawerInput_' + drawerName + '\', \'drawerMicBtn_' + drawerName + '\')" class="absolute right-2 text-blue-400 hover:text-blue-300 p-1.5 transition">' +
-              '<i class="fa-solid fa-microphone text-sm"></i>' +
-            '</button>' +
-          '</div>' +
-          '<div class="flex gap-2">' +
-            '<label class="bg-gray-800 hover:bg-gray-700 text-blue-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
-              '<i class="fa-solid fa-camera"></i>' +
-              '<span>Snap Photo</span>' +
-              '<input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoInput(this)">' +
-            '</label>' +
-            '<button onclick="submitUnifiedInput(\'drawerInput_' + drawerName + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shrink-0">' +
-              '<span>Send</span>' +
-              '<i class="fa-solid fa-paper-plane"></i>' +
-            '</button>' +
-          '</div>' +
-        '</div>' +
-      '</div>';
-    });
+  output.textContent = responseText || '✅ LOGGED & FIRED TO BOARD! ⚡';
+  setTimeout(function() { output.textContent = 'POCKET CHIEF OF STAFF READY'; }, 3500);
 }
 
 function openDrawer(name) {
-  activeDrawerContext = name;
+  currentDrawer = name;
   document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + name + ' Drawer';
   
-  var empireSub = document.getElementById('empireSubNav');
-  if (name.toLowerCase() === 'empire' || name.toLowerCase() === 'shop ops') {
-    empireSub.classList.remove('hidden');
-  } else {
-    empireSub.classList.add('hidden');
-  }
+  const exchangeBar = document.getElementById('exchangeSearchBar');
+  if (exchangeBar) exchangeBar.classList.toggle('hidden', name !== 'Exchange');
 
-  var drawerModal = document.getElementById('drawerModal');
-  drawerModal.classList.remove('hidden');
-  loadDrawerItems(name);
+  document.getElementById('drawerModal').classList.remove('hidden');
+  fetchDrawerItems(name);
 }
 
-function switchEmpireView(viewType) {
-  var btnMain = document.getElementById('subEmpireMain');
-  var btnShop = document.getElementById('subEmpireShop');
-  if (viewType === 'shop_ops') {
-    btnShop.className = 'bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg';
-    btnMain.className = 'bg-gray-800 text-gray-300 hover:bg-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg';
-    activeDrawerContext = 'Shop Ops';
-    loadDrawerItems('Shop Ops');
-  } else {
-    btnMain.className = 'bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg';
-    btnShop.className = 'bg-gray-800 text-gray-300 hover:bg-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg';
-    activeDrawerContext = 'Empire';
-    loadDrawerItems('Empire');
+function completePinballTask(btn) {
+  const card = btn.closest('.bg-gray-900');
+  if (card) {
+    card.remove();
+    flashLed('✅ TASK KNOCKED OUT! ⚡');
   }
 }
 
-function closeDrawer() {
-  activeDrawerContext = '';
-  document.getElementById('drawerModal').classList.add('hidden');
+async function fetchDrawerItems(name) {
+  const drawerContent = document.getElementById('drawerContent');
+  drawerContent.innerHTML = '<p class="text-center text-gray-500 pt-8">Loading live cards...</p>';
+
+  try {
+    const res = await fetch('/.netlify/functions/getBoard?board_id=18424728273&group=' + encodeURIComponent(name));
+    const data = await res.json();
+    drawerContent.innerHTML = '';
+
+    if (!data.items || data.items.length === 0) {
+      drawerContent.innerHTML = '<div class="p-6 bg-gray-900 rounded-2xl border border-gray-800 text-center space-y-2"><p class="font-bold text-white text-sm">No active items in ' + name + ' queue.</p></div>';
+      return;
+    }
+
+    if (name === 'Pinball') {
+      let pinballHtml = '<div class="space-y-3 pb-8">';
+      data.items.forEach(item => {
+        pinballHtml += `
+          <div class="bg-gray-900 border border-purple-800/60 p-3 rounded-2xl flex items-center justify-between">
+            <div>
+              <div class="font-bold text-white text-xs">${item.name}</div>
+              <div class="text-[10px] text-amber-400">LIVE PINBALL TASK ⚡</div>
+            </div>
+            <button onclick="completePinballTask(this)" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1 rounded-xl text-[10px]">✅ Complete</button>
+          </div>
+        `;
+      });
+      pinballHtml += '</div>';
+      drawerContent.innerHTML = pinballHtml;
+      return;
+    }
+
+    const template = document.getElementById('tappy-card-template');
+    data.items.forEach(item => {
+      const clone = template.content.cloneNode(true);
+      const titleEl = clone.querySelector('.card-title');
+      if (titleEl) titleEl.textContent = item.name || 'Untitled Card';
+
+      const callEl = clone.querySelector('.card-call');
+      if (callEl) callEl.href = 'tel:' + (item.phone || '4105551234');
+
+      const smsEl = clone.querySelector('.card-sms');
+      if (smsEl) smsEl.href = 'sms:' + (item.phone || '4105551234');
+
+      const emailEl = clone.querySelector('.card-email');
+      if (emailEl) emailEl.href = 'mailto:' + (item.email || 'customer@email.com');
+
+      drawerContent.appendChild(clone);
+    });
+
+  } catch (err) {
+    drawerContent.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 text-center"><p class="text-red-400">Unable to load items.</p></div>';
+  }
 }
 
-function toggleFeaturesModal() {
-  document.getElementById('featuresModal').classList.toggle('hidden');
+function searchVault() {
+  const query = document.getElementById('vaultQuery').value.trim().toLowerCase();
+  const drawerContent = document.getElementById('drawerContent');
+  if (!query) return;
+  
+  drawerContent.innerHTML = '<p class="text-center text-blue-400 font-bold pt-8">⚡ Pinball Searching 22,283 Records...</p>';
+  const results = clientVaultData.filter(record => record.name.toLowerCase().includes(query) || record.phone.includes(query));
+
+  setTimeout(() => {
+    if (results.length === 0) {
+      drawerContent.innerHTML = '<div class="p-6 bg-gray-900 rounded-2xl border border-gray-800 text-center"><p class="font-bold text-white text-sm">No record found.</p></div>';
+      return;
+    }
+
+    let resultsHtml = '';
+    results.forEach(record => {
+      resultsHtml += `
+        <div class="bg-gray-900 border border-blue-500/50 p-4 rounded-2xl space-y-1 mb-3">
+          <div class="text-sm font-bold text-white">${record.name}</div>
+          <div class="text-xs text-gray-300">📞 ${record.phone}</div>
+          <div class="text-xs text-gray-400">📍 ${record.address}</div>
+        </div>
+      `;
+    });
+    drawerContent.innerHTML = resultsHtml;
+  }, 200);
 }
+
+function closeDrawer() { document.getElementById('drawerModal').classList.add('hidden'); }
+function toggleFeaturesModal() { document.getElementById('featuresModal').classList.toggle('hidden'); }
+function toggleCastModal() { document.getElementById('castModal').classList.toggle('hidden'); }
 </script>
 </body>
 </html>
