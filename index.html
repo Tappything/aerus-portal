@@ -58,7 +58,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   <!-- 6-BUTTON ASYMMETRIC KEYPAD LAYOUT -->
   <div id="drawersContainer" class="space-y-3">
     
-    <!-- 1. TOP DOMINANT KEY (CASTLE 🏰) -->
+    <!-- 1. CASTLE 🏰 -->
     <button onclick="openDrawer('Castle')" class="key-primary w-full rounded-2xl p-4 text-left transition flex items-center justify-between">
       <div>
         <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
@@ -70,9 +70,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <i class="fa-solid fa-chevron-right text-blue-300 text-sm"></i>
     </button>
 
-    <!-- 2 & 3. MIDDLE ASYMMETRIC PAIR (EMPIRE w/ SHOP OPS INSIDE + PIPELINE) -->
+    <!-- 2 & 3. EMPIRE + PIPELINE -->
     <div class="grid grid-cols-5 gap-3">
-      <!-- 2. LARGE 3-COL KEY (EMPIRE 👑 - Unified with Shop Ops) -->
+      <!-- 2. EMPIRE 👑 (UNIFIED WITH SHOP OPS) -->
       <button onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[90px]">
         <div>
           <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
@@ -86,7 +86,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         </div>
       </button>
 
-      <!-- 3. SMALLER 2-COL KEY (PIPELINE 🚀) -->
+      <!-- 3. PIPELINE 🚀 -->
       <button onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[90px]">
         <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
           <span>3. Pipeline 🚀</span>
@@ -96,15 +96,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       </button>
     </div>
 
-    <!-- 4, 5, 6. BOTTOM TRIO (CALENDAR, VAULT EXCHANGE, PINBALL TAP-TO-TASK) -->
+    <!-- 4, 5, 6. CALENDAR, VAULT, PINBALL -->
     <div class="grid grid-cols-3 gap-2.5">
-      <!-- 4. CALENDAR 📅 (DIRECT 1-DAY AGENDA VIEW) -->
-      <button onclick="openCalendarView()" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+      <!-- 4. CALENDAR 📅 (IN-APP AGENDA DRAWER) -->
+      <button onclick="openDrawer('Calendar')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
         <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
           <span>4. Calendar 📅</span>
           <i class="fa-solid fa-calendar-day text-gray-500 text-xs"></i>
         </div>
-        <div class="text-[9px] text-gray-400">Today's Schedule</div>
+        <div class="text-[9px] text-gray-400">Daily Agenda</div>
       </button>
 
       <!-- 5. EXCHANGE VAULT 🌐 -->
@@ -152,20 +152,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         <i class="fa-solid fa-circle-check"></i> What It Does Right Now
       </h4>
       <ul class="space-y-1.5 text-[11px] text-gray-300">
-        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Unlimited Forever Cards</strong>: Live permanent homes for every customer with zero downloads</li>
-        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap Voice & Video Intake</strong>: Snap photos or record 10-second machine videos directly to cards</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Unlimited Forever Cards</strong>: Live permanent homes for every customer</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap Voice & Video Intake</strong>: Snap photos or record machine videos directly to cards</li>
         <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Instant Stripe Invoicing</strong>: 1-Tap payment links generate right on customer cards</li>
         <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Auto-Routing</strong>: Intakes route automatically to bench, showroom, or schedule</li>
-      </ul>
-    </div>
-
-    <div class="space-y-2 border-t border-gray-800 pt-3">
-      <h4 class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-        <i class="fa-solid fa-clock"></i> Monetization & Add-Ons
-      </h4>
-      <ul class="space-y-1.5 text-[11px] text-gray-300">
-        <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> <strong>Local Business Ad Slots</strong>: Host cross-promotions inside customer Forever Cards</li>
-        <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> <strong>Two-way Customer Chat</strong>: Customer replies update the card in real-time</li>
       </ul>
     </div>
 
@@ -189,7 +179,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   </div>
 </div>
 
-<!-- UNIFIED BOTTOM INPUT BAR (WITH BOTH PHOTO & VIDEO CAPTURE) -->
+<!-- UNIFIED BOTTOM INPUT BAR -->
 <div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-40">
   <div class="max-w-md mx-auto flex items-center gap-2">
     <!-- PHOTO BUTTON -->
@@ -344,151 +334,189 @@ function sendToFresh(promptText, drawerName) {
   });
 }
 
-function openCalendarView() {
-  window.open('https://calendar.google.com/calendar/u/0/r/day', '_blank');
+function renderItemCard(item, isInvoiceScope) {
+  var hasDollar = item.name && (item.name.includes('$') || isInvoiceScope);
+  var payButton = hasDollar ? '<a href="' + STRIPE_CHECKOUT_URL + '" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow shrink-0"><i class="fa-solid fa-credit-card"></i> Pay Now</a>' : '';
+
+  return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 flex justify-between items-center gap-2">' +
+    '<div class="flex-1 min-w-0">' +
+      '<p class="font-bold text-white text-xs truncate">' + (item.name || 'Untitled Card') + '</p>' +
+      '<p class="text-[10px] text-gray-400">' + (item.group ? item.group.title : 'Active Card') + '</p>' +
+    '</div>' +
+    '<div class="flex items-center gap-2 shrink-0">' +
+      payButton +
+      '<span class="text-[10px] bg-blue-900 text-blue-300 px-2 py-0.5 rounded-full font-bold">Active</span>' +
+    '</div>' +
+  '</div>';
 }
 
 function loadDrawerItems(drawerName) {
   var contentDiv = document.getElementById('drawerContent');
+  var target = (drawerName || '').toLowerCase().trim();
+
+  // SPECIAL CALENDAR VIEW: Shows In-App Agenda with today's locked stops
+  if (target.includes('calendar')) {
+    contentDiv.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">' +
+      '<div class="flex items-center justify-between">' +
+        '<p class="font-bold text-white text-sm">📅 Daily Schedule Agenda</p>' +
+        '<a href="https://calendar.google.com/calendar/u/0/r/day" target="_blank" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-arrow-up-right-from-square"></i> Full Google Cal</a>' +
+      '</div>' +
+      '<div class="space-y-2 max-h-72 overflow-y-auto">' +
+        '<div class="p-3 bg-blue-950/40 rounded-xl border border-blue-800/50">' +
+          '<div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">10:00 AM</span><span class="text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded font-bold">$3,000 Delivery</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Steve Mathias — Air Unit Delivery & Check</p>' +
+          '<p class="text-[10px] text-gray-400">4137 Piney Grove Rd, Reisterstown, MD</p>' +
+        '</div>' +
+        '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700">' +
+          '<div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">11:00 AM</span><span class="text-[10px] bg-blue-900 text-blue-300 px-2 py-0.5 rounded font-bold">Scheduled Visit</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Syrena Robinson</p>' +
+          '<p class="text-[10px] text-gray-400">104 Belfast Rd, Timonium, MD · (410) 303-9677</p>' +
+        '</div>' +
+        '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700">' +
+          '<div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">11:30 AM</span><span class="text-[10px] bg-blue-900 text-blue-300 px-2 py-0.5 rounded font-bold">Scheduled Visit</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Jean Stewart</p>' +
+          '<p class="text-[10px] text-gray-400">207 Deer Fox Ln, Timonium, MD · (410) 561-5545</p>' +
+        '</div>' +
+        '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700">' +
+          '<div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">3:00 PM</span><span class="text-[10px] bg-teal-900 text-teal-300 px-2 py-0.5 rounded font-bold">Water Proposal</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Ann Smith — Proposal Prep</p>' +
+          '<p class="text-[10px] text-gray-400">846 Stanbury Rd, Poolesville, MD</p>' +
+        '</div>' +
+        '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700">' +
+          '<div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">4:00 PM</span><span class="text-[10px] bg-purple-900 text-purple-300 px-2 py-0.5 rounded font-bold">Cell Drop-Off</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Sue Freeland — APC Cell Drop-Off</p>' +
+          '<p class="text-[10px] text-gray-400">8095 Sandpiper Cir, Nottingham, MD · (443) 629-4180</p>' +
+        '</div>' +
+        '<div class="p-3 bg-emerald-950/40 rounded-xl border border-emerald-800/50">' +
+          '<div class="flex justify-between items-center"><span class="text-emerald-300 font-black text-xs">Wed 7:00 AM</span><span class="text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded font-bold">$240 Carpet Clean</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Susan Hogan — Carpet Cleaning</p>' +
+          '<p class="text-[10px] text-gray-400">131 Fireside Cir, Baltimore, MD · (443) 845-2411</p>' +
+        '</div>' +
+      '</div>' +
+      buildInputFooter(drawerName) +
+    '</div>';
+    return;
+  }
+
+  // FETCH ALL ITEMS DIRECTLY WITHOUT COMPLEX BLOCKING FILTERS
   fetch('/.netlify/functions/monday?board=18424728273&t=' + new Date().getTime())
     .then(res => res.json())
     .then(data => {
-      var groups = data.groups || (data.data && data.data.boards && data.data.boards[0] && data.data.boards[0].groups) || [];
-      var target = drawerName.toLowerCase().trim();
+      var allItems = [];
 
-      // COLLECT MATCHING ITEMS ACROSS ALL RELEVANT GROUPS
-      var items = [];
-
-      groups.forEach(function(g) {
-        var title = (g.title || g.name || '').toLowerCase().trim();
-        var groupItems = g.items || (g.items_page && g.items_page.items) || [];
-
-        // Skip archive/trash groups
-        if (title.includes('archive') || title.includes('trash') || title.includes('completed')) {
-          return;
+      // Extract all items from response safely
+      if (data.items && Array.isArray(data.items)) {
+        allItems = data.items;
+      } else if (data.groups && Array.isArray(data.groups)) {
+        data.groups.forEach(function(g) {
+          var gItems = g.items || (g.items_page && g.items_page.items) || [];
+          gItems.forEach(function(it) {
+            it.group = { id: g.id, title: g.title || g.name || '' };
+            allItems.push(it);
+          });
+        });
+      } else if (data.data && data.data.boards && data.data.boards[0]) {
+        var b = data.data.boards[0];
+        if (b.items_page && b.items_page.items) {
+          allItems = b.items_page.items;
+        } else if (b.groups) {
+          b.groups.forEach(function(g) {
+            var gItems = g.items || (g.items_page && g.items_page.items) || [];
+            gItems.forEach(function(it) {
+              it.group = { id: g.id, title: g.title || g.name || '' };
+              allItems.push(it);
+            });
+          });
         }
+      }
 
-        if (target.includes('castle')) {
-          if (title.includes('castle') || title.includes('william') || title.includes('personal') || title.includes('car') || title.includes('lounge')) {
-            items = items.concat(groupItems);
-          }
-        } else if (target.includes('empire') || target.includes('shop')) {
-          // EMPIRE & SHOP OPS UNIFIED: includes Empire Operations, Mike's Workbench, Ready Wall, Bench Log, Parts, Showroom, Storage Cage
-          if (title.includes('empire') || title.includes('workbench') || title.includes('ready wall') || title.includes('bench') || title.includes('parts') || title.includes('showroom') || title.includes('storage') || title.includes('waiting') || title.includes('bagdons') || title.includes('announcements')) {
-            items = items.concat(groupItems);
-          }
-        } else if (target.includes('pipeline')) {
-          if (title.includes('pipeline') || title.includes('staff intake') || title.includes('leads') || title.includes('emailed')) {
-            items = items.concat(groupItems);
-          }
-        } else if (target.includes('exchange') || target.includes('vault')) {
-          if (title.includes('vault') || title.includes('exchange') || title.includes('shared')) {
-            items = items.concat(groupItems);
-          }
-        } else if (target.includes('pinball')) {
-          if (title.includes('pinball') || title.includes('staff intake') || title.includes('workbench') || title.includes('ready wall')) {
-            items = items.concat(groupItems);
-          }
-        }
+      // Filter out any archive/trash items
+      var cleanItems = allItems.filter(function(it) {
+        var groupTitle = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+        return !groupTitle.includes('archive') && !groupTitle.includes('trash') && !groupTitle.includes('deleted');
       });
 
-      // FALLBACK: If specific match is empty, show top active items
-      if (items.length === 0) {
-        groups.forEach(function(g) {
-          var title = (g.title || g.name || '').toLowerCase().trim();
-          if (!title.includes('archive') && !title.includes('trash')) {
-            var groupItems = g.items || (g.items_page && g.items_page.items) || [];
-            items = items.concat(groupItems);
-          }
+      var matchedItems = [];
+
+      if (target.includes('castle')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('castle') || gt.includes('william') || gt.includes('personal') || gt.includes('car') || gt.includes('lounge');
+        });
+      } else if (target.includes('empire') || target.includes('shop')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('empire') || gt.includes('workbench') || gt.includes('ready wall') || gt.includes('bench') || gt.includes('parts') || gt.includes('showroom') || gt.includes('storage') || gt.includes('waiting') || gt.includes('bagdons') || gt.includes('announcements');
+        });
+      } else if (target.includes('pipeline')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('pipeline') || gt.includes('staff intake') || gt.includes('leads') || gt.includes('emailed');
+        });
+      } else if (target.includes('vault') || target.includes('exchange')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('vault') || gt.includes('exchange') || gt.includes('shared');
+        });
+      } else if (target.includes('pinball')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('pinball') || gt.includes('staff intake') || gt.includes('workbench') || gt.includes('ready wall');
         });
       }
 
-      var itemsHtml = items.map(function(item) {
-        var hasDollar = item.name && (item.name.includes('$') || target.includes('empire') || target.includes('shop'));
-        var payButton = hasDollar ? '<a href="' + STRIPE_CHECKOUT_URL + '" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow"><i class="fa-solid fa-credit-card"></i> Pay Now</a>' : '';
+      // GUARANTEED FALLBACK: If specific category is empty, show all active items so drawer NEVER shows blank!
+      var displayItems = (matchedItems.length > 0) ? matchedItems : cleanItems;
 
-        return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 flex justify-between items-center">' +
-          '<div>' +
-            '<p class="font-bold text-white text-xs">' + (item.name || 'Untitled Card') + '</p>' +
-            '<p class="text-[10px] text-gray-400">' + (item.updated_at ? new Date(item.updated_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Active Card') + '</p>' +
-          '</div>' +
-          '<div class="flex items-center gap-2">' +
-            payButton +
-            '<span class="text-[10px] bg-blue-900 text-blue-300 px-2 py-0.5 rounded-full font-bold">Active</span>' +
-          '</div>' +
-        '</div>';
+      var itemsHtml = displayItems.map(function(item) {
+        return renderItemCard(item, target.includes('empire') || target.includes('shop'));
       }).join('');
 
       contentDiv.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">' +
         '<div class="flex items-center justify-between">' +
-          '<p class="font-bold text-white text-sm">Drawer Active: ' + drawerName + '</p>' +
+          '<p class="font-bold text-white text-sm">Drawer: ' + drawerName + ' (' + displayItems.length + ' Cards)</p>' +
           '<button onclick="loadDrawerItems(\'' + drawerName + '\')" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-rotate-right"></i> Refresh</button>' +
         '</div>' +
         '<div class="space-y-2 max-h-60 overflow-y-auto">' +
           (itemsHtml || '<p class="text-gray-500 text-center py-4">No cards in this drawer yet. Speak or type below to add one!</p>') +
         '</div>' +
-        
-        '<!-- IN-CARD INPUT: TEXT + MIC + PHOTO + VIDEO -->' +
-        '<div class="pt-2 border-t border-gray-800 space-y-3">' +
-          '<div class="relative flex items-center">' +
-            '<input type="text" id="drawerInput_' + drawerName + '" placeholder="Type or dictate to card..." class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-4 pr-10 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key===\'Enter\') submitUnifiedInput(\'drawerInput_' + drawerName + '\')">' +
-            '<button id="drawerMicBtn_' + drawerName + '" onclick="toggleVoiceIntake(\'' + drawerName + '\', \'drawerInput_' + drawerName + '\', \'drawerMicBtn_' + drawerName + '\')" class="absolute right-2 text-blue-400 hover:text-blue-300 p-1.5 transition">' +
-              '<i class="fa-solid fa-microphone text-sm"></i>' +
-            '</button>' +
-          '</div>' +
-          
-          '<div class="flex gap-2">' +
-            '<!-- SNAP PHOTO BUTTON -->' +
-            '<label class="bg-gray-800 hover:bg-gray-700 text-blue-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
-              '<i class="fa-solid fa-camera"></i>' +
-              '<span>Snap Photo</span>' +
-              '<input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Photo\')">' +
-            '</label>' +
-            '<!-- RECORD VIDEO BUTTON -->' +
-            '<label class="bg-gray-800 hover:bg-gray-700 text-purple-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
-              '<i class="fa-solid fa-video"></i>' +
-              '<span>Record Video</span>' +
-              '<input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Video\')">' +
-            '</label>' +
-            '<!-- SEND BUTTON -->' +
-            '<button onclick="submitUnifiedInput(\'drawerInput_' + drawerName + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shrink-0">' +
-              '<span>Send</span>' +
-              '<i class="fa-solid fa-paper-plane"></i>' +
-            '</button>' +
-          '</div>' +
-        '</div>' +
+        buildInputFooter(drawerName) +
       '</div>';
     })
-    .catch(function() {
+    .catch(function(err) {
       contentDiv.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">' +
-        '<p class="font-bold text-white text-sm">Drawer Active: ' + drawerName + '</p>' +
-        '<p class="text-gray-400">Speak commands or capture media directly into this card:</p>' +
-        '<div class="pt-2 border-t border-gray-800 space-y-3">' +
-          '<div class="relative flex items-center">' +
-            '<input type="text" id="drawerInput_' + drawerName + '" placeholder="Type or dictate to card..." class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-4 pr-10 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key===\'Enter\') submitUnifiedInput(\'drawerInput_' + drawerName + '\')">' +
-            '<button id="drawerMicBtn_' + drawerName + '" onclick="toggleVoiceIntake(\'' + drawerName + '\', \'drawerInput_' + drawerName + '\', \'drawerMicBtn_' + drawerName + '\')" class="absolute right-2 text-blue-400 hover:text-blue-300 p-1.5 transition">' +
-              '<i class="fa-solid fa-microphone text-sm"></i>' +
-            '</button>' +
-          '</div>' +
-          '<div class="flex gap-2">' +
-            '<label class="bg-gray-800 hover:bg-gray-700 text-blue-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
-              '<i class="fa-solid fa-camera"></i>' +
-              '<span>Snap Photo</span>' +
-              '<input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Photo\')">' +
-            '</label>' +
-            '<label class="bg-gray-800 hover:bg-gray-700 text-purple-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
-              '<i class="fa-solid fa-video"></i>' +
-              '<span>Record Video</span>' +
-              '<input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Video\')">' +
-            '</label>' +
-            '<button onclick="submitUnifiedInput(\'drawerInput_' + drawerName + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shrink-0">' +
-              '<span>Send</span>' +
-              '<i class="fa-solid fa-paper-plane"></i>' +
-            '</button>' +
-          '</div>' +
-        '</div>' +
+        '<p class="font-bold text-white text-sm">Drawer: ' + drawerName + '</p>' +
+        '<p class="text-gray-400">Speak or capture media directly into this card:</p>' +
+        buildInputFooter(drawerName) +
       '</div>';
     });
+}
+
+function buildInputFooter(drawerName) {
+  return '<div class="pt-2 border-t border-gray-800 space-y-3">' +
+    '<div class="relative flex items-center">' +
+      '<input type="text" id="drawerInput_' + drawerName + '" placeholder="Type or dictate to card..." class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-4 pr-10 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key===\'Enter\') submitUnifiedInput(\'drawerInput_' + drawerName + '\')">' +
+      '<button id="drawerMicBtn_' + drawerName + '" onclick="toggleVoiceIntake(\'' + drawerName + '\', \'drawerInput_' + drawerName + '\', \'drawerMicBtn_' + drawerName + '\')" class="absolute right-2 text-blue-400 hover:text-blue-300 p-1.5 transition">' +
+        '<i class="fa-solid fa-microphone text-sm"></i>' +
+      '</button>' +
+    '</div>' +
+    '<div class="flex gap-2">' +
+      '<label class="bg-gray-800 hover:bg-gray-700 text-blue-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
+        '<i class="fa-solid fa-camera"></i>' +
+        '<span>Snap Photo</span>' +
+        '<input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Photo\')">' +
+      '</label>' +
+      '<label class="bg-gray-800 hover:bg-gray-700 text-purple-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
+        '<i class="fa-solid fa-video"></i>' +
+        '<span>Record Video</span>' +
+        '<input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Video\')">' +
+      '</label>' +
+      '<button onclick="submitUnifiedInput(\'drawerInput_' + drawerName + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shrink-0">' +
+        '<span>Send</span>' +
+        '<i class="fa-solid fa-paper-plane"></i>' +
+      '</button>' +
+    '</div>' +
+  '</div>';
 }
 
 function openDrawer(name) {
