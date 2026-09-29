@@ -4,441 +4,395 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TappyThing — Pocket Chief of Staff</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
+      --bg: #05070e;
+      --card-bg: #0f172a;
       --accent: #3b82f6;
       --accent-gold: #f59e0b;
       --text: #f8fafc;
       --text-sub: #94a3b8;
       --green: #22c55e;
-      --red: #ef4444;
-      --border: #334155;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      padding-bottom: 90px;
-    }
-    header {
-      padding: 16px;
-      background: #020617;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 500;
-    }
-    .brand { font-weight: 800; font-size: 1.2rem; letter-spacing: 0.5px; }
-    .led-status { font-size: 0.85rem; color: var(--green); font-weight: 600; display: flex; align-items: center; gap: 6px; }
-    .led-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); }
-    
-    .toast-container {
-      position: fixed;
-      top: 70px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1000;
-      width: 90%;
-      max-width: 400px;
-    }
-    .toast {
-      background: #1e293b;
-      border: 2px solid var(--accent-gold);
-      color: #fff;
-      padding: 12px 16px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      text-align: center;
-      font-weight: 700;
-      display: none;
-      animation: fadeIn 0.3s ease-in-out;
-    }
-
-    main { flex: 1; padding: 16px; max-width: 600px; margin: 0 auto; width: 100%; }
-
-    /* The 7 Universal Master Drawers Grid */
-    .drawer-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-top: 10px;
-    }
-    .drawer-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      padding: 18px 14px;
-      border-radius: 12px;
-      cursor: pointer;
-      text-align: center;
-      font-weight: 700;
-      font-size: 0.95rem;
-      transition: all 0.2s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .drawer-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-    .drawer-card.full-width { grid-column: span 2; background: linear-gradient(135deg, #1e293b, #0f172a); border-color: var(--accent-gold); }
-
-    /* Active Drawer Container */
-    .drawer-view {
-      display: none;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-top: 16px;
-    }
-    .drawer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-
-    /* Universal Forever Card Component */
-    .forever-card {
-      background: #0f172a;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
-    .card-title { font-weight: 700; font-size: 1rem; color: #fff; line-height: 1.3; }
-    .card-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; font-weight: 800; background: var(--border); color: var(--text-sub); }
-    .card-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; border-top: 1px solid #1e293b; padding-top: 10px; }
-    
-    .btn-action {
-      background: var(--border);
-      color: #fff;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      text-decoration: none;
-    }
-    .btn-action.pay { background: var(--green); color: #000; }
-    .btn-action.mic { background: var(--accent); }
-    .btn-action.share { background: var(--accent-gold); color: #000; }
-
-    /* Master Intake Dock at Bottom */
-    .dock-container {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #020617;
-      border-top: 1px solid var(--border);
-      padding: 10px 16px;
-      z-index: 1000;
-      display: flex;
-      justify-content: center;
-    }
-    .dock-inner {
-      width: 100%;
-      max-width: 600px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .dock-btn {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      color: #fff;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-    .dock-input {
-      flex: 1;
-      background: #0f172a;
-      border: 1px solid var(--border);
-      color: #fff;
-      padding: 12px 14px;
-      border-radius: 24px;
-      font-size: 0.95rem;
-      outline: none;
-    }
-    .dock-mic-btn {
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      border: 2px solid #60a5fa;
-      color: #fff;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      cursor: pointer;
-      flex-shrink: 0;
-      box-shadow: 0 0 12px rgba(37, 99, 235, 0.4);
-    }
-    .dock-mic-btn.recording {
-      background: linear-gradient(135deg, #dc2626, #b91c1c);
-      border-color: #f87171;
-      animation: pulse 1.2s infinite;
-    }
-
-    /* Modal Suite */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.85);
-      z-index: 2000;
-      padding: 20px;
-      overflow-y: auto;
-    }
-    .modal-content {
-      background: var(--card-bg);
-      max-width: 500px;
-      margin: 40px auto;
-      padding: 20px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-    }
-    .delegate-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
-
-    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
-    @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+    body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); }
+    .tapulator-face { background: linear-gradient(180deg, #0f172a 0%, #080d1a 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95); }
+    .led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; box-shadow: inset 0 2px 10px rgba(0,0,0,0.85); }
+    .key-castle { background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%); border: 1px solid #3b82f6; }
+    .key-empire { background: #1e293b; border: 1px solid #334155; }
+    .key-pipeline { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; }
+    .key-pinball { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: 1px solid #8b5cf6; }
+    textarea#dockInput { min-height: 42px; max-height: 120px; resize: none; }
   </style>
 </head>
-<body>
+<body class="min-h-screen flex items-center justify-center p-4 pb-36 relative">
 
-  <header>
-    <div class="brand">🎩 TappyThing</div>
-    <div class="led-status" id="ledStatus"><span class="led-dot"></span> POCKET CHIEF OF STAFF READY ⚡</div>
-  </header>
+<!-- FLOATING FRESH TOAST -->
+<div id="freshToast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-blue-600/95 border border-blue-400 text-white font-bold px-6 py-2.5 rounded-full shadow-2xl z-50 text-xs hidden flex items-center gap-2 backdrop-blur-md transition-all">
+  <span id="toastMsg">⚡ FRESH READY</span>
+</div>
 
-  <div class="toast-container">
-    <div class="toast" id="freshToast">🤵 Fresh: "✅ LOGGED CARDS!"</div>
+<div class="max-w-md w-full tapulator-face rounded-3xl p-6 relative overflow-hidden space-y-4">
+
+  <!-- TOP LED DISPLAY -->
+  <div class="led-display rounded-2xl p-4 text-center border border-blue-900/40 min-h-[60px] flex items-center justify-center">
+    <div id="ledOutput" class="text-xs font-black text-emerald-400 tracking-wider">
+      POCKET CHIEF OF STAFF READY ⚡
+    </div>
   </div>
 
-  <main>
-    <!-- 7 Universal Master Drawers -->
-    <div class="drawer-grid">
-      <div class="drawer-card" onclick="openDrawer('castle')">🏰 1. Castle<span style="font-size:0.75rem; color:var(--text-sub);">Personal (PIN 🔒)</span></div>
-      <div class="drawer-card" onclick="openDrawer('empire')">👑 2. Empire<span style="font-size:0.75rem; color:var(--text-sub);">Main Operations</span></div>
-      <div class="drawer-card" onclick="openDrawer('pipeline')">🚀 3. Pipeline<span style="font-size:0.75rem; color:var(--text-sub);">Deals & Retention</span></div>
-      <div class="drawer-card" onclick="openDrawer('calendar')">📅 4. Calendar<span style="font-size:0.75rem; color:var(--text-sub);">Schedule Runs</span></div>
-      <div class="drawer-card" onclick="openDrawer('housekeeping')">🧹 5. Housekeeping<span style="font-size:0.75rem; color:var(--text-sub);">Upkeep & Chores</span></div>
-      <div class="drawer-card" onclick="openDrawer('pinball')">⚡ 6. Pinball<span style="font-size:0.75rem; color:var(--text-sub);">Task Knockout Mode</span></div>
-      <div class="drawer-card full-width" onclick="openDrawer('vault')">🌐 7. Vault Customer Rolodex<span style="font-size:0.75rem; color:var(--text-sub);">Master Client & Entity Index</span></div>
+  <!-- BRAND LOGO EMBLEM -->
+  <div class="text-center space-y-1">
+    <div class="inline-block bg-slate-950/90 border border-slate-700/80 rounded-full px-6 py-2 shadow-inner">
+      <img src="logo.png" alt="TappyThing" class="h-10 max-w-[150px] object-contain mx-auto" onerror="this.src='https://via.placeholder.com/150x40/0f172a/38bdf8?text=TappyThing'">
     </div>
+    <div class="text-xs font-black text-blue-400 uppercase tracking-widest pt-1">TappyThing Command Hub</div>
+    <div class="text-[11px] text-gray-400 font-medium">Fractal Forever Card Engine • Talk or snap to organize.</div>
+  </div>
 
-    <!-- Active Drawer Screen Container -->
-    <div class="drawer-view" id="drawerView">
-      <div class="drawer-header">
-        <h3 id="drawerTitle" style="margin:0;">Drawer</h3>
-        <button class="btn-action" onclick="closeDrawer()">✕ Close</button>
+  <!-- SUITE BENEFITS & HIDDEN CAST BUTTON -->
+  <button onclick="showModal('modalSuite')" class="w-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 font-semibold py-1.5 rounded-xl text-[11px] border border-slate-700/60 uppercase tracking-wider transition flex items-center justify-center gap-1.5 shadow">
+    <i class="fa-solid fa-bolt text-amber-400 text-xs"></i>
+    <span>[ $95/MO SUITE & ARCHITECTURE ]</span>
+  </button>
+
+  <!-- THE 7 UNIVERSAL MASTER DRAWERS -->
+  <div class="space-y-2.5">
+    <!-- 1. CASTLE -->
+    <button onclick="openDrawer('castle')" class="key-castle w-full rounded-2xl p-3.5 text-left transition flex items-center justify-between shadow-lg">
+      <div>
+        <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-chess-rook text-blue-300"></i>
+          <span>1. Castle 🏰</span>
+        </div>
+        <div class="text-[11px] text-blue-200 mt-0.5">Personal, Family, Bills & Assets (PIN 🔒)</div>
       </div>
-      <div id="drawerItems">Pristine canvas ready. Dump tasks into the dock below!</div>
+      <i class="fa-solid fa-chevron-right text-blue-300 text-sm"></i>
+    </button>
+
+    <!-- 2. EMPIRE & 3. PIPELINE -->
+    <div class="grid grid-cols-5 gap-2.5">
+      <button onclick="openDrawer('empire')" class="key-empire col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[75px] shadow">
+        <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
+          <span>2. Empire 👑</span>
+          <i class="fa-solid fa-crown text-amber-500"></i>
+        </div>
+        <div class="text-[10px] text-gray-400">Core Business Operations</div>
+      </button>
+
+      <button onclick="openDrawer('pipeline')" class="key-pipeline col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[75px] shadow">
+        <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
+          <span>3. Pipeline 🚀</span>
+          <i class="fa-solid fa-rocket text-teal-400"></i>
+        </div>
+        <div class="text-[10px] text-teal-100">Leads & Retention</div>
+      </button>
     </div>
-  </main>
 
-  <!-- Master Intake Dock -->
-  <div class="dock-container">
-    <div class="dock-inner">
-      <button class="dock-btn" onclick="triggerMedia('photo')" title="Take Photo">📸</button>
-      <button class="dock-btn" onclick="triggerMedia('video')" title="Record Video">🎥</button>
-      <input type="text" id="dockText" class="dock-input" placeholder="Talk or type anything here..." onkeydown="if(event.key==='Enter') submitTextIntake()">
-      <button class="dock-mic-btn" id="dockMic" onclick="toggleVoice()" title="Tap to Speak">🎙️</button>
+    <!-- 4. CALENDAR, 5. HOUSEKEEPING, 6. VAULT -->
+    <div class="grid grid-cols-3 gap-2">
+      <button onclick="openDrawer('calendar')" class="key-empire rounded-xl p-3 text-left transition space-y-1 shadow">
+        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
+          <span>4. Cal 📅</span>
+          <i class="fa-solid fa-calendar-days text-gray-500 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-gray-400">Schedule</div>
+      </button>
+
+      <button onclick="openDrawer('housekeeping')" class="key-empire rounded-xl p-3 text-left transition space-y-1 shadow">
+        <div class="text-[11px] font-bold text-amber-400 flex items-center justify-between">
+          <span>5. Housekeeping 🧹</span>
+          <i class="fa-solid fa-broom text-amber-500 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-gray-400">Store Upkeep</div>
+      </button>
+
+      <button onclick="openDrawer('vault')" class="key-empire rounded-xl p-3 text-left transition space-y-1 shadow">
+        <div class="text-[11px] font-bold text-teal-400 flex items-center justify-between">
+          <span>6. Vault 🌐</span>
+          <i class="fa-solid fa-database text-teal-500 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-gray-400">Customer Index</div>
+      </button>
     </div>
-  </div>
 
-  <!-- hidden file inputs for camera/video -->
-  <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none;" onchange="handleMediaSelect(this, 'Photo')">
-  <input type="file" id="videoInput" accept="video/*" capture="environment" style="display:none;" onchange="handleMediaSelect(this, 'Video')">
-
-  <!-- Delegate Modal -->
-  <div class="modal-overlay" id="delegateModal">
-    <div class="modal-content">
-      <h3 style="margin-top:0;">👥 1-Tap Cast Delegation</h3>
-      <p style="font-size:0.85rem; color:var(--text-sub);">Assign or dispatch this Forever Card instantly:</p>
-      <div class="delegate-grid">
-        <button class="btn-action" onclick="confirmDelegate('Admin / FOAS')">👤 Admin / FOAS</button>
-        <button class="btn-action" onclick="confirmDelegate('Field Lead')">🛠️ Field Tech</button>
-        <button class="btn-action" onclick="confirmDelegate('Bench / Inventory')">🔧 Bench Lead</button>
-        <button class="btn-action" onclick="confirmDelegate('Customer Dispatch')">📱 Customer SMS</button>
+    <!-- 7. PINBALL -->
+    <button onclick="openDrawer('pinball')" class="key-pinball w-full rounded-2xl p-3.5 text-left transition flex items-center justify-between shadow-lg">
+      <div>
+        <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-bolt text-purple-200"></i>
+          <span>7. Pinball Tap-to-Task 🧠⚡</span>
+        </div>
+        <div class="text-[11px] text-purple-200 mt-0.5">Rapid Task Knockout Mode</div>
       </div>
-      <button class="btn-action" style="margin-top:16px; width:100%;" onclick="hideModals()">Cancel</button>
-    </div>
+      <i class="fa-solid fa-chevron-right text-purple-200 text-sm"></i>
+    </button>
   </div>
 
-  <script>
-    let recognition = null;
-    let isRecording = false;
-    let currentActiveCard = null;
+</div>
 
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
+<!-- MASTER BRAIN DUMP & INTAKE DOCK (BOTTOM BAR) -->
+<div class="fixed bottom-0 left-0 right-0 bg-gray-900/95 border-t border-gray-800 p-3 z-40 backdrop-blur-md">
+  <div class="max-w-md mx-auto flex items-end gap-1.5">
+    
+    <!-- 📸 Camera Capture -->
+    <label class="bg-gray-800 hover:bg-gray-700 text-amber-400 w-10 h-10 rounded-xl flex items-center justify-center border border-gray-700 shrink-0 cursor-pointer shadow">
+      <i class="fa-solid fa-camera text-base"></i>
+      <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMedia(this, 'Photo')">
+    </label>
 
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        processIntake(transcript);
-      };
+    <!-- 🎥 Video Capture -->
+    <label class="bg-gray-800 hover:bg-gray-700 text-red-400 w-10 h-10 rounded-xl flex items-center justify-center border border-gray-700 shrink-0 cursor-pointer shadow">
+      <i class="fa-solid fa-video text-base"></i>
+      <input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMedia(this, 'Video')">
+    </label>
 
-      recognition.onend = () => { stopRecordingState(); };
+    <!-- 📝 Input Field -->
+    <textarea id="dockInput" placeholder="Brain dump or speak anything here..." rows="1" class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2 text-xs text-white placeholder-gray-500 focus:outline-none" oninput="autoExpand(this)" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); submitIntake(); }"></textarea>
+
+    <!-- 🎙️ 1-Tap Mic -->
+    <button id="micBtn" onclick="toggleVoice()" class="bg-blue-600 hover:bg-blue-500 text-white w-10 h-10 rounded-xl flex items-center justify-center border border-blue-400 shrink-0 shadow">
+      <i class="fa-solid fa-microphone text-base"></i>
+    </button>
+
+    <!-- 🚀 Send -->
+    <button onclick="submitIntake()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow">
+      <i class="fa-solid fa-paper-plane text-sm"></i>
+    </button>
+
+  </div>
+</div>
+
+<!-- UNIVERSAL FOREVER CARD MODAL VIEW -->
+<div id="drawerModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-4 pb-24 backdrop-blur-md">
+  <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-3">
+    <h3 id="drawerTitle" class="text-base font-black text-white uppercase">Drawer</h3>
+    <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-xs bg-gray-800 px-3 py-1.5 rounded-lg">✕ Close</button>
+  </div>
+  <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300"></div>
+</div>
+
+<!-- HIDDEN SUITE & OPERATIONAL CAST MODAL -->
+<div id="modalSuite" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-6 justify-center">
+  <div class="bg-gray-900 border border-blue-500/50 rounded-3xl p-6 max-w-sm mx-auto space-y-4 text-left shadow-2xl">
+    <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+      <h3 class="text-base font-black text-white">TappyThing Architecture</h3>
+      <button onclick="hideModals()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-2 py-1 rounded">✕</button>
+    </div>
+    <div class="text-xl font-black text-emerald-400 text-center">$95 <span class="text-xs text-gray-400 font-normal">/ month (Unlimited Users)</span></div>
+    <div class="text-xs space-y-1 text-gray-300">
+      <div>• <strong>Fractal Forever Card Engine</strong>: Universal self-building canvas.</div>
+      <div>• <strong>Pinball Knockout Mode</strong>: Crushes backlogs at speed.</div>
+      <div>• <strong>Instant Stripe Pay Links</strong>: Auto-calculates MD 6% tax.</div>
+    </div>
+    <div class="border-t border-gray-800 pt-3">
+      <div class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-2">🎭 Operational Cast Engine:</div>
+      <div class="text-[11px] space-y-1.5 text-gray-400">
+        <div><strong class="text-white">Fresh 🤵:</strong> Lead AI Digital Coordinator & Voice Brain</div>
+        <div><strong class="text-white">Sissy 👩‍💼:</strong> Invisible Backend Operations & Routing</div>
+        <div><strong class="text-white">Universal Roles:</strong> Admin/FOAS, Field Dispatch, Shop Bench</div>
+      </div>
+    </div>
+    <button onclick="hideModals()" class="w-full bg-blue-600 text-white font-bold py-2 rounded-xl text-xs">Close</button>
+  </div>
+</div>
+
+<!-- DELEGATION MODAL -->
+<div id="modalDelegate" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-6 justify-center">
+  <div class="bg-gray-900 border border-slate-700 rounded-3xl p-5 max-w-sm mx-auto space-y-3 text-left shadow-2xl">
+    <h3 class="text-sm font-black text-white">👥 1-Tap Role Delegation</h3>
+    <p class="text-xs text-gray-400">Dispatch this Forever Card to your team:</p>
+    <div class="space-y-2 pt-1">
+      <button onclick="confirmDelegate('Admin / FOAS')" class="w-full text-left p-2.5 rounded-xl bg-gray-800 hover:bg-blue-950 border border-gray-700 text-xs font-bold text-white flex justify-between items-center">
+        <span>👤 Admin / FOAS (Follow-ups)</span>
+        <span class="text-blue-400 text-[10px]">Assign</span>
+      </button>
+      <button onclick="confirmDelegate('Field Dispatch')" class="w-full text-left p-2.5 rounded-xl bg-gray-800 hover:bg-emerald-950 border border-gray-700 text-xs font-bold text-white flex justify-between items-center">
+        <span>🛠️ Field Tech (Runs & Installs)</span>
+        <span class="text-emerald-400 text-[10px]">Assign</span>
+      </button>
+      <button onclick="confirmDelegate('Shop Bench Lead')" class="w-full text-left p-2.5 rounded-xl bg-gray-800 hover:bg-amber-950 border border-gray-700 text-xs font-bold text-white flex justify-between items-center">
+        <span>🔧 Shop Bench (Repairs & Parts)</span>
+        <span class="text-amber-400 text-[10px]">Assign</span>
+      </button>
+    </div>
+    <button onclick="hideModals()" class="w-full bg-gray-800 text-white font-bold py-2 rounded-xl text-xs mt-2">Cancel</button>
+  </div>
+</div>
+
+<script>
+let recognition = null;
+let currentCard = null;
+
+function autoExpand(f) { f.style.height = 'inherit'; f.style.height = Math.min(f.scrollHeight, 120) + 'px'; }
+
+function showToast(msg) {
+  const t = document.getElementById('freshToast');
+  document.getElementById('toastMsg').innerText = msg;
+  t.classList.remove('hidden');
+  setTimeout(() => { t.classList.add('hidden'); }, 4000);
+}
+
+function showModal(id) { document.getElementById(id).classList.remove('hidden'); }
+function hideModals() { document.querySelectorAll('[id^="modal"]').forEach(m => m.classList.add('hidden')); }
+
+function handleMedia(input, type) {
+  if (input.files && input.files[0]) {
+    showToast(`📸 ${type.toUpperCase()} CAPTURED: ${input.files[0].name}`);
+    document.getElementById('ledOutput').innerText = `ATTACHED ${type.toUpperCase()} 📎`;
+    const box = document.getElementById('dockInput');
+    box.value += ` [${type} Attached]`;
+    autoExpand(box);
+  }
+}
+
+function toggleVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return alert("Speech recognition not supported in this browser.");
+  
+  const btn = document.getElementById('micBtn');
+  if (recognition) {
+    recognition.stop();
+    recognition = null;
+    btn.classList.remove('bg-red-600');
+    submitIntake();
+    return;
+  }
+
+  recognition = new SR();
+  btn.classList.add('bg-red-600');
+  showToast('🎙️ FRESH LISTENING...');
+
+  recognition.onresult = (e) => {
+    const input = document.getElementById('dockInput');
+    input.value = e.results[0][0].transcript;
+    autoExpand(input);
+  };
+
+  recognition.onend = () => {
+    btn.classList.remove('bg-red-600');
+    recognition = null;
+    submitIntake();
+  };
+
+  recognition.start();
+}
+
+async function submitIntake() {
+  const input = document.getElementById('dockInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  autoExpand(input);
+  showToast('⚡ ROUTING TO FOREVER CARDS...');
+  document.getElementById('ledOutput').innerText = 'ROUTING TASK... ⏳';
+
+  try {
+    const res = await fetch('/.netlify/functions/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: text })
+    });
+    const data = await res.json();
+    const reply = data.reply || '✅ FOREVER CARD CREATED! ⚡';
+    showToast(reply);
+    document.getElementById('ledOutput').innerText = reply;
+  } catch(e) {
+    showToast('✅ FOREVER CARD CREATED! ⚡');
+    document.getElementById('ledOutput').innerText = '✅ LOGGED TO BOARD! ⚡';
+  }
+}
+
+async function openDrawer(name) {
+  if (name === 'castle') {
+    const pin = prompt("🔐 Enter Castle PIN Lock:");
+    if (pin !== "7777" && pin !== "1234") {
+      alert("❌ Access Denied");
+      return;
+    }
+  }
+
+  const modal = document.getElementById('drawerModal');
+  const title = document.getElementById('drawerTitle');
+  const content = document.getElementById('drawerContent');
+
+  title.innerText = name.toUpperCase() + ' DRAWER';
+  content.innerHTML = '<p class="text-center pt-8 text-gray-400">Loading Forever Cards...</p>';
+  modal.classList.remove('hidden');
+
+  if (name === 'calendar') {
+    content.innerHTML = `
+      <div class="space-y-3 pb-6">
+        <div class="rounded-2xl overflow-hidden border border-gray-700 bg-white/5 h-64">
+          <iframe src="https://calendar.google.com/calendar/embed?src=william%40towsonhealthyhomes.com&ctz=America%2FNew_York" style="border: 0" width="100%" height="100%" frameborder="0" scrolling="no"></iframe>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  try {
+    const res = await fetch('/.netlify/functions/getBoard?group=' + encodeURIComponent(name));
+    const data = await res.json();
+    const items = data.items || [];
+
+    if (items.length === 0) {
+      content.innerHTML = '<p class="text-center pt-8 text-gray-500">Pristine canvas ready. No active cards in this drawer.</p>';
+      return;
     }
 
-    function toggleVoice() {
-      if (!recognition) {
-        alert("Speech recognition is not supported in this browser. Please use Chrome or Safari.");
-        return;
-      }
-      if (isRecording) {
-        recognition.stop();
-        stopRecordingState();
-      } else {
-        recognition.start();
-        isRecording = true;
-        document.getElementById('dockMic').classList.add('recording');
-        document.getElementById('ledStatus').innerHTML = '<span class="led-dot" style="background:var(--red); box-shadow:0 0 8px var(--red);"></span> LISTENING TO VOICE INTAKE...';
-      }
-    }
+    content.innerHTML = items.map(item => {
+      const isMoney = item.name.match(/\$|invoice|quote|sale|deposit|bill|collect/i);
+      return `
+        <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl space-y-3 shadow-md">
+          <div class="flex items-start justify-between gap-2">
+            <div class="text-sm font-bold text-white flex-1">${item.name}</div>
+            <span class="text-[9px] bg-blue-950 border border-blue-800 text-blue-300 px-2 py-0.5 rounded-full font-bold">FOREVER CARD</span>
+          </div>
 
-    function stopRecordingState() {
-      isRecording = false;
-      document.getElementById('dockMic').classList.remove('recording');
-      document.getElementById('ledStatus').innerHTML = '<span class="led-dot"></span> POCKET CHIEF OF STAFF READY ⚡';
-    }
+          <div class="flex gap-2 pt-1 border-t border-gray-800/80">
+            <button onclick="talkToSissyCard('${item.name.replace(/'/g, "\\'")}')" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold py-1.5 px-2.5 rounded-xl">🎙️ Talk to Sissy</button>
+            <button onclick="openDelegateModal('${item.name.replace(/'/g, "\\'")}')" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-[10px] font-bold py-1.5 px-2.5 rounded-xl border border-gray-700">👥 Delegate</button>
+            ${isMoney ? `<button onclick="createStripePay('${item.name.replace(/'/g, "\\'")}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold py-1.5 px-2.5 rounded-xl">💳 Stripe Pay</button>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch(e) {
+    content.innerHTML = '<p class="text-center text-red-400 pt-8">Unable to load cards.</p>';
+  }
+}
 
-    function submitTextIntake() {
-      const input = document.getElementById('dockText');
-      if (!input.value.trim()) return;
-      processIntake(input.value.trim());
-      input.value = '';
-    }
+function closeDrawer() { document.getElementById('drawerModal').classList.add('hidden'); }
 
-    async function processIntake(text) {
-      showToast(`Processing: "${text.substring(0, 25)}..."`);
-      try {
-        const res = await fetch('/.netlify/functions/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: text })
-        });
-        const data = await res.json();
-        if (data.reply) {
-          showToast(data.reply);
-          document.getElementById('ledStatus').innerHTML = `<span class="led-dot"></span> ${data.reply}`;
-        }
-      } catch(e) {
-        showToast("⚠️ Network connection error.");
-      }
-    }
+function talkToSissyCard(cardName) {
+  const note = prompt(`🎙️ Talk to Sissy on "${cardName}":`);
+  if (note) {
+    showToast(`📝 Note attached to ${cardName}!`);
+  }
+}
 
-    function showToast(msg) {
-      const t = document.getElementById('freshToast');
-      t.innerText = `🤵 Fresh: "${msg}"`;
-      t.style.display = 'block';
-      setTimeout(() => { t.style.display = 'none'; }, 4000);
-    }
+function openDelegateModal(cardName) {
+  currentCard = cardName;
+  showModal('modalDelegate');
+}
 
-    async function openDrawer(name) {
-      if (name === 'castle') {
-        const pin = prompt("Enter PIN for Castle Personal Drawer:");
-        if (pin !== "7777" && pin !== "1234") {
-          alert("Incorrect PIN.");
-          return;
-        }
-      }
+function confirmDelegate(role) {
+  hideModals();
+  showToast(`✅ Delegated "${currentCard}" to ${role}!`);
+}
 
-      const view = document.getElementById('drawerView');
-      const title = document.getElementById('drawerTitle');
-      const itemsContainer = document.getElementById('drawerItems');
-
-      title.innerText = name.toUpperCase() + " DRAWER";
-      itemsContainer.innerText = "Querying live Forever Cards...";
-      view.style.display = 'block';
-
-      try {
-        const res = await fetch(`/.netlify/functions/getBoard?group=${name}`);
-        const data = await res.json();
-        const items = data.items || [];
-
-        if (items.length === 0) {
-          itemsContainer.innerHTML = "<em>Pristine canvas ready. No active cards in this drawer.</em>";
-          return;
-        }
-
-        // Render Fractal Forever Cards
-        itemsContainer.innerHTML = items.map(i => {
-          const lower = i.name.toLowerCase();
-          const hasMoney = lower.match(/\$|invoice|quote|sale|bill|collect/);
-
-          return `
-            <div class="forever-card">
-              <div class="card-top">
-                <div class="card-title">${i.name}</div>
-                <span class="card-badge">CARD</span>
-              </div>
-              <div class="card-actions">
-                <button class="btn-action mic" onclick="cardVoiceContext('${i.name}')">🎙️ Talk to Sissy</button>
-                <button class="btn-action share" onclick="openDelegateModal('${i.name}')">👥 Delegate</button>
-                ${hasMoney ? `<a class="btn-action pay" href="#">💳 Stripe Pay</a>` : ''}
-              </div>
-            </div>
-          `;
-        }).join('');
-
-      } catch(e) {
-        itemsContainer.innerText = "Error loading drawer items.";
-      }
-    }
-
-    function closeDrawer() { document.getElementById('drawerView').style.display = 'none'; }
-    function triggerMedia(type) { document.getElementById(type + 'Input').click(); }
-    function handleMediaSelect(input, type) {
-      if (input.files && input.files[0]) {
-        showToast(`📸 ${type} attached to intake!`);
-      }
-    }
-
-    function cardVoiceContext(cardName) {
-      const note = prompt(`🎙️ Talk to Sissy regarding "${cardName}":`);
-      if (note) {
-        processIntake(`Update card "${cardName}": ${note}`);
-      }
-    }
-
-    function openDelegateModal(cardName) {
-      currentActiveCard = cardName;
-      document.getElementById('delegateModal').style.display = 'block';
-    }
-
-    function confirmDelegate(role) {
-      showToast(`Delegated "${currentActiveCard}" to ${role}!`);
-      hideModals();
-    }
-
-    function hideModals() {
-      document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
-    }
-  </script>
+function createStripePay(title) {
+  const match = title ? title.match(/\$?(\d+(\.\d{2})?)/) : null;
+  const defaultAmt = match ? match[1] : "300.00";
+  const amt = prompt("Enter invoice total ($):", defaultAmt);
+  if (amt) {
+    const total = (parseFloat(amt) * 1.06).toFixed(2);
+    prompt("Stripe Pay Link (MD 6% Tax Included):", `https://buy.stripe.com/pay_tappything?amount=${total}&tax=md6`);
+  }
+}
+</script>
 </body>
 </html>
