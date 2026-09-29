@@ -52,8 +52,50 @@ exports.handler = async function(event, context) {
 
     const lower = rawPrompt.toLowerCase().trim();
 
-    // TRACK B: ACTION COMMAND TRACK (Move to Pinball Queue)
-    if (lower.includes('bring everything') || lower.includes('move to pinball') || lower.includes('move all') || lower.includes('clean up') || lower.includes('clear board')) {
+    // TRACK 1: WIPE / CLEAR QUEUE COMMAND (Moves items to Archive)
+    if (lower.includes('clear board') || lower.includes('clear queue') || lower.includes('wipe queue') || lower.includes('clear out the temporary queue') || lower.includes('clear temporary queue')) {
+      const getItemsQuery = JSON.stringify({
+        query: `{ boards(ids: [${targetBoardId}]) { groups(ids: ["group_mm7mfbre", "group_mm6b77as"]) { items_page(limit: 50) { items { id } } } } }`
+      });
+
+      const itemsRes = await makePostRequest('https://api.monday.com/v2', {
+        'Content-Type': 'application/json',
+        'Authorization': mondayKey,
+        'API-Version': '2023-10',
+        'Content-Length': Buffer.byteLength(getItemsQuery)
+      }, getItemsQuery);
+
+      const groups = itemsRes?.data?.boards?.[0]?.groups || [];
+      let archiveCount = 0;
+
+      for (const group of groups) {
+        const items = group.items_page?.items || [];
+        for (const item of items) {
+          const archiveQuery = JSON.stringify({
+            query: `mutation { move_item_to_group (item_id: "${item.id}", group_id: "group_mm6xs2fx") { id } }`
+          });
+          await makePostRequest('https://api.monday.com/v2', {
+            'Content-Type': 'application/json',
+            'Authorization': mondayKey,
+            'API-Version': '2023-10',
+            'Content-Length': Buffer.byteLength(archiveQuery)
+          }, archiveQuery);
+          archiveCount++;
+        }
+      }
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          reply: `⚡ BOARD CLEARED: All ${archiveCount} active items moved to Archive!`,
+          count: archiveCount
+        })
+      };
+    }
+
+    // TRACK 2: MOVE TO PINBALL COMMAND
+    if (lower.includes('bring everything') || lower.includes('move to pinball') || lower.includes('move all') || lower.includes('knockout mode')) {
       const getItemsQuery = JSON.stringify({
         query: `{ boards(ids: [${targetBoardId}]) { groups(ids: ["group_mm7mfbre", "group_mm6b77as"]) { items_page(limit: 50) { items { id } } } } }`
       });
@@ -88,19 +130,18 @@ exports.handler = async function(event, context) {
         statusCode: 200,
         headers,
         body: JSON.stringify({
-          reply: `All ${moveCount} active tasks moved directly to Pinball queue, William! Let's knock them out!`,
+          reply: `⚡ STAGED: All ${moveCount} items moved to Pinball queue!`,
           count: moveCount
         })
       };
     }
 
-    // TRACK A: MULTI-CARD INTAKE SPLITTER & ROUTER
+    // TRACK 3: MULTI-TASK SPLITTER & INTAKE ROUTER
     const groupMap = {
       empire: { id: 'group_mm7mfbre', name: 'Empire Operations' },
       pipeline: { id: 'group_mm7myd0b', name: 'Pipeline' },
       castle: { id: 'group_mm7mv0yv', name: 'Castle Drawer' },
       pinball: { id: 'group_mm7mmekt', name: 'Pinball Queue' },
-      housekeeping: { id: 'group_mm6b77as', name: 'Housekeeping' },
       intake: { id: 'group_mm6b77as', name: 'Staff Intake' }
     };
 
@@ -117,19 +158,8 @@ exports.handler = async function(event, context) {
 
       if (sLower.includes('personal') || sLower.includes('home') || sLower.includes('family')) {
         targetKey = 'castle';
-      } else if (sLower.includes('lead') || sLower.includes('sale') || sLower.includes('quote') || sLower.includes('
-
----
-
-### **Action:**
-1. Commit this into **`netlify/functions/chat.js`** on GitHub.
-2. Ensure **`index.html`** and **`netlify/functions/getBoard.js`** are pushed.
-3. Wait 20 seconds for Netlify to publish the build.
-
-Once deployed, open `freshtappything.com`—your live 2-track voice intake and Pinball queue are ready!) || sLower.includes('dollar')) {
+      } else if (sLower.includes('lead') || sLower.includes('sale') || sLower.includes('quote')) {
         targetKey = 'pipeline';
-      } else if (sLower.includes('clean') || sLower.includes('trash') || sLower.includes('chore') || sLower.includes('housekeeping')) {
-        targetKey = 'housekeeping';
       } else if (sLower.includes('quick') || sLower.includes('urgent') || sLower.includes('pinball')) {
         targetKey = 'pinball';
       } else if (sLower.includes('shop') || sLower.includes('bench') || sLower.includes('repair')) {
