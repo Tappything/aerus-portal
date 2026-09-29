@@ -94,6 +94,7 @@ exports.handler = async function(event, context) {
       'empire': ['empire', 'staff intake', 'intake', 'bench', 'operations'],
       'shop ops': ['staff intake', 'intake', 'bench', 'empire'],
       'castle': ['castle', 'personal', 'car', 'vehicle'],
+      'housekeeping': ['housekeeping', 'chores', 'checklist', 'clean'],
       'pipeline': ['pipeline', 'lead', 'private'],
       'pinball': ['pinball', 'staff intake', 'intake', 'queue'],
       'calendar': ['calendar']
