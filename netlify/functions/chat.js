@@ -10,72 +10,49 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers, body: '' };
   }
 
+  // Broad token check across all possible Netlify environment variable names
   const token = process.env.MONDAY_API_TOKEN || process.env.MONDAY_API_KEY || process.env.MONDAY_TOKEN;
   const boardId = "18424728273";
 
   if (!token) {
-    return { statusCode: 500, headers, body: JSON.stringify({ reply: 'Monday API token missing' }) };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: '❌ MONDAY_API_TOKEN is missing in Netlify Environment Variables.' }) };
   }
 
-  let body = {};
-  try {
-    body = JSON.parse(event.body || '{}');
-  } catch(e) {
-    body = {};
-  }
+  const qParams = event.queryStringParameters || {};
+  const rawDrawer = qParams.group || qParams.drawer || 'all';
+  const drawer = rawDrawer.toLowerCase();
 
-  const prompt = (body.prompt || body.text || '').trim();
-  if (!prompt) {
-    return { statusCode: 400, headers, body: JSON.stringify({ reply: 'Empty brain dump' }) };
-  }
-
-  // 1. Protect titles like Mrs., Mr., Dr. from false splits
-  let safeText = prompt.replace(/(Mrs|Mr|Ms|Dr)\./gi, "$1___DOT___");
-
-  // 2. Decompose compound stream on COMMAS, periods, newlines, semicolons, and "and"
-  let rawParts = safeText
-    .split(/,|\.|\n|;|\band\s+/i)
-    .map(t => t.replace(/___DOT___/g, ".").trim().replace(/^and\s+/i, ''))
-    .filter(t => t.length > 2);
-
-  let tasks = rawParts.length > 0 ? rawParts : [prompt.replace(/___DOT___/g, ".")];
-
-  // 3. Precision 7-Drawer Routing Map
-  const routeTask = (task) => {
-    const lower = task.toLowerCase();
-    
-    // Castle 🏰 (PIN Personal / Bills / Family)
-    if (lower.match(/personal|mortgage|insurance|bill|doctor|family|private|home|tax|pickleball/)) {
-      return 'group_mm7mv0yv';
-    }
-    // Calendar 📅 (Dates / Times / Appointments / Water Tests)
-    if (lower.match(/tomorrow|\bat\b\s*\d+|\bam\b|\bpm\b|noon|schedule|appointment|water test|friday|monday|tuesday|wednesday|thursday|saturday|sunday/)) {
-      return 'group_mm7maw66';
-    }
-    // Pipeline 🚀 (Sales / Quotes / Money / Forever Cards)
-    if (lower.match(/forever card|follow up|lead|sale|quote|deposit|\$|invoice|collect/)) {
-      return 'group_mm7myd0b';
-    }
-    // Housekeeping 🧹 (Chores / Upkeep / Cleaning)
-    if (lower.match(/cleaning|chores|upkeep|clean|showroom|trash|vacuum floor/)) {
-      return 'group_mm6b77as';
-    }
-    // Pinball ⚡ (Rapid knockout)
-    if (lower.match(/pinball|rapid|knockout/)) {
-      return 'group_mm7mmekt';
-    }
-    // Empire 👑 (Default Core Operations / Bench / Tech Repairs)
-    return 'group_mm7mfbre';
+  // Multi-group routing map so incoming Staff Intake cards display across all relevant drawers
+  const groupMap = {
+    castle: ['group_mm7mv0yv', 'group_mm6b77as'],
+    empire: ['group_mm7mfbre', 'group_mm6b77as'],
+    pipeline: ['group_mm7myd0b', 'group_mm6b77as'],
+    calendar: ['group_mm7maw66', 'group_mm6b77as'],
+    housekeeping: ['group_mm6b77as'],
+    pinball: ['group_mm7mmekt', 'group_mm6b77as'],
+    vault: ['group_mm6xs2fx']
   };
 
-  const mutations = tasks.map((task, idx) => {
-    const groupId = routeTask(task);
-    let cleanName = task.charAt(0).toUpperCase() + task.slice(1);
-    const safeName = cleanName.replace(/"/g, '\\"');
-    return `c${idx}: create_item(board_id: ${boardId}, group_id: "${groupId}", item_name: "${safeName}") { id }`;
-  }).join("\n");
+  const targetGroups = groupMap[drawer] || ['group_mm7mfbre', 'group_mm6b77as'];
+  const groupIdsFormatted = JSON.stringify(targetGroups);
 
-  const query = `mutation {\n${mutations}\n}`;
+  const query = `
+    query {
+      boards(ids: [${boardId}]) {
+        groups(ids: ${groupIdsFormatted}) {
+          id
+          title
+          items_page(limit: 50, query_params: { order_by: [{ column_id: "__creation_log__", direction: desc }] }) {
+            items {
+              id
+              name
+              created_at
+            }
+          }
+        }
+      }
+    }
+  `;
 
   try {
     const response = await fetch('https://api.monday.com/v2', {
@@ -89,21 +66,46 @@ exports.handler = async (event) => {
     });
 
     const data = await response.json();
+
+    if (data.errors && data.errors.length > 0) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'Monday GraphQL Error: ' + data.errors[0].message })
+      };
+    }
+
+    const groups = data.data?.boards?.[0]?.groups || [];
+    
+    let allItems = [];
+    const seen = new Set();
+    groups.forEach(g => {
+      if (g.items_page && g.items_page.items) {
+        g.items_page.items.forEach(item => {
+          if (!seen.has(item.id)) {
+            seen.add(item.id);
+            allItems.push(item);
+          }
+        });
+      }
+    });
+
+    allItems.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        reply: `✅ LOGGED ${tasks.length} ACTION CARDS! ⚡`,
-        count: tasks.length,
-        tasks: tasks,
-        mondayResponse: data
+        drawer: drawer,
+        count: allItems.length,
+        items: allItems
       })
     };
   } catch (err) {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ reply: 'Error processing intake: ' + err.message })
+      body: JSON.stringify({ error: 'Server fetch error: ' + err.message })
     };
   }
 };
