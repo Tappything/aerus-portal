@@ -1,353 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TappyThing — Pocket Chief of Staff</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --bg: #030712;
-      --card-bg: #0f172a;
-      --accent: #3b82f6;
-      --accent-gold: #f59e0b;
-      --text: #f8fafc;
-    }
-    body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); }
-    .tapulator-face { background: linear-gradient(180deg, #0f172a 0%, #090e17 100%); border: 1px solid #1e293b; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9); }
-    .led-display { background: #020617; border: 1px solid #1e293b; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
-    .key-castle { background: linear-gradient(135deg, #1e3a8a 0%, #172554 100%); border: 1px solid #3b82f6; }
-    .key-empire { background: #1e293b; border: 1px solid #334155; }
-    .key-pipeline { background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%); border: 1px solid #14b8a6; }
-    .key-pinball { background: linear-gradient(135deg, #6b21a8 0%, #581c87 100%); border: 1px solid #a855f7; }
-    textarea#dockInput { min-height: 44px; max-height: 120px; resize: none; }
-  </style>
-</head>
-<body class="min-h-screen flex flex-col items-center justify-start p-4 pb-36">
-
-<!-- FLOATING TOAST -->
-<div id="freshToast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-blue-600 border border-blue-400 text-white font-bold px-5 py-2 rounded-full shadow-2xl z-50 text-xs hidden flex items-center gap-2 backdrop-blur-md">
-  <span id="toastMsg">⚡ FRESH DIGITAL COORDINATOR ACTIVE</span>
-</div>
-
-<div class="max-w-md w-full tapulator-face rounded-3xl p-5 space-y-4 my-2">
-
-  <!-- TOP LED DISPLAY -->
-  <div class="led-display rounded-2xl p-3.5 text-center border border-blue-900/50 min-h-[54px] flex items-center justify-center">
-    <div id="ledOutput" class="text-xs font-black text-emerald-400 tracking-wider">
-      POCKET CHIEF OF STAFF READY ⚡
-    </div>
-  </div>
-
-  <!-- LOGO EMBLEM (IMAGE RESTORED) -->
-  <div class="text-center space-y-1">
-    <div class="inline-flex items-center justify-center bg-slate-950 border border-slate-700 rounded-full px-6 py-2 shadow-inner min-h-[48px]">
-      <img src="logo.png" alt="TappyThing" class="h-10 max-w-[170px] object-contain mx-auto" onerror="this.onerror=null; this.src='https://via.placeholder.com/160x44/0f172a/38bdf8?text=⚡+TAPPYTHING';">
-    </div>
-    <div class="text-[11px] text-gray-400 font-medium">Fractal Forever Card Engine • Speak or type below.</div>
-  </div>
-
-  <!-- FEATURES, BENEFITS & SOUL BUTTON -->
-  <button onclick="showModal('modalSuite')" class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold py-2 rounded-xl text-[11px] border border-slate-700 uppercase tracking-wider transition flex items-center justify-center gap-2">
-    <i class="fa-solid fa-book-open text-blue-400 text-xs"></i>
-    <span>[ FEATURES, BENEFITS & SOUL ]</span>
-  </button>
-
-  <!-- 7 UNIVERSAL MASTER DRAWERS -->
-  <div class="space-y-2.5">
-    
-    <!-- 1. CASTLE -->
-    <button onclick="openDrawer('castle')" class="key-castle w-full rounded-2xl p-3.5 text-left transition flex items-center justify-between shadow-md">
-      <div>
-        <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-solid fa-chess-rook text-blue-300"></i>
-          <span>1. Castle 🏰</span>
-        </div>
-        <div class="text-[11px] text-blue-200 mt-0.5">Personal, Family, Bills & Assets (PIN 🔒)</div>
-      </div>
-      <i class="fa-solid fa-chevron-right text-blue-300 text-sm"></i>
-    </button>
-
-    <!-- 2. EMPIRE & 3. PIPELINE -->
-    <div class="grid grid-cols-5 gap-2.5">
-      <button onclick="openDrawer('empire')" class="key-empire col-span-3 rounded-2xl p-3 text-left transition flex flex-col justify-between min-h-[72px] shadow-sm">
-        <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
-          <span>2. Empire 👑</span>
-          <i class="fa-solid fa-crown text-amber-500"></i>
-        </div>
-        <div class="text-[10px] text-gray-400">Core Business Operations</div>
-      </button>
-
-      <button onclick="openDrawer('pipeline')" class="key-pipeline col-span-2 rounded-2xl p-3 text-left transition flex flex-col justify-between min-h-[72px] shadow-sm">
-        <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
-          <span>3. Pipeline 🚀</span>
-          <i class="fa-solid fa-rocket text-teal-400"></i>
-        </div>
-        <div class="text-[10px] text-teal-100">Leads & Retention</div>
-      </button>
-    </div>
-
-    <!-- 4. CALENDAR, 5. HOUSEKEEPING, 6. VAULT -->
-    <div class="grid grid-cols-3 gap-2">
-      <button onclick="openDrawer('calendar')" class="key-empire rounded-xl p-2.5 text-left transition space-y-1 shadow-sm">
-        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
-          <span>4. Cal 📅</span>
-          <i class="fa-solid fa-calendar text-gray-500 text-xs"></i>
-        </div>
-        <div class="text-[9px] text-gray-400">Schedule</div>
-      </button>
-
-      <button onclick="openDrawer('housekeeping')" class="key-empire rounded-xl p-2.5 text-left transition space-y-1 shadow-sm">
-        <div class="text-[11px] font-bold text-amber-400 flex items-center justify-between">
-          <span>5. House 🧹</span>
-          <i class="fa-solid fa-broom text-amber-500 text-xs"></i>
-        </div>
-        <div class="text-[9px] text-gray-400">Store Upkeep</div>
-      </button>
-
-      <button onclick="openDrawer('vault')" class="key-empire rounded-xl p-2.5 text-left transition space-y-1 shadow-sm">
-        <div class="text-[11px] font-bold text-teal-400 flex items-center justify-between">
-          <span>6. Vault 🌐</span>
-          <i class="fa-solid fa-database text-teal-500 text-xs"></i>
-        </div>
-        <div class="text-[9px] text-gray-400">22K Customers</div>
-      </button>
-    </div>
-
-    <!-- 7. PINBALL -->
-    <button onclick="openDrawer('pinball')" class="key-pinball w-full rounded-2xl p-3.5 text-left transition flex items-center justify-between shadow-md">
-      <div>
-        <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-solid fa-bolt text-purple-200"></i>
-          <span>7. Pinball Tap-to-Task 🧠⚡</span>
-        </div>
-        <div class="text-[11px] text-purple-200 mt-0.5">Rapid Task Knockout Mode</div>
-      </div>
-      <i class="fa-solid fa-chevron-right text-purple-200 text-sm"></i>
-    </button>
-  </div>
-
-  <!-- LAWYER IP VAULT LINK -->
-  <div class="text-center pt-2 border-t border-gray-800">
-    <button onclick="unlockLawyerVault()" class="text-red-400 hover:text-red-300 text-[10px] font-bold tracking-wider uppercase transition">
-      🔒 Protected IP Hub
-    </button>
-  </div>
-
-</div>
-
-<!-- BOTTOM MASTER DOCK -->
-<div class="fixed bottom-0 left-0 right-0 bg-gray-900/95 border-t border-gray-800 p-3 z-40 backdrop-blur-md">
-  <div class="max-w-md mx-auto flex items-end gap-1.5">
-    
-    <label class="bg-gray-800 hover:bg-gray-700 text-amber-400 w-10 h-10 rounded-xl flex items-center justify-center border border-gray-700 shrink-0 cursor-pointer shadow">
-      <i class="fa-solid fa-camera text-base"></i>
-      <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMedia(this, 'Photo')">
-    </label>
-
-    <label class="bg-gray-800 hover:bg-gray-700 text-red-400 w-10 h-10 rounded-xl flex items-center justify-center border border-gray-700 shrink-0 cursor-pointer shadow">
-      <i class="fa-solid fa-video text-base"></i>
-      <input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMedia(this, 'Video')">
-    </label>
-
-    <textarea id="dockInput" placeholder="Brain dump or speak anything here..." rows="1" class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2 text-xs text-white placeholder-gray-500 focus:outline-none" oninput="autoExpand(this)" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); submitIntake(); }"></textarea>
-
-    <button id="micBtn" onclick="toggleVoice()" class="bg-blue-600 hover:bg-blue-500 text-white w-10 h-10 rounded-xl flex items-center justify-center border border-blue-400 shrink-0 shadow">
-      <i class="fa-solid fa-microphone text-base"></i>
-    </button>
-
-    <button onclick="submitIntake()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow">
-      <i class="fa-solid fa-paper-plane text-sm"></i>
-    </button>
-
-  </div>
-</div>
-
-<!-- DRAWER MODAL -->
-<div id="drawerModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-4 pb-24 backdrop-blur-md">
-  <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-3">
-    <h3 id="drawerTitle" class="text-base font-black text-white uppercase">Drawer</h3>
-    <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-xs bg-gray-800 px-3 py-1.5 rounded-lg">✕ Close</button>
-  </div>
-  <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300"></div>
-</div>
-
-<!-- SYSTEM GUIDE & FEATURES / BENEFITS MODAL -->
-<div id="modalSuite" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-4 justify-center backdrop-blur-md overflow-y-auto">
-  <div class="bg-gray-900 border border-blue-500/50 rounded-3xl p-5 max-w-md mx-auto space-y-4 text-left shadow-2xl my-auto">
-    <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-      <h3 class="text-xs font-black text-white tracking-wider uppercase">⚡ Features, Benefits & Soul</h3>
-      <button onclick="hideModals()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-2 py-1 rounded-lg">✕</button>
-    </div>
-
-    <div class="text-[11px] text-gray-300 space-y-3 max-h-[60vh] overflow-y-auto pr-1">
-      
-      <!-- FEATURE 1 -->
-      <div class="bg-gray-800/80 p-3 rounded-2xl border border-blue-900/40 space-y-1">
-        <div class="font-bold text-white flex items-center gap-1.5 text-xs text-blue-300">
-          <i class="fa-solid fa-microphone-lines text-blue-400"></i>
-          <span>1. 1-Tap Compound Voice Brain Dump</span>
-        </div>
-        <div class="text-gray-300 text-[10px]">
-          <strong>Benefit:</strong> Speak multiple tasks in 1 breath. Decomposes & routes instantly to your team with zero friction.
-        </div>
-      </div>
-
-      <!-- FEATURE 2 -->
-      <div class="bg-gray-800/80 p-3 rounded-2xl border border-amber-900/40 space-y-1">
-        <div class="font-bold text-white flex items-center gap-1.5 text-xs text-amber-300">
-          <i class="fa-solid fa-layer-group text-amber-400"></i>
-          <span>2. 7 Asymmetric Universal Drawers</span>
-        </div>
-        <div class="text-gray-300 text-[10px]">
-          <strong>Benefit:</strong> Complete mental clarity. Personal life & PIN-locked bills live in Castle, shop repairs in Empire, sales in Pipeline, schedule in Calendar, and upkeep in Housekeeping.
-        </div>
-      </div>
-
-      <!-- FEATURE 3 -->
-      <div class="bg-gray-800/80 p-3 rounded-2xl border border-emerald-900/40 space-y-1">
-        <div class="font-bold text-white flex items-center gap-1.5 text-xs text-emerald-300">
-          <i class="fa-solid fa-id-card text-emerald-400"></i>
-          <span>3. Living Fractal "Forever Cards"</span>
-        </div>
-        <div class="text-gray-300 text-[10px]">
-          <strong>Benefit:</strong> Every client, unit, and job becomes a permanent living card with 2-way voice notes, role delegation, and full historical records.
-        </div>
-      </div>
-
-      <!-- FEATURE 4 -->
-      <div class="bg-gray-800/80 p-3 rounded-2xl border border-teal-900/40 space-y-1">
-        <div class="font-bold text-white flex items-center gap-1.5 text-xs text-teal-300">
-          <i class="fa-solid fa-credit-card text-teal-400"></i>
-          <span>4. Context-Triggered 1-Tap Stripe Pay Links</span>
-        </div>
-        <div class="text-gray-300 text-[10px]">
-          <strong>Benefit:</strong> Say a price or quote, and TappyThing generates an instant checkout link (with 6% sales tax auto-calculated) for instant customer payment.
-        </div>
-      </div>
-
-      <!-- FEATURE 5 -->
-      <div class="bg-gray-800/80 p-3 rounded-2xl border border-purple-900/40 space-y-1">
-        <div class="font-bold text-white flex items-center gap-1.5 text-xs text-purple-300">
-          <i class="fa-solid fa-shield-halved text-purple-400"></i>
-          <span>5. Permanent Security & Zero Hard Deletes</span>
-        </div>
-        <div class="text-gray-300 text-[10px]">
-          <strong>Benefit:</strong> Company records cannot be destroyed. Finished tasks soft-archive automatically, protecting your 22,000+ customer history forever.
-        </div>
-      </div>
-
-      <!-- NESTED CLOSED SOUL DRAWER -->
-      <div class="border-t border-gray-800 pt-3">
-        <button onclick="toggleSoulDrawer()" class="w-full bg-slate-950 hover:bg-slate-800 border border-slate-700 p-3 rounded-2xl flex items-center justify-between text-left transition shadow-md">
-          <div>
-            <div class="text-xs font-bold text-blue-300">🎭 Meet the Tappy Family & Crew (Soul Drawer)</div>
-            <div class="text-[10px] text-gray-500 mt-0.5">Tap to view the spirits and archetypes behind TappyThing</div>
-          </div>
-          <i id="soulChevron" class="fa-solid fa-chevron-down text-gray-400 text-xs transition-transform duration-200"></i>
-        </button>
-
-        <!-- CLOSED BY DEFAULT -->
-        <div id="soulDrawerContent" class="hidden mt-2.5 space-y-2 bg-gray-950 p-3 rounded-2xl border border-gray-800">
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-white text-[11px]">👑 Boudie <span class="text-blue-400 font-normal">— Founder & Chief</span></div>
-            <div class="text-gray-400 text-[10px]">30+ years in the small business trenches. Built TappyThing for freedom, simplicity, and speed.</div>
-          </div>
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-amber-300 text-[11px]">🤵 Fresh <span class="text-gray-400 font-normal">— Digital Coordinator & Guiding Star</span></div>
-            <div class="text-gray-400 text-[10px]">The heart of the platform. Clear, direct, joyful, zero-friction.</div>
-          </div>
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-emerald-300 text-[11px]">👩‍💼 Sissy <span class="text-gray-400 font-normal">— Invisible Backend Engine</span></div>
-            <div class="text-gray-400 text-[10px]">The quiet powerhouse. Routing tasks and making sure nothing slips through the cracks.</div>
-          </div>
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-teal-300 text-[11px]">⚡ Noosh <span class="text-gray-400 font-normal">— Flow & Connectivity</span></div>
-            <div class="text-gray-400 text-[10px]">Keeping communication channels wide open and tasks moving across the shop.</div>
-          </div>
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-purple-300 text-[11px]">🧘‍♀️️ Yogi <span class="text-gray-400 font-normal">— Calm & Stress Relief</span></div>
-            <div class="text-gray-400 text-[10px]">The grounding force. Bringing warmth, peace of mind, and work-life balance.</div>
-          </div>
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-red-400 text-[11px]">🥊 Squash <span class="text-gray-400 font-normal">— Sales Coach & Motivator</span></div>
-            <div class="text-gray-400 text-[10px]">Pure Zig Ziglar energy! Pushing owners to close deals and win every single day.</div>
-          </div>
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-amber-400 text-[11px]">💼 L <span class="text-gray-400 font-normal">— Chief of Treasury & Cashflow</span></div>
-            <div class="text-gray-400 text-[10px]">Invoicing, 1-tap Stripe pay links, and steady cash collections.</div>
-          </div>
-          <div class="pt-1">
-            <div class="font-bold text-pink-400 text-[11px]">🎨 Rob Art <span class="text-gray-400 font-normal">— Creative Soul</span></div>
-            <div class="text-gray-400 text-[10px]">The visual heartbeat and artistic spirit behind TappyThing.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <button onclick="hideModals()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-xl text-xs transition">Close Guide</button>
-  </div>
-</div>
-
-<!-- LAWYER MODAL -->
-<div id="modalLawyer" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-4 justify-center backdrop-blur-md overflow-y-auto">
-  <div class="bg-gray-900 border border-red-500/60 rounded-3xl p-5 max-w-md mx-auto space-y-3.5 text-left shadow-2xl my-auto">
-    <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-      <h3 class="text-xs font-black text-red-400 tracking-wider uppercase">🔒 Confidential IP & Patent Disclosure</h3>
-      <button onclick="hideModals()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-2 py-1 rounded-lg">✕</button>
-    </div>
-
-    <div class="text-[11px] text-gray-300 space-y-2 max-h-[60vh] overflow-y-auto pr-1">
-      <div class="bg-red-950/30 border border-red-800/60 rounded-xl p-2.5">
-        <div class="font-bold text-red-300">INVENTION TITLE:</div>
-        <div class="text-white">Asymmetric Voice-Driven Task Decomposition & Living Fractal Forever Card System</div>
-      </div>
-      <div class="bg-gray-800/70 p-2.5 rounded-xl border border-gray-700/60">
-        <div class="text-white font-bold">Claim 1: Compound Voice Decomposition Engine</div>
-        <p class="text-gray-400">Continuous voice stream parsing into discrete, independent action cards without back-and-forth prompts.</p>
-      </div>
-      <div class="bg-gray-800/70 p-2.5 rounded-xl border border-gray-700/60">
-        <div class="text-white font-bold">Claim 2: Asymmetric 7-Drawer Routing Architecture</div>
-        <p class="text-gray-400">Automatic distribution into isolated domains (PIN Castle, Empire Ops, Pipeline, Calendar).</p>
-      </div>
-      <div class="bg-gray-800/70 p-2.5 rounded-xl border border-gray-700/60">
-        <div class="text-white font-bold">Claim 3: Context-Triggered Micro-Checkout Generation</div>
-        <p class="text-gray-400">Audio quote detection auto-generating instant localized Stripe payment links on task cards.</p>
-      </div>
-      <div class="bg-gray-800/70 p-2.5 rounded-xl border border-gray-700/60">
-        <div class="text-white font-bold">Claim 4: 2-Way Living Forever Card Protocol</div>
-        <p class="text-gray-400">Self-building, client-facing card with voice notes, media, and 1-tap delegation.</p>
-      </div>
-    </div>
-
-    <button onclick="hideModals()" class="w-full bg-red-900/80 hover:bg-red-800 text-white font-bold py-2 rounded-xl text-xs transition">Close Protected Vault</button>
-  </div>
-</div>
-
-<!-- DELEGATION MODAL -->
-<div id="modalDelegate" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-6 justify-center">
-  <div class="bg-gray-900 border border-slate-700 rounded-3xl p-5 max-w-sm mx-auto space-y-3 text-left shadow-2xl">
-    <h3 class="text-sm font-black text-white">👥 1-Tap Role Delegation</h3>
-    <p class="text-xs text-gray-400">Dispatch this Forever Card to your team:</p>
-    <div class="space-y-2 pt-1">
-      <button onclick="confirmDelegate('Admin / FOAS')" class="w-full text-left p-2.5 rounded-xl bg-gray-800 hover:bg-blue-950 border border-gray-700 text-xs font-bold text-white flex justify-between items-center">
-        <span>👤 Admin / FOAS (Follow-ups)</span>
-        <span class="text-blue-400 text-[10px]">Assign</span>
-      </button>
-      <button onclick="confirmDelegate('Field Tech')" class="w-full text-left p-2.5 rounded-xl bg-gray-800 hover:bg-emerald-950 border border-gray-700 text-xs font-bold text-white flex justify-between items-center">
-        <span>🛠️ Field Tech (Runs & Installs)</span>
-        <span class="text-emerald-400 text-[10px]">Assign</span>
-      </button>
-      <button onclick="confirmDelegate('Shop Bench Lead')" class="w-full text-left p-2.5 rounded-xl bg-gray-800 hover:bg-amber-950 border border-gray-700 text-xs font-bold text-white flex justify-between items-center">
-        <span>🔧 Shop Bench (Repairs & Parts)</span>
-        <span class="text-amber-400 text-[10px]">Assign</span>
-      </button>
-    </div>
-    <button onclick="hideModals()" class="w-full bg-gray-800 text-white font-bold py-2 rounded-xl text-xs mt-2">Cancel</button>
-  </div>
-</div>
-
 <script>
 let recognition = null;
 let currentCard = null;
@@ -441,13 +91,22 @@ async function submitIntake() {
       body: JSON.stringify({ prompt: text })
     });
     const data = await res.json();
-    const reply = data.reply || '✅ FOREVER CARD CREATED! ⚡';
+    const reply = data.reply || '✅ FOREVER CARDS CREATED! ⚡';
     showToast(reply);
     document.getElementById('ledOutput').innerText = reply;
   } catch(e) {
-    showToast('✅ FOREVER CARD CREATED! ⚡');
+    showToast('✅ FOREVER CARDS CREATED! ⚡');
     document.getElementById('ledOutput').innerText = '✅ LOGGED TO BOARD! ⚡';
   }
+}
+
+function escapeHtml(str) {
+  return (str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 async function openDrawer(name) {
@@ -467,29 +126,33 @@ async function openDrawer(name) {
   content.innerHTML = '<p class="text-center pt-8 text-gray-400">Loading Forever Cards...</p>';
   modal.classList.remove('hidden');
 
+  let calendarHtml = '';
   if (name === 'calendar') {
-    content.innerHTML = `
-      <div class="space-y-3 pb-6">
-        <div class="rounded-2xl overflow-hidden border border-gray-700 bg-white/5 h-64">
+    calendarHtml = `
+      <div class="space-y-3 pb-3">
+        <div class="rounded-2xl overflow-hidden border border-gray-700 bg-white/5 h-56">
           <iframe src="https://calendar.google.com/calendar/embed?src=william%40towsonhealthyhomes.com&ctz=America%2FNew_York" style="border: 0" width="100%" height="100%" frameborder="0" scrolling="no"></iframe>
         </div>
       </div>
     `;
-    return;
   }
 
   try {
-    const res = await fetch('/.netlify/functions/getBoard?group=' + encodeURIComponent(name));
+    // Add cache-busting timestamp so browser NEVER serves stale data
+    const res = await fetch('/.netlify/functions/getBoard?group=' + encodeURIComponent(name) + '&_t=' + Date.now());
     const data = await res.json();
     const items = data.items || [];
 
     if (items.length === 0) {
-      content.innerHTML = '<p class="text-center pt-8 text-gray-500">Pristine canvas ready. No active cards in this drawer.</p>';
+      content.innerHTML = calendarHtml + '<p class="text-center pt-6 text-gray-500">Pristine canvas ready. No active cards in this drawer.</p>';
       return;
     }
 
-    content.innerHTML = items.map(item => {
+    const cardsHtml = items.map(item => {
       const isMoney = item.name.match(/\$|invoice|quote|sale|deposit|bill|collect/i);
+      const safeName = escapeHtml(item.name);
+      const encodedName = encodeURIComponent(item.name);
+
       return `
         <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl space-y-3 shadow-md hover:border-blue-900/50 transition">
           <div class="flex items-center justify-between gap-2 border-b border-gray-800/60 pb-2">
@@ -499,12 +162,12 @@ async function openDrawer(name) {
             <span class="text-[9px] bg-blue-950 border border-blue-800 text-blue-300 px-2 py-0.5 rounded-full font-bold">FOREVER CARD</span>
           </div>
 
-          <div class="text-sm font-bold text-white leading-snug">${item.name}</div>
+          <div class="text-sm font-bold text-white leading-snug">${safeName}</div>
 
           <div class="flex gap-2 pt-1 border-t border-gray-800/80">
-            <button onclick="talkToSissyCard('${item.name.replace(/'/g, "\\'")}')" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold py-1.5 px-2.5 rounded-xl transition">🎙️ Talk to Sissy</button>
-            <button onclick="openDelegateModal('${item.name.replace(/'/g, "\\'")}')" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-[10px] font-bold py-1.5 px-2.5 rounded-xl border border-gray-700 transition">👥 Delegate</button>
-            ${isMoney ? `<button onclick="createStripePay('${item.name.replace(/'/g, "\\'")}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold py-1.5 px-2.5 rounded-xl transition">💳 Stripe Pay</button>` : ''}
+            <button onclick="talkToSissyCard(decodeURIComponent('${encodedName}'))" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold py-1.5 px-2.5 rounded-xl transition">🎙️ Talk to Sissy</button>
+            <button onclick="openDelegateModal(decodeURIComponent('${encodedName}'))" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-[10px] font-bold py-1.5 px-2.5 rounded-xl border border-gray-700 transition">👥 Delegate</button>
+            ${isMoney ? `<button onclick="createStripePay(decodeURIComponent('${encodedName}'))" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold py-1.5 px-2.5 rounded-xl transition">💳 Stripe Pay</button>` : ''}
           </div>
 
           <div class="pt-1 text-center border-t border-gray-800/40">
@@ -513,8 +176,10 @@ async function openDrawer(name) {
         </div>
       `;
     }).join('');
+
+    content.innerHTML = calendarHtml + cardsHtml;
   } catch(e) {
-    content.innerHTML = '<p class="text-center text-red-400 pt-8">Unable to load cards.</p>';
+    content.innerHTML = calendarHtml + '<p class="text-center text-red-400 pt-8">Unable to load cards: ' + e.message + '</p>';
   }
 }
 
@@ -523,7 +188,7 @@ function closeDrawer() { document.getElementById('drawerModal').classList.add('h
 function talkToSissyCard(cardName) {
   const note = prompt(`🎙️ Talk to Sissy on "${cardName}":`);
   if (note) {
-    showToast(`📝 Note attached to ${cardName}!`);
+    showToast(`📝 Note attached to card!`);
   }
 }
 
@@ -534,7 +199,7 @@ function openDelegateModal(cardName) {
 
 function confirmDelegate(role) {
   hideModals();
-  showToast(`✅ Delegated "${currentCard}" to ${role}!`);
+  showToast(`✅ Delegated to ${role}!`);
 }
 
 function createStripePay(title) {
@@ -547,5 +212,3 @@ function createStripePay(title) {
   }
 }
 </script>
-</body>
-</html>
