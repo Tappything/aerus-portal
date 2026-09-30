@@ -18,7 +18,6 @@ exports.handler = async (event) => {
     return { statusCode: 500, headers, body: JSON.stringify({ error: "Missing Monday API token." }) };
   }
 
-  // Group Map for Drawers
   const groupMap = {
     'castle': 'group_mm7mv0yv',
     'empire': 'group_mm7mfbre',
