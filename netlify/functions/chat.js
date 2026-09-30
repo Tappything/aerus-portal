@@ -26,10 +26,10 @@ exports.handler = async (event) => {
     return { statusCode: 500, headers, body: JSON.stringify({ reply: "❌ MONDAY_API_TOKEN missing in Netlify." }) };
   }
 
-  // Strip bot preambles & clean quotes
-  text = text.replace(/^(fresh,?\s*process\s*this\s*run:?\s*|fresh,?\s*)/i, '').replace(/["“”\\]/g, '').trim();
+  // Clean voice triggers
+  text = text.replace(/^(fresh,?\sprocess\sthis\srun:?\s|fresh,?\s*)/i, '').replace(/["“”]/g, '').trim();
 
-  // Honorific Protection
+  // Protect Honorifics
   let safeText = text.replace(/(Mrs|Mr|Ms|Dr)\./gi, "$1___DOT___");
 
   // Targeted Conjunction & Sentence Splitting
@@ -44,49 +44,47 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers, body: JSON.stringify({ reply: "✅ Queue ready!" }) };
   }
 
-  // GRANULAR SHOP OPS ROUTING ENGINE
+  // Precise Group ID Routing Engine
   const routeTask = (t) => {
     const lower = t.toLowerCase();
 
-    // 1. Castle (Home & Personal)
+    // 1. Castle (Personal / Home)
     if (lower.match(/mortgage|home|personal|family|gas|electric|bills|pickleball/)) {
       return 'group_mm7mv0yv';
     }
-
-    // 2. Parts Needed / Orders (Shop Bench Support)
-    if (lower.match(/parts|order|cord|hose|filter|belt|amazon|desco|supplies/)) {
+    // 2. Parts Needed
+    if (lower.match(/parts|order|cord|hose|filter|belt|amazon|desco/)) {
       return 'group_mm6bv2h0';
     }
-
-    // 3. Ready Wall / Delivery Runs (Customer Drop-off / Pickup)
-    if (lower.match(/ready|deliver|delivery|pickup|drop off|drop-off/)) {
-      return 'group_mm6s961c';
-    }
-
-    // 4. Mike's Workbench (Active Repairs & Diagnostics)
-    if (lower.match(/bench|repair|breakdown|shampooer|canister|upright|diagnostic|check unit/)) {
+    // 3. Bench Repairs
+    if (lower.match(/bench|repair|breakdown|shampooer|canister|upright|check unit|diagnostic/)) {
       return 'group_mm76qbbh';
     }
-
-    // 5. Calendar (Time-Locked Commitments)
-    if (lower.match(/tomorrow|\bat \d+|\bam\b|\bpm\b|noon|schedule|appointment|water test/)) {
+    // 4. Ready Wall / Delivery
+    if (lower.match(/ready|deliver|delivery|pickup|drop off/)) {
+      return 'group_mm6s961c';
+    }
+    // 5. Calendar
+    if (lower.match(/tomorrow|\bat\b\s*\d+|\bam\b|\bpm\b|noon|schedule|appointment|water test/)) {
       return 'group_mm7maw66';
     }
-
-    // 6. Pipeline (Sales & Leads)
-    if (lower.match(/lead|sale|quote|follow up|forever card|deposit|\$|dollar|check/)) {
+    // 6. Pipeline (Deals, Forever Cards, Retention)
+    if (lower.match(/forever card|follow up|job completed|lead|sale|quote|deposit|check/)) {
       return 'group_mm7myd0b';
     }
-
-    // 7. Housekeeping / Chores
-    if (lower.match(/clean|trash|chore|sweep|mop/)) {
+    // 7. Housekeeping
+    if (lower.match(/cleaning|chores|upkeep|clean|inventory check|trash/)) {
       return 'group_mm6b77as';
     }
-
-    // 8. Default to Empire Operations
+    // 8. Pinball Mode
+    if (lower.match(/pinball|rapid|knockout/)) {
+      return 'group_mm7mmekt';
+    }
+    // 9. Empire General Ops (Default Shop Fallback)
     return 'group_mm7mfbre';
   };
 
+  // Batched GraphQL Mutation Payload (0.4s Execution)
   const mutations = tasks.map((task, idx) => {
     const groupId = routeTask(task);
     let cleanName = task.charAt(0).toUpperCase() + task.slice(1);
