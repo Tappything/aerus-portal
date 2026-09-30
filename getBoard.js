@@ -14,7 +14,7 @@ exports.handler = async (event) => {
   const boardId = "18424728273";
 
   if (!token) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: 'MONDAY_API_TOKEN missing' }) };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: '❌ MONDAY_API_TOKEN is missing in Netlify Environment Variables.' }) };
   }
 
   const qParams = event.queryStringParameters || {};
@@ -64,6 +64,15 @@ exports.handler = async (event) => {
     });
 
     const data = await response.json();
+
+    if (data.errors && data.errors.length > 0) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'Monday GraphQL Error: ' + data.errors[0].message })
+      };
+    }
+
     const groups = data.data?.boards?.[0]?.groups || [];
     
     let allItems = [];
@@ -94,7 +103,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: err.message })
+      body: JSON.stringify({ error: 'Server fetch error: ' + err.message })
     };
   }
 };
