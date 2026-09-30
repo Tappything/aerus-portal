@@ -14,7 +14,11 @@ exports.handler = async (event) => {
   const boardId = "18424728273";
 
   if (!token) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: 'MONDAY_API_TOKEN missing' }) };
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ error: '❌ MONDAY_API_TOKEN environment variable is missing in Netlify.' })
+    };
   }
 
   const query = `
@@ -46,9 +50,25 @@ exports.handler = async (event) => {
       body: JSON.stringify({ query })
     });
 
-    const data = await response.json();
-    const groups = data.data?.boards?.[0]?.groups || [];
-    
+    const resData = await response.json();
+
+    if (resData.errors && resData.errors.length > 0) {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ error: 'Monday API Error: ' + resData.errors[0].message })
+      };
+    }
+
+    if (resData.error_message) {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ error: 'Monday Auth Error: ' + resData.error_message })
+      };
+    }
+
+    const groups = resData?.data?.boards?.[0]?.groups || [];
     let allItems = [];
     const seen = new Set();
     groups.forEach(g => {
@@ -67,13 +87,16 @@ exports.handler = async (event) => {
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ items: allItems, count: allItems.length })
+      body: JSON.stringify({
+        count: allItems.length,
+        items: allItems
+      })
     };
   } catch (err) {
     return {
-      statusCode: 500,
+      statusCode: 200,
       headers,
-      body: JSON.stringify({ error: err.message, items: [] })
+      body: JSON.stringify({ error: 'Netlify Fetch Error: ' + err.message })
     };
   }
 };
