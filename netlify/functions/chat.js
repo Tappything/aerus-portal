@@ -29,42 +29,42 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ reply: 'Empty brain dump' }) };
   }
 
-  // Protect honorifics from splitting
+  // 1. Protect titles like Mrs., Mr., Dr. from false splits
   let safeText = prompt.replace(/(Mrs|Mr|Ms|Dr)\./gi, "$1___DOT___");
 
-  // Decompose compound stream
+  // 2. Decompose compound stream on COMMAS, periods, newlines, semicolons, and "and"
   let rawParts = safeText
-    .split(/(?<=[.!?])\s+(?=[A-Z0-9])|\band\s+(?=[a-z0-9])|;\s*|\n+/i)
+    .split(/,|\.|\n|;|\band\s+/i)
     .map(t => t.replace(/___DOT___/g, ".").trim().replace(/^and\s+/i, ''))
     .filter(t => t.length > 2);
 
   let tasks = rawParts.length > 0 ? rawParts : [prompt.replace(/___DOT___/g, ".")];
 
-  // Precision 7-Drawer Routing Map
+  // 3. Precision 7-Drawer Routing Map
   const routeTask = (task) => {
     const lower = task.toLowerCase();
     
-    // 1. Castle 🏰 (PIN Personal / Bills / Family)
+    // Castle 🏰 (PIN Personal / Bills / Family)
     if (lower.match(/personal|mortgage|insurance|bill|doctor|family|private|home|tax|pickleball/)) {
       return 'group_mm7mv0yv';
     }
-    // 2. Calendar 📅 (Dates / Times / Appointments / Runs)
+    // Calendar 📅 (Dates / Times / Appointments / Water Tests)
     if (lower.match(/tomorrow|\bat\b\s*\d+|\bam\b|\bpm\b|noon|schedule|appointment|water test|friday|monday|tuesday|wednesday|thursday|saturday|sunday/)) {
       return 'group_mm7maw66';
     }
-    // 3. Pipeline 🚀 (Sales / Quotes / Money / Forever Cards)
+    // Pipeline 🚀 (Sales / Quotes / Money / Forever Cards)
     if (lower.match(/forever card|follow up|lead|sale|quote|deposit|\$|invoice|collect/)) {
       return 'group_mm7myd0b';
     }
-    // 4. Housekeeping 🧹 (Chores / Upkeep / Cleaning)
+    // Housekeeping 🧹 (Chores / Upkeep / Cleaning)
     if (lower.match(/cleaning|chores|upkeep|clean|showroom|trash|vacuum floor/)) {
       return 'group_mm6b77as';
     }
-    // 5. Pinball ⚡ (Rapid knockout)
+    // Pinball ⚡ (Rapid knockout)
     if (lower.match(/pinball|rapid|knockout/)) {
       return 'group_mm7mmekt';
     }
-    // 6. Empire 👑 (Default Core Operations / Bench / Tech Repairs)
+    // Empire 👑 (Default Core Operations / Bench / Tech Repairs)
     return 'group_mm7mfbre';
   };
 
