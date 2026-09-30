@@ -1,323 +1,544 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>TappyThing — Digital Coordinator</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { background-color: #000000; color: #FFFFFF; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    .pulse-animation { animation: pulse 1.2s infinite; }
-    @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.8; transform: scale(0.98); } 100% { opacity: 1; transform: scale(1); } }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TappyThing — Pocket Chief of Staff</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05070e; color: #f3f4f6; }
+.tapulator-face { background: linear-gradient(180deg, #0f172a 0%, #090d16 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); }
+.led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
+.key-primary { background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%); border: 1px solid #3b82f6; box-shadow: 0 4px 14px rgba(29, 78, 216, 0.4); cursor: pointer; }
+.key-primary:active { transform: scale(0.98); }
+.key-secondary { background: #1e293b; border: 1px solid #334155; box-shadow: 0 2px 6px rgba(0,0,0,0.4); cursor: pointer; }
+.key-secondary:hover { background: #273549; }
+.key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; cursor: pointer; }
+.key-pinball { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: 1px solid #8b5cf6; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); cursor: pointer; }
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+.mic-pulsing {
+  animation: pulse-red 1.5s infinite;
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
+}
+</style>
 </head>
-<body class="min-h-screen p-3 flex flex-col items-center justify-between">
+<body class="min-h-screen flex items-center justify-center p-4 pb-28 relative">
 
-  <div id="toast" class="hidden fixed top-4 left-1/2 -translate-x-1/2 bg-yellow-400 text-black px-4 py-2 rounded-full font-black text-xs z-50 shadow-2xl">
-    NOTIFICATION
-  </div>
+<!-- MAIN TAPULATOR DEVICE FACE -->
+<div class="max-w-md w-full tapulator-face rounded-3xl p-6 relative space-y-5 shadow-2xl my-auto">
 
-  <div class="w-full max-w-md text-center flex flex-col items-center mt-2">
-    <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-20 h-20 rounded-full border-4 border-blue-400 mx-auto mb-2 block shadow-2xl shadow-blue-500/30 object-cover ring-2 ring-blue-500/20" alt="Fresh Avatar">
-    <h1 class="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-amber-500">TappyThing</h1>
-    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-0.5">Digital Coordinator Hub</p>
-  </div>
+  <!-- FRESH AVATAR LOGO -->
+  <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-20 h-20 rounded-full border-4 border-blue-400 mx-auto mb-2 block shadow-2xl shadow-blue-500/30 object-cover ring-2 ring-blue-500/20" alt="Fresh Avatar">
 
-  <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-xl p-3 my-3 text-center shadow-lg">
-    <div id="ledOutput" class="text-xs font-black text-green-400 uppercase tracking-wide break-words">
+  <!-- TOP LED DISPLAY SCREEN -->
+  <div class="led-display rounded-2xl p-4 text-center border border-blue-900/50 min-h-[70px] flex items-center justify-center">
+    <div id="ledOutput" class="text-sm font-bold text-emerald-400 tracking-wide transition-all">
       POCKET CHIEF OF STAFF READY ⚡
     </div>
   </div>
 
-  <div class="w-full max-w-md mb-4">
-    <button id="mainMicBtn" onclick="toggleMainMic()" class="w-full h-16 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl text-white font-black text-lg flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20 active:scale-95 transition-transform">
-      <span class="text-2xl">🎙️</span>
-      <span id="micBtnText">TAP & SPEAK TO SISSY</span>
+  <!-- DEVICE HEADER -->
+  <div class="text-center space-y-0.5">
+    <div class="text-xs font-black text-blue-400 uppercase tracking-widest">TappyThing Command Hub</div>
+    <div class="text-[11px] text-gray-400 font-medium">Tap. Talk. Operations live in seconds.</div>
+  </div>
+
+  <!-- SUBTLE FEATURES & BENEFITS BUTTON -->
+  <button type="button" onclick="openFeaturesModal()" class="w-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 font-semibold py-1.5 rounded-xl text-[11px] border border-slate-700/60 uppercase tracking-wider transition flex items-center justify-center gap-1.5">
+    <i class="fa-solid fa-list-check text-slate-400 text-xs"></i>
+    <span>[ FEATURES & BENEFITS ]</span>
+  </button>
+
+  <!-- 6-BUTTON ASYMMETRIC KEYPAD LAYOUT -->
+  <div id="drawersContainer" class="space-y-3">
+    
+    <!-- 1. CASTLE 🏰 -->
+    <button type="button" onclick="openDrawer('Castle')" class="key-primary w-full rounded-2xl p-4 text-left transition flex items-center justify-between">
+      <div>
+        <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-chess-rook text-blue-300"></i>
+          <span>1. Castle 🏰</span>
+        </div>
+        <div class="text-[11px] text-blue-200 mt-0.5">Personal, Family, Pickleball, Bills & Chores</div>
+      </div>
+      <i class="fa-solid fa-chevron-right text-blue-300 text-sm"></i>
+    </button>
+
+    <!-- 2 & 3. EMPIRE + PIPELINE -->
+    <div class="grid grid-cols-5 gap-3">
+      <!-- 2. EMPIRE 👑 (UNIFIED WITH SHOP OPS) -->
+      <button type="button" onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[90px]">
+        <div>
+          <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
+            <span>2. Empire 👑</span>
+            <i class="fa-solid fa-crown text-amber-500"></i>
+          </div>
+          <div class="text-[10px] text-gray-400 font-medium mt-0.5">Business Hub & Shop Ops</div>
+        </div>
+        <div class="text-[9px] text-amber-300/80 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/40 inline-block w-fit">
+          🛠️ Shop Bench & Ops Inside
+        </div>
+      </button>
+
+      <!-- 3. PIPELINE 🚀 -->
+      <button type="button" onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[90px]">
+        <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
+          <span>3. Pipeline 🚀</span>
+          <i class="fa-solid fa-rocket text-teal-400"></i>
+        </div>
+        <div class="text-[10px] text-teal-100 font-medium">Leads & Future Cash</div>
+      </button>
+    </div>
+
+    <!-- 4, 5, 6. CALENDAR, VAULT, PINBALL -->
+    <div class="grid grid-cols-3 gap-2.5">
+      <!-- 4. CALENDAR 📅 -->
+      <button type="button" onclick="openDrawer('Calendar')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
+          <span>4. Calendar 📅</span>
+          <i class="fa-solid fa-calendar-day text-gray-500 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-gray-400">Daily Agenda</div>
+      </button>
+
+      <!-- 5. EXCHANGE VAULT 🌐 -->
+      <button type="button" onclick="openDrawer('Exchange')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
+          <span>5. Vault 🌐</span>
+          <i class="fa-solid fa-share-nodes text-gray-500 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-gray-400">22.2k Cust Vault</div>
+      </button>
+
+      <!-- 6. PINBALL TAP-TO-TASK 🎯 -->
+      <button type="button" onclick="openDrawer('Pinball')" class="key-pinball rounded-xl p-3 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-purple-200 flex items-center justify-between">
+          <span>6. Pinball 🎯</span>
+          <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-purple-200/80">Tap-to-Task Queue</div>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- SUBTLE SALES REP PORTAL LINK -->
+  <div class="text-center pt-2">
+    <button type="button" onclick="alert('Rep portal coming soon — contact William at towsonhealthyhomes.com')" class="text-[10px] text-gray-500 hover:text-gray-400 transition underline tracking-wider">
+      Sales Rep Portal
     </button>
   </div>
 
-  <div class="w-full max-w-md grid grid-cols-2 gap-2.5 mb-4">
-    <div onclick="openDrawer('castle')" class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer active:bg-zinc-800 transition-colors">
-      <span class="text-3xl mb-1">🏰</span>
-      <span class="text-sm font-black text-gray-100">Castle</span>
-      <span class="text-[10px] text-gray-400 mt-0.5">Personal & Owner</span>
+</div>
+
+<!-- PERSISTENT CARD DRAWER MODAL -->
+<div id="drawerModal" style="display:none;" class="fixed inset-0 bg-black/95 z-50 flex flex-col p-4 backdrop-blur-md justify-between">
+  <div class="max-w-md w-full mx-auto flex flex-col h-full">
+    <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-3 shrink-0">
+      <h3 id="drawerTitle" class="text-base font-black text-white flex items-center gap-2">
+        <i class="fa-solid fa-folder-open text-blue-400"></i> Drawer
+      </h3>
+      <button type="button" onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-xs bg-gray-800 px-3 py-1.5 rounded-lg">✕ Close</button>
     </div>
 
-    <div onclick="openDrawer('empire')" class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer active:bg-zinc-800 transition-colors">
-      <span class="text-3xl mb-1">👑</span>
-      <span class="text-sm font-black text-gray-100">Empire</span>
-      <span class="text-[10px] text-gray-400 mt-0.5">Bench & Shop Ops</span>
-    </div>
-
-    <div onclick="openDrawer('pipeline')" class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer active:bg-zinc-800 transition-colors">
-      <span class="text-3xl mb-1">🚀</span>
-      <span class="text-sm font-black text-gray-100">Pipeline</span>
-      <span class="text-[10px] text-gray-400 mt-0.5">Staff Intake & Leads</span>
-    </div>
-
-    <div onclick="openDrawer('calendar')" class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer active:bg-zinc-800 transition-colors">
-      <span class="text-3xl mb-1">📅</span>
-      <span class="text-sm font-black text-gray-100">Calendar</span>
-      <span class="text-[10px] text-gray-400 mt-0.5">Schedule & Agenda</span>
-    </div>
-
-    <div onclick="openDrawer('vault')" class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer active:bg-zinc-800 transition-colors">
-      <span class="text-3xl mb-1">🌐</span>
-      <span class="text-sm font-black text-gray-100">Vault</span>
-      <span class="text-[10px] text-gray-400 mt-0.5">22k+ Records</span>
-    </div>
-
-    <div onclick="openDrawer('pinball')" class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer active:bg-zinc-800 transition-colors">
-      <span class="text-3xl mb-1">🎯</span>
-      <span class="text-sm font-black text-gray-100">Pinball</span>
-      <span class="text-[10px] text-gray-400 mt-0.5">Pending Review</span>
+    <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300">
+      <p class="text-center text-gray-500 pt-8">Loading cards...</p>
     </div>
   </div>
+</div>
 
-  <div class="w-full max-w-md flex gap-2 mb-2">
-    <label class="flex-1 h-11 bg-zinc-900 border border-zinc-800 rounded-lg text-gray-300 font-bold text-xs flex items-center justify-center gap-1 active:bg-zinc-800 cursor-pointer">
-      📷 Photo
-      <input type="file" accept="image/*" capture="environment" class="hidden" onchange="showToast('📷 Photo Captured: ' + (this.files[0] ? this.files[0].name : ''))">
+<!-- FEATURES & BENEFITS MODAL -->
+<div id="featuresModal" style="display:none;" class="fixed inset-0 bg-black/95 z-50 flex flex-col p-4 justify-center backdrop-blur-md overflow-y-auto">
+  <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-6 max-w-sm mx-auto space-y-5 text-left shadow-2xl max-h-[85vh] overflow-y-auto my-auto">
+    <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+      <h3 class="text-base font-black text-white flex items-center gap-2">
+        <i class="fa-solid fa-mobile-screen-button text-blue-400"></i> Pocket Chief of Staff
+      </h3>
+      <button type="button" onclick="closeFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+    </div>
+
+    <div class="space-y-2">
+      <h4 class="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+        <i class="fa-solid fa-circle-check"></i> Core Capabilities
+      </h4>
+      <ul class="space-y-1.5 text-[11px] text-gray-300">
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Unlimited Forever Cards</strong>: Live permanent homes for every customer with zero downloads</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap Voice & Video Intake</strong>: Snap photos or record machine videos directly to cards</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Instant Stripe Invoicing</strong>: Pay buttons appear ONLY on priced invoices ($)</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Auto-Routing</strong>: Intakes route automatically to bench, showroom, or schedule</li>
+      </ul>
+    </div>
+
+    <button type="button" onclick="closeFeaturesModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
+      Got It
+    </button>
+  </div>
+</div>
+
+<!-- UNIFIED BOTTOM INPUT BAR -->
+<div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-40">
+  <div class="max-w-md mx-auto flex items-center gap-2">
+    <!-- PHOTO BUTTON -->
+    <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0" title="Snap Photo">
+      <i class="fa-solid fa-camera text-base"></i>
+      <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaInput(this, 'Photo')">
     </label>
-    <label class="flex-1 h-11 bg-zinc-900 border border-zinc-800 rounded-lg text-gray-300 font-bold text-xs flex items-center justify-center gap-1 active:bg-zinc-800 cursor-pointer">
-      🎥 Video
-      <input type="file" accept="video/*" capture="environment" class="hidden" onchange="showToast('🎥 Video Captured: ' + (this.files[0] ? this.files[0].name : ''))">
+
+    <!-- VIDEO BUTTON -->
+    <label class="bg-gray-800 hover:bg-gray-700 text-purple-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0" title="Record Video">
+      <i class="fa-solid fa-video text-base"></i>
+      <input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, 'Video')">
     </label>
-    <button onclick="openFeaturesModal()" class="flex-1 h-11 bg-zinc-900 border border-zinc-800 rounded-lg text-gray-300 font-bold text-xs flex items-center justify-center gap-1 active:bg-zinc-800">✨ Features</button>
+
+    <!-- UNIFIED TEXT / DICTATION INPUT -->
+    <input type="text" id="unifiedInput" placeholder="Talk, type, snap, or video..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') submitUnifiedInput()">
+
+    <!-- MIC BUTTON -->
+    <button type="button" id="micBtn" onclick="toggleVoiceIntake()" class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-10 h-10 rounded-xl flex items-center justify-center border border-gray-700 transition shrink-0">
+      <i class="fa-solid fa-microphone text-base"></i>
+    </button>
+
+    <!-- SEND BUTTON -->
+    <button type="button" onclick="submitUnifiedInput()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3.5 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1">
+      <i class="fa-solid fa-paper-plane"></i>
+    </button>
   </div>
+</div>
 
-  <div class="text-[10px] text-zinc-600 font-semibold my-2 text-center">Cast & Characters • Aerus Timonium / Clean Environment LLC</div>
+<script>
+var activeDrawerContext = '';
+var isListening = false;
+var activeRecognition = null;
+var silenceTimer = null;
 
-  <!-- DRAWER OVERLAY -->
-  <div id="drawerOverlay" class="fixed inset-0 bg-black/80 z-50 justify-center items-end" style="display: none;">
-    <div class="w-full max-w-md h-[85vh] bg-zinc-950 border-t border-zinc-800 rounded-t-2xl flex flex-col overflow-hidden">
-      <div class="p-4 bg-zinc-900 border-b border-zinc-800 flex justify-between items-center">
-        <div id="drawerTitle" class="text-lg font-black text-yellow-400 flex items-center gap-2">🏰 Castle</div>
-        <button onclick="closeDrawer()" class="bg-zinc-800 text-white w-8 h-8 rounded-full font-bold flex items-center justify-center">✕</button>
-      </div>
-      <div id="drawerBody" class="p-3 overflow-y-auto flex-1 space-y-2">
-      </div>
-    </div>
-  </div>
+var STRIPE_CHECKOUT_URL = window.STRIPE_PAYMENT_LINK || 'https://buy.stripe.com/test_tappything';
 
-  <script>
-    let isListening = false;
-    let mainRecognition = null;
+function toggleVoiceIntake(drawerContext, targetInputId, targetBtnId) {
+  var targetDrawer = drawerContext || activeDrawerContext;
+  var input = document.getElementById(targetInputId || 'unifiedInput');
+  var btn = document.getElementById(targetBtnId || 'micBtn');
+  var output = document.getElementById('ledOutput');
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('Voice not supported.'); return; }
+  
+  if (isListening && activeRecognition) {
+    activeRecognition.stop();
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+    output.textContent = 'POCKET CHIEF OF STAFF READY ⚡';
+    if (silenceTimer) clearTimeout(silenceTimer);
+    return;
+  }
 
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.innerText = msg;
-      toast.classList.remove('hidden');
-      setTimeout(() => { toast.classList.add('hidden'); }, 3000);
-    }
+  activeRecognition = new SR();
+  activeRecognition.continuous = true;
+  activeRecognition.interimResults = true;
+  activeRecognition.lang = 'en-US';
+  
+  if (btn) btn.classList.add('mic-pulsing');
+  output.textContent = 'LISTENING... (SPEAK FREELY)';
+  isListening = true;
 
-    function toggleMainMic() {
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) return alert("Speech recognition not supported on this device.");
+  var accumulated = '';
 
-      const micBtn = document.getElementById('mainMicBtn');
-      const micText = document.getElementById('micBtnText');
-      const led = document.getElementById('ledOutput');
+  activeRecognition.onresult = function(e) {
+    var interim = '';
+    var currentFinal = '';
 
-      if (isListening && mainRecognition) {
-        mainRecognition.stop();
-        return;
+    for (var i = e.resultIndex; i < e.results.length; ++i) {
+      if (e.results[i].isFinal) {
+        currentFinal += e.results[i][0].transcript + ' ';
+      } else {
+        interim += e.results[i][0].transcript;
       }
-
-      mainRecognition = new SR();
-      mainRecognition.continuous = true;
-      mainRecognition.interimResults = false;
-
-      mainRecognition.onstart = () => {
-        isListening = true;
-        micBtn.classList.add('pulse-animation');
-        micText.innerText = "SISSY LISTENING...";
-        led.innerText = "LISTENING... SPEAK FREELY 🎙️";
-      };
-
-      mainRecognition.onresult = (e) => {
-        const transcript = e.results[e.results.length - 1][0].transcript;
-        led.innerText = `CAPTURED: "${transcript.toUpperCase()}"`;
-        showToast(`📝 SENT TO SISSY: "${transcript}"`);
-        
-        // Send to Netlify chat function
-        fetch('/.netlify/functions/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: transcript, board_id: '18424728273' })
-        }).catch(err => console.log('Chat error:', err));
-      };
-
-      mainRecognition.onerror = (err) => {
-        showToast(`⚠️ Mic Error: ${err.error}`);
-        stopMainMic();
-      };
-
-      mainRecognition.onend = () => {
-        stopMainMic();
-      };
-
-      mainRecognition.start();
     }
 
-    function stopMainMic() {
-      isListening = false;
-      const micBtn = document.getElementById('mainMicBtn');
-      const micText = document.getElementById('micBtnText');
-      const led = document.getElementById('ledOutput');
-      if (micBtn) micBtn.classList.remove('pulse-animation');
-      if (micText) micText.innerText = "TAP & SPEAK TO SISSY";
-      if (led) led.innerText = "POCKET CHIEF OF STAFF READY ⚡";
-    }
+    accumulated += currentFinal;
+    if (input) input.value = accumulated + interim;
 
-    async function openDrawer(drawerName) {
-      const overlay = document.getElementById('drawerOverlay');
-      const title = document.getElementById('drawerTitle');
-      const body = document.getElementById('drawerBody');
-
-      const titles = {
-        castle: "🏰 Castle Drawer",
-        empire: "👑 Empire Drawer",
-        pipeline: "🚀 Pipeline Drawer",
-        calendar: "📅 Calendar & Agenda",
-        vault: "🌐 Vault Database",
-        pinball: "🎯 Pinball Review Queue"
-      };
-
-      title.innerText = titles[drawerName] || "Drawer";
-      body.innerHTML = '<div class="text-center text-zinc-500 py-10 font-bold text-sm">Loading active cards...</div>';
-      overlay.style.display = 'flex';
-
-      if (drawerName === 'calendar') {
-        body.innerHTML = `
-          <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3 mb-2">
-            <div class="font-bold text-sm text-yellow-400">📅 Steve Mathias — $3,000 Air Unit Install</div>
-            <div class="text-xs text-zinc-400 mt-1">Confirmed Appointment • High-Value Install</div>
-          </div>
-          <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3 mb-2">
-            <div class="font-bold text-sm text-yellow-400">📅 Kelly Keyser — Water Consultation</div>
-            <div class="text-xs text-zinc-400 mt-1">On-Site Diagnostic & Testing (Monkton)</div>
-          </div>
-          <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3 mb-2">
-            <div class="font-bold text-sm text-yellow-400">📅 Susan Hogan — $240 Carpet Clean</div>
-            <div class="text-xs text-zinc-400 mt-1">Tomorrow @ 7:00 AM • 131 Fireside Cir</div>
-          </div>
-          <a href="https://calendar.google.com/calendar/u/0/r/day" target="_blank" class="w-full bg-blue-600 text-white font-bold text-xs py-2.5 rounded-lg text-center block mt-4">
-            🗓️ Open Full Google Calendar
-          </a>
-        `;
-        return;
+    if (silenceTimer) clearTimeout(silenceTimer);
+    silenceTimer = setTimeout(function() {
+      var fullText = (accumulated + interim).trim();
+      if (fullText.length > 0 && isListening) {
+        output.textContent = 'PROCESSING...';
+        sendToFresh(fullText, targetDrawer);
+        if (activeRecognition) activeRecognition.stop();
+        isListening = false;
+        if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
       }
+    }, 3000);
+  };
 
-      try {
-        const res = await fetch('/.netlify/functions/monday?board=18424728273&t=' + Date.now());
-        const data = await res.json();
-        
-        let groups = data.groups || (data.data && data.data.boards && data.data.boards[0] ? data.data.boards[0].groups : []);
-        let itemsToDisplay = [];
+  activeRecognition.onerror = function() {
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+    output.textContent = 'MIC ERROR';
+    if (silenceTimer) clearTimeout(silenceTimer);
+  };
 
-        if (groups && groups.length > 0) {
-          groups.forEach(g => {
-            const gTitle = (g.title || '').toLowerCase();
-            let matches = false;
+  activeRecognition.onend = function() {
+    if (isListening) {
+      try { activeRecognition.start(); } catch(err) { isListening = false; if (btn) btn.classList.remove('mic-pulsing', 'text-red-500'); }
+    } else {
+      if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+    }
+  };
 
-            if (drawerName === 'castle' && (gTitle.includes('castle') || gTitle.includes('personal') || gTitle.includes('william') || gTitle.includes('car') || gTitle.includes('lounge'))) matches = true;
-            if (drawerName === 'empire' && (gTitle.includes('empire') || gTitle.includes('workbench') || gTitle.includes('ready wall') || gTitle.includes('bench') || gTitle.includes('parts') || gTitle.includes('showroom') || gTitle.includes('storage'))) matches = true;
-            if (drawerName === 'pipeline' && (gTitle.includes('pipeline') || gTitle.includes('staff intake') || gTitle.includes('leads'))) matches = true;
-            if (drawerName === 'vault' && (gTitle.includes('vault') || gTitle.includes('exchange') || gTitle.includes('shared'))) matches = true;
-            if (drawerName === 'pinball' && (gTitle.includes('pinball') || gTitle.includes('staff intake'))) matches = true;
+  activeRecognition.start();
+}
 
-            const gItems = g.items || (g.items_page && g.items_page.items) || [];
-            if (matches && gItems.length > 0) {
-              gItems.forEach(item => {
-                itemsToDisplay.push({ name: item.name, group: g.title, id: item.id });
-              });
-            }
+function handleMediaInput(fileInput, mediaType) {
+  if (fileInput.files && fileInput.files[0]) {
+    var fileName = fileInput.files[0].name;
+    flashLed(mediaType.toUpperCase() + ' LOGGED: ' + fileName);
+    sendToFresh(mediaType + ' attached: ' + fileName, activeDrawerContext);
+  }
+}
+
+function submitUnifiedInput(inputId) {
+  var targetId = inputId || 'unifiedInput';
+  var inputEl = document.getElementById(targetId);
+  var text = inputEl ? inputEl.value.trim() : '';
+  if (text) {
+    sendToFresh(text, activeDrawerContext);
+    if (inputEl) inputEl.value = '';
+  }
+}
+
+function flashLed(responseText) {
+  var output = document.getElementById('ledOutput');
+  output.textContent = responseText || 'Logged! ⚡';
+  setTimeout(function() {
+    output.textContent = 'POCKET CHIEF OF STAFF READY ⚡';
+  }, 3000);
+}
+
+function sendToFresh(promptText, drawerName) {
+  document.getElementById('ledOutput').textContent = 'PROCESSING...';
+  var fullPrompt = drawerName ? '[' + drawerName + ' Drawer] ' + promptText : promptText;
+
+  fetch('/.netlify/functions/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt: fullPrompt, board_id: '18424728273' })
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    flashLed(data.reply || 'Logged! ⚡');
+    if (activeDrawerContext) {
+      setTimeout(function() {
+        loadDrawerItems(activeDrawerContext);
+      }, 1500);
+    }
+  })
+  .catch(function(err) {
+    flashLed('Logged! ⚡');
+    if (activeDrawerContext) {
+      setTimeout(function() {
+        loadDrawerItems(activeDrawerContext);
+      }, 1500);
+    }
+  });
+}
+
+function renderItemCard(item) {
+  var hasDollar = item.name && /\$\d+/.test(item.name);
+  var payButton = hasDollar ? '<a href="' + STRIPE_CHECKOUT_URL + '" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow shrink-0"><i class="fa-solid fa-credit-card"></i> Pay Now</a>' : '';
+
+  return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 flex justify-between items-center gap-2">' +
+    '<div class="flex-1 min-w-0">' +
+      '<p class="font-bold text-white text-xs truncate">' + (item.name || 'Untitled Card') + '</p>' +
+      '<p class="text-[10px] text-gray-400">' + (item.group ? item.group.title : 'Active Card') + '</p>' +
+    '</div>' +
+    '<div class="flex items-center gap-2 shrink-0">' +
+      payButton +
+      '<button type="button" onclick="toggleVoiceIntake(\'' + (item.group ? item.group.title : '') + '\')" class="bg-blue-900/60 hover:bg-blue-800 text-blue-300 p-1.5 rounded-lg border border-blue-700 text-[10px] flex items-center gap-1 font-semibold" title="Talk to Card">' +
+        '<i class="fa-solid fa-microphone text-xs"></i> Talk' +
+      '</button>' +
+    '</div>' +
+  '</div>';
+}
+
+function loadDrawerItems(drawerName) {
+  var contentDiv = document.getElementById('drawerContent');
+  var target = (drawerName || '').toLowerCase().trim();
+
+  // SPECIAL CALENDAR VIEW: In-App Agenda with today's locked stops
+  if (target.includes('calendar')) {
+    contentDiv.innerHTML = '<div class="space-y-4">' +
+      '<div class="flex items-center justify-between">' +
+        '<p class="font-bold text-white text-sm">📅 Daily Schedule Agenda</p>' +
+        '<a href="https://calendar.google.com/calendar/u/0/r/day" target="_blank" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-arrow-up-right-from-square"></i> Full Google Cal</a>' +
+      '</div>' +
+      '<div class="space-y-2 max-h-72 overflow-y-auto">' +
+        '<div class="p-3 bg-blue-950/40 rounded-xl border border-blue-800/50">' +
+          '<div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">Today 4:00 PM</span><span class="text-[10px] bg-teal-900 text-teal-300 px-2 py-0.5 rounded font-bold">Water Consultation</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Kelly Keyser — Water Test Consultation (2 Locations)</p>' +
+          '<p class="text-[10px] text-gray-400">15302 Manor Rd, Monkton, MD · (808) 298-7102</p>' +
+        '</div>' +
+        '<div class="p-3 bg-emerald-950/40 rounded-xl border border-emerald-800/50">' +
+          '<div class="flex justify-between items-center"><span class="text-emerald-300 font-black text-xs">Thu 7:00 AM</span><span class="text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded font-bold">$240 Carpet Clean</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Susan Hogan — Carpet Cleaning</p>' +
+          '<p class="text-[10px] text-gray-400">131 Fireside Cir, Baltimore, MD · (443) 845-2411</p>' +
+        '</div>' +
+        '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700">' +
+          '<div class="flex justify-between items-center"><span class="text-amber-300 font-black text-xs">Pickup / Ready</span><span class="text-[10px] bg-amber-900 text-amber-300 px-2 py-0.5 rounded font-bold">Shop Ops</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">George Gross — Vacuum Ready for Pickup</p>' +
+          '<p class="text-[10px] text-gray-400">Towson Area · Guardian Overhaul</p>' +
+        '</div>' +
+      '</div>' +
+      buildInputFooter(drawerName) +
+    '</div>';
+    return;
+  }
+
+  fetch('/.netlify/functions/monday?board=18424728273&t=' + new Date().getTime())
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      var allItems = [];
+
+      if (data.items && Array.isArray(data.items)) {
+        allItems = data.items;
+      } else if (data.groups && Array.isArray(data.groups)) {
+        data.groups.forEach(function(g) {
+          var gItems = g.items || (g.items_page && g.items_page.items) || [];
+          gItems.forEach(function(it) {
+            it.group = { id: g.id, title: g.title || g.name || '' };
+            allItems.push(it);
+          });
+        });
+      } else if (data.data && data.data.boards && data.data.boards[0]) {
+        var b = data.data.boards[0];
+        if (b.items_page && b.items_page.items) {
+          allItems = b.items_page.items;
+        } else if (b.groups) {
+          b.groups.forEach(function(g) {
+            var gItems = g.items || (g.items_page && g.items_page.items) || [];
+            gItems.forEach(function(it) {
+              it.group = { id: g.id, title: g.title || g.name || '' };
+              allItems.push(it);
+            });
           });
         }
-
-        if (itemsToDisplay.length === 0) {
-          body.innerHTML = '<div class="text-center text-zinc-500 py-10 font-medium text-xs">No active cards in this drawer.<br>Tap the mic or camera below to add one!</div>';
-        } else {
-          body.innerHTML = itemsToDisplay.map(item => renderItemCard(item)).join('');
-        }
-
-      } catch (err) {
-        body.innerHTML = '<div class="text-center text-zinc-500 py-10 font-medium text-xs">No active cards in this drawer.<br>Tap the mic or camera below to add one!</div>';
       }
-    }
 
-    function renderItemCard(item) {
-      const hasDollarPrice = /\$\d+/.test(item.name);
-      
-      return `
-        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3">
-          <div class="font-bold text-sm text-white">${item.name}</div>
-          <div class="text-[11px] text-zinc-400 mt-1 flex justify-between">
-            <span>Group: ${item.group || 'Active'}</span>
-          </div>
-          <div class="flex gap-2 mt-2">
-            <button onclick="talkToSissyCard('${item.name.replace(/'/g, "\\'")}')" class="bg-zinc-800 border border-zinc-700 text-white px-3 py-1 rounded-md text-xs font-bold flex items-center gap-1">🎙️ Talk to Sissy</button>
-            ${hasDollarPrice ? `<button onclick="showToast('💳 Generating Stripe Link...')" class="bg-emerald-500 text-black px-3 py-1 rounded-md text-xs font-black">💳 Pay Now</button>` : ''}
-          </div>
-        </div>
-      `;
-    }
+      var cleanItems = allItems.filter(function(it) {
+        var groupTitle = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+        return !groupTitle.includes('archive') && !groupTitle.includes('trash') && !groupTitle.includes('deleted');
+      });
 
-    function talkToSissyCard(cardName) {
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) return alert("Speech recognition not supported in this browser.");
+      var matchedItems = [];
 
-      showToast(`🎙️ SISSY LISTENING FOR: ${cardName}`);
-      document.getElementById('ledOutput').innerText = `LISTENING FOR ${cardName.toUpperCase()}... 🎙️`;
+      if (target.includes('castle')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('castle') || gt.includes('william') || gt.includes('personal') || gt.includes('car') || gt.includes('lounge');
+        });
+      } else if (target.includes('empire') || target.includes('shop')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('empire') || gt.includes('workbench') || gt.includes('ready wall') || gt.includes('bench') || gt.includes('parts') || gt.includes('showroom') || gt.includes('storage') || gt.includes('waiting') || gt.includes('bagdons') || gt.includes('announcements');
+        });
+      } else if (target.includes('pipeline')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('pipeline') || gt.includes('staff intake') || gt.includes('leads') || gt.includes('emailed');
+        });
+      } else if (target.includes('vault') || target.includes('exchange')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('vault') || gt.includes('exchange') || gt.includes('shared');
+        });
+      } else if (target.includes('pinball')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('pinball') || gt.includes('staff intake') || gt.includes('workbench') || gt.includes('ready wall');
+        });
+      }
 
-      const cardRec = new SR();
-      cardRec.continuous = false;
-      cardRec.interimResults = false;
-      cardRec.start();
+      var displayItems = (matchedItems.length > 0) ? matchedItems : cleanItems;
 
-      cardRec.onresult = (e) => {
-        const speech = e.results[0][0].transcript;
-        showToast(`📝 NOTE LOGGED TO CARD: "${speech}"`);
-        document.getElementById('ledOutput').innerText = `NOTE SAVED TO CARD! ⚡`;
-      };
+      var itemsHtml = displayItems.map(function(item) {
+        return renderItemCard(item);
+      }).join('');
 
-      cardRec.onerror = (err) => {
-        showToast(`⚠️ Mic Error: ${err.error}`);
-        document.getElementById('ledOutput').innerText = `POCKET CHIEF OF STAFF READY ⚡`;
-      };
-    }
+      contentDiv.innerHTML = '<div class="space-y-4">' +
+        '<div class="flex items-center justify-between">' +
+          '<p class="font-bold text-white text-sm">Drawer: ' + drawerName + ' (' + displayItems.length + ' Cards)</p>' +
+          '<button type="button" onclick="loadDrawerItems(\'' + drawerName + '\')" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-rotate-right"></i> Refresh</button>' +
+        '</div>' +
+        '<div class="space-y-2 max-h-60 overflow-y-auto">' +
+          (itemsHtml || '<p class="text-gray-500 text-center py-4">No cards in this drawer yet. Speak or type below to add one!</p>') +
+        '</div>' +
+        buildInputFooter(drawerName) +
+      '</div>';
+    })
+    .catch(function(err) {
+      contentDiv.innerHTML = '<div class="space-y-4">' +
+        '<p class="font-bold text-white text-sm">Drawer: ' + drawerName + '</p>' +
+        '<p class="text-gray-400">Speak or capture media directly into this card:</p>' +
+        buildInputFooter(drawerName) +
+      '</div>';
+    });
+}
 
-    function closeDrawer() {
-      document.getElementById('drawerOverlay').style.display = 'none';
-    }
+function buildInputFooter(drawerName) {
+  return '<div class="pt-2 border-t border-gray-800 space-y-3">' +
+    '<div class="relative flex items-center">' +
+      '<input type="text" id="drawerInput_' + drawerName + '" placeholder="Type or dictate to card..." class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-4 pr-10 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key===\'Enter\') submitUnifiedInput(\'drawerInput_' + drawerName + '\')">' +
+      '<button type="button" id="drawerMicBtn_' + drawerName + '" onclick="toggleVoiceIntake(\'' + drawerName + '\', \'drawerInput_' + drawerName + '\', \'drawerMicBtn_' + drawerName + '\')" class="absolute right-2 text-blue-400 hover:text-blue-300 p-1.5 transition">' +
+        '<i class="fa-solid fa-microphone text-sm"></i>' +
+      '</button>' +
+    '</div>' +
+    '<div class="flex gap-2">' +
+      '<label class="bg-gray-800 hover:bg-gray-700 text-blue-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
+        '<i class="fa-solid fa-camera"></i>' +
+        '<span>Snap Photo</span>' +
+        '<input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Photo\')">' +
+      '</label>' +
+      '<label class="bg-gray-800 hover:bg-gray-700 text-purple-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
+        '<i class="fa-solid fa-video"></i>' +
+        '<span>Record Video</span>' +
+        '<input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Video\')">' +
+      '</label>' +
+      '<button type="button" onclick="submitUnifiedInput(\'drawerInput_' + drawerName + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shrink-0">' +
+        '<span>Send</span>' +
+        '<i class="fa-solid fa-paper-plane"></i>' +
+      '</button>' +
+    '</div>' +
+  '</div>';
+}
 
-    function openFeaturesModal() {
-      const overlay = document.getElementById('drawerOverlay');
-      const title = document.getElementById('drawerTitle');
-      const body = document.getElementById('drawerBody');
+function openDrawer(name) {
+  activeDrawerContext = name;
+  document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + name + ' Drawer';
+  var modal = document.getElementById('drawerModal');
+  modal.style.display = 'flex';
+  loadDrawerItems(name);
+}
 
-      title.innerText = "✨ Features & Benefits";
-      body.innerHTML = `
-        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3">
-          <div class="font-bold text-sm text-yellow-400">🎙️ 1-Tap Voice Intake</div>
-          <p class="text-xs text-zinc-400 mt-1">Speak customer notes or tasks instantly. Sissy routes everything behind the scenes.</p>
-        </div>
-        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3">
-          <div class="font-bold text-sm text-yellow-400">⏰ Failsafe GPS & Voice Time Clock</div>
-          <p class="text-xs text-zinc-400 mt-1">Staff tap to clock in/out with voice notes and physical location verification. Zero time theft.</p>
-        </div>
-        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3">
-          <div class="font-bold text-sm text-yellow-400">💳 Context-Triggered Stripe Payments</div>
-          <p class="text-xs text-zinc-400 mt-1">Pay Now links generate strictly on priced invoices ($) so customers pay in seconds.</p>
-        </div>
-        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3">
-          <div class="font-bold text-sm text-yellow-400">🌐 22,000+ Customer Vault Access</div>
-          <p class="text-xs text-zinc-400 mt-1">Zero hard deletes. Instant lifetime lookup for addresses, phone numbers, and job history.</p>
-        </div>
-      `;
-      overlay.style.display = 'flex';
-    }
-  </script>
+function closeDrawer() {
+  activeDrawerContext = '';
+  var modal = document.getElementById('drawerModal');
+  modal.style.display = 'none';
+}
+
+function openFeaturesModal() {
+  var modal = document.getElementById('featuresModal');
+  modal.style.display = 'flex';
+}
+
+function closeFeaturesModal() {
+  var modal = document.getElementById('featuresModal');
+  modal.style.display = 'none';
+}
+</script>
 </body>
 </html>
