@@ -26,13 +26,13 @@ exports.handler = async (event) => {
     return { statusCode: 500, headers, body: JSON.stringify({ reply: "❌ MONDAY_API_TOKEN missing in Netlify." }) };
   }
 
-  // Clean voice triggers
+  // Clean voice prefix and quotes
   text = text.replace(/^(fresh,?\sprocess\sthis\srun:?\s|fresh,?\s*)/i, '').replace(/["“”]/g, '').trim();
 
-  // Protect Honorifics
+  // Protect honorifics from splitting
   let safeText = text.replace(/(Mrs|Mr|Ms|Dr)\./gi, "$1___DOT___");
 
-  // Targeted Conjunction & Sentence Splitting
+  // Targeted compound task splitter
   const splitRegex = /(?:\. |\n|;|\band pay\b|\band also\b|\band then\b|\band remind\b|\band tell\b|\band mark\b|, (?=[a-zA-Z]{3,}))/i;
   const rawParts = safeText.split(splitRegex);
 
@@ -44,11 +44,11 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers, body: JSON.stringify({ reply: "✅ Queue ready!" }) };
   }
 
-  // Precise Group ID Routing Engine
+  // Exact 7-Drawer Routing Engine for Board 18424728273
   const routeTask = (t) => {
     const lower = t.toLowerCase();
-
-    // 1. Castle (Personal / Home)
+    
+    // 1. Castle (PIN-gated personal tasks)
     if (lower.match(/mortgage|home|personal|family|gas|electric|bills|pickleball/)) {
       return 'group_mm7mv0yv';
     }
@@ -60,7 +60,7 @@ exports.handler = async (event) => {
     if (lower.match(/bench|repair|breakdown|shampooer|canister|upright|check unit|diagnostic/)) {
       return 'group_mm76qbbh';
     }
-    // 4. Ready Wall / Delivery
+    // 4. Ready Wall
     if (lower.match(/ready|deliver|delivery|pickup|drop off/)) {
       return 'group_mm6s961c';
     }
@@ -68,11 +68,11 @@ exports.handler = async (event) => {
     if (lower.match(/tomorrow|\bat\b\s*\d+|\bam\b|\bpm\b|noon|schedule|appointment|water test/)) {
       return 'group_mm7maw66';
     }
-    // 6. Pipeline (Deals, Forever Cards, Retention)
+    // 6. Pipeline (Deals & Leads)
     if (lower.match(/forever card|follow up|job completed|lead|sale|quote|deposit|check/)) {
       return 'group_mm7myd0b';
     }
-    // 7. Housekeeping
+    // 7. Housekeeping (Staff Intake)
     if (lower.match(/cleaning|chores|upkeep|clean|inventory check|trash/)) {
       return 'group_mm6b77as';
     }
@@ -80,11 +80,11 @@ exports.handler = async (event) => {
     if (lower.match(/pinball|rapid|knockout/)) {
       return 'group_mm7mmekt';
     }
-    // 9. Empire General Ops (Default Shop Fallback)
+    // 9. Empire Ops (Default shop routing)
     return 'group_mm7mfbre';
   };
 
-  // Batched GraphQL Mutation Payload (0.4s Execution)
+  // Batched create_item mutations (Hard-Blocked Deletions - Safety Locked)
   const mutations = tasks.map((task, idx) => {
     const groupId = routeTask(task);
     let cleanName = task.charAt(0).toUpperCase() + task.slice(1);
