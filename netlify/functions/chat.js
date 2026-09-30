@@ -13,78 +13,61 @@ exports.handler = async (event) => {
   const token = process.env.MONDAY_API_TOKEN || process.env.MONDAY_API_KEY || process.env.MONDAY_TOKEN;
   const boardId = "18424728273";
 
+  if (!token) {
+    return { statusCode: 500, headers, body: JSON.stringify({ reply: 'Monday API token missing' }) };
+  }
+
   let body = {};
   try {
     body = JSON.parse(event.body || '{}');
-  } catch(e) {}
-
-  let text = (body.prompt || body.text || "").trim();
-  if (!text) {
-    return { statusCode: 400, headers, body: JSON.stringify({ reply: "No prompt provided" }) };
-  }
-  if (!token) {
-    return { statusCode: 500, headers, body: JSON.stringify({ reply: "❌ MONDAY_API_TOKEN missing in Netlify." }) };
+  } catch(e) {
+    body = {};
   }
 
-  // Clean voice prefix and quotes
-  text = text.replace(/^(fresh,?\sprocess\sthis\srun:?\s|fresh,?\s*)/i, '').replace(/["“”]/g, '').trim();
+  const prompt = (body.prompt || body.text || '').trim();
+  if (!prompt) {
+    return { statusCode: 400, headers, body: JSON.stringify({ reply: 'Empty brain dump' }) };
+  }
 
   // Protect honorifics from splitting
-  let safeText = text.replace(/(Mrs|Mr|Ms|Dr)\./gi, "$1___DOT___");
+  let safeText = prompt.replace(/(Mrs|Mr|Ms|Dr)\./gi, "$1___DOT___");
 
-  // Targeted compound task splitter
-  const splitRegex = /(?:\. |\n|;|\band pay\b|\band also\b|\band then\b|\band remind\b|\band tell\b|\band mark\b|, (?=[a-zA-Z]{3,}))/i;
-  const rawParts = safeText.split(splitRegex);
+  // Decompose compound stream
+  let rawParts = safeText
+    .split(/(?<=[.!?])\s+(?=[A-Z0-9])|\band\s+(?=[a-z0-9])|;\s*|\n+/i)
+    .map(t => t.replace(/___DOT___/g, ".").trim().replace(/^and\s+/i, ''))
+    .filter(t => t.length > 2);
 
-  const tasks = rawParts
-    .map(p => p.replace(/___DOT___/g, ".").trim())
-    .filter(p => p.length > 2);
+  let tasks = rawParts.length > 0 ? rawParts : [prompt.replace(/___DOT___/g, ".")];
 
-  if (tasks.length === 0) {
-    return { statusCode: 200, headers, body: JSON.stringify({ reply: "✅ Queue ready!" }) };
-  }
-
-  // Exact 7-Drawer Routing Engine for Board 18424728273
-  const routeTask = (t) => {
-    const lower = t.toLowerCase();
+  // Precision 7-Drawer Routing Map
+  const routeTask = (task) => {
+    const lower = task.toLowerCase();
     
-    // 1. Castle (PIN-gated personal tasks)
-    if (lower.match(/mortgage|home|personal|family|gas|electric|bills|pickleball/)) {
+    // 1. Castle 🏰 (PIN Personal / Bills / Family)
+    if (lower.match(/personal|mortgage|insurance|bill|doctor|family|private|home|tax|pickleball/)) {
       return 'group_mm7mv0yv';
     }
-    // 2. Parts Needed
-    if (lower.match(/parts|order|cord|hose|filter|belt|amazon|desco/)) {
-      return 'group_mm6bv2h0';
-    }
-    // 3. Bench Repairs
-    if (lower.match(/bench|repair|breakdown|shampooer|canister|upright|check unit|diagnostic/)) {
-      return 'group_mm76qbbh';
-    }
-    // 4. Ready Wall
-    if (lower.match(/ready|deliver|delivery|pickup|drop off/)) {
-      return 'group_mm6s961c';
-    }
-    // 5. Calendar
-    if (lower.match(/tomorrow|\bat\b\s*\d+|\bam\b|\bpm\b|noon|schedule|appointment|water test/)) {
+    // 2. Calendar 📅 (Dates / Times / Appointments / Runs)
+    if (lower.match(/tomorrow|\bat\b\s*\d+|\bam\b|\bpm\b|noon|schedule|appointment|water test|friday|monday|tuesday|wednesday|thursday|saturday|sunday/)) {
       return 'group_mm7maw66';
     }
-    // 6. Pipeline (Deals & Leads)
-    if (lower.match(/forever card|follow up|job completed|lead|sale|quote|deposit|check/)) {
+    // 3. Pipeline 🚀 (Sales / Quotes / Money / Forever Cards)
+    if (lower.match(/forever card|follow up|lead|sale|quote|deposit|\$|invoice|collect/)) {
       return 'group_mm7myd0b';
     }
-    // 7. Housekeeping (Staff Intake)
-    if (lower.match(/cleaning|chores|upkeep|clean|inventory check|trash/)) {
+    // 4. Housekeeping 🧹 (Chores / Upkeep / Cleaning)
+    if (lower.match(/cleaning|chores|upkeep|clean|showroom|trash|vacuum floor/)) {
       return 'group_mm6b77as';
     }
-    // 8. Pinball Mode
+    // 5. Pinball ⚡ (Rapid knockout)
     if (lower.match(/pinball|rapid|knockout/)) {
       return 'group_mm7mmekt';
     }
-    // 9. Empire Ops (Default shop routing)
+    // 6. Empire 👑 (Default Core Operations / Bench / Tech Repairs)
     return 'group_mm7mfbre';
   };
 
-  // Batched create_item mutations (Hard-Blocked Deletions - Safety Locked)
   const mutations = tasks.map((task, idx) => {
     const groupId = routeTask(task);
     let cleanName = task.charAt(0).toUpperCase() + task.slice(1);
@@ -109,9 +92,9 @@ exports.handler = async (event) => {
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         reply: `✅ LOGGED ${tasks.length} ACTION CARDS! ⚡`,
-        count: tasks.length, 
+        count: tasks.length,
         tasks: tasks,
         mondayResponse: data
       })
