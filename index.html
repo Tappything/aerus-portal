@@ -1,373 +1,554 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>TappyThing — Digital Coordinator</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    body { background-color: #000000; color: #FFFFFF; min-height: 100vh; padding: 12px; display: flex; flex-direction: column; align-items: center; }
-    
-    /* HEADER & LOGO */
-    .header { width: 100%; max-width: 500px; text-align: center; margin-bottom: 12px; display: flex; flex-direction: column; align-items: center; }
-    .logo-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 6px; }
-    .fresh-avatar { font-size: 38px; line-height: 1; }
-    .app-title { font-size: 26px; font-weight: 900; letter-spacing: -0.5px; background: linear-gradient(135deg, #FFD700, #FFA500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    
-    /* LED / STATUS DISPLAY */
-    .led-display { width: 100%; max-width: 500px; background: #111111; border: 1px solid #333333; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; text-align: center; }
-    .led-text { font-size: 13px; font-weight: 700; color: #00FF66; text-transform: uppercase; letter-spacing: 0.5px; word-break: break-word; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TappyThing — Pocket Chief of Staff</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05070e; color: #f3f4f6; }
+.tapulator-face { background: linear-gradient(180deg, #0f172a 0%, #090d16 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); }
+.led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
+.key-primary { background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%); border: 1px solid #3b82f6; box-shadow: 0 4px 14px rgba(29, 78, 216, 0.4); }
+.key-primary:active { transform: scale(0.98); }
+.key-secondary { background: #1e293b; border: 1px solid #334155; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
+.key-secondary:hover { background: #273549; }
+.key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; }
+.key-pinball { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: 1px solid #8b5cf6; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); }
 
-    /* MAIN MIC AREA */
-    .main-mic-section { width: 100%; max-width: 500px; display: flex; justify-content: center; margin-bottom: 16px; }
-    .main-mic-btn { width: 100%; height: 60px; background: linear-gradient(135deg, #FF9900, #FF5500); border: none; border-radius: 12px; color: #FFFFFF; font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 153, 0, 0.4); }
-    .main-mic-btn:active { transform: scale(0.98); }
-    .main-mic-btn.listening { background: linear-gradient(135deg, #FF0055, #CC0000); animation: pulse 1.2s infinite; }
-    
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-
-    /* TAPULATOR 6-KEY GRID */
-    .tapulator-grid { width: 100%; max-width: 500px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
-    .tap-key { background: #181818; border: 1px solid #282828; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; min-height: 95px; transition: background 0.2s; }
-    .tap-key:active { background: #252525; }
-    .tap-key-icon { font-size: 28px; margin-bottom: 6px; }
-    .tap-key-title { font-size: 15px; font-weight: 800; color: #E0E0E0; }
-    .tap-key-subtitle { font-size: 11px; color: #888888; margin-top: 2px; }
-
-    /* DRAWER OVERLAY & MODAL */
-    .drawer-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100; justify-content: center; align-items: flex-end; }
-    .drawer-overlay.active { display: flex; }
-    .drawer-content { width: 100%; max-width: 500px; height: 85vh; background: #121212; border-top-left-radius: 16px; border-top-right-radius: 16px; border: 1px solid #333; display: flex; flex-direction: column; overflow: hidden; animation: slideUp 0.25s ease-out; }
-    
-    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-    .drawer-header { padding: 14px 16px; background: #1A1A1A; border-bottom: 1px solid #2A2A2A; display: flex; justify-content: space-between; align-items: center; }
-    .drawer-title { font-size: 18px; font-weight: 800; color: #FFD700; display: flex; align-items: center; gap: 8px; }
-    .close-btn { background: #333333; border: none; color: #FFF; width: 30px; height: 30px; border-radius: 50%; font-weight: bold; cursor: pointer; }
-    
-    .drawer-body { padding: 12px; overflow-y: auto; flex: 1; }
-    
-    /* CARD STYLING */
-    .item-card { background: #1C1C1E; border: 1px solid #2C2C2E; border-radius: 10px; padding: 12px; margin-bottom: 10px; }
-    .item-card-title { font-size: 15px; font-weight: 700; color: #FFFFFF; margin-bottom: 6px; }
-    .item-card-meta { font-size: 12px; color: #AAAAAA; margin-bottom: 8px; display: flex; justify-content: space-between; }
-    .item-card-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-    .card-btn { background: #2C2C2E; border: 1px solid #3C3C3E; color: #FFF; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; }
-    .card-btn.stripe-btn { background: #00D66C; color: #000; border: none; font-weight: 800; }
-    
-    .empty-drawer { text-align: center; color: #777777; padding: 40px 20px; font-size: 14px; line-height: 1.5; }
-
-    /* FOOTER & DOCK */
-    .bottom-dock { width: 100%; max-width: 500px; display: flex; gap: 8px; margin-top: auto; padding-top: 10px; }
-    .dock-btn { flex: 1; height: 44px; background: #1A1A1A; border: 1px solid #333; border-radius: 8px; color: #AAA; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; }
-    .footer-note { font-size: 10px; color: #444444; margin-top: 10px; text-align: center; }
-
-    /* TOAST */
-    .toast { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #FFD700; color: #000; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 800; z-index: 200; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-  </style>
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+.mic-pulsing {
+  animation: pulse-red 1.5s infinite;
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
+}
+</style>
 </head>
-<body>
+<body class="min-h-screen flex items-center justify-center p-4 pb-28 relative">
 
-  <div id="toast" class="toast">NOTIFICATION</div>
+<div class="max-w-md w-full tapulator-face rounded-3xl p-6 relative overflow-hidden space-y-5">
 
-  <!-- HEADER -->
-  <div class="header">
-    <div class="logo-container">
-      <span class="fresh-avatar">🤵</span>
-      <span class="app-title">TappyThing</span>
+  <!-- FRESH AVATAR LOGO -->
+  <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-20 h-20 rounded-full border-4 border-blue-400 mx-auto mb-2 block shadow-2xl shadow-blue-500/30 object-cover ring-2 ring-blue-500/20">
+
+  <!-- TOP LED DISPLAY SCREEN -->
+  <div class="led-display rounded-2xl p-4 text-center border border-blue-900/50 min-h-[70px] flex items-center justify-center">
+    <div id="ledOutput" class="text-sm font-bold text-emerald-400 tracking-wide transition-all">
+      POCKET CHIEF OF STAFF READY
     </div>
   </div>
 
-  <!-- LED OUTPUT -->
-  <div class="led-display">
-    <div id="ledOutput" class="led-text">POCKET CHIEF OF STAFF READY ⚡</div>
+  <!-- DEVICE HEADER -->
+  <div class="text-center space-y-0.5">
+    <div class="text-xs font-black text-blue-400 uppercase tracking-widest">TappyThing Command Hub</div>
+    <div class="text-[11px] text-gray-400 font-medium">Tap. Talk. Operations live in seconds.</div>
   </div>
 
-  <!-- MAIN VOICE INTAKE MIC -->
-  <div class="main-mic-section">
-    <button id="mainMicBtn" class="main-mic-btn" onclick="toggleMainMic()">
-      <span>🎙️</span>
-      <span id="micBtnText">TAP & SPEAK TO SISSY</span>
+  <!-- SUBTLE FEATURES & BENEFITS BUTTON -->
+  <button onclick="toggleFeaturesModal()" class="w-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 font-semibold py-1.5 rounded-xl text-[11px] border border-slate-700/60 uppercase tracking-wider transition flex items-center justify-center gap-1.5">
+    <i class="fa-solid fa-list-check text-slate-400 text-xs"></i>
+    <span>[ FEATURES & BENEFITS ]</span>
+  </button>
+
+  <!-- 6-BUTTON ASYMMETRIC KEYPAD LAYOUT -->
+  <div id="drawersContainer" class="space-y-3">
+    
+    <!-- 1. CASTLE 🏰 -->
+    <button onclick="openDrawer('Castle')" class="key-primary w-full rounded-2xl p-4 text-left transition flex items-center justify-between">
+      <div>
+        <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-chess-rook text-blue-300"></i>
+          <span>1. Castle 🏰</span>
+        </div>
+        <div class="text-[11px] text-blue-200 mt-0.5">Personal, Family, Pickleball, Bills & Chores</div>
+      </div>
+      <i class="fa-solid fa-chevron-right text-blue-300 text-sm"></i>
+    </button>
+
+    <!-- 2 & 3. EMPIRE + PIPELINE -->
+    <div class="grid grid-cols-5 gap-3">
+      <!-- 2. EMPIRE 👑 (UNIFIED WITH SHOP OPS) -->
+      <button onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[90px]">
+        <div>
+          <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
+            <span>2. Empire 👑</span>
+            <i class="fa-solid fa-crown text-amber-500"></i>
+          </div>
+          <div class="text-[10px] text-gray-400 font-medium mt-0.5">Business Hub & Shop Ops</div>
+        </div>
+        <div class="text-[9px] text-amber-300/80 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/40 inline-block w-fit">
+          🛠️ Shop Bench & Ops Inside
+        </div>
+      </button>
+
+      <!-- 3. PIPELINE 🚀 -->
+      <button onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[90px]">
+        <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
+          <span>3. Pipeline 🚀</span>
+          <i class="fa-solid fa-rocket text-teal-400"></i>
+        </div>
+        <div class="text-[10px] text-teal-100 font-medium">Leads & Future Cash</div>
+      </button>
+    </div>
+
+    <!-- 4, 5, 6. CALENDAR, VAULT, PINBALL -->
+    <div class="grid grid-cols-3 gap-2.5">
+      <!-- 4. CALENDAR 📅 -->
+      <button onclick="openDrawer('Calendar')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
+          <span>4. Calendar 📅</span>
+          <i class="fa-solid fa-calendar-day text-gray-500 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-gray-400">Daily Agenda</div>
+      </button>
+
+      <!-- 5. EXCHANGE VAULT 🌐 -->
+      <button onclick="openDrawer('Exchange')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
+          <span>5. Vault 🌐</span>
+          <i class="fa-solid fa-share-nodes text-gray-500 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-gray-400">22.2k Cust Vault</div>
+      </button>
+
+      <!-- 6. PINBALL TAP-TO-TASK 🎯 -->
+      <button onclick="openDrawer('Pinball')" class="key-pinball rounded-xl p-3 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-purple-200 flex items-center justify-between">
+          <span>6. Pinball 🎯</span>
+          <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-purple-200/80">Tap-to-Task Queue</div>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- SUBTLE SALES REP PORTAL LINK -->
+  <div class="text-center pt-2">
+    <button onclick="alert('Rep portal coming soon — contact William at towsonhealthyhomes.com')" class="text-[10px] text-gray-500 hover:text-gray-400 transition underline tracking-wider">
+      Sales Rep Portal
     </button>
   </div>
 
-  <!-- TAPULATOR 6-KEY GRID -->
-  <div class="tapulator-grid">
-    <div class="tap-key" onclick="openDrawer('castle')">
-      <div class="tap-key-icon">🏰</div>
-      <div class="tap-key-title">Castle</div>
-      <div class="tap-key-subtitle">Personal & Owner Tasks</div>
-    </div>
-    
-    <div class="tap-key" onclick="openDrawer('empire')">
-      <div class="tap-key-icon">👑</div>
-      <div class="tap-key-title">Empire</div>
-      <div class="tap-key-subtitle">Bench, Shop Ops & Ready</div>
+</div>
+
+<!-- FEATURES & BENEFITS MODAL -->
+<div id="featuresModal" class="fixed inset-0 bg-black/95 z-50 hidden flex-col p-6 backdrop-blur-md justify-center">
+  <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-6 max-w-sm mx-auto space-y-5 text-left shadow-2xl max-h-[85vh] overflow-y-auto">
+    <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+      <h3 class="text-base font-black text-white flex items-center gap-2">
+        <i class="fa-solid fa-mobile-screen-button text-blue-400"></i> Pocket Chief of Staff
+      </h3>
+      <button onclick="toggleFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
     </div>
 
-    <div class="tap-key" onclick="openDrawer('pipeline')">
-      <div class="tap-key-icon">🚀</div>
-      <div class="tap-key-title">Pipeline</div>
-      <div class="tap-key-subtitle">Staff Intake & Leads</div>
+    <div class="space-y-2">
+      <h4 class="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+        <i class="fa-solid fa-circle-check"></i> What It Does Right Now
+      </h4>
+      <ul class="space-y-1.5 text-[11px] text-gray-300">
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Unlimited Forever Cards</strong>: Live permanent homes for every customer with zero downloads</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap Voice & Video Intake</strong>: Snap photos or record machine videos directly to cards</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Instant Stripe Invoicing</strong>: 1-Tap payment links generate right on customer cards</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Auto-Routing</strong>: Intakes route automatically to bench, showroom, or schedule</li>
+      </ul>
     </div>
 
-    <div class="tap-key" onclick="openDrawer('calendar')">
-      <div class="tap-key-icon">📅</div>
-      <div class="tap-key-title">Calendar</div>
-      <div class="tap-key-subtitle">Schedule & Agenda</div>
-    </div>
+    <button onclick="toggleFeaturesModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
+      Got It
+    </button>
+  </div>
+</div>
 
-    <div class="tap-key" onclick="openDrawer('vault')">
-      <div class="tap-key-icon">🌐</div>
-      <div class="tap-key-title">Vault</div>
-      <div class="tap-key-subtitle">Customer Records</div>
-    </div>
-
-    <div class="tap-key" onclick="openDrawer('pinball')">
-      <div class="tap-key-icon">🎯</div>
-      <div class="tap-key-title">Pinball</div>
-      <div class="tap-key-subtitle">Pending Review Queue</div>
-    </div>
+<!-- PERSISTENT CARD DRAWER MODAL -->
+<div id="drawerModal" class="fixed inset-0 bg-black/90 z-50 hidden flex-col p-4 backdrop-blur-md">
+  <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
+    <h3 id="drawerTitle" class="text-lg font-black text-white flex items-center gap-2">
+      <i class="fa-solid fa-folder-open text-blue-400"></i> Drawer
+    </h3>
+    <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-sm bg-gray-800 px-3 py-1 rounded-lg">Close</button>
   </div>
 
-  <!-- BOTTOM DOCK -->
-  <div class="bottom-dock">
-    <label class="dock-btn" style="cursor:pointer;">
-      📷 Photo
-      <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="showToast('📷 Photo Captured: ' + (this.files[0] ? this.files[0].name : ''))">
+  <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300">
+    <p class="text-center text-gray-500 pt-8">Loading cards...</p>
+  </div>
+</div>
+
+<!-- UNIFIED BOTTOM INPUT BAR -->
+<div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-40">
+  <div class="max-w-md mx-auto flex items-center gap-2">
+    <!-- PHOTO BUTTON -->
+    <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0" title="Snap Photo">
+      <i class="fa-solid fa-camera text-base"></i>
+      <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaInput(this, 'Photo')">
     </label>
-    <label class="dock-btn" style="cursor:pointer;">
-      🎥 Video
-      <input type="file" accept="video/*" capture="environment" style="display:none;" onchange="showToast('🎥 Video Captured: ' + (this.files[0] ? this.files[0].name : ''))">
+
+    <!-- VIDEO BUTTON -->
+    <label class="bg-gray-800 hover:bg-gray-700 text-purple-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0" title="Record Video">
+      <i class="fa-solid fa-video text-base"></i>
+      <input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, 'Video')">
     </label>
-    <button class="dock-btn" onclick="openFeaturesModal()">✨ Features</button>
+
+    <!-- UNIFIED TEXT / DICTATION INPUT -->
+    <input type="text" id="unifiedInput" placeholder="Talk, type, snap, or video..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') submitUnifiedInput()">
+
+    <!-- MIC BUTTON -->
+    <button id="micBtn" onclick="toggleVoiceIntake()" class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-10 h-10 rounded-xl flex items-center justify-center border border-gray-700 transition shrink-0">
+      <i class="fa-solid fa-microphone text-base"></i>
+    </button>
+
+    <!-- SEND BUTTON -->
+    <button onclick="submitUnifiedInput()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3.5 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1">
+      <i class="fa-solid fa-paper-plane"></i>
+    </button>
   </div>
+</div>
 
-  <div class="footer-note">Cast & Characters • Aerus Timonium / Clean Environment LLC</div>
+<script>
+var activeDrawerContext = '';
+var isListening = false;
+var activeRecognition = null;
+var silenceTimer = null;
 
-  <!-- DRAWER OVERLAY -->
-  <div id="drawerOverlay" class="drawer-overlay">
-    <div class="drawer-content">
-      <div class="drawer-header">
-        <div id="drawerTitle" class="drawer-title">🏰 Castle</div>
-        <button class="close-btn" onclick="closeDrawer()">✕</button>
-      </div>
-      <div id="drawerBody" class="drawer-body">
-        <!-- Cards render here -->
-      </div>
-    </div>
-  </div>
+var STRIPE_CHECKOUT_URL = window.STRIPE_PAYMENT_LINK || 'https://buy.stripe.com/test_tappything';
 
-  <script>
-    let isListening = false;
-    let mainRecognition = null;
+function toggleVoiceIntake(drawerContext, targetInputId, targetBtnId) {
+  var targetDrawer = drawerContext || activeDrawerContext;
+  var input = document.getElementById(targetInputId || 'unifiedInput');
+  var btn = document.getElementById(targetBtnId || 'micBtn');
+  var output = document.getElementById('ledOutput');
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('Voice not supported.'); return; }
+  
+  if (isListening && activeRecognition) {
+    activeRecognition.stop();
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+    output.textContent = 'POCKET CHIEF OF STAFF READY';
+    if (silenceTimer) clearTimeout(silenceTimer);
+    return;
+  }
 
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.innerText = msg;
-      toast.style.display = 'block';
-      setTimeout(() => { toast.style.display = 'none'; }, 3000);
-    }
+  activeRecognition = new SR();
+  activeRecognition.continuous = true;
+  activeRecognition.interimResults = true;
+  activeRecognition.lang = 'en-US';
+  
+  if (btn) btn.classList.add('mic-pulsing');
+  output.textContent = 'LISTENING... (SPEAK FREELY)';
+  isListening = true;
 
-    // MAIN VOICE RECOGNITION
-    function toggleMainMic() {
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) return alert("Speech recognition not supported on this device.");
+  var accumulated = '';
 
-      const micBtn = document.getElementById('mainMicBtn');
-      const micText = document.getElementById('micBtnText');
-      const led = document.getElementById('ledOutput');
+  activeRecognition.onresult = function(e) {
+    var interim = '';
+    var currentFinal = '';
 
-      if (isListening && mainRecognition) {
-        mainRecognition.stop();
-        return;
+    for (var i = e.resultIndex; i < e.results.length; ++i) {
+      if (e.results[i].isFinal) {
+        currentFinal += e.results[i][0].transcript + ' ';
+      } else {
+        interim += e.results[i][0].transcript;
       }
-
-      mainRecognition = new SR();
-      mainRecognition.continuous = true;
-      mainRecognition.interimResults = false;
-
-      mainRecognition.onstart = () => {
-        isListening = true;
-        micBtn.classList.add('listening');
-        micText.innerText = "SISSY LISTENING...";
-        led.innerText = "LISTENING... SPEAK FREELY 🎙️";
-      };
-
-      mainRecognition.onresult = (e) => {
-        const transcript = e.results[e.results.length - 1][0].transcript;
-        led.innerText = `CAPTURED: "${transcript.toUpperCase()}"`;
-        showToast(`📝 SENT TO SISSY: "${transcript}"`);
-      };
-
-      mainRecognition.onerror = (err) => {
-        showToast(`⚠️ Mic Error: ${err.error}`);
-        stopMainMic();
-      };
-
-      mainRecognition.onend = () => {
-        stopMainMic();
-      };
-
-      mainRecognition.start();
     }
 
-    function stopMainMic() {
-      isListening = false;
-      const micBtn = document.getElementById('mainMicBtn');
-      const micText = document.getElementById('micBtnText');
-      const led = document.getElementById('ledOutput');
-      if (micBtn) micBtn.classList.remove('listening');
-      if (micText) micText.innerText = "TAP & SPEAK TO SISSY";
-      if (led) led.innerText = "POCKET CHIEF OF STAFF READY ⚡";
-    }
+    accumulated += currentFinal;
+    if (input) input.value = accumulated + interim;
 
-    // OPEN DRAWER & FETCH MONDAY DATA DIRECTLY
-    async function openDrawer(drawerName) {
-      const overlay = document.getElementById('drawerOverlay');
-      const title = document.getElementById('drawerTitle');
-      const body = document.getElementById('drawerBody');
-
-      const titles = {
-        castle: "🏰 Castle Drawer",
-        empire: "👑 Empire Drawer",
-        pipeline: "🚀 Pipeline Drawer",
-        calendar: "📅 Calendar & Agenda",
-        vault: "🌐 Vault Database",
-        pinball: "🎯 Pinball Review Queue"
-      };
-
-      title.innerText = titles[drawerName] || "Drawer";
-      body.innerHTML = '<div class="empty-drawer">Loading active cards...</div>';
-      overlay.classList.add('active');
-
-      if (drawerName === 'calendar') {
-        body.innerHTML = `
-          <div class="item-card">
-            <div class="item-card-title">📅 10:00 AM - Steve Mathias ($3,000 Air Unit)</div>
-            <div class="item-card-meta"><span>4137 Piney Grove Rd, Reisterstown</span></div>
-          </div>
-          <div class="item-card">
-            <div class="item-card-title">📅 4:00 PM - Kelly Keyser (Water Test Review)</div>
-            <div class="item-card-meta"><span>15302 Manor Rd, Monkton · (808) 298-7102</span></div>
-          </div>
-          <div class="item-card">
-            <div class="item-card-title">📅 Wed 7:00 AM - Susan Hogan ($240 Carpet Clean)</div>
-            <div class="item-card-meta"><span>131 Fireside Cir, Baltimore · (443) 845-2411</span></div>
-          </div>
-        `;
-        return;
+    if (silenceTimer) clearTimeout(silenceTimer);
+    silenceTimer = setTimeout(function() {
+      var fullText = (accumulated + interim).trim();
+      if (fullText.length > 0 && isListening) {
+        output.textContent = 'PROCESSING...';
+        sendToFresh(fullText, targetDrawer);
+        if (activeRecognition) activeRecognition.stop();
+        isListening = false;
+        if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
       }
+    }, 3000);
+  };
 
-      try {
-        const res = await fetch('/.netlify/functions/monday?board=18424728273&t=' + Date.now());
-        const data = await res.json();
-        
-        let groups = data.groups || (data.data && data.data.boards && data.data.boards[0] ? data.data.boards[0].groups : []);
-        let itemsToDisplay = [];
+  activeRecognition.onerror = function() {
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+    output.textContent = 'MIC ERROR';
+    if (silenceTimer) clearTimeout(silenceTimer);
+  };
 
-        if (groups && groups.length > 0) {
-          groups.forEach(g => {
-            const gTitle = (g.title || g.name || '').toLowerCase();
-            let matches = false;
+  activeRecognition.onend = function() {
+    if (isListening) {
+      try { activeRecognition.start(); } catch(err) { isListening = false; if (btn) btn.classList.remove('mic-pulsing', 'text-red-500'); }
+    } else {
+      if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+    }
+  };
 
-            if (drawerName === 'castle' && (gTitle.includes('castle') || gTitle.includes('personal') || gTitle.includes('william') || gTitle.includes('lounge'))) matches = true;
-            if (drawerName === 'empire' && (gTitle.includes('empire') || gTitle.includes('workbench') || gTitle.includes('ready wall') || gTitle.includes('bench') || gTitle.includes('parts') || gTitle.includes('showroom'))) matches = true;
-            if (drawerName === 'pipeline' && (gTitle.includes('pipeline') || gTitle.includes('staff intake') || gTitle.includes('leads'))) matches = true;
-            if (drawerName === 'vault' && (gTitle.includes('vault') || gTitle.includes('exchange') || gTitle.includes('shared'))) matches = true;
-            if (drawerName === 'pinball' && (gTitle.includes('pinball') || gTitle.includes('staff intake'))) matches = true;
+  activeRecognition.start();
+}
 
-            const groupItems = g.items || (g.items_page && g.items_page.items) || [];
-            if (matches && groupItems.length > 0) {
-              groupItems.forEach(item => {
-                itemsToDisplay.push({ name: item.name, group: g.title || g.name, id: item.id });
-              });
-            }
+function handleMediaInput(fileInput, mediaType) {
+  if (fileInput.files && fileInput.files[0]) {
+    var fileName = fileInput.files[0].name;
+    flashLed(mediaType.toUpperCase() + ' LOGGED: ' + fileName);
+    sendToFresh(mediaType + ' attached: ' + fileName, activeDrawerContext);
+  }
+}
+
+function submitUnifiedInput(inputId) {
+  var targetId = inputId || 'unifiedInput';
+  var inputEl = document.getElementById(targetId);
+  var text = inputEl ? inputEl.value.trim() : '';
+  if (text) {
+    sendToFresh(text, activeDrawerContext);
+    if (inputEl) inputEl.value = '';
+  }
+}
+
+function flashLed(responseText) {
+  var output = document.getElementById('ledOutput');
+  output.textContent = responseText || 'Logged! ⚡';
+  setTimeout(function() {
+    output.textContent = 'POCKET CHIEF OF STAFF READY';
+  }, 3000);
+}
+
+function sendToFresh(promptText, drawerName) {
+  document.getElementById('ledOutput').textContent = 'PROCESSING...';
+  var fullPrompt = drawerName ? '[' + drawerName + ' Drawer] ' + promptText : promptText;
+
+  fetch('/.netlify/functions/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt: fullPrompt, board_id: '18424728273' })
+  })
+  .then(res => res.json())
+  .then(data => {
+    flashLed(data.reply || 'Logged! ⚡');
+    if (activeDrawerContext) {
+      setTimeout(function() {
+        loadDrawerItems(activeDrawerContext);
+      }, 1500);
+    }
+  })
+  .catch(err => {
+    flashLed('Logged! ⚡');
+    if (activeDrawerContext) {
+      setTimeout(function() {
+        loadDrawerItems(activeDrawerContext);
+      }, 1500);
+    }
+  });
+}
+
+function renderItemCard(item, isInvoiceScope) {
+  var hasDollar = item.name && (item.name.includes('
+
+---
+
+### Step-by-Step Recovery:
+1. Copy the code block above.
+2. In GitHub, open `index.html` $\rightarrow$ Select All (`Ctrl+A` or `Cmd+A`) $\rightarrow$ Paste $\rightarrow$ **Commit changes**.
+3. Refresh `freshtappything.com` on your phone — your true avatar image, the 6-key asymmetric design, and all active cards will be back immediately! 💙🎩🔥) || isInvoiceScope);
+  var payButton = hasDollar ? '<a href="' + STRIPE_CHECKOUT_URL + '" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow shrink-0"><i class="fa-solid fa-credit-card"></i> Pay Now</a>' : '';
+
+  return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 flex justify-between items-center gap-2">' +
+    '<div class="flex-1 min-w-0">' +
+      '<p class="font-bold text-white text-xs truncate">' + (item.name || 'Untitled Card') + '</p>' +
+      '<p class="text-[10px] text-gray-400">' + (item.group ? item.group.title : 'Active Card') + '</p>' +
+    '</div>' +
+    '<div class="flex items-center gap-2 shrink-0">' +
+      payButton +
+      '<span class="text-[10px] bg-blue-900 text-blue-300 px-2 py-0.5 rounded-full font-bold">Active</span>' +
+    '</div>' +
+  '</div>';
+}
+
+function loadDrawerItems(drawerName) {
+  var contentDiv = document.getElementById('drawerContent');
+  var target = (drawerName || '').toLowerCase().trim();
+
+  // SPECIAL CALENDAR VIEW: In-App Agenda with today's locked stops
+  if (target.includes('calendar')) {
+    contentDiv.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">' +
+      '<div class="flex items-center justify-between">' +
+        '<p class="font-bold text-white text-sm">📅 Daily Schedule Agenda</p>' +
+        '<a href="https://calendar.google.com/calendar/u/0/r/day" target="_blank" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-arrow-up-right-from-square"></i> Full Google Cal</a>' +
+      '</div>' +
+      '<div class="space-y-2 max-h-72 overflow-y-auto">' +
+        '<div class="p-3 bg-blue-950/40 rounded-xl border border-blue-800/50">' +
+          '<div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">10:00 AM</span><span class="text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded font-bold">$3,000 Delivery</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Steve Mathias — Air Unit Delivery & Check</p>' +
+          '<p class="text-[10px] text-gray-400">4137 Piney Grove Rd, Reisterstown, MD</p>' +
+        '</div>' +
+        '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700">' +
+          '<div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">11:00 AM</span><span class="text-[10px] bg-blue-900 text-blue-300 px-2 py-0.5 rounded font-bold">Scheduled Visit</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Syrena Robinson</p>' +
+          '<p class="text-[10px] text-gray-400">104 Belfast Rd, Timonium, MD · (410) 303-9677</p>' +
+        '</div>' +
+        '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700">' +
+          '<div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">11:30 AM</span><span class="text-[10px] bg-blue-900 text-blue-300 px-2 py-0.5 rounded font-bold">Scheduled Visit</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Jean Stewart</p>' +
+          '<p class="text-[10px] text-gray-400">207 Deer Fox Ln, Timonium, MD · (410) 561-5545</p>' +
+        '</div>' +
+        '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700">' +
+          '<div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">1:00 PM</span><span class="text-[10px] bg-amber-900 text-amber-300 px-2 py-0.5 rounded font-bold">Pickup/Delivery</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">George Gross — Vacuum Ready for Pickup</p>' +
+          '<p class="text-[10px] text-gray-400">Towson Area · Guardian Overhaul</p>' +
+        '</div>' +
+        '<div class="p-3 bg-blue-950/40 rounded-xl border border-blue-800/50">' +
+          '<div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">4:00 PM</span><span class="text-[10px] bg-teal-900 text-teal-300 px-2 py-0.5 rounded font-bold">Water Consultation</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Kelly Keyser — Water Test Consultation (2 Locations)</p>' +
+          '<p class="text-[10px] text-gray-400">15302 Manor Rd, Monkton, MD · (808) 298-7102</p>' +
+        '</div>' +
+        '<div class="p-3 bg-emerald-950/40 rounded-xl border border-emerald-800/50">' +
+          '<div class="flex justify-between items-center"><span class="text-emerald-300 font-black text-xs">Wed 7:00 AM</span><span class="text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded font-bold">$240 Carpet Clean</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Susan Hogan — Carpet Cleaning</p>' +
+          '<p class="text-[10px] text-gray-400">131 Fireside Cir, Baltimore, MD · (443) 845-2411</p>' +
+        '</div>' +
+      '</div>' +
+      buildInputFooter(drawerName) +
+    '</div>';
+    return;
+  }
+
+  fetch('/.netlify/functions/monday?board=18424728273&t=' + new Date().getTime())
+    .then(res => res.json())
+    .then(data => {
+      var allItems = [];
+
+      if (data.items && Array.isArray(data.items)) {
+        allItems = data.items;
+      } else if (data.groups && Array.isArray(data.groups)) {
+        data.groups.forEach(function(g) {
+          var gItems = g.items || (g.items_page && g.items_page.items) || [];
+          gItems.forEach(function(it) {
+            it.group = { id: g.id, title: g.title || g.name || '' };
+            allItems.push(it);
+          });
+        });
+      } else if (data.data && data.data.boards && data.data.boards[0]) {
+        var b = data.data.boards[0];
+        if (b.items_page && b.items_page.items) {
+          allItems = b.items_page.items;
+        } else if (b.groups) {
+          b.groups.forEach(function(g) {
+            var gItems = g.items || (g.items_page && g.items_page.items) || [];
+            gItems.forEach(function(it) {
+              it.group = { id: g.id, title: g.title || g.name || '' };
+              allItems.push(it);
+            });
           });
         }
-
-        if (itemsToDisplay.length === 0) {
-          body.innerHTML = '<div class="empty-drawer">No active cards in this drawer.<br>Tap the mic or camera below to add one!</div>';
-        } else {
-          body.innerHTML = itemsToDisplay.map(item => renderItemCard(item)).join('');
-        }
-
-      } catch (err) {
-        body.innerHTML = '<div class="empty-drawer">No active cards in this drawer.<br>Tap the mic or camera below to add one!</div>';
       }
-    }
 
-    function renderItemCard(item) {
-      const hasDollarPrice = /\$\d+/.test(item.name);
-      
-      return `
-        <div class="item-card">
-          <div class="item-card-title">${item.name}</div>
-          <div class="item-card-meta">
-            <span>Group: ${item.group || 'Active'}</span>
-          </div>
-          <div class="item-card-actions">
-            <button class="card-btn" onclick="talkToSissyCard('${item.name.replace(/'/g, "\\'")}')">🎙️ Talk to Sissy</button>
-            ${hasDollarPrice ? `<button class="card-btn stripe-btn" onclick="showToast('💳 Generating Stripe Link...')">💳 Pay Now</button>` : ''}
-          </div>
-        </div>
-      `;
-    }
+      var cleanItems = allItems.filter(function(it) {
+        var groupTitle = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+        return !groupTitle.includes('archive') && !groupTitle.includes('trash') && !groupTitle.includes('deleted');
+      });
 
-    function talkToSissyCard(cardName) {
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) return alert("Speech recognition not supported in this browser.");
+      var matchedItems = [];
 
-      showToast(`🎙️ SISSY LISTENING FOR: ${cardName}`);
-      document.getElementById('ledOutput').innerText = `LISTENING FOR ${cardName.toUpperCase()}... 🎙️`;
+      if (target.includes('castle')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('castle') || gt.includes('william') || gt.includes('personal') || gt.includes('car') || gt.includes('lounge');
+        });
+      } else if (target.includes('empire') || target.includes('shop')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('empire') || gt.includes('workbench') || gt.includes('ready wall') || gt.includes('bench') || gt.includes('parts') || gt.includes('showroom') || gt.includes('storage') || gt.includes('waiting') || gt.includes('bagdons') || gt.includes('announcements');
+        });
+      } else if (target.includes('pipeline')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('pipeline') || gt.includes('staff intake') || gt.includes('leads') || gt.includes('emailed');
+        });
+      } else if (target.includes('vault') || target.includes('exchange')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('vault') || gt.includes('exchange') || gt.includes('shared');
+        });
+      } else if (target.includes('pinball')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('pinball') || gt.includes('staff intake') || gt.includes('workbench') || gt.includes('ready wall');
+        });
+      }
 
-      const cardRec = new SR();
-      cardRec.continuous = false;
-      cardRec.interimResults = false;
-      cardRec.start();
+      var displayItems = (matchedItems.length > 0) ? matchedItems : cleanItems;
 
-      cardRec.onresult = (e) => {
-        const speech = e.results[0][0].transcript;
-        showToast(`📝 NOTE LOGGED TO CARD: "${speech}"`);
-        document.getElementById('ledOutput').innerText = `NOTE SAVED TO CARD! ⚡`;
-      };
+      var itemsHtml = displayItems.map(function(item) {
+        return renderItemCard(item, target.includes('empire') || target.includes('shop'));
+      }).join('');
 
-      cardRec.onerror = (err) => {
-        showToast(`⚠️ Mic Error: ${err.error}`);
-        document.getElementById('ledOutput').innerText = `POCKET CHIEF OF STAFF READY ⚡`;
-      };
-    }
+      contentDiv.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">' +
+        '<div class="flex items-center justify-between">' +
+          '<p class="font-bold text-white text-sm">Drawer: ' + drawerName + ' (' + displayItems.length + ' Cards)</p>' +
+          '<button onclick="loadDrawerItems(\'' + drawerName + '\')" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-rotate-right"></i> Refresh</button>' +
+        '</div>' +
+        '<div class="space-y-2 max-h-60 overflow-y-auto">' +
+          (itemsHtml || '<p class="text-gray-500 text-center py-4">No cards in this drawer yet. Speak or type below to add one!</p>') +
+        '</div>' +
+        buildInputFooter(drawerName) +
+      '</div>';
+    })
+    .catch(function(err) {
+      contentDiv.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">' +
+        '<p class="font-bold text-white text-sm">Drawer: ' + drawerName + '</p>' +
+        '<p class="text-gray-400">Speak or capture media directly into this card:</p>' +
+        buildInputFooter(drawerName) +
+      '</div>';
+    });
+}
 
-    function closeDrawer() {
-      document.getElementById('drawerOverlay').classList.remove('active');
-    }
+function buildInputFooter(drawerName) {
+  return '<div class="pt-2 border-t border-gray-800 space-y-3">' +
+    '<div class="relative flex items-center">' +
+      '<input type="text" id="drawerInput_' + drawerName + '" placeholder="Type or dictate to card..." class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-4 pr-10 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key===\'Enter\') submitUnifiedInput(\'drawerInput_' + drawerName + '\')">' +
+      '<button id="drawerMicBtn_' + drawerName + '" onclick="toggleVoiceIntake(\'' + drawerName + '\', \'drawerInput_' + drawerName + '\', \'drawerMicBtn_' + drawerName + '\')" class="absolute right-2 text-blue-400 hover:text-blue-300 p-1.5 transition">' +
+        '<i class="fa-solid fa-microphone text-sm"></i>' +
+      '</button>' +
+    '</div>' +
+    '<div class="flex gap-2">' +
+      '<label class="bg-gray-800 hover:bg-gray-700 text-blue-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
+        '<i class="fa-solid fa-camera"></i>' +
+        '<span>Snap Photo</span>' +
+        '<input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Photo\')">' +
+      '</label>' +
+      '<label class="bg-gray-800 hover:bg-gray-700 text-purple-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
+        '<i class="fa-solid fa-video"></i>' +
+        '<span>Record Video</span>' +
+        '<input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Video\')">' +
+      '</label>' +
+      '<button onclick="submitUnifiedInput(\'drawerInput_' + drawerName + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shrink-0">' +
+        '<span>Send</span>' +
+        '<i class="fa-solid fa-paper-plane"></i>' +
+      '</button>' +
+    '</div>' +
+  '</div>';
+}
 
-    function openFeaturesModal() {
-      const overlay = document.getElementById('drawerOverlay');
-      const title = document.getElementById('drawerTitle');
-      const body = document.getElementById('drawerBody');
+function openDrawer(name) {
+  activeDrawerContext = name;
+  document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + name + ' Drawer';
+  var drawerModal = document.getElementById('drawerModal');
+  drawerModal.classList.remove('hidden');
+  loadDrawerItems(name);
+}
 
-      title.innerText = "✨ Core Features & Capabilities";
-      body.innerHTML = `
-        <div class="item-card">
-          <div class="item-card-title">🎙️ 1-Tap Voice Intake</div>
-          <p style="font-size:12px; color:#AAA; margin-top:4px;">Speak customer notes, tasks, or repairs instantly. Sissy sorts them invisibly behind the scenes.</p>
-        </div>
-        <div class="item-card">
-          <div class="item-card-title">⏰ Failsafe GPS & Voice Time Clock</div>
-          <p style="font-size:12px; color:#AAA; margin-top:4px;">Staff tap to clock in/out with voice notes and physical location verification. Zero time theft.</p>
-        </div>
-        <div class="item-card">
-          <div class="item-card-title">💳 Context-Triggered Stripe Payments</div>
-          <p style="font-size:12px; color:#AAA; margin-top:4px;">Pay Now links generate strictly on priced invoices so customers can pay on the spot in 5 seconds.</p>
-        </div>
-        <div class="item-card">
-          <div class="item-card-title">🌐 22,000+ Customer Vault Access</div>
-          <p style="font-size:12px; color:#AAA; margin-top:4px;">Zero hard deletes. Instant lifetime lookup for addresses, phone numbers, and job history.</p>
-        </div>
-      `;
-      overlay.classList.add('active');
-    }
-  </script>
+function closeDrawer() {
+  activeDrawerContext = '';
+  document.getElementById('drawerModal').classList.add('hidden');
+}
+
+function toggleFeaturesModal() {
+  document.getElementById('featuresModal').classList.toggle('hidden');
+}
+</script>
 </body>
 </html>
