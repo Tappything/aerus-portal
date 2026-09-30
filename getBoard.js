@@ -12,37 +12,47 @@ exports.handler = async (event) => {
 
   const token = process.env.MONDAY_API_TOKEN || process.env.MONDAY_API_KEY || process.env.MONDAY_TOKEN;
   const boardId = "18424728273";
-  const groupParam = (event.queryStringParameters && event.queryStringParameters.group) ? event.queryStringParameters.group.toLowerCase() : '';
 
   if (!token) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: "Missing Monday API token." }) };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Missing Monday API token' }) };
   }
 
-  // Multi-group queries so real active cards show up in every drawer
-  let groupIds = [];
-  if (groupParam === 'castle') {
-    groupIds = ['group_mm7mv0yv', 'group_mm7cn4en'];
-  } else if (groupParam === 'empire') {
-    groupIds = ['group_mm7mfbre', 'group_mm6b77as', 'group_mm76qbbh', 'group_mm6s961c'];
-  } else if (groupParam === 'pipeline') {
-    groupIds = ['group_mm7myd0b', 'group_mm6c4aj6'];
-  } else if (groupParam === 'calendar') {
-    groupIds = ['group_mm7maw66'];
-  } else if (groupParam === 'housekeeping') {
-    groupIds = ['group_mm6b77as', 'group_mm744g20'];
-  } else if (groupParam === 'pinball') {
-    groupIds = ['group_mm7mmekt', 'group_mm6b77as', 'group_mm7mfbre'];
-  } else if (groupParam === 'vault') {
-    groupIds = ['group_mm6xs2fx', 'group_mm6b77as'];
-  }
+  const qParams = event.queryStringParameters || {};
+  const rawDrawer = qParams.group || qParams.drawer || 'all';
+  const drawer = rawDrawer.toLowerCase();
 
-  let query = '';
-  if (groupIds.length > 0) {
-    const formattedGroupIds = groupIds.map(id => `"${id}"`).join(',');
-    query = `query { boards(ids: [${boardId}]) { groups(ids: [${formattedGroupIds}]) { items_page(limit: 50) { items { id name created_at } } } } }`;
-  } else {
-    query = `query { boards(ids: [${boardId}]) { items_page(limit: 50) { items { id name created_at } } } }`;
-  }
+  // Precision 7-Drawer Group Map
+  const groupMap = {
+    castle: ['group_mm7mv0yv'],
+    empire: ['group_mm7mfbre', 'group_mm6b77as'], // Includes Staff Intake so nothing is ever missed!
+    pipeline: ['group_mm7myd0b'],
+    calendar: ['group_mm7maw66'],
+    housekeeping: ['group_mm6b77as'],
+    pinball: ['group_mm7mmekt'],
+    vault: ['group_mm6xs2fx']
+  };
+
+  const targetGroups = groupMap[drawer] || ['group_mm7mfbre', 'group_mm6b77as'];
+  const groupIdsFormatted = JSON.stringify(targetGroups);
+
+  // Newest items first query
+  const query = `
+    query {
+      boards(ids: [${boardId}]) {
+        groups(ids: ${groupIdsFormatted}) {
+          id
+          title
+          items_page(limit: 50, query_params: { order_by: [{ column_id: "__creation_log__", direction: desc }] }) {
+            items {
+              id
+              name
+              created_at
+            }
+          }
+        }
+      }
+    }
+  `;
 
   try {
     const response = await fetch('https://api.monday.com/v2', {
@@ -56,29 +66,33 @@ exports.handler = async (event) => {
     });
 
     const data = await response.json();
-    let items = [];
+    const groups = data.data?.boards?.[0]?.groups || [];
+    
+    // Flatten items across mapped groups and deduplicate
+    let allItems = [];
+    groups.forEach(g => {
+      if (g.items_page && g.items_page.items) {
+        allItems = allItems.concat(g.items_page.items);
+      }
+    });
 
-    if (groupIds.length > 0) {
-      const groups = data?.data?.boards?.[0]?.groups || [];
-      groups.forEach(g => {
-        if (g.items_page && g.items_page.items) {
-          items = items.concat(g.items_page.items);
-        }
-      });
-    } else {
-      items = data?.data?.boards?.[0]?.items_page?.items || [];
-    }
+    // Sort newest to oldest
+    allItems.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ group: groupParam, count: items.length, items: items })
+      body: JSON.stringify({
+        drawer: drawer,
+        count: allItems.length,
+        items: allItems
+      })
     };
   } catch (err) {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: "Failed to query board: " + err.message })
+      body: JSON.stringify({ error: 'Failed to fetch drawer: ' + err.message })
     };
   }
 };
