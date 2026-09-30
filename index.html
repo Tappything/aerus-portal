@@ -182,8 +182,6 @@
     </div>
 
     <div class="text-[11px] text-gray-300 space-y-3 max-h-[60vh] overflow-y-auto pr-1">
-      
-      <!-- FEATURE 1 -->
       <div class="bg-gray-800/80 p-3 rounded-2xl border border-blue-900/40 space-y-1">
         <div class="font-bold text-white flex items-center gap-1.5 text-xs text-blue-300">
           <i class="fa-solid fa-microphone-lines text-blue-400"></i>
@@ -194,7 +192,6 @@
         </div>
       </div>
 
-      <!-- FEATURE 2 -->
       <div class="bg-gray-800/80 p-3 rounded-2xl border border-amber-900/40 space-y-1">
         <div class="font-bold text-white flex items-center gap-1.5 text-xs text-amber-300">
           <i class="fa-solid fa-layer-group text-amber-400"></i>
@@ -205,7 +202,6 @@
         </div>
       </div>
 
-      <!-- FEATURE 3 -->
       <div class="bg-gray-800/80 p-3 rounded-2xl border border-emerald-900/40 space-y-1">
         <div class="font-bold text-white flex items-center gap-1.5 text-xs text-emerald-300">
           <i class="fa-solid fa-id-card text-emerald-400"></i>
@@ -216,7 +212,6 @@
         </div>
       </div>
 
-      <!-- FEATURE 4 -->
       <div class="bg-gray-800/80 p-3 rounded-2xl border border-teal-900/40 space-y-1">
         <div class="font-bold text-white flex items-center gap-1.5 text-xs text-teal-300">
           <i class="fa-solid fa-credit-card text-teal-400"></i>
@@ -227,7 +222,6 @@
         </div>
       </div>
 
-      <!-- FEATURE 5 -->
       <div class="bg-gray-800/80 p-3 rounded-2xl border border-purple-900/40 space-y-1">
         <div class="font-bold text-white flex items-center gap-1.5 text-xs text-purple-300">
           <i class="fa-solid fa-shield-halved text-purple-400"></i>
@@ -248,7 +242,6 @@
           <i id="soulChevron" class="fa-solid fa-chevron-down text-gray-400 text-xs transition-transform duration-200"></i>
         </button>
 
-        <!-- CLOSED BY DEFAULT -->
         <div id="soulDrawerContent" class="hidden mt-2.5 space-y-2 bg-gray-950 p-3 rounded-2xl border border-gray-800">
           <div class="border-b border-gray-800 pb-1.5">
             <div class="font-bold text-white text-[11px]">👑 Boudie <span class="text-blue-400 font-normal">— Founder & Chief</span></div>
@@ -487,32 +480,76 @@ async function openDrawer(name) {
     `;
   }
 
-  try {
-    // Force live query with cache-busting timestamp
-    const res = await fetch('/.netlify/functions/getBoard?group=' + encodeURIComponent(name) + '&_t=' + Date.now());
-    const data = await res.json();
+  const groupMap = {
+    castle: ['group_mm7mv0yv', 'group_mm6b77as'],
+    empire: ['group_mm7mfbre', 'group_mm6b77as'],
+    pipeline: ['group_mm7myd0b', 'group_mm6b77as'],
+    calendar: ['group_mm7maw66', 'group_mm6b77as'],
+    housekeeping: ['group_mm6b77as'],
+    pinball: ['group_mm7mmekt', 'group_mm6b77as'],
+    vault: ['group_mm6xs2fx']
+  };
 
-    // EXPLICIT ERROR DISPLAY BLOCK
-    if (data.error) {
-      content.innerHTML = calendarHtml + `
-        <div class="p-4 bg-red-950/80 border border-red-600 rounded-2xl text-red-200 text-xs space-y-1 my-4">
-          <div class="font-bold flex items-center gap-1.5 text-red-400">
-            <span>⚠️</span> Netlify Engine Report:
-          </div>
-          <div>${escapeHtml(data.error)}</div>
-        </div>
-      `;
-      return;
+  const targetGroups = groupMap[name.toLowerCase()] || ['group_mm7mfbre', 'group_mm6b77as'];
+  const groupIdsFormatted = JSON.stringify(targetGroups);
+  
+  // DIRECT CLIENT FETCH (BYPASSES GETBOARD NETLIFY FUNCTION COMPLETELY)
+  const token = "3b08e50bc7855db6509fbe795f70bb0a"; // Active board token
+  const boardId = "18424728273";
+
+  const query = `
+    query {
+      boards(ids: [${boardId}]) {
+        groups(ids: ${groupIdsFormatted}) {
+          id
+          title
+          items_page(limit: 50, query_params: { order_by: [{ column_id: "__creation_log__", direction: desc }] }) {
+            items {
+              id
+              name
+              created_at
+            }
+          }
+        }
+      }
     }
+  `;
 
-    const items = data.items || [];
+  try {
+    const res = await fetch('https://api.monday.com/v2', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token,
+        'API-Version': '2023-10'
+      },
+      body: JSON.stringify({ query })
+    });
 
-    if (items.length === 0) {
+    const resData = await res.json();
+    const groups = resData?.data?.boards?.[0]?.groups || [];
+    
+    let allItems = [];
+    const seen = new Set();
+    groups.forEach(g => {
+      if (g.items_page && g.items_page.items) {
+        g.items_page.items.forEach(item => {
+          if (!seen.has(item.id)) {
+            seen.add(item.id);
+            allItems.push(item);
+          }
+        });
+      }
+    });
+
+    allItems.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    if (allItems.length === 0) {
       content.innerHTML = calendarHtml + '<p class="text-center pt-6 text-gray-500">Pristine canvas ready. No active cards in this drawer.</p>';
       return;
     }
 
-    const cardsHtml = items.map(item => {
+    const cardsHtml = allItems.map(item => {
       const isMoney = item.name.match(/\$|invoice|quote|sale|deposit|bill|collect/i);
       const safeName = escapeHtml(item.name);
       const encodedName = encodeURIComponent(item.name);
@@ -545,7 +582,7 @@ async function openDrawer(name) {
   } catch(e) {
     content.innerHTML = calendarHtml + `
       <div class="p-4 bg-red-950/80 border border-red-600 rounded-2xl text-red-200 text-xs my-4">
-        ⚠️️ Fetch Failed: ${escapeHtml(e.message)}
+        ⚠️ Fetch Failed: ${escapeHtml(e.message)}
       </div>
     `;
   }
