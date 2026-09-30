@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>TappyThing — Pocket Chief of Staff</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -10,12 +10,12 @@
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05070e; color: #f3f4f6; }
 .tapulator-face { background: linear-gradient(180deg, #0f172a 0%, #090d16 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); }
 .led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
-.key-primary { background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%); border: 1px solid #3b82f6; box-shadow: 0 4px 14px rgba(29, 78, 216, 0.4); }
+.key-primary { background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%); border: 1px solid #3b82f6; box-shadow: 0 4px 14px rgba(29, 78, 216, 0.4); cursor: pointer; }
 .key-primary:active { transform: scale(0.98); }
-.key-secondary { background: #1e293b; border: 1px solid #334155; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
+.key-secondary { background: #1e293b; border: 1px solid #334155; box-shadow: 0 2px 6px rgba(0,0,0,0.4); cursor: pointer; }
 .key-secondary:hover { background: #273549; }
-.key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; }
-.key-pinball { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: 1px solid #8b5cf6; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); }
+.key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; cursor: pointer; }
+.key-pinball { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: 1px solid #8b5cf6; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); cursor: pointer; }
 
 @keyframes pulse-red {
   0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
@@ -31,15 +31,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 pb-28 relative">
 
-<div class="max-w-md w-full tapulator-face rounded-3xl p-6 relative overflow-hidden space-y-5">
+<!-- MAIN TAPULATOR DEVICE FACE -->
+<div class="max-w-md w-full tapulator-face rounded-3xl p-6 relative space-y-5 shadow-2xl">
 
   <!-- FRESH AVATAR LOGO -->
-  <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-20 h-20 rounded-full border-4 border-blue-400 mx-auto mb-2 block shadow-2xl shadow-blue-500/30 object-cover ring-2 ring-blue-500/20">
+  <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-20 h-20 rounded-full border-4 border-blue-400 mx-auto mb-2 block shadow-2xl shadow-blue-500/30 object-cover ring-2 ring-blue-500/20" alt="Fresh Logo">
 
   <!-- TOP LED DISPLAY SCREEN -->
   <div class="led-display rounded-2xl p-4 text-center border border-blue-900/50 min-h-[70px] flex items-center justify-center">
     <div id="ledOutput" class="text-sm font-bold text-emerald-400 tracking-wide transition-all">
-      POCKET CHIEF OF STAFF READY
+      POCKET CHIEF OF STAFF READY ⚡
     </div>
   </div>
 
@@ -50,7 +51,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   </div>
 
   <!-- SUBTLE FEATURES & BENEFITS BUTTON -->
-  <button onclick="toggleFeaturesModal()" class="w-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 font-semibold py-1.5 rounded-xl text-[11px] border border-slate-700/60 uppercase tracking-wider transition flex items-center justify-center gap-1.5">
+  <button type="button" onclick="openFeaturesModal()" class="w-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 font-semibold py-1.5 rounded-xl text-[11px] border border-slate-700/60 uppercase tracking-wider transition flex items-center justify-center gap-1.5">
     <i class="fa-solid fa-list-check text-slate-400 text-xs"></i>
     <span>[ FEATURES & BENEFITS ]</span>
   </button>
@@ -59,7 +60,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   <div id="drawersContainer" class="space-y-3">
     
     <!-- 1. CASTLE 🏰 -->
-    <button onclick="openDrawer('Castle')" class="key-primary w-full rounded-2xl p-4 text-left transition flex items-center justify-between">
+    <button type="button" onclick="openDrawer('Castle')" class="key-primary w-full rounded-2xl p-4 text-left transition flex items-center justify-between">
       <div>
         <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
           <i class="fa-solid fa-chess-rook text-blue-300"></i>
@@ -73,7 +74,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     <!-- 2 & 3. EMPIRE + PIPELINE -->
     <div class="grid grid-cols-5 gap-3">
       <!-- 2. EMPIRE 👑 (UNIFIED WITH SHOP OPS) -->
-      <button onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[90px]">
+      <button type="button" onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[90px]">
         <div>
           <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
             <span>2. Empire 👑</span>
@@ -87,7 +88,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       </button>
 
       <!-- 3. PIPELINE 🚀 -->
-      <button onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[90px]">
+      <button type="button" onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[90px]">
         <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
           <span>3. Pipeline 🚀</span>
           <i class="fa-solid fa-rocket text-teal-400"></i>
@@ -99,7 +100,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     <!-- 4, 5, 6. CALENDAR, VAULT, PINBALL -->
     <div class="grid grid-cols-3 gap-2.5">
       <!-- 4. CALENDAR 📅 -->
-      <button onclick="openDrawer('Calendar')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+      <button type="button" onclick="openDrawer('Calendar')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
         <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
           <span>4. Calendar 📅</span>
           <i class="fa-solid fa-calendar-day text-gray-500 text-xs"></i>
@@ -108,7 +109,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       </button>
 
       <!-- 5. EXCHANGE VAULT 🌐 -->
-      <button onclick="openDrawer('Exchange')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+      <button type="button" onclick="openDrawer('Exchange')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
         <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
           <span>5. Vault 🌐</span>
           <i class="fa-solid fa-share-nodes text-gray-500 text-xs"></i>
@@ -117,7 +118,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       </button>
 
       <!-- 6. PINBALL TAP-TO-TASK 🎯 -->
-      <button onclick="openDrawer('Pinball')" class="key-pinball rounded-xl p-3 text-left transition space-y-1">
+      <button type="button" onclick="openDrawer('Pinball')" class="key-pinball rounded-xl p-3 text-left transition space-y-1">
         <div class="text-[11px] font-bold text-purple-200 flex items-center justify-between">
           <span>6. Pinball 🎯</span>
           <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
@@ -130,21 +131,37 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
   <!-- SUBTLE SALES REP PORTAL LINK -->
   <div class="text-center pt-2">
-    <button onclick="alert('Rep portal coming soon — contact William at towsonhealthyhomes.com')" class="text-[10px] text-gray-500 hover:text-gray-400 transition underline tracking-wider">
+    <button type="button" onclick="alert('Rep portal coming soon — contact William at towsonhealthyhomes.com')" class="text-[10px] text-gray-500 hover:text-gray-400 transition underline tracking-wider">
       Sales Rep Portal
     </button>
   </div>
 
 </div>
 
+<!-- PERSISTENT CARD DRAWER MODAL (OUTSIDE TAPULATOR FOR RELIABLE DISPLAY) -->
+<div id="drawerModal" style="display:none;" class="fixed inset-0 bg-black/95 z-50 flex-col p-4 backdrop-blur-md justify-between">
+  <div class="max-w-md w-full mx-auto flex flex-col h-full">
+    <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-3 shrink-0">
+      <h3 id="drawerTitle" class="text-base font-black text-white flex items-center gap-2">
+        <i class="fa-solid fa-folder-open text-blue-400"></i> Drawer
+      </h3>
+      <button type="button" onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-xs bg-gray-800 px-3 py-1.5 rounded-lg">✕ Close</button>
+    </div>
+
+    <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300">
+      <p class="text-center text-gray-500 pt-8">Loading cards...</p>
+    </div>
+  </div>
+</div>
+
 <!-- FEATURES & BENEFITS MODAL -->
-<div id="featuresModal" class="fixed inset-0 bg-black/95 z-50 hidden flex-col p-6 backdrop-blur-md justify-center">
-  <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-6 max-w-sm mx-auto space-y-5 text-left shadow-2xl max-h-[85vh] overflow-y-auto">
+<div id="featuresModal" style="display:none;" class="fixed inset-0 bg-black/95 z-50 flex-col p-4 justify-center backdrop-blur-md overflow-y-auto">
+  <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-6 max-w-sm mx-auto space-y-5 text-left shadow-2xl max-h-[85vh] overflow-y-auto my-auto">
     <div class="flex items-center justify-between border-b border-gray-800 pb-3">
       <h3 class="text-base font-black text-white flex items-center gap-2">
         <i class="fa-solid fa-mobile-screen-button text-blue-400"></i> Pocket Chief of Staff
       </h3>
-      <button onclick="toggleFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+      <button type="button" onclick="closeFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
     </div>
 
     <div class="space-y-2">
@@ -152,30 +169,26 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         <i class="fa-solid fa-circle-check"></i> What It Does Right Now
       </h4>
       <ul class="space-y-1.5 text-[11px] text-gray-300">
-        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Unlimited Forever Cards</strong>: Live permanent homes for every customer</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Unlimited Forever Cards</strong>: Live permanent homes for every customer with zero downloads</li>
         <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap Voice & Video Intake</strong>: Snap photos or record machine videos directly to cards</li>
         <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Instant Stripe Invoicing</strong>: 1-Tap payment links generate right on customer cards</li>
         <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Auto-Routing</strong>: Intakes route automatically to bench, showroom, or schedule</li>
       </ul>
     </div>
 
-    <button onclick="toggleFeaturesModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
+    <div class="space-y-2 border-t border-gray-800 pt-3">
+      <h4 class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+        <i class="fa-solid fa-clock"></i> Monetization & Add-Ons
+      </h4>
+      <ul class="space-y-1.5 text-[11px] text-gray-300">
+        <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> <strong>Local Business Ad Slots</strong>: Host cross-promotions inside customer Forever Cards</li>
+        <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> <strong>Two-way Customer Chat</strong>: Customer replies update the card in real-time</li>
+      </ul>
+    </div>
+
+    <button type="button" onclick="closeFeaturesModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
       Got It
     </button>
-  </div>
-</div>
-
-<!-- PERSISTENT CARD DRAWER MODAL -->
-<div id="drawerModal" class="fixed inset-0 bg-black/90 z-50 hidden flex-col p-4 backdrop-blur-md">
-  <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
-    <h3 id="drawerTitle" class="text-lg font-black text-white flex items-center gap-2">
-      <i class="fa-solid fa-folder-open text-blue-400"></i> Drawer
-    </h3>
-    <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-sm bg-gray-800 px-3 py-1 rounded-lg">Close</button>
-  </div>
-
-  <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300">
-    <p class="text-center text-gray-500 pt-8">Loading cards...</p>
   </div>
 </div>
 
@@ -198,12 +211,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     <input type="text" id="unifiedInput" placeholder="Talk, type, snap, or video..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') submitUnifiedInput()">
 
     <!-- MIC BUTTON -->
-    <button id="micBtn" onclick="toggleVoiceIntake()" class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-10 h-10 rounded-xl flex items-center justify-center border border-gray-700 transition shrink-0">
+    <button type="button" id="micBtn" onclick="toggleVoiceIntake()" class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-10 h-10 rounded-xl flex items-center justify-center border border-gray-700 transition shrink-0">
       <i class="fa-solid fa-microphone text-base"></i>
     </button>
 
     <!-- SEND BUTTON -->
-    <button onclick="submitUnifiedInput()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3.5 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1">
+    <button type="button" onclick="submitUnifiedInput()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3.5 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1">
       <i class="fa-solid fa-paper-plane"></i>
     </button>
   </div>
@@ -229,7 +242,7 @@ function toggleVoiceIntake(drawerContext, targetInputId, targetBtnId) {
     activeRecognition.stop();
     isListening = false;
     if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
-    output.textContent = 'POCKET CHIEF OF STAFF READY';
+    output.textContent = 'POCKET CHIEF OF STAFF READY ⚡';
     if (silenceTimer) clearTimeout(silenceTimer);
     return;
   }
@@ -313,7 +326,7 @@ function flashLed(responseText) {
   var output = document.getElementById('ledOutput');
   output.textContent = responseText || 'Logged! ⚡';
   setTimeout(function() {
-    output.textContent = 'POCKET CHIEF OF STAFF READY';
+    output.textContent = 'POCKET CHIEF OF STAFF READY ⚡';
   }, 3000);
 }
 
@@ -326,8 +339,8 @@ function sendToFresh(promptText, drawerName) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt: fullPrompt, board_id: '18424728273' })
   })
-  .then(res => res.json())
-  .then(data => {
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
     flashLed(data.reply || 'Logged! ⚡');
     if (activeDrawerContext) {
       setTimeout(function() {
@@ -335,7 +348,7 @@ function sendToFresh(promptText, drawerName) {
       }, 1500);
     }
   })
-  .catch(err => {
+  .catch(function(err) {
     flashLed('Logged! ⚡');
     if (activeDrawerContext) {
       setTimeout(function() {
@@ -346,14 +359,7 @@ function sendToFresh(promptText, drawerName) {
 }
 
 function renderItemCard(item, isInvoiceScope) {
-  var hasDollar = item.name && (item.name.includes('
-
----
-
-### Commit & Test in 10 Seconds:
-1. Select All $\rightarrow$ Paste into GitHub `index.html` $\rightarrow$ Commit.
-2. Refresh `freshtappything.com` on your phone.
-3. Tap **Castle** or **Empire** — the drawer will instantly slide up and all your cards will be right there! 💙🎩🔥) || isInvoiceScope);
+  var hasDollar = item.name && (item.name.includes('$') || isInvoiceScope);
   var payButton = hasDollar ? '<a href="' + STRIPE_CHECKOUT_URL + '" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow shrink-0"><i class="fa-solid fa-credit-card"></i> Pay Now</a>' : '';
 
   return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 flex justify-between items-center gap-2">' +
@@ -374,7 +380,7 @@ function loadDrawerItems(drawerName) {
 
   // SPECIAL CALENDAR VIEW: In-App Agenda with today's locked stops
   if (target.includes('calendar')) {
-    contentDiv.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">' +
+    contentDiv.innerHTML = '<div class="space-y-4">' +
       '<div class="flex items-center justify-between">' +
         '<p class="font-bold text-white text-sm">📅 Daily Schedule Agenda</p>' +
         '<a href="https://calendar.google.com/calendar/u/0/r/day" target="_blank" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-arrow-up-right-from-square"></i> Full Google Cal</a>' +
@@ -417,8 +423,8 @@ function loadDrawerItems(drawerName) {
   }
 
   fetch('/.netlify/functions/monday?board=18424728273&t=' + new Date().getTime())
-    .then(res => res.json())
-    .then(data => {
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
       var allItems = [];
 
       if (data.items && Array.isArray(data.items)) {
@@ -486,10 +492,10 @@ function loadDrawerItems(drawerName) {
         return renderItemCard(item, target.includes('empire') || target.includes('shop'));
       }).join('');
 
-      contentDiv.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">' +
+      contentDiv.innerHTML = '<div class="space-y-4">' +
         '<div class="flex items-center justify-between">' +
           '<p class="font-bold text-white text-sm">Drawer: ' + drawerName + ' (' + displayItems.length + ' Cards)</p>' +
-          '<button onclick="loadDrawerItems(\'' + drawerName + '\')" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-rotate-right"></i> Refresh</button>' +
+          '<button type="button" onclick="loadDrawerItems(\'' + drawerName + '\')" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-rotate-right"></i> Refresh</button>' +
         '</div>' +
         '<div class="space-y-2 max-h-60 overflow-y-auto">' +
           (itemsHtml || '<p class="text-gray-500 text-center py-4">No cards in this drawer yet. Speak or type below to add one!</p>') +
@@ -498,7 +504,7 @@ function loadDrawerItems(drawerName) {
       '</div>';
     })
     .catch(function(err) {
-      contentDiv.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">' +
+      contentDiv.innerHTML = '<div class="space-y-4">' +
         '<p class="font-bold text-white text-sm">Drawer: ' + drawerName + '</p>' +
         '<p class="text-gray-400">Speak or capture media directly into this card:</p>' +
         buildInputFooter(drawerName) +
@@ -510,7 +516,7 @@ function buildInputFooter(drawerName) {
   return '<div class="pt-2 border-t border-gray-800 space-y-3">' +
     '<div class="relative flex items-center">' +
       '<input type="text" id="drawerInput_' + drawerName + '" placeholder="Type or dictate to card..." class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-4 pr-10 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key===\'Enter\') submitUnifiedInput(\'drawerInput_' + drawerName + '\')">' +
-      '<button id="drawerMicBtn_' + drawerName + '" onclick="toggleVoiceIntake(\'' + drawerName + '\', \'drawerInput_' + drawerName + '\', \'drawerMicBtn_' + drawerName + '\')" class="absolute right-2 text-blue-400 hover:text-blue-300 p-1.5 transition">' +
+      '<button type="button" id="drawerMicBtn_' + drawerName + '" onclick="toggleVoiceIntake(\'' + drawerName + '\', \'drawerInput_' + drawerName + '\', \'drawerMicBtn_' + drawerName + '\')" class="absolute right-2 text-blue-400 hover:text-blue-300 p-1.5 transition">' +
         '<i class="fa-solid fa-microphone text-sm"></i>' +
       '</button>' +
     '</div>' +
@@ -525,7 +531,7 @@ function buildInputFooter(drawerName) {
         '<span>Record Video</span>' +
         '<input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Video\')">' +
       '</label>' +
-      '<button onclick="submitUnifiedInput(\'drawerInput_' + drawerName + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shrink-0">' +
+      '<button type="button" onclick="submitUnifiedInput(\'drawerInput_' + drawerName + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shrink-0">' +
         '<span>Send</span>' +
         '<i class="fa-solid fa-paper-plane"></i>' +
       '</button>' +
@@ -537,27 +543,24 @@ function openDrawer(name) {
   activeDrawerContext = name;
   document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + name + ' Drawer';
   var modal = document.getElementById('drawerModal');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
+  modal.style.display = 'flex';
   loadDrawerItems(name);
 }
 
 function closeDrawer() {
   activeDrawerContext = '';
   var modal = document.getElementById('drawerModal');
-  modal.classList.add('hidden');
-  modal.classList.remove('flex');
+  modal.style.display = 'none';
 }
 
-function toggleFeaturesModal() {
+function openFeaturesModal() {
   var modal = document.getElementById('featuresModal');
-  if (modal.classList.contains('hidden')) {
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-  } else {
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-  }
+  modal.style.display = 'flex';
+}
+
+function closeFeaturesModal() {
+  var modal = document.getElementById('featuresModal');
+  modal.style.display = 'none';
 }
 </script>
 </body>
