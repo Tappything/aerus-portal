@@ -17,21 +17,21 @@ exports.handler = async (event) => {
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ error: '❌ MONDAY_API_TOKEN environment variable is missing in Netlify.' })
+      body: JSON.stringify({ error: '❌ MONDAY_API_TOKEN is missing in Netlify Environment Variables.' })
     };
   }
 
   const query = `
     query {
       boards(ids: [${boardId}]) {
-        groups {
-          id
-          title
-          items_page(limit: 50, query_params: { order_by: [{ column_id: "__creation_log__", direction: desc }] }) {
-            items {
+        items_page(limit: 50, query_params: { order_by: [{ column_id: "__creation_log__", direction: desc }] }) {
+          items {
+            id
+            name
+            created_at
+            group {
               id
-              name
-              created_at
+              title
             }
           }
         }
@@ -68,28 +68,14 @@ exports.handler = async (event) => {
       };
     }
 
-    const groups = resData?.data?.boards?.[0]?.groups || [];
-    let allItems = [];
-    const seen = new Set();
-    groups.forEach(g => {
-      if (g.items_page && g.items_page.items) {
-        g.items_page.items.forEach(item => {
-          if (!seen.has(item.id)) {
-            seen.add(item.id);
-            allItems.push(item);
-          }
-        });
-      }
-    });
-
-    allItems.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    const items = resData?.data?.boards?.[0]?.items_page?.items || [];
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        count: allItems.length,
-        items: allItems
+        count: items.length,
+        items: items
       })
     };
   } catch (err) {
