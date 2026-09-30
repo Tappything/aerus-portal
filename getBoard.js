@@ -21,21 +21,20 @@ exports.handler = async (event) => {
   const rawDrawer = qParams.group || qParams.drawer || 'all';
   const drawer = rawDrawer.toLowerCase();
 
-  // Precision 7-Drawer Group Map
+  // Every drawer checks its target group PLUS Staff Intake so nothing is ever blank!
   const groupMap = {
-    castle: ['group_mm7mv0yv'],
-    empire: ['group_mm7mfbre', 'group_mm6b77as'], // Includes Staff Intake so nothing is ever missed!
-    pipeline: ['group_mm7myd0b'],
-    calendar: ['group_mm7maw66'],
+    castle: ['group_mm7mv0yv', 'group_mm6b77as'],
+    empire: ['group_mm7mfbre', 'group_mm6b77as'],
+    pipeline: ['group_mm7myd0b', 'group_mm6b77as'],
+    calendar: ['group_mm7maw66', 'group_mm6b77as'],
     housekeeping: ['group_mm6b77as'],
-    pinball: ['group_mm7mmekt'],
+    pinball: ['group_mm7mmekt', 'group_mm6b77as'],
     vault: ['group_mm6xs2fx']
   };
 
   const targetGroups = groupMap[drawer] || ['group_mm7mfbre', 'group_mm6b77as'];
   const groupIdsFormatted = JSON.stringify(targetGroups);
 
-  // Newest items first query
   const query = `
     query {
       boards(ids: [${boardId}]) {
@@ -68,15 +67,19 @@ exports.handler = async (event) => {
     const data = await response.json();
     const groups = data.data?.boards?.[0]?.groups || [];
     
-    // Flatten items across mapped groups and deduplicate
     let allItems = [];
+    const seen = new Set();
     groups.forEach(g => {
       if (g.items_page && g.items_page.items) {
-        allItems = allItems.concat(g.items_page.items);
+        g.items_page.items.forEach(item => {
+          if (!seen.has(item.id)) {
+            seen.add(item.id);
+            allItems.push(item);
+          }
+        });
       }
     });
 
-    // Sort newest to oldest
     allItems.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     return {
@@ -92,7 +95,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Failed to fetch drawer: ' + err.message })
+      body: JSON.stringify({ error: 'Failed: ' + err.message })
     };
   }
 };
