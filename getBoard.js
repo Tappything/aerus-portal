@@ -14,30 +14,13 @@ exports.handler = async (event) => {
   const boardId = "18424728273";
 
   if (!token) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: '❌ MONDAY_API_TOKEN is missing in Netlify Environment Variables.' }) };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: 'MONDAY_API_TOKEN missing' }) };
   }
-
-  const qParams = event.queryStringParameters || {};
-  const rawDrawer = qParams.group || qParams.drawer || 'all';
-  const drawer = rawDrawer.toLowerCase();
-
-  const groupMap = {
-    castle: ['group_mm7mv0yv', 'group_mm6b77as'],
-    empire: ['group_mm7mfbre', 'group_mm6b77as'],
-    pipeline: ['group_mm7myd0b', 'group_mm6b77as'],
-    calendar: ['group_mm7maw66', 'group_mm6b77as'],
-    housekeeping: ['group_mm6b77as'],
-    pinball: ['group_mm7mmekt', 'group_mm6b77as'],
-    vault: ['group_mm6xs2fx']
-  };
-
-  const targetGroups = groupMap[drawer] || ['group_mm7mfbre', 'group_mm6b77as'];
-  const groupIdsFormatted = JSON.stringify(targetGroups);
 
   const query = `
     query {
       boards(ids: [${boardId}]) {
-        groups(ids: ${groupIdsFormatted}) {
+        groups {
           id
           title
           items_page(limit: 50, query_params: { order_by: [{ column_id: "__creation_log__", direction: desc }] }) {
@@ -64,15 +47,6 @@ exports.handler = async (event) => {
     });
 
     const data = await response.json();
-
-    if (data.errors && data.errors.length > 0) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Monday GraphQL Error: ' + data.errors[0].message })
-      };
-    }
-
     const groups = data.data?.boards?.[0]?.groups || [];
     
     let allItems = [];
@@ -93,17 +67,13 @@ exports.handler = async (event) => {
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({
-        drawer: drawer,
-        count: allItems.length,
-        items: allItems
-      })
+      body: JSON.stringify({ items: allItems, count: allItems.length })
     };
   } catch (err) {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Server fetch error: ' + err.message })
+      body: JSON.stringify({ error: err.message, items: [] })
     };
   }
 };
