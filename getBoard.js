@@ -18,24 +18,28 @@ exports.handler = async (event) => {
     return { statusCode: 500, headers, body: JSON.stringify({ error: "Missing Monday API token." }) };
   }
 
-  const groupMap = {
-    'castle': 'group_mm7mv0yv',
-    'empire': 'group_mm7mfbre',
-    'pipeline': 'group_mm7myd0b',
-    'calendar': 'group_mm7maw66',
-    'housekeeping': 'group_mm6b77as',
-    'pinball': 'group_mm7mmekt',
-    'parts': 'group_mm6bv2h0',
-    'bench': 'group_mm76qbbh',
-    'ready': 'group_mm6s961c',
-    'vault': 'group_mm7myd0b'
-  };
-
-  const groupId = groupMap[groupParam] || null;
+  // Multi-group queries so real active cards show up in every drawer
+  let groupIds = [];
+  if (groupParam === 'castle') {
+    groupIds = ['group_mm7mv0yv', 'group_mm7cn4en'];
+  } else if (groupParam === 'empire') {
+    groupIds = ['group_mm7mfbre', 'group_mm6b77as', 'group_mm76qbbh', 'group_mm6s961c'];
+  } else if (groupParam === 'pipeline') {
+    groupIds = ['group_mm7myd0b', 'group_mm6c4aj6'];
+  } else if (groupParam === 'calendar') {
+    groupIds = ['group_mm7maw66'];
+  } else if (groupParam === 'housekeeping') {
+    groupIds = ['group_mm6b77as', 'group_mm744g20'];
+  } else if (groupParam === 'pinball') {
+    groupIds = ['group_mm7mmekt', 'group_mm6b77as', 'group_mm7mfbre'];
+  } else if (groupParam === 'vault') {
+    groupIds = ['group_mm6xs2fx', 'group_mm6b77as'];
+  }
 
   let query = '';
-  if (groupId) {
-    query = `query { boards(ids: [${boardId}]) { groups(ids: ["${groupId}"]) { items_page(limit: 50) { items { id name created_at } } } } }`;
+  if (groupIds.length > 0) {
+    const formattedGroupIds = groupIds.map(id => `"${id}"`).join(',');
+    query = `query { boards(ids: [${boardId}]) { groups(ids: [${formattedGroupIds}]) { items_page(limit: 50) { items { id name created_at } } } } }`;
   } else {
     query = `query { boards(ids: [${boardId}]) { items_page(limit: 50) { items { id name created_at } } } }`;
   }
@@ -54,8 +58,13 @@ exports.handler = async (event) => {
     const data = await response.json();
     let items = [];
 
-    if (groupId) {
-      items = data?.data?.boards?.[0]?.groups?.[0]?.items_page?.items || [];
+    if (groupIds.length > 0) {
+      const groups = data?.data?.boards?.[0]?.groups || [];
+      groups.forEach(g => {
+        if (g.items_page && g.items_page.items) {
+          items = items.concat(g.items_page.items);
+        }
+      });
     } else {
       items = data?.data?.boards?.[0]?.items_page?.items || [];
     }
@@ -63,7 +72,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ group: groupParam, groupId: groupId, items: items })
+      body: JSON.stringify({ group: groupParam, count: items.length, items: items })
     };
   } catch (err) {
     return {
