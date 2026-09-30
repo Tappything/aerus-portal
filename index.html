@@ -57,14 +57,14 @@
   <!-- 7 UNIVERSAL MASTER DRAWERS -->
   <div class="space-y-2.5">
     
-    <!-- 1. CASTLE -->
+    <!-- 1. CASTLE (UNLOCKED) -->
     <button onclick="openDrawer('castle')" class="key-castle w-full rounded-2xl p-3.5 text-left transition flex items-center justify-between shadow-md">
       <div>
         <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
           <i class="fa-solid fa-chess-rook text-blue-300"></i>
           <span>1. Castle 🏰</span>
         </div>
-        <div class="text-[11px] text-blue-200 mt-0.5">Personal, Family, Bills & Assets (PIN 🔒)</div>
+        <div class="text-[11px] text-blue-200 mt-0.5">Personal, Family, Bills & Assets</div>
       </div>
       <i class="fa-solid fa-chevron-right text-blue-300 text-sm"></i>
     </button>
@@ -198,7 +198,7 @@
           <span>2. 7 Asymmetric Universal Drawers</span>
         </div>
         <div class="text-gray-300 text-[10px]">
-          <strong>Benefit:</strong> Complete mental clarity. Personal life & PIN-locked bills live in Castle, shop repairs in Empire, sales in Pipeline, schedule in Calendar, and upkeep in Housekeeping.
+          <strong>Benefit:</strong> Complete mental clarity. Personal life in Castle, shop repairs in Empire, sales in Pipeline, schedule in Calendar, and upkeep in Housekeeping.
         </div>
       </div>
 
@@ -302,7 +302,7 @@
       </div>
       <div class="bg-gray-800/70 p-2.5 rounded-xl border border-gray-700/60">
         <div class="text-white font-bold">Claim 2: Asymmetric 7-Drawer Routing Architecture</div>
-        <p class="text-gray-400">Automatic distribution into isolated domains (PIN Castle, Empire Ops, Pipeline, Calendar).</p>
+        <p class="text-gray-400">Automatic distribution into isolated domains (Castle, Empire Ops, Pipeline, Calendar).</p>
       </div>
       <div class="bg-gray-800/70 p-2.5 rounded-xl border border-gray-700/60">
         <div class="text-white font-bold">Claim 3: Context-Triggered Micro-Checkout Generation</div>
@@ -453,14 +453,6 @@ function escapeHtml(str) {
 }
 
 async function openDrawer(name) {
-  if (name === 'castle') {
-    const pin = prompt("🔐 Enter Castle PIN Lock:");
-    if (pin !== "7777" && pin !== "1234") {
-      alert("❌ Access Denied");
-      return;
-    }
-  }
-
   const modal = document.getElementById('drawerModal');
   const title = document.getElementById('drawerTitle');
   const content = document.getElementById('drawerContent');
@@ -480,76 +472,30 @@ async function openDrawer(name) {
     `;
   }
 
-  const groupMap = {
-    castle: ['group_mm7mv0yv', 'group_mm6b77as'],
-    empire: ['group_mm7mfbre', 'group_mm6b77as'],
-    pipeline: ['group_mm7myd0b', 'group_mm6b77as'],
-    calendar: ['group_mm7maw66', 'group_mm6b77as'],
-    housekeeping: ['group_mm6b77as'],
-    pinball: ['group_mm7mmekt', 'group_mm6b77as'],
-    vault: ['group_mm6xs2fx']
-  };
-
-  const targetGroups = groupMap[name.toLowerCase()] || ['group_mm7mfbre', 'group_mm6b77as'];
-  const groupIdsFormatted = JSON.stringify(targetGroups);
-  
-  // DIRECT CLIENT FETCH (BYPASSES GETBOARD NETLIFY FUNCTION COMPLETELY)
-  const token = "3b08e50bc7855db6509fbe795f70bb0a"; // Active board token
-  const boardId = "18424728273";
-
-  const query = `
-    query {
-      boards(ids: [${boardId}]) {
-        groups(ids: ${groupIdsFormatted}) {
-          id
-          title
-          items_page(limit: 50, query_params: { order_by: [{ column_id: "__creation_log__", direction: desc }] }) {
-            items {
-              id
-              name
-              created_at
-            }
-          }
-        }
-      }
-    }
-  `;
-
   try {
-    const res = await fetch('https://api.monday.com/v2', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token,
-        'API-Version': '2023-10'
-      },
-      body: JSON.stringify({ query })
-    });
+    const res = await fetch('/.netlify/functions/getBoard?group=' + encodeURIComponent(name) + '&_t=' + Date.now());
+    const data = await res.json();
 
-    const resData = await res.json();
-    const groups = resData?.data?.boards?.[0]?.groups || [];
-    
-    let allItems = [];
-    const seen = new Set();
-    groups.forEach(g => {
-      if (g.items_page && g.items_page.items) {
-        g.items_page.items.forEach(item => {
-          if (!seen.has(item.id)) {
-            seen.add(item.id);
-            allItems.push(item);
-          }
-        });
-      }
-    });
+    if (data.error) {
+      content.innerHTML = calendarHtml + `
+        <div class="p-4 bg-red-950/80 border border-red-600 rounded-2xl text-red-200 text-xs space-y-1 my-4">
+          <div class="font-bold flex items-center gap-1.5 text-red-400">
+            <span>⚠️</span> System Notice:
+          </div>
+          <div>${escapeHtml(data.error)}</div>
+        </div>
+      `;
+      return;
+    }
 
-    allItems.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    const items = data.items || [];
 
-    if (allItems.length === 0) {
+    if (items.length === 0) {
       content.innerHTML = calendarHtml + '<p class="text-center pt-6 text-gray-500">Pristine canvas ready. No active cards in this drawer.</p>';
       return;
     }
 
-    const cardsHtml = allItems.map(item => {
+    const cardsHtml = items.map(item => {
       const isMoney = item.name.match(/\$|invoice|quote|sale|deposit|bill|collect/i);
       const safeName = escapeHtml(item.name);
       const encodedName = encodeURIComponent(item.name);
@@ -591,7 +537,7 @@ async function openDrawer(name) {
 function closeDrawer() { document.getElementById('drawerModal').classList.add('hidden'); }
 
 function talkToSissyCard(cardName) {
-  const note = prompt(`🎙️ Talk to Sissy on "${cardName}":`);
+  const note = prompt(`🎙️️ Talk to Sissy on "${cardName}":`);
   if (note) {
     showToast(`📝 Note attached to card!`);
   }
