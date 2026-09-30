@@ -10,7 +10,6 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers, body: '' };
   }
 
-  // Broad token check across all possible Netlify environment variable names
   const token = process.env.MONDAY_API_TOKEN || process.env.MONDAY_API_KEY || process.env.MONDAY_TOKEN;
   const boardId = "18424728273";
 
@@ -22,7 +21,6 @@ exports.handler = async (event) => {
   const rawDrawer = qParams.group || qParams.drawer || 'all';
   const drawer = rawDrawer.toLowerCase();
 
-  // Multi-group routing map so incoming Staff Intake cards display across all relevant drawers
   const groupMap = {
     castle: ['group_mm7mv0yv', 'group_mm6b77as'],
     empire: ['group_mm7mfbre', 'group_mm6b77as'],
