@@ -10,18 +10,19 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers, body: '' };
   }
 
+  // Broad token check across all possible Netlify environment variable names
   const token = process.env.MONDAY_API_TOKEN || process.env.MONDAY_API_KEY || process.env.MONDAY_TOKEN;
   const boardId = "18424728273";
 
   if (!token) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Missing Monday API token' }) };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: '❌ MONDAY_API_TOKEN is missing in Netlify Environment Variables.' }) };
   }
 
   const qParams = event.queryStringParameters || {};
   const rawDrawer = qParams.group || qParams.drawer || 'all';
   const drawer = rawDrawer.toLowerCase();
 
-  // Every drawer checks its target group PLUS Staff Intake so nothing is ever blank!
+  // Multi-group routing map so incoming Staff Intake cards display across all relevant drawers
   const groupMap = {
     castle: ['group_mm7mv0yv', 'group_mm6b77as'],
     empire: ['group_mm7mfbre', 'group_mm6b77as'],
@@ -65,6 +66,15 @@ exports.handler = async (event) => {
     });
 
     const data = await response.json();
+
+    if (data.errors && data.errors.length > 0) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'Monday GraphQL Error: ' + data.errors[0].message })
+      };
+    }
+
     const groups = data.data?.boards?.[0]?.groups || [];
     
     let allItems = [];
@@ -95,7 +105,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Failed: ' + err.message })
+      body: JSON.stringify({ error: 'Server fetch error: ' + err.message })
     };
   }
 };
