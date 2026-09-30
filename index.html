@@ -1,605 +1,581 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TappyThing — Pocket Chief of Staff</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --bg: #030712;
-      --card-bg: #0f172a;
-      --accent: #3b82f6;
-      --accent-gold: #f59e0b;
-      --text: #f8fafc;
-    }
-    body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); }
-    .tapulator-face { background: linear-gradient(180deg, #0f172a 0%, #090e17 100%); border: 1px solid #1e293b; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9); }
-    .led-display { background: #020617; border: 1px solid #1e293b; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
-    .key-castle { background: linear-gradient(135deg, #1e3a8a 0%, #172554 100%); border: 1px solid #3b82f6; }
-    .key-empire { background: #1e293b; border: 1px solid #334155; }
-    .key-pipeline { background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%); border: 1px solid #14b8a6; }
-    .key-pinball { background: linear-gradient(135deg, #6b21a8 0%, #581c87 100%); border: 1px solid #a855f7; }
-    textarea#dockInput { min-height: 44px; max-height: 120px; resize: none; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TappyThing — Pocket Chief of Staff</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05070e; color: #f3f4f6; }
+.tapulator-face { background: linear-gradient(180deg, #0f172a 0%, #090d16 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); }
+.led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
+.key-primary { background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%); border: 1px solid #3b82f6; box-shadow: 0 4px 14px rgba(29, 78, 216, 0.4); }
+.key-primary:active { transform: scale(0.98); }
+.key-secondary { background: #1e293b; border: 1px solid #334155; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
+.key-secondary:hover { background: #273549; }
+.key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; }
+.key-pinball { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: 1px solid #8b5cf6; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); }
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+.mic-pulsing {
+  animation: pulse-red 1.5s infinite;
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
+}
+</style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-start p-4 pb-36">
+<body class="min-h-screen flex items-center justify-center p-4 pb-28 relative">
 
-<!-- FLOATING TOAST -->
-<div id="freshToast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-blue-600 border border-blue-400 text-white font-bold px-5 py-2 rounded-full shadow-2xl z-50 text-xs hidden flex items-center gap-2 backdrop-blur-md">
-  <span id="toastMsg">⚡ FRESH DIGITAL COORDINATOR ACTIVE</span>
-</div>
+<div class="max-w-md w-full tapulator-face rounded-3xl p-6 relative overflow-hidden space-y-5">
 
-<div class="max-w-md w-full tapulator-face rounded-3xl p-5 space-y-4 my-2">
+  <!-- FRESH AVATAR LOGO (ENLARGED & PROMINENT) -->
+  <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-20 h-20 rounded-full border-4 border-blue-400 mx-auto mb-2 block shadow-2xl shadow-blue-500/30 object-cover ring-2 ring-blue-500/20">
 
-  <!-- TOP LED DISPLAY -->
-  <div class="led-display rounded-2xl p-3.5 text-center border border-blue-900/50 min-h-[54px] flex items-center justify-center">
-    <div id="ledOutput" class="text-xs font-black text-emerald-400 tracking-wider">
-      POCKET CHIEF OF STAFF READY ⚡
+  <!-- TOP LED DISPLAY SCREEN -->
+  <div class="led-display rounded-2xl p-4 text-center border border-blue-900/50 min-h-[70px] flex items-center justify-center">
+    <div id="ledOutput" class="text-sm font-bold text-emerald-400 tracking-wide transition-all">
+      POCKET CHIEF OF STAFF READY
     </div>
   </div>
 
-  <!-- LOGO EMBLEM -->
-  <div class="text-center space-y-1">
-    <div class="inline-flex items-center justify-center bg-slate-950 border border-slate-700 rounded-full px-6 py-2 shadow-inner min-h-[48px]">
-      <img src="logo.png" alt="TappyThing" class="h-10 max-w-[170px] object-contain mx-auto" onerror="this.onerror=null; this.src='https://via.placeholder.com/160x44/0f172a/38bdf8?text=⚡+TAPPYTHING';">
-    </div>
-    <div class="text-[11px] text-gray-400 font-medium">Fractal Forever Card Engine • Speak or type below.</div>
+  <!-- DEVICE HEADER -->
+  <div class="text-center space-y-0.5">
+    <div class="text-xs font-black text-blue-400 uppercase tracking-widest">TappyThing Command Hub</div>
+    <div class="text-[11px] text-gray-400 font-medium">Tap. Talk. Operations live in seconds.</div>
   </div>
 
-  <!-- FEATURES, BENEFITS & SOUL BUTTON -->
-  <button onclick="showModal('modalSuite')" class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold py-2 rounded-xl text-[11px] border border-slate-700 uppercase tracking-wider transition flex items-center justify-center gap-2">
-    <i class="fa-solid fa-book-open text-blue-400 text-xs"></i>
-    <span>[ FEATURES, BENEFITS & SOUL ]</span>
+  <!-- SUBTLE FEATURES & BENEFITS BUTTON -->
+  <button onclick="toggleFeaturesModal()" class="w-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 font-semibold py-1.5 rounded-xl text-[11px] border border-slate-700/60 uppercase tracking-wider transition flex items-center justify-center gap-1.5">
+    <i class="fa-solid fa-list-check text-slate-400 text-xs"></i>
+    <span>[ FEATURES & BENEFITS ]</span>
   </button>
 
-  <!-- 7 UNIVERSAL MASTER DRAWERS -->
-  <div class="space-y-2.5">
+  <!-- 6-BUTTON ASYMMETRIC KEYPAD LAYOUT -->
+  <div id="drawersContainer" class="space-y-3">
     
-    <!-- 1. CASTLE -->
-    <button onclick="openDrawer('castle')" class="key-castle w-full rounded-2xl p-3.5 text-left transition flex items-center justify-between shadow-md">
+    <!-- 1. CASTLE 🏰 -->
+    <button onclick="openDrawer('Castle')" class="key-primary w-full rounded-2xl p-4 text-left transition flex items-center justify-between">
       <div>
         <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
           <i class="fa-solid fa-chess-rook text-blue-300"></i>
           <span>1. Castle 🏰</span>
         </div>
-        <div class="text-[11px] text-blue-200 mt-0.5">Personal, Family, Bills & Assets</div>
+        <div class="text-[11px] text-blue-200 mt-0.5">Personal, Family, Pickleball, Bills & Chores</div>
       </div>
       <i class="fa-solid fa-chevron-right text-blue-300 text-sm"></i>
     </button>
 
-    <!-- 2. EMPIRE & 3. PIPELINE -->
-    <div class="grid grid-cols-5 gap-2.5">
-      <button onclick="openDrawer('empire')" class="key-empire col-span-3 rounded-2xl p-3 text-left transition flex flex-col justify-between min-h-[72px] shadow-sm">
-        <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
-          <span>2. Empire 👑</span>
-          <i class="fa-solid fa-crown text-amber-500"></i>
+    <!-- 2 & 3. EMPIRE + PIPELINE -->
+    <div class="grid grid-cols-5 gap-3">
+      <!-- 2. EMPIRE 👑 (UNIFIED WITH SHOP OPS) -->
+      <button onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[90px]">
+        <div>
+          <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
+            <span>2. Empire 👑</span>
+            <i class="fa-solid fa-crown text-amber-500"></i>
+          </div>
+          <div class="text-[10px] text-gray-400 font-medium mt-0.5">Business Hub & Shop Ops</div>
         </div>
-        <div class="text-[10px] text-gray-400">Core Business Operations</div>
+        <div class="text-[9px] text-amber-300/80 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/40 inline-block w-fit">
+          🛠️ Shop Bench & Ops Inside
+        </div>
       </button>
 
-      <button onclick="openDrawer('pipeline')" class="key-pipeline col-span-2 rounded-2xl p-3 text-left transition flex flex-col justify-between min-h-[72px] shadow-sm">
+      <!-- 3. PIPELINE 🚀 -->
+      <button onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3.5 text-left transition flex flex-col justify-between min-h-[90px]">
         <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
           <span>3. Pipeline 🚀</span>
           <i class="fa-solid fa-rocket text-teal-400"></i>
         </div>
-        <div class="text-[10px] text-teal-100">Leads & Retention</div>
+        <div class="text-[10px] text-teal-100 font-medium">Leads & Future Cash</div>
       </button>
     </div>
 
-    <!-- 4. CALENDAR, 5. HOUSEKEEPING, 6. VAULT -->
-    <div class="grid grid-cols-3 gap-2">
-      <button onclick="openDrawer('calendar')" class="key-empire rounded-xl p-2.5 text-left transition space-y-1 shadow-sm">
+    <!-- 4, 5, 6. CALENDAR, VAULT, PINBALL -->
+    <div class="grid grid-cols-3 gap-2.5">
+      <!-- 4. CALENDAR 📅 -->
+      <button onclick="openDrawer('Calendar')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
         <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
-          <span>4. Cal 📅</span>
-          <i class="fa-solid fa-calendar text-gray-500 text-xs"></i>
+          <span>4. Calendar 📅</span>
+          <i class="fa-solid fa-calendar-day text-gray-500 text-xs"></i>
         </div>
-        <div class="text-[9px] text-gray-400">Schedule</div>
+        <div class="text-[9px] text-gray-400">Daily Agenda</div>
       </button>
 
-      <button onclick="openDrawer('housekeeping')" class="key-empire rounded-xl p-2.5 text-left transition space-y-1 shadow-sm">
-        <div class="text-[11px] font-bold text-amber-400 flex items-center justify-between">
-          <span>5. House 🧹</span>
-          <i class="fa-solid fa-broom text-amber-500 text-xs"></i>
+      <!-- 5. EXCHANGE VAULT 🌐 -->
+      <button onclick="openDrawer('Exchange')" class="key-secondary rounded-xl p-3 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
+          <span>5. Vault 🌐</span>
+          <i class="fa-solid fa-share-nodes text-gray-500 text-xs"></i>
         </div>
-        <div class="text-[9px] text-gray-400">Store Upkeep</div>
+        <div class="text-[9px] text-gray-400">22.2k Cust Vault</div>
       </button>
 
-      <button onclick="openDrawer('vault')" class="key-empire rounded-xl p-2.5 text-left transition space-y-1 shadow-sm">
-        <div class="text-[11px] font-bold text-teal-400 flex items-center justify-between">
-          <span>6. Vault 🌐</span>
-          <i class="fa-solid fa-database text-teal-500 text-xs"></i>
+      <!-- 6. PINBALL TAP-TO-TASK 🎯 -->
+      <button onclick="openDrawer('Pinball')" class="key-pinball rounded-xl p-3 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-purple-200 flex items-center justify-between">
+          <span>6. Pinball 🎯</span>
+          <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
         </div>
-        <div class="text-[9px] text-gray-400">22K Customers</div>
+        <div class="text-[9px] text-purple-200/80">Tap-to-Task Queue</div>
       </button>
     </div>
 
-    <!-- 7. PINBALL -->
-    <button onclick="openDrawer('pinball')" class="key-pinball w-full rounded-2xl p-3.5 text-left transition flex items-center justify-between shadow-md">
-      <div>
-        <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-solid fa-bolt text-purple-200"></i>
-          <span>7. Pinball Tap-to-Task 🧠⚡</span>
-        </div>
-        <div class="text-[11px] text-purple-200 mt-0.5">Rapid Task Knockout Mode</div>
-      </div>
-      <i class="fa-solid fa-chevron-right text-purple-200 text-sm"></i>
-    </button>
   </div>
 
-  <!-- LAWYER IP VAULT LINK -->
-  <div class="text-center pt-2 border-t border-gray-800">
-    <button onclick="unlockLawyerVault()" class="text-red-400 hover:text-red-300 text-[10px] font-bold tracking-wider uppercase transition">
-      🔒 Protected IP Hub
+  <!-- SUBTLE SALES REP & CAST OF CHARACTERS LINKS -->
+  <div class="flex justify-between items-center pt-2 px-1 text-[10px] text-gray-500">
+    <button onclick="alert('Rep portal coming soon — contact William at towsonhealthyhomes.com')" class="hover:text-gray-400 transition underline tracking-wider">
+      Sales Rep Portal
+    </button>
+    <button onclick="alert('Cast & Characters: William (Founder), Fresh (Coordinator), Chris (Bench), Mona (Front Desk), Mike (Field), Norby (FOAS)')" class="hover:text-gray-400 transition underline tracking-wider">
+      Cast & Characters 🎭
     </button>
   </div>
 
 </div>
 
-<!-- BOTTOM MASTER DOCK -->
-<div class="fixed bottom-0 left-0 right-0 bg-gray-900/95 border-t border-gray-800 p-3 z-40 backdrop-blur-md">
-  <div class="max-w-md mx-auto flex items-end gap-1.5">
-    
-    <label class="bg-gray-800 hover:bg-gray-700 text-amber-400 w-10 h-10 rounded-xl flex items-center justify-center border border-gray-700 shrink-0 cursor-pointer shadow">
+<!-- FEATURES & BENEFITS MODAL -->
+<div id="featuresModal" class="fixed inset-0 bg-black/95 z-50 hidden flex-col p-6 backdrop-blur-md justify-center">
+  <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-6 max-w-sm mx-auto space-y-5 text-left shadow-2xl max-h-[85vh] overflow-y-auto">
+    <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+      <h3 class="text-base font-black text-white flex items-center gap-2">
+        <i class="fa-solid fa-mobile-screen-button text-blue-400"></i> Pocket Chief of Staff
+      </h3>
+      <button onclick="toggleFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+    </div>
+
+    <div class="space-y-2">
+      <h4 class="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+        <i class="fa-solid fa-circle-check"></i> Core Capabilities
+      </h4>
+      <ul class="space-y-1.5 text-[11px] text-gray-300">
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Unlimited Forever Cards</strong>: Permanent, live digital homes for every customer & lead</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>1-Tap Voice & Video Intake</strong>: 10-second machine diagnostics & serial photo capture</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Failsafe GPS & Voice Time Clock</strong>: 1-Tap punch in/out with automated field log</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Instant Stripe Invoicing</strong>: 1-Tap pay links generate directly on cards</li>
+        <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span> <strong>Auto-Delegation Engine</strong>: Automatic routing to bench, showroom, or schedule</li>
+      </ul>
+    </div>
+
+    <div class="space-y-2 border-t border-gray-800 pt-3">
+      <h4 class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+        <i class="fa-solid fa-clock"></i> Monetization & Add-Ons
+      </h4>
+      <ul class="space-y-1.5 text-[11px] text-gray-300">
+        <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> <strong>Local Business Ad Slots</strong>: Host cross-promotions inside customer Forever Cards</li>
+        <li class="flex items-start gap-2"><span class="text-amber-400 font-bold">•</span> <strong>Two-way Customer Chat</strong>: Customer replies update the card in real-time</li>
+      </ul>
+    </div>
+
+    <div class="border-t border-gray-800 pt-3 flex justify-between items-center text-[10px] text-gray-500">
+      <span>TappyThing v2.4 · Clean Environment LLC</span>
+      <span class="text-blue-400 font-mono">Cast & Characters 🎭</span>
+    </div>
+
+    <button onclick="toggleFeaturesModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
+      Got It
+    </button>
+  </div>
+</div>
+
+<!-- PERSISTENT CARD DRAWER MODAL -->
+<div id="drawerModal" class="fixed inset-0 bg-black/90 z-50 hidden flex-col p-4 backdrop-blur-md">
+  <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
+    <h3 id="drawerTitle" class="text-lg font-black text-white flex items-center gap-2">
+      <i class="fa-solid fa-folder-open text-blue-400"></i> Drawer
+    </h3>
+    <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-sm bg-gray-800 px-3 py-1 rounded-lg">Close</button>
+  </div>
+
+  <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300">
+    <p class="text-center text-gray-500 pt-8">Loading cards...</p>
+  </div>
+</div>
+
+<!-- UNIFIED BOTTOM INPUT BAR -->
+<div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-40">
+  <div class="max-w-md mx-auto flex items-center gap-2">
+    <!-- PHOTO BUTTON -->
+    <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0" title="Snap Photo">
       <i class="fa-solid fa-camera text-base"></i>
-      <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMedia(this, 'Photo')">
+      <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaInput(this, 'Photo')">
     </label>
 
-    <label class="bg-gray-800 hover:bg-gray-700 text-red-400 w-10 h-10 rounded-xl flex items-center justify-center border border-gray-700 shrink-0 cursor-pointer shadow">
+    <!-- VIDEO BUTTON -->
+    <label class="bg-gray-800 hover:bg-gray-700 text-purple-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0" title="Record Video">
       <i class="fa-solid fa-video text-base"></i>
-      <input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMedia(this, 'Video')">
+      <input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, 'Video')">
     </label>
 
-    <textarea id="dockInput" placeholder="Brain dump or speak anything here..." rows="1" class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2 text-xs text-white placeholder-gray-500 focus:outline-none" oninput="autoExpand(this)" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); submitIntake(); }"></textarea>
+    <!-- UNIFIED TEXT / DICTATION INPUT -->
+    <input type="text" id="unifiedInput" placeholder="Talk, type, snap, or video..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') submitUnifiedInput()">
 
-    <button id="micBtn" onclick="toggleVoice()" class="bg-blue-600 hover:bg-blue-500 text-white w-10 h-10 rounded-xl flex items-center justify-center border border-blue-400 shrink-0 shadow">
+    <!-- MIC BUTTON -->
+    <button id="micBtn" onclick="toggleVoiceIntake()" class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-10 h-10 rounded-xl flex items-center justify-center border border-gray-700 transition shrink-0">
       <i class="fa-solid fa-microphone text-base"></i>
     </button>
 
-    <button onclick="submitIntake()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow">
-      <i class="fa-solid fa-paper-plane text-sm"></i>
+    <!-- SEND BUTTON -->
+    <button onclick="submitUnifiedInput()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3.5 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1">
+      <i class="fa-solid fa-paper-plane"></i>
     </button>
-
-  </div>
-</div>
-
-<!-- DRAWER MODAL -->
-<div id="drawerModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-4 pb-24 backdrop-blur-md">
-  <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-3">
-    <h3 id="drawerTitle" class="text-base font-black text-white uppercase">Drawer</h3>
-    <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-xs bg-gray-800 px-3 py-1.5 rounded-lg">✕ Close</button>
-  </div>
-  <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300"></div>
-</div>
-
-<!-- SYSTEM GUIDE & FEATURES / BENEFITS MODAL -->
-<div id="modalSuite" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-4 justify-center backdrop-blur-md overflow-y-auto">
-  <div class="bg-gray-900 border border-blue-500/50 rounded-3xl p-5 max-w-md mx-auto space-y-4 text-left shadow-2xl my-auto">
-    <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-      <h3 class="text-xs font-black text-white tracking-wider uppercase">⚡ Features, Benefits & Soul</h3>
-      <button onclick="hideModals()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-2 py-1 rounded-lg">✕</button>
-    </div>
-
-    <div class="text-[11px] text-gray-300 space-y-3 max-h-[60vh] overflow-y-auto pr-1">
-      <div class="bg-gray-800/80 p-3 rounded-2xl border border-blue-900/40 space-y-1">
-        <div class="font-bold text-white flex items-center gap-1.5 text-xs text-blue-300">
-          <i class="fa-solid fa-microphone-lines text-blue-400"></i>
-          <span>1. 1-Tap Compound Voice Brain Dump</span>
-        </div>
-        <div class="text-gray-300 text-[10px]">
-          <strong>Benefit:</strong> Speak multiple tasks in 1 breath. Decomposes & routes instantly to your team with zero friction.
-        </div>
-      </div>
-
-      <div class="bg-gray-800/80 p-3 rounded-2xl border border-amber-900/40 space-y-1">
-        <div class="font-bold text-white flex items-center gap-1.5 text-xs text-amber-300">
-          <i class="fa-solid fa-layer-group text-amber-400"></i>
-          <span>2. 7 Asymmetric Universal Drawers</span>
-        </div>
-        <div class="text-gray-300 text-[10px]">
-          <strong>Benefit:</strong> Complete mental clarity. Personal life in Castle, shop repairs in Empire, sales in Pipeline, schedule in Calendar, and upkeep in Housekeeping.
-        </div>
-      </div>
-
-      <div class="bg-gray-800/80 p-3 rounded-2xl border border-emerald-900/40 space-y-1">
-        <div class="font-bold text-white flex items-center gap-1.5 text-xs text-emerald-300">
-          <i class="fa-solid fa-id-card text-emerald-400"></i>
-          <span>3. Living Fractal "Forever Cards"</span>
-        </div>
-        <div class="text-gray-300 text-[10px]">
-          <strong>Benefit:</strong> Every client, unit, and job becomes a permanent living card with 2-way voice notes, role delegation, and full historical records.
-        </div>
-      </div>
-
-      <div class="bg-gray-800/80 p-3 rounded-2xl border border-teal-900/40 space-y-1">
-        <div class="font-bold text-white flex items-center gap-1.5 text-xs text-teal-300">
-          <i class="fa-solid fa-credit-card text-teal-400"></i>
-          <span>4. Context-Triggered 1-Tap Stripe Pay Links</span>
-        </div>
-        <div class="text-gray-300 text-[10px]">
-          <strong>Benefit:</strong> Say a price or quote, and TappyThing generates an instant checkout link (with 6% sales tax auto-calculated) for instant customer payment.
-        </div>
-      </div>
-
-      <div class="bg-gray-800/80 p-3 rounded-2xl border border-purple-900/40 space-y-1">
-        <div class="font-bold text-white flex items-center gap-1.5 text-xs text-purple-300">
-          <i class="fa-solid fa-shield-halved text-purple-400"></i>
-          <span>5. Permanent Security & Zero Hard Deletes</span>
-        </div>
-        <div class="text-gray-300 text-[10px]">
-          <strong>Benefit:</strong> Company records cannot be destroyed. Finished tasks soft-archive automatically, protecting your 22,000+ customer history forever.
-        </div>
-      </div>
-
-      <!-- NESTED CLOSED SOUL DRAWER -->
-      <div class="border-t border-gray-800 pt-3">
-        <button onclick="toggleSoulDrawer()" class="w-full bg-slate-950 hover:bg-slate-800 border border-slate-700 p-3 rounded-2xl flex items-center justify-between text-left transition shadow-md">
-          <div>
-            <div class="text-xs font-bold text-blue-300">🎭 Meet the Tappy Family & Crew (Soul Drawer)</div>
-            <div class="text-[10px] text-gray-500 mt-0.5">Tap to view the spirits and archetypes behind TappyThing</div>
-          </div>
-          <i id="soulChevron" class="fa-solid fa-chevron-down text-gray-400 text-xs transition-transform duration-200"></i>
-        </button>
-
-        <div id="soulDrawerContent" class="hidden mt-2.5 space-y-2 bg-gray-950 p-3 rounded-2xl border border-gray-800">
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-white text-[11px]">👑 Boudie <span class="text-blue-400 font-normal">— Founder & Chief</span></div>
-            <div class="text-gray-400 text-[10px]">30+ years in the small business trenches. Built TappyThing for freedom, simplicity, and speed.</div>
-          </div>
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-amber-300 text-[11px]">🤵 Fresh <span class="text-gray-400 font-normal">— Digital Coordinator & Guiding Star</span></div>
-            <div class="text-gray-400 text-[10px]">The heart of the platform. Clear, direct, joyful, zero-friction.</div>
-          </div>
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-emerald-300 text-[11px]">👩‍💼 Sissy <span class="text-gray-400 font-normal">— Invisible Backend Engine</span></div>
-            <div class="text-gray-400 text-[10px]">The quiet powerhouse. Routing tasks and making sure nothing slips through the cracks.</div>
-          </div>
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-teal-300 text-[11px]">⚡ Noosh <span class="text-gray-400 font-normal">— Flow & Connectivity</span></div>
-            <div class="text-gray-400 text-[10px]">Keeping communication channels wide open and tasks moving across the shop.</div>
-          </div>
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-purple-300 text-[11px]">🧘‍♀️ Yogi <span class="text-gray-400 font-normal">— Calm & Stress Relief</span></div>
-            <div class="text-gray-400 text-[10px]">The grounding force. Bringing warmth, peace of mind, and work-life balance.</div>
-          </div>
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-red-400 text-[11px]">🥊 Squash <span class="text-gray-400 font-normal">— Sales Coach & Motivator</span></div>
-            <div class="text-gray-400 text-[10px]">Pure Zig Ziglar energy! Pushing owners to close deals and win every single day.</div>
-          </div>
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-amber-400 text-[11px]">💼 L <span class="text-gray-400 font-normal">— Chief of Treasury & Cashflow</span></div>
-            <div class="text-gray-400 text-[10px]">Invoicing, 1-tap Stripe pay links, and steady cash collections.</div>
-          </div>
-          <div class="pt-1">
-            <div class="font-bold text-pink-400 text-[11px]">🎨 Rob Art <span class="text-gray-400 font-normal">— Creative Soul</span></div>
-            <div class="text-gray-400 text-[10px]">The visual heartbeat and artistic spirit behind TappyThing.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <button onclick="hideModals()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-xl text-xs transition">Close Guide</button>
-  </div>
-</div>
-
-<!-- LAWYER MODAL -->
-<div id="modalLawyer" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-4 justify-center backdrop-blur-md overflow-y-auto">
-  <div class="bg-gray-900 border border-red-500/60 rounded-3xl p-5 max-w-md mx-auto space-y-3.5 text-left shadow-2xl my-auto">
-    <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-      <h3 class="text-xs font-black text-red-400 tracking-wider uppercase">🔒 Confidential IP & Patent Disclosure</h3>
-      <button onclick="hideModals()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-2 py-1 rounded-lg">✕</button>
-    </div>
-
-    <div class="text-[11px] text-gray-300 space-y-2 max-h-[60vh] overflow-y-auto pr-1">
-      <div class="bg-red-950/30 border border-red-800/60 rounded-xl p-2.5">
-        <div class="font-bold text-red-300">INVENTION TITLE:</div>
-        <div class="text-white">Asymmetric Voice-Driven Task Decomposition & Living Fractal Forever Card System</div>
-      </div>
-      <div class="bg-gray-800/70 p-2.5 rounded-xl border border-gray-700/60">
-        <div class="text-white font-bold">Claim 1: Compound Voice Decomposition Engine</div>
-        <p class="text-gray-400">Continuous voice stream parsing into discrete, independent action cards without back-and-forth prompts.</p>
-      </div>
-      <div class="bg-gray-800/70 p-2.5 rounded-xl border border-gray-700/60">
-        <div class="text-white font-bold">Claim 2: Asymmetric 7-Drawer Routing Architecture</div>
-        <p class="text-gray-400">Automatic distribution into isolated domains (Castle, Empire Ops, Pipeline, Calendar).</p>
-      </div>
-      <div class="bg-gray-800/70 p-2.5 rounded-xl border border-gray-700/60">
-        <div class="text-white font-bold">Claim 3: Context-Triggered Micro-Checkout Generation</div>
-        <p class="text-gray-400">Audio quote detection auto-generating instant localized Stripe payment links on task cards.</p>
-      </div>
-      <div class="bg-gray-800/70 p-2.5 rounded-xl border border-gray-700/60">
-        <div class="text-white font-bold">Claim 4: 2-Way Living Forever Card Protocol</div>
-        <p class="text-gray-400">Self-building, client-facing card with voice notes, media, and 1-tap delegation.</p>
-      </div>
-    </div>
-
-    <button onclick="hideModals()" class="w-full bg-red-900/80 hover:bg-red-800 text-white font-bold py-2 rounded-xl text-xs transition">Close Protected Vault</button>
-  </div>
-</div>
-
-<!-- DELEGATION MODAL -->
-<div id="modalDelegate" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-6 justify-center">
-  <div class="bg-gray-900 border border-slate-700 rounded-3xl p-5 max-w-sm mx-auto space-y-3 text-left shadow-2xl">
-    <h3 class="text-sm font-black text-white">👥 1-Tap Role Delegation</h3>
-    <p class="text-xs text-gray-400">Dispatch this Forever Card to your team:</p>
-    <div class="space-y-2 pt-1">
-      <button onclick="confirmDelegate('Admin / FOAS')" class="w-full text-left p-2.5 rounded-xl bg-gray-800 hover:bg-blue-950 border border-gray-700 text-xs font-bold text-white flex justify-between items-center">
-        <span>👤 Admin / FOAS (Follow-ups)</span>
-        <span class="text-blue-400 text-[10px]">Assign</span>
-      </button>
-      <button onclick="confirmDelegate('Field Tech')" class="w-full text-left p-2.5 rounded-xl bg-gray-800 hover:bg-emerald-950 border border-gray-700 text-xs font-bold text-white flex justify-between items-center">
-        <span>🛠️ Field Tech (Runs & Installs)</span>
-        <span class="text-emerald-400 text-[10px]">Assign</span>
-      </button>
-      <button onclick="confirmDelegate('Shop Bench Lead')" class="w-full text-left p-2.5 rounded-xl bg-gray-800 hover:bg-amber-950 border border-gray-700 text-xs font-bold text-white flex justify-between items-center">
-        <span>🔧 Shop Bench (Repairs & Parts)</span>
-        <span class="text-amber-400 text-[10px]">Assign</span>
-      </button>
-    </div>
-    <button onclick="hideModals()" class="w-full bg-gray-800 text-white font-bold py-2 rounded-xl text-xs mt-2">Cancel</button>
   </div>
 </div>
 
 <script>
-let recognition = null;
-let currentCard = null;
-let activeDrawer = 'empire';
+var activeDrawerContext = '';
+var isListening = false;
+var activeRecognition = null;
+var silenceTimer = null;
 
-// Standalone in-memory Forever Card Engine
-const localCards = {
-  empire: [
-    { name: "⚡ Chris tune up Guardian air purifier on bench", state: "Active" },
-    { name: "🔧 Mona take intake photos of the Aerus upright on counter", state: "Active" },
-    { name: "📦 Order 3 HEPA filters and 2 belts from Desco", state: "Active" },
-    { name: "🛠️ Chris inspect Mrs. Higgins Lux upright vacuum on bench", state: "Active" },
-    { name: "🚗 Mike deliver air purifier to Dr. Roberts office Monday 11 AM", state: "Active" }
-  ],
-  castle: [
-    { name: "🏠 Pay personal mortgage on Friday", state: "Active" },
-    { name: "💡 Pay shop electric bill on Friday", state: "Active" },
-    { name: "🏥 Schedule doctor annual checkup for next Tuesday", state: "Active" },
-    { name: "🛒 Pick up groceries & water softener salt", state: "Active" }
-  ],
-  pipeline: [
-    { name: "💬 Quote $350 for upright vacuum to Sarah Jenkins", state: "Active" },
-    { name: "💧 Quote $850 for whole house filtration to Mark Johnson", state: "Active" },
-    { name: "📞 Send quote for $450 to Diane Miller", state: "Active" },
-    { name: "🤝 Schedule follow-up with Ann Smith for Saturday demo", state: "Active" }
-  ],
-  calendar: [
-    { name: "📅 Susan Hogan — 6 Rooms Carpet Cleaning at 7:00 AM", state: "Active" },
-    { name: "📅 Water Test Appointment tomorrow at 10:00 AM", state: "Active" },
-    { name: "📅 Dr. Roberts AP Delivery on Monday at 11:00 AM", state: "Active" }
-  ],
-  housekeeping: [
-    { name: "🧹 Clean and polish front showroom display shelves", state: "Active" },
-    { name: "🗑️ Empty shop trash & sweep bench assembly area", state: "Active" },
-    { name: "📦 Organize back storage cage & vacuum inventory", state: "Active" }
-  ],
-  vault: [
-    { name: "🌐 Vault Master Index — 22,283 Customer Records Active", state: "Secured" },
-    { name: "🔒 Permanent Soft-Archive Retention: ON", state: "Secured" }
-  ],
-  pinball: [
-    { name: "⚡ Quick Knockout: Call parts supplier Desco on backordered cords", state: "Fast" },
-    { name: "⚡ Quick Knockout: Text Diane Miller pickup ready notification", state: "Fast" }
-  ]
-};
+var STRIPE_CHECKOUT_URL = window.STRIPE_PAYMENT_LINK || 'https://buy.stripe.com/test_tappything';
 
-function autoExpand(f) { f.style.height = 'inherit'; f.style.height = Math.min(f.scrollHeight, 120) + 'px'; }
-
-function showToast(msg) {
-  const t = document.getElementById('freshToast');
-  document.getElementById('toastMsg').innerText = msg;
-  t.classList.remove('hidden');
-  setTimeout(() => { t.classList.add('hidden'); }, 3500);
-}
-
-function showModal(id) { document.getElementById(id).classList.remove('hidden'); }
-function hideModals() { document.querySelectorAll('[id^="modal"]').forEach(m => m.classList.add('hidden')); }
-
-function toggleSoulDrawer() {
-  const content = document.getElementById('soulDrawerContent');
-  const chevron = document.getElementById('soulChevron');
-  if (content.classList.contains('hidden')) {
-    content.classList.remove('hidden');
-    chevron.classList.add('rotate-180');
-  } else {
-    content.classList.add('hidden');
-    chevron.classList.remove('rotate-180');
-  }
-}
-
-function unlockLawyerVault() {
-  const pin = prompt("🔐 Enter 4-Digit IP Vault PIN:");
-  if (pin === "7777") showModal('modalLawyer');
-  else if (pin) alert("❌ Access Denied");
-}
-
-function handleMedia(input, type) {
-  if (input.files && input.files[0]) {
-    showToast(`📸 ${type.toUpperCase()} CAPTURED: ${input.files[0].name}`);
-    document.getElementById('ledOutput').innerText = `ATTACHED ${type.toUpperCase()} 📎`;
-    const box = document.getElementById('dockInput');
-    box.value += ` [${type} Attached]`;
-    autoExpand(box);
-  }
-}
-
-function toggleVoice() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return alert("Speech recognition not supported in this browser.");
+function toggleVoiceIntake(drawerContext, targetInputId, targetBtnId) {
+  var targetDrawer = drawerContext || activeDrawerContext;
+  var input = document.getElementById(targetInputId || 'unifiedInput');
+  var btn = document.getElementById(targetBtnId || 'micBtn');
+  var output = document.getElementById('ledOutput');
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('Voice not supported.'); return; }
   
-  const btn = document.getElementById('micBtn');
-  if (recognition) {
-    recognition.stop();
-    recognition = null;
-    btn.classList.remove('bg-red-600');
-    submitIntake();
+  if (isListening && activeRecognition) {
+    activeRecognition.stop();
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+    output.textContent = 'POCKET CHIEF OF STAFF READY';
+    if (silenceTimer) clearTimeout(silenceTimer);
     return;
   }
 
-  recognition = new SR();
-  btn.classList.add('bg-red-600');
-  showToast('🎙️ FRESH LISTENING...');
+  activeRecognition = new SR();
+  activeRecognition.continuous = true;
+  activeRecognition.interimResults = true;
+  activeRecognition.lang = 'en-US';
+  
+  if (btn) btn.classList.add('mic-pulsing');
+  output.textContent = 'LISTENING... (SPEAK FREELY)';
+  isListening = true;
 
-  recognition.onresult = (e) => {
-    const input = document.getElementById('dockInput');
-    input.value = e.results[0][0].transcript;
-    autoExpand(input);
-  };
+  var accumulatedTranscript = '';
 
-  recognition.onend = () => {
-    btn.classList.remove('bg-red-600');
-    recognition = null;
-    submitIntake();
-  };
+  activeRecognition.onresult = function(e) {
+    var interimTranscript = '';
+    var currentFinal = '';
 
-  recognition.start();
-}
-
-function submitIntake() {
-  const input = document.getElementById('dockInput');
-  const text = input.value.trim();
-  if (!text) return;
-
-  input.value = '';
-  autoExpand(input);
-  showToast('⚡ ROUTING TO FOREVER CARDS...');
-  document.getElementById('ledOutput').innerText = 'DECOMPOSING TASK... ⏳';
-
-  setTimeout(() => {
-    // Split compound tasks on commas or 'and'
-    const parts = text.split(/,|\band\b/i).map(s => s.trim()).filter(s => s.length > 2);
-    const count = parts.length > 0 ? parts.length : 1;
-
-    parts.forEach(p => {
-      let target = 'empire';
-      const low = p.toLowerCase();
-      if (low.includes('home') || low.includes('mortgage') || low.includes('personal') || low.includes('doctor')) target = 'castle';
-      else if (low.includes('quote') || low.includes('lead') || low.includes('estimate') || low.includes('sale')) target = 'pipeline';
-      else if (low.includes('tomorrow') || low.includes('at ') || low.includes('calendar') || low.includes('schedule')) target = 'calendar';
-      else if (low.includes('clean') || low.includes('sweep') || low.includes('trash')) target = 'housekeeping';
-      else if (low.includes('quick') || low.includes('urgent') || low.includes('pinball')) target = 'pinball';
-
-      if (!localCards[target]) localCards[target] = [];
-      localCards[target].unshift({ name: p, state: "Active" });
-    });
-
-    const reply = `✅ Logged & Routed ${count} Action Card(s)! ⚡`;
-    showToast(reply);
-    document.getElementById('ledOutput').innerText = `ROUTED ${count} ACTION CARD(S) ⚡`;
-    
-    // If currently open, re-render
-    const modal = document.getElementById('drawerModal');
-    if (!modal.classList.contains('hidden')) {
-      renderDrawerCards(activeDrawer);
+    for (var i = e.resultIndex; i < e.results.length; ++i) {
+      if (e.results[i].isFinal) {
+        currentFinal += e.results[i][0].transcript + ' ';
+      } else {
+        interimTranscript += e.results[i][0].transcript;
+      }
     }
-  }, 400);
+
+    accumulatedTranscript += currentFinal;
+
+    if (input) {
+      input.value = accumulatedTranscript + interimTranscript;
+    }
+
+    // Extended silence guard: Wait 3 seconds of pause before auto-sending so you can take a breath
+    if (silenceTimer) clearTimeout(silenceTimer);
+    silenceTimer = setTimeout(function() {
+      var fullText = (accumulatedTranscript + interimTranscript).trim();
+      if (fullText.length > 0 && isListening) {
+        output.textContent = 'PROCESSING...';
+        sendToFresh(fullText, targetDrawer);
+        if (activeRecognition) activeRecognition.stop();
+        isListening = false;
+        if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+      }
+    }, 3000);
+  };
+
+  activeRecognition.onerror = function() {
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+    output.textContent = 'MIC ERROR';
+    if (silenceTimer) clearTimeout(silenceTimer);
+  };
+
+  activeRecognition.onend = function() {
+    if (isListening) {
+      // Auto-restart if still flagged listening to avoid premature cutoff
+      try { activeRecognition.start(); } catch(err) { isListening = false; if (btn) btn.classList.remove('mic-pulsing', 'text-red-500'); }
+    } else {
+      if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+    }
+  };
+
+  activeRecognition.start();
 }
 
-function escapeHtml(str) {
-  return (str || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-function renderDrawerCards(name) {
-  const content = document.getElementById('drawerContent');
-  let calendarHtml = '';
-  if (name === 'calendar') {
-    calendarHtml = `
-      <div class="space-y-3 pb-3">
-        <div class="rounded-2xl overflow-hidden border border-gray-700 bg-white/5 h-56">
-          <iframe src="https://calendar.google.com/calendar/embed?src=william%40towsonhealthyhomes.com&ctz=America%2FNew_York" style="border: 0" width="100%" height="100%" frameborder="0" scrolling="no"></iframe>
-        </div>
-      </div>
-    `;
+function handleMediaInput(fileInput, mediaType) {
+  if (fileInput.files && fileInput.files[0]) {
+    var fileName = fileInput.files[0].name;
+    flashLed(mediaType.toUpperCase() + ' LOGGED: ' + fileName);
+    sendToFresh(mediaType + ' attached: ' + fileName, activeDrawerContext);
   }
+}
 
-  const items = localCards[name] || [];
-  if (items.length === 0) {
-    content.innerHTML = calendarHtml + '<p class="text-center pt-6 text-gray-500">Pristine canvas ready. No active cards in this drawer.</p>';
+function submitUnifiedInput(inputId) {
+  var targetId = inputId || 'unifiedInput';
+  var inputEl = document.getElementById(targetId);
+  var text = inputEl ? inputEl.value.trim() : '';
+  if (text) {
+    sendToFresh(text, activeDrawerContext);
+    if (inputEl) inputEl.value = '';
+  }
+}
+
+function flashLed(responseText) {
+  var output = document.getElementById('ledOutput');
+  output.textContent = responseText || 'Logged! ⚡';
+  setTimeout(function() {
+    output.textContent = 'POCKET CHIEF OF STAFF READY';
+  }, 3000);
+}
+
+function sendToFresh(promptText, drawerName) {
+  document.getElementById('ledOutput').textContent = 'PROCESSING...';
+  var fullPrompt = drawerName ? '[' + drawerName + ' Drawer] ' + promptText : promptText;
+
+  fetch('/.netlify/functions/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt: fullPrompt, board_id: '18424728273' })
+  })
+  .then(res => res.json())
+  .then(data => {
+    flashLed(data.reply || 'Logged! ⚡');
+    if (activeDrawerContext) {
+      setTimeout(function() {
+        loadDrawerItems(activeDrawerContext);
+      }, 1500);
+    }
+  })
+  .catch(err => {
+    flashLed('Logged! ⚡');
+    if (activeDrawerContext) {
+      setTimeout(function() {
+        loadDrawerItems(activeDrawerContext);
+      }, 1500);
+    }
+  });
+}
+
+function openCalendarView() {
+  window.open('https://calendar.google.com/calendar/u/0/r/day', '_blank');
+}
+
+function renderItemCard(item, isInvoiceScope) {
+  var hasDollar = item.name && (item.name.includes('$') || isInvoiceScope);
+  var payButton = hasDollar ? '<a href="' + STRIPE_CHECKOUT_URL + '" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow shrink-0"><i class="fa-solid fa-credit-card"></i> Pay Now</a>' : '';
+
+  return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 flex justify-between items-center gap-2">' +
+    '<div class="flex-1 min-w-0">' +
+      '<p class="font-bold text-white text-xs truncate">' + (item.name || 'Untitled Card') + '</p>' +
+      '<p class="text-[10px] text-gray-400">' + (item.group ? item.group.title : 'Active Card') + '</p>' +
+    '</div>' +
+    '<div class="flex items-center gap-1.5 shrink-0">' +
+      payButton +
+      '<button onclick="toggleVoiceIntake(\'' + (item.group ? item.group.title : '') + '\')" class="bg-blue-900/60 hover:bg-blue-800 text-blue-300 p-1.5 rounded-lg border border-blue-700 text-[10px] flex items-center gap-1 font-semibold" title="Talk to Card">' +
+        '<i class="fa-solid fa-microphone text-xs"></i> Talk' +
+      '</button>' +
+    '</div>' +
+  '</div>';
+}
+
+function loadDrawerItems(drawerName) {
+  var contentDiv = document.getElementById('drawerContent');
+  var target = (drawerName || '').toLowerCase().trim();
+
+  // SPECIAL CALENDAR VIEW: Shows In-App Agenda with today's locked stops
+  if (target.includes('calendar')) {
+    contentDiv.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">' +
+      '<div class="flex items-center justify-between">' +
+        '<p class="font-bold text-white text-sm">📅 Daily Schedule Agenda</p>' +
+        '<a href="https://calendar.google.com/calendar/u/0/r/day" target="_blank" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-arrow-up-right-from-square"></i> Full Google Cal</a>' +
+      '</div>' +
+      '<div class="space-y-2 max-h-72 overflow-y-auto">' +
+        '<div class="p-3 bg-blue-950/40 rounded-xl border border-blue-800/50">' +
+          '<div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">10:00 AM</span><span class="text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded font-bold">$3,000 Delivery</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Steve Mathias — Air Unit Delivery & Check</p>' +
+          '<p class="text-[10px] text-gray-400">4137 Piney Grove Rd, Reisterstown, MD</p>' +
+        '</div>' +
+        '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700">' +
+          '<div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">11:00 AM</span><span class="text-[10px] bg-blue-900 text-blue-300 px-2 py-0.5 rounded font-bold">Scheduled Visit</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Syrena Robinson</p>' +
+          '<p class="text-[10px] text-gray-400">104 Belfast Rd, Timonium, MD · (410) 303-9677</p>' +
+        '</div>' +
+        '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700">' +
+          '<div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">11:30 AM</span><span class="text-[10px] bg-blue-900 text-blue-300 px-2 py-0.5 rounded font-bold">Scheduled Visit</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Jean Stewart</p>' +
+          '<p class="text-[10px] text-gray-400">207 Deer Fox Ln, Timonium, MD · (410) 561-5545</p>' +
+        '</div>' +
+        '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700">' +
+          '<div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">1:00 PM</span><span class="text-[10px] bg-amber-900 text-amber-300 px-2 py-0.5 rounded font-bold">Pickup/Delivery</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">George Gross — Vacuum Ready for Pickup</p>' +
+          '<p class="text-[10px] text-gray-400">Towson Area · Guardian Overhaul</p>' +
+        '</div>' +
+        '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700">' +
+          '<div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">4:00 PM</span><span class="text-[10px] bg-purple-900 text-purple-300 px-2 py-0.5 rounded font-bold">Cell Drop-Off</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Sue Freeland — APC Cell Drop-Off</p>' +
+          '<p class="text-[10px] text-gray-400">8095 Sandpiper Cir, Nottingham, MD · (443) 629-4180</p>' +
+        '</div>' +
+        '<div class="p-3 bg-blue-950/40 rounded-xl border border-blue-800/50">' +
+          '<div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">4:00 PM</span><span class="text-[10px] bg-teal-900 text-teal-300 px-2 py-0.5 rounded font-bold">Water Consultation</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Kelly Keyser — Water Test Consultation (2 Locations)</p>' +
+          '<p class="text-[10px] text-gray-400">15302 Manor Rd, Monkton, MD · (808) 298-7102</p>' +
+        '</div>' +
+        '<div class="p-3 bg-emerald-950/40 rounded-xl border border-emerald-800/50">' +
+          '<div class="flex justify-between items-center"><span class="text-emerald-300 font-black text-xs">Wed 7:00 AM</span><span class="text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded font-bold">$240 Carpet Clean</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Susan Hogan — Carpet Cleaning</p>' +
+          '<p class="text-[10px] text-gray-400">131 Fireside Cir, Baltimore, MD · (443) 845-2411</p>' +
+        '</div>' +
+      '</div>' +
+      buildInputFooter(drawerName) +
+    '</div>';
     return;
   }
 
-  const cardsHtml = items.map(item => {
-    const isMoney = item.name.match(/\$|invoice|quote|sale|deposit|bill|collect/i);
-    const safeName = escapeHtml(item.name);
-    const encodedName = encodeURIComponent(item.name);
+  fetch('/.netlify/functions/monday?board=18424728273&t=' + new Date().getTime())
+    .then(res => res.json())
+    .then(data => {
+      var allItems = [];
 
-    return `
-      <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl space-y-3 shadow-md hover:border-blue-900/50 transition">
-        <div class="flex items-center justify-between gap-2 border-b border-gray-800/60 pb-2">
-          <span class="text-[11px] font-bold text-blue-400 flex items-center gap-1.5">
-            <span>⚡</span> Fresh Digital Coordinator
-          </span>
-          <span class="text-[9px] bg-blue-950 border border-blue-800 text-blue-300 px-2 py-0.5 rounded-full font-bold">FOREVER CARD</span>
-        </div>
-        <div class="text-sm font-bold text-white leading-snug">${safeName}</div>
-        <div class="flex gap-2 pt-1 border-t border-gray-800/80">
-          <button onclick="talkToSissyCard(decodeURIComponent('${encodedName}'))" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold py-1.5 px-2.5 rounded-xl transition">🎙️ Talk to Sissy</button>
-          <button onclick="openDelegateModal(decodeURIComponent('${encodedName}'))" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-[10px] font-bold py-1.5 px-2.5 rounded-xl border border-gray-700 transition">👥 Delegate</button>
-          ${isMoney ? `<button onclick="createStripePay(decodeURIComponent('${encodedName}'))" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold py-1.5 px-2.5 rounded-xl transition">💳 Stripe Pay</button>` : ''}
-        </div>
-        <div class="pt-1 text-center border-t border-gray-800/40">
-          <span class="text-[10px] text-gray-500 font-medium">⚡ Powered by <strong class="text-gray-400 font-bold">TappyThing</strong></span>
-        </div>
-      </div>
-    `;
-  }).join('');
+      if (data.items && Array.isArray(data.items)) {
+        allItems = data.items;
+      } else if (data.groups && Array.isArray(data.groups)) {
+        data.groups.forEach(function(g) {
+          var gItems = g.items || (g.items_page && g.items_page.items) || [];
+          gItems.forEach(function(it) {
+            it.group = { id: g.id, title: g.title || g.name || '' };
+            allItems.push(it);
+          });
+        });
+      } else if (data.data && data.data.boards && data.data.boards[0]) {
+        var b = data.data.boards[0];
+        if (b.items_page && b.items_page.items) {
+          allItems = b.items_page.items;
+        } else if (b.groups) {
+          b.groups.forEach(function(g) {
+            var gItems = g.items || (g.items_page && g.items_page.items) || [];
+            gItems.forEach(function(it) {
+              it.group = { id: g.id, title: g.title || g.name || '' };
+              allItems.push(it);
+            });
+          });
+        }
+      }
 
-  content.innerHTML = calendarHtml + cardsHtml;
+      var cleanItems = allItems.filter(function(it) {
+        var groupTitle = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+        return !groupTitle.includes('archive') && !groupTitle.includes('trash') && !groupTitle.includes('deleted');
+      });
+
+      var matchedItems = [];
+
+      if (target.includes('castle')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('castle') || gt.includes('william') || gt.includes('personal') || gt.includes('car') || gt.includes('lounge');
+        });
+      } else if (target.includes('empire') || target.includes('shop')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('empire') || gt.includes('workbench') || gt.includes('ready wall') || gt.includes('bench') || gt.includes('parts') || gt.includes('showroom') || gt.includes('storage') || gt.includes('waiting') || gt.includes('bagdons') || gt.includes('announcements');
+        });
+      } else if (target.includes('pipeline')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('pipeline') || gt.includes('staff intake') || gt.includes('leads') || gt.includes('emailed');
+        });
+      } else if (target.includes('vault') || target.includes('exchange')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('vault') || gt.includes('exchange') || gt.includes('shared');
+        });
+      } else if (target.includes('pinball')) {
+        matchedItems = cleanItems.filter(function(it) {
+          var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+          return gt.includes('pinball') || gt.includes('staff intake') || gt.includes('workbench') || gt.includes('ready wall');
+        });
+      }
+
+      var displayItems = (matchedItems.length > 0) ? matchedItems : cleanItems;
+
+      var itemsHtml = displayItems.map(function(item) {
+        return renderItemCard(item, target.includes('empire') || target.includes('shop'));
+      }).join('');
+
+      contentDiv.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">' +
+        '<div class="flex items-center justify-between">' +
+          '<p class="font-bold text-white text-sm">Drawer: ' + drawerName + ' (' + displayItems.length + ' Cards)</p>' +
+          '<button onclick="loadDrawerItems(\'' + drawerName + '\')" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-rotate-right"></i> Refresh</button>' +
+        '</div>' +
+        '<div class="space-y-2 max-h-60 overflow-y-auto">' +
+          (itemsHtml || '<p class="text-gray-500 text-center py-4">No cards in this drawer yet. Speak or type below to add one!</p>') +
+        '</div>' +
+        buildInputFooter(drawerName) +
+      '</div>';
+    })
+    .catch(function(err) {
+      contentDiv.innerHTML = '<div class="p-4 bg-gray-900 rounded-xl border border-gray-800 space-y-4">' +
+        '<p class="font-bold text-white text-sm">Drawer: ' + drawerName + '</p>' +
+        '<p class="text-gray-400">Speak or capture media directly into this card:</p>' +
+        buildInputFooter(drawerName) +
+      '</div>';
+    });
+}
+
+function buildInputFooter(drawerName) {
+  return '<div class="pt-2 border-t border-gray-800 space-y-3">' +
+    '<div class="relative flex items-center">' +
+      '<input type="text" id="drawerInput_' + drawerName + '" placeholder="Type or dictate to card..." class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-4 pr-10 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key===\'Enter\') submitUnifiedInput(\'drawerInput_' + drawerName + '\')">' +
+      '<button id="drawerMicBtn_' + drawerName + '" onclick="toggleVoiceIntake(\'' + drawerName + '\', \'drawerInput_' + drawerName + '\', \'drawerMicBtn_' + drawerName + '\')" class="absolute right-2 text-blue-400 hover:text-blue-300 p-1.5 transition">' +
+        '<i class="fa-solid fa-microphone text-sm"></i>' +
+      '</button>' +
+    '</div>' +
+    '<div class="flex gap-2">' +
+      '<label class="bg-gray-800 hover:bg-gray-700 text-blue-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
+        '<i class="fa-solid fa-camera"></i>' +
+        '<span>Snap Photo</span>' +
+        '<input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Photo\')">' +
+      '</label>' +
+      '<label class="bg-gray-800 hover:bg-gray-700 text-purple-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
+        '<i class="fa-solid fa-video"></i>' +
+        '<span>Record Video</span>' +
+        '<input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Video\')">' +
+      '</label>' +
+      '<button onclick="submitUnifiedInput(\'drawerInput_' + drawerName + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shrink-0">' +
+        '<span>Send</span>' +
+        '<i class="fa-solid fa-paper-plane"></i>' +
+      '</button>' +
+    '</div>' +
+  '</div>';
 }
 
 function openDrawer(name) {
-  if (name === 'castle') {
-    const pin = prompt("🔐 Enter Castle PIN Lock:");
-    if (pin !== "7777" && pin !== "1234") {
-      alert("❌ Access Denied");
-      return;
-    }
-  }
-
-  activeDrawer = name;
-  const modal = document.getElementById('drawerModal');
-  const title = document.getElementById('drawerTitle');
-  title.innerText = name.toUpperCase() + ' DRAWER';
-  modal.classList.remove('hidden');
-  renderDrawerCards(name);
+  activeDrawerContext = name;
+  document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + name + ' Drawer';
+  var drawerModal = document.getElementById('drawerModal');
+  drawerModal.classList.remove('hidden');
+  loadDrawerItems(name);
 }
 
-function closeDrawer() { document.getElementById('drawerModal').classList.add('hidden'); }
-
-function talkToSissyCard(cardName) {
-  const note = prompt(`🎙️ Add voice note or instruction to "${cardName}":`);
-  if (note) {
-    showToast(`📝 Note saved to Forever Card!`);
-  }
+function closeDrawer() {
+  activeDrawerContext = '';
+  document.getElementById('drawerModal').classList.add('hidden');
 }
 
-function openDelegateModal(cardName) {
-  currentCard = cardName;
-  showModal('modalDelegate');
-}
-
-function confirmDelegate(role) {
-  hideModals();
-  showToast(`✅ Dispatched to ${role}!`);
-}
-
-function createStripePay(title) {
-  const match = title ? title.match(/\$?(\d+(\.\d{2})?)/) : null;
-  const defaultAmt = match ? match[1] : "300.00";
-  const amt = prompt("Enter invoice total ($):", defaultAmt);
-  if (amt) {
-    const total = (parseFloat(amt) * 1.06).toFixed(2);
-    prompt("Stripe Pay Link (MD 6% Tax Included):", `https://buy.stripe.com/pay_tappything?amount=${total}&tax=md6`);
-  }
+function toggleFeaturesModal() {
+  document.getElementById('featuresModal').classList.toggle('hidden');
 }
 </script>
 </body>
