@@ -2,7 +2,6 @@
 function classifyZone(text) {
   const lower = (text || '').toLowerCase();
 
-  // ROUTING RULES (keyword -> group ID)
   if (/\b(repair|bench|belt|motor|vacuum|intake|diagnostic|oreck|kirby|pickup|machine)\b/.test(lower)) {
     return 'group_mm7mfbre'; // Empire Operations
   }
@@ -19,8 +18,7 @@ function classifyZone(text) {
     return 'group_mm6bv2h0'; // Parts Needed
   }
 
-  // Default fallback -> Staff Intake (Pending Review)
-  return 'group_mm6b77as';
+  return 'group_mm6b77as'; // Default: Staff Intake — Pending Review
 }
 
 exports.handler = async (event) => {
@@ -35,7 +33,6 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers, body: '' };
   }
 
-  // Broad token check across all possible Netlify environment variable names
   const token = process.env.MONDAY_API_TOKEN || process.env.MONDAY_API_KEY || process.env.MONDAY_TOKEN;
   const boardId = "18424728273";
 
@@ -43,9 +40,9 @@ exports.handler = async (event) => {
     return { statusCode: 500, headers, body: JSON.stringify({ error: '❌ MONDAY_API_TOKEN is missing in Netlify Environment Variables.' }) };
   }
 
-  // ==========================================
-  // WRITE HANDLER (POST) - Sisi Smart Route
-  // ==========================================
+  // ========================================
+  // WRITE HANDLER (POST) - Smart Route
+  // ========================================
   if (event.httpMethod === 'POST') {
     try {
       const bodyData = JSON.parse(event.body || '{}');
@@ -60,8 +57,6 @@ exports.handler = async (event) => {
       }
 
       const targetGroupId = classifyZone(prompt);
-
-      // Escape quotes in the prompt text for GraphQL string safety
       const sanitizedPrompt = prompt.replace(/"/g, '\\"').replace(/\n/g, ' ');
 
       const mutation = `
@@ -96,7 +91,7 @@ exports.handler = async (event) => {
         statusCode: 200,
         headers,
         body: JSON.stringify({
-          reply: `✅ Logged to ${targetGroupId}! ⚡`,
+          reply: `✅ Logged! ⚡`,
           itemId: result.data?.create_item?.id
         })
       };
@@ -109,14 +104,13 @@ exports.handler = async (event) => {
     }
   }
 
-  // ==========================================
+  // ========================================
   // READ HANDLER (GET) - Existing Logic
-  // ==========================================
+  // ========================================
   const qParams = event.queryStringParameters || {};
   const rawDrawer = qParams.group || qParams.drawer || 'all';
   const drawer = rawDrawer.toLowerCase();
 
-  // Multi-group routing map so incoming Staff Intake cards display across all relevant drawers
   const groupMap = {
     castle: ['group_mm7mv0yv', 'group_mm6b77as'],
     empire: ['group_mm7mfbre', 'group_mm6b77as'],
