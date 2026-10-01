@@ -1,615 +1,641 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>TappyThing — Digital Coordinator</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    if (sessionStorage.getItem('tappy_auth') !== 'true') {
-      let pin = prompt("🔐 Enter Master PIN:");
-      if (pin === "7777") {
-        sessionStorage.setItem('tappy_auth', 'true');
-      } else {
-        document.write("<h1 style='color:white;background:#030712;height:100vh;display:flex;align-items:center;justify-content:center;margin:0;font-family:sans-serif;'>🔒 ACCESS DENIED</h1>");
-        window.stop();
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              900: '#0c4a6e',
+            }
+          }
+        }
       }
     }
   </script>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TappyThing — Pocket Chief of Staff</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- FontAwesome & Phosphor Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
-    :root {
-      --bg: #030712;
-      --card-bg: #0f172a;
-      --accent: #3b82f6;
-      --accent-gold: #f59e0b;
-      --text: #f8fafc;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    .pulse-glow { animation: pulseGlow 2s infinite; }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(14, 165, 233, 0.4); }
+      50% { box-shadow: 0 0 30px rgba(14, 165, 233, 0.8); }
     }
-    body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); }
-    .tapulator-face { background: linear-gradient(180deg, #0f172a 0%, #090e17 100%); border: 1px solid #1e293b; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9); }
-    .led-display { background: #020617; border: 1px solid #1e293b; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
-    .key-castle { background: linear-gradient(135deg, #1e3a8a 0%, #172554 100%); border: 1px solid #3b82f6; }
-    .key-empire { background: #1e293b; border: 1px solid #334155; }
-    .key-pipeline { background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%); border: 1px solid #14b8a6; }
-    .key-pinball { background: linear-gradient(135deg, #6b21a8 0%, #581c87 100%); border: 1px solid #a855f7; }
-    textarea#dockInput { min-height: 44px; max-height: 120px; resize: none; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 4px; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-start p-4 pb-36">
+<body class="h-full flex flex-col bg-slate-950 text-slate-100 overflow-hidden">
 
-<!-- FLOATING TOAST -->
-<div id="freshToast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-blue-600 border border-blue-400 text-white font-bold px-5 py-2 rounded-full shadow-2xl z-50 text-xs hidden flex items-center gap-2 backdrop-blur-md">
-  <span id="toastMsg">⚡ FRESH DIGITAL COORDINATOR ACTIVE</span>
-</div>
+  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-<div class="max-w-md w-full tapulator-face rounded-3xl p-5 space-y-4 my-2">
-
-  <!-- TOP LED DISPLAY -->
-  <div class="led-display rounded-2xl p-3.5 text-center border border-blue-900/50 min-h-[54px] flex items-center justify-center">
-    <div id="ledOutput" class="text-xs font-black text-emerald-400 tracking-wider">
-      POCKET CHIEF OF STAFF READY ⚡
-    </div>
-  </div>
-
-  <!-- LOGO EMBLEM -->
-  <div class="text-center space-y-1">
-    <div class="inline-flex items-center justify-center bg-slate-950 border border-slate-700 rounded-full px-6 py-2 shadow-inner min-h-[48px]">
-      <img src="logo.png" alt="TappyThing" class="h-10 max-w-[170px] object-contain mx-auto" onerror="this.onerror=null; this.src='https://via.placeholder.com/160x44/0f172a/38bdf8?text=⚡+TAPPYTHING';">
-    </div>
-    <div class="text-[11px] text-gray-400 font-medium">Fractal Forever Card Engine • Speak or type below.</div>
-  </div>
-
-  <!-- FEATURES, BENEFITS & SOUL BUTTON -->
-  <button onclick="showModal('modalSuite')" class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold py-2 rounded-xl text-[11px] border border-slate-700 uppercase tracking-wider transition flex items-center justify-center gap-2">
-    <i class="fa-solid fa-book-open text-blue-400 text-xs"></i>
-    <span>[ FEATURES, BENEFITS & SOUL ]</span>
-  </button>
-
-  <!-- 7 UNIVERSAL MASTER DRAWERS -->
-  <div class="space-y-2.5">
-    
-    <!-- 1. CASTLE -->
-    <button onclick="openDrawer('castle')" class="key-castle w-full rounded-2xl p-3.5 text-left transition flex items-center justify-between shadow-md">
-      <div>
-        <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-solid fa-chess-rook text-blue-300"></i>
-          <span>1. Castle 🏰</span>
+  <div id="master-hub" class="flex-1 flex flex-col h-full max-w-4xl mx-auto w-full p-3 sm:p-6 overflow-hidden">
+    <!-- Top Bar -->
+    <header class="flex items-center justify-between pb-3 border-b border-slate-800">
+      <div class="flex items-center gap-3">
+        <div class="relative">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-2xl shadow-lg pulse-glow">
+            🤵
+          </div>
+          <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-slate-950 rounded-full"></span>
         </div>
-        <div class="text-[11px] text-blue-200 mt-0.5">Personal, Family, Bills & Assets</div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            TappyThing <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-sky-950 text-sky-400 border border-sky-800">Master Hub</span>
+          </h1>
+          <p class="text-xs text-slate-400">Fresh — Digital Coordinator (Aerus Timonium)</p>
+        </div>
       </div>
-      <i class="fa-solid fa-chevron-right text-blue-300 text-sm"></i>
-    </button>
-
-    <!-- 2. EMPIRE & 3. PIPELINE -->
-    <div class="grid grid-cols-5 gap-2.5">
-      <button onclick="openDrawer('empire')" class="key-empire col-span-3 rounded-2xl p-3 text-left transition flex flex-col justify-between min-h-[72px] shadow-sm">
-        <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
-          <span>2. Empire 👑</span>
-          <i class="fa-solid fa-crown text-amber-500"></i>
-        </div>
-        <div class="text-[10px] text-gray-400">Core Business Operations</div>
+      <button onclick="shareCardLink('shop-ops')" class="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-sky-400 px-3 py-2 rounded-xl border border-sky-900/50 transition text-xs font-semibold">
+        <i class="fa-solid font-bold fa-share-nodes"></i>
+        <span>🔗 Share Staff Card</span>
       </button>
+    </header>
 
-      <button onclick="openDrawer('pipeline')" class="key-pipeline col-span-2 rounded-2xl p-3 text-left transition flex flex-col justify-between min-h-[72px] shadow-sm">
-        <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
-          <span>3. Pipeline 🚀</span>
-          <i class="fa-solid fa-rocket text-teal-400"></i>
+    <!-- LED Status Display -->
+    <div class="my-4 p-4 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col gap-3 shadow-inner">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span id="led-indicator" class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="led-status-text" class="text-xs font-mono tracking-wider text-emerald-400 uppercase font-semibold">Fresh Online — Listening</span>
         </div>
-        <div class="text-[10px] text-teal-100">Leads & Retention</div>
+        <span class="text-xs text-slate-500 font-mono" id="clock-display">--:-- --</span>
+      </div>
+      <div id="transcript-box" class="text-sm font-medium text-slate-300 min-h-[40px] flex items-center bg-slate-950/60 rounded-xl p-3 border border-slate-800/80 italic">
+        "Tap the Fresh button below and speak your prompt..."
+      </div>
+    </div>
+
+    <!-- Central 1-Tap Voice Button -->
+    <div class="flex flex-col items-center justify-center py-4">
+      <button id="master-mic-btn" onclick="toggleMasterMic()" class="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-gradient-to-b from-sky-400 to-sky-600 text-white shadow-2xl shadow-sky-500/30 flex flex-col items-center justify-center gap-1 active:scale-95 transition transform hover:scale-105 border-4 border-slate-950">
+        <i class="fa-solid fa-microphone text-3xl sm:text-4xl" id="master-mic-icon"></i>
+        <span class="text-[10px] font-black tracking-widest uppercase" id="master-mic-label">TAP TO TALK</span>
       </button>
     </div>
 
-    <!-- 4. CALENDAR, 5. HOUSEKEEPING, 6. VAULT -->
-    <div class="grid grid-cols-3 gap-2">
-      <button onclick="openDrawer('calendar')" class="key-empire rounded-xl p-2.5 text-left transition space-y-1 shadow-sm">
-        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
-          <span>4. Cal 📅</span>
-          <i class="fa-solid fa-calendar text-gray-500 text-xs"></i>
+    <!-- Asymmetric 6-Key Tapulator -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 flex-1 overflow-y-auto custom-scrollbar p-1">
+      <!-- Castle -->
+      <div class="bg-slate-900/90 hover:bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between transition cursor-pointer group" onclick="openDrawer('Castle Hub', 'Castle Operations & Strategy')">
+        <div class="flex items-center justify-between">
+          <span class="p-2.5 rounded-xl bg-sky-950/80 text-sky-400 text-lg border border-sky-900/50"><i class="fa-solid fa-chess-rook"></i></span>
+          <button onclick="event.stopPropagation(); shareCardLink('castle')" class="text-xs text-slate-500 hover:text-sky-400"><i class="fa-solid fa-link"></i></button>
         </div>
-        <div class="text-[9px] text-gray-400">Schedule</div>
-      </button>
+        <div>
+          <h3 class="font-bold text-white text-base group-hover:text-sky-400 transition">Castle</h3>
+          <p class="text-xs text-slate-400">Core Command & Strategy</p>
+        </div>
+      </div>
 
-      <button onclick="openDrawer('housekeeping')" class="key-empire rounded-xl p-2.5 text-left transition space-y-1 shadow-sm">
-        <div class="text-[11px] font-bold text-amber-400 flex items-center justify-between">
-          <span>5. House 🧹</span>
-          <i class="fa-solid fa-broom text-amber-500 text-xs"></i>
+      <!-- Empire / Shop Ops -->
+      <div class="bg-slate-900/90 hover:bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between transition cursor-pointer group" onclick="openSharedCardMode('shop-ops')">
+        <div class="flex items-center justify-between">
+          <span class="p-2.5 rounded-xl bg-indigo-950/80 text-indigo-400 text-lg border border-indigo-900/50"><i class="fa-solid fa-store"></i></span>
+          <button onclick="event.stopPropagation(); shareCardLink('shop-ops')" class="text-xs text-slate-500 hover:text-indigo-400"><i class="fa-solid fa-link"></i></button>
         </div>
-        <div class="text-[9px] text-gray-400">Store Upkeep</div>
-      </button>
+        <div>
+          <h3 class="font-bold text-white text-base group-hover:text-indigo-400 transition">Empire (Shop Ops)</h3>
+          <p class="text-xs text-slate-400">Bench, Intake & Ready Wall</p>
+        </div>
+      </div>
 
-      <button onclick="openDrawer('vault')" class="key-empire rounded-xl p-2.5 text-left transition space-y-1 shadow-sm">
-        <div class="text-[11px] font-bold text-teal-400 flex items-center justify-between">
-          <span>6. Vault 🌐</span>
-          <i class="fa-solid fa-database text-teal-500 text-xs"></i>
+      <!-- Pipeline -->
+      <div class="bg-slate-900/90 hover:bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between transition cursor-pointer group" onclick="openDrawer('Pipeline Hub', 'Active Deals & Closing Proposals')">
+        <div class="flex items-center justify-between">
+          <span class="p-2.5 rounded-xl bg-emerald-950/80 text-emerald-400 text-lg border border-emerald-900/50"><i class="fa-solid fa-filter-circle-dollar"></i></span>
+          <button onclick="event.stopPropagation(); shareCardLink('pipeline')" class="text-xs text-slate-500 hover:text-emerald-400"><i class="fa-solid fa-link"></i></button>
         </div>
-        <div class="text-[9px] text-gray-400">22K Customers</div>
-      </button>
+        <div>
+          <h3 class="font-bold text-white text-base group-hover:text-emerald-400 transition">Pipeline</h3>
+          <p class="text-xs text-slate-400">Leads, Proposals & Deals</p>
+        </div>
+      </div>
+
+      <!-- Calendar Agenda -->
+      <div class="bg-slate-900/90 hover:bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between transition cursor-pointer group" onclick="openCalendarDrawer()">
+        <div class="flex items-center justify-between">
+          <span class="p-2.5 rounded-xl bg-amber-950/80 text-amber-400 text-lg border border-amber-900/50"><i class="fa-solid fa-calendar-days"></i></span>
+          <button onclick="event.stopPropagation(); shareCardLink('calendar')" class="text-xs text-slate-500 hover:text-amber-400"><i class="fa-solid fa-link"></i></button>
+        </div>
+        <div>
+          <h3 class="font-bold text-white text-base group-hover:text-amber-400 transition">Calendar</h3>
+          <p class="text-xs text-slate-400">Field Schedule & Appointments</p>
+        </div>
+      </div>
+
+      <!-- 22k Vault -->
+      <div class="bg-slate-900/90 hover:bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between transition cursor-pointer group" onclick="openDrawer('Vault Database', '22,283 Customer Records')">
+        <div class="flex items-center justify-between">
+          <span class="p-2.5 rounded-xl bg-purple-950/80 text-purple-400 text-lg border border-purple-900/50"><i class="fa-solid fa-database"></i></span>
+          <button onclick="event.stopPropagation(); shareCardLink('vault')" class="text-xs text-slate-500 hover:text-purple-400"><i class="fa-solid fa-link"></i></button>
+        </div>
+        <div>
+          <h3 class="font-bold text-white text-base group-hover:text-purple-400 transition">22k Vault</h3>
+          <p class="text-xs text-slate-400">Customer Records & History</p>
+        </div>
+      </div>
+
+      <!-- Pinball Engine -->
+      <div class="bg-slate-900/90 hover:bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between transition cursor-pointer group" onclick="triggerPinballProtocol()">
+        <div class="flex items-center justify-between">
+          <span class="p-2.5 rounded-xl bg-rose-950/80 text-rose-400 text-lg border border-rose-900/50"><i class="fa-solid fa-bolt font-bold"></i></span>
+          <span class="text-[10px] uppercase font-extrabold px-2 py-0.5 bg-rose-950 text-rose-300 rounded-full border border-rose-800">1-Tap Protocol</span>
+        </div>
+        <div>
+          <h3 class="font-bold text-white text-base group-hover:text-rose-400 transition">Pinball</h3>
+          <p class="text-xs text-slate-400">Auto Task & Outreach Sweep</p>
+        </div>
+      </div>
     </div>
-
-    <!-- 7. PINBALL -->
-    <button onclick="openDrawer('pinball')" class="key-pinball w-full rounded-2xl p-3.5 text-left transition flex items-center justify-between shadow-md">
-      <div>
-        <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-solid fa-bolt text-purple-200"></i>
-          <span>7. Pinball Tap-to-Task 🧠⚡</span>
-        </div>
-        <div class="text-[11px] text-purple-200 mt-0.5">Rapid Task Knockout Mode</div>
-      </div>
-      <i class="fa-solid fa-chevron-right text-purple-200 text-sm"></i>
-    </button>
   </div>
 
-  <!-- LAWYER IP VAULT LINK -->
-  <div class="text-center pt-2 border-t border-gray-800">
-    <button onclick="unlockLawyerVault()" class="text-red-400 hover:text-red-300 text-[10px] font-bold tracking-wider uppercase transition">
-      🔒 Protected IP Hub
-    </button>
-  </div>
-
-</div>
-
-<!-- BOTTOM MASTER DOCK -->
-<div class="fixed bottom-0 left-0 right-0 bg-gray-900/95 border-t border-gray-800 p-3 z-40 backdrop-blur-md">
-  <div class="max-w-md mx-auto flex items-end gap-1.5">
-    
-    <label class="bg-gray-800 hover:bg-gray-700 text-amber-400 w-10 h-10 rounded-xl flex items-center justify-center border border-gray-700 shrink-0 cursor-pointer shadow">
-      <i class="fa-solid fa-camera text-base"></i>
-      <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMedia(this, 'Photo')">
-    </label>
-
-    <label class="bg-gray-800 hover:bg-gray-700 text-red-400 w-10 h-10 rounded-xl flex items-center justify-center border border-gray-700 shrink-0 cursor-pointer shadow">
-      <i class="fa-solid fa-video text-base"></i>
-      <input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMedia(this, 'Video')">
-    </label>
-
-    <textarea id="dockInput" placeholder="Brain dump or speak anything here..." rows="1" class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2 text-xs text-white placeholder-gray-500 focus:outline-none" oninput="autoExpand(this)" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); submitIntake(); }"></textarea>
-
-    <button id="micBtn" onclick="toggleVoice()" class="bg-blue-600 hover:bg-blue-500 text-white w-10 h-10 rounded-xl flex items-center justify-center border border-blue-400 shrink-0 shadow">
-      <i class="fa-solid fa-microphone text-base"></i>
-    </button>
-
-    <button onclick="submitIntake()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow">
-      <i class="fa-solid fa-paper-plane text-sm"></i>
-    </button>
-
-  </div>
-</div>
-
-<!-- DRAWER MODAL -->
-<div id="drawerModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-4 pb-24 backdrop-blur-md">
-  <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-3">
-    <h3 id="drawerTitle" class="text-base font-black text-white uppercase">Drawer</h3>
-    <button onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-xs bg-gray-800 px-3 py-1.5 rounded-lg">✕ Close</button>
-  </div>
-  <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300"></div>
-</div>
-
-<!-- SYSTEM GUIDE & FEATURES / BENEFITS MODAL -->
-<div id="modalSuite" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-4 justify-center backdrop-blur-md overflow-y-auto">
-  <div class="bg-gray-900 border border-blue-500/50 rounded-3xl p-5 max-w-md mx-auto space-y-4 text-left shadow-2xl my-auto">
-    <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-      <h3 class="text-xs font-black text-white tracking-wider uppercase">⚡ Features, Benefits & Soul</h3>
-      <button onclick="hideModals()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-2 py-1 rounded-lg">✕</button>
-    </div>
-
-    <div class="text-[11px] text-gray-300 space-y-3 max-h-[60vh] overflow-y-auto pr-1">
-      <div class="bg-gray-800/80 p-3 rounded-2xl border border-blue-900/40 space-y-1">
-        <div class="font-bold text-white flex items-center gap-1.5 text-xs text-blue-300">
-          <i class="fa-solid fa-microphone-lines text-blue-400"></i>
-          <span>1. 1-Tap Compound Voice Brain Dump</span>
+  <div id="shared-card-view" class="hidden flex-1 flex-col h-full max-w-4xl mx-auto w-full p-3 sm:p-6 overflow-hidden">
+    <!-- Header -->
+    <header class="flex items-center justify-between pb-3 border-b border-slate-800">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-sky-500 flex items-center justify-center text-xl text-white shadow-lg">
+          ⚡
         </div>
-        <div class="text-gray-300 text-[10px]">
-          <strong>Benefit:</strong> Speak multiple tasks in 1 breath. Decomposes & routes instantly to your team with zero friction.
+        <div>
+          <h1 class="text-lg font-bold text-white flex items-center gap-2" id="shared-card-title">
+            Aerus Timonium — Staff Ops & Intake
+          </h1>
+          <p class="text-xs text-sky-400 font-medium">Standalone Staff Forever Card</p>
         </div>
       </div>
+      <button onclick="returnToMasterHub()" id="master-return-btn" class="hidden bg-slate-900 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-xl border border-slate-800 text-xs font-semibold">
+        <i class="fa-solid fa-arrow-left mr-1"></i> Master Hub
+      </button>
+    </header>
 
-      <div class="bg-gray-800/80 p-3 rounded-2xl border border-amber-900/40 space-y-1">
-        <div class="font-bold text-white flex items-center gap-1.5 text-xs text-amber-300">
-          <i class="fa-solid fa-layer-group text-amber-400"></i>
-          <span>2. 7 Asymmetric Universal Drawers</span>
+    <!-- 1-Tap Counter Intake Bar -->
+    <div class="my-3 p-4 rounded-2xl bg-gradient-to-r from-sky-950/60 to-slate-900 border border-sky-800/60 shadow-lg">
+      <h2 class="text-xs font-bold uppercase tracking-wider text-sky-400 mb-2 flex items-center gap-2">
+        <i class="fa-solid fa-plus-circle"></i> 1-Tap Counter Intake
+      </h2>
+      <div class="flex flex-col sm:flex-row gap-2">
+        <div class="flex-1 relative">
+          <input type="text" id="intake-input" placeholder="Speak or type customer drop-off..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-sky-500 pr-10" />
+          <button onclick="toggleIntakeMic()" id="intake-mic-btn" class="absolute right-2 top-2 text-slate-400 hover:text-sky-400 p-1">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
         </div>
-        <div class="text-gray-300 text-[10px]">
-          <strong>Benefit:</strong> Complete mental clarity. Personal life in Castle, shop repairs in Empire, sales in Pipeline, schedule in Calendar, and upkeep in Housekeeping.
-        </div>
-      </div>
-
-      <div class="bg-gray-800/80 p-3 rounded-2xl border border-emerald-900/40 space-y-1">
-        <div class="font-bold text-white flex items-center gap-1.5 text-xs text-emerald-300">
-          <i class="fa-solid fa-id-card text-emerald-400"></i>
-          <span>3. Living Fractal "Forever Cards"</span>
-        </div>
-        <div class="text-gray-300 text-[10px]">
-          <strong>Benefit:</strong> Every client, unit, and job becomes a permanent living card with 2-way voice notes, role delegation, and full historical records.
-        </div>
-      </div>
-
-      <div class="bg-gray-800/80 p-3 rounded-2xl border border-teal-900/40 space-y-1">
-        <div class="font-bold text-white flex items-center gap-1.5 text-xs text-teal-300">
-          <i class="fa-solid fa-credit-card text-teal-400"></i>
-          <span>4. Context-Triggered 1-Tap Stripe Pay Links</span>
-        </div>
-        <div class="text-gray-300 text-[10px]">
-          <strong>Benefit:</strong> Say a price or quote, and TappyThing generates an instant checkout link (with 6% sales tax auto-calculated) for instant customer payment.
-        </div>
-      </div>
-
-      <div class="bg-gray-800/80 p-3 rounded-2xl border border-purple-900/40 space-y-1">
-        <div class="font-bold text-white flex items-center gap-1.5 text-xs text-purple-300">
-          <i class="fa-solid fa-shield-halved text-purple-400"></i>
-          <span>5. Permanent Security & Zero Hard Deletes</span>
-        </div>
-        <div class="text-gray-300 text-[10px]">
-          <strong>Benefit:</strong> Company records cannot be destroyed. Finished tasks soft-archive automatically, protecting your 22,000+ customer history forever.
-        </div>
-      </div>
-
-      <!-- NESTED CLOSED SOUL DRAWER -->
-      <div class="border-t border-gray-800 pt-3">
-        <button onclick="toggleSoulDrawer()" class="w-full bg-slate-950 hover:bg-slate-800 border border-slate-700 p-3 rounded-2xl flex items-center justify-between text-left transition shadow-md">
-          <div>
-            <div class="text-xs font-bold text-blue-300">🎭 Meet the Tappy Family & Crew (Soul Drawer)</div>
-            <div class="text-[10px] text-gray-500 mt-0.5">Tap to view the spirits and archetypes behind TappyThing</div>
-          </div>
-          <i id="soulChevron" class="fa-solid fa-chevron-down text-gray-400 text-xs transition-transform duration-200"></i>
-        </button>
-
-        <div id="soulDrawerContent" class="hidden mt-2.5 space-y-2 bg-gray-950 p-3 rounded-2xl border border-gray-800">
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-white text-[11px]">👑 Boudie <span class="text-blue-400 font-normal">— Founder & Chief</span></div>
-            <div class="text-gray-400 text-[10px]">30+ years in the small business trenches. Built TappyThing for freedom, simplicity, and speed.</div>
-          </div>
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-amber-300 text-[11px]">🤵 Fresh <span class="text-gray-400 font-normal">— Digital Coordinator & Guiding Star</span></div>
-            <div class="text-gray-400 text-[10px]">The heart of the platform. Clear, direct, joyful, zero-friction.</div>
-          </div>
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-emerald-300 text-[11px]">👩‍💼 Sissy <span class="text-gray-400 font-normal">— Invisible Backend Engine</span></div>
-            <div class="text-gray-400 text-[10px]">The quiet powerhouse. Routing tasks and making sure nothing slips through the cracks.</div>
-          </div>
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-teal-300 text-[11px]">⚡ Noosh <span class="text-gray-400 font-normal">— Flow & Connectivity</span></div>
-            <div class="text-gray-400 text-[10px]">Keeping communication channels wide open and tasks moving across the shop.</div>
-          </div>
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-purple-300 text-[11px]">🧘‍♀️️ Yogi <span class="text-gray-400 font-normal">— Calm & Stress Relief</span></div>
-            <div class="text-gray-400 text-[10px]">The grounding force. Bringing warmth, peace of mind, and work-life balance.</div>
-          </div>
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-red-400 text-[11px]">🥊 Squash <span class="text-gray-400 font-normal">— Sales Coach & Motivator</span></div>
-            <div class="text-gray-400 text-[10px]">Pure Zig Ziglar energy! Pushing owners to close deals and win every single day.</div>
-          </div>
-          <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-amber-400 text-[11px]">💼 L <span class="text-gray-400 font-normal">— Chief of Treasury & Cashflow</span></div>
-            <div class="text-gray-400 text-[10px]">Invoicing, 1-tap Stripe pay links, and steady cash collections.</div>
-          </div>
-          <div class="pt-1">
-            <div class="font-bold text-pink-400 text-[11px]">🎨 Rob Art <span class="text-gray-400 font-normal">— Creative Soul</span></div>
-            <div class="text-gray-400 text-[10px]">The visual heartbeat and artistic spirit behind TappyThing.</div>
-          </div>
+        <div class="flex gap-2">
+          <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2.5 rounded-xl border border-slate-700 text-xs font-semibold flex items-center gap-1">
+            <i class="fa-solid fa-camera"></i> <span>Snap</span>
+            <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaUpload(this, 'Photo')" />
+          </label>
+          <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2.5 rounded-xl border border-slate-700 text-xs font-semibold flex items-center gap-1">
+            <i class="fa-solid fa-video"></i> <span>Video</span>
+            <input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaUpload(this, 'Video')" />
+          </label>
+          <button onclick="submitCounterIntake()" class="bg-sky-500 hover:bg-sky-400 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-md transition">
+            Submit
+          </button>
         </div>
       </div>
     </div>
 
-    <button onclick="hideModals()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-xl text-xs transition">Close Guide</button>
-  </div>
-</div>
+    <!-- 4 Nested Live Sections -->
+    <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto custom-scrollbar pr-1">
+      <!-- Section 1: Counter Intake -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col h-64 sm:h-auto">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-800 mb-2">
+          <h3 class="text-sm font-bold text-sky-400 flex items-center gap-2">
+            <span>📥</span> Counter Intakes
+          </h3>
+          <button onclick="dictateToSection('Counter Intakes')" class="text-xs bg-slate-800 hover:bg-slate-700 text-sky-300 px-2 py-1 rounded-lg border border-slate-700">
+            <i class="fa-solid fa-microphone mr-1"></i> Talk
+          </button>
+        </div>
+        <div id="section-intake-list" class="flex-1 overflow-y-auto custom-scrollbar space-y-2 text-xs">
+          <!-- Dynamic Items inserted here -->
+        </div>
+      </div>
 
-<!-- LAWYER MODAL -->
-<div id="modalLawyer" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-4 justify-center backdrop-blur-md overflow-y-auto">
-  <div class="bg-gray-900 border border-red-500/60 rounded-3xl p-5 max-w-md mx-auto space-y-3.5 text-left shadow-2xl my-auto">
-    <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-      <h3 class="text-xs font-black text-red-400 tracking-wider uppercase">🔒 Confidential IP & Patent Disclosure</h3>
-      <button onclick="hideModals()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-2 py-1 rounded-lg">✕</button>
+      <!-- Section 2: Active Bench Queue -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col h-64 sm:h-auto">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-800 mb-2">
+          <h3 class="text-sm font-bold text-indigo-400 flex items-center gap-2">
+            <span>🛠️</span> Active Bench Queue (Mike & Chris)
+          </h3>
+          <button onclick="dictateToSection('Bench Queue')" class="text-xs bg-slate-800 hover:bg-slate-700 text-indigo-300 px-2 py-1 rounded-lg border border-slate-700">
+            <i class="fa-solid fa-microphone mr-1"></i> Talk
+          </button>
+        </div>
+        <div id="section-bench-list" class="flex-1 overflow-y-auto custom-scrollbar space-y-2 text-xs">
+          <!-- Dynamic Items inserted here -->
+        </div>
+      </div>
+
+      <!-- Section 3: Ready Wall -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col h-64 sm:h-auto">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-800 mb-2">
+          <h3 class="text-sm font-bold text-emerald-400 flex items-center gap-2">
+            <span>🟢</span> Ready Wall (Pickup / Deliver)
+          </h3>
+          <button onclick="dictateToSection('Ready Wall')" class="text-xs bg-slate-800 hover:bg-slate-700 text-emerald-300 px-2 py-1 rounded-lg border border-slate-700">
+            <i class="fa-solid fa-microphone mr-1"></i> Talk
+          </button>
+        </div>
+        <div id="section-ready-list" class="flex-1 overflow-y-auto custom-scrollbar space-y-2 text-xs">
+          <!-- Dynamic Items inserted here -->
+        </div>
+      </div>
+
+      <!-- Section 4: Parts & Communication Hub -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col h-64 sm:h-auto">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-800 mb-2">
+          <h3 class="text-sm font-bold text-amber-400 flex items-center gap-2">
+            <span>🔩</span> Parts Needed & Team Hub
+          </h3>
+          <button onclick="dictateToSection('Parts Hub')" class="text-xs bg-slate-800 hover:bg-slate-700 text-amber-300 px-2 py-1 rounded-lg border border-slate-700">
+            <i class="fa-solid fa-microphone mr-1"></i> Talk
+          </button>
+        </div>
+        <div id="section-parts-list" class="flex-1 overflow-y-auto custom-scrollbar space-y-2 text-xs">
+          <!-- Dynamic Items inserted here -->
+        </div>
+      </div>
     </div>
+  </div>
 
-    <div class="text-[11px] text-gray-300 space-y-2 max-h-[60vh] overflow-y-auto pr-1">
-      <div class="bg-red-950/30 border border-red-800/60 rounded-xl p-2.5">
-        <div class="font-bold text-red-300">INVENTION TITLE:</div>
-        <div class="text-white">Asymmetric Voice-Driven Task Decomposition & Living Fractal Forever Card System</div>
+  <div id="drawer-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden z-40 flex justify-end">
+    <div class="w-full max-w-lg bg-slate-900 border-l border-slate-800 h-full p-6 flex flex-col shadow-2xl">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div>
+          <h2 id="drawer-title" class="text-lg font-bold text-white">Drawer View</h2>
+          <p id="drawer-subtitle" class="text-xs text-slate-400">TappyThing Command System</p>
+        </div>
+        <button onclick="closeDrawer()" class="p-2 text-slate-400 hover:text-white text-xl">&times;</button>
       </div>
-      <div class="bg-gray-800/70 p-2.5 rounded-xl border border-gray-700/60">
-        <div class="text-white font-bold">Claim 1: Compound Voice Decomposition Engine</div>
-        <p class="text-gray-400">Continuous voice stream parsing into discrete, independent action cards without back-and-forth prompts.</p>
+      <div id="drawer-content" class="flex-1 my-4 overflow-y-auto custom-scrollbar text-sm text-slate-300 space-y-3">
+        <!-- Content dynamically injected -->
       </div>
-      <div class="bg-gray-800/70 p-2.5 rounded-xl border border-gray-700/60">
-        <div class="text-white font-bold">Claim 2: Asymmetric 7-Drawer Routing Architecture</div>
-        <p class="text-gray-400">Automatic distribution into isolated domains (Castle, Empire Ops, Pipeline, Calendar).</p>
-      </div>
-      <div class="bg-gray-800/70 p-2.5 rounded-xl border border-gray-700/60">
-        <div class="text-white font-bold">Claim 3: Context-Triggered Micro-Checkout Generation</div>
-        <p class="text-gray-400">Audio quote detection auto-generating instant localized Stripe payment links on task cards.</p>
-      </div>
-      <div class="bg-gray-800/70 p-2.5 rounded-xl border border-gray-700/60">
-        <div class="text-white font-bold">Claim 4: 2-Way Living Forever Card Protocol</div>
-        <p class="text-gray-400">Self-building, client-facing card with voice notes, media, and 1-tap delegation.</p>
+      <div class="pt-3 border-t border-slate-800 flex justify-between items-center">
+        <button onclick="closeDrawer()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs">Close Panel</button>
       </div>
     </div>
-
-    <button onclick="hideModals()" class="w-full bg-red-900/80 hover:bg-red-800 text-white font-bold py-2 rounded-xl text-xs transition">Close Protected Vault</button>
   </div>
-</div>
 
-<!-- DELEGATION MODAL -->
-<div id="modalDelegate" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-6 justify-center">
-  <div class="bg-gray-900 border border-slate-700 rounded-3xl p-5 max-w-sm mx-auto space-y-3 text-left shadow-2xl">
-    <h3 class="text-sm font-black text-white">👥 1-Tap Role Delegation</h3>
-    <p class="text-xs text-gray-400">Dispatch this Forever Card to your team:</p>
-    <div class="space-y-2 pt-1">
-      <button onclick="confirmDelegate('Admin / FOAS')" class="w-full text-left p-2.5 rounded-xl bg-gray-800 hover:bg-blue-950 border border-gray-700 text-xs font-bold text-white flex justify-between items-center">
-        <span>👤 Admin / FOAS (Follow-ups)</span>
-        <span class="text-blue-400 text-[10px]">Assign</span>
-      </button>
-      <button onclick="confirmDelegate('Field Tech')" class="w-full text-left p-2.5 rounded-xl bg-gray-800 hover:bg-emerald-950 border border-gray-700 text-xs font-bold text-white flex justify-between items-center">
-        <span>🛠️ Field Tech (Runs & Installs)</span>
-        <span class="text-emerald-400 text-[10px]">Assign</span>
-      </button>
-      <button onclick="confirmDelegate('Shop Bench Lead')" class="w-full text-left p-2.5 rounded-xl bg-gray-800 hover:bg-amber-950 border border-gray-700 text-xs font-bold text-white flex justify-between items-center">
-        <span>🔧 Shop Bench (Repairs & Parts)</span>
-        <span class="text-amber-400 text-[10px]">Assign</span>
-      </button>
-    </div>
-    <button onclick="hideModals()" class="w-full bg-gray-800 text-white font-bold py-2 rounded-xl text-xs mt-2">Cancel</button>
-  </div>
-</div>
+  <!-- JavaScript Application Engine -->
+  <script>
+    const STATE = {
+      isListening: false,
+      isStandaloneCard: false,
+      cardId: null,
+      recognition: null,
+      boardData: {
+        intakes: [
+          { id: '101', name: 'Eric Landers', item: 'Guardian Vac (New Motor)', status: 'Ready for Dropoff', date: 'Today 11:30' },
+          { id: '102', name: 'Paul Schwab', item: '9 Central Vac Inlets', status: 'Inlet Repair', date: 'Today 10:30' }
+        ],
+        bench: [
+          { id: '201', tech: 'Mike', item: 'Platinum Powerhead', task: 'Replace Elbow' },
+          { id: '202', tech: 'Chris', item: 'Guardian Canister', task: 'Motor Replacement (Pending $250)' }
+        ],
+        ready: [
+          { id: '301', name: 'John Smith', item: 'Lux Legacy', status: 'Tested & Tagged' }
+        ],
+        parts: [
+          { id: '401', part: 'Central Vac Hose Pigtail Adapter', qty: 1, reqBy: 'William' },
+          { id: '402', part: 'Platinum Hose', qty: 2, reqBy: 'Norby (FOAS)' }
+        ]
+      }
+    };
 
-<script>
-let recognition = null;
-let currentCard = null;
-let activeDrawer = 'empire';
-
-// Autonomic Local Forever Card Engine
-const localCards = {
-  empire: [
-    { name: "⚡ Chris tune up Guardian air purifier on bench", state: "Active" },
-    { name: "🔧 Mona take intake photos of the Aerus upright on counter", state: "Active" },
-    { name: "📦 Order 3 HEPA filters and 2 belts from Desco", state: "Active" },
-    { name: "🛠️ Chris inspect Mrs. Higgins Lux upright vacuum on bench", state: "Active" },
-    { name: "🚗 Mike deliver air purifier to Dr. Roberts office Monday 11 AM", state: "Active" }
-  ],
-  castle: [
-    { name: "🏠 Pay personal mortgage on Friday", state: "Active" },
-    { name: "💡 Pay shop electric bill on Friday", state: "Active" },
-    { name: "🏥 Schedule doctor annual checkup for next Tuesday", state: "Active" },
-    { name: "🛒 Pick up groceries & water softener salt", state: "Active" }
-  ],
-  pipeline: [
-    { name: "💬 Quote $350 for upright vacuum to Sarah Jenkins", state: "Active" },
-    { name: "💧 Quote $850 for whole house filtration to Mark Johnson", state: "Active" },
-    { name: "📞 Send quote for $450 to Diane Miller", state: "Active" },
-    { name: "🤝 Schedule follow-up with Ann Smith for Saturday demo", state: "Active" }
-  ],
-  calendar: [
-    { name: "📅 Susan Hogan — 6 Rooms Carpet Cleaning at 7:00 AM", state: "Active" },
-    { name: "📅 Water Test Appointment tomorrow at 10:00 AM", state: "Active" },
-    { name: "📅 Dr. Roberts AP Delivery on Monday at 11:00 AM", state: "Active" }
-  ],
-  housekeeping: [
-    { name: "🧹 Clean and polish front showroom display shelves", state: "Active" },
-    { name: "🗑️ Empty shop trash & sweep bench assembly area", state: "Active" },
-    { name: "📦 Organize back storage cage & vacuum inventory", state: "Active" }
-  ],
-  vault: [
-    { name: "🌐 Vault Master Index — 22,283 Customer Records Active", state: "Secured" },
-    { name: "🔒 Permanent Soft-Archive Retention: ON", state: "Secured" }
-  ],
-  pinball: [
-    { name: "⚡ Quick Knockout: Call parts supplier Desco on backordered cords", state: "Fast" },
-    { name: "⚡ Quick Knockout: Text Diane Miller pickup ready notification", state: "Fast" }
-  ]
-};
-
-function autoExpand(f) { f.style.height = 'inherit'; f.style.height = Math.min(f.scrollHeight, 120) + 'px'; }
-
-function showToast(msg) {
-  const t = document.getElementById('freshToast');
-  document.getElementById('toastMsg').innerText = msg;
-  t.classList.remove('hidden');
-  setTimeout(() => { t.classList.add('hidden'); }, 3500);
-}
-
-function showModal(id) { document.getElementById(id).classList.remove('hidden'); }
-function hideModals() { document.querySelectorAll('[id^="modal"]').forEach(m => m.classList.add('hidden')); }
-
-function toggleSoulDrawer() {
-  const content = document.getElementById('soulDrawerContent');
-  const chevron = document.getElementById('soulChevron');
-  if (content.classList.contains('hidden')) {
-    content.classList.remove('hidden');
-    chevron.classList.add('rotate-180');
-  } else {
-    content.classList.add('hidden');
-    chevron.classList.remove('rotate-180');
-  }
-}
-
-function unlockLawyerVault() {
-  const pin = prompt("🔐 Enter 4-Digit IP Vault PIN:");
-  if (pin === "7777") showModal('modalLawyer');
-  else if (pin) alert("❌ Access Denied");
-}
-
-function handleMedia(input, type) {
-  if (input.files && input.files[0]) {
-    showToast(`📸 ${type.toUpperCase()} CAPTURED: ${input.files[0].name}`);
-    document.getElementById('ledOutput').innerText = `ATTACHED ${type.toUpperCase()} 📎`;
-    const box = document.getElementById('dockInput');
-    box.value += ` [${type} Attached]`;
-    autoExpand(box);
-  }
-}
-
-function toggleVoice() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return alert("Speech recognition not supported in this browser.");
-  
-  const btn = document.getElementById('micBtn');
-  if (recognition) {
-    recognition.stop();
-    recognition = null;
-    btn.classList.remove('bg-red-600');
-    submitIntake();
-    return;
-  }
-
-  recognition = new SR();
-  btn.classList.add('bg-red-600');
-  showToast('🎙️ FRESH LISTENING...');
-
-  recognition.onresult = (e) => {
-    const input = document.getElementById('dockInput');
-    input.value = e.results[0][0].transcript;
-    autoExpand(input);
-  };
-
-  recognition.onend = () => {
-    btn.classList.remove('bg-red-600');
-    recognition = null;
-    submitIntake();
-  };
-
-  recognition.start();
-}
-
-function submitIntake() {
-  const input = document.getElementById('dockInput');
-  const text = input.value.trim();
-  if (!text) return;
-
-  input.value = '';
-  autoExpand(input);
-  showToast('⚡ ROUTING TO FOREVER CARDS...');
-  document.getElementById('ledOutput').innerText = 'DECOMPOSING TASK... ⏳';
-
-  setTimeout(() => {
-    const parts = text.split(/,|\band\b/i).map(s => s.trim()).filter(s => s.length > 2);
-    const count = parts.length > 0 ? parts.length : 1;
-
-    parts.forEach(p => {
-      let target = 'empire';
-      const low = p.toLowerCase();
-      if (low.includes('home') || low.includes('mortgage') || low.includes('personal') || low.includes('doctor')) target = 'castle';
-      else if (low.includes('quote') || low.includes('lead') || low.includes('estimate') || low.includes('sale')) target = 'pipeline';
-      else if (low.includes('tomorrow') || low.includes('at ') || low.includes('calendar') || low.includes('schedule')) target = 'calendar';
-      else if (low.includes('clean') || low.includes('sweep') || low.includes('trash')) target = 'housekeeping';
-      else if (low.includes('quick') || low.includes('urgent') || low.includes('pinball')) target = 'pinball';
-
-      if (!localCards[target]) localCards[target] = [];
-      localCards[target].unshift({ name: p, state: "Active" });
+    document.addEventListener('DOMContentLoaded', () => {
+      updateClock();
+      setInterval(updateClock, 1000);
+      initRouter();
+      initSpeechRecognition();
+      fetchMondayData();
     });
 
-    const reply = `✅ Logged & Routed ${count} Action Card(s)! ⚡`;
-    showToast(reply);
-    document.getElementById('ledOutput').innerText = `ROUTED ${count} ACTION CARD(S) ⚡`;
-    
-    const modal = document.getElementById('drawerModal');
-    if (!modal.classList.contains('hidden')) {
-      renderDrawerCards(activeDrawer);
+    function updateClock() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const clockEl = document.getElementById('clock-display');
+      if (clockEl) clockEl.innerText = timeStr;
     }
-  }, 350);
-}
 
-function escapeHtml(str) {
-  return (str || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
+    function initRouter() {
+      const params = new URLSearchParams(window.location.search);
+      const cardParam = params.get('card') || params.get('staff');
 
-function renderDrawerCards(name) {
-  const content = document.getElementById('drawerContent');
-  let calendarHtml = '';
-  if (name === 'calendar') {
-    calendarHtml = `
-      <div class="space-y-3 pb-3">
-        <div class="rounded-2xl overflow-hidden border border-gray-700 bg-white/5 h-56">
-          <iframe src="https://calendar.google.com/calendar/embed?src=william%40towsonhealthyhomes.com&ctz=America%2FNew_York" style="border: 0" width="100%" height="100%" frameborder="0" scrolling="no"></iframe>
-        </div>
-      </div>
-    `;
-  }
-
-  const items = localCards[name] || [];
-  if (items.length === 0) {
-    content.innerHTML = calendarHtml + '<p class="text-center pt-6 text-gray-500">Pristine canvas ready. No active cards in this drawer.</p>';
-    return;
-  }
-
-  const cardsHtml = items.map(item => {
-    const isMoney = item.name.match(/\$|invoice|quote|sale|deposit|bill|collect/i);
-    const safeName = escapeHtml(item.name);
-    const encodedName = encodeURIComponent(item.name);
-
-    return `
-      <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl space-y-3 shadow-md hover:border-blue-900/50 transition">
-        <div class="flex items-center justify-between gap-2 border-b border-gray-800/60 pb-2">
-          <span class="text-[11px] font-bold text-blue-400 flex items-center gap-1.5">
-            <span>⚡</span> Fresh Digital Coordinator
-          </span>
-          <span class="text-[9px] bg-blue-950 border border-blue-800 text-blue-300 px-2 py-0.5 rounded-full font-bold">FOREVER CARD</span>
-        </div>
-        <div class="text-sm font-bold text-white leading-snug">${safeName}</div>
-        <div class="flex gap-2 pt-1 border-t border-gray-800/80">
-          <button onclick="talkToSissyCard(decodeURIComponent('${encodedName}'))" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold py-1.5 px-2.5 rounded-xl transition">🎙️ Talk to Sissy</button>
-          <button onclick="openDelegateModal(decodeURIComponent('${encodedName}'))" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-[10px] font-bold py-1.5 px-2.5 rounded-xl border border-gray-700 transition">👥 Delegate</button>
-          ${isMoney ? `<button onclick="createStripePay(decodeURIComponent('${encodedName}'))" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold py-1.5 px-2.5 rounded-xl transition">💳 Stripe Pay</button>` : ''}
-        </div>
-        <div class="pt-1 text-center border-t border-gray-800/40">
-          <span class="text-[10px] text-gray-500 font-medium">⚡ Powered by <strong class="text-gray-400 font-bold">TappyThing</strong></span>
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  content.innerHTML = calendarHtml + cardsHtml;
-}
-
-function openDrawer(name) {
-  if (name === 'castle') {
-    const pin = prompt("🔐 Enter Castle PIN Lock:");
-    if (pin !== "7777" && pin !== "1234") {
-      alert("❌ Access Denied");
-      return;
+      if (cardParam) {
+        // Shared Card Mode
+        STATE.isStandaloneCard = true;
+        STATE.cardId = cardParam;
+        document.getElementById('master-hub').classList.add('hidden');
+        document.getElementById('shared-card-view').classList.remove('hidden');
+        document.getElementById('shared-card-view').classList.add('flex');
+        
+        if (window.history.length > 1) {
+          document.getElementById('master-return-btn').classList.remove('hidden');
+        }
+        
+        renderNestedSections();
+        showToast(`⚡ Standalone Staff Card: ${cardParam.toUpperCase()}`, 'info');
+      } else {
+        // Master Hub Mode
+        STATE.isStandaloneCard = false;
+        document.getElementById('master-hub').classList.remove('hidden');
+        document.getElementById('shared-card-view').classList.add('hidden');
+        document.getElementById('shared-card-view').classList.remove('flex');
+      }
     }
-  }
 
-  activeDrawer = name;
-  const modal = document.getElementById('drawerModal');
-  const title = document.getElementById('drawerTitle');
-  title.innerText = name.toUpperCase() + ' DRAWER';
-  modal.classList.remove('hidden');
-  renderDrawerCards(name);
-}
+    function openSharedCardMode(cardId) {
+      const newUrl = `${window.location.pathname}?card=${cardId}`;
+      window.history.pushState({ card: cardId }, '', newUrl);
+      initRouter();
+    }
 
-function closeDrawer() { document.getElementById('drawerModal').classList.add('hidden'); }
+    function returnToMasterHub() {
+      const newUrl = window.location.pathname;
+      window.history.pushState({}, '', newUrl);
+      initRouter();
+    }
 
-function talkToSissyCard(cardName) {
-  const note = prompt(`🎙️ Add voice note or instruction to "${cardName}":`);
-  if (note) {
-    showToast(`📝 Note saved to Forever Card!`);
-  }
-}
+    function initSpeechRecognition() {
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        STATE.recognition = new SpeechRecognition();
+        STATE.recognition.continuous = false;
+        STATE.recognition.interimResults = true;
 
-function openDelegateModal(cardName) {
-  currentCard = cardName;
-  showModal('modalDelegate');
-}
+        STATE.recognition.onstart = () => {
+          STATE.isListening = true;
+          updateLedStatus(true, 'Listening to Voice Input...');
+        };
 
-function confirmDelegate(role) {
-  hideModals();
-  showToast(`✅ Dispatched to ${role}!`);
-}
+        STATE.recognition.onresult = (event) => {
+          let transcript = '';
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            transcript += event.results[i][0].transcript;
+          }
+          document.getElementById('transcript-box').innerText = `"${transcript}"`;
+          
+          if (event.results[0].isFinal) {
+            processVoiceCommand(transcript);
+          }
+        };
 
-function createStripePay(title) {
-  const match = title ? title.match(/\$?(\d+(\.\d{2})?)/) : null;
-  const defaultAmt = match ? match[1] : "300.00";
-  const amt = prompt("Enter invoice total ($):", defaultAmt);
-  if (amt) {
-    const total = (parseFloat(amt) * 1.06).toFixed(2);
-    prompt("Stripe Pay Link (MD 6% Tax Included):", `https://buy.stripe.com/pay_tappything?amount=${total}&tax=md6`);
-  }
-}
-</script>
+        STATE.recognition.onerror = () => {
+          STATE.isListening = false;
+          updateLedStatus(false, 'Fresh Ready — Tap to Talk');
+        };
+
+        STATE.recognition.onend = () => {
+          STATE.isListening = false;
+          updateLedStatus(false, 'Fresh Ready — Tap to Talk');
+        };
+      }
+    }
+
+    function toggleMasterMic() {
+      if (!STATE.recognition) {
+        showToast('Speech recognition is not supported on this browser.', 'error');
+        return;
+      }
+      if (STATE.isListening) {
+        STATE.recognition.stop();
+      } else {
+        STATE.recognition.start();
+      }
+    }
+
+    function toggleIntakeMic() {
+      toggleMasterMic();
+    }
+
+    function processVoiceCommand(text) {
+      showToast(`Processed: "${text}"`, 'success');
+      // Append to active intake input if present
+      const intakeInput = document.getElementById('intake-input');
+      if (intakeInput) intakeInput.value = text;
+    }
+
+    function updateLedStatus(active, message) {
+      const indicator = document.getElementById('led-indicator');
+      const text = document.getElementById('led-status-text');
+      if (active) {
+        indicator.className = 'w-3 h-3 rounded-full bg-sky-400 animate-ping';
+        text.className = 'text-xs font-mono tracking-wider text-sky-400 uppercase font-semibold';
+      } else {
+        indicator.className = 'w-3 h-3 rounded-full bg-emerald-500 animate-pulse';
+        text.className = 'text-xs font-mono tracking-wider text-emerald-400 uppercase font-semibold';
+      }
+      text.innerText = message;
+    }
+
+    function renderNestedSections() {
+      // 1. Counter Intakes
+      const intakeEl = document.getElementById('section-intake-list');
+      intakeEl.innerHTML = STATE.boardData.intakes.map(item => `
+        <div class="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between">
+          <div>
+            <p class="font-bold text-slate-100">${item.name}</p>
+            <p class="text-[11px] text-slate-400">${item.item} — <span class="text-sky-400">${item.status}</span></p>
+          </div>
+          <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full">${item.date}</span>
+        </div>
+      `).join('');
+
+      // 2. Bench Queue
+      const benchEl = document.getElementById('section-bench-list');
+      benchEl.innerHTML = STATE.boardData.bench.map(item => `
+        <div class="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between">
+          <div>
+            <p class="font-bold text-slate-100">${item.item}</p>
+            <p class="text-[11px] text-slate-400">Tech: ${item.tech} | ${item.task}</p>
+          </div>
+          <button onclick="smartStripePay('${item.item}', 250)" class="text-[10px] bg-indigo-950 hover:bg-indigo-900 text-indigo-300 px-2 py-1 rounded-lg border border-indigo-800 font-semibold">
+            💳 Pay $250
+          </button>
+        </div>
+      `).join('');
+
+      // 3. Ready Wall
+      const readyEl = document.getElementById('section-ready-list');
+      readyEl.innerHTML = STATE.boardData.ready.map(item => `
+        <div class="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between">
+          <div>
+            <p class="font-bold text-slate-100">${item.name}</p>
+            <p class="text-[11px] text-emerald-400">${item.item} (${item.status})</p>
+          </div>
+          <span class="text-[10px] bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-800">READY</span>
+        </div>
+      `).join('');
+
+      // 4. Parts Needed
+      const partsEl = document.getElementById('section-parts-list');
+      partsEl.innerHTML = STATE.boardData.parts.map(item => `
+        <div class="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between">
+          <div>
+            <p class="font-bold text-slate-100">${item.part}</p>
+            <p class="text-[11px] text-slate-400">Qty: ${item.qty} | Req by: ${item.reqBy}</p>
+          </div>
+          <span class="text-[10px] bg-amber-950 text-amber-300 px-2 py-0.5 rounded-full border border-amber-800">ORDER</span>
+        </div>
+      `).join('');
+    }
+
+    function submitCounterIntake() {
+      const input = document.getElementById('intake-input');
+      const text = input.value.trim();
+      if (!text) {
+        showToast('Please speak or enter an intake note first.', 'error');
+        return;
+      }
+
+      STATE.boardData.intakes.unshift({
+        id: Date.now().toString(),
+        name: 'Counter Drop-off',
+        item: text,
+        status: 'Just Added',
+        date: 'Just Now'
+      });
+
+      input.value = '';
+      renderNestedSections();
+      showToast('📥 New Intake card logged to Shop Ops!', 'success');
+    }
+
+    function handleMediaUpload(input, type) {
+      if (input.files && input.files[0]) {
+        showToast(`📷 ${type} captured and attached to intake card!`, 'success');
+      }
+    }
+
+    function dictateToSection(sectionName) {
+      showToast(`🎙️ Speak now to add note to ${sectionName}...`, 'info');
+      toggleMasterMic();
+    }
+
+    function shareCardLink(cardId) {
+      const shareUrl = `${window.location.origin}${window.location.pathname}?card=${cardId}`;
+      
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          showToast(`🔗 Staff Forever Card Link Copied!`, 'success');
+        }).catch(() => fallbackCopy(shareUrl));
+      } else {
+        fallbackCopy(shareUrl);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showToast(`🔗 Staff Forever Card Link Copied!`, 'success');
+      } catch (err) {
+        showToast(`Link: ${text}`, 'info');
+      }
+      document.body.removeChild(textArea);
+    }
+
+    function smartStripePay(itemName, amount) {
+      showToast(`💳 Opening Stripe Checkout for $${amount} (${itemName})...`, 'info');
+    }
+
+    async function fetchMondayData() {
+      try {
+        const res = await fetch('/.netlify/functions/monday?board=18424728273');
+        if (res.ok) {
+          const data = await res.json();
+          showToast('Updated live from Monday board', 'success');
+        }
+      } catch (e) {
+        // Fallback gracefully to default state
+      }
+    }
+
+    function openDrawer(title, subtitle) {
+      document.getElementById('drawer-title').innerText = title;
+      document.getElementById('drawer-subtitle').innerText = subtitle;
+      document.getElementById('drawer-content').innerHTML = `
+        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800">
+          <p class="font-bold text-white mb-1">Active Card Drawer</p>
+          <p class="text-xs text-slate-400">Live operational data synced via Fresh Digital Coordinator.</p>
+        </div>
+      `;
+      document.getElementById('drawer-modal').classList.remove('hidden');
+    }
+
+    function openCalendarDrawer() {
+      document.getElementById('drawer-title').innerText = "In-App Calendar Agenda";
+      document.getElementById('drawer-subtitle').innerText = "Today's Field Appointments";
+      document.getElementById('drawer-content').innerHTML = `
+        <div class="space-y-2">
+          <div class="p-3 rounded-xl bg-slate-950 border border-amber-900/50">
+            <span class="text-xs text-amber-400 font-mono">10:30 AM — Field Appointment</span>
+            <p class="font-bold text-white text-sm">Paul Schwab — Central Vac Inlets</p>
+            <p class="text-xs text-slate-400">Inspect 9 inlets, present cord adapter, check suction.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+            <span class="text-xs text-sky-400 font-mono">11:30 AM – 1:00 PM</span>
+            <p class="font-bold text-white text-sm">Eric Landers Drop-off</p>
+            <p class="text-xs text-slate-400">Deliver Guardian Vac with new motor & repaired hoses.</p>
+          </div>
+        </div>
+      `;
+      document.getElementById('drawer-modal').classList.remove('hidden');
+    }
+
+    function closeDrawer() {
+      document.getElementById('drawer-modal').classList.add('hidden');
+    }
+
+    function triggerPinballProtocol() {
+      showToast('⚡ PINBALL PROTOCOL ACTIVATED: Processing pending queue...', 'success');
+      setTimeout(() => {
+        showToast('🎯 100% finished outputs ready for Eric Landers & Paul Schwab!', 'info');
+      }, 1200);
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      const colors = {
+        success: 'bg-emerald-950 text-emerald-200 border-emerald-800',
+        error: 'bg-rose-950 text-rose-200 border-rose-800',
+        info: 'bg-sky-950 text-sky-200 border-sky-800'
+      };
+
+      toast.className = `px-4 py-3 rounded-xl border shadow-xl text-xs font-semibold flex items-center gap-2 pointer-events-auto transform transition duration-300 ${colors[type] || colors.info}`;
+      toast.innerHTML = `<span>${message}</span>`;
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+  </script>
 </body>
 </html>
