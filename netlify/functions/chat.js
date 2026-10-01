@@ -47,7 +47,7 @@ exports.handler = async (event) => {
   }
 
   // ==========================================
-  // WRITE HANDLER (POST) - Sisi Smart Route
+  // WRITE HANDLER (POST) - Sisi Smart Route + Name Lookup
   // ==========================================
   if (event.httpMethod === 'POST') {
     try {
@@ -62,14 +62,73 @@ exports.handler = async (event) => {
         };
       }
 
+      let cardTitle = prompt;
+
+      // 1. Try to extract customer name (First Last pattern)
+      const nameMatch = prompt.match(/\b([A-Z][a-z]+\s+[A-Z][a-z]+)\b/);
+      if (nameMatch) {
+        const extractedName = nameMatch[1];
+        
+        // 2. Query Monday board for matching customer name
+        const searchQuery = `
+          query {
+            boards(ids: [${boardId}]) {
+              items_page(query_params: { rules: [{ column_id: "name", compare_value: ["${extractedName}"], operator: contains_text }] }) {
+                items {
+                  id
+                  name
+                  column_values {
+                    id
+                    text
+                  }
+                }
+              }
+            }
+          }
+        `;
+
+        try {
+          const searchRes = await fetch('https://api.monday.com/v2', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': token,
+              'API-Version': '2023-10'
+            },
+            body: JSON.stringify({ query: searchQuery })
+          });
+
+          const searchData = await searchRes.json();
+          const foundItems = searchData.data?.boards?.[0]?.items_page?.items || [];
+
+          // 3. If match found, append details to card title
+          if (foundItems.length > 0) {
+            const matchedItem = foundItems[0];
+            const details = matchedItem.column_values
+              .map(cv => cv.text)
+              .filter(t => t && t.trim().length > 0)
+              .join(' • ');
+
+            if (details) {
+              cardTitle = `${prompt} [Match: ${matchedItem.name} — ${details}]`;
+            } else {
+              cardTitle = `${prompt} [Match: ${matchedItem.name}]`;
+            }
+          }
+        } catch (lookupErr) {
+          // Fallback gracefully if lookup times out or fails
+          console.error('Customer lookup error:', lookupErr);
+        }
+      }
+
       const targetGroupId = classifyZone(prompt);
 
       // Escape quotes in the prompt text for GraphQL string safety
-      const sanitizedPrompt = prompt.replace(/"/g, '\\"').replace(/\n/g, ' ');
+      const sanitizedTitle = cardTitle.replace(/"/g, '\\"').replace(/\n/g, ' ');
 
       const mutation = `
         mutation {
-          create_item(board_id: ${boardId}, group_id: "${targetGroupId}", item_name: "${sanitizedPrompt}") {
+          create_item(board_id: ${boardId}, group_id: "${targetGroupId}", item_name: "${sanitizedTitle}") {
             id
           }
         }
