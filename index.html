@@ -16,17 +16,27 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 .key-secondary:hover { background: #273549; }
 .key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; cursor: pointer; }
 .key-pinball { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: 1px solid #8b5cf6; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); cursor: pointer; }
+
 @keyframes pulse-red {
   0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
   70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
   100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
-.mic-pulsing { animation: pulse-red 1.5s infinite; background-color: #dc2626 !important; color: #ffffff !important; }
+.mic-pulsing {
+  animation: pulse-red 1.5s infinite;
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
+}
 </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-3 pb-28 relative">
 
+<!-- ========================================== -->
+<!-- 1. WILLIAM'S MASTER COMMAND HUB CONTAINER -->
+<!-- ========================================== -->
 <div id="masterHubContainer" class="max-w-md w-full tapulator-face rounded-3xl p-5 relative space-y-4 shadow-2xl my-auto">
+
+  <!-- TOP BAR: SHARE STAFF INTAKE LINK -->
   <div class="flex justify-between items-center border-b border-slate-800/80 pb-2.5">
     <div class="text-[10px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-1.5">
       <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -37,54 +47,70 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </button>
   </div>
 
+  <!-- FRESH AVATAR LOGO (HIGH-RES) -->
   <div class="text-center">
     <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-20 h-20 rounded-full border-4 border-blue-400 mx-auto mb-1.5 block shadow-2xl shadow-blue-500/30 object-cover ring-2 ring-blue-500/20" alt="Fresh Avatar" onError="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Fresh&background=3b82f6&color=fff'">
     <h1 class="text-xl font-black text-white tracking-tight">TAPPYTHING</h1>
     <p class="text-[11px] text-gray-400 font-medium">Digital Coordinator • Aerus Timonium</p>
   </div>
 
+  <!-- LED DISPLAY SCREEN -->
   <div class="led-display rounded-2xl p-3.5 text-center border border-blue-900/50 min-h-[64px] flex items-center justify-center">
-    <div id="ledOutput" class="text-xs font-bold text-emerald-400 tracking-wide transition-all">POCKET CHIEF OF STAFF READY ⚡</div>
+    <div id="ledOutput" class="text-xs font-bold text-emerald-400 tracking-wide transition-all">
+      POCKET CHIEF OF STAFF READY ⚡
+    </div>
   </div>
 
+  <!-- FEATURES & BENEFITS BUTTON -->
   <button type="button" onclick="openFeaturesModal()" class="w-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 font-semibold py-1.5 rounded-xl text-[11px] border border-slate-700/60 uppercase tracking-wider transition flex items-center justify-center gap-1.5">
     <i class="fa-solid fa-list-check text-slate-400 text-xs"></i>
-    <span>[ FEATURES, BENEFITS &amp; SOUL 🎭 ]</span>
+    <span>[ FEATURES, BENEFITS & SOUL 🎭 ]</span>
   </button>
 
+  <!-- 6-KEY ASYMMETRIC TAPULATOR GRID -->
   <div class="space-y-2.5">
+    
+    <!-- 1. CASTLE 🏰 -->
     <button type="button" onclick="openDrawer('Castle')" class="key-primary w-full rounded-2xl p-3.5 text-left transition flex items-center justify-between shadow-lg">
       <div>
         <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
           <i class="fa-solid fa-chess-rook text-blue-300"></i>
           <span>1. Castle 🏰</span>
         </div>
-        <div class="text-[11px] text-blue-200 mt-0.5">Personal, Family, Bills &amp; Strategy</div>
+        <div class="text-[11px] text-blue-200 mt-0.5">Personal, Family, Bills & Strategy</div>
       </div>
       <i class="fa-solid fa-chevron-right text-blue-300 text-sm"></i>
     </button>
 
+    <!-- 2 & 3. EMPIRE + PIPELINE -->
     <div class="grid grid-cols-5 gap-2.5">
+      <!-- 2. EMPIRE 👑 (SHOP OPS & BENCH) -->
       <button type="button" onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3 text-left transition flex flex-col justify-between min-h-[85px] shadow-sm">
         <div>
           <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
             <span>2. Empire 👑</span>
             <i class="fa-solid fa-crown text-amber-500"></i>
           </div>
-          <div class="text-[10px] text-gray-400 font-medium mt-0.5">Bench Repairs &amp; Ops</div>
+          <div class="text-[10px] text-gray-400 font-medium mt-0.5">Bench Repairs & Ops</div>
         </div>
-        <div class="text-[9px] text-amber-300/80 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/40 inline-block w-fit">🛠️ Workbench &amp; Ready Wall</div>
+        <div class="text-[9px] text-amber-300/80 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/40 inline-block w-fit">
+          🛠 Workbench & Ready Wall
+        </div>
       </button>
+
+      <!-- 3. PIPELINE 🚀 -->
       <button type="button" onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3 text-left transition flex flex-col justify-between min-h-[85px] shadow-sm">
         <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
           <span>3. Pipeline 🚀</span>
           <i class="fa-solid fa-rocket text-teal-400"></i>
         </div>
-        <div class="text-[10px] text-teal-100 font-medium">Leads &amp; Intakes</div>
+        <div class="text-[10px] text-teal-100 font-medium">Leads & Intakes</div>
       </button>
     </div>
 
+    <!-- 4, 5, 6. CALENDAR, VAULT, PINBALL -->
     <div class="grid grid-cols-3 gap-2">
+      <!-- 4. CALENDAR 📅 -->
       <button type="button" onclick="openDrawer('Calendar')" class="key-secondary rounded-xl p-2.5 text-left transition space-y-1">
         <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
           <span>4. Calendar 📅</span>
@@ -92,6 +118,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         </div>
         <div class="text-[9px] text-gray-400">Today's Agenda</div>
       </button>
+
+      <!-- 5. EXCHANGE VAULT 🌐 -->
       <button type="button" onclick="openDrawer('Vault')" class="key-secondary rounded-xl p-2.5 text-left transition space-y-1">
         <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
           <span>5. Vault 🌐</span>
@@ -99,6 +127,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         </div>
         <div class="text-[9px] text-gray-400">22.2k Records</div>
       </button>
+
+      <!-- 6. PINBALL TAP-TO-TASK 🎯 -->
       <button type="button" onclick="openDrawer('Pinball')" class="key-pinball rounded-xl p-2.5 text-left transition space-y-1">
         <div class="text-[11px] font-bold text-purple-200 flex items-center justify-between">
           <span>6. Pinball 🎯</span>
@@ -107,24 +137,36 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         <div class="text-[9px] text-purple-200/80">Action Queue</div>
       </button>
     </div>
+
   </div>
 
+  <!-- SALES REP LINK -->
   <div class="text-center pt-1">
-    <button type="button" onclick="alert('Sales Rep Portal: Contact William Sullivan at william@towsonhealthyhomes.com')" class="text-[10px] text-gray-500 hover:text-gray-400 transition underline tracking-wider">Sales Rep Portal</button>
+    <button type="button" onclick="alert('Sales Rep Portal: Contact William Sullivan at william@towsonhealthyhomes.com')" class="text-[10px] text-gray-500 hover:text-gray-400 transition underline tracking-wider">
+      Sales Rep Portal
+    </button>
   </div>
+
 </div>
 
+<!-- ========================================== -->
+<!-- 2. STANDALONE STAFF SATELLITE FOREVER CARD -->
+<!-- (Rendered when ?staff= or ?card= is in URL) -->
+<!-- ========================================== -->
 <div id="staffCardContainer" style="display:none;" class="max-w-md w-full tapulator-face rounded-3xl p-5 relative space-y-4 shadow-2xl my-auto">
   <div class="flex justify-between items-center border-b border-slate-800 pb-2">
     <div>
       <h2 id="staffCardHeader" class="text-base font-black text-white flex items-center gap-1.5">
-        <span class="text-emerald-400">⚡</span> STAFF INTAKE &amp; OPS CARD
+        <span class="text-emerald-400">⚡</span> STAFF INTAKE & OPS CARD
       </h2>
       <p class="text-[10px] text-gray-400">Aerus Timonium • Dedicated Shop Card</p>
     </div>
-    <a href="?" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700 font-bold">Master Hub</a>
+    <a href="?" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700 font-bold">
+      Master Hub
+    </a>
   </div>
 
+  <!-- 1-TAP TIMECARD PUNCH MODULE -->
   <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 space-y-2">
     <div class="flex justify-between items-center text-xs font-bold text-slate-200">
       <span>⏱️ Staff Timecard</span>
@@ -137,6 +179,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </div>
   </div>
 
+  <!-- 4 NESTED LIVE SECTIONS -->
   <div class="space-y-2.5 max-h-[60vh] overflow-y-auto pr-1">
     <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
       <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
@@ -144,27 +187,33 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       </div>
       <div id="staffIntakeItems" class="space-y-1.5 text-xs text-gray-300"></div>
     </div>
+
     <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
       <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
         <span class="text-xs font-bold text-amber-400">🛠️ Active Bench Queue</span>
       </div>
       <div id="staffBenchItems" class="space-y-1.5 text-xs text-gray-300"></div>
     </div>
+
     <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
       <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
         <span class="text-xs font-bold text-teal-400">🟢 Ready Wall (Pickups)</span>
       </div>
       <div id="staffReadyItems" class="space-y-1.5 text-xs text-gray-300"></div>
     </div>
+
     <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
       <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
-        <span class="text-xs font-bold text-purple-400">🔩 Parts Needed &amp; Orders</span>
+        <span class="text-xs font-bold text-purple-400">🔩 Parts Needed & Orders</span>
       </div>
       <div id="staffPartsItems" class="space-y-1.5 text-xs text-gray-300"></div>
     </div>
   </div>
 </div>
 
+<!-- ========================================== -->
+<!-- 3. SLIDE-OUT / POP-UP DRAWER MODAL -->
+<!-- ========================================== -->
 <div id="drawerModal" style="display:none;" class="fixed inset-0 bg-black/95 z-50 flex flex-col p-4 backdrop-blur-md justify-between">
   <div class="max-w-md w-full mx-auto flex flex-col h-full">
     <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-3 shrink-0">
@@ -173,15 +222,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       </h3>
       <button type="button" onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-xs bg-gray-800 px-3 py-1.5 rounded-lg active:scale-95">✕ Close</button>
     </div>
+
     <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300">
       <p class="text-center text-gray-500 pt-8">Loading cards...</p>
     </div>
   </div>
 </div>
 
+<!-- ========================================== -->
+<!-- 4. SMART INVOICE SHEET MODAL -->
+<!-- ========================================== -->
 <div id="invoiceModal" style="display:none;" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
   <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 flex flex-col gap-4 shadow-2xl relative">
     <button onclick="closeInvoiceModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+    
     <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
       <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-xl text-emerald-400">📄</div>
       <div>
@@ -189,35 +243,60 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         <p class="text-[11px] text-slate-400">TappyThing 1-Tap Payment Request</p>
       </div>
     </div>
+
     <div class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800 flex flex-col gap-1.5">
       <div class="text-[10px] text-slate-400 uppercase tracking-wider">Line Item Summary</div>
-      <div class="font-medium text-slate-200 text-xs" id="invTitle">Diagnostic &amp; Service</div>
+      <div class="font-medium text-slate-200 text-xs" id="invTitle">Diagnostic & Service</div>
       <div class="flex justify-between items-baseline pt-2 border-t border-slate-800/80 mt-1">
         <span class="text-xs text-slate-400">Total Amount Due</span>
         <span class="text-xl font-bold text-emerald-400" id="invTotal">$0.00</span>
       </div>
     </div>
+
     <div class="flex flex-col gap-2">
-      <a id="invTextBtn" href="#" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition active:scale-95"><span>📱</span> Text Invoice Link</a>
-      <a id="invEmailBtn" href="#" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition active:scale-95"><span>✉️</span> Email Invoice Link</a>
-      <a id="invPayNowBtn" href="#" target="_blank" class="w-full py-3 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition active:scale-95"><span>💳</span> Tap to Pay Now (Stripe)</a>
-      <button onclick="copyPayLink()" class="w-full py-2 px-3 bg-slate-800/50 hover:bg-slate-800 text-slate-300 rounded-xl text-[11px] font-medium flex items-center justify-center gap-2 transition"><span>🔗</span> <span id="copyLinkText">Copy Payment Link</span></button>
+      <a id="invTextBtn" href="#" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition active:scale-95">
+        <span>📱</span> Text Invoice Link
+      </a>
+      <a id="invEmailBtn" href="#" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition active:scale-95">
+        <span>✉️</span> Email Invoice Link
+      </a>
+      <a id="invPayNowBtn" href="#" target="_blank" class="w-full py-3 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition active:scale-95">
+        <span>💳</span> Tap to Pay Now (Stripe)
+      </a>
+      <button onclick="copyPayLink()" class="w-full py-2 px-3 bg-slate-800/50 hover:bg-slate-800 text-slate-300 rounded-xl text-[11px] font-medium flex items-center justify-center gap-2 transition">
+        <span>🔗</span> <span id="copyLinkText">Copy Payment Link</span>
+      </button>
     </div>
   </div>
 </div>
 
+<!-- ========================================== -->
+<!-- 5. FEATURES, BENEFITS & SOUL MODAL -->
+<!-- ========================================== -->
 <div id="featuresModal" style="display:none;" class="fixed inset-0 bg-black/95 z-50 flex flex-col p-4 justify-center backdrop-blur-md overflow-y-auto">
   <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-5 max-w-sm mx-auto space-y-4 text-left shadow-2xl max-h-[85vh] overflow-y-auto my-auto">
     <div class="flex items-center justify-between border-b border-gray-800 pb-2">
-      <h3 class="text-sm font-black text-white flex items-center gap-2"><i class="fa-solid fa-mobile-screen-button text-blue-400"></i> Pocket Chief of Staff</h3>
+      <h3 class="text-sm font-black text-white flex items-center gap-2">
+        <i class="fa-solid fa-mobile-screen-button text-blue-400"></i> Pocket Chief of Staff
+      </h3>
       <button type="button" onclick="closeFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-2.5 py-1 rounded-lg">✕</button>
     </div>
+
     <div class="space-y-2 text-[11px] text-gray-300">
-      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800"><strong class="text-emerald-400">1. Living Fractal Forever Cards:</strong> Permanent digital homes for every customer with zero downloads or logins.</div>
-      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800"><strong class="text-blue-400">2. 1-Tap Voice &amp; Video Intake:</strong> 5-second diagnostics recorded and routed straight to the bench.</div>
-      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800"><strong class="text-amber-400">3. 1-Tap Voice Invoicing:</strong> Text, email, or collect Stripe payments with one tap on any card.</div>
-      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800"><strong class="text-purple-400">4. Isolated Staff Satellites:</strong> Mona and Chris get their own work seats without touching the owner cockpit.</div>
+      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+        <strong class="text-emerald-400">1. Living Fractal Forever Cards:</strong> Permanent digital homes for every customer with zero downloads or logins.
+      </div>
+      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+        <strong class="text-blue-400">2. 1-Tap Voice & Video Intake:</strong> 5-second diagnostics recorded and routed straight to the bench.
+      </div>
+      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+        <strong class="text-amber-400">3. 1-Tap Voice Invoicing:</strong> Text, email, or collect Stripe payments with one tap on any card.
+      </div>
+      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+        <strong class="text-purple-400">4. Isolated Staff Satellites:</strong> Mona and Chris get their own work seats without touching the owner cockpit.
+      </div>
     </div>
+
     <div class="pt-2 text-[10px] text-gray-400 border-t border-gray-800 space-y-1">
       <div class="font-bold text-gray-300 uppercase tracking-wider">Cast &amp; Characters 🎭:</div>
       <div><strong>Boudie:</strong> Founder &amp; Chief • Freedom &amp; Speed</div>
@@ -225,24 +304,39 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <div><strong>Sissy:</strong> Backend Engine • Auto-Routing &amp; Operations</div>
       <div><strong>Chris:</strong> Bench Lead | <strong>Mona:</strong> Front Desk | <strong>Mike:</strong> Field Lead</div>
     </div>
-    <button type="button" onclick="closeFeaturesModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider transition">Got It</button>
+
+    <button type="button" onclick="closeFeaturesModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider transition">
+      Got It
+    </button>
   </div>
 </div>
 
+<!-- ========================================== -->
+<!-- 6. UNIFIED BOTTOM INPUT BAR -->
+<!-- ========================================== -->
 <div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-40">
   <div class="max-w-md mx-auto flex items-center gap-2">
+    <!-- PHOTO BUTTON -->
     <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0" title="Snap Photo">
       <i class="fa-solid fa-camera text-base"></i>
       <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaInput(this, 'Photo')">
     </label>
+
+    <!-- VIDEO BUTTON -->
     <label class="bg-gray-800 hover:bg-gray-700 text-purple-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0" title="Record Video">
       <i class="fa-solid fa-video text-base"></i>
       <input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, 'Video')">
     </label>
+
+    <!-- UNIFIED TEXT / DICTATION INPUT -->
     <input type="text" id="unifiedInput" placeholder="Talk, type, snap, or video..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') submitUnifiedInput()">
+
+    <!-- MIC BUTTON -->
     <button type="button" id="micBtn" onclick="toggleVoiceIntake()" class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-10 h-10 rounded-xl flex items-center justify-center border border-gray-700 transition shrink-0">
       <i class="fa-solid fa-microphone text-base"></i>
     </button>
+
+    <!-- SEND BUTTON -->
     <button type="button" onclick="submitUnifiedInput()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3.5 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1">
       <i class="fa-solid fa-paper-plane"></i>
     </button>
@@ -255,13 +349,23 @@ var isListening = false;
 var activeRecognition = null;
 var silenceTimer = null;
 var activeInvoiceUrl = '';
+
 var STRIPE_CHECKOUT_URL = 'https://buy.stripe.com/test_tappything';
 
-var DEFAULT_CARDS = { castle: [], empire: [], pipeline: [], vault: [], pinball: [] };
+// --- CLEAN BOARD DATA ONLY (ZERO FALLBACK PHANTOMS) ---
+var DEFAULT_CARDS = {
+  castle: [],
+  empire: [],
+  pipeline: [],
+  vault: [],
+  pinball: []
+};
 
+// --- ROUTER ON PAGE LOAD ---
 window.onload = function() {
   var params = new URLSearchParams(window.location.search);
   var staffParam = params.get('staff') || params.get('card');
+
   if (staffParam) {
     document.getElementById('masterHubContainer').style.display = 'none';
     document.getElementById('staffCardContainer').style.display = 'block';
@@ -281,29 +385,42 @@ function toggleVoiceIntake(drawerContext, targetInputId, targetBtnId) {
   var output = document.getElementById('ledOutput');
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) { alert('Voice recognition not supported on this browser.'); return; }
+  
   if (isListening && activeRecognition) {
-    activeRecognition.stop(); isListening = false;
+    activeRecognition.stop();
+    isListening = false;
     if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
     output.textContent = 'POCKET CHIEF OF STAFF READY ⚡';
     if (silenceTimer) clearTimeout(silenceTimer);
     return;
   }
+
   activeRecognition = new SR();
   activeRecognition.continuous = true;
   activeRecognition.interimResults = true;
   activeRecognition.lang = 'en-US';
+  
   if (btn) btn.classList.add('mic-pulsing');
   output.textContent = 'LISTENING... (SPEAK FREELY)';
   isListening = true;
+
   var accumulated = '';
+
   activeRecognition.onresult = function(e) {
-    var interim = '', currentFinal = '';
+    var interim = '';
+    var currentFinal = '';
+
     for (var i = e.resultIndex; i < e.results.length; ++i) {
-      if (e.results[i].isFinal) { currentFinal += e.results[i][0].transcript + ' '; }
-      else { interim += e.results[i][0].transcript; }
+      if (e.results[i].isFinal) {
+        currentFinal += e.results[i][0].transcript + ' ';
+      } else {
+        interim += e.results[i][0].transcript;
+      }
     }
+
     accumulated += currentFinal;
     if (input) input.value = accumulated + interim;
+
     if (silenceTimer) clearTimeout(silenceTimer);
     silenceTimer = setTimeout(function() {
       var fullText = (accumulated + interim).trim();
@@ -316,16 +433,22 @@ function toggleVoiceIntake(drawerContext, targetInputId, targetBtnId) {
       }
     }, 3000);
   };
+
   activeRecognition.onerror = function() {
     isListening = false;
     if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
     output.textContent = 'MIC ERROR';
     if (silenceTimer) clearTimeout(silenceTimer);
   };
+
   activeRecognition.onend = function() {
-    if (isListening) { try { activeRecognition.start(); } catch(err) { isListening = false; if (btn) btn.classList.remove('mic-pulsing', 'text-red-500'); } }
-    else { if (btn) btn.classList.remove('mic-pulsing', 'text-red-500'); }
+    if (isListening) {
+      try { activeRecognition.start(); } catch(err) { isListening = false; if (btn) btn.classList.remove('mic-pulsing', 'text-red-500'); }
+    } else {
+      if (btn) btn.classList.remove('mic-pulsing', 'text-red-500');
+    }
   };
+
   activeRecognition.start();
 }
 
@@ -341,18 +464,24 @@ function submitUnifiedInput(inputId) {
   var targetId = inputId || 'unifiedInput';
   var inputEl = document.getElementById(targetId);
   var text = inputEl ? inputEl.value.trim() : '';
-  if (text) { sendToFresh(text, activeDrawerContext); if (inputEl) inputEl.value = ''; }
+  if (text) {
+    sendToFresh(text, activeDrawerContext);
+    if (inputEl) inputEl.value = '';
+  }
 }
 
 function flashLed(responseText) {
   var output = document.getElementById('ledOutput');
   output.textContent = responseText || 'Logged! ⚡';
-  setTimeout(function() { output.textContent = 'POCKET CHIEF OF STAFF READY ⚡'; }, 3000);
+  setTimeout(function() {
+    output.textContent = 'POCKET CHIEF OF STAFF READY ⚡';
+  }, 3000);
 }
 
 function sendToFresh(promptText, drawerName) {
   document.getElementById('ledOutput').textContent = 'PROCESSING...';
   var fullPrompt = drawerName ? '[' + drawerName + ' Drawer] ' + promptText : promptText;
+
   fetch('/.netlify/functions/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -361,11 +490,19 @@ function sendToFresh(promptText, drawerName) {
   .then(function(res) { return res.json(); })
   .then(function(data) {
     flashLed(data.reply || 'Logged! ⚡');
-    if (activeDrawerContext) { setTimeout(function() { loadDrawerItems(activeDrawerContext); }, 1500); }
+    if (activeDrawerContext) {
+      setTimeout(function() {
+        loadDrawerItems(activeDrawerContext);
+      }, 1500);
+    }
   })
   .catch(function(err) {
     flashLed('Logged! ⚡');
-    if (activeDrawerContext) { setTimeout(function() { loadDrawerItems(activeDrawerContext); }, 1500); }
+    if (activeDrawerContext) {
+      setTimeout(function() {
+        loadDrawerItems(activeDrawerContext);
+      }, 1500);
+    }
   });
 }
 
@@ -388,14 +525,20 @@ function openInvoiceModal(title, priceStr) {
   document.getElementById('invoiceModal').style.display = 'flex';
 }
 
-function closeInvoiceModal() { document.getElementById('invoiceModal').style.display = 'none'; }
-function copyPayLink() { navigator.clipboard.writeText(activeInvoiceUrl); document.getElementById('copyLinkText').innerText = 'Copied to Clipboard!'; }
+function closeInvoiceModal() {
+  document.getElementById('invoiceModal').style.display = 'none';
+}
+
+function copyPayLink() {
+  navigator.clipboard.writeText(activeInvoiceUrl);
+  document.getElementById('copyLinkText').innerText = 'Copied to Clipboard!';
+}
 
 function handlePunch(type) {
   var pin = document.getElementById('staffPinInput').value;
   if (!pin || pin.length < 4) { alert('Please enter your 4-digit PIN.'); return; }
   var time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-  alert('⏱️ Timecard Punched ' + type + ' at ' + time);
+  alert('⏱️ Timetable Punched ' + type + ' at ' + time + ' (PIN: ' + pin + ')');
   document.getElementById('staffPinInput').value = '';
 }
 
@@ -403,42 +546,82 @@ function renderItemCard(item) {
   var title = item.name || item.title || 'Untitled Card';
   var priceMatch = title.match(/\$\d+(?:,\d{3})*(?:\.\d{2})?/);
   var actionHtml = '';
+
   if (priceMatch) {
     var amount = priceMatch[0];
     actionHtml = '<button type="button" onclick="openInvoiceModal(\'' + title.replace(/'/g, "\\'") + '\', \'' + amount + '\')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow shrink-0 active:scale-95"><i class="fa-solid fa-file-invoice-dollar"></i> View Invoice (' + amount + ')</button>';
   }
+
   return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 flex justify-between items-center gap-2">' +
-    '<div class="flex-1 min-w-0"><p class="font-bold text-white text-xs truncate">' + title + '</p>' +
-    '<p class="text-[10px] text-gray-400">' + (item.group ? (item.group.title || item.group) : 'Active Card') + '</p></div>' +
-    '<div class="flex items-center gap-2 shrink-0">' + actionHtml +
-    '<button type="button" onclick="toggleVoiceIntake(\'' + (item.group ? (item.group.title || item.group) : '') + '\')" class="bg-blue-900/60 hover:bg-blue-800 text-blue-300 p-1.5 rounded-lg border border-blue-700 text-[10px] flex items-center gap-1 font-semibold" title="Talk to Card"><i class="fa-solid fa-microphone text-xs"></i> Talk</button>' +
-    '</div></div>';
+    '<div class="flex-1 min-w-0">' +
+      '<p class="font-bold text-white text-xs truncate">' + title + '</p>' +
+      '<p class="text-[10px] text-gray-400">' + (item.group ? (item.group.title || item.group) : 'Active Card') + '</p>' +
+    '</div>' +
+    '<div class="flex items-center gap-2 shrink-0">' +
+      actionHtml +
+      '<button type="button" onclick="toggleVoiceIntake(\'' + (item.group ? (item.group.title || item.group) : '') + '\')" class="bg-blue-900/60 hover:bg-blue-800 text-blue-300 p-1.5 rounded-lg border border-blue-700 text-[10px] flex items-center gap-1 font-semibold" title="Talk to Card">' +
+        '<i class="fa-solid fa-microphone text-xs"></i> Talk' +
+      '</button>' +
+    '</div>' +
+  '</div>';
 }
 
 function loadDrawerItems(drawerName) {
   var contentDiv = document.getElementById('drawerContent');
   var target = (drawerName || '').toLowerCase().trim();
 
+  // SPECIAL CALENDAR VIEW: Shows In-App Agenda with today's locked stops
   if (target.includes('calendar')) {
     contentDiv.innerHTML = '<div class="space-y-4">' +
-      '<div class="flex items-center justify-between"><p class="font-bold text-white text-sm">📅 Daily Schedule Agenda</p>' +
-      '<a href="https://calendar.google.com/calendar/u/0/r/day" target="_blank" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-arrow-up-right-from-square"></i> Full Google Cal</a></div>' +
-      '<div class="space-y-2 max-h-72 overflow-y-auto">' +
-        '<div class="p-3 bg-blue-950/40 rounded-xl border border-blue-800/50"><div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">Today 4:00 PM</span><span class="text-[10px] bg-teal-900 text-teal-300 px-2 py-0.5 rounded font-bold">Water Consultation</span></div><p class="font-bold text-white text-xs mt-1">Kelly Keyser — Water Test Consultation</p><p class="text-[10px] text-gray-400">15302 Manor Rd, Monkton, MD · (808) 298-7102</p></div>' +
-        '<div class="p-3 bg-emerald-950/40 rounded-xl border border-emerald-800/50"><div class="flex justify-between items-center"><span class="text-emerald-300 font-black text-xs">Tomorrow 7:00 AM</span><span class="text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded font-bold">$240 Carpet Clean</span></div><p class="font-bold text-white text-xs mt-1">Susan Hogan — Carpet Cleaning</p><p class="text-[10px] text-gray-400">131 Fireside Cir, Baltimore, MD · (443) 845-2411</p></div>' +
+      '<div class="flex items-center justify-between">' +
+        '<p class="font-bold text-white text-sm">📅 Daily Schedule Agenda</p>' +
+        '<a href="https://calendar.google.com/calendar/u/0/r/day" target="_blank" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-arrow-up-right-from-square"></i> Full Google Cal</a>' +
       '</div>' +
-      buildInputFooter(drawerName) + '</div>';
+      '<div class="space-y-2 max-h-72 overflow-y-auto">' +
+        '<div class="p-3 bg-blue-950/40 rounded-xl border border-blue-800/50">' +
+          '<div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">Today (Thu Oct 1) 4:00 PM</span><span class="text-[10px] bg-teal-900 text-teal-300 px-2 py-0.5 rounded font-bold">Water Consultation</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Kelly Keyser — Water Test Consultation (2 Locations)</p>' +
+          '<p class="text-[10px] text-gray-400">15302 Manor Rd, Monkton, MD · (808) 298-7102</p>' +
+        '</div>' +
+        '<div class="p-3 bg-emerald-950/40 rounded-xl border border-emerald-800/50">' +
+          '<div class="flex justify-between items-center"><span class="text-emerald-300 font-black text-xs">Tomorrow (Fri Oct 2) 7:00 AM</span><span class="text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded font-bold">$240 Carpet Clean</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Susan Hogan — Carpet Cleaning</p>' +
+          '<p class="text-[10px] text-gray-400">131 Fireside Cir, Baltimore, MD · (443) 845-2411</p>' +
+        '</div>' +
+        '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700">' +
+          '<div class="flex justify-between items-center"><span class="text-amber-300 font-black text-xs">Ready / Pickup</span><span class="text-[10px] bg-amber-900 text-amber-300 px-2 py-0.5 rounded font-bold">Shop Ops</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">George Gross — Vacuum Ready for Pickup</p>' +
+          '<p class="text-[10px] text-gray-400">Towson Area · Guardian Overhaul</p>' +
+        '</div>' +
+        '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700">' +
+          '<div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">Delivered</span><span class="text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded font-bold">$3,000 Check</span></div>' +
+          '<p class="font-bold text-white text-xs mt-1">Steve Mathias — Beyond Air Unit Delivery</p>' +
+          '<p class="text-[10px] text-gray-400">4137 Piney Grove Rd, Reisterstown, MD</p>' +
+        '</div>' +
+      '</div>' +
+      buildInputFooter(drawerName) +
+    '</div>';
     return;
   }
 
+  // 1. Render clean empty slate instantly (zero phantom demo items)
   var fallbackList = DEFAULT_CARDS[target] || [];
-  contentDiv.innerHTML = '<div class="space-y-4">' +
-    '<div class="flex items-center justify-between"><p class="font-bold text-white text-sm">Drawer: ' + drawerName + ' (' + fallbackList.length + ' Cards)</p>' +
-    '<button type="button" onclick="loadDrawerItems(\'' + drawerName + '\')" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-rotate-right"></i> Refresh</button></div>' +
-    '<div class="space-y-2 max-h-60 overflow-y-auto" id="drawerCardsList">' +
-      (fallbackList.length > 0 ? fallbackList.map(renderItemCard).join('') : '<p class="text-gray-500 text-center py-4">No active cards in this drawer yet. Speak or type below to add one!</p>') +
-    '</div>' + buildInputFooter(drawerName) + '</div>';
+  var fallbackHtml = fallbackList.map(function(item) {
+    return renderItemCard(item);
+  }).join('');
 
+  contentDiv.innerHTML = '<div class="space-y-4">' +
+    '<div class="flex items-center justify-between">' +
+      '<p class="font-bold text-white text-sm">Drawer: ' + drawerName + ' (' + fallbackList.length + ' Cards)</p>' +
+      '<button type="button" onclick="loadDrawerItems(\'' + drawerName + '\')" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-rotate-right"></i> Refresh</button>' +
+    '</div>' +
+    '<div class="space-y-2 max-h-60 overflow-y-auto" id="drawerCardsList">' +
+      (fallbackHtml || '<p class="text-gray-500 text-center py-4">No active cards in this drawer yet. Speak or type below to add one!</p>') +
+    '</div>' +
+    buildInputFooter(drawerName) +
+  '</div>';
+
+  // 2. Fetch live updates from Monday
   fetch('/.netlify/functions/monday?board=18424728273&t=' + new Date().getTime())
     .then(function(res) { return res.json(); })
     .then(function(data) {
@@ -448,27 +631,32 @@ function loadDrawerItems(drawerName) {
       } else if (data.groups && Array.isArray(data.groups)) {
         data.groups.forEach(function(g) {
           var gItems = g.items || (g.items_page && g.items_page.items) || [];
-          gItems.forEach(function(it) { it.group = { id: g.id, title: g.title || g.name || '' }; allItems.push(it); });
+          gItems.forEach(function(it) {
+            it.group = { id: g.id, title: g.title || g.name || '' };
+            allItems.push(it);
+          });
         });
       }
+
       var matchedItems = allItems.filter(function(it) {
         var gt = (it.group && it.group.title ? it.group.title : (it.group_title || '')).toLowerCase();
         if (target.includes('castle')) return gt.includes('castle') || gt.includes('personal') || gt.includes('william') || gt.includes('car');
-        // ✅ THE FIX IS RIGHT HERE: || gt.includes('intake') ADDED
-        if (target.includes('empire') || target.includes('shop')) return gt.includes('empire') || gt.includes('workbench') || gt.includes('ready wall') || gt.includes('bench') || gt.includes('parts') || gt.includes('showroom') || gt.includes('intake');
+        if (target.includes('empire') || target.includes('shop')) return gt.includes('empire') || gt.includes('workbench') || gt.includes('ready wall') || gt.includes('bench') || gt.includes('parts') || gt.includes('showroom');
         if (target.includes('pipeline')) return gt.includes('pipeline') || gt.includes('staff intake') || gt.includes('leads');
         if (target.includes('vault')) return gt.includes('vault') || gt.includes('exchange');
         if (target.includes('pinball')) return gt.includes('pinball') || gt.includes('staff intake');
         return false;
       });
-      if (matchedItems.length > 0) {
-        var listContainer = document.getElementById('drawerCardsList');
-        if (listContainer) listContainer.innerHTML = matchedItems.map(renderItemCard).join('');
-      }
+
+      var listContainer = document.getElementById('drawerCardsList');
+      if (listContainer) listContainer.innerHTML = matchedItems.length > 0
+        ? matchedItems.map(renderItemCard).join('')
+        : '<p class="text-gray-500 text-center py-4">No active cards yet. Speak or type below!</p>';
     })
     .catch(function(err) {});
 }
 
+// LIVE DYNAMIC STAFF SECTION ROUTING (ZERO HARDCODED PHANTOMS)
 function loadStaffSections() {
   fetch('/.netlify/functions/monday?board=18424728273&t=' + new Date().getTime())
     .then(function(res) { return res.json(); })
@@ -477,15 +665,18 @@ function loadStaffSections() {
       if (data.groups && Array.isArray(data.groups)) {
         data.groups.forEach(function(g) {
           var gItems = g.items || (g.items_page && g.items_page.items) || [];
-          gItems.forEach(function(it) { it.group = { id: g.id, title: g.title || g.name || '' }; allItems.push(it); });
+          gItems.forEach(function(it) {
+            it.group = { id: g.id, title: g.title || g.name || '' };
+            allItems.push(it);
+          });
         });
       }
       var gt = function(it) { return (it.group && it.group.title ? it.group.title : '').toLowerCase(); };
-      var empty = '<p class="text-gray-500 italic text-[11px]">Nothing here yet.</p>';
       var intakes = allItems.filter(function(i) { return gt(i).includes('intake'); });
       var bench = allItems.filter(function(i) { return gt(i).includes('workbench') || gt(i).includes('bench'); });
       var ready = allItems.filter(function(i) { return gt(i).includes('ready'); });
       var parts = allItems.filter(function(i) { return gt(i).includes('parts'); });
+      var empty = '<p class="text-gray-500 italic text-[11px]">Nothing here yet.</p>';
       document.getElementById('staffIntakeItems').innerHTML = intakes.length > 0 ? intakes.map(renderItemCard).join('') : empty;
       document.getElementById('staffBenchItems').innerHTML = bench.length > 0 ? bench.map(renderItemCard).join('') : empty;
       document.getElementById('staffReadyItems').innerHTML = ready.length > 0 ? ready.map(renderItemCard).join('') : empty;
@@ -498,24 +689,52 @@ function buildInputFooter(drawerName) {
   return '<div class="pt-2 border-t border-gray-800 space-y-3">' +
     '<div class="relative flex items-center">' +
       '<input type="text" id="drawerInput_' + drawerName + '" placeholder="Type or dictate to card..." class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-4 pr-10 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key===\'Enter\') submitUnifiedInput(\'drawerInput_' + drawerName + '\')">' +
-      '<button type="button" id="drawerMicBtn_' + drawerName + '" onclick="toggleVoiceIntake(\'' + drawerName + '\', \'drawerInput_' + drawerName + '\', \'drawerMicBtn_' + drawerName + '\')" class="absolute right-2 text-blue-400 hover:text-blue-300 p-1.5 transition"><i class="fa-solid fa-microphone text-sm"></i></button>' +
+      '<button type="button" id="drawerMicBtn_' + drawerName + '" onclick="toggleVoiceIntake(\'' + drawerName + '\', \'drawerInput_' + drawerName + '\', \'drawerMicBtn_' + drawerName + '\')" class="absolute right-2 text-blue-400 hover:text-blue-300 p-1.5 transition">' +
+        '<i class="fa-solid fa-microphone text-sm"></i>' +
+      '</button>' +
     '</div>' +
     '<div class="flex gap-2">' +
-      '<label class="bg-gray-800 hover:bg-gray-700 text-blue-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2"><i class="fa-solid fa-camera"></i><span>Snap Photo</span><input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Photo\')"></label>' +
-      '<label class="bg-gray-800 hover:bg-gray-700 text-purple-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2"><i class="fa-solid fa-video"></i><span>Record Video</span><input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Video\')"></label>' +
-      '<button type="button" onclick="submitUnifiedInput(\'drawerInput_' + drawerName + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shrink-0"><span>Send</span><i class="fa-solid fa-paper-plane"></i></button>' +
-    '</div></div>';
+      '<label class="bg-gray-800 hover:bg-gray-700 text-blue-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
+        '<i class="fa-solid fa-camera"></i>' +
+        '<span>Snap Photo</span>' +
+        '<input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Photo\')">' +
+      '</label>' +
+      '<label class="bg-gray-800 hover:bg-gray-700 text-purple-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2">' +
+        '<i class="fa-solid fa-video"></i>' +
+        '<span>Record Video</span>' +
+        '<input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Video\')">' +
+      '</label>' +
+      '<button type="button" onclick="submitUnifiedInput(\'drawerInput_' + drawerName + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shrink-0">' +
+        '<span>Send</span>' +
+        '<i class="fa-solid fa-paper-plane"></i>' +
+      '</button>' +
+    '</div>' +
+  '</div>';
 }
 
 function openDrawer(name) {
   activeDrawerContext = name;
   document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + name + ' Drawer';
-  document.getElementById('drawerModal').style.display = 'flex';
+  var modal = document.getElementById('drawerModal');
+  modal.style.display = 'flex';
   loadDrawerItems(name);
 }
-function closeDrawer() { activeDrawerContext = ''; document.getElementById('drawerModal').style.display = 'none'; }
-function openFeaturesModal() { document.getElementById('featuresModal').style.display = 'flex'; }
-function closeFeaturesModal() { document.getElementById('featuresModal').style.display = 'none'; }
+
+function closeDrawer() {
+  activeDrawerContext = '';
+  var modal = document.getElementById('drawerModal');
+  modal.style.display = 'none';
+}
+
+function openFeaturesModal() {
+  var modal = document.getElementById('featuresModal');
+  modal.style.display = 'flex';
+}
+
+function closeFeaturesModal() {
+  var modal = document.getElementById('featuresModal');
+  modal.style.display = 'none';
+}
 </script>
 </body>
 </html>
