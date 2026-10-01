@@ -1,24 +1,29 @@
 // Smart Zone Classifier for incoming voice/text prompts
 function classifyZone(text) {
   const lower = (text || '').toLowerCase();
+  
+  // Strip leading phone speech-to-text artifacts like "test." or "test"
+  const cleaned = lower.replace(/^test\.?\s*/i, '').trim();
 
-  if (/\b(repair|bench|belt|motor|vacuum|intake|diagnostic|oreck|kirby|pickup|machine|tune.?up|work.?bench|dropoff|drop.?off|estimate)\b/.test(lower)) {
+  // ROUTING RULES (keyword -> group ID)
+  if (/\b(repair|bench|belt|motor|vacuum|intake|diagnostic|oreck|kirby|pickup|machine|tune.?up|work.?bench|dropoff|drop.?off|estimate)\b/.test(cleaned)) {
     return 'group_mm7mfbre'; // Empire Operations
   }
-  if (/\b(invoice|proposal|payment|pay|charge|quote|lead|prospect|call|contact|customer)\b/.test(lower)) {
+  if (/\b(invoice|estimate|proposal|payment|pay|charge|quote|lead|prospect|call|contact|follow up|customer)\b/.test(cleaned)) {
     return 'group_mm7myd0b'; // Pipeline
   }
-  if (/\b(personal|bill|mortgage|car|home|family|pickleball)\b/.test(lower)) {
+  if (/\b(personal|bill|mortgage|car|home|family|pickleball)\b/.test(cleaned)) {
     return 'group_mm7mv0yv'; // Castle
   }
-  if (/\b(schedule|appointment|tomorrow|today at|calendar|reminder)\b/.test(lower)) {
+  if (/\b(schedule|appointment|tomorrow|today at|calendar|reminder)\b/.test(cleaned)) {
     return 'group_mm7maw66'; // Calendar
   }
-  if (/\b(parts|order|desco|amazon|supplier)\b/.test(lower)) {
+  if (/\b(parts|order|desco|amazon|supplier)\b/.test(cleaned)) {
     return 'group_mm6bv2h0'; // Parts Needed
   }
 
-  return 'group_mm6b77as'; // Default: Staff Intake — Pending Review
+  // Default fallback -> Staff Intake (Pending Review)
+  return 'group_mm6b77as';
 }
 
 exports.handler = async (event) => {
@@ -33,20 +38,17 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers, body: '' };
   }
 
+  // Broad token check across all possible Netlify environment variable names
   const token = process.env.MONDAY_API_TOKEN || process.env.MONDAY_API_KEY || process.env.MONDAY_TOKEN;
   const boardId = "18424728273";
 
   if (!token) {
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: '❌ MONDAY_API_TOKEN is missing in Netlify Environment Variables.' })
-    };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: '❌ MONDAY_API_TOKEN is missing in Netlify Environment Variables.' }) };
   }
 
-  // ========================================
-  // WRITE HANDLER (POST) - Smart Route
-  // ========================================
+  // ==========================================
+  // WRITE HANDLER (POST) - Sisi Smart Route
+  // ==========================================
   if (event.httpMethod === 'POST') {
     try {
       const bodyData = JSON.parse(event.body || '{}');
@@ -61,6 +63,8 @@ exports.handler = async (event) => {
       }
 
       const targetGroupId = classifyZone(prompt);
+
+      // Escape quotes in the prompt text for GraphQL string safety
       const sanitizedPrompt = prompt.replace(/"/g, '\\"').replace(/\n/g, ' ');
 
       const mutation = `
@@ -108,13 +112,14 @@ exports.handler = async (event) => {
     }
   }
 
-  // ========================================
+  // ==========================================
   // READ HANDLER (GET) - Existing Logic
-  // ========================================
+  // ==========================================
   const qParams = event.queryStringParameters || {};
   const rawDrawer = qParams.group || qParams.drawer || 'all';
   const drawer = rawDrawer.toLowerCase();
 
+  // Multi-group routing map so incoming Staff Intake cards display across all relevant drawers
   const groupMap = {
     castle: ['group_mm7mv0yv', 'group_mm6b77as'],
     empire: ['group_mm7mfbre', 'group_mm6b77as'],
@@ -168,9 +173,9 @@ exports.handler = async (event) => {
     }
 
     const groups = data.data?.boards?.[0]?.groups || [];
+    
     let allItems = [];
     const seen = new Set();
-
     groups.forEach(g => {
       if (g.items_page && g.items_page.items) {
         g.items_page.items.forEach(item => {
