@@ -1,772 +1,938 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-950 text-slate-100 dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>TappyThing — Digital Coordinator</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,500;0,700;1,700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            display: ['Chakra Petch', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-          },
-          colors: {
-            brand: {
-              50: '#f0fdf4',
-              100: '#dcfce7',
-              400: '#4ade80',
-              500: '#22c55e',
-              600: '#16a34a',
-              900: '#14532d',
-            },
-            fresh: {
-              gold: '#fbbf24',
-              cyan: '#06b6d4',
-              neon: '#10b981',
-              dark: '#0f172a'
-            }
-          },
-          boxShadow: {
-            'glow-green': '0 0 25px -5px rgba(34, 197, 94, 0.5)',
-            'glow-cyan': '0 0 25px -5px rgba(6, 182, 212, 0.5)',
-            'glow-amber': '0 0 25px -5px rgba(251, 191, 36, 0.5)',
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TappyThing — Digital Coordinator</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #10b981;
+            --accent-hover: #059669;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --border: #334155;
+            --pay-btn: #16a34a;
+            --danger: #ef4444;
         }
-      }
-    }
-  </script>
-  <style>
-    .led-border {
-      box-shadow: inset 0 0 10px rgba(34, 197, 94, 0.2), 0 0 15px rgba(34, 197, 94, 0.3);
-    }
-    .pulse-ring {
-      animation: pulse-ring-anim 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
-    }
-    @keyframes pulse-ring-anim {
-      0% { transform: scale(0.95); opacity: 0.8; }
-      50% { transform: scale(1.08); opacity: 0.4; }
-      100% { transform: scale(0.95); opacity: 0.8; }
-    }
-    .tapulator-btn {
-      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .tapulator-btn:active {
-      transform: scale(0.96);
-    }
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #090d16; }
-    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #334155; }
-  </style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 80px;
+        }
+
+        header {
+            width: 100%;
+            max-width: 600px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.95);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            padding: 4px;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+        }
+
+        .status-led {
+            width: 14px;
+            height: 14px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            border: 2px solid var(--bg-color);
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        .status-led.listening {
+            background-color: #ef4444;
+            box-shadow: 0 0 12px #ef4444;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--text-main);
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 1-Tap Mic Button */
+        .main-mic-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .mic-btn {
+            width: 100%;
+            padding: 20px;
+            border-radius: 16px;
+            border: none;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .mic-btn:active {
+            transform: scale(0.98);
+        }
+
+        .mic-btn.active {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Smart Media Intake Preview Modal/Area */
+        .intake-preview-card {
+            background: var(--card-bg);
+            border: 2px solid var(--accent);
+            border-radius: 16px;
+            padding: 16px;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+
+        .intake-preview-card.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .media-preview-container {
+            position: relative;
+            width: 100%;
+            max-height: 200px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .media-preview-container img,
+        .media-preview-container video {
+            max-width: 100%;
+            max-height: 200px;
+            object-fit: contain;
+        }
+
+        .voice-status-banner {
+            background: rgba(16, 185, 129, 0.15);
+            border-left: 4px solid var(--accent);
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .intake-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-submit {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-cancel {
+            background: var(--border);
+            color: var(--text-main);
+        }
+
+        /* Asymmetric Tapulator Grid */
+        .tapulator-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .tap-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .tap-card:hover, .tap-card:active {
+            border-color: var(--accent);
+            background: #26334d;
+        }
+
+        .tap-card-icon {
+            font-size: 24px;
+        }
+
+        .tap-card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .tap-card-count {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+        }
+
+        /* Generic Operational Zones */
+        .zone-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .zone-header {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .zone-header .badge {
+            background: var(--border);
+            color: var(--text-main);
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .card-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .item-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+        }
+
+        .item-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .item-card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1.4;
+        }
+
+        .item-media {
+            width: 100%;
+            max-height: 180px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+            margin-top: 4px;
+        }
+
+        .item-media img, .item-media video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .pay-btn {
+            background: var(--pay-btn);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            cursor: pointer;
+            margin-top: 4px;
+            box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-top: 4px;
+        }
+
+        .talk-card-btn {
+            background: rgba(51, 65, 85, 0.6);
+            border: 1px solid var(--border);
+            color: var(--text-sub);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .talk-card-btn:active {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* Timecard Module */
+        .timecard-widget {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .timecard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .pin-input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .pin-input {
+            width: 100%;
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            color: var(--text-main);
+            font-size: 1rem;
+            text-align: center;
+            letter-spacing: 4px;
+        }
+
+        .timecard-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-punch-in {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-punch-out {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        /* Bottom Floating Dock */
+        .bottom-dock {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 600px;
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid var(--border);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            backdrop-filter: blur(8px);
+            z-index: 100;
+        }
+
+        .dock-btn {
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .dock-btn.active, .dock-btn:active {
+            color: var(--accent);
+        }
+
+        .dock-btn-icon {
+            font-size: 20px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+    </style>
 </head>
-<body class="h-full bg-slate-950 text-slate-100 flex flex-col font-sans antialiased selection:bg-brand-500 selection:text-black overflow-x-hidden">
+<body>
 
-  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80 px-4 py-3 flex items-center justify-between shadow-lg">
-    <div class="flex items-center space-x-3">
-      <!-- Fresh Avatar Logo -->
-      <div class="relative group cursor-pointer" onclick="resetToHome()">
-        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-600 via-emerald-400 to-fresh-cyan p-0.5 shadow-glow-green transition-transform group-hover:scale-105">
-          <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center overflow-hidden">
-            <span class="font-display font-bold text-xl text-emerald-400 tracking-wider">F⚡</span>
-          </div>
+    <header>
+        <div class="avatar-container">
+            <div class="avatar">🤵</div>
+            <div class="status-led" id="statusLed"></div>
         </div>
-        <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-brand-500 border-2 border-slate-950 rounded-full animate-pulse"></span>
-      </div>
+        <div class="header-title" id="headerTitle">TappyThing Command Hub</div>
+    </header>
 
-      <div>
-        <div class="flex items-center space-x-2">
-          <h1 class="font-display font-bold text-lg text-white tracking-wide" id="appHeaderTitle">TAPPYTHING</h1>
-          <span class="px-2 py-0.5 text-[10px] font-mono font-semibold uppercase bg-emerald-950 text-emerald-400 border border-emerald-800/50 rounded-full tracking-wider" id="appRoleBadge">MASTER COMMAND</span>
-        </div>
-        <p class="text-xs text-slate-400 flex items-center gap-1 font-mono">
-          <i class="fa-solid fa-bolt text-fresh-gold text-[10px]"></i>
-          <span id="subStatusText">FRESH DIGITAL COORDINATOR — AERUS TIMONIUM</span>
-        </p>
-      </div>
-    </div>
+    <div class="app-container">
 
-    <div class="flex items-center space-x-2">
-      <!-- Timecard Trigger Button -->
-      <button onclick="openTimecardModal()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-mono font-medium flex items-center gap-2 transition-all active:scale-95 shadow-sm">
-        <i class="fa-solid fa-clock-rotate-left text-brand-400"></i>
-        <span class="hidden sm:inline">PUNCH</span> TIMECARD
-      </button>
-
-      <!-- Sync Refresh Button -->
-      <button onclick="syncBoardData()" class="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition-all active:rotate-180" title="Sync Monday Board">
-        <i class="fa-solid fa-arrows-rotate text-xs" id="syncSpinner"></i>
-      </button>
-    </div>
-  </header>
-
-  <main class="flex-1 max-w-5xl w-full mx-auto p-4 md:p-6 space-y-6 pb-28">
-
-    <!-- AUDIO LED DISPLAY & CONTINUOUS LISTENER HUD -->
-    <section class="bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 shadow-xl backdrop-blur-sm relative overflow-hidden">
-      <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-cyan-500/5 to-transparent pointer-events-none"></div>
-      <div class="flex items-center justify-between mb-2">
-        <div class="flex items-center gap-2">
-          <div class="w-2.5 h-2.5 rounded-full bg-slate-600" id="micLedStatus"></div>
-          <span class="text-xs font-mono uppercase tracking-widest text-slate-400 font-bold" id="listeningStateLabel">VOICE ASSISTANT READY</span>
-        </div>
-        <div class="text-[11px] font-mono text-slate-500" id="silenceTimerText">3s GUARD ACTIVE</div>
-      </div>
-
-      <!-- Transcript & Output LED Window -->
-      <div class="bg-slate-950 border border-slate-800 rounded-xl p-3.5 min-h-[64px] flex items-center justify-between font-mono text-sm shadow-inner">
-        <div class="flex items-start gap-3 w-full">
-          <i class="fa-solid fa-terminal text-emerald-400 mt-1 text-xs"></i>
-          <p class="text-slate-300 font-medium leading-relaxed w-full" id="transcriptDisplay">
-            Tap the button below or talk directly. Say: <span class="text-brand-400">"Invoice San Fuji $10 for cord diagnostic"</span> or <span class="text-cyan-400">"Add belt replacement to workbench"</span>.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- VIEW CONTAINER 1: MASTER COMMAND HUB (NO PARAMS) -->
-    <div id="masterCommandHub" class="space-y-6">
-      <!-- 6-KEY ASYMMETRIC TAPULATOR GRID -->
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-        
-        <!-- Castle (Intakes) -->
-        <button onclick="openDrawer('Workbench', 'Castle (Intakes & Front Counter)')" class="tapulator-btn bg-gradient-to-br from-slate-900 to-slate-900/90 hover:from-emerald-950/40 hover:to-slate-900 border border-slate-800 hover:border-emerald-500/50 p-4 rounded-2xl text-left shadow-lg group relative overflow-hidden">
-          <div class="flex justify-between items-start mb-3">
-            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
-              <i class="fa-solid fa-fort-awesome text-lg"></i>
-            </div>
-            <span class="text-xs font-mono bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded-md font-bold" id="badgeCastle">0</span>
-          </div>
-          <h3 class="font-display font-bold text-slate-100 text-base tracking-wide group-hover:text-emerald-400 transition-colors">CASTLE</h3>
-          <p class="text-xs text-slate-400 mt-0.5">Workbench & Counter Intakes</p>
-        </button>
-
-        <!-- Empire (Bench & In Progress) -->
-        <button onclick="openDrawer('In Progress', 'Empire (Bench & Repairs)')" class="tapulator-btn bg-gradient-to-br from-slate-900 to-slate-900/90 hover:from-cyan-950/40 hover:to-slate-900 border border-slate-800 hover:border-cyan-500/50 p-4 rounded-2xl text-left shadow-lg group relative overflow-hidden">
-          <div class="flex justify-between items-start mb-3">
-            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
-              <i class="fa-solid fa-crown text-lg"></i>
-            </div>
-            <span class="text-xs font-mono bg-cyan-950 text-cyan-400 px-2 py-0.5 rounded-md font-bold" id="badgeEmpire">0</span>
-          </div>
-          <h3 class="font-display font-bold text-slate-100 text-base tracking-wide group-hover:text-cyan-400 transition-colors">EMPIRE</h3>
-          <p class="text-xs text-slate-400 mt-0.5">In Progress & Bench Queue</p>
-        </button>
-
-        <!-- Pipeline (Ready Wall & Parts) -->
-        <button onclick="openDrawer('Ready Wall', 'Pipeline (Ready Wall & Deliveries)')" class="tapulator-btn bg-gradient-to-br from-slate-900 to-slate-900/90 hover:from-amber-950/40 hover:to-slate-900 border border-slate-800 hover:border-amber-500/50 p-4 rounded-2xl text-left shadow-lg group relative overflow-hidden">
-          <div class="flex justify-between items-start mb-3">
-            <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
-              <i class="fa-solid fa-boxes-packing text-lg"></i>
-            </div>
-            <span class="text-xs font-mono bg-amber-950 text-amber-400 px-2 py-0.5 rounded-md font-bold" id="badgePipeline">0</span>
-          </div>
-          <h3 class="font-display font-bold text-slate-100 text-base tracking-wide group-hover:text-amber-400 transition-colors">PIPELINE</h3>
-          <p class="text-xs text-slate-400 mt-0.5">Ready Wall & Parts List</p>
-        </button>
-
-        <!-- Calendar (Schedule) -->
-        <button onclick="toggleCalendarModal()" class="tapulator-btn bg-gradient-to-br from-slate-900 to-slate-900/90 hover:from-purple-950/40 hover:to-slate-900 border border-slate-800 hover:border-purple-500/50 p-4 rounded-2xl text-left shadow-lg group relative overflow-hidden">
-          <div class="flex justify-between items-start mb-3">
-            <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
-              <i class="fa-solid fa-calendar-day text-lg"></i>
-            </div>
-            <span class="text-xs font-mono bg-purple-950 text-purple-400 px-2 py-0.5 rounded-md font-bold">TODAY</span>
-          </div>
-          <h3 class="font-display font-bold text-slate-100 text-base tracking-wide group-hover:text-purple-400 transition-colors">CALENDAR</h3>
-          <p class="text-xs text-slate-400 mt-0.5">Stops, Pickups & Reminders</p>
-        </button>
-
-        <!-- Vault (Master Archive) -->
-        <button onclick="openDrawer('Vault', 'Vault (Completed & Archive)')" class="tapulator-btn bg-gradient-to-br from-slate-900 to-slate-900/90 hover:from-blue-950/40 hover:to-slate-900 border border-slate-800 hover:border-blue-500/50 p-4 rounded-2xl text-left shadow-lg group relative overflow-hidden">
-          <div class="flex justify-between items-start mb-3">
-            <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
-              <i class="fa-solid fa-vault text-lg"></i>
-            </div>
-            <span class="text-xs font-mono bg-blue-950 text-blue-400 px-2 py-0.5 rounded-md font-bold" id="badgeVault">0</span>
-          </div>
-          <h3 class="font-display font-bold text-slate-100 text-base tracking-wide group-hover:text-blue-400 transition-colors">VAULT</h3>
-          <p class="text-xs text-slate-400 mt-0.5">Master Archive & Records</p>
-        </button>
-
-        <!-- Pinball (Rapid Dispatch Engine) -->
-        <button onclick="triggerPinballProtocol()" class="tapulator-btn bg-gradient-to-br from-red-950/50 via-slate-900 to-slate-900 hover:from-red-900/60 border border-red-800/60 hover:border-red-500 p-4 rounded-2xl text-left shadow-lg group relative overflow-hidden">
-          <div class="flex justify-between items-start mb-3">
-            <div class="w-10 h-10 rounded-xl bg-red-500/20 border border-red-500/30 flex items-center justify-center text-red-400 group-hover:scale-110 transition-transform">
-              <i class="fa-solid fa-fire-flame-curved text-lg"></i>
-            </div>
-            <span class="text-xs font-mono bg-red-950 text-red-400 px-2 py-0.5 rounded-md font-bold">22K RECS</span>
-          </div>
-          <h3 class="font-display font-bold text-red-200 text-base tracking-wide group-hover:text-red-400 transition-colors">PINBALL</h3>
-          <p class="text-xs text-red-300/70 mt-0.5">Rapid Action Protocol</p>
-        </button>
-
-      </div>
-
-      <!-- MASTER RECENT FEED -->
-      <section class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 md:p-5">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="font-display font-bold text-md text-slate-200 flex items-center gap-2">
-            <i class="fa-solid fa-layer-group text-brand-400"></i> LIVE OPERATIONAL FEED
-          </h2>
-          <span class="text-xs font-mono text-slate-500" id="feedCountText">0 cards loaded</span>
-        </div>
-        <div class="space-y-3" id="masterFeedContainer">
-          <!-- Dynamic cards injected here -->
-        </div>
-      </section>
-    </div>
-
-    <!-- VIEW CONTAINER 2: STANDALONE STAFF FOREVER CARD ENGINE (?card= OR ?staff=) -->
-    <div id="staffForeverCard" class="space-y-6 hidden">
-      <div class="bg-gradient-to-r from-slate-900 via-slate-900 to-emerald-950/40 border border-emerald-800/40 p-5 rounded-2xl shadow-xl relative overflow-hidden">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-              <h2 class="font-display font-bold text-xl text-white tracking-wide" id="staffCardTitle">STAFF FOREVER CARD</h2>
-            </div>
-            <p class="text-xs text-slate-400 mt-1 font-mono">Dedicated Operational Hub & Direct Channel</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <button onclick="triggerQuickIntakeVoice()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-glow-green transition-all">
-              <i class="fa-solid fa-plus text-xs"></i> 1-TAP INTAKE
+        <!-- 1-Tap Voice Button -->
+        <div class="main-mic-container">
+            <button class="mic-btn" id="mainMicBtn" onclick="toggleVoiceListening()">
+                <span>🎙️</span> <span id="micBtnText">Tap & Speak</span>
             </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 4 NESTED LIVE SECTIONS FOR STAFF -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        
-        <!-- Generic Section 1: Workbench -->
-        <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 space-y-3">
-          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-            <h3 class="font-display font-bold text-sm text-emerald-400 flex items-center gap-2">
-              <i class="fa-solid fa-screws-tilting"></i> WORKBENCH INTAKES
-            </h3>
-            <span class="text-xs font-mono text-slate-500" id="staffWorkbenchCount">0</span>
-          </div>
-          <div class="space-y-2 max-h-72 overflow-y-auto pr-1" id="staffWorkbenchList"></div>
         </div>
 
-        <!-- Generic Section 2: In Progress -->
-        <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 space-y-3">
-          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-            <h3 class="font-display font-bold text-sm text-cyan-400 flex items-center gap-2">
-              <i class="fa-solid fa-gears"></i> IN PROGRESS / BENCH
-            </h3>
-            <span class="text-xs font-mono text-slate-500" id="staffInProgressCount">0</span>
-          </div>
-          <div class="space-y-2 max-h-72 overflow-y-auto pr-1" id="staffInProgressList"></div>
-        </div>
-
-        <!-- Generic Section 3: Ready Wall -->
-        <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 space-y-3">
-          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-            <h3 class="font-display font-bold text-sm text-amber-400 flex items-center gap-2">
-              <i class="fa-solid fa-circle-check"></i> READY WALL & PICKUPS
-            </h3>
-            <span class="text-xs font-mono text-slate-500" id="staffReadyWallCount">0</span>
-          </div>
-          <div class="space-y-2 max-h-72 overflow-y-auto pr-1" id="staffReadyWallList"></div>
-        </div>
-
-        <!-- Generic Section 4: Shared Parts & Team Hub -->
-        <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 space-y-3">
-          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-            <h3 class="font-display font-bold text-sm text-purple-400 flex items-center gap-2">
-              <i class="fa-solid fa-truck-ramp-box"></i> SHARED PARTS & COMM HUB
-            </h3>
-            <span class="text-xs font-mono text-slate-500" id="staffPartsHubCount">0</span>
-          </div>
-          <div class="space-y-2 max-h-72 overflow-y-auto pr-1" id="staffPartsHubList"></div>
-        </div>
-
-      </div>
-
-      <!-- PRIVATE DIRECT COMMUNICATION BOARD (William ↔ Staff Member) -->
-      <section class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
-        <h3 class="font-display font-bold text-sm text-slate-200 flex items-center gap-2 border-b border-slate-800 pb-2">
-          <i class="fa-solid fa-lock text-emerald-400"></i> DIRECT COORDINATOR CHANNEL (PRIVATE)
-        </h3>
-        <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3 h-36 overflow-y-auto space-y-2 font-mono text-xs" id="privateCommsThread">
-          <div class="text-slate-400"><span class="text-emerald-400 font-bold">[FRESH]:</span> Direct channel ready. Voice messages routed automatically.</div>
-        </div>
-        <div class="flex gap-2">
-          <input type="text" id="privateCommsInput" placeholder="Type or tap mic to send direct note..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-sans">
-          <button onclick="sendPrivateComm()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all">SEND</button>
-        </div>
-      </section>
-    </div>
-
-  </main>
-
-  <footer class="fixed bottom-0 left-0 right-0 z-50 bg-slate-950/95 border-t border-slate-800 backdrop-blur-lg px-4 py-3">
-    <div class="max-w-xl mx-auto flex items-center justify-between gap-3">
-      
-      <!-- Camera Snap Action -->
-      <button onclick="triggerCameraCapture()" class="w-12 h-12 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white flex items-center justify-center transition-all active:scale-95 shadow-md" title="Snap Photo">
-        <i class="fa-solid fa-camera text-base"></i>
-      </button>
-
-      <!-- THE DIGITAL COORDINATOR MAIN BUTTON -->
-      <button id="mainVoiceBtn" onclick="toggleVoiceSession()" class="flex-1 h-14 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 rounded-2xl font-display font-bold text-lg tracking-wider flex items-center justify-center gap-3 shadow-glow-green transition-all transform active:scale-95 relative overflow-hidden">
-        <i class="fa-solid fa-microphone text-xl" id="voiceMicIcon"></i>
-        <span id="voiceBtnLabel">TAP TO TALK</span>
-        <span class="w-2.5 h-2.5 rounded-full bg-slate-950 opacity-40" id="voicePulseDot"></span>
-      </button>
-
-      <!-- Video Action -->
-      <button onclick="triggerVideoRecord()" class="w-12 h-12 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white flex items-center justify-center transition-all active:scale-95 shadow-md" title="Record Video Note">
-        <i class="fa-solid fa-video text-base"></i>
-      </button>
-
-    </div>
-  </footer>
-
-  
-  <!-- GENERIC DRAWER MODAL -->
-  <div id="drawerModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex justify-end">
-    <div class="w-full max-w-lg bg-slate-900 border-l border-slate-800 h-full p-5 flex flex-col justify-between shadow-2xl animate-in slide-in-from-right duration-200">
-      <div>
-        <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
-          <h2 class="font-display font-bold text-lg text-white" id="drawerTitle">ZONE VIEW</h2>
-          <button onclick="closeDrawer()" class="p-1 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-        </div>
-        <div class="space-y-3 overflow-y-auto max-h-[calc(100vh-140px)] pr-1" id="drawerContentList">
-          <!-- Items injected here -->
-        </div>
-      </div>
-      <button onclick="closeDrawer()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono text-xs rounded-xl border border-slate-700">CLOSE DRAWER</button>
-    </div>
-  </div>
-
-  <!-- TIMECARD PIN MODAL -->
-  <div id="timecardModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-sm w-full space-y-5 shadow-2xl">
-      <div class="text-center space-y-1">
-        <div class="w-12 h-12 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-2 text-xl">
-          <i class="fa-solid fa-clock"></i>
-        </div>
-        <h3 class="font-display font-bold text-lg text-white">STAFF TIMECARD</h3>
-        <p class="text-xs text-slate-400">Enter PIN to Punch In / Out</p>
-      </div>
-
-      <!-- PIN Input Display -->
-      <div class="bg-slate-950 border border-slate-800 rounded-xl py-3 text-center tracking-[0.5em] font-mono font-bold text-2xl text-emerald-400" id="pinDisplay">----</div>
-
-      <!-- Keypad Grid -->
-      <div class="grid grid-cols-3 gap-2">
-        <script>
-          for (let i = 1; i <= 9; i++) {
-            document.write(`<button onclick="pressPinNum('${i}')" class="py-3 bg-slate-800/80 hover:bg-slate-700 font-mono font-bold text-lg rounded-xl text-white active:scale-95 transition-all">${i}</button>`);
-          }
-        </script>
-        <button onclick="clearPin()" class="py-3 bg-slate-800/40 text-slate-400 hover:text-white font-mono text-xs rounded-xl active:scale-95">CLEAR</button>
-        <button onclick="pressPinNum('0')" class="py-3 bg-slate-800/80 hover:bg-slate-700 font-mono font-bold text-lg rounded-xl text-white active:scale-95">0</button>
-        <button onclick="submitPinPunch()" class="py-3 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs rounded-xl active:scale-95 shadow-glow-green">ENTER</button>
-      </div>
-
-      <button onclick="closeTimecardModal()" class="w-full py-2 text-slate-500 text-xs font-mono hover:text-slate-300">CANCEL</button>
-    </div>
-  </div>
-
-  <!-- CALENDAR MODAL -->
-  <div id="calendarModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-md w-full space-y-4 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="font-display font-bold text-base text-white flex items-center gap-2">
-          <i class="fa-solid fa-calendar-check text-purple-400"></i> TODAY'S LOCKED STOPS
-        </h3>
-        <button onclick="toggleCalendarModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <div class="space-y-2.5 font-mono text-xs" id="calendarAgendaList">
-        <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
-          <div>
-            <span class="text-purple-400 font-bold">10:30 AM</span> — Paul Schwab (Central Vac Parts)
-          </div>
-          <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400">CONFIRMED</span>
-        </div>
-        <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
-          <div>
-            <span class="text-purple-400 font-bold">11:50 AM</span> — Mortgage Call Reminder
-          </div>
-          <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400">ALARM</span>
-        </div>
-        <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
-          <div>
-            <span class="text-purple-400 font-bold">12:00 PM</span> — Oreck Pickup (Mrs. Boatwright)
-          </div>
-          <span class="text-[10px] bg-purple-950 text-purple-300 px-2 py-0.5 rounded">PICKUP</span>
-        </div>
-        <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
-          <div>
-            <span class="text-purple-400 font-bold">12:00 PM</span> — Donna Wenderhoff Wand Delivery
-          </div>
-          <span class="text-[10px] bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded">DELIVERY</span>
-        </div>
-      </div>
-
-      <a href="https://calendar.google.com" target="_blank" class="block w-full text-center py-2.5 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 rounded-xl font-mono text-xs transition-all">
-        OPEN FULL GOOGLE CALENDAR <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-1"></i>
-      </a>
-    </div>
-  </div>
-
-  <script>
-    // CORE APPLICATION STATE
-    const MONDAY_ENDPOINT = '/.netlify/functions/monday?board=18424728273';
-    const STRIPE_CHECKOUT_URL = 'https://buy.stripe.com/test_payment_link'; // Standardized Stripe Payment URL
-    
-    let isListening = false;
-    let recognition = null;
-    let silenceTimer = null;
-    let currentPin = '';
-    let appBoardData = [
-      { id: '101', title: 'Sam Fuji — Invoice $10 for cord diagnostic', group: 'Workbench', text: 'Central Vac cord diagnostic charge', timestamp: '12:15 PM' },
-      { id: '102', title: 'Paul Schwab — 2 Filters & Conversion Cords', group: 'Workbench', text: 'Needs 2 inlet valves, 2 cords, 2 filters + service labor', timestamp: '10:30 AM' },
-      { id: '103', title: 'Oreck XL Bench Tune-Up', group: 'In Progress', text: 'Replace drive belt and roller brush', timestamp: '11:00 AM' },
-      { id: '104', title: 'Donna Wenderhoff — Wand Delivery $240', group: 'Ready Wall', text: 'Delivery scheduled for afternoon run', timestamp: '09:45 AM' },
-      { id: '105', title: 'Replacement Belts Order (10x)', group: 'Vault', text: 'Shared inventory order logged', timestamp: 'Yesterday' }
-    ];
-
-    // ON PAGE LOAD ROUTER
-    window.onload = function() {
-      const params = new URLSearchParams(window.location.search);
-      const staffParam = params.get('staff') || params.get('card');
-
-      if (staffParam) {
-        renderStaffForeverCardView(staffParam);
-      } else {
-        renderMasterHubView();
-      }
-
-      initSpeechRecognition();
-      renderFeedCards();
-    };
-
-    // ROUTER VIEW 1: MASTER COMMAND HUB
-    function renderMasterHubView() {
-      document.getElementById('masterCommandHub').classList.remove('hidden');
-      document.getElementById('staffForeverCard').classList.add('hidden');
-      document.getElementById('appHeaderTitle').textContent = 'TAPPYTHING';
-      document.getElementById('appRoleBadge').textContent = 'MASTER COMMAND';
-    }
-
-    // ROUTER VIEW 2: STANDALONE STAFF FOREVER CARD
-    function renderStaffForeverCardView(staffName) {
-      document.getElementById('masterCommandHub').classList.add('hidden');
-      document.getElementById('staffForeverCard').classList.remove('hidden');
-      
-      const cleanName = staffName.toUpperCase().replace('-', ' ');
-      document.getElementById('appHeaderTitle').textContent = `TAPPYTHING — ${cleanName}`;
-      document.getElementById('appRoleBadge').textContent = 'FOREVER CARD';
-      document.getElementById('staffCardTitle').textContent = `${cleanName} OPERATIONAL CARD`;
-      
-      renderStaffNestedSections();
-    }
-
-    function resetToHome() {
-      window.history.pushState({}, '', window.location.pathname);
-      renderMasterHubView();
-    }
-
-    // RENDER SINGLE ITEM CARD WITH STRIPE PAY BUTTON LOGIC
-    function renderItemCard(item) {
-      // Rule 3: Check for dollar amount with digits (e.g. '$240', '$10', '$3,000')
-      const hasInvoiceAmount = /\$\d+(?:,\d{3})*(?:\.\d{2})?/.test(item.title);
-      const match = item.title.match(/\$\d+(?:,\d{3})*(?:\.\d{2})?/);
-      const displayAmount = match ? match[0] : '';
-
-      return `
-        <div class="bg-slate-900 border border-slate-800 hover:border-slate-700 p-3.5 rounded-2xl space-y-2.5 transition-all shadow-md">
-          <div class="flex items-start justify-between gap-2">
-            <div>
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 uppercase tracking-wider">${item.group}</span>
-              <h4 class="font-bold text-slate-100 text-sm mt-1 leading-snug">${item.title}</h4>
+        <!-- Smart Unified Photo/Video + Voice Intake Modal/Card -->
+        <div class="intake-preview-card" id="intakePreviewCard">
+            <div class="media-preview-container" id="mediaPreviewContainer"></div>
+            <div class="voice-status-banner">
+                <span>🎙️</span> <span id="intakeVoicePrompt">Listening for customer name & diagnosis...</span>
             </div>
-            <span class="text-[10px] font-mono text-slate-500 whitespace-nowrap">${item.timestamp || 'Just now'}</span>
-          </div>
-
-          ${item.text ? `<p class="text-xs text-slate-400 font-sans leading-relaxed">${item.text}</p>` : ''}
-
-          <div class="flex items-center justify-between pt-1 border-t border-slate-800/60 gap-2">
-            <!-- Talk to Card Audio Button -->
-            <button onclick="talkToCard('${item.id}')" class="px-2.5 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-xs font-mono text-slate-300 flex items-center gap-1.5 transition-all">
-              <i class="fa-solid fa-microphone text-brand-400 text-[11px]"></i>
-              <span>Talk to Card</span>
-            </button>
-
-            <!-- STRIPE 1-TAP PAY BUTTON (IF INVOICE DETECTED) -->
-            ${hasInvoiceAmount ? `
-              <a href="${STRIPE_CHECKOUT_URL}?amount=${encodeURIComponent(displayAmount)}&ref=${item.id}" target="_blank" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-slate-950 font-extrabold text-xs flex items-center gap-1.5 shadow-glow-green transition-all transform active:scale-95">
-                <i class="fa-solid fa-credit-card text-xs"></i>
-                <span>💳 Pay ${displayAmount}</span>
-              </a>
-            ` : ''}
-          </div>
+            <div class="intake-actions">
+                <button class="btn btn-cancel" onclick="cancelSmartIntake()">Cancel</button>
+                <button class="btn btn-submit" onclick="submitSmartIntake()">⚡ Submit to Workbench</button>
+            </div>
         </div>
-      `;
-    }
 
-    // RENDER FEED CARDS ACROSS ZONES
-    function renderFeedCards() {
-      const feedContainer = document.getElementById('masterFeedContainer');
-      feedContainer.innerHTML = appBoardData.map(item => renderItemCard(item)).join('');
-      document.getElementById('feedCountText').textContent = `${appBoardData.length} cards loaded`;
+        <!-- Dynamic Content Mount Point -->
+        <div id="viewMount"></div>
 
-      // Update Zone Badges
-      document.getElementById('badgeCastle').textContent = appBoardData.filter(i => i.group === 'Workbench').length;
-      document.getElementById('badgeEmpire').textContent = appBoardData.filter(i => i.group === 'In Progress').length;
-      document.getElementById('badgePipeline').textContent = appBoardData.filter(i => i.group === 'Ready Wall').length;
-      document.getElementById('badgeVault').textContent = appBoardData.filter(i => i.group === 'Vault').length;
+    </div>
 
-      renderStaffNestedSections();
-    }
+    <!-- Hidden File Inputs for Smart Intake -->
+    <input type="file" id="photoInput" accept="image/*" capture="environment" onchange="handleMediaCaptured(event, 'photo')">
+    <input type="file" id="videoInput" accept="video/*" capture="environment" onchange="handleMediaCaptured(event, 'video')">
 
-    // RENDER STAFF 4 NESTED SECTIONS
-    function renderStaffNestedSections() {
-      const wb = appBoardData.filter(i => i.group === 'Workbench');
-      const ip = appBoardData.filter(i => i.group === 'In Progress');
-      const rw = appBoardData.filter(i => i.group === 'Ready Wall');
-      const vt = appBoardData.filter(i => i.group === 'Vault');
+    <!-- Bottom Floating Dock -->
+    <div class="bottom-dock">
+        <button class="dock-btn" onclick="triggerCamera('photo')">
+            <span class="dock-btn-icon">📷</span>
+            <span>Snap Tag</span>
+        </button>
+        <button class="dock-btn" onclick="triggerCamera('video')">
+            <span class="dock-btn-icon">🎥</span>
+            <span>Record Video</span>
+        </button>
+        <button class="dock-btn" onclick="renderView()">
+            <span class="dock-btn-icon">⚡</span>
+            <span>Zones</span>
+        </button>
+    </div>
 
-      const wbList = document.getElementById('staffWorkbenchList');
-      const ipList = document.getElementById('staffInProgressList');
-      const rwList = document.getElementById('staffReadyWallList');
-      const ptList = document.getElementById('staffPartsHubList');
+    <script>
+        // --- State Management ---
+        const CONFIG = {
+            stripeBaseUrl: "https://buy.stripe.com/test_fT6",
+            mondayEndpoint: "/.netlify/functions/monday?board=18424728273"
+        };
 
-      if (wbList) wbList.innerHTML = wb.map(i => renderItemCard(i)).join('') || '<p class="text-xs text-slate-600 font-mono italic">No items in Workbench</p>';
-      if (ipList) ipList.innerHTML = ip.map(i => renderItemCard(i)).join('') || '<p class="text-xs text-slate-600 font-mono italic">No items in Bench Queue</p>';
-      if (rwList) rwList.innerHTML = rw.map(i => renderItemCard(i)).join('') || '<p class="text-xs text-slate-600 font-mono italic">No items on Ready Wall</p>';
-      if (ptList) ptList.innerHTML = vt.map(i => renderItemCard(i)).join('') || '<p class="text-xs text-slate-600 font-mono italic">No items in Shared Parts</p>';
+        let isListening = false;
+        let recognition = null;
+        let currentCapturedMedia = null; // { type: 'photo'|'video', dataUrl: string, blob: Blob }
+        let currentVoiceTranscript = "";
 
-      if (document.getElementById('staffWorkbenchCount')) document.getElementById('staffWorkbenchCount').textContent = wb.length;
-      if (document.getElementById('staffInProgressCount')) document.getElementById('staffInProgressCount').textContent = ip.length;
-      if (document.getElementById('staffReadyWallCount')) document.getElementById('staffReadyWallCount').textContent = rw.length;
-      if (document.getElementById('staffPartsHubCount')) document.getElementById('staffPartsHubCount').textContent = vt.length;
-    }
+        // Sample State (Generic Operational Zones)
+        let boardState = {
+            workbench: [
+                { id: '1', title: 'Mrs. Boatwright Oreck upright — broken belt check $40', media: null, mediaType: null },
+                { id: '2', title: 'San Fuji cord diagnostic $10', media: null, mediaType: null }
+            ],
+            inProgress: [
+                { id: '3', title: 'Paul Schwab Central Vac conversion cord install', media: null, mediaType: null }
+            ],
+            readyWall: [
+                { id: '4', title: 'Donna Wenderhoff wand pickup ready', media: null, mediaType: null }
+            ],
+            partsHub: [
+                { id: '5', title: 'Shared Order: Veridian Plus filters (Serena Robinson)', media: null, mediaType: null }
+            ],
+            commsPrivate: []
+        };
 
-    function initSpeechRecognition() {
-      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = true;
+        // --- Web Speech Initialization ---
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
 
-        recognition.onresult = function(event) {
-          clearTimeout(silenceTimer);
-          let interimTranscript = '';
-          let finalTranscript = '';
+            recognition.onresult = (event) => {
+                let interim = '';
+                let final = '';
 
-          for (let i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-              finalTranscript += event.results[i][0].transcript;
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        final += event.results[i][0].transcript;
+                    } else {
+                        interim += event.results[i][0].transcript;
+                    }
+                }
+
+                const speechText = final || interim;
+                if (speechText.trim()) {
+                    currentVoiceTranscript = speechText;
+                    if (currentCapturedMedia) {
+                        document.getElementById('intakeVoicePrompt').innerText = `"${speechText}"`;
+                    } else {
+                        document.getElementById('micBtnText').innerText = `"${speechText.substring(0, 25)}..."`;
+                    }
+                }
+            };
+
+            recognition.onerror = () => stopListening();
+            recognition.onend = () => {
+                if (isListening && !currentCapturedMedia) stopListening();
+            };
+        }
+
+        function toggleVoiceListening() {
+            if (isListening) {
+                stopListening();
+                if (currentVoiceTranscript && !currentCapturedMedia) {
+                    // Direct voice card creation
+                    createCardFromVoice(currentVoiceTranscript);
+                    currentVoiceTranscript = "";
+                    document.getElementById('micBtnText').innerText = "Tap & Speak";
+                }
             } else {
-              interimTranscript += event.results[i][0].transcript;
+                startListening();
             }
-          }
+        }
 
-          const currentText = finalTranscript || interimTranscript;
-          if (currentText) {
-            document.getElementById('transcriptDisplay').innerHTML = `<span class="text-emerald-400">${currentText}</span>`;
-          }
-
-          // 3-Second Silence Guard Logic
-          silenceTimer = setTimeout(() => {
-            if (finalTranscript.trim().length > 0) {
-              processVoiceCommand(finalTranscript.trim());
+        function startListening() {
+            if (!recognition) {
+                alert("Speech recognition not supported on this browser.");
+                return;
             }
-          }, 3000);
-        };
-
-        recognition.onerror = function() {
-          stopVoiceListening();
-        };
-
-        recognition.onend = function() {
-          if (isListening) recognition.start();
-        };
-      }
-    }
-
-    function toggleVoiceSession() {
-      if (!isListening) {
-        startVoiceListening();
-      } else {
-        stopVoiceListening();
-      }
-    }
-
-    function startVoiceListening() {
-      if (recognition) {
-        isListening = true;
-        recognition.start();
-        document.getElementById('voiceMicIcon').className = 'fa-solid fa-microphone-lines text-slate-950 animate-bounce';
-        document.getElementById('voiceBtnLabel').textContent = 'LISTENING...';
-        document.getElementById('micLedStatus').className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping';
-        document.getElementById('listeningStateLabel').textContent = 'FRESH IS LISTENING';
-      }
-    }
-
-    function stopVoiceListening() {
-      if (recognition) {
-        isListening = false;
-        recognition.stop();
-        document.getElementById('voiceMicIcon').className = 'fa-solid fa-microphone text-xl';
-        document.getElementById('voiceBtnLabel').textContent = 'TAP TO TALK';
-        document.getElementById('micLedStatus').className = 'w-2.5 h-2.5 rounded-full bg-slate-600';
-        document.getElementById('listeningStateLabel').textContent = 'VOICE ASSISTANT READY';
-      }
-    }
-
-    // PROCESS VOICE INPUT AND DYNAMICALLY CREATE INVOICE OR TASK
-    function processVoiceCommand(text) {
-      stopVoiceListening();
-      
-      const newCard = {
-        id: Date.now().toString(),
-        title: text,
-        group: text.toLowerCase().includes('invoice') || text.includes('$') ? 'Workbench' : 'In Progress',
-        text: 'Logged via Fresh Voice Intake',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      appBoardData.unshift(newCard);
-      renderFeedCards();
-
-      document.getElementById('transcriptDisplay').innerHTML = `<span class="text-emerald-400 font-bold">✓ PROCESSED:</span> "${text}"`;
-    }
-
-    // MONDAY ENDPOINT FETCH
-    async function syncBoardData() {
-      const spinner = document.getElementById('syncSpinner');
-      spinner.classList.add('animate-spin');
-      
-      try {
-        const response = await fetch(MONDAY_ENDPOINT);
-        if (response.ok) {
-          const data = await response.json();
-          if (data && data.items) {
-            appBoardData = data.items;
-            renderFeedCards();
-          }
+            isListening = true;
+            currentVoiceTranscript = "";
+            recognition.start();
+            document.getElementById('statusLed').classList.add('listening');
+            document.getElementById('mainMicBtn').classList.add('active');
+            document.getElementById('micBtnText').innerText = "Listening...";
         }
-      } catch (err) {
-        console.log('Monday API fallback active.');
-      } finally {
-        setTimeout(() => spinner.classList.remove('animate-spin'), 600);
-      }
-    }
 
-    // TALK TO CARD DIRECT AUDIO UPDATE
-    function talkToCard(cardId) {
-      const card = appBoardData.find(i => i.id === cardId);
-      if (card) {
-        const note = prompt(`Talk to Card: Adding voice note to "${card.title}"`);
-        if (note) {
-          card.text += ` | Note: ${note}`;
-          renderFeedCards();
+        function stopListening() {
+            isListening = false;
+            if (recognition) recognition.stop();
+            document.getElementById('statusLed').classList.remove('listening');
+            document.getElementById('mainMicBtn').classList.remove('active');
+            if (!currentVoiceTranscript) {
+                document.getElementById('micBtnText').innerText = "Tap & Speak";
+            }
         }
-      }
-    }
 
-    // DRAWER MODAL CONTROL
-    function openDrawer(groupName, titleLabel) {
-      document.getElementById('drawerTitle').textContent = titleLabel;
-      const filtered = appBoardData.filter(i => i.group === groupName);
-      const listContainer = document.getElementById('drawerContentList');
-      
-      listContainer.innerHTML = filtered.length > 0 
-        ? filtered.map(i => renderItemCard(i)).join('')
-        : '<p class="text-xs text-slate-500 font-mono py-4 text-center">Zone is empty.</p>';
+        // --- Smart Photo/Video + Voice Unified Intake Flow ---
+        function triggerCamera(type) {
+            if (type === 'photo') {
+                document.getElementById('photoInput').click();
+            } else if (type === 'video') {
+                document.getElementById('videoInput').click();
+            }
+        }
 
-      document.getElementById('drawerModal').classList.remove('hidden');
-    }
+        function handleMediaCaptured(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
 
-    function closeDrawer() {
-      document.getElementById('drawerModal').classList.add('hidden');
-    }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentCapturedMedia = {
+                    type: type,
+                    dataUrl: e.target.result
+                };
 
-    // PINBALL PROTOCOL
-    function triggerPinballProtocol() {
-      alert('PINBALL PROTOCOL ACTIVATED: 22,283 Customer Records cross-referenced. Dispatch queue prepared.');
-    }
+                // Show Smart Preview Card
+                const previewCard = document.getElementById('intakePreviewCard');
+                const container = document.getElementById('mediaPreviewContainer');
+                
+                if (type === 'photo') {
+                    container.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                } else {
+                    container.innerHTML = `<video src="${e.target.result}" controls></video>`;
+                }
 
-    // TIMECARD MODAL LOGIC
-    function openTimecardModal() {
-      clearPin();
-      document.getElementById('timecardModal').classList.remove('hidden');
-    }
+                previewCard.classList.add('active');
+                
+                // Activate mic immediately for customer & diagnosis voice-over
+                startListening();
+                document.getElementById('intakeVoicePrompt').innerText = "Speak customer name & diagnosis now...";
+            };
+            reader.readAsDataURL(file);
+        }
 
-    function closeTimecardModal() {
-      document.getElementById('timecardModal').classList.add('hidden');
-    }
+        function cancelSmartIntake() {
+            stopListening();
+            currentCapturedMedia = null;
+            currentVoiceTranscript = "";
+            document.getElementById('intakePreviewCard').classList.remove('active');
+            document.getElementById('photoInput').value = "";
+            document.getElementById('videoInput').value = "";
+        }
 
-    function pressPinNum(num) {
-      if (currentPin.length < 4) {
-        currentPin += num;
-        document.getElementById('pinDisplay').textContent = '*'.repeat(currentPin.length) || '----';
-      }
-    }
+        function submitSmartIntake() {
+            stopListening();
+            const title = currentVoiceTranscript.trim() || "New Intake Item (Voice Pending)";
+            
+            const newCard = {
+                id: Date.now().toString(),
+                title: title,
+                media: currentCapturedMedia ? currentCapturedMedia.dataUrl : null,
+                mediaType: currentCapturedMedia ? currentCapturedMedia.type : null
+            };
 
-    function clearPin() {
-      currentPin = '';
-      document.getElementById('pinDisplay').textContent = '----';
-    }
+            // Route to Workbench by default
+            boardState.workbench.unshift(newCard);
+            
+            // Reset and render
+            cancelSmartIntake();
+            renderView();
+        }
 
-    function submitPinPunch() {
-      if (currentPin.length === 4) {
-        const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        alert(`TIMECARD PUNCHED SUCCESSFUL!\nPIN: ${currentPin}\nTimestamp: ${timeStr}`);
-        closeTimecardModal();
-      } else {
-        alert('Please enter a valid 4-digit PIN.');
-      }
-    }
+        function createCardFromVoice(text) {
+            const lower = text.toLowerCase();
+            const newCard = {
+                id: Date.now().toString(),
+                title: text,
+                media: null,
+                mediaType: null
+            };
 
-    // CALENDAR MODAL
-    function toggleCalendarModal() {
-      const modal = document.getElementById('calendarModal');
-      modal.classList.toggle('hidden');
-    }
+            // Generic Zone Routing Logic
+            if (lower.includes('ready') || lower.includes('pickup')) {
+                boardState.readyWall.unshift(newCard);
+            } else if (lower.includes('progress') || lower.includes('conversion') || lower.includes('bench')) {
+                boardState.inProgress.unshift(newCard);
+            } else if (lower.includes('part') || lower.includes('order')) {
+                boardState.partsHub.unshift(newCard);
+            } else {
+                boardState.workbench.unshift(newCard);
+            }
 
-    // QUICK MEDIA ACTIONS
-    function triggerCameraCapture() {
-      alert('Opening Camera for 1-Tap Intake Photo...');
-    }
+            renderView();
+        }
 
-    function triggerVideoRecord() {
-      alert('Opening Video Recording Note...');
-    }
+        // --- Card Renderer with 1-Tap Stripe Pay Button ---
+        function renderItemCard(item) {
+            // Check for dollar amount literal (e.g. $10, $40, $240)
+            const priceMatch = item.title.match(/\$\d+(?:,\d{3})*(?:\.\d{2})?/);
+            let payButtonHtml = "";
 
-    function triggerQuickIntakeVoice() {
-      toggleVoiceSession();
-    }
+            if (priceMatch) {
+                const amount = priceMatch[0];
+                payButtonHtml = `
+                    <a href="${CONFIG.stripeBaseUrl}?amount=${amount.replace('$', '')}" target="_blank" class="pay-btn">
+                        💳 Pay ${amount} Now
+                    </a>
+                `;
+            }
 
-    function sendPrivateComm() {
-      const input = document.getElementById('privateCommsInput');
-      if (input && input.value.trim()) {
-        const thread = document.getElementById('privateCommsThread');
-        const note = document.createElement('div');
-        note.className = 'text-slate-300';
-        note.innerHTML = `<span class="text-cyan-400 font-bold">[STAFF]:</span> ${input.value.trim()}`;
-        thread.appendChild(note);
-        input.value = '';
-        thread.scrollTop = thread.scrollHeight;
-      }
-    }
-  </script>
+            let mediaHtml = "";
+            if (item.media) {
+                if (item.mediaType === 'photo') {
+                    mediaHtml = `<div class="item-media"><img src="${item.media}" alt="Attachment"></div>`;
+                } else if (item.mediaType === 'video') {
+                    mediaHtml = `<div class="item-media"><video src="${item.media}" controls></video></div>`;
+                }
+            }
+
+            return `
+                <div class="item-card">
+                    <div class="item-card-header">
+                        <div class="item-card-title">${escapeHtml(item.title)}</div>
+                    </div>
+                    ${mediaHtml}
+                    ${payButtonHtml}
+                    <div class="card-actions">
+                        <button class="talk-card-btn" onclick="toggleVoiceListening()">
+                            🎙️ Talk to Card
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Timecard PIN Module Component ---
+        function renderTimecardModule() {
+            return `
+                <div class="timecard-widget">
+                    <div class="timecard-header">
+                        <span>⏱️ Staff Timecard</span>
+                        <span style="font-size: 0.8rem; color: var(--text-sub);">PIN Protected</span>
+                    </div>
+                    <div class="pin-input-group">
+                        <input type="password" class="pin-input" maxlength="4" placeholder="Enter PIN" id="staffPin">
+                    </div>
+                    <div class="timecard-btns">
+                        <button class="btn btn-punch-in" onclick="handlePunch('IN')">Punch IN</button>
+                        <button class="btn btn-punch-out" onclick="handlePunch('OUT')">Punch OUT</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handlePunch(type) {
+            const pin = document.getElementById('staffPin').value;
+            if (!pin || pin.length < 4) {
+                alert("Please enter your 4-digit PIN.");
+                return;
+            }
+            alert(`Punched ${type} successfully at ${new Date().toLocaleTimeString()}!`);
+            document.getElementById('staffPin').value = "";
+        }
+
+        // --- Dual-Mode URL Parameter View Router ---
+        function renderView() {
+            const params = new URLSearchParams(window.location.search);
+            const staffParam = params.get('staff') || params.get('card');
+            const mount = document.getElementById('viewMount');
+
+            if (!staffParam) {
+                // --- Master Command Hub (William's View) ---
+                document.getElementById('headerTitle').innerText = "TappyThing Command Hub";
+                
+                mount.innerHTML = `
+                    <div class="tapulator-grid">
+                        <div class="tap-card" onclick="scrollToZone('workbenchZone')">
+                            <span class="tap-card-icon">🛠️</span>
+                            <span class="tap-card-title">Workbench</span>
+                            <span class="tap-card-count">${boardState.workbench.length} Intakes</span>
+                        </div>
+                        <div class="tap-card" onclick="scrollToZone('inProgressZone')">
+                            <span class="tap-card-icon">⚡</span>
+                            <span class="tap-card-title">In Progress</span>
+                            <span class="tap-card-count">${boardState.inProgress.length} Items</span>
+                        </div>
+                        <div class="tap-card" onclick="scrollToZone('readyWallZone')">
+                            <span class="tap-card-icon">🧱</span>
+                            <span class="tap-card-title">Ready Wall</span>
+                            <span class="tap-card-count">${boardState.readyWall.length} Ready</span>
+                        </div>
+                        <div class="tap-card" onclick="scrollToZone('partsZone')">
+                            <span class="tap-card-icon">📦</span>
+                            <span class="tap-card-title">Parts / Hub</span>
+                            <span class="tap-card-count">${boardState.partsHub.length} Orders</span>
+                        </div>
+                    </div>
+
+                    ${renderTimecardModule()}
+
+                    <div class="zone-container" id="workbenchZone">
+                        <div class="zone-header">
+                            <span>🛠️ Workbench</span>
+                            <span class="badge">${boardState.workbench.length}</span>
+                        </div>
+                        <div class="card-list">
+                            ${boardState.workbench.map(renderItemCard).join('')}
+                        </div>
+                    </div>
+
+                    <div class="zone-container" id="inProgressZone">
+                        <div class="zone-header">
+                            <span>⚡ In Progress / Waiting on Parts</span>
+                            <span class="badge">${boardState.inProgress.length}</span>
+                        </div>
+                        <div class="card-list">
+                            ${boardState.inProgress.map(renderItemCard).join('')}
+                        </div>
+                    </div>
+
+                    <div class="zone-container" id="readyWallZone">
+                        <div class="zone-header">
+                            <span>🧱 Ready Wall</span>
+                            <span class="badge">${boardState.readyWall.length}</span>
+                        </div>
+                        <div class="card-list">
+                            ${boardState.readyWall.map(renderItemCard).join('')}
+                        </div>
+                    </div>
+                `;
+            } else {
+                // --- Standalone Staff Forever Card View ---
+                const staffName = staffParam.charAt(0).toUpperCase() + staffParam.slice(1);
+                document.getElementById('headerTitle').innerText = `${staffName}'s Forever Card`;
+
+                mount.innerHTML = `
+                    ${renderTimecardModule()}
+
+                    <div class="zone-container">
+                        <div class="zone-header">
+                            <span>🛠️ Active Workbench</span>
+                            <span class="badge">${boardState.workbench.length}</span>
+                        </div>
+                        <div class="card-list">
+                            ${boardState.workbench.map(renderItemCard).join('')}
+                        </div>
+                    </div>
+
+                    <div class="zone-container">
+                        <div class="zone-header">
+                            <span>⚡ Bench Queue / In Progress</span>
+                            <span class="badge">${boardState.inProgress.length}</span>
+                        </div>
+                        <div class="card-list">
+                            ${boardState.inProgress.map(renderItemCard).join('')}
+                        </div>
+                    </div>
+
+                    <div class="zone-container">
+                        <div class="zone-header">
+                            <span>🧱 Ready Wall</span>
+                            <span class="badge">${boardState.readyWall.length}</span>
+                        </div>
+                        <div class="card-list">
+                            ${boardState.readyWall.map(renderItemCard).join('')}
+                        </div>
+                    </div>
+
+                    <div class="zone-container">
+                        <div class="zone-header">
+                            <span>📦 Shared Parts Order List</span>
+                            <span class="badge">${boardState.partsHub.length}</span>
+                        </div>
+                        <div class="card-list">
+                            ${boardState.partsHub.map(renderItemCard).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function scrollToZone(id) {
+            const el = document.getElementById(id);
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>"']/g, function(m) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                }[m];
+            });
+        }
+
+        // --- Initial Load ---
+        window.addEventListener('DOMContentLoaded', () => {
+            renderView();
+        });
+    </script>
 </body>
 </html>
