@@ -22,8 +22,8 @@ function classifyZone(text) {
     return 'group_mm6bv2h0'; // Parts Needed
   }
 
-  // Default fallback -> Staff Intake (Pending Review)
-  return 'group_mm6b77as';
+  // Default fallback -> Empire Operations
+  return 'group_mm7mfbre';
 }
 
 exports.handler = async (event) => {
@@ -116,7 +116,6 @@ exports.handler = async (event) => {
             }
           }
         } catch (lookupErr) {
-          // Fallback gracefully if lookup times out or fails
           console.error('Customer lookup error:', lookupErr);
         }
       }
