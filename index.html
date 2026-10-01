@@ -6,6 +6,7 @@
     <title>TappyThing — Digital Coordinator</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
             theme: {
@@ -18,33 +19,28 @@
                         }
                     },
                     boxShadow: {
-                        'glow-green': '0 0 20px rgba(16, 185, 129, 0.4)'
+                        'glow-blue': '0 0 25px rgba(59, 130, 246, 0.5)',
+                        'glow-green': '0 0 25px rgba(16, 185, 129, 0.5)'
                     }
                 }
             }
         }
     </script>
 </head>
-<body class="h-full flex flex-col font-sans antialiased overflow-x-hidden bg-slate-950 text-slate-100">
+<body class="h-full flex flex-col font-sans antialiased overflow-x-hidden bg-slate-950 text-slate-100 selection:bg-blue-500 selection:text-white">
 
     <!-- Top Sticky Bar -->
-    <header class="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex items-center justify-between">
+    <header class="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-lg">
         <div class="flex items-center gap-3">
-            <button onclick="toggleSidePanel()" class="p-2 rounded-lg bg-slate-800 text-slate-200 hover:text-white hover:bg-slate-700 transition">
+            <button onclick="toggleSidePanel()" class="p-2 rounded-xl bg-slate-800 text-slate-200 hover:text-white hover:bg-slate-700 transition active:scale-95">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
             </button>
-            <div class="flex items-center gap-2">
-                <div class="relative">
-                    <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh Logo" class="w-12 h-12 rounded-full border-2 border-emerald-500 shadow-glow-green object-cover" onError="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Fresh&background=10b981&color=fff'">
-                    <div id="statusLed" class="absolute bottom-0 right-0 w-3 h-3 bg-brand-500 border-2 border-slate-900 rounded-full"></div>
-                </div>
-                <span id="headerTitle" class="font-bold text-lg text-slate-100 tracking-wide">TappyThing</span>
-            </div>
+            <span id="headerTitle" class="font-bold text-lg text-slate-100 tracking-wide">TappyThing</span>
         </div>
-        <button onclick="triggerCamera('photo')" class="px-3 py-1.5 bg-brand-500/10 text-brand-500 border border-brand-500/30 rounded-lg text-sm font-semibold flex items-center gap-1.5 hover:bg-brand-500/20">
-            <span>📷</span> <span>Snap</span>
+        <button onclick="copyStaffLink()" class="px-3 py-1.5 bg-blue-500/10 text-blue-400 border border-blue-500/30 rounded-xl text-xs font-bold flex items-center gap-1.5 hover:bg-blue-500/20 transition active:scale-95 shadow-sm">
+            <span>🔗</span> <span id="copyStaffText">Share Staff Intake Card</span>
         </button>
     </header>
 
@@ -53,34 +49,40 @@
     <aside id="sideDrawer" class="fixed top-0 left-0 bottom-0 w-80 bg-slate-900 border-r border-slate-800 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out p-6 flex flex-col gap-6 overflow-y-auto">
         <div class="flex items-center justify-between pb-4 border-b border-slate-800">
             <div class="flex items-center gap-3">
-                <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh Logo" class="w-12 h-12 rounded-full border-2 border-emerald-500 shadow-lg object-cover" onError="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Fresh&background=10b981&color=fff'">
+                <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" alt="Fresh Avatar" class="w-12 h-12 rounded-full border-2 border-blue-400 object-cover shadow-lg" onError="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Fresh&background=3b82f6&color=fff'">
                 <div>
                     <h2 class="font-bold text-slate-100">Fresh 🤵</h2>
-                    <p class="text-xs text-slate-400">Digital Coordinator</p>
+                    <p class="text-xs text-blue-400 font-semibold">Digital Coordinator</p>
                 </div>
             </div>
             <button onclick="toggleSidePanel()" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
         </div>
 
         <nav class="flex flex-col gap-2">
-            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Operational Zones</p>
-            <a href="?" class="flex items-center justify-between p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-slate-200">
-                <span class="flex items-center gap-2.5 font-medium"><span>🛠️</span> Master Command Hub</span>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Master Navigation</p>
+            <a href="?" class="flex items-center gap-2.5 p-3 rounded-xl bg-blue-600/20 text-blue-300 font-semibold border border-blue-500/30">
+                <span>🏰</span> Master Command Hub
             </a>
-            <button onclick="scrollToZone('workbenchZone'); toggleSidePanel();" class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-800/40 text-slate-300 text-left">
-                <span class="flex items-center gap-2.5"><span>🛠️</span> Workbench</span>
+            <button onclick="openDrawerSection('castle'); toggleSidePanel();" class="flex items-center gap-2.5 p-3 rounded-xl hover:bg-slate-800/60 text-slate-300 text-left">
+                <span>🏰</span> Castle (Personal &amp; Strategy)
             </button>
-            <button onclick="scrollToZone('inProgressZone'); toggleSidePanel();" class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-800/40 text-slate-300 text-left">
-                <span class="flex items-center gap-2.5"><span>⚡</span> In Progress</span>
+            <button onclick="openDrawerSection('empire'); toggleSidePanel();" class="flex items-center gap-2.5 p-3 rounded-xl hover:bg-slate-800/60 text-slate-300 text-left">
+                <span>👑</span> Empire (Shop Ops &amp; Workbench)
             </button>
-            <button onclick="scrollToZone('readyWallZone'); toggleSidePanel();" class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-800/40 text-slate-300 text-left">
-                <span class="flex items-center gap-2.5"><span>🧱</span> Ready Wall</span>
+            <button onclick="openDrawerSection('pipeline'); toggleSidePanel();" class="flex items-center gap-2.5 p-3 rounded-xl hover:bg-slate-800/60 text-slate-300 text-left">
+                <span>🚀</span> Pipeline (Leads &amp; Invoices)
             </button>
-            <button onclick="scrollToZone('partsZone'); toggleSidePanel();" class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-800/40 text-slate-300 text-left">
-                <span class="flex items-center gap-2.5"><span>📦</span> Shared Parts / Hub</span>
+            <button onclick="openDrawerSection('vault'); toggleSidePanel();" class="flex items-center gap-2.5 p-3 rounded-xl hover:bg-slate-800/60 text-slate-300 text-left">
+                <span>🌐</span> Vault (22,283 Records)
+            </button>
+            <button onclick="openDrawerSection('pinball'); toggleSidePanel();" class="flex items-center gap-2.5 p-3 rounded-xl hover:bg-slate-800/60 text-slate-300 text-left">
+                <span>🎯</span> Pinball (Rapid Task Queue)
             </button>
 
-            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-1">Staff Forever Cards</p>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-1">Staff Satellite Links</p>
+            <a href="?staff=intake" class="flex items-center gap-2.5 p-3 rounded-xl hover:bg-slate-800/40 text-slate-300">
+                <span>📋</span> Staff Intake Floor Card
+            </a>
             <a href="?staff=mona" class="flex items-center gap-2.5 p-3 rounded-xl hover:bg-slate-800/40 text-slate-300">
                 <span>👤</span> Mona's Forever Card
             </a>
@@ -90,25 +92,39 @@
         </nav>
     </aside>
 
-    <!-- Main Container -->
-    <main class="flex-1 max-w-2xl w-full mx-auto p-4 flex flex-col gap-6 pb-24">
+    <!-- Main View Container -->
+    <main class="flex-1 max-w-2xl w-full mx-auto p-4 flex flex-col gap-6 pb-28">
 
-        <!-- 1-Tap Mic Action Button -->
-        <div class="flex flex-col items-center">
-            <button id="mainMicBtn" onclick="toggleVoiceListening()" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-bold text-lg shadow-glow-green flex items-center justify-center gap-3 transition transform active:scale-95">
-                <span class="text-2xl">🎙️</span> <span id="micBtnText">Tap & Speak</span>
-            </button>
+        <!-- High-Res Avatar Logo Banner -->
+        <div id="masterAvatarHeader" class="text-center pt-2 flex flex-col items-center">
+            <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-20 h-20 rounded-full border-4 border-blue-400 mx-auto mb-2 block shadow-2xl shadow-blue-500/30 object-cover ring-2 ring-blue-500/20" alt="Fresh Avatar" onError="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Fresh&background=3b82f6&color=fff'">
+            <h1 class="text-xl font-black text-slate-100 tracking-tight">TAPPYTHING</h1>
+            <p class="text-xs text-blue-400 font-bold uppercase tracking-widest mt-0.5">Digital Coordinator &amp; Command Hub</p>
         </div>
 
-        <!-- Smart Unified Photo/Video + Voice Intake Preview Modal -->
-        <div id="intakePreviewCard" class="hidden bg-slate-900 border-2 border-brand-500 rounded-2xl p-4 flex-col gap-4 shadow-xl">
+        <!-- LED Status Display -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-2 shadow-inner">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                    <span id="statusLed" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                    LED Status Screen
+                </span>
+                <span id="syncBadge" class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-semibold">Sync Active</span>
+            </div>
+            <div id="ledDisplay" class="font-mono text-sm font-bold text-blue-400 bg-slate-950 p-3 rounded-xl border border-slate-800/80 tracking-wide leading-relaxed">
+                POCKET CHIEF OF STAFF READY ⚡
+            </div>
+        </div>
+
+        <!-- Smart Unified Photo/Video + Voice Intake Preview Card -->
+        <div id="intakePreviewCard" class="hidden bg-slate-900 border-2 border-emerald-500 rounded-2xl p-4 flex-col gap-4 shadow-xl">
             <div id="mediaPreviewContainer" class="w-full max-h-56 rounded-xl overflow-hidden bg-black flex items-center justify-center"></div>
-            <div class="bg-brand-500/10 border-l-4 border-brand-500 p-3 rounded-r-lg text-sm text-slate-200 flex items-center gap-2">
-                <span>🎙️</span> <span id="intakeVoicePrompt">Listening for customer name & diagnosis...</span>
+            <div class="bg-emerald-500/10 border-l-4 border-emerald-500 p-3 rounded-r-lg text-sm text-slate-200 flex items-center gap-2">
+                <span>🎙️</span> <span id="intakeVoicePrompt">Listening for customer name &amp; diagnosis...</span>
             </div>
             <div class="flex gap-2">
                 <button onclick="cancelSmartIntake()" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-300 font-semibold hover:bg-slate-700">Cancel</button>
-                <button onclick="submitSmartIntake()" class="flex-1 py-2.5 rounded-xl bg-brand-500 text-white font-semibold hover:bg-brand-600">⚡ Submit Card</button>
+                <button onclick="submitSmartIntake()" class="flex-1 py-2.5 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600">⚡ Submit Card</button>
             </div>
         </div>
 
@@ -122,7 +138,7 @@
         <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 flex flex-col gap-5 shadow-2xl relative">
             <button onclick="closeInvoiceModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold">&times;</button>
             <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
-                <div class="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-xl text-brand-500">📄</div>
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-xl text-emerald-500">📄</div>
                 <div>
                     <h3 class="font-bold text-lg text-slate-100" id="invCustomer">Customer Invoice</h3>
                     <p class="text-xs text-slate-400">TappyThing Payment Request</p>
@@ -131,10 +147,10 @@
 
             <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 flex flex-col gap-2">
                 <div class="text-xs text-slate-400 uppercase tracking-wider">Line Item Summary</div>
-                <div class="font-medium text-slate-200" id="invTitle">Diagnostic & Service</div>
+                <div class="font-medium text-slate-200" id="invTitle">Diagnostic &amp; Service</div>
                 <div class="flex justify-between items-baseline pt-2 border-t border-slate-800/80 mt-1">
                     <span class="text-sm text-slate-400">Total Amount Due</span>
-                    <span class="text-2xl font-bold text-brand-500" id="invTotal">$0.00</span>
+                    <span class="text-2xl font-bold text-emerald-500" id="invTotal">$0.00</span>
                 </div>
             </div>
 
@@ -145,7 +161,7 @@
                 <a id="invEmailBtn" href="#" class="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl font-semibold flex items-center justify-center gap-2">
                     <span>✉️</span> Email Invoice Link
                 </a>
-                <a id="invPayNowBtn" href="#" target="_blank" class="w-full py-3 px-4 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-glow-green">
+                <a id="invPayNowBtn" href="#" target="_blank" class="w-full py-3 px-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-glow-green">
                     <span>💳</span> Tap to Pay Now
                 </a>
                 <button onclick="copyPayLink()" class="w-full py-2.5 px-4 bg-slate-800/50 hover:bg-slate-800 text-slate-300 rounded-xl text-sm font-medium flex items-center justify-center gap-2">
@@ -160,24 +176,24 @@
     <input type="file" id="videoInput" accept="video/*" capture="environment" onchange="handleMediaCaptured(event, 'video')" class="hidden">
 
     <!-- Bottom Dock -->
-    <div class="fixed bottom-0 left-0 right-0 bg-slate-900/95 border-t border-slate-800 py-2 px-6 flex justify-around items-center z-30 backdrop-blur-md max-w-2xl mx-auto">
-        <button onclick="triggerCamera('photo')" class="flex flex-col items-center gap-1 text-slate-400 hover:text-brand-500">
+    <div class="fixed bottom-0 left-0 right-0 bg-slate-900/95 border-t border-slate-800 py-3 px-6 flex justify-around items-center z-30 backdrop-blur-md max-w-2xl mx-auto shadow-2xl">
+        <button onclick="triggerCamera('photo')" class="flex flex-col items-center gap-1 text-slate-400 hover:text-blue-400 transition active:scale-95">
             <span class="text-xl">📷</span>
-            <span class="text-xs font-medium">Snap Tag</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Snap</span>
         </button>
-        <button onclick="triggerCamera('video')" class="flex flex-col items-center gap-1 text-slate-400 hover:text-brand-500">
+        <button id="mainMicBtn" onclick="toggleVoiceListening()" class="p-4 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-glow-blue transition transform active:scale-90 -mt-5 border-4 border-slate-950">
+            <span class="text-2xl">🎙️</span>
+        </button>
+        <button onclick="triggerCamera('video')" class="flex flex-col items-center gap-1 text-slate-400 hover:text-blue-400 transition active:scale-95">
             <span class="text-xl">🎥</span>
-            <span class="text-xs font-medium">Record</span>
-        </button>
-        <button onclick="scrollToTop()" class="flex flex-col items-center gap-1 text-slate-400 hover:text-brand-500">
-            <span class="text-xl">⚡</span>
-            <span class="text-xs font-medium">Top</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Record</span>
         </button>
     </div>
 
     <script>
         const CONFIG = {
-            stripeBaseUrl: "https://buy.stripe.com/test_fT6"
+            stripeBaseUrl: "https://buy.stripe.com/test_fT6",
+            mondayEndpoint: "/.netlify/functions/monday?board=18424728273"
         };
 
         let isListening = false;
@@ -185,25 +201,8 @@
         let currentCapturedMedia = null;
         let currentVoiceTranscript = "";
         let activeInvoiceUrl = "";
+        let rawBoardItems = [];
 
-        // Core Board State
-        let boardState = {
-            workbench: [
-                { id: '1', title: 'Mrs. Boatwright Oreck upright — broken belt check $40', media: null, mediaType: null },
-                { id: '2', title: 'San Fuji cord diagnostic $10', media: null, mediaType: null }
-            ],
-            inProgress: [
-                { id: '3', title: 'Paul Schwab Central Vac conversion cord install', media: null, mediaType: null }
-            ],
-            readyWall: [
-                { id: '4', title: 'Donna Wenderhoff wand pickup ready', media: null, mediaType: null }
-            ],
-            partsHub: [
-                { id: '5', title: 'Shared Order: Veridian Plus filters (Serena Robinson)', media: null, mediaType: null }
-            ]
-        };
-
-        // --- Web Speech API ---
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
@@ -220,11 +219,7 @@
                 const text = final || interim;
                 if (text.trim()) {
                     currentVoiceTranscript = text;
-                    if (currentCapturedMedia) {
-                        document.getElementById('intakeVoicePrompt').innerText = `"${text}"`;
-                    } else {
-                        document.getElementById('micBtnText').innerText = `"${text.substring(0, 24)}..."`;
-                    }
+                    updateLED(`" ${text} "`);
                 }
             };
             recognition.onerror = () => stopListening();
@@ -237,7 +232,6 @@
                 if (currentVoiceTranscript && !currentCapturedMedia) {
                     createCardFromVoice(currentVoiceTranscript);
                     currentVoiceTranscript = "";
-                    document.getElementById('micBtnText').innerText = "Tap & Speak";
                 }
             } else {
                 startListening();
@@ -249,25 +243,33 @@
             isListening = true;
             currentVoiceTranscript = "";
             recognition.start();
-            document.getElementById('statusLed').classList.add('animate-ping');
-            document.getElementById('mainMicBtn').classList.add('from-red-500', 'to-red-600');
-            document.getElementById('micBtnText').innerText = "Listening...";
+            document.getElementById('statusLed').className = "w-2.5 h-2.5 rounded-full bg-red-500 animate-ping";
+            document.getElementById('mainMicBtn').className = "p-4 rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg transition transform active:scale-90 -mt-5 border-4 border-slate-950 animate-pulse";
+            updateLED("LISTENING FOR VOICE COMMAND...");
         }
 
         function stopListening() {
             isListening = false;
             if (recognition) recognition.stop();
-            document.getElementById('statusLed').classList.remove('animate-ping');
-            document.getElementById('mainMicBtn').classList.remove('from-red-500', 'to-red-600');
-            if (!currentVoiceTranscript) document.getElementById('micBtnText').innerText = "Tap & Speak";
+            document.getElementById('statusLed').className = "w-2.5 h-2.5 rounded-full bg-emerald-500";
+            document.getElementById('mainMicBtn').className = "p-4 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-glow-blue transition transform active:scale-90 -mt-5 border-4 border-slate-950";
+            if (!currentVoiceTranscript) updateLED("POCKET CHIEF OF STAFF READY ⚡");
         }
 
-        // --- UI & Drawer ---
+        function updateLED(msg) {
+            document.getElementById('ledDisplay').innerText = msg;
+        }
+
         function toggleSidePanel() {
-            const drawer = document.getElementById('sideDrawer');
-            const overlay = document.getElementById('sideDrawerOverlay');
-            drawer.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
+            document.getElementById('sideDrawer').classList.toggle('-translate-x-full');
+            document.getElementById('sideDrawerOverlay').classList.toggle('hidden');
+        }
+
+        function copyStaffLink() {
+            const link = `${window.location.origin}/?staff=intake`;
+            navigator.clipboard.writeText(link);
+            document.getElementById('copyStaffText').innerText = "Copied Link!";
+            setTimeout(() => document.getElementById('copyStaffText').innerText = "Share Staff Intake Card", 2000);
         }
 
         function triggerCamera(type) {
@@ -285,7 +287,7 @@
                 const container = document.getElementById('mediaPreviewContainer');
                 
                 container.innerHTML = type === 'photo' 
-                    ? `<img src="${e.target.result}" class="max-h-56 object-contain">` 
+                    ? `<img src="${e.target.result}" class="max-h-56 object-contain">`
                     : `<video src="${e.target.result}" controls class="max-h-56"></video>`;
 
                 previewCard.classList.remove('hidden');
@@ -304,28 +306,30 @@
 
         function submitSmartIntake() {
             stopListening();
-            const title = currentVoiceTranscript.trim() || "New Intake Item";
-            boardState.workbench.unshift({
+            const title = currentVoiceTranscript.trim() || "New Voice/Photo Intake Card";
+            rawBoardItems.unshift({
                 id: Date.now().toString(),
-                title: title,
+                name: title,
+                group: { title: 'Pipeline' },
                 media: currentCapturedMedia ? currentCapturedMedia.dataUrl : null,
                 mediaType: currentCapturedMedia ? currentCapturedMedia.type : null
             });
             cancelSmartIntake();
+            updateLED(`SUBMITTED: ${title}`);
             renderView();
         }
 
         function createCardFromVoice(text) {
-            boardState.workbench.unshift({
+            rawBoardItems.unshift({
                 id: Date.now().toString(),
-                title: text,
-                media: null,
-                mediaType: null
+                name: text,
+                group: { title: 'Pipeline' },
+                media: null
             });
+            updateLED(`LOGGED CARD: ${text}`);
             renderView();
         }
 
-        // --- Invoice Modal Flow ---
         function openInvoiceModal(title, priceStr) {
             activeInvoiceUrl = `${CONFIG.stripeBaseUrl}?amount=${priceStr.replace('$', '')}`;
             
@@ -350,18 +354,17 @@
             document.getElementById('copyLinkText').innerText = "Copied to Clipboard!";
         }
 
-        // --- Timecard Module (Included on Staff Forever Cards ONLY) ---
         function renderTimecardModule() {
             return `
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3 shadow-lg">
                     <div class="flex justify-between items-center text-sm font-bold">
                         <span class="text-slate-200">⏱️ Staff Timecard Punch</span>
-                        <span class="text-xs text-slate-500">PIN Protected</span>
+                        <span class="text-xs text-blue-400 font-mono">PIN Protected</span>
                     </div>
-                    <input type="password" maxlength="4" placeholder="Enter PIN" id="staffPin" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-center text-slate-100 tracking-widest text-lg focus:outline-none focus:border-brand-500">
+                    <input type="password" maxlength="4" placeholder="Enter PIN" id="staffPin" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-center text-slate-100 tracking-widest text-lg focus:outline-none focus:border-blue-500">
                     <div class="grid grid-cols-2 gap-2">
-                        <button onclick="handlePunch('IN')" class="py-2.5 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl text-sm">Punch IN</button>
-                        <button onclick="handlePunch('OUT')" class="py-2.5 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl text-sm">Punch OUT</button>
+                        <button onclick="handlePunch('IN')" class="py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-sm">Punch IN</button>
+                        <button onclick="handlePunch('OUT')" class="py-2.5 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl text-sm">Punch OUT</button>
                     </div>
                 </div>
             `;
@@ -374,15 +377,15 @@
             document.getElementById('staffPin').value = "";
         }
 
-        // --- Card Renderer ---
         function renderItemCard(item) {
-            const priceMatch = item.title.match(/\$\d+(?:,\d{3})*(?:\.\d{2})?/);
+            const title = item.name || item.title || "";
+            const priceMatch = title.match(/\$\d+(?:,\d{3})*(?:\.\d{2})?/);
             let actionHtml = "";
 
             if (priceMatch) {
                 const amount = priceMatch[0];
                 actionHtml = `
-                    <button onclick="openInvoiceModal('${escapeHtml(item.title)}', '${amount}')" class="mt-2 w-full py-2 px-3 bg-brand-500/10 border border-brand-500/40 hover:bg-brand-500/20 text-brand-500 font-bold rounded-xl text-sm flex items-center justify-center gap-2">
+                    <button onclick="openInvoiceModal('${escapeHtml(title)}', '${amount}')" class="mt-2 w-full py-2 px-3 bg-emerald-500/10 border border-emerald-500/40 hover:bg-emerald-500/20 text-emerald-400 font-bold rounded-xl text-xs flex items-center justify-center gap-2">
                         <span>📄</span> View Invoice (${amount})
                     </button>
                 `;
@@ -391,112 +394,190 @@
             let mediaHtml = "";
             if (item.media) {
                 mediaHtml = item.mediaType === 'photo' 
-                    ? `<div class="mt-2 rounded-lg overflow-hidden max-h-48 bg-black"><img src="${item.media}" class="w-full h-full object-cover"></div>` 
+                    ? `<div class="mt-2 rounded-lg overflow-hidden max-h-48 bg-black"><img src="${item.media}" class="w-full h-full object-cover"></div>`
                     : `<div class="mt-2 rounded-lg overflow-hidden max-h-48 bg-black"><video src="${item.media}" controls class="w-full h-full"></video></div>`;
             }
 
             return `
-                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col gap-1">
-                    <div class="text-sm text-slate-200 font-medium leading-relaxed">${escapeHtml(item.title)}</div>
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 flex flex-col gap-1 shadow-sm">
+                    <div class="text-sm text-slate-200 font-medium leading-relaxed">${escapeHtml(title)}</div>
                     ${mediaHtml}
                     ${actionHtml}
                 </div>
             `;
         }
 
-        // --- Dual-Mode Router ---
+        function loadDrawerItems(key) {
+            const items = rawBoardItems.filter(item => {
+                const grp = ((item.group && item.group.title) || '').toLowerCase();
+                const title = (item.name || '').toLowerCase();
+
+                if (key === 'castle') return grp.includes('castle') || grp.includes('personal') || grp.includes('william') || grp.includes('car') || grp.includes('lounge');
+                if (key === 'empire') return grp.includes('empire') || grp.includes('workbench') || grp.includes('ready wall') || grp.includes('bench') || grp.includes('parts') || grp.includes('showroom');
+                if (key === 'pipeline') return grp.includes('pipeline') || grp.includes('staff intake') || grp.includes('leads') || title.includes('intake') || title.includes('lead');
+                if (key === 'vault') return grp.includes('vault') || grp.includes('exchange') || grp.includes('shared');
+                if (key === 'pinball') return grp.includes('pinball') || grp.includes('staff intake') || title.includes('task');
+                return true;
+            });
+
+            if (items.length === 0) {
+                return `<div class="p-4 rounded-xl bg-slate-900/50 border border-slate-800/80 text-xs text-slate-400 text-center italic">No active cards in this drawer. Tap the mic below to add one!</div>`;
+            }
+
+            return items.map(renderItemCard).join('');
+        }
+
         function renderView() {
             const params = new URLSearchParams(window.location.search);
             const staffParam = params.get('staff') || params.get('card');
             const mount = document.getElementById('viewMount');
 
             if (!staffParam) {
-                // Master Command Hub (Clean generic zones, no timecard on hub)
+                document.getElementById('masterAvatarHeader').classList.remove('hidden');
                 document.getElementById('headerTitle').innerText = "TappyThing";
+
                 mount.innerHTML = `
-                    <div class="space-y-6">
-                        <section id="workbenchZone" class="space-y-3">
-                            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                                <h2 class="font-bold text-slate-200 flex items-center gap-2"><span>🛠️</span> Workbench</h2>
-                                <span class="bg-slate-800 text-slate-400 text-xs px-2 py-0.5 rounded-full font-bold">${boardState.workbench.length}</span>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="openDrawerSection('castle')" class="bg-slate-900 border border-slate-800 hover:border-blue-500/50 p-4 rounded-2xl flex flex-col gap-2 cursor-pointer transition shadow-md">
+                            <span class="text-2xl">🏰</span>
+                            <div>
+                                <h3 class="font-bold text-sm text-slate-100">1. Castle</h3>
+                                <p class="text-[11px] text-slate-400">Personal &amp; Strategy</p>
                             </div>
-                            <div class="space-y-2.5">${boardState.workbench.map(renderItemCard).join('')}</div>
+                        </div>
+                        <div onclick="openDrawerSection('empire')" class="bg-slate-900 border border-slate-800 hover:border-blue-500/50 p-4 rounded-2xl flex flex-col gap-2 cursor-pointer transition shadow-md">
+                            <span class="text-2xl">👑</span>
+                            <div>
+                                <h3 class="font-bold text-sm text-slate-100">2. Empire</h3>
+                                <p class="text-[11px] text-slate-400">Workbench &amp; Ops</p>
+                            </div>
+                        </div>
+                        <div onclick="openDrawerSection('pipeline')" class="bg-slate-900 border border-slate-800 hover:border-blue-500/50 p-4 rounded-2xl flex flex-col gap-2 cursor-pointer transition shadow-md">
+                            <span class="text-2xl">🚀</span>
+                            <div>
+                                <h3 class="font-bold text-sm text-slate-100">3. Pipeline</h3>
+                                <p class="text-[11px] text-slate-400">Leads &amp; Invoices</p>
+                            </div>
+                        </div>
+                        <div onclick="openDrawerSection('calendar')" class="bg-slate-900 border border-slate-800 hover:border-blue-500/50 p-4 rounded-2xl flex flex-col gap-2 cursor-pointer transition shadow-md">
+                            <span class="text-2xl">📅</span>
+                            <div>
+                                <h3 class="font-bold text-sm text-slate-100">4. Calendar</h3>
+                                <p class="text-[11px] text-slate-400">Agenda &amp; Stops</p>
+                            </div>
+                        </div>
+                        <div onclick="openDrawerSection('vault')" class="bg-slate-900 border border-slate-800 hover:border-blue-500/50 p-4 rounded-2xl flex flex-col gap-2 cursor-pointer transition shadow-md">
+                            <span class="text-2xl">🌐</span>
+                            <div>
+                                <h3 class="font-bold text-sm text-slate-100">5. Vault</h3>
+                                <p class="text-[11px] text-slate-400">22,283 Records</p>
+                            </div>
+                        </div>
+                        <div onclick="openDrawerSection('pinball')" class="bg-slate-900 border border-slate-800 hover:border-blue-500/50 p-4 rounded-2xl flex flex-col gap-2 cursor-pointer transition shadow-md">
+                            <span class="text-2xl">🎯</span>
+                            <div>
+                                <h3 class="font-bold text-sm text-slate-100">6. Pinball</h3>
+                                <p class="text-[11px] text-slate-400">Rapid Task Queue</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="toggleFeaturesModal()" class="w-full py-3.5 px-4 bg-slate-900 border border-slate-800 hover:border-blue-500/40 rounded-2xl font-bold text-sm text-blue-400 flex items-center justify-center gap-2 shadow-md">
+                        <span>🎭</span> Features, Benefits &amp; Soul (6 Pillars)
+                    </button>
+
+                    <div id="drawerContentSection" class="flex flex-col gap-6 pt-2">
+                        <section id="sectionCastle" class="space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                                <h2 class="font-bold text-slate-200 text-sm flex items-center gap-2"><span>🏰</span> Castle Zone</h2>
+                            </div>
+                            <div class="space-y-2">${loadDrawerItems('castle')}</div>
                         </section>
 
-                        <section id="inProgressZone" class="space-y-3">
+                        <section id="sectionEmpire" class="space-y-3">
                             <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                                <h2 class="font-bold text-slate-200 flex items-center gap-2"><span>⚡</span> In Progress</h2>
-                                <span class="bg-slate-800 text-slate-400 text-xs px-2 py-0.5 rounded-full font-bold">${boardState.inProgress.length}</span>
+                                <h2 class="font-bold text-slate-200 text-sm flex items-center gap-2"><span>👑</span> Empire Zone</h2>
                             </div>
-                            <div class="space-y-2.5">${boardState.inProgress.map(renderItemCard).join('')}</div>
+                            <div class="space-y-2">${loadDrawerItems('empire')}</div>
                         </section>
 
-                        <section id="readyWallZone" class="space-y-3">
+                        <section id="sectionPipeline" class="space-y-3">
                             <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                                <h2 class="font-bold text-slate-200 flex items-center gap-2"><span>🧱</span> Ready Wall</h2>
-                                <span class="bg-slate-800 text-slate-400 text-xs px-2 py-0.5 rounded-full font-bold">${boardState.readyWall.length}</span>
+                                <h2 class="font-bold text-slate-200 text-sm flex items-center gap-2"><span>🚀</span> Pipeline Zone</h2>
                             </div>
-                            <div class="space-y-2.5">${boardState.readyWall.map(renderItemCard).join('')}</div>
-                        </section>
-
-                        <section id="partsZone" class="space-y-3">
-                            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                                <h2 class="font-bold text-slate-200 flex items-center gap-2"><span>📦</span> Shared Parts / Hub</h2>
-                                <span class="bg-slate-800 text-slate-400 text-xs px-2 py-0.5 rounded-full font-bold">${boardState.partsHub.length}</span>
-                            </div>
-                            <div class="space-y-2.5">${boardState.partsHub.map(renderItemCard).join('')}</div>
+                            <div class="space-y-2">${loadDrawerItems('pipeline')}</div>
                         </section>
                     </div>
                 `;
             } else {
+                document.getElementById('masterAvatarHeader').classList.add('hidden');
                 const staffName = staffParam.charAt(0).toUpperCase() + staffParam.slice(1);
-                document.getElementById('headerTitle').innerText = `${staffName}'s Card`;
+                document.getElementById('headerTitle').innerText = `${staffName}'s Satellite Card`;
+
                 mount.innerHTML = `
                     <div class="space-y-6">
                         ${renderTimecardModule()}
 
                         <section class="space-y-3">
                             <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                                <h2 class="font-bold text-slate-200 flex items-center gap-2"><span>🛠️</span> Active Workbench</h2>
-                                <span class="bg-slate-800 text-slate-400 text-xs px-2 py-0.5 rounded-full font-bold">${boardState.workbench.length}</span>
+                                <h2 class="font-bold text-slate-200 text-sm flex items-center gap-2"><span>📋</span> Counter Intake Queue</h2>
                             </div>
-                            <div class="space-y-2.5">${boardState.workbench.map(renderItemCard).join('')}</div>
+                            <div class="space-y-2">${loadDrawerItems('pipeline')}</div>
                         </section>
 
                         <section class="space-y-3">
                             <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                                <h2 class="font-bold text-slate-200 flex items-center gap-2"><span>⚡</span> In Progress</h2>
-                                <span class="bg-slate-800 text-slate-400 text-xs px-2 py-0.5 rounded-full font-bold">${boardState.inProgress.length}</span>
+                                <h2 class="font-bold text-slate-200 text-sm flex items-center gap-2"><span>🛠️</span> Active Bench Queue</h2>
                             </div>
-                            <div class="space-y-2.5">${boardState.inProgress.map(renderItemCard).join('')}</div>
+                            <div class="space-y-2">${loadDrawerItems('empire')}</div>
                         </section>
 
                         <section class="space-y-3">
                             <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                                <h2 class="font-bold text-slate-200 flex items-center gap-2"><span>🧱</span> Ready Wall</h2>
-                                <span class="bg-slate-800 text-slate-400 text-xs px-2 py-0.5 rounded-full font-bold">${boardState.readyWall.length}</span>
+                                <h2 class="font-bold text-slate-200 text-sm flex items-center gap-2"><span>🧱</span> Ready Wall</h2>
                             </div>
-                            <div class="space-y-2.5">${boardState.readyWall.map(renderItemCard).join('')}</div>
+                            <div class="space-y-2">${loadDrawerItems('vault')}</div>
                         </section>
                     </div>
                 `;
             }
         }
 
-        function scrollToZone(id) {
-            const el = document.getElementById(id);
+        function openDrawerSection(id) {
+            const el = document.getElementById('section' + id.charAt(0).toUpperCase() + id.slice(1));
             if (el) el.scrollIntoView({ behavior: 'smooth' });
+            else alert(`Opening ${id.toUpperCase()} drawer section...`);
         }
 
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function toggleFeaturesModal() {
+            alert("TappyThing 6 Pillars:\n1. 1-Tap Voice Intake\n2. Dual-Mode Routing\n3. 1-Tap Stripe Invoicing\n4. PIN Timecard Protection\n5. Live Board Sync\n6. 10x Frictionless Architecture");
+        }
+
+        function fetchLiveMondayData() {
+            fetch(CONFIG.mondayEndpoint)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.items) {
+                        rawBoardItems = data.items;
+                        document.getElementById('syncBadge').innerText = "Monday Live";
+                        document.getElementById('syncBadge').className = "text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold";
+                        renderView();
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('syncBadge').innerText = "Offline Cache";
+                    renderView();
+                });
         }
 
         function escapeHtml(str) {
             return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]);
         }
 
-        window.addEventListener('DOMContentLoaded', renderView);
+        window.addEventListener('DOMContentLoaded', () => {
+            renderView();
+            fetchLiveMondayData();
+        });
     </script>
 </body>
 </html>
