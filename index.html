@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    if (sessionStorage.getItem('tappy_auth') !== 'true') {
+      let pin = prompt("🔐 Enter Master PIN:");
+      if (pin === "7777") {
+        sessionStorage.setItem('tappy_auth', 'true');
+      } else {
+        document.write("<h1 style='color:white;background:#030712;height:100vh;display:flex;align-items:center;justify-content:center;margin:0;font-family:sans-serif;'>🔒 ACCESS DENIED</h1>");
+        window.stop();
+      }
+    }
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TappyThing — Pocket Chief of Staff</title>
@@ -260,7 +271,7 @@
             <div class="text-gray-400 text-[10px]">Keeping communication channels wide open and tasks moving across the shop.</div>
           </div>
           <div class="border-b border-gray-800 pb-1.5">
-            <div class="font-bold text-purple-300 text-[11px]">🧘‍♀️ Yogi <span class="text-gray-400 font-normal">— Calm & Stress Relief</span></div>
+            <div class="font-bold text-purple-300 text-[11px]">🧘‍♀️️ Yogi <span class="text-gray-400 font-normal">— Calm & Stress Relief</span></div>
             <div class="text-gray-400 text-[10px]">The grounding force. Bringing warmth, peace of mind, and work-life balance.</div>
           </div>
           <div class="border-b border-gray-800 pb-1.5">
