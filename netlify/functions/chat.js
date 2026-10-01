@@ -2,10 +2,10 @@
 function classifyZone(text) {
   const lower = (text || '').toLowerCase();
 
-  if (/\b(repair|bench|belt|motor|vacuum|intake|diagnostic|oreck|kirby|pickup|machine)\b/.test(lower)) {
+  if (/\b(repair|bench|belt|motor|vacuum|intake|diagnostic|oreck|kirby|pickup|machine|tune.?up|work.?bench|dropoff|drop.?off|estimate)\b/.test(lower)) {
     return 'group_mm7mfbre'; // Empire Operations
   }
-  if (/\b(invoice|estimate|proposal|payment|pay|charge|quote|lead|prospect|call|contact|follow up|customer)\b/.test(lower)) {
+  if (/\b(invoice|proposal|payment|pay|charge|quote|lead|prospect|call|contact|customer)\b/.test(lower)) {
     return 'group_mm7myd0b'; // Pipeline
   }
   if (/\b(personal|bill|mortgage|car|home|family|pickleball)\b/.test(lower)) {
@@ -37,7 +37,11 @@ exports.handler = async (event) => {
   const boardId = "18424728273";
 
   if (!token) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: '❌ MONDAY_API_TOKEN is missing in Netlify Environment Variables.' }) };
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: '❌ MONDAY_API_TOKEN is missing in Netlify Environment Variables.' })
+    };
   }
 
   // ========================================
@@ -91,7 +95,7 @@ exports.handler = async (event) => {
         statusCode: 200,
         headers,
         body: JSON.stringify({
-          reply: `✅ Logged! ⚡`,
+          reply: '✅ Logged! ⚡',
           itemId: result.data?.create_item?.id
         })
       };
@@ -164,9 +168,9 @@ exports.handler = async (event) => {
     }
 
     const groups = data.data?.boards?.[0]?.groups || [];
-    
     let allItems = [];
     const seen = new Set();
+
     groups.forEach(g => {
       if (g.items_page && g.items_page.items) {
         g.items_page.items.forEach(item => {
