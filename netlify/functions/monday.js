@@ -1,111 +1,86 @@
-const https = require('https');
+exports.handler = async (event) => {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Content-Type': 'application/json'
+  };
 
-exports.handler = async function(event, context) {
-  // Read dynamic board parameter from URL or fallback to env default
-  const boardId = (event.queryStringParameters && event.queryStringParameters.board) || process.env.MONDAY_BOARD_ID;
-  const apiKey = process.env.MONDAY_API_KEY;
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
 
-  if (!apiKey) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'MONDAY_API_KEY environment variable missing' })
+  const token = process.env.MONDAY_API_TOKEN || process.env.MONDAY_API_KEY || process.env.MONDAY_TOKEN;
+  const qParams = event.queryStringParameters || {};
+  const boardId = qParams.board || "18424728273";
+
+  if (!token) {
+    return { 
+      statusCode: 500, 
+      headers, 
+      body: JSON.stringify({ error: '❌ MONDAY_API_TOKEN missing in environment variables.' }) 
     };
   }
 
-  const query = JSON.stringify({
-    query: `query {
-      boards (ids: [${boardId}]) {
-        name
+  // GraphQL Query fetching groups AND items with group titles attached for index.html filtering
+  const query = `
+    query {
+      boards(ids: [${boardId}]) {
         groups {
           id
           title
-          items_page {
+          items_page(limit: 50, query_params: { order_by: [{ column_id: "__creation_log__", direction: desc }] }) {
             items {
               id
               name
-              state
-              column_values {
+              created_at
+              group {
                 id
-                text
-                value
+                title
               }
             }
           }
         }
       }
-    }`
-  });
-
-  const options = {
-    hostname: 'api.monday.com',
-    path: '/v2',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': Buffer.byteLength(query),
-      'Authorization': apiKey,
-      'API-Version': '2023-10'
     }
-  };
+  `;
 
-  return new Promise((resolve, reject) => {
-    const req = https.request(options, (res) => {
-      let data = '';
-
-      res.on('data', (chunk) => {
-        data += chunk;
-      });
-
-      res.on('end', () => {
-        try {
-          const result = JSON.parse(data);
-
-          if (result.errors) {
-            resolve({
-              statusCode: 400,
-              body: JSON.stringify({ error: result.errors })
-            });
-            return;
-          }
-
-          const board = result.data?.boards?.[0];
-          if (!board) {
-            resolve({
-              statusCode: 404,
-              body: JSON.stringify({ error: `Board ID ${boardId} not found` })
-            });
-            return;
-          }
-
-          resolve({
-            statusCode: 200,
-            headers: {
-              'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*'
-            },
-            body: JSON.stringify({
-              board_id: boardId,
-              board_name: board.name,
-              groups: board.groups
-            })
-          });
-        } catch (err) {
-          resolve({
-            statusCode: 500,
-            body: JSON.stringify({ error: 'Failed to parse response', details: err.message })
-          });
-        }
-      });
+  try {
+    const response = await fetch('https://api.monday.com/v2', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token,
+        'API-Version': '2023-10'
+      },
+      body: JSON.stringify({ query })
     });
 
-    req.on('error', (error) => {
-      resolve({
-        statusCode: 500,
-        body: JSON.stringify({ error: 'Failed to connect to Monday.com API', details: error.message })
-      });
-    });
+    const data = await response.json();
 
-    req.write(query);
-    req.end();
-  });
+    if (data.errors && data.errors.length > 0) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'Monday GraphQL Error: ' + data.errors[0].message })
+      };
+    }
+
+    const groups = data.data?.boards?.[0]?.groups || [];
+
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        boardId: boardId,
+        groups: groups
+      })
+    };
+  } catch (err) {
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: 'Server fetch error: ' + err.message })
+    };
+  }
 };
