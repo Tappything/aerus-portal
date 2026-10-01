@@ -124,7 +124,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </div>
     <a href="?" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700 font-bold">Master Hub</a>
   </div>
-
   <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 space-y-2">
     <div class="flex justify-between items-center text-xs font-bold text-slate-200">
       <span>⏱️ Staff Timecard</span>
@@ -136,7 +135,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <button onclick="handlePunch('OUT')" class="flex-1 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-xl transition active:scale-95">Punch OUT</button>
     </div>
   </div>
-
   <div class="space-y-2.5 max-h-[60vh] overflow-y-auto pr-1">
     <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
       <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
@@ -231,11 +229,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
 <div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-40">
   <div class="max-w-md mx-auto flex items-center gap-2">
-    <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0" title="Snap Photo">
+    <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0">
       <i class="fa-solid fa-camera text-base"></i>
       <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaInput(this, 'Photo')">
     </label>
-    <label class="bg-gray-800 hover:bg-gray-700 text-purple-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0" title="Record Video">
+    <label class="bg-gray-800 hover:bg-gray-700 text-purple-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0">
       <i class="fa-solid fa-video text-base"></i>
       <input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, 'Video')">
     </label>
@@ -264,8 +262,7 @@ window.onload = function() {
   if (staffParam) {
     document.getElementById('masterHubContainer').style.display = 'none';
     document.getElementById('staffCardContainer').style.display = 'block';
-    var cleanName = staffParam.toUpperCase().replace('-', ' ');
-    document.getElementById('staffCardHeader').innerHTML = '<span class="text-emerald-400">⚡</span> ' + cleanName + ' SATELLITE CARD';
+    document.getElementById('staffCardHeader').innerHTML = '<span class="text-emerald-400">⚡</span> ' + staffParam.toUpperCase().replace('-', ' ') + ' SATELLITE CARD';
     loadStaffSections();
   } else {
     document.getElementById('masterHubContainer').style.display = 'block';
@@ -386,7 +383,6 @@ function openInvoiceModal(title, priceStr) {
 
 function closeInvoiceModal() { document.getElementById('invoiceModal').style.display = 'none'; }
 function copyPayLink() { navigator.clipboard.writeText(activeInvoiceUrl); document.getElementById('copyLinkText').innerText = 'Copied to Clipboard!'; }
-
 function handlePunch(type) {
   var pin = document.getElementById('staffPinInput').value;
   if (!pin || pin.length < 4) { alert('Please enter your 4-digit PIN.'); return; }
@@ -402,12 +398,37 @@ function renderItemCard(item) {
     var amount = priceMatch[0];
     actionHtml = '<button type="button" onclick="openInvoiceModal(\'' + title.replace(/'/g, "\\'") + '\', \'' + amount + '\')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow shrink-0 active:scale-95"><i class="fa-solid fa-file-invoice-dollar"></i> View Invoice (' + amount + ')</button>';
   }
+  var groupTitle = item.group ? (item.group.title || item.group) : 'Active Card';
   return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 flex justify-between items-center gap-2">' +
     '<div class="flex-1 min-w-0"><p class="font-bold text-white text-xs truncate">' + title + '</p>' +
-    '<p class="text-[10px] text-gray-400">' + (item.group ? (item.group.title || item.group) : 'Active Card') + '</p></div>' +
+    '<p class="text-[10px] text-gray-400">' + groupTitle + '</p></div>' +
     '<div class="flex items-center gap-2 shrink-0">' + actionHtml +
-    '<button type="button" onclick="toggleVoiceIntake(\'' + (item.group ? (item.group.title || item.group) : '') + '\')" class="bg-blue-900/60 hover:bg-blue-800 text-blue-300 p-1.5 rounded-lg border border-blue-700 text-[10px] flex items-center gap-1 font-semibold"><i class="fa-solid fa-microphone text-xs"></i> Talk</button>' +
+    '<button type="button" onclick="toggleVoiceIntake(\'' + groupTitle + '\')" class="bg-blue-900/60 hover:bg-blue-800 text-blue-300 p-1.5 rounded-lg border border-blue-700 text-[10px] flex items-center gap-1 font-semibold"><i class="fa-solid fa-microphone text-xs"></i> Talk</button>' +
     '</div></div>';
+}
+
+// ============================================================
+// THE KEY FIX: monday.js now returns groups[] with items inside
+// This function correctly flattens groups → items with group.title
+// ============================================================
+function flattenGroupsToItems(data) {
+  var allItems = [];
+  // New format from monday.js: { groups: [{id, title, items_page: {items:[]}}] }
+  if (data.groups && Array.isArray(data.groups)) {
+    data.groups.forEach(function(g) {
+      var gItems = (g.items_page && g.items_page.items) ? g.items_page.items : (g.items || []);
+      gItems.forEach(function(it) {
+        // Attach group info so filters work correctly
+        it.group = { id: g.id, title: g.title || '' };
+        allItems.push(it);
+      });
+    });
+  }
+  // Legacy format fallback: { items: [] }
+  else if (data.items && Array.isArray(data.items)) {
+    allItems = data.items;
+  }
+  return allItems;
 }
 
 function loadDrawerItems(drawerName) {
@@ -421,60 +442,50 @@ function loadDrawerItems(drawerName) {
       '<div class="space-y-2 max-h-72 overflow-y-auto">' +
         '<div class="p-3 bg-blue-950/40 rounded-xl border border-blue-800/50"><div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">Today 4:00 PM</span><span class="text-[10px] bg-teal-900 text-teal-300 px-2 py-0.5 rounded font-bold">Water Consultation</span></div><p class="font-bold text-white text-xs mt-1">Kelly Keyser — Water Test Consultation</p><p class="text-[10px] text-gray-400">15302 Manor Rd, Monkton, MD · (808) 298-7102</p></div>' +
         '<div class="p-3 bg-emerald-950/40 rounded-xl border border-emerald-800/50"><div class="flex justify-between items-center"><span class="text-emerald-300 font-black text-xs">Tomorrow 7:00 AM</span><span class="text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded font-bold">$240 Carpet Clean</span></div><p class="font-bold text-white text-xs mt-1">Susan Hogan — Carpet Cleaning</p><p class="text-[10px] text-gray-400">131 Fireside Cir, Baltimore, MD · (443) 845-2411</p></div>' +
-      '</div>' +
-      buildInputFooter(drawerName) + '</div>';
+      '</div>' + buildInputFooter(drawerName) + '</div>';
     return;
   }
 
-  var fallbackList = DEFAULT_CARDS[target] || [];
   contentDiv.innerHTML = '<div class="space-y-4">' +
-    '<div class="flex items-center justify-between"><p class="font-bold text-white text-sm">Drawer: ' + drawerName + ' (' + fallbackList.length + ' Cards)</p>' +
+    '<div class="flex items-center justify-between"><p class="font-bold text-white text-sm" id="drawerCount">Drawer: ' + drawerName + ' — Loading...</p>' +
     '<button type="button" onclick="loadDrawerItems(\'' + drawerName + '\')" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-rotate-right"></i> Refresh</button></div>' +
-    '<div class="space-y-2 max-h-60 overflow-y-auto" id="drawerCardsList">' +
-      (fallbackList.length > 0 ? fallbackList.map(renderItemCard).join('') : '<p class="text-gray-500 text-center py-4">Loading live cards...</p>') +
-    '</div>' + buildInputFooter(drawerName) + '</div>';
+    '<div class="space-y-2 max-h-60 overflow-y-auto" id="drawerCardsList"><p class="text-gray-500 text-center py-4">Loading live cards...</p></div>' +
+    buildInputFooter(drawerName) + '</div>';
 
   fetch('/.netlify/functions/monday?board=18424728273&t=' + new Date().getTime())
     .then(function(res) { return res.json(); })
     .then(function(data) {
-      var allItems = [];
-      if (data.items && Array.isArray(data.items)) {
-        allItems = data.items;
-      } else if (data.groups && Array.isArray(data.groups)) {
-        data.groups.forEach(function(g) {
-          var gItems = g.items || (g.items_page && g.items_page.items) || [];
-          gItems.forEach(function(it) { it.group = { id: g.id, title: g.title || g.name || '' }; allItems.push(it); });
-        });
-      }
+      var allItems = flattenGroupsToItems(data);
+      
       var matchedItems = allItems.filter(function(it) {
-        var gt = (it.group && it.group.title ? it.group.title : (it.group_title || '')).toLowerCase();
+        var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
         if (target.includes('castle')) return gt.includes('castle') || gt.includes('personal') || gt.includes('william') || gt.includes('car');
-        // ✅ FIXED: || gt.includes('intake') ensures voice intakes show in Empire
-        if (target.includes('empire') || target.includes('shop')) return gt.includes('empire') || gt.includes('workbench') || gt.includes('ready wall') || gt.includes('bench') || gt.includes('parts') || gt.includes('showroom') || gt.includes('intake');
-        if (target.includes('pipeline')) return gt.includes('pipeline') || gt.includes('staff intake') || gt.includes('leads');
-        if (target.includes('vault')) return gt.includes('vault') || gt.includes('exchange');
-        if (target.includes('pinball')) return gt.includes('pinball') || gt.includes('staff intake');
+        if (target.includes('empire') || target.includes('shop')) return gt.includes('empire') || gt.includes('workbench') || gt.includes('ready') || gt.includes('bench') || gt.includes('parts') || gt.includes('showroom') || gt.includes('intake');
+        if (target.includes('pipeline')) return gt.includes('pipeline') || gt.includes('intake') || gt.includes('leads');
+        if (target.includes('vault')) return gt.includes('vault') || gt.includes('exchange') || gt.includes('archive');
+        if (target.includes('pinball')) return gt.includes('pinball') || gt.includes('queue');
         return false;
       });
+
+      var countEl = document.getElementById('drawerCount');
+      if (countEl) countEl.textContent = 'Drawer: ' + drawerName + ' (' + matchedItems.length + ' Cards)';
+      
       var listContainer = document.getElementById('drawerCardsList');
       if (listContainer) listContainer.innerHTML = matchedItems.length > 0
         ? matchedItems.map(renderItemCard).join('')
         : '<p class="text-gray-500 text-center py-4">No active cards yet. Speak or type below!</p>';
     })
-    .catch(function() {});
+    .catch(function(err) {
+      var listContainer = document.getElementById('drawerCardsList');
+      if (listContainer) listContainer.innerHTML = '<p class="text-red-400 text-center py-4">Connection error. Try refreshing.</p>';
+    });
 }
 
 function loadStaffSections() {
   fetch('/.netlify/functions/monday?board=18424728273&t=' + new Date().getTime())
     .then(function(res) { return res.json(); })
     .then(function(data) {
-      var allItems = [];
-      if (data.groups && Array.isArray(data.groups)) {
-        data.groups.forEach(function(g) {
-          var gItems = g.items || (g.items_page && g.items_page.items) || [];
-          gItems.forEach(function(it) { it.group = { id: g.id, title: g.title || g.name || '' }; allItems.push(it); });
-        });
-      }
+      var allItems = flattenGroupsToItems(data);
       var gt = function(it) { return (it.group && it.group.title ? it.group.title : '').toLowerCase(); };
       var empty = '<p class="text-gray-500 italic text-[11px]">Nothing here yet.</p>';
       var intakes = allItems.filter(function(i) { return gt(i).includes('intake'); });
