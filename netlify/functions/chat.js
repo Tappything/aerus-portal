@@ -1,3 +1,6 @@
+const fs = require('fs');
+const path = require('path');
+
 // Smart Zone Classifier for incoming voice/text prompts
 function classifyZone(text) {
   const lower = (text || '').toLowerCase();
@@ -6,11 +9,11 @@ function classifyZone(text) {
   const cleaned = lower.replace(/^test\.?\s*/i, '').trim();
 
   // ROUTING RULES (keyword -> group ID)
+  if (/\b(invoice|payment|proposal|quote|pay|charge)\b/.test(cleaned)) {
+    return 'group_mm7myd0b'; // Pipeline
+  }
   if (/\b(repair|bench|belt|motor|vacuum|intake|diagnostic|oreck|kirby|pickup|machine|tune.?up|work.?bench|dropoff|drop.?off|estimate)\b/.test(cleaned)) {
     return 'group_mm7mfbre'; // Empire Operations
-  }
-  if (/\b(invoice|estimate|proposal|payment|pay|charge|quote|lead|prospect|call|contact|follow up|customer)\b/.test(cleaned)) {
-    return 'group_mm7myd0b'; // Pipeline
   }
   if (/\b(personal|bill|mortgage|car|home|family|pickleball)\b/.test(cleaned)) {
     return 'group_mm7mv0yv'; // Castle
@@ -26,6 +29,48 @@ function classifyZone(text) {
   return 'group_mm7mfbre';
 }
 
+// Local CSV Vault Lookup Function (22,283 Records — Zero API Cost)
+function lookupCustomerInCSV(promptText) {
+  try {
+    const csvPath = path.join(__dirname, '..', '..', 'export_export (34).csv');
+    if (!fs.existsSync(csvPath)) {
+      console.log('CSV Vault file not found at:', csvPath);
+      return null;
+    }
+
+    const fileData = fs.readFileSync(csvPath, 'utf8');
+    const lines = fileData.split(/\r?\n/);
+    if (lines.length <= 1) return null;
+
+    // Search for extracted First Last name in prompt
+    const nameMatch = promptText.match(/\b([A-Z][a-z]+\s+[A-Z][a-z]+)\b/);
+    const searchTarget = nameMatch ? nameMatch[1].toLowerCase() : null;
+
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i];
+      if (!line) continue;
+
+      // Simple CSV row parser handling quotes
+      const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/^"\vert{}"$/g, '').trim());
+      const custName = cols[1] || '';
+      const address = cols[3] || '';
+      const phone = cols[4] || '';
+
+      if (searchTarget && custName.toLowerCase().includes(searchTarget)) {
+        return { name: custName, phone, address };
+      } else if (!searchTarget) {
+        // Fallback: direct line match if entire prompt contains customer name
+        if (custName && promptText.toLowerCase().includes(custName.toLowerCase())) {
+          return { name: custName, phone, address };
+        }
+      }
+    }
+  } catch (err) {
+    console.error('CSV Vault Lookup error:', err);
+  }
+  return null;
+}
+
 exports.handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -38,7 +83,6 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers, body: '' };
   }
 
-  // Broad token check across all possible Netlify environment variable names
   const token = process.env.MONDAY_API_TOKEN || process.env.MONDAY_API_KEY || process.env.MONDAY_TOKEN;
   const boardId = "18424728273";
 
@@ -47,7 +91,7 @@ exports.handler = async (event) => {
   }
 
   // ==========================================
-  // WRITE HANDLER (POST) - Sisi Smart Route + Name Lookup
+  // WRITE HANDLER (POST) - CSV Vault Search + Smart Route
   // ==========================================
   if (event.httpMethod === 'POST') {
     try {
@@ -64,60 +108,15 @@ exports.handler = async (event) => {
 
       let cardTitle = prompt;
 
-      // 1. Try to extract customer name (First Last pattern)
-      const nameMatch = prompt.match(/\b([A-Z][a-z]+\s+[A-Z][a-z]+)\b/);
-      if (nameMatch) {
-        const extractedName = nameMatch[1];
-        
-        // 2. Query Monday board for matching customer name
-        const searchQuery = `
-          query {
-            boards(ids: [${boardId}]) {
-              items_page(query_params: { rules: [{ column_id: "name", compare_value: ["${extractedName}"], operator: contains_text }] }) {
-                items {
-                  id
-                  name
-                  column_values {
-                    id
-                    text
-                  }
-                }
-              }
-            }
-          }
-        `;
+      // 1. Query Local CSV Vault (Zero API Cost)
+      const csvMatch = lookupCustomerInCSV(prompt);
+      if (csvMatch) {
+        const details = [
+          csvMatch.phone ? `📞 ${csvMatch.phone}` : '',
+          csvMatch.address ? `📍 ${csvMatch.address}` : ''
+        ].filter(Boolean).join(' | ');
 
-        try {
-          const searchRes = await fetch('https://api.monday.com/v2', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': token,
-              'API-Version': '2023-10'
-            },
-            body: JSON.stringify({ query: searchQuery })
-          });
-
-          const searchData = await searchRes.json();
-          const foundItems = searchData.data?.boards?.[0]?.items_page?.items || [];
-
-          // 3. If match found, append details to card title
-          if (foundItems.length > 0) {
-            const matchedItem = foundItems[0];
-            const details = matchedItem.column_values
-              .map(cv => cv.text)
-              .filter(t => t && t.trim().length > 0)
-              .join(' • ');
-
-            if (details) {
-              cardTitle = `${prompt} [Match: ${matchedItem.name} — ${details}]`;
-            } else {
-              cardTitle = `${prompt} [Match: ${matchedItem.name}]`;
-            }
-          }
-        } catch (lookupErr) {
-          console.error('Customer lookup error:', lookupErr);
-        }
+        cardTitle = `${prompt} [📞 ${csvMatch.phone || 'N/A'} | 📍 ${csvMatch.address || 'N/A'}]`;
       }
 
       const targetGroupId = classifyZone(prompt);
@@ -171,13 +170,12 @@ exports.handler = async (event) => {
   }
 
   // ==========================================
-  // READ HANDLER (GET) - Existing Logic
+  // READ HANDLER (GET) - Board Fetch Logic
   // ==========================================
   const qParams = event.queryStringParameters || {};
   const rawDrawer = qParams.group || qParams.drawer || 'all';
   const drawer = rawDrawer.toLowerCase();
 
-  // Multi-group routing map so incoming Staff Intake cards display across all relevant drawers
   const groupMap = {
     castle: ['group_mm7mv0yv', 'group_mm6b77as'],
     empire: ['group_mm7mfbre', 'group_mm6b77as'],
@@ -202,6 +200,10 @@ exports.handler = async (event) => {
               id
               name
               created_at
+              group {
+                id
+                title
+              }
             }
           }
         }
