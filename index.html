@@ -74,7 +74,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
           </div>
           <div class="text-[10px] text-gray-400 font-medium mt-0.5">Bench Repairs &amp; Ops</div>
         </div>
-        <div class="text-[9px] text-amber-300/80 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/40 inline-block w-fit">🛠️ Workbench &amp; Ready Wall</div>
+        <div class="text-[9px] text-amber-300/80 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/40 inline-block w-fit">🛠 Workbench &amp; Ready Wall</div>
       </button>
       <button type="button" onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3 text-left transition flex flex-col justify-between min-h-[85px] shadow-sm">
         <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
@@ -146,7 +146,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </div>
     <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
       <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
-        <span class="text-xs font-bold text-amber-400">🛠️ Active Bench Queue</span>
+        <span class="text-xs font-bold text-amber-400">🛠 Active Bench Queue</span>
       </div>
       <div id="staffBenchItems" class="space-y-1.5 text-xs text-gray-300"></div>
     </div>
@@ -185,6 +185,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 flex flex-col gap-4 shadow-2xl relative">
     <button onclick="closeInvoiceModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold">&times;</button>
 
+    <!-- Document Type Badge -->
     <div class="text-center pb-2 border-b border-slate-800">
       <div class="inline-block px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 mb-2" id="modalDocType">INVOICE</div>
       <div class="flex items-center justify-center gap-2">
@@ -196,9 +197,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       </div>
     </div>
 
+    <!-- Itemized Breakdown & Total Charge -->
     <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 flex flex-col gap-2">
       <div class="text-[10px] text-slate-400 uppercase tracking-wider">Itemized Breakdown</div>
       <div id="modalItemizedList" class="space-y-1 text-xs text-slate-200"></div>
+      
       <div class="flex justify-between items-center pt-2 border-t border-slate-800 mt-1">
         <span class="text-xs text-slate-400 font-semibold">Payment This Transaction</span>
         <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl px-3 py-1">
@@ -206,12 +209,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
           <input type="text" id="customPayAmount" oninput="updateBalanceDue()" class="w-24 bg-transparent text-2xl font-black text-emerald-400 outline-none text-right" value="0.00">
         </div>
       </div>
+
       <div class="flex justify-between items-center pt-1 text-xs">
         <span class="text-slate-400">Balance Due:</span>
         <span id="modalBalanceDue" class="font-bold text-amber-400">$0.00</span>
       </div>
     </div>
 
+    <!-- Action Buttons -->
     <div class="flex flex-col gap-2">
       <a id="btnSms" href="#" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition active:scale-95"><span>📱</span> Text Invoice Link</a>
       <a id="btnEmail" href="#" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition active:scale-95"><span>✉️</span> Email Invoice Link</a>
@@ -250,7 +255,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <i class="fa-solid fa-camera text-base"></i>
       <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaInput(this, 'Photo')">
     </label>
-    <!-- ✅ FIXED: accept="video/*" corrected here -->
     <label class="bg-gray-800 hover:bg-gray-700 text-purple-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0">
       <i class="fa-solid fa-video text-base"></i>
       <input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, 'Video')">
@@ -386,10 +390,15 @@ function copyStaffLink() {
   setTimeout(function() { document.getElementById('copyStaffText').innerText = 'Share Staff Intake Card'; }, 2000);
 }
 
+// ============================================================
+// SMART INVOICE MODAL — MARYLAND 6% TAX & PURE ITEM STRIPPING
+// ============================================================
 async function openInvoiceModal(rawText) {
+  // 1. Extract Price
   var amountMatch = rawText.match(/\$(\d+(\.\d{2})?)/);
   var baseAmount = amountMatch ? parseFloat(amountMatch[0].replace('$', '')) : 0.00;
 
+  // 2. Determine Document Type
   var textLower = rawText.toLowerCase();
   var docType = 'INVOICE';
   if (textLower.includes('estimate') || textLower.includes('diagnostic') ||
@@ -399,6 +408,7 @@ async function openInvoiceModal(rawText) {
     docType = 'PROPOSAL';
   }
 
+  // 3. Extract Clean Customer Name
   var cleanText = rawText.replace(/deliver|drop off|check|repair|service|order|needs/gi, '|');
   var parts = cleanText.split('|');
   var rawName = parts[0].replace(/\$/g, '').trim();
@@ -406,17 +416,28 @@ async function openInvoiceModal(rawText) {
   var customerName = nameWords.slice(0, 3).join(' ');
   if (!customerName || customerName.length > 25) { customerName = 'Aerus Customer'; }
 
+  // 4. Pure Item Extraction (Strips customer names, addresses, and invoice prefixes)
   var cleanItem = rawText
     .replace(/^invoice\s+/i, '')
-    .replace(new RegExp(customerName, 'gi'), '')
     .replace(/for\s+/gi, '')
     .replace(/\$\d+(\.\d{2})?/, '')
     .replace(/\b(dunloy|baltimore|md|road|ave|st)\b/gi, '')
     .replace(/\b(tomorrow|today|at|\d{1,2}:\d{2}\s*(pm|am)?)\b/gi, '')
-    .replace(/\[.*\]/g, '')
-    .trim();
+    .replace(/\[.*\]/g, '');
+
+  // Strip all words present in customerName out of cleanItem
+  var nameParts = customerName.split(/\s+/);
+  nameParts.forEach(function(part) {
+    if (part.length > 1) {
+      var re = new RegExp('\\b' + part + '\\b', 'gi');
+      cleanItem = cleanItem.replace(re, '');
+    }
+  });
+  cleanItem = cleanItem.replace(/\s+/g, ' ').trim();
+
   if (!cleanItem) { cleanItem = 'Aerus Equipment & Service'; }
 
+  // 5. Maryland 6% Sales Tax Detection
   var taxableKeywords = ["bag", "filter", "part", "product", "purifier", "unit", "machine", "sale"];
   var isTaxable = taxableKeywords.some(function(kw) { return textLower.includes(kw); });
   var taxAmount = isTaxable ? (baseAmount * 0.06) : 0;
@@ -425,23 +446,24 @@ async function openInvoiceModal(rawText) {
   document.getElementById('modalDocType').innerText = docType;
   document.getElementById('modalCustomerName').innerText = customerName;
 
+  // 6. Render Itemized Line Items Format
   var listContainer = document.getElementById('modalItemizedList');
   if (listContainer) {
-    var breakdownHtml =
+    var breakdownHtml = 
       '<div class="flex justify-between items-center py-1 text-xs">' +
         '<span class="font-bold text-slate-200">' + cleanItem + '</span>' +
         '<span class="font-bold text-slate-100">$' + baseAmount.toFixed(2) + '</span>' +
       '</div>';
 
     if (isTaxable) {
-      breakdownHtml +=
+      breakdownHtml += 
         '<div class="flex justify-between items-center py-1 text-xs text-slate-400 border-t border-slate-800/50">' +
           '<span>Maryland Tax (6%)</span>' +
           '<span>$' + taxAmount.toFixed(2) + '</span>' +
         '</div>';
     }
 
-    breakdownHtml +=
+    breakdownHtml += 
       '<div class="flex justify-between items-center pt-2 border-t border-slate-700 font-bold text-xs text-emerald-400">' +
         '<span>Total Invoice:</span>' +
         '<span>$' + currentInvoiceTotal.toFixed(2) + '</span>' +
@@ -460,6 +482,7 @@ async function openInvoiceModal(rawText) {
   document.getElementById('btnSms').href = 'sms:?body=' + encodeURIComponent(smsMsg);
   document.getElementById('btnEmail').href = 'mailto:?subject=' + encodeURIComponent(emailSubj) + '&body=' + encodeURIComponent(emailBody);
 
+  // 7. Stripe Checkout Button
   var payBtn = document.getElementById('btnPayNow');
   payBtn.innerText = '💳 Tap to Pay Now (Stripe)';
   payBtn.onclick = async function(e) {
@@ -493,7 +516,9 @@ function updateBalanceDue() {
   var paymentValue = parseFloat(payInput.value) || 0;
   var balanceDue = currentInvoiceTotal - paymentValue;
   var balanceEl = document.getElementById('modalBalanceDue');
-  if (balanceEl) { balanceEl.innerText = '$' + Math.max(0, balanceDue).toFixed(2); }
+  if (balanceEl) {
+    balanceEl.innerText = '$' + Math.max(0, balanceDue).toFixed(2);
+  }
 }
 
 function closeInvoiceModal() { document.getElementById('invoiceModal').style.display = 'none'; }
