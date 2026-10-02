@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>TappyThing — Digital Coordinator</title>
+<title>Fresh TappyThing — Digital Coordinator</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -26,11 +26,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 </head>
 <body class="min-h-screen flex items-center justify-center p-3 pb-28 relative">
 
+<!-- MASTER COMMAND HUB -->
 <div id="masterHubContainer" class="max-w-md w-full tapulator-face rounded-3xl p-5 relative space-y-4 shadow-2xl my-auto">
   <div class="flex justify-between items-center border-b border-slate-800/80 pb-2.5">
     <div class="text-[10px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-1.5">
       <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-      TAPPYTHING COMMAND HUB
+      FRESH TAPPYTHING COMMAND HUB
     </div>
     <button type="button" onclick="copyStaffLink()" class="px-2.5 py-1 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-lg text-[10px] font-bold flex items-center gap-1 transition active:scale-95">
       <span>🔗</span> <span id="copyStaffText">Share Staff Intake Card</span>
@@ -39,7 +40,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
   <div class="text-center">
     <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-20 h-20 rounded-full border-4 border-blue-400 mx-auto mb-1.5 block shadow-2xl shadow-blue-500/30 object-cover ring-2 ring-blue-500/20" alt="Fresh Avatar" onError="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Fresh&background=3b82f6&color=fff'">
-    <h1 class="text-xl font-black text-white tracking-tight">TAPPYTHING</h1>
+    <h1 class="text-xl font-black text-white tracking-tight">FRESH TAPPYTHING</h1>
     <p class="text-[11px] text-gray-400 font-medium">Digital Coordinator • Aerus Timonium</p>
   </div>
 
@@ -114,6 +115,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   </div>
 </div>
 
+<!-- STAFF SATELLITE CARD -->
 <div id="staffCardContainer" style="display:none;" class="max-w-md w-full tapulator-face rounded-3xl p-5 relative space-y-4 shadow-2xl my-auto">
   <div class="flex justify-between items-center border-b border-slate-800 pb-2">
     <div>
@@ -163,6 +165,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   </div>
 </div>
 
+<!-- DRAWER MODAL -->
 <div id="drawerModal" style="display:none;" class="fixed inset-0 bg-black/95 z-50 flex flex-col p-4 backdrop-blur-md justify-between">
   <div class="max-w-md w-full mx-auto flex flex-col h-full">
     <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-3 shrink-0">
@@ -177,33 +180,44 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   </div>
 </div>
 
+<!-- INVOICE MODAL — REDESIGNED WITH CLEAN PARSING -->
 <div id="invoiceModal" style="display:none;" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
   <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 flex flex-col gap-4 shadow-2xl relative">
     <button onclick="closeInvoiceModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold">&times;</button>
-    <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
-      <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-xl text-emerald-400">📄</div>
-      <div>
-        <h3 class="font-bold text-base text-slate-100" id="invCustomer">Customer Invoice</h3>
-        <p class="text-[11px] text-slate-400">TappyThing 1-Tap Payment Request</p>
+
+    <!-- Document Type Badge -->
+    <div class="text-center pb-2 border-b border-slate-800">
+      <div class="inline-block px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 mb-2" id="modalDocType">INVOICE</div>
+      <div class="flex items-center justify-center gap-2">
+        <div class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">📄</div>
+        <div class="text-left">
+          <h3 class="font-black text-lg text-white" id="modalCustomerName">Customer</h3>
+          <p class="text-[11px] text-slate-400">Aerus Home Wellness • Timonium, MD</p>
+        </div>
       </div>
     </div>
-    <div class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800 flex flex-col gap-1.5">
-      <div class="text-[10px] text-slate-400 uppercase tracking-wider">Line Item Summary</div>
-      <div class="font-medium text-slate-200 text-xs" id="invTitle">Diagnostic &amp; Service</div>
+
+    <!-- Service & Amount -->
+    <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 flex flex-col gap-2">
+      <div class="text-[10px] text-slate-400 uppercase tracking-wider">Service / Line Item</div>
+      <div class="font-medium text-slate-200 text-sm" id="modalServiceDesc">Equipment Service</div>
       <div class="flex justify-between items-baseline pt-2 border-t border-slate-800/80 mt-1">
         <span class="text-xs text-slate-400">Total Amount Due</span>
-        <span class="text-xl font-bold text-emerald-400" id="invTotal">$0.00</span>
+        <span class="text-3xl font-black text-emerald-400" id="modalAmount">$0.00</span>
       </div>
     </div>
+
+    <!-- Action Buttons -->
     <div class="flex flex-col gap-2">
-      <a id="invTextBtn" href="#" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition active:scale-95"><span>📱</span> Text Invoice Link</a>
-      <a id="invEmailBtn" href="#" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition active:scale-95"><span>✉️</span> Email Invoice Link</a>
-      <a id="invPayNowBtn" href="#" target="_blank" class="w-full py-3 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition active:scale-95"><span>💳</span> Tap to Pay Now (Stripe)</a>
-      <button onclick="copyPayLink()" class="w-full py-2 px-3 bg-slate-800/50 hover:bg-slate-800 text-slate-300 rounded-xl text-[11px] font-medium flex items-center justify-center gap-2 transition"><span>🔗</span> <span id="copyLinkText">Copy Payment Link</span></button>
+      <a id="btnSms" href="#" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition active:scale-95"><span>📱</span> Text Invoice Link</a>
+      <a id="btnEmail" href="#" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition active:scale-95"><span>✉️</span> Email Invoice Link</a>
+      <button id="btnPayNow" class="w-full py-3 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition active:scale-95"><span>💳</span> Tap to Pay Now (Stripe)</button>
+      <button onclick="copyInvoiceLink()" class="w-full py-2 px-3 bg-slate-800/50 hover:bg-slate-800 text-slate-300 rounded-xl text-[11px] font-medium flex items-center justify-center gap-2 transition"><span>🔗</span> <span id="copyLinkText">Copy Payment Link</span></button>
     </div>
   </div>
 </div>
 
+<!-- FEATURES MODAL -->
 <div id="featuresModal" style="display:none;" class="fixed inset-0 bg-black/95 z-50 flex flex-col p-4 justify-center backdrop-blur-md overflow-y-auto">
   <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-5 max-w-sm mx-auto space-y-4 text-left shadow-2xl max-h-[85vh] overflow-y-auto my-auto">
     <div class="flex items-center justify-between border-b border-gray-800 pb-2">
@@ -211,22 +225,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <button type="button" onclick="closeFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-2.5 py-1 rounded-lg">✕</button>
     </div>
     <div class="space-y-2 text-[11px] text-gray-300">
-      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800"><strong class="text-emerald-400">1. Living Fractal Forever Cards:</strong> Permanent digital homes for every customer with zero downloads or logins.</div>
-      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800"><strong class="text-blue-400">2. 1-Tap Voice &amp; Video Intake:</strong> 5-second diagnostics recorded and routed straight to the bench.</div>
-      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800"><strong class="text-amber-400">3. 1-Tap Voice Invoicing:</strong> Text, email, or collect Stripe payments with one tap on any card.</div>
-      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800"><strong class="text-purple-400">4. Isolated Staff Satellites:</strong> Mona and Chris get their own work seats without touching the owner cockpit.</div>
+      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800"><strong class="text-emerald-400">1. Living Fractal Forever Cards:</strong> Permanent digital homes for every customer.</div>
+      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800"><strong class="text-blue-400">2. 1-Tap Voice &amp; Video Intake:</strong> 5-second diagnostics routed straight to the bench.</div>
+      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800"><strong class="text-amber-400">3. Smart Invoicing:</strong> Auto-detects Invoice vs Estimate vs Proposal. 1-tap Stripe payment.</div>
+      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800"><strong class="text-purple-400">4. Staff Satellites:</strong> Mona and Chris get their own work seats without touching your cockpit.</div>
     </div>
     <div class="pt-2 text-[10px] text-gray-400 border-t border-gray-800 space-y-1">
       <div class="font-bold text-gray-300 uppercase tracking-wider">Cast &amp; Characters 🎭:</div>
-      <div><strong>Boudie:</strong> Founder &amp; Chief • Freedom &amp; Speed</div>
-      <div><strong>Fresh:</strong> Digital Coordinator • Direct &amp; Energizing</div>
-      <div><strong>Sissy:</strong> Backend Engine • Auto-Routing &amp; Operations</div>
-      <div><strong>Chris:</strong> Bench Lead | <strong>Mona:</strong> Front Desk | <strong>Mike:</strong> Field Lead</div>
+      <div><strong>Boudie:</strong> Founder &amp; Chief • <strong>Fresh:</strong> Digital Coordinator • <strong>Sissy:</strong> Backend Engine</div>
+      <div><strong>Chris:</strong> Bench Lead | <strong>Mona:</strong> Front Desk | <strong>Mike:</strong> Field Lead | <strong>Norby:</strong> FOAS VA</div>
     </div>
     <button type="button" onclick="closeFeaturesModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider transition">Got It</button>
   </div>
 </div>
 
+<!-- BOTTOM INPUT BAR -->
 <div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-40">
   <div class="max-w-md mx-auto flex items-center gap-2">
     <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0">
@@ -252,8 +265,7 @@ var activeDrawerContext = '';
 var isListening = false;
 var activeRecognition = null;
 var silenceTimer = null;
-var activeInvoiceUrl = '';
-var STRIPE_CHECKOUT_URL = 'https://buy.stripe.com/test_tappything';
+var currentPaymentUrl = '';
 var DEFAULT_CARDS = { castle: [], empire: [], pipeline: [], vault: [], pinball: [] };
 
 window.onload = function() {
@@ -369,20 +381,90 @@ function copyStaffLink() {
   setTimeout(function() { document.getElementById('copyStaffText').innerText = 'Share Staff Intake Card'; }, 2000);
 }
 
-function openInvoiceModal(title, priceStr) {
-  activeInvoiceUrl = STRIPE_CHECKOUT_URL + '?amount=' + encodeURIComponent(priceStr.replace('$', ''));
-  document.getElementById('invTitle').innerText = title;
-  document.getElementById('invTotal').innerText = priceStr;
-  document.getElementById('invCustomer').innerText = title.split('—')[0].split('-')[0].trim();
-  document.getElementById('invPayNowBtn').href = activeInvoiceUrl;
-  document.getElementById('invTextBtn').href = 'sms:?body=' + encodeURIComponent('Here is your Aerus invoice link: ' + activeInvoiceUrl);
-  document.getElementById('invEmailBtn').href = 'mailto:?subject=Aerus Invoice&body=' + encodeURIComponent('Please view and pay your invoice here: ' + activeInvoiceUrl);
-  document.getElementById('copyLinkText').innerText = 'Copy Payment Link';
+// ============================================================
+// SMART INVOICE MODAL — Auto-detects type, parses cleanly
+// ============================================================
+async function openInvoiceModal(rawText) {
+  var amountMatch = rawText.match(/\$(\d+(\.\d{2})?)/);
+  var amountStr = amountMatch ? amountMatch[0] : '$0.00';
+
+  var textLower = rawText.toLowerCase();
+  var docType = 'INVOICE';
+  if (textLower.includes('estimate') || textLower.includes('diagnostic') ||
+      textLower.includes('repair') || textLower.includes('belt') || textLower.includes('motor')) {
+    docType = 'ESTIMATE';
+  } else if (textLower.includes('proposal')) {
+    docType = 'PROPOSAL';
+  }
+
+  var cleanText = rawText.replace(/deliver|drop off|check|repair|service|order|needs/gi, '|');
+  var parts = cleanText.split('|');
+  var rawName = parts[0].replace(/\$/g, '').trim();
+  var nameWords = rawName.split(/\s+/).filter(Boolean);
+  var customerName = nameWords.slice(0, 3).join(' ');
+  if (!customerName || customerName.length > 25) { customerName = 'Aerus Customer'; }
+
+  var serviceDesc = rawText
+    .replace(amountStr, '')
+    .replace(rawName, '')
+    .replace(/\b(tomorrow|today|at|\d{1,2}:\d{2}\s*(pm|am)?)\b/gi, '')
+    .replace(/after pickleball/gi, '')
+    .replace(/and order.*amazon/gi, '')
+    .trim();
+  if (!serviceDesc || serviceDesc.length < 3) { serviceDesc = 'Aerus Equipment Service'; }
+
+  document.getElementById('modalDocType').innerText = docType;
+  document.getElementById('modalCustomerName').innerText = customerName;
+  document.getElementById('modalServiceDesc').innerText = serviceDesc;
+  document.getElementById('modalAmount').innerText = amountStr;
+
+  var smsMsg = 'Your Aerus ' + docType + ' for ' + amountStr + ' is ready. Tap to pay online when checkout link is sent!';
+  var emailSubj = 'Aerus Timonium ' + docType + ' — ' + amountStr;
+  var emailBody = 'Hello ' + customerName + ',\n\nYour ' + docType + ' for ' + amountStr + ' from Aerus Home Wellness is ready.\n\nWe will send your secure payment link shortly.\n\nThank you!\nAerus Timonium';
+
+  document.getElementById('btnSms').href = 'sms:?body=' + encodeURIComponent(smsMsg);
+  document.getElementById('btnEmail').href = 'mailto:?subject=' + encodeURIComponent(emailSubj) + '&body=' + encodeURIComponent(emailBody);
+
+  var payBtn = document.getElementById('btnPayNow');
+  payBtn.innerText = '💳 Tap to Pay Now (Stripe)';
+  payBtn.onclick = async function(e) {
+    e.preventDefault();
+    payBtn.innerText = 'Generating Checkout...';
+    try {
+      var response = await fetch('/.netlify/functions/stripe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: amountStr, description: serviceDesc, customer: customerName })
+      });
+      var data = await response.json();
+      if (data.url) {
+        currentPaymentUrl = data.url;
+        payBtn.innerText = '💳 Tap to Pay Now (Stripe)';
+        window.open(data.url, '_blank');
+      } else {
+        payBtn.innerText = 'Checkout Unavailable';
+      }
+    } catch (err) {
+      payBtn.innerText = 'Error — Try Again';
+    }
+  };
+
   document.getElementById('invoiceModal').style.display = 'flex';
 }
 
 function closeInvoiceModal() { document.getElementById('invoiceModal').style.display = 'none'; }
-function copyPayLink() { navigator.clipboard.writeText(activeInvoiceUrl); document.getElementById('copyLinkText').innerText = 'Copied to Clipboard!'; }
+
+function copyInvoiceLink() {
+  if (currentPaymentUrl) {
+    navigator.clipboard.writeText(currentPaymentUrl);
+    document.getElementById('copyLinkText').innerText = 'Copied!';
+    setTimeout(function() { document.getElementById('copyLinkText').innerText = 'Copy Payment Link'; }, 2000);
+  } else {
+    document.getElementById('copyLinkText').innerText = 'Generate invoice first';
+    setTimeout(function() { document.getElementById('copyLinkText').innerText = 'Copy Payment Link'; }, 2000);
+  }
+}
+
 function handlePunch(type) {
   var pin = document.getElementById('staffPinInput').value;
   if (!pin || pin.length < 4) { alert('Please enter your 4-digit PIN.'); return; }
@@ -395,8 +477,7 @@ function renderItemCard(item) {
   var priceMatch = title.match(/\$\d+(?:,\d{3})*(?:\.\d{2})?/);
   var actionHtml = '';
   if (priceMatch) {
-    var amount = priceMatch[0];
-    actionHtml = '<button type="button" onclick="openInvoiceModal(\'' + title.replace(/'/g, "\\'") + '\', \'' + amount + '\')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow shrink-0 active:scale-95"><i class="fa-solid fa-file-invoice-dollar"></i> View Invoice (' + amount + ')</button>';
+    actionHtml = '<button type="button" onclick="openInvoiceModal(\'' + title.replace(/'/g, "\\'") + '\')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow shrink-0 active:scale-95"><i class="fa-solid fa-file-invoice-dollar"></i> ' + (title.toLowerCase().includes('estimate') || title.toLowerCase().includes('diagnostic') ? 'View Estimate' : title.toLowerCase().includes('proposal') ? 'View Proposal' : 'View Invoice') + ' (' + priceMatch[0] + ')</button>';
   }
   var groupTitle = item.group ? (item.group.title || item.group) : 'Active Card';
   return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 flex justify-between items-center gap-2">' +
@@ -407,25 +488,17 @@ function renderItemCard(item) {
     '</div></div>';
 }
 
-// ============================================================
-// THE KEY FIX: monday.js now returns groups[] with items inside
-// This function correctly flattens groups → items with group.title
-// ============================================================
 function flattenGroupsToItems(data) {
   var allItems = [];
-  // New format from monday.js: { groups: [{id, title, items_page: {items:[]}}] }
   if (data.groups && Array.isArray(data.groups)) {
     data.groups.forEach(function(g) {
       var gItems = (g.items_page && g.items_page.items) ? g.items_page.items : (g.items || []);
       gItems.forEach(function(it) {
-        // Attach group info so filters work correctly
         it.group = { id: g.id, title: g.title || '' };
         allItems.push(it);
       });
     });
-  }
-  // Legacy format fallback: { items: [] }
-  else if (data.items && Array.isArray(data.items)) {
+  } else if (data.items && Array.isArray(data.items)) {
     allItems = data.items;
   }
   return allItems;
@@ -440,7 +513,7 @@ function loadDrawerItems(drawerName) {
       '<div class="flex items-center justify-between"><p class="font-bold text-white text-sm">📅 Daily Schedule Agenda</p>' +
       '<a href="https://calendar.google.com/calendar/u/0/r/day" target="_blank" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-arrow-up-right-from-square"></i> Full Google Cal</a></div>' +
       '<div class="space-y-2 max-h-72 overflow-y-auto">' +
-        '<div class="p-3 bg-blue-950/40 rounded-xl border border-blue-800/50"><div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">Today 4:00 PM</span><span class="text-[10px] bg-teal-900 text-teal-300 px-2 py-0.5 rounded font-bold">Water Consultation</span></div><p class="font-bold text-white text-xs mt-1">Kelly Keyser — Water Test Consultation</p><p class="text-[10px] text-gray-400">15302 Manor Rd, Monkton, MD · (808) 298-7102</p></div>' +
+        '<div class="p-3 bg-blue-950/40 rounded-xl border border-blue-800/50"><div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">Today</span><span class="text-[10px] bg-teal-900 text-teal-300 px-2 py-0.5 rounded font-bold">Water Consultation</span></div><p class="font-bold text-white text-xs mt-1">Kelly Keyser — Water Test</p><p class="text-[10px] text-gray-400">15302 Manor Rd, Monkton, MD · (808) 298-7102</p></div>' +
         '<div class="p-3 bg-emerald-950/40 rounded-xl border border-emerald-800/50"><div class="flex justify-between items-center"><span class="text-emerald-300 font-black text-xs">Tomorrow 7:00 AM</span><span class="text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded font-bold">$240 Carpet Clean</span></div><p class="font-bold text-white text-xs mt-1">Susan Hogan — Carpet Cleaning</p><p class="text-[10px] text-gray-400">131 Fireside Cir, Baltimore, MD · (443) 845-2411</p></div>' +
       '</div>' + buildInputFooter(drawerName) + '</div>';
     return;
@@ -456,7 +529,6 @@ function loadDrawerItems(drawerName) {
     .then(function(res) { return res.json(); })
     .then(function(data) {
       var allItems = flattenGroupsToItems(data);
-      
       var matchedItems = allItems.filter(function(it) {
         var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
         if (target.includes('castle')) return gt.includes('castle') || gt.includes('personal') || gt.includes('william') || gt.includes('car');
@@ -466,16 +538,14 @@ function loadDrawerItems(drawerName) {
         if (target.includes('pinball')) return gt.includes('pinball') || gt.includes('queue');
         return false;
       });
-
       var countEl = document.getElementById('drawerCount');
       if (countEl) countEl.textContent = 'Drawer: ' + drawerName + ' (' + matchedItems.length + ' Cards)';
-      
       var listContainer = document.getElementById('drawerCardsList');
       if (listContainer) listContainer.innerHTML = matchedItems.length > 0
         ? matchedItems.map(renderItemCard).join('')
         : '<p class="text-gray-500 text-center py-4">No active cards yet. Speak or type below!</p>';
     })
-    .catch(function(err) {
+    .catch(function() {
       var listContainer = document.getElementById('drawerCardsList');
       if (listContainer) listContainer.innerHTML = '<p class="text-red-400 text-center py-4">Connection error. Try refreshing.</p>';
     });
