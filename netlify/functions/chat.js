@@ -11,8 +11,9 @@ function classifyZone(text) {
     return 'group_mm7mv0yv';
   }
 
-  // CALENDAR — Appointments, Time-Based, Service Calls
-  if (/\b(schedule|appointment|tomorrow|today|calendar|reminder|pick.?up|service.?call|7.?am|8.?am|9.?am|10.?am|monday|tuesday|wednesday|thursday|friday|saturday|sunday|\d{1,2}:\d{2})\b/.test(cleaned)) {
+  // CALENDAR — Appointments, Time-Based, Service Calls (Clean Substring Array Match)
+  const calendarWords = ['today', 'tomorrow', 'schedule', 'appointment', 'calendar', 'reminder', 'pick up', 'pickup', 'service call', '7am', '8am', '9am', '10am', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+  if (calendarWords.some(w => cleaned.includes(w)) || /\d{1,2}:\d{2}/.test(cleaned)) {
     return 'group_mm7maw66';
   }
 
