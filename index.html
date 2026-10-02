@@ -146,7 +146,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </div>
     <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
       <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
-        <span class="text-xs font-bold text-amber-400">🛠️ Active Bench Queue</span>
+        <span class="text-xs font-bold text-amber-400">🛠️️ Active Bench Queue</span>
       </div>
       <div id="staffBenchItems" class="space-y-1.5 text-xs text-gray-300"></div>
     </div>
@@ -180,7 +180,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   </div>
 </div>
 
-<!-- INVOICE MODAL — CLEAN ITEMIZED BREAKDOWN -->
+<!-- INVOICE MODAL — PURE ITEMIZED PRODUCT BREAKDOWN -->
 <div id="invoiceModal" style="display:none;" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
   <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 flex flex-col gap-4 shadow-2xl relative">
     <button onclick="closeInvoiceModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold">&times;</button>
@@ -269,7 +269,6 @@ var isListening = false;
 var activeRecognition = null;
 var silenceTimer = null;
 var currentPaymentUrl = '';
-var DEFAULT_CARDS = { castle: [], empire: [], pipeline: [], vault: [], pinball: [] };
 
 window.onload = function() {
   var params = new URLSearchParams(window.location.search);
@@ -385,10 +384,10 @@ function copyStaffLink() {
 }
 
 // ============================================================
-// SMART INVOICE MODAL — CLEAN ITEMIZED BREAKDOWN PARSER
+// SMART INVOICE MODAL — PURE DYNAMIC PRODUCT PARSER
 // ============================================================
 async function openInvoiceModal(rawText) {
-  // 1. Extract Total Price
+  // 1. Extract Price
   var amountMatch = rawText.match(/\$(\d+(\.\d{2})?)/);
   var amountStr = amountMatch ? amountMatch[0].replace('$', '') : '0.00';
 
@@ -402,7 +401,7 @@ async function openInvoiceModal(rawText) {
     docType = 'PROPOSAL';
   }
 
-  // 3. Extract Customer Name
+  // 3. Extract Clean Customer Name
   var cleanText = rawText.replace(/deliver|drop off|check|repair|service|order|needs/gi, '|');
   var parts = cleanText.split('|');
   var rawName = parts[0].replace(/\$/g, '').trim();
@@ -410,7 +409,7 @@ async function openInvoiceModal(rawText) {
   var customerName = nameWords.slice(0, 3).join(' ');
   if (!customerName || customerName.length > 25) { customerName = 'Aerus Customer'; }
 
-  // 4. Clean Item Description (Strips customer names, addresses, and invoice prefixes)
+  // 4. Pure Item Extraction (Strips customer names, addresses, and invoice prefixes)
   var cleanItem = rawText
     .replace(/^invoice\s+/i, '')
     .replace(new RegExp(customerName, 'gi'), '')
@@ -426,12 +425,12 @@ async function openInvoiceModal(rawText) {
   document.getElementById('modalDocType').innerText = docType;
   document.getElementById('modalCustomerName').innerText = customerName;
 
-  // 5. Build Clean Itemized Line Row
+  // 5. Render Clean Itemized Line Item
   var listContainer = document.getElementById('modalItemizedList');
   if (listContainer) {
     listContainer.innerHTML = 
       '<div class="flex justify-between items-center py-1.5 border-b border-slate-800/80 text-xs">' +
-        '<span class="font-bold text-slate-200">1x ' + cleanItem + '</span>' +
+        '<span class="font-bold text-slate-200">' + cleanItem + '</span>' +
         '<span class="font-black text-emerald-400">$' + amountStr + '</span>' +
       '</div>';
   }
@@ -445,7 +444,7 @@ async function openInvoiceModal(rawText) {
   document.getElementById('btnSms').href = 'sms:?body=' + encodeURIComponent(smsMsg);
   document.getElementById('btnEmail').href = 'mailto:?subject=' + encodeURIComponent(emailSubj) + '&body=' + encodeURIComponent(emailBody);
 
-  // 6. Stripe Checkout Action
+  // 6. Send the Typed Custom Amount straight to Stripe
   var payBtn = document.getElementById('btnPayNow');
   payBtn.innerText = '💳 Tap to Pay Now (Stripe)';
   payBtn.onclick = async function(e) {
