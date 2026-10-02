@@ -74,7 +74,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
           </div>
           <div class="text-[10px] text-gray-400 font-medium mt-0.5">Bench Repairs &amp; Ops</div>
         </div>
-        <div class="text-[9px] text-amber-300/80 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/40 inline-block w-fit">🛠️️ Workbench &amp; Ready Wall</div>
+        <div class="text-[9px] text-amber-300/80 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/40 inline-block w-fit">🛠 Workbench &amp; Ready Wall</div>
       </button>
       <button type="button" onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3 text-left transition flex flex-col justify-between min-h-[85px] shadow-sm">
         <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
@@ -180,7 +180,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   </div>
 </div>
 
-<!-- INVOICE MODAL — REDESIGNED WITH ITEMIZED BREAKDOWN -->
+<!-- INVOICE MODAL — CLEAN ITEMIZED BREAKDOWN -->
 <div id="invoiceModal" style="display:none;" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
   <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 flex flex-col gap-4 shadow-2xl relative">
     <button onclick="closeInvoiceModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold">&times;</button>
@@ -342,7 +342,7 @@ function toggleVoiceIntake(drawerContext, targetInputId, targetBtnId) {
 
 function handleMediaInput(fileInput, mediaType) {
   if (fileInput.files && fileInput.files[0]) {
-    flashLed(mediaType.UPPERCASE ? mediaType.toUpperCase() + ' LOGGED: ' + fileInput.files[0].name : 'FILE LOGGED');
+    flashLed(mediaType.toUpperCase() + ' LOGGED: ' + fileInput.files[0].name);
     sendToFresh(mediaType + ' attached: ' + fileInput.files[0].name, activeDrawerContext);
   }
 }
@@ -385,12 +385,14 @@ function copyStaffLink() {
 }
 
 // ============================================================
-// SMART INVOICE MODAL — EDITABLE PAYMENT AMOUNT INPUT
+// SMART INVOICE MODAL — CLEAN ITEMIZED BREAKDOWN PARSER
 // ============================================================
 async function openInvoiceModal(rawText) {
+  // 1. Extract Total Price
   var amountMatch = rawText.match(/\$(\d+(\.\d{2})?)/);
   var amountStr = amountMatch ? amountMatch[0].replace('$', '') : '0.00';
 
+  // 2. Determine Document Type
   var textLower = rawText.toLowerCase();
   var docType = 'INVOICE';
   if (textLower.includes('estimate') || textLower.includes('diagnostic') ||
@@ -400,6 +402,7 @@ async function openInvoiceModal(rawText) {
     docType = 'PROPOSAL';
   }
 
+  // 3. Extract Customer Name
   var cleanText = rawText.replace(/deliver|drop off|check|repair|service|order|needs/gi, '|');
   var parts = cleanText.split('|');
   var rawName = parts[0].replace(/\$/g, '').trim();
@@ -407,22 +410,30 @@ async function openInvoiceModal(rawText) {
   var customerName = nameWords.slice(0, 3).join(' ');
   if (!customerName || customerName.length > 25) { customerName = 'Aerus Customer'; }
 
-  var serviceDesc = rawText
+  // 4. Clean Item Description (Strips customer names, addresses, and invoice prefixes)
+  var cleanItem = rawText
+    .replace(/^invoice\s+/i, '')
+    .replace(new RegExp(customerName, 'gi'), '')
+    .replace(/for\s+/gi, '')
     .replace(/\$\d+(\.\d{2})?/, '')
-    .replace(rawName, '')
+    .replace(/\b(dunloy|baltimore|md|road|ave|st)\b/gi, '')
     .replace(/\b(tomorrow|today|at|\d{1,2}:\d{2}\s*(pm|am)?)\b/gi, '')
-    .replace(/after pickleball/gi, '')
-    .replace(/and order.*amazon/gi, '')
+    .replace(/\[.*\]/g, '')
     .trim();
-  if (!serviceDesc || serviceDesc.length < 3) { serviceDesc = 'Aerus Equipment Service'; }
+
+  if (!cleanItem) { cleanItem = 'Aerus Equipment & Service'; }
 
   document.getElementById('modalDocType').innerText = docType;
   document.getElementById('modalCustomerName').innerText = customerName;
-  
-  // Render Itemized Line
+
+  // 5. Build Clean Itemized Line Row
   var listContainer = document.getElementById('modalItemizedList');
   if (listContainer) {
-    listContainer.innerHTML = '<div class="flex justify-between items-center py-1 border-b border-slate-800/50"><span>' + serviceDesc + '</span><span class="font-bold text-slate-100">$' + amountStr + '</span></div>';
+    listContainer.innerHTML = 
+      '<div class="flex justify-between items-center py-1.5 border-b border-slate-800/80 text-xs">' +
+        '<span class="font-bold text-slate-200">1x ' + cleanItem + '</span>' +
+        '<span class="font-black text-emerald-400">$' + amountStr + '</span>' +
+      '</div>';
   }
 
   document.getElementById('customPayAmount').value = amountStr;
@@ -434,6 +445,7 @@ async function openInvoiceModal(rawText) {
   document.getElementById('btnSms').href = 'sms:?body=' + encodeURIComponent(smsMsg);
   document.getElementById('btnEmail').href = 'mailto:?subject=' + encodeURIComponent(emailSubj) + '&body=' + encodeURIComponent(emailBody);
 
+  // 6. Stripe Checkout Action
   var payBtn = document.getElementById('btnPayNow');
   payBtn.innerText = '💳 Tap to Pay Now (Stripe)';
   payBtn.onclick = async function(e) {
@@ -444,7 +456,7 @@ async function openInvoiceModal(rawText) {
       var response = await fetch('/.netlify/functions/stripe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: chargeAmount, description: serviceDesc, customer: customerName })
+        body: JSON.stringify({ amount: chargeAmount, description: cleanItem, customer: customerName })
       });
       var data = await response.json();
       if (data.url) {
