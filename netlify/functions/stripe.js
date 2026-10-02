@@ -14,10 +14,21 @@ exports.handler = async (event) => {
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const amountStr = (body.amount || '0').toString().replace(/[$,]/g, '');
+    
+    // Accept custom input amount or default to original bill amount
+    const rawAmount = body.customAmount || body.amount || '0';
+    const amountStr = rawAmount.toString().replace(/[$,]/g, '');
     const amountCents = Math.round(parseFloat(amountStr) * 100);
-    const description = body.description || 'Aerus Service';
+    const description = body.description || 'Aerus Service Payment';
     const customerName = body.customer || 'Customer';
+
+    if (amountCents <= 0) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'Invalid payment amount.' })
+      };
+    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -25,7 +36,7 @@ exports.handler = async (event) => {
         price_data: {
           currency: 'usd',
           product_data: {
-            name: description,
+            name: `${description} (Partial Payment — ${customerName})`,
             description: 'Aerus Home Wellness — Timonium, MD'
           },
           unit_amount: amountCents,
