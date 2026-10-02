@@ -97,7 +97,7 @@ exports.handler = async (event) => {
   }
 
   // ==========================================
-  // WRITE HANDLER (POST) - CSV Vault Search + Smart Route
+  // WRITE HANDLER (POST) - CSV Vault Search + Smart Route + Forever Card Search
   // ==========================================
   if (event.httpMethod === 'POST') {
     try {
@@ -120,11 +120,49 @@ exports.handler = async (event) => {
         cardTitle = `${prompt} [📞 ${csvMatch.phone || 'N/A'} | 📍 ${csvMatch.address || 'N/A'}]`;
       }
 
-      const targetGroupId = classifyZone(prompt);
-
-      // Escape quotes in the prompt text for GraphQL string safety
       const sanitizedTitle = cardTitle.replace(/"/g, '\\"').replace(/\n/g, ' ');
 
+      // 2. Search Monday for existing Forever Card with customer name
+      const nameMatch = prompt.match(/\b([A-Z][a-z]+\s+[A-Z][a-z]+)\b/);
+      if (nameMatch) {
+        const searchName = nameMatch[1];
+        const searchQuery = `query { boards(ids: [${boardId}]) { 
+          items_page(query_params: { rules: [{ column_id: "name", 
+          compare_value: ["${searchName}"], operator: contains_text }] }) 
+          { items { id name } } } }`;
+        const searchRes = await fetch('https://api.monday.com/v2', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': token, 
+            'API-Version': '2023-10' 
+          },
+          body: JSON.stringify({ query: searchQuery })
+        });
+        const searchData = await searchRes.json();
+        const existing = searchData.data?.boards?.[0]?.items_page?.items || [];
+        if (existing.length > 0) {
+          const updateMutation = `mutation { create_update(item_id: ${existing[0].id}, 
+          body: "${sanitizedTitle}") { id } }`;
+          await fetch('https://api.monday.com/v2', { 
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': token, 
+              'API-Version': '2023-10' 
+            },
+            body: JSON.stringify({ query: updateMutation }) 
+          });
+          return { 
+            statusCode: 200, 
+            headers, 
+            body: JSON.stringify({ reply: '✅ Added to ' + searchName + "'s Forever Card! ⚡" }) 
+          };
+        }
+      }
+
+      // 3. Fallback: Create new card as normal if no existing Forever Card found
+      const targetGroupId = classifyZone(prompt);
       const mutation = `
         mutation {
           create_item(board_id: ${boardId}, group_id: "${targetGroupId}", item_name: "${sanitizedTitle}") {
