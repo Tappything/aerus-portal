@@ -1,28 +1,34 @@
 const fs = require('fs');
 const path = require('path');
 
-// Smart Zone Classifier for incoming voice/text prompts
+// Upgraded Smart Zone Classifier for incoming voice/text prompts
 function classifyZone(text) {
   const lower = (text || '').toLowerCase();
-  
-  // Strip leading phone speech-to-text artifacts like "test." or "test"
   const cleaned = lower.replace(/^test\.?\s*/i, '').trim();
 
-  // ROUTING RULES (keyword -> group ID)
-  if (/\b(invoice|payment|proposal|quote|pay|charge)\b/.test(cleaned)) {
-    return 'group_mm7myd0b'; // Pipeline
+  // CASTLE — Personal, Business Formation, Legal
+  if (/\b(personal|bill|mortgage|car|home|family|pickleball|courthouse|llc|company|register|attorney|lawyer|filing|incorporate|formation)\b/.test(cleaned)) {
+    return 'group_mm7mv0yv';
   }
-  if (/\b(repair|bench|belt|motor|vacuum|intake|diagnostic|oreck|kirby|pickup|machine|tune.?up|work.?bench|dropoff|drop.?off|estimate)\b/.test(cleaned)) {
-    return 'group_mm7mfbre'; // Empire Operations
+
+  // CALENDAR — Appointments, Time-Based, Service Calls
+  if (/\b(schedule|appointment|tomorrow|today|calendar|reminder|pick.?up|service.?call|7.?am|8.?am|9.?am|10.?am|monday|tuesday|wednesday|thursday|friday|saturday|sunday|\d{1,2}:\d{2})\b/.test(cleaned)) {
+    return 'group_mm7maw66';
   }
-  if (/\b(personal|bill|mortgage|car|home|family|pickleball)\b/.test(cleaned)) {
-    return 'group_mm7mv0yv'; // Castle
+
+  // PIPELINE — Invoices, Proposals, Leads
+  if (/\b(invoice|estimate|proposal|payment|pay|charge|quote|lead|prospect|call|contact|follow.?up|customer)\b/.test(cleaned)) {
+    return 'group_mm7myd0b';
   }
-  if (/\b(schedule|appointment|tomorrow|today at|calendar|reminder)\b/.test(cleaned)) {
-    return 'group_mm7maw66'; // Calendar
+
+  // PARTS — Orders and Supplies
+  if (/\b(parts|order|desco|amazon|supplier|cord|hose|belt|filter|bag)\b/.test(cleaned)) {
+    return 'group_mm6bv2h0';
   }
-  if (/\b(parts|order|desco|amazon|supplier)\b/.test(cleaned)) {
-    return 'group_mm6bv2h0'; // Parts Needed
+
+  // EMPIRE — Bench Repairs and Shop Ops (default shop work)
+  if (/\b(repair|bench|motor|vacuum|intake|diagnostic|oreck|kirby|machine|tune.?up|work.?bench|dropoff|drop.?off|burnt|wire|overhaul|service)\b/.test(cleaned)) {
+    return 'group_mm7mfbre';
   }
 
   // Default fallback -> Empire Operations
@@ -111,11 +117,6 @@ exports.handler = async (event) => {
       // 1. Query Local CSV Vault (Zero API Cost)
       const csvMatch = lookupCustomerInCSV(prompt);
       if (csvMatch) {
-        const details = [
-          csvMatch.phone ? `📞 ${csvMatch.phone}` : '',
-          csvMatch.address ? `📍 ${csvMatch.address}` : ''
-        ].filter(Boolean).join(' | ');
-
         cardTitle = `${prompt} [📞 ${csvMatch.phone || 'N/A'} | 📍 ${csvMatch.address || 'N/A'}]`;
       }
 
