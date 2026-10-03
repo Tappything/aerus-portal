@@ -23,7 +23,7 @@ exports.handler = async (event) => {
   const rawDrawer = qParams.group || qParams.drawer || 'all';
   const drawer = rawDrawer.toLowerCase().trim();
 
-  // Targeted group mapping — Calendar locked to group_mm7maw66
+  // Clean, targeted group mapping for Netlify Monday Function
   const groupMap = {
     castle: ['group_mm7mv0yv', 'group_mm6b77as'],
     empire: ['group_mm7mfbre', 'group_mm6b77as'],
@@ -82,29 +82,13 @@ exports.handler = async (event) => {
     }
 
     const groups = data.data?.boards?.[0]?.groups || [];
-    
-    let allItems = [];
-    const seen = new Set();
-    groups.forEach(g => {
-      if (g.items_page && g.items_page.items) {
-        g.items_page.items.forEach(item => {
-          if (!seen.has(item.id)) {
-            seen.add(item.id);
-            allItems.push(item);
-          }
-        });
-      }
-    });
-
-    allItems.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         drawer: drawer,
-        count: allItems.length,
-        items: allItems,
+        count: groups.reduce((acc, g) => acc + (g.items_page?.items?.length || 0), 0),
         groups: groups
       })
     };
