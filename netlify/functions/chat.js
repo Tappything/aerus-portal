@@ -6,28 +6,28 @@ function classifyZone(text) {
   const lower = (text || '').toLowerCase();
   const cleaned = lower.replace(/^test\.?\s*/i, '').trim();
 
-  // CASTLE — Personal, Business Formation, Legal
-  if (/\b(personal|bill|mortgage|car|home|family|pickleball|courthouse|llc|company|register|attorney|lawyer|filing|incorporate|formation)\b/.test(cleaned)) {
-    return 'group_mm7mv0yv';
-  }
-
-  // CALENDAR — Appointments, Time-Based, Service Calls (Clean Substring Array Match)
+  // 1. CALENDAR — Appointments, Time-Based, Service Calls (FIRST PRIORITY)
   const calendarWords = ['today', 'tomorrow', 'schedule', 'appointment', 'calendar', 'reminder', 'pick up', 'pickup', 'service call', '7am', '8am', '9am', '10am', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
   if (calendarWords.some(w => cleaned.includes(w)) || /\d{1,2}:\d{2}/.test(cleaned)) {
     return 'group_mm7maw66';
   }
 
-  // PIPELINE — Invoices, Proposals, Leads
+  // 2. CASTLE — Personal, Business Formation, Legal
+  if (/\b(personal|bill|mortgage|car|home|family|pickleball|courthouse|llc|company|register|attorney|lawyer|filing|incorporate|formation)\b/.test(cleaned)) {
+    return 'group_mm7mv0yv';
+  }
+
+  // 3. PIPELINE — Invoices, Proposals, Leads (BEATS REPAIR)
   if (/\b(invoice|estimate|proposal|payment|pay|charge|quote|lead|prospect|call|contact|follow.?up|customer)\b/.test(cleaned)) {
     return 'group_mm7myd0b';
   }
 
-  // PARTS — Orders and Supplies
+  // 4. PARTS — Orders and Supplies
   if (/\b(parts|order|desco|amazon|supplier|cord|hose|belt|filter|bag)\b/.test(cleaned)) {
     return 'group_mm6bv2h0';
   }
 
-  // EMPIRE — Bench Repairs and Shop Ops (default shop work)
+  // 5. EMPIRE — Bench Repairs and Shop Ops (default shop work)
   if (/\b(repair|bench|motor|vacuum|intake|diagnostic|oreck|kirby|machine|tune.?up|work.?bench|dropoff|drop.?off|burnt|wire|overhaul|service)\b/.test(cleaned)) {
     return 'group_mm7mfbre';
   }
