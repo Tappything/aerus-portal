@@ -4,10 +4,16 @@ const path = require('path');
 // Upgraded Smart Zone Classifier for incoming voice/text prompts
 function classifyZone(text) {
   const lower = (text || '').toLowerCase();
-  const cleaned = lower.replace(/^test\.?\s*/i, '').trim();
+  const cleaned = lower.replace(/^test\.\?\s*/i, '').trim();
 
   // 1. CALENDAR — Appointments, Time-Based, Service Calls (FIRST PRIORITY)
-  const calendarWords = ['today', 'tomorrow', 'schedule', 'appointment', 'calendar', 'reminder', 'pick up', 'pickup', 'service call', '7am', '8am', '9am', '10am', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+  const calendarWords = [
+    'today', 'tomorrow', 'schedule', 'appointment', 'calendar', 'reminder', 
+    'pick up', 'pickup', 'service call', '7am', '8am', '9am', '10am', 
+    'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
+    'water test', 'water analysis', 'consultation', 'delivery', 'install', 
+    'drop off', '11:30', '3pm', '3:00', 'this afternoon', 'this morning'
+  ];
   if (calendarWords.some(w => cleaned.includes(w)) || /\d{1,2}:\d{2}/.test(cleaned)) {
     return 'group_mm7maw66';
   }
@@ -220,7 +226,7 @@ exports.handler = async (event) => {
     castle: ['group_mm7mv0yv', 'group_mm6b77as'],
     empire: ['group_mm7mfbre', 'group_mm6b77as'],
     pipeline: ['group_mm7myd0b', 'group_mm6b77as'],
-    calendar: ['group_mm7maw66', 'group_mm6b77as'],
+    calendar: ['group_mm7maw66'],
     housekeeping: ['group_mm6b77as'],
     pinball: ['group_mm7mmekt', 'group_mm6b77as'],
     vault: ['group_mm6xs2fx']
