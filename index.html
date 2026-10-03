@@ -268,6 +268,8 @@ var activeRecognition = null;
 var silenceTimer = null;
 var currentPaymentUrl = '';
 var currentInvoiceTotal = 0;
+var currentCustomerName = '';
+var currentCleanItem = '';
 
 window.onload = function() {
   var params = new URLSearchParams(window.location.search);
@@ -386,7 +388,8 @@ function copyStaffLink() {
 // SMART INVOICE MODAL — MD TAX + BALANCE DUE + SAVE-BACK ✅
 // ============================================================
 async function openInvoiceModal(rawText) {
-  var amountMatch = rawText.match(/\$(\d+(\.\d{2})?)/);
+  currentPaymentUrl = ''; // Reset on open
+  var amountMatch = rawText.match(/\$(\d+(?:\.\d{2})?)/);
   var baseAmount = amountMatch ? parseFloat(amountMatch[0].replace('$', '')) : 0.00;
 
   var textLower = rawText.toLowerCase();
@@ -422,6 +425,9 @@ async function openInvoiceModal(rawText) {
   });
   cleanItem = cleanItem.replace(/\s+/g, ' ').trim();
   if (!cleanItem) { cleanItem = 'Aerus Equipment & Service'; }
+
+  currentCustomerName = customerName;
+  currentCleanItem = cleanItem;
 
   var taxableKeywords = ["bag", "filter", "part", "product", "purifier", "unit", "machine", "sale"];
   var isTaxable = taxableKeywords.some(function(kw) { return textLower.includes(kw); });
@@ -512,14 +518,37 @@ function updateBalanceDue() {
 
 function closeInvoiceModal() { document.getElementById('invoiceModal').style.display = 'none'; }
 
-function copyInvoiceLink() {
+async function copyInvoiceLink() {
+  var btnText = document.getElementById('copyLinkText');
+  if (!currentPaymentUrl) {
+    btnText.innerText = 'Generating link...';
+    try {
+      var chargeAmount = document.getElementById('customPayAmount').value || '0.00';
+      var response = await fetch('/.netlify/functions/stripe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: chargeAmount,
+          description: currentCleanItem || 'Aerus Equipment & Service',
+          customer: currentCustomerName || 'Aerus Customer'
+        })
+      });
+      var data = await response.json();
+      if (data.url) {
+        currentPaymentUrl = data.url;
+      }
+    } catch (err) {
+      console.error('Error generating Stripe link:', err);
+    }
+  }
+
   if (currentPaymentUrl) {
     navigator.clipboard.writeText(currentPaymentUrl);
-    document.getElementById('copyLinkText').innerText = 'Copied!';
-    setTimeout(function() { document.getElementById('copyLinkText').innerText = 'Copy Payment Link'; }, 2000);
+    btnText.innerText = 'Copied!';
+    setTimeout(function() { btnText.innerText = 'Copy Payment Link'; }, 2000);
   } else {
-    document.getElementById('copyLinkText').innerText = 'Generate invoice first';
-    setTimeout(function() { document.getElementById('copyLinkText').innerText = 'Copy Payment Link'; }, 2000);
+    btnText.innerText = 'Error generating link';
+    setTimeout(function() { btnText.innerText = 'Copy Payment Link'; }, 2000);
   }
 }
 
