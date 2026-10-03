@@ -592,29 +592,20 @@ function loadDrawerItems(drawerName) {
   var contentDiv = document.getElementById('drawerContent');
   var target = (drawerName || '').toLowerCase().trim();
 
-  if (target.includes('calendar')) {
-    contentDiv.innerHTML = '<div class="space-y-4">' +
-      '<div class="flex items-center justify-between"><p class="font-bold text-white text-sm">📅 Daily Schedule Agenda</p>' +
-      '<a href="https://calendar.google.com/calendar/u/0/r/day" target="_blank" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-arrow-up-right-from-square"></i> Full Google Cal</a></div>' +
-      '<div class="space-y-2 max-h-72 overflow-y-auto">' +
-        '<div class="p-3 bg-blue-950/40 rounded-xl border border-blue-800/50"><div class="flex justify-between items-center"><span class="text-blue-300 font-black text-xs">Today</span><span class="text-[10px] bg-teal-900 text-teal-300 px-2 py-0.5 rounded font-bold">Water Consultation</span></div><p class="font-bold text-white text-xs mt-1">Kelly Keyser — Water Test</p><p class="text-[10px] text-gray-400">15302 Manor Rd, Monkton, MD · (808) 298-7102</p></div>' +
-        '<div class="p-3 bg-emerald-950/40 rounded-xl border border-emerald-800/50"><div class="flex justify-between items-center"><span class="text-emerald-300 font-black text-xs">Tomorrow 7:00 AM</span><span class="text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded font-bold">$240 Carpet Clean</span></div><p class="font-bold text-white text-xs mt-1">Susan Hogan — Carpet Cleaning</p><p class="text-[10px] text-gray-400">131 Fireside Cir, Baltimore, MD · (443) 845-2411</p></div>' +
-      '</div>' + buildInputFooter(drawerName) + '</div>';
-    return;
-  }
-
   contentDiv.innerHTML = '<div class="space-y-4">' +
     '<div class="flex items-center justify-between"><p class="font-bold text-white text-sm" id="drawerCount">Drawer: ' + drawerName + ' — Loading...</p>' +
     '<button type="button" onclick="loadDrawerItems(\'' + drawerName + '\')" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-rotate-right"></i> Refresh</button></div>' +
     '<div class="space-y-2 max-h-60 overflow-y-auto" id="drawerCardsList"><p class="text-gray-500 text-center py-4">Loading live cards...</p></div>' +
     buildInputFooter(drawerName) + '</div>';
 
-  fetch('/.netlify/functions/monday?board=18424728273&t=' + new Date().getTime())
+  fetch('/.netlify/functions/monday?drawer=' + encodeURIComponent(target) + '&board=18424728273&t=' + new Date().getTime())
     .then(function(res) { return res.json(); })
     .then(function(data) {
       var allItems = flattenGroupsToItems(data);
       var matchedItems = allItems.filter(function(it) {
         var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
+        var gid = (it.group && it.group.id ? it.group.id : '').toLowerCase();
+        if (target.includes('calendar')) return gt.includes('calendar') || gid === 'group_mm7maw66';
         if (target.includes('castle')) return gt.includes('castle') || gt.includes('personal') || gt.includes('william') || gt.includes('car');
         if (target.includes('empire') || target.includes('shop')) return gt.includes('empire') || gt.includes('workbench') || gt.includes('ready') || gt.includes('bench') || gt.includes('parts') || gt.includes('showroom') || gt.includes('intake');
         if (target.includes('pipeline')) return gt.includes('pipeline') || gt.includes('intake') || gt.includes('leads');
