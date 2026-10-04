@@ -22,6 +22,7 @@ exports.handler = async (event, context) => {
   try {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
+      console.error('DEBUG ERROR: GEMINI_API_KEY is missing in Netlify Environment Variables');
       return {
         statusCode: 500,
         headers,
@@ -30,6 +31,8 @@ exports.handler = async (event, context) => {
     }
 
     const { prompt } = JSON.parse(event.body || '{}');
+    console.log('DEBUG: Received intake prompt:', prompt);
+
     if (!prompt) {
       return {
         statusCode: 400,
@@ -85,8 +88,18 @@ GUIDELINES FOR GENERATING THE PROPOSAL:
     ]);
 
     const responseText = result.response.text().trim();
-    const cleanJsonText = responseText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/, '').trim();
+    console.log('DEBUG: Raw responseText from Gemini API:', responseText);
+
+    const cleanJsonText = responseText
+      .replace(/^```json\s*/i, '')
+      .replace(/^```\s*/i, '')
+      .replace(/\s*```$/, '')
+      .trim();
+
+    console.log('DEBUG: Cleaned JSON text before parse:', cleanJsonText);
+
     const parsedData = JSON.parse(cleanJsonText);
+    console.log('DEBUG: Parsed JSON object successfully:', JSON.stringify(parsedData));
 
     return {
       statusCode: 200,
@@ -94,6 +107,7 @@ GUIDELINES FOR GENERATING THE PROPOSAL:
       body: JSON.stringify(parsedData),
     };
   } catch (err) {
+    console.error('DEBUG ERROR in gemini.js handler:', err.message);
     return {
       statusCode: 500,
       headers,
