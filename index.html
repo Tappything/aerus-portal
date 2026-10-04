@@ -180,9 +180,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   </div>
 </div>
 
-<!-- INVOICE MODAL — MD TAX + BALANCE DUE + SAVE-BACK TO FOREVER CARD -->
+<!-- INVOICE / PROPOSAL MODAL — MD TAX + BALANCE DUE + SAVE-BACK TO FOREVER CARD -->
 <div id="invoiceModal" style="display:none;" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-  <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 flex flex-col gap-4 shadow-2xl relative">
+  <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 flex flex-col gap-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
     <button onclick="closeInvoiceModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold">&times;</button>
     <div class="text-center pb-2 border-b border-slate-800">
       <div class="inline-block px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 mb-2" id="modalDocType">INVOICE</div>
@@ -381,11 +381,153 @@ async function createStaffCard(prompt) {
   }
 }
 
+function renderProposalModal(proposalData, rawPrompt) {
+  currentPaymentUrl = '';
+  var customerName = proposalData.customerName || 'Valued Customer';
+  var totalAmount = proposalData.total || proposalData.amount || 0.00;
+  var items = proposalData.items || [
+    { name: proposalData.summary || 'Aerus Home Wellness Package', price: totalAmount }
+  ];
+
+  currentCustomerName = customerName;
+  currentCleanItem = proposalData.summary || 'Aerus Home Wellness Package';
+  currentInvoiceTotal = totalAmount;
+
+  document.getElementById('modalDocType').innerText = 'PROPOSAL';
+  document.getElementById('modalCustomerName').innerText = customerName;
+
+  var listContainer = document.getElementById('modalItemizedList');
+  if (listContainer) {
+    var breakdownHtml = '';
+    items.forEach(function(item) {
+      breakdownHtml +=
+        '<div class="flex justify-between items-center py-1 text-xs">' +
+          '<span class="font-bold text-slate-200">' + item.name + '</span>' +
+          '<span class="font-bold text-slate-100">$' + parseFloat(item.price).toFixed(2) + '</span>' +
+        '</div>';
+    });
+    if (proposalData.retailTotal && proposalData.discount) {
+      breakdownHtml +=
+        '<div class="flex justify-between items-center py-1 text-xs text-slate-400 border-t border-slate-800/50">' +
+          '<span>Retail Package Value:</span>' +
+          '<span class="line-through">$' + parseFloat(proposalData.retailTotal).toFixed(2) + '</span>' +
+        '</div>' +
+        '<div class="flex justify-between items-center py-1 text-xs text-amber-400">' +
+          '<span>Special Package Discount:</span>' +
+          '<span>-$' + parseFloat(proposalData.discount).toFixed(2) + '</span>' +
+        '</div>';
+    }
+    breakdownHtml +=
+      '<div class="flex justify-between items-center pt-2 border-t border-slate-700 font-bold text-xs text-emerald-400">' +
+        '<span>Total Investment:</span>' +
+        '<span>$' + parseFloat(totalAmount).toFixed(2) + '</span>' +
+      '</div>';
+    listContainer.innerHTML = breakdownHtml;
+  }
+
+  document.getElementById('customPayAmount').value = parseFloat(totalAmount).toFixed(2);
+  updateBalanceDue();
+
+  var smsMsg = 'Your Aerus Professional Proposal for $' + parseFloat(totalAmount).toFixed(2) + ' is ready for review and acceptance!';
+  var emailSubj = 'Aerus Timonium — Professional Proposal for ' + customerName;
+  var emailBody = 'Hello ' + customerName + ',\n\nYour proposal for the Aerus Home Wellness Package is ready.\nTotal: $' + parseFloat(totalAmount).toFixed(2) + '\n\nThank you!\nAerus Timonium';
+
+  document.getElementById('btnSms').href = 'sms:?body=' + encodeURIComponent(smsMsg);
+  document.getElementById('btnEmail').href = 'mailto:?subject=' + encodeURIComponent(emailSubj) + '&body=' + encodeURIComponent(emailBody);
+
+  var payBtn = document.getElementById('btnPayNow');
+  payBtn.innerText = '💳 Accept & Pay Now (Stripe)';
+  payBtn.onclick = async function(e) {
+    e.preventDefault();
+    var chargeAmount = document.getElementById('customPayAmount').value || '0.00';
+    payBtn.innerText = 'Generating Checkout...';
+    try {
+      var response = await fetch('/.netlify/functions/stripe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: chargeAmount, description: currentCleanItem, customer: customerName })
+      });
+      var data = await response.json();
+      if (data.url) {
+        currentPaymentUrl = data.url;
+        payBtn.innerText = '💳 Accept & Pay Now (Stripe)';
+        window.open(data.url, '_blank');
+
+        fetch('/.netlify/functions/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: '📄 PROPOSAL ACCEPTED & PAID: ' + customerName + ' — ' + currentCleanItem + ' | Amount: $' + chargeAmount,
+            board_id: '18424728273'
+          })
+        });
+      } else {
+        payBtn.innerText = 'Checkout Unavailable';
+      }
+    } catch (err) {
+      payBtn.innerText = 'Error — Try Again';
+    }
+  };
+
+  document.getElementById('invoiceModal').style.display = 'flex';
+}
+
 function sendToFresh(promptText, drawerName) {
   document.getElementById('ledOutput').textContent = 'PROCESSING...';
   
   if (promptText.toLowerCase().includes('create a staff card')) {
     createStaffCard(promptText);
+    return;
+  }
+
+  if (promptText.toLowerCase().includes('proposal')) {
+    flashLed('Generating AI Proposal... ⚡');
+    var fullPrompt = drawerName ? '[' + drawerName + ' Drawer] ' + promptText : promptText;
+    
+    fetch('/.netlify/functions/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: fullPrompt })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(geminiData) {
+      flashLed('Proposal Ready! ⚡');
+      var proposalObj = geminiData.proposal || {
+        customerName: 'Valued Customer',
+        total: 0.00,
+        summary: 'Aerus Home Wellness Package',
+        items: []
+      };
+
+      renderProposalModal(proposalObj, promptText);
+
+      fetch('/.netlify/functions/generate-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerName: proposalObj.customerName,
+          amount: proposalObj.total,
+          items: proposalObj.items
+        })
+      }).catch(function(err) { console.error('PDF generation logged.', err); });
+
+      fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: '📄 PROPOSAL LOGGED TO FOREVER CARD: ' + proposalObj.customerName + ' — Total: $' + proposalObj.total,
+          board_id: '18424728273'
+        })
+      });
+    })
+    .catch(function(err) {
+      console.error('Gemini proposal error, falling back to standard intake.', err);
+      renderProposalModal({
+        customerName: 'Valued Customer',
+        total: 0.00,
+        summary: 'Aerus Home Wellness Package'
+      }, promptText);
+    });
     return;
   }
 
