@@ -74,7 +74,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
           </div>
           <div class="text-[10px] text-gray-400 font-medium mt-0.5">Bench Repairs &amp; Ops</div>
         </div>
-        <div class="text-[9px] text-amber-300/80 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/40 inline-block w-fit">🛠️ Workbench &amp; Ready Wall</div>
+        <div class="text-[9px] text-amber-300/80 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/40 inline-block w-fit">🛠️️ Workbench &amp; Ready Wall</div>
       </button>
       <button type="button" onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3 text-left transition flex flex-col justify-between min-h-[85px] shadow-sm">
         <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
@@ -211,7 +211,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </div>
     <div class="flex flex-col gap-2">
       <a id="btnSms" href="#" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition active:scale-95"><span>📱</span> Text Invoice Link</a>
-      <a id="btnEmail" href="#" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition active:scale-95"><span>✉️</span> Email Invoice Link</a>
+      <a id="btnEmail" href="#" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition active:scale-95"><span>✉️️</span> Email Invoice Link</a>
       <button id="btnPayNow" class="w-full py-3 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition active:scale-95"><span>💳</span> Tap to Pay Now (Stripe)</button>
       <button onclick="copyInvoiceLink()" class="w-full py-2 px-3 bg-slate-800/50 hover:bg-slate-800 text-slate-300 rounded-xl text-[11px] font-medium flex items-center justify-center gap-2 transition"><span>🔗</span> <span id="copyLinkText">Copy Payment Link</span></button>
     </div>
@@ -359,8 +359,34 @@ function flashLed(msg) {
   setTimeout(function() { output.textContent = 'POCKET CHIEF OF STAFF READY ⚡'; }, 3000);
 }
 
+async function createStaffCard(prompt) {
+  const nameMatch = prompt.match(/card for (\w+)/i);
+  const roleMatch = prompt.match(/for \w+ (.+)/i);
+  if (!nameMatch) return;
+  const name = nameMatch[1];
+  const role = roleMatch ? roleMatch[1] : 'staff';
+  
+  flashLed('Creating ' + name + "'s card...");
+  const response = await fetch('/.netlify/functions/create-staff-card', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, role })
+  });
+  const data = await response.json();
+  if (data.url) {
+    flashLed('✅ ' + name + "'s card ready! ⚡");
+    navigator.clipboard.writeText(data.url);
+  }
+}
+
 function sendToFresh(promptText, drawerName) {
   document.getElementById('ledOutput').textContent = 'PROCESSING...';
+  
+  if (promptText.toLowerCase().includes('create a staff card')) {
+    createStaffCard(promptText);
+    return;
+  }
+
   var fullPrompt = drawerName ? '[' + drawerName + ' Drawer] ' + promptText : promptText;
   fetch('/.netlify/functions/chat', {
     method: 'POST',
