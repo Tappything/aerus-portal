@@ -399,26 +399,36 @@ function renderProposalModal(proposalData, rawPrompt) {
   var listContainer = document.getElementById('modalItemizedList');
   if (listContainer) {
     var breakdownHtml = '';
+    if (proposalData.diagnosticNotes) {
+      breakdownHtml +=
+        '<div class="p-2.5 mb-2 rounded-xl bg-blue-950/40 border border-blue-800/50 text-[11px] text-blue-200 leading-relaxed">' +
+          '<strong class="text-blue-400 block mb-0.5">📋 Water Diagnostic Summary:</strong>' +
+          proposalData.diagnosticNotes +
+        '</div>';
+    }
     items.forEach(function(item) {
       breakdownHtml +=
-        '<div class="flex justify-between items-center py-1 text-xs">' +
-          '<span class="font-bold text-slate-200">' + item.name + '</span>' +
-          '<span class="font-bold text-slate-100">$' + parseFloat(item.price).toFixed(2) + '</span>' +
+        '<div class="py-1 text-xs border-b border-slate-800/40">' +
+          '<div class="flex justify-between items-center font-bold text-slate-200">' +
+            '<span>' + item.name + '</span>' +
+            '<span class="text-slate-100">$' + parseFloat(item.price).toFixed(2) + '</span>' +
+          '</div>' +
+          (item.reason ? '<p class="text-[10px] text-slate-400 italic font-normal mt-0.5">' + item.reason + '</p>' : '') +
         '</div>';
     });
     if (proposalData.retailTotal && proposalData.discount) {
       breakdownHtml +=
-        '<div class="flex justify-between items-center py-1 text-xs text-slate-400 border-t border-slate-800/50">' +
+        '<div class="flex justify-between items-center py-1 text-xs text-slate-400 border-t border-slate-800/50 mt-1">' +
           '<span>Retail Package Value:</span>' +
           '<span class="line-through">$' + parseFloat(proposalData.retailTotal).toFixed(2) + '</span>' +
         '</div>' +
-        '<div class="flex justify-between items-center py-1 text-xs text-amber-400">' +
+        '<div class="flex justify-between items-center py-1 text-xs text-amber-400 font-semibold">' +
           '<span>Special Package Discount:</span>' +
           '<span>-$' + parseFloat(proposalData.discount).toFixed(2) + '</span>' +
         '</div>';
     }
     breakdownHtml +=
-      '<div class="flex justify-between items-center pt-2 border-t border-slate-700 font-bold text-xs text-emerald-400">' +
+      '<div class="flex justify-between items-center pt-2 border-t border-slate-700 font-bold text-xs text-emerald-400 mt-1">' +
         '<span>Total Investment:</span>' +
         '<span>$' + parseFloat(totalAmount).toFixed(2) + '</span>' +
       '</div>';
