@@ -29,6 +29,7 @@ exports.handler = async (event) => {
     calendar: ['group_mm7maw66'],
     housekeeping: ['group_mm6b77as'],
     pinball: ['group_mm7mmekt', 'group_mm6b77as'],
+    'needs attention': ['group_mm6b77as'],
     vault: ['group_mm6xs2fx'],
     all: ['group_mm7maw66', 'group_mm7mv0yv', 'group_mm7myd0b', 'group_mm6bv2h0', 'group_mm7mfbre', 'group_mm6b77as', 'group_mm7mmekt', 'group_mm6xs2fx']
   };
