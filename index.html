@@ -34,9 +34,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
       FRESH TAPPYTHING COMMAND HUB
     </div>
-    <button type="button" onclick="copyStaffLink()" class="px-2.5 py-1 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-lg text-[10px] font-bold flex items-center gap-1 transition active:scale-95">
-      <span>🔗</span> <span id="copyStaffText">Share Staff Intake Card</span>
-    </button>
   </div>
 
   <div class="text-center">
@@ -569,12 +566,6 @@ function sendToFresh(promptText, drawerName) {
     flashLed('Logged! ⚡');
     if (activeDrawerContext) { setTimeout(function() { loadDrawerItems(activeDrawerContext); }, 1500); }
   });
-}
-
-function copyStaffLink() {
-  navigator.clipboard.writeText(window.location.origin + '/?staff=intake');
-  document.getElementById('copyStaffText').innerText = 'Copied Link!';
-  setTimeout(function() { document.getElementById('copyStaffText').innerText = 'Share Staff Intake Card'; }, 2000);
 }
 
 // ============================================================
