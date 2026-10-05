@@ -21,13 +21,13 @@ exports.handler = async (event) => {
   const rawDrawer = qParams.group || qParams.drawer || 'all';
   const drawer = rawDrawer.toLowerCase().trim();
 
-  // Clean, targeted group mapping for Netlify Monday Function
+  // Strict, dedicated group mapping — zero drawer overlap
   const groupMap = {
-    castle: ['group_mm7mv0yv', 'group_mm6b77as'],
-    empire: ['group_mm7mfbre', 'group_mm6b77as'],
-    pipeline: ['group_mm7myd0b', 'group_mm6b77as'],
+    castle: ['group_mm7mv0yv'],
+    empire: ['group_mm7mfbre'],
+    pipeline: ['group_mm7myd0b'],
     calendar: ['group_mm7maw66'],
-    housekeeping: ['group_mm6b77as'],
+    parts: ['group_mm6bv2h0'],
     pinball: ['group_mm7mmekt', 'group_mm6b77as'],
     'needs attention': ['group_mm6b77as'],
     vault: ['group_mm6xs2fx'],
