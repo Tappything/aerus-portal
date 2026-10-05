@@ -1,129 +1,102 @@
-exports.handler = async (event, context) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json',
-  };
+function classifyZone(promptText) {
+  const text = (promptText || '').toLowerCase();
 
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+  // 1. Castle / Personal
+  if (text.includes('personal') || text.includes('family') || text.includes('bill') || text.includes('car') || text.includes('castle')) {
+    return 'group_mm7mv0yv';
+  }
+  // 2. Empire / Bench Repairs
+  if (text.includes('repair') || text.includes('bench') || text.includes('workbench') || text.includes('vacuum') || text.includes('empire')) {
+    return 'group_mm7mfbre';
+  }
+  // 3. Pipeline / Leads
+  if (text.includes('lead') || text.includes('intake') || text.includes('pipeline') || text.includes('customer')) {
+    return 'group_mm7myd0b';
+  }
+  // 4. Calendar
+  if (text.includes('calendar') || text.includes('agenda') || text.includes('today') || text.includes('appointment')) {
+    return 'group_mm7maw66';
+  }
+  // 5. Parts Needed
+  if (text.includes('part') || text.includes('order') || text.includes('belt') || text.includes('filter')) {
+    return 'group_mm6bv2h0';
+  }
+  // 6. Pinball / Action Queue
+  if (text.includes('pinball') || text.includes('task') || text.includes('todo') || text.includes('queue')) {
+    return 'group_mm7mmekt';
   }
 
+  // BULLETPROOF FALLBACK: Never drop an intake!
+  return 'group_mm6b77as'; // Staff Intake / Needs Attention
+}
+
+exports.handler = async function (event, context) {
   if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method Not Allowed' }),
-    };
+    return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
   try {
-    const { prompt, board_id } = JSON.parse(event.body || '{}');
+    const body = JSON.parse(event.body || '{}');
+    const prompt = body.prompt || '';
+    const boardId = body.board_id || '18424728273';
+    const apiKey = process.env.MONDAY_API_KEY;
 
     if (!prompt) {
       return {
         statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Missing prompt parameter' }),
+        body: JSON.stringify({ error: 'Prompt is required' })
       };
     }
 
-    const targetBoardId = board_id || '18424728273';
     const groupId = classifyZone(prompt);
 
     const query = `
-      mutation CreateItem($boardId: ID!, $groupId: String!, $itemName: String!) {
+      mutation ($boardId: ID!, $groupId: String!, $itemName: String!) {
         create_item (board_id: $boardId, group_id: $groupId, item_name: $itemName) {
           id
+          name
         }
       }
     `;
 
+    const variables = {
+      boardId: boardId,
+      groupId: groupId,
+      itemName: prompt
+    };
+
     const response = await fetch('https://api.monday.com/v2', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: process.env.MONDAY_API_TOKEN,
+        'Authorization': apiKey,
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        query,
-        variables: {
-          boardId: targetBoardId,
-          groupId: groupId,
-          itemName: prompt,
-        },
-      }),
+      body: JSON.stringify({ query, variables })
     });
 
-    const result = await response.json();
+    const resData = await response.json();
 
-    if (result.errors) {
+    if (resData.errors) {
+      console.error('Monday API Errors:', resData.errors);
       return {
         statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: result.errors }),
+        body: JSON.stringify({ error: 'Failed to create item on Monday.com', details: resData.errors })
       };
     }
 
     return {
       statusCode: 200,
-      headers,
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        success: true,
-        reply: `⚡ Card Created: "${prompt}"`,
-        groupId: groupId,
-        itemId: result.data.create_item.id,
-      }),
+        reply: 'Logged! ⚡',
+        item: resData.data.create_item
+      })
     };
-  } catch (err) {
+  } catch (error) {
+    console.error('Chat function error:', error);
     return {
       statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: err.message }),
+      body: JSON.stringify({ error: 'Internal Server Error', message: error.message })
     };
   }
 };
-
-function classifyZone(text) {
-  const lower = (text || '').toLowerCase();
-  const cleaned = lower.replace(/^test\.?\s*/i, '').trim();
-
-  const calendarWords = [
-    'today', 'tomorrow', 'schedule', 'appointment', 'calendar',
-    'pick up', 'pickup', 'service call', 'water test', 'consultation',
-    'delivery', 'install', 'drop off', 'this morning', 'this afternoon',
-    'at 2pm', 'at 3pm', 'at 7am', 'at 8am', 'at 9am', 'at 10am', 'at 11am'
-  ];
-  if (
-    calendarWords.some(w => cleaned.includes(w)) ||
-    /\d{1,2}:\d{2}/.test(cleaned)
-  ) {
-    return 'group_mm7maw66';
-  }
-
-  if (
-    /\b(personal|bill|mortgage|car|home|family|pickleball|courthouse|llc|company|register|attorney|lawyer|filing|incorporate)\b/.test(cleaned)
-  ) {
-    return 'group_mm7mv0yv';
-  }
-
-  if (
-    /\b(invoice|estimate|proposal|payment|pay|charge|quote|lead|prospect|customer)\b/.test(cleaned)
-  ) {
-    return 'group_mm7myd0b';
-  }
-
-  if (
-    /\b(parts|order|desco|amazon|cord|hose|belt|filter|bag)\b/.test(cleaned)
-  ) {
-    return 'group_mm6bv2h0';
-  }
-
-  if (
-    /\b(repair|bench|motor|vacuum|intake|diagnostic|oreck|kirby|machine|burnt|wire|overhaul|service|disposed)\b/.test(cleaned)
-  ) {
-    return 'group_mm7mfbre';
-  }
-
-  return 'group_mm7mfbre';
-}
