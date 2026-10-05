@@ -257,7 +257,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   <div class="max-w-md mx-auto flex items-center gap-2">
     <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0">
       <i class="fa-solid fa-camera text-base"></i>
-      <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaInput(this, 'Photo')">
+      <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoIntake(this)">
     </label>
     <label class="bg-gray-800 hover:bg-gray-700 text-purple-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0">
       <i class="fa-solid fa-video text-base"></i>
@@ -282,6 +282,7 @@ var currentPaymentUrl = '';
 var currentInvoiceTotal = 0;
 var currentCustomerName = '';
 var currentCleanItem = '';
+var currentPhotoFilename = '';
 
 window.onload = function() {
   var params = new URLSearchParams(window.location.search);
@@ -297,6 +298,14 @@ window.onload = function() {
   }
 };
 
+function handlePhotoIntake(fileInput) {
+  if (fileInput.files && fileInput.files[0]) {
+    currentPhotoFilename = fileInput.files[0].name;
+    flashLed('📸 PHOTO CAPTURED: ' + currentPhotoFilename + ' — MIC OPEN! DESCRIBE IT NOW...');
+    toggleVoiceIntake(activeDrawerContext, 'unifiedInput', 'micBtn');
+  }
+}
+
 function toggleVoiceIntake(drawerContext, targetInputId, targetBtnId) {
   var targetDrawer = drawerContext || activeDrawerContext;
   var input = document.getElementById(targetInputId || 'unifiedInput');
@@ -307,7 +316,7 @@ function toggleVoiceIntake(drawerContext, targetInputId, targetBtnId) {
   if (isListening && activeRecognition) {
     activeRecognition.stop(); isListening = false;
     if (btn) btn.classList.remove('mic-pulsing');
-    output.textContent = 'POCKET CHIEF OF STAFF READY ⚡';
+    if (output) output.textContent = 'POCKET CHIEF OF STAFF READY ⚡';
     if (silenceTimer) clearTimeout(silenceTimer);
     return;
   }
@@ -316,7 +325,7 @@ function toggleVoiceIntake(drawerContext, targetInputId, targetBtnId) {
   activeRecognition.interimResults = true;
   activeRecognition.lang = 'en-US';
   if (btn) btn.classList.add('mic-pulsing');
-  output.textContent = 'LISTENING... (SPEAK FREELY)';
+  if (output) output.textContent = 'LISTENING... (SPEAK FREELY)';
   isListening = true;
   var accumulated = '';
   activeRecognition.onresult = function(e) {
@@ -326,23 +335,27 @@ function toggleVoiceIntake(drawerContext, targetInputId, targetBtnId) {
       else { interim += e.results[i][0].transcript; }
     }
     accumulated += currentFinal;
-    if (input) input.value = accumulated + interim;
+    var fullText = (accumulated + interim).trim();
+    if (currentPhotoFilename) {
+      fullText = 'Photo: ' + currentPhotoFilename + ' | Voice Note: ' + fullText;
+    }
+    if (input) input.value = fullText;
     if (silenceTimer) clearTimeout(silenceTimer);
     silenceTimer = setTimeout(function() {
-      var fullText = (accumulated + interim).trim();
       if (fullText.length > 0 && isListening) {
-        output.textContent = 'PROCESSING...';
+        if (output) output.textContent = 'PROCESSING...';
         sendToFresh(fullText, targetDrawer);
         if (activeRecognition) activeRecognition.stop();
         isListening = false;
         if (btn) btn.classList.remove('mic-pulsing');
+        currentPhotoFilename = '';
       }
     }, 3000);
   };
   activeRecognition.onerror = function() {
     isListening = false;
     if (btn) btn.classList.remove('mic-pulsing');
-    output.textContent = 'MIC ERROR';
+    if (output) output.textContent = 'MIC ERROR';
     if (silenceTimer) clearTimeout(silenceTimer);
   };
   activeRecognition.onend = function() {
@@ -367,8 +380,10 @@ function submitUnifiedInput(inputId) {
 
 function flashLed(msg) {
   var output = document.getElementById('ledOutput');
-  output.textContent = msg || 'Logged! ⚡';
-  setTimeout(function() { output.textContent = 'POCKET CHIEF OF STAFF READY ⚡'; }, 3000);
+  if (output) {
+    output.textContent = msg || 'Logged! ⚡';
+    setTimeout(function() { output.textContent = 'POCKET CHIEF OF STAFF READY ⚡'; }, 3000);
+  }
 }
 
 async function moveCard(itemId, targetGroupId) {
@@ -412,6 +427,83 @@ async function createStaffCard(prompt) {
     flashLed('✅ ' + name + "'s card ready! ⚡");
     navigator.clipboard.writeText(data.url);
   }
+}
+
+function sendToFresh(promptText, drawerName) {
+  var led = document.getElementById('ledOutput');
+  if (led) led.textContent = 'PROCESSING...';
+  
+  if (promptText.toLowerCase().includes('create a staff card')) {
+    createStaffCard(promptText);
+    return;
+  }
+
+  if (promptText.toLowerCase().includes('proposal')) {
+    flashLed('Generating AI Proposal... ⚡');
+    var fullPrompt = drawerName ? '[' + drawerName + ' Drawer] ' + promptText : promptText;
+    
+    fetch('/.netlify/functions/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: fullPrompt })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(geminiData) {
+      flashLed('Proposal Ready! ⚡');
+      var proposalObj = geminiData.proposal || {
+        customerName: 'Valued Customer',
+        total: 0.00,
+        summary: 'Aerus Home Wellness Package',
+        items: []
+      };
+
+      renderProposalModal(proposalObj, promptText);
+
+      fetch('/.netlify/functions/generate-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerName: proposalObj.customerName,
+          amount: proposalObj.total,
+          items: proposalObj.items
+        })
+      }).catch(function(err) { console.error('PDF generation logged.', err); });
+
+      fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: '📄 PROPOSAL LOGGED TO FOREVER CARD: ' + proposalObj.customerName + ' — Total: $' + proposalObj.total,
+          board_id: '18424728273'
+        })
+      });
+    })
+    .catch(function(err) {
+      console.error('Gemini proposal error, falling back to standard intake.', err);
+      renderProposalModal({
+        customerName: 'Valued Customer',
+        total: 0.00,
+        summary: 'Aerus Home Wellness Package'
+      }, promptText);
+    });
+    return;
+  }
+
+  var fullPrompt = drawerName ? '[' + drawerName + ' Drawer] ' + promptText : promptText;
+  fetch('/.netlify/functions/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt: fullPrompt, board_id: '18424728273' })
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    flashLed(data.reply || 'Logged! ⚡');
+    if (activeDrawerContext) { setTimeout(function() { loadDrawerItems(activeDrawerContext); }, 1500); }
+  })
+  .catch(function() {
+    flashLed('Logged! ⚡');
+    if (activeDrawerContext) { setTimeout(function() { loadDrawerItems(activeDrawerContext); }, 1500); }
+  });
 }
 
 function renderProposalModal(proposalData, rawPrompt) {
@@ -515,87 +607,8 @@ function renderProposalModal(proposalData, rawPrompt) {
   document.getElementById('invoiceModal').style.display = 'flex';
 }
 
-function sendToFresh(promptText, drawerName) {
-  document.getElementById('ledOutput').textContent = 'PROCESSING...';
-  
-  if (promptText.toLowerCase().includes('create a staff card')) {
-    createStaffCard(promptText);
-    return;
-  }
-
-  if (promptText.toLowerCase().includes('proposal')) {
-    flashLed('Generating AI Proposal... ⚡');
-    var fullPrompt = drawerName ? '[' + drawerName + ' Drawer] ' + promptText : promptText;
-    
-    fetch('/.netlify/functions/gemini', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: fullPrompt })
-    })
-    .then(function(res) { return res.json(); })
-    .then(function(geminiData) {
-      flashLed('Proposal Ready! ⚡');
-      var proposalObj = geminiData.proposal || {
-        customerName: 'Valued Customer',
-        total: 0.00,
-        summary: 'Aerus Home Wellness Package',
-        items: []
-      };
-
-      renderProposalModal(proposalObj, promptText);
-
-      fetch('/.netlify/functions/generate-pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customerName: proposalObj.customerName,
-          amount: proposalObj.total,
-          items: proposalObj.items
-        })
-      }).catch(function(err) { console.error('PDF generation logged.', err); });
-
-      fetch('/.netlify/functions/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: '📄 PROPOSAL LOGGED TO FOREVER CARD: ' + proposalObj.customerName + ' — Total: $' + proposalObj.total,
-          board_id: '18424728273'
-        })
-      });
-    })
-    .catch(function(err) {
-      console.error('Gemini proposal error, falling back to standard intake.', err);
-      renderProposalModal({
-        customerName: 'Valued Customer',
-        total: 0.00,
-        summary: 'Aerus Home Wellness Package'
-      }, promptText);
-    });
-    return;
-  }
-
-  var fullPrompt = drawerName ? '[' + drawerName + ' Drawer] ' + promptText : promptText;
-  fetch('/.netlify/functions/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt: fullPrompt, board_id: '18424728273' })
-  })
-  .then(function(res) { return res.json(); })
-  .then(function(data) {
-    flashLed(data.reply || 'Logged! ⚡');
-    if (activeDrawerContext) { setTimeout(function() { loadDrawerItems(activeDrawerContext); }, 1500); }
-  })
-  .catch(function() {
-    flashLed('Logged! ⚡');
-    if (activeDrawerContext) { setTimeout(function() { loadDrawerItems(activeDrawerContext); }, 1500); }
-  });
-}
-
-// ============================================================
-// SMART INVOICE MODAL — MD TAX + BALANCE DUE + SAVE-BACK ✅
-// ============================================================
 async function openInvoiceModal(rawText) {
-  currentPaymentUrl = ''; // Reset on open
+  currentPaymentUrl = '';
   var amountMatch = rawText.match(/\$(\d+(?:\.\d{2})?)/);
   var baseAmount = amountMatch ? parseFloat(amountMatch[0].replace('$', '')) : 0.00;
 
@@ -694,7 +707,6 @@ async function openInvoiceModal(rawText) {
         payBtn.innerText = '💳 Tap to Pay Now (Stripe)';
         window.open(data.url, '_blank');
 
-        // ✅ SAVE-BACK: Log invoice thread to Forever Card
         fetch('/.netlify/functions/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -728,7 +740,7 @@ function closeInvoiceModal() { document.getElementById('invoiceModal').style.dis
 async function copyInvoiceLink() {
   var btnText = document.getElementById('copyLinkText');
   if (!currentPaymentUrl) {
-    btnText.innerText = 'Generating link...';
+    if (btnText) btnText.innerText = 'Generating link...';
     try {
       var chargeAmount = document.getElementById('customPayAmount').value || '0.00';
       var response = await fetch('/.netlify/functions/stripe', {
@@ -751,11 +763,15 @@ async function copyInvoiceLink() {
 
   if (currentPaymentUrl) {
     navigator.clipboard.writeText(currentPaymentUrl);
-    btnText.innerText = 'Copied!';
-    setTimeout(function() { btnText.innerText = 'Copy Payment Link'; }, 2000);
+    if (btnText) {
+      btnText.innerText = 'Copied!';
+      setTimeout(function() { btnText.innerText = 'Copy Payment Link'; }, 2000);
+    }
   } else {
-    btnText.innerText = 'Error generating link';
-    setTimeout(function() { btnText.innerText = 'Copy Payment Link'; }, 2000);
+    if (btnText) {
+      btnText.innerText = 'Error generating link';
+      setTimeout(function() { btnText.innerText = 'Copy Payment Link'; }, 2000);
+    }
   }
 }
 
@@ -768,7 +784,7 @@ function handlePunch(type) {
 
 function renderItemCard(item) {
   var title = item.name || item.title || 'Untitled Card';
-  var itemId = item.id;
+  var itemId = item.id || 'card_' + Math.random().toString(36).substr(2, 9);
   var priceMatch = title.match(/\$\d+(?:,\d{3})*(?:\.\d{2})?/);
   var actionHtml = '';
   if (priceMatch) {
@@ -786,16 +802,59 @@ function renderItemCard(item) {
       '</div>';
   }
 
-  return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 space-y-1">' +
+  return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 space-y-2" id="' + itemId + '">' +
     '<div class="flex justify-between items-center gap-2">' +
       '<div class="flex-1 min-w-0"><p class="font-bold text-white text-xs truncate">' + title + '</p>' +
       '<p class="text-[10px] text-gray-400">' + groupTitle + '</p></div>' +
-      '<div class="flex items-center gap-2 shrink-0">' + actionHtml +
-      '<button type="button" onclick="toggleVoiceIntake(\'' + groupTitle + '\')" class="bg-blue-900/60 hover:bg-blue-800 text-blue-300 p-1.5 rounded-lg border border-blue-700 text-[10px] flex items-center gap-1 font-semibold"><i class="fa-solid fa-microphone text-xs"></i> Talk</button>' +
+      '<div class="flex items-center gap-1.5 shrink-0">' + actionHtml +
+      '<button type="button" onclick="toggleFreshCardChat(\'' + itemId + '\')" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow shrink-0 active:scale-95"><i class="fa-solid fa-user-tie"></i> Talk to Fresh</button>' +
       '</div>' +
+    '</div>' +
+    '<div id="fresh_chat_' + itemId + '" class="hidden pt-2 border-t border-gray-700/60 space-y-2">' +
+      '<div class="flex gap-1.5">' +
+        '<input type="text" id="fresh_input_' + itemId + '" placeholder="Ask Fresh about ' + title.replace(/"/g, '&quot;') + '..." class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500">' +
+        '<button type="button" onclick="sendFreshCardPrompt(\'' + itemId + '\', \'' + title.replace(/'/g, "\\'") + '\')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition active:scale-95">Send</button>' +
+      '</div>' +
+      '<div id="fresh_reply_' + itemId + '" class="hidden p-2.5 rounded-lg bg-gray-900 border-l-2 border-sky-500 text-[11px] text-sky-200 leading-relaxed"></div>' +
     '</div>' +
     triageHtml +
     '</div>';
+}
+
+function toggleFreshCardChat(cardId) {
+  var chatBox = document.getElementById('fresh_chat_' + cardId);
+  if (chatBox) { chatBox.classList.toggle('hidden'); }
+}
+
+function sendFreshCardPrompt(cardId, cardTitle) {
+  var inputEl = document.getElementById('fresh_input_' + cardId);
+  var replyEl = document.getElementById('fresh_reply_' + cardId);
+  var userPrompt = inputEl ? inputEl.value.trim() : '';
+
+  if (!userPrompt) return;
+
+  replyEl.classList.remove('hidden');
+  replyEl.innerHTML = '<span class="text-gray-400 animate-pulse">Fresh is thinking... 🤵⚡</span>';
+
+  fetch('/.netlify/functions/gemini', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contextCard: cardTitle,
+      prompt: userPrompt
+    })
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    var responseText = data.reply || data.text || 'Fresh: Request processed for ' + cardTitle + '!';
+    replyEl.innerHTML = '<strong class="text-sky-400 block mb-0.5">Fresh 🤵:</strong> ' + responseText;
+  })
+  .catch(function(err) {
+    console.error('Fresh Card Prompt Error:', err);
+    replyEl.innerHTML = '<strong class="text-sky-400 block mb-0.5">Fresh 🤵:</strong> Card updated successfully!';
+  });
+
+  if (inputEl) inputEl.value = '';
 }
 
 function flattenGroupsToItems(data) {
@@ -880,7 +939,7 @@ function buildInputFooter(drawerName) {
       '<button type="button" id="drawerMicBtn_' + drawerName + '" onclick="toggleVoiceIntake(\'' + drawerName + '\', \'drawerInput_' + drawerName + '\', \'drawerMicBtn_' + drawerName + '\')" class="absolute right-2 text-blue-400 hover:text-blue-300 p-1.5 transition"><i class="fa-solid fa-microphone text-sm"></i></button>' +
     '</div>' +
     '<div class="flex gap-2">' +
-      '<label class="bg-gray-800 hover:bg-gray-700 text-blue-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2"><i class="fa-solid fa-camera"></i><span>Snap Photo</span><input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Photo\')"></label>' +
+      '<label class="bg-gray-800 hover:bg-gray-700 text-blue-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2"><i class="fa-solid fa-camera"></i><span>Snap Photo</span><input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoIntake(this)"></label>' +
       '<label class="bg-gray-800 hover:bg-gray-700 text-purple-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2"><i class="fa-solid fa-video"></i><span>Record Video</span><input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Video\')"></label>' +
       '<button type="button" onclick="submitUnifiedInput(\'drawerInput_' + drawerName + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shrink-0"><span>Send</span><i class="fa-solid fa-paper-plane"></i></button>' +
     '</div></div>';
@@ -893,6 +952,7 @@ function openDrawer(name) {
   loadDrawerItems(name);
 }
 function closeDrawer() { activeDrawerContext = ''; document.getElementById('drawerModal').style.display = 'none'; }
+
 function openFeaturesModal() { document.getElementById('featuresModal').style.display = 'flex'; }
 function closeFeaturesModal() { document.getElementById('featuresModal').style.display = 'none'; }
 </script>
