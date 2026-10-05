@@ -786,17 +786,22 @@ function loadDrawerItems(drawerName) {
     .then(function(res) { return res.json(); })
     .then(function(data) {
       var allItems = flattenGroupsToItems(data);
+      
+      const groupIdMap = {
+        calendar: ['group_mm7maw66'],
+        castle: ['group_mm7mv0yv'],
+        empire: ['group_mm7mfbre'],
+        pipeline: ['group_mm7myd0b'],
+        vault: ['group_mm6xs2fx'],
+        pinball: ['group_mm7mmekt', 'group_mm6b77as']
+      };
+
+      var matchedIds = groupIdMap[target] || [];
       var matchedItems = allItems.filter(function(it) {
-        var gt = (it.group && it.group.title ? it.group.title : '').toLowerCase();
-        var gid = (it.group && it.group.id ? it.group.id : '').toLowerCase();
-        if (target.includes('calendar')) return gt.includes('calendar') || gid === 'group_mm7maw66';
-        if (target.includes('castle')) return gt.includes('castle') || gt.includes('personal') || gt.includes('william') || gt.includes('car');
-        if (target.includes('empire') || target.includes('shop')) return gt.includes('empire') || gt.includes('workbench') || gt.includes('ready') || gt.includes('bench') || gt.includes('parts') || gt.includes('showroom') || gt.includes('intake');
-        if (target.includes('pipeline')) return gt.includes('pipeline') || gt.includes('intake') || gt.includes('leads');
-        if (target.includes('vault')) return gt.includes('vault') || gt.includes('exchange') || gt.includes('archive');
-        if (target.includes('pinball')) return gt.includes('pinball') || gt.includes('queue');
-        return false;
+        var gid = it.group && it.group.id ? it.group.id.toLowerCase() : '';
+        return matchedIds.includes(gid);
       });
+
       var countEl = document.getElementById('drawerCount');
       if (countEl) countEl.textContent = 'Drawer: ' + drawerName + ' (' + matchedItems.length + ' Cards)';
       var listContainer = document.getElementById('drawerCardsList');
