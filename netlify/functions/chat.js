@@ -48,6 +48,61 @@ exports.handler = async function (event, context) {
       };
     }
 
+    // HANDLE MOVE_CARD MUTATION
+    if (prompt === 'MOVE_CARD') {
+      const itemId = body.item_id;
+      const groupId = body.group_id;
+
+      if (!itemId || !groupId) {
+        return {
+          statusCode: 400,
+          body: JSON.stringify({ error: 'item_id and group_id are required for MOVE_CARD' })
+        };
+      }
+
+      const moveQuery = `
+        mutation ($itemId: ID!, $groupId: String!) {
+          move_item_to_group (item_id: $itemId, group_id: $groupId) {
+            id
+          }
+        }
+      `;
+
+      const moveVariables = {
+        itemId: itemId,
+        groupId: groupId
+      };
+
+      const moveResponse = await fetch('https://api.monday.com/v2', {
+        method: 'POST',
+        headers: {
+          'Authorization': apiKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ query: moveQuery, variables: moveVariables })
+      });
+
+      const moveData = await moveResponse.json();
+
+      if (moveData.errors) {
+        console.error('Monday API Move Errors:', moveData.errors);
+        return {
+          statusCode: 500,
+          body: JSON.stringify({ error: 'Failed to move item on Monday.com', details: moveData.errors })
+        };
+      }
+
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reply: 'Card Routed! ⚡',
+          item: moveData.data.move_item_to_group
+        })
+      };
+    }
+
+    // STANDARD CREATE ITEM MUTATION
     const groupId = classifyZone(prompt);
 
     const query = `
