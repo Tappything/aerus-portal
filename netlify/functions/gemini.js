@@ -30,8 +30,8 @@ exports.handler = async (event, context) => {
       };
     }
 
-    const { prompt } = JSON.parse(event.body || '{}');
-    console.log('DEBUG: Received intake prompt:', prompt);
+    const { prompt, contextCard } = JSON.parse(event.body || '{}');
+    console.log('DEBUG: Received intake prompt:', prompt, 'contextCard:', contextCard);
 
     if (!prompt) {
       return {
@@ -44,8 +44,28 @@ exports.handler = async (event, context) => {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-    const systemPrompt = `
-You are Fresh, the master Digital Coordinator for Aerus Home Wellness.
+    // 1. ROUTE A: CARD CONTEXT PRESENT -> Plain text conversational response
+    if (contextCard) {
+      const systemPrompt = `You are Fresh, the Digital Coordinator for Aerus Home Wellness.
+You are helping with this specific customer/job card: [${contextCard}].
+Respond directly, concisely, and conversationally in 2-3 sentences.
+Do NOT output JSON or proposal markdown formatting.`;
+
+      const result = await model.generateContent([
+        { text: systemPrompt },
+        { text: `Question/Instruction: "${prompt}"` }
+      ]);
+
+      const replyText = result.response.text().trim();
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ reply: replyText }),
+      };
+    }
+
+    // 2. ROUTE B: NO CARD CONTEXT -> Parse JSON Proposal
+    const systemPrompt = `You are Fresh, the master Digital Coordinator for Aerus Home Wellness.
 Your job is to parse intake prompts and output a professional, high-converting customer proposal formatted strictly as valid JSON.
 
 GUIDELINES FOR GENERATING THE PROPOSAL:
@@ -88,18 +108,13 @@ GUIDELINES FOR GENERATING THE PROPOSAL:
     ]);
 
     const responseText = result.response.text().trim();
-    console.log('DEBUG: Raw responseText from Gemini API:', responseText);
-
     const cleanJsonText = responseText
       .replace(/^```json\s*/i, '')
       .replace(/^```\s*/i, '')
       .replace(/\s*```$/, '')
       .trim();
 
-    console.log('DEBUG: Cleaned JSON text before parse:', cleanJsonText);
-
     const parsedData = JSON.parse(cleanJsonText);
-    console.log('DEBUG: Parsed JSON object successfully:', JSON.stringify(parsedData));
 
     return {
       statusCode: 200,
