@@ -371,6 +371,29 @@ function flashLed(msg) {
   setTimeout(function() { output.textContent = 'POCKET CHIEF OF STAFF READY ⚡'; }, 3000);
 }
 
+async function moveCard(itemId, targetGroupId) {
+  flashLed('Routing card...');
+  try {
+    const res = await fetch('/.netlify/functions/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: "MOVE_CARD",
+        item_id: itemId,
+        group_id: targetGroupId,
+        board_id: '18424728273'
+      })
+    });
+    const data = await res.json();
+    flashLed('Routed! ⚡');
+    if (activeDrawerContext) {
+      setTimeout(function() { loadDrawerItems(activeDrawerContext); }, 1000);
+    }
+  } catch (err) {
+    flashLed('Error moving card');
+  }
+}
+
 async function createStaffCard(prompt) {
   const nameMatch = prompt.match(/card for (\w+)/i);
   const roleMatch = prompt.match(/for \w+ (.+)/i);
@@ -745,18 +768,34 @@ function handlePunch(type) {
 
 function renderItemCard(item) {
   var title = item.name || item.title || 'Untitled Card';
+  var itemId = item.id;
   var priceMatch = title.match(/\$\d+(?:,\d{3})*(?:\.\d{2})?/);
   var actionHtml = '';
   if (priceMatch) {
     actionHtml = '<button type="button" onclick="openInvoiceModal(\'' + title.replace(/'/g, "\\'") + '\')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow shrink-0 active:scale-95"><i class="fa-solid fa-file-invoice-dollar"></i> ' + (title.toLowerCase().includes('estimate') || title.toLowerCase().includes('diagnostic') ? 'View Estimate' : title.toLowerCase().includes('proposal') ? 'View Proposal' : 'View Invoice') + ' (' + priceMatch[0] + ')</button>';
   }
   var groupTitle = item.group ? (item.group.title || item.group) : 'Active Card';
-  return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 flex justify-between items-center gap-2">' +
-    '<div class="flex-1 min-w-0"><p class="font-bold text-white text-xs truncate">' + title + '</p>' +
-    '<p class="text-[10px] text-gray-400">' + groupTitle + '</p></div>' +
-    '<div class="flex items-center gap-2 shrink-0">' + actionHtml +
-    '<button type="button" onclick="toggleVoiceIntake(\'' + groupTitle + '\')" class="bg-blue-900/60 hover:bg-blue-800 text-blue-300 p-1.5 rounded-lg border border-blue-700 text-[10px] flex items-center gap-1 font-semibold"><i class="fa-solid fa-microphone text-xs"></i> Talk</button>' +
-    '</div></div>';
+
+  var triageHtml = '';
+  if (activeDrawerContext && activeDrawerContext.toLowerCase() === 'pinball') {
+    triageHtml = '<div class="flex gap-1.5 pt-2 mt-2 border-t border-gray-700/60 text-[10px]">' +
+      '<button type="button" onclick="moveCard(\'' + itemId + '\', \'group_mm7maw66\')" class="px-2 py-1 bg-blue-900/60 hover:bg-blue-800 text-blue-200 border border-blue-700 rounded-lg font-bold flex-1 active:scale-95">📅 Cal</button>' +
+      '<button type="button" onclick="moveCard(\'' + itemId + '\', \'group_mm7mfbre\')" class="px-2 py-1 bg-amber-900/60 hover:bg-amber-800 text-amber-200 border border-amber-700 rounded-lg font-bold flex-1 active:scale-95">👑 Emp</button>' +
+      '<button type="button" onclick="moveCard(\'' + itemId + '\', \'group_mm7myd0b\')" class="px-2 py-1 bg-teal-900/60 hover:bg-teal-800 text-teal-200 border border-teal-700 rounded-lg font-bold flex-1 active:scale-95">🚀 Pipe</button>' +
+      '<button type="button" onclick="moveCard(\'' + itemId + '\', \'group_mm7mv0yv\')" class="px-2 py-1 bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-700 rounded-lg font-bold flex-1 active:scale-95">🏰 Castle</button>' +
+      '</div>';
+  }
+
+  return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 space-y-1">' +
+    '<div class="flex justify-between items-center gap-2">' +
+      '<div class="flex-1 min-w-0"><p class="font-bold text-white text-xs truncate">' + title + '</p>' +
+      '<p class="text-[10px] text-gray-400">' + groupTitle + '</p></div>' +
+      '<div class="flex items-center gap-2 shrink-0">' + actionHtml +
+      '<button type="button" onclick="toggleVoiceIntake(\'' + groupTitle + '\')" class="bg-blue-900/60 hover:bg-blue-800 text-blue-300 p-1.5 rounded-lg border border-blue-700 text-[10px] flex items-center gap-1 font-semibold"><i class="fa-solid fa-microphone text-xs"></i> Talk</button>' +
+      '</div>' +
+    '</div>' +
+    triageHtml +
+    '</div>';
 }
 
 function flattenGroupsToItems(data) {
