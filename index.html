@@ -138,7 +138,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   </div>
   <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 space-y-2">
     <div class="flex justify-between items-center text-xs font-bold text-slate-200">
-      <span>⏱️ Staff Timecard</span>
+      <span>⏱️️ Staff Timecard</span>
       <span class="text-[10px] text-emerald-400 font-mono font-semibold">PIN PROTECTED</span>
     </div>
     <div class="flex gap-2">
@@ -787,6 +787,7 @@ function handlePunch(type) {
 function renderItemCard(item) {
   var title = item.name || item.title || 'Untitled Card';
   var itemId = item.id || 'card_' + Math.random().toString(36).substr(2, 9);
+  var cardUrl = '/card.html?id=' + encodeURIComponent(itemId) + '&title=' + encodeURIComponent(title);
   var priceMatch = title.match(/\$\d+(?:,\d{3})*(?:\.\d{2})?/);
   var actionHtml = '';
   if (priceMatch) {
@@ -807,8 +808,11 @@ function renderItemCard(item) {
   return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 space-y-2" id="' + itemId + '">' +
     '<div class="flex justify-between items-center gap-2">' +
       '<div class="flex-1 min-w-0">' +
-        '<p class="font-bold text-white text-xs truncate">' + title + '</p>' +
-        '<p class="text-[10px] text-gray-400">' + groupTitle + '</p>' +
+        '<a href="' + cardUrl + '" class="font-bold text-white text-xs truncate hover:text-blue-400 transition flex items-center gap-1.5">' +
+          '<span class="truncate">' + title + '</span>' +
+          '<i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-blue-400 shrink-0"></i>' +
+        '</a>' +
+        '<p class="text-[10px] text-gray-400 mt-0.5">' + groupTitle + '</p>' +
       '</div>' +
       '<div class="flex items-center gap-1.5 shrink-0">' + actionHtml +
         '<button type="button" onclick="toggleFreshCardChat(\'' + itemId + '\')" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow shrink-0 active:scale-95"><i class="fa-solid fa-user-tie"></i> Talk to Fresh</button>' +
@@ -856,110 +860,4 @@ function sendFreshCardPrompt(cardId, cardTitle) {
   })
   .catch(function(err) {
     console.error('Fresh Card Prompt Error:', err);
-    replyEl.innerHTML = '<strong class="text-sky-400 block mb-0.5">Fresh 🤵:</strong> Card updated successfully!';
-  });
-
-  if (inputEl) inputEl.value = '';
-}
-
-function flattenGroupsToItems(data) {
-  var allItems = [];
-  if (data.groups && Array.isArray(data.groups)) {
-    data.groups.forEach(function(g) {
-      var gItems = (g.items_page && g.items_page.items) ? g.items_page.items : (g.items || []);
-      gItems.forEach(function(it) { it.group = { id: g.id, title: g.title || '' }; allItems.push(it); });
-    });
-  } else if (data.items && Array.isArray(data.items)) {
-    allItems = data.items;
-  }
-  return allItems;
-}
-
-function loadDrawerItems(drawerName) {
-  var contentDiv = document.getElementById('drawerContent');
-  var target = (drawerName || '').toLowerCase().trim();
-
-  contentDiv.innerHTML = '<div class="space-y-4">' +
-    '<div class="flex items-center justify-between"><p class="font-bold text-white text-sm" id="drawerCount">Drawer: ' + drawerName + ' — Loading...</p>' +
-    '<button type="button" onclick="loadDrawerItems(\'' + drawerName + '\')" class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-rotate-right"></i> Refresh</button></div>' +
-    '<div class="space-y-2 max-h-60 overflow-y-auto" id="drawerCardsList"><p class="text-gray-500 text-center py-4">Loading live cards...</p></div>' +
-    buildInputFooter(drawerName) + '</div>';
-
-  fetch('/.netlify/functions/monday?drawer=' + encodeURIComponent(target) + '&board=18424728273&t=' + new Date().getTime())
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      var allItems = flattenGroupsToItems(data);
-      
-      const groupIdMap = {
-        calendar: ['group_mm7maw66'],
-        castle: ['group_mm7mv0yv'],
-        empire: ['group_mm7mfbre'],
-        pipeline: ['group_mm7myd0b'],
-        vault: ['group_mm6xs2fx'],
-        pinball: ['group_mm7mmekt', 'group_mm6b77as']
-      };
-
-      var matchedIds = groupIdMap[target] || [];
-      var matchedItems = allItems.filter(function(it) {
-        var gid = it.group && it.group.id ? it.group.id.toLowerCase() : '';
-        return matchedIds.includes(gid);
-      });
-
-      var countEl = document.getElementById('drawerCount');
-      if (countEl) countEl.textContent = 'Drawer: ' + drawerName + ' (' + matchedItems.length + ' Cards)';
-      var listContainer = document.getElementById('drawerCardsList');
-      if (listContainer) listContainer.innerHTML = matchedItems.length > 0
-        ? matchedItems.map(renderItemCard).join('')
-        : '<p class="text-gray-500 text-center py-4">No active cards yet. Speak or type below!</p>';
-    })
-    .catch(function() {
-      var listContainer = document.getElementById('drawerCardsList');
-      if (listContainer) listContainer.innerHTML = '<p class="text-red-400 text-center py-4">Connection error. Try refreshing.</p>';
-    });
-}
-
-function loadStaffSections() {
-  fetch('/.netlify/functions/monday?board=18424728273&t=' + new Date().getTime())
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      var allItems = flattenGroupsToItems(data);
-      var gt = function(it) { return (it.group && it.group.title ? it.group.title : '').toLowerCase(); };
-      var empty = '<p class="text-gray-500 italic text-[11px]">Nothing here yet.</p>';
-      var intakes = allItems.filter(function(i) { return gt(i).includes('intake'); });
-      var bench = allItems.filter(function(i) { return gt(i).includes('workbench') || gt(i).includes('bench'); });
-      var ready = allItems.filter(function(i) { return gt(i).includes('ready'); });
-      var parts = allItems.filter(function(i) { return gt(i).includes('parts'); });
-      document.getElementById('staffIntakeItems').innerHTML = intakes.length > 0 ? intakes.map(renderItemCard).join('') : empty;
-      document.getElementById('staffBenchItems').innerHTML = bench.length > 0 ? bench.map(renderItemCard).join('') : empty;
-      document.getElementById('staffReadyItems').innerHTML = ready.length > 0 ? ready.map(renderItemCard).join('') : empty;
-      document.getElementById('staffPartsItems').innerHTML = parts.length > 0 ? parts.map(renderItemCard).join('') : empty;
-    })
-    .catch(function() {});
-}
-
-function buildInputFooter(drawerName) {
-  return '<div class="pt-2 border-t border-gray-800 space-y-3">' +
-    '<div class="relative flex items-center">' +
-      '<input type="text" id="drawerInput_' + drawerName + '" placeholder="Type or dictate to card..." class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-4 pr-10 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key===\'Enter\') submitUnifiedInput(\'drawerInput_' + drawerName + '\')">' +
-      '<button type="button" id="drawerMicBtn_' + drawerName + '" onclick="toggleVoiceIntake(\'' + drawerName + '\', \'drawerInput_' + drawerName + '\', \'drawerMicBtn_' + drawerName + '\')" class="absolute right-2 text-blue-400 hover:text-blue-300 p-1.5 transition"><i class="fa-solid fa-microphone text-sm"></i></button>' +
-    '</div>' +
-    '<div class="flex gap-2">' +
-      '<label class="bg-gray-800 hover:bg-gray-700 text-blue-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2"><i class="fa-solid fa-camera"></i><span>Snap Photo</span><input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoIntake(this)"></label>' +
-      '<label class="bg-gray-800 hover:bg-gray-700 text-purple-400 py-2.5 px-3 rounded-xl cursor-pointer border border-gray-700 flex-1 text-center text-xs font-bold flex items-center justify-center gap-2"><i class="fa-solid fa-video"></i><span>Record Video</span><input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, \'Video\')"></label>' +
-      '<button type="button" onclick="submitUnifiedInput(\'drawerInput_' + drawerName + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shrink-0"><span>Send</span><i class="fa-solid fa-paper-plane"></i></button>' +
-    '</div></div>';
-}
-
-function openDrawer(name) {
-  activeDrawerContext = name;
-  document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + name + ' Drawer';
-  document.getElementById('drawerModal').style.display = 'flex';
-  loadDrawerItems(name);
-}
-function closeDrawer() { activeDrawerContext = ''; document.getElementById('drawerModal').style.display = 'none'; }
-
-function openFeaturesModal() { document.getElementById('featuresModal').style.display = 'flex'; }
-function closeFeaturesModal() { document.getElementById('featuresModal').style.display = 'none'; }
-</script>
-</body>
-</html>
+    replyEl.innerHTML = '<strong class="text-sky-400 block mb-0.5">Fresh
