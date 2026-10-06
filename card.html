@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Forever Card™ — TappyThing</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05070e; color: #f3f4f6; }
+.tapulator-face { background: linear-gradient(180deg, #0f172a 0%, #090d16 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); }
+.led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
+</style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-3 pb-24 relative">
+
+<!-- TOP HEADER NAVIGATION -->
+<div class="max-w-md w-full flex justify-between items-center py-2 px-1">
+  <a href="/" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-1.5 active:scale-95 transition">
+    <i class="fa-solid fa-arrow-left text-blue-400"></i> Back to Hub
+  </a>
+  <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-1.5 bg-emerald-950/40 border border-emerald-800/40 px-2.5 py-1 rounded-full">
+    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+    LIVE FOREVER CARD™
+  </span>
+</div>
+
+<!-- FOREVER CARD MAIN CONTAINER -->
+<div class="max-w-md w-full tapulator-face rounded-3xl p-5 relative space-y-4 shadow-2xl my-auto">
+
+  <!-- HEADER / CUSTOMER TITLE -->
+  <div class="border-b border-slate-800 pb-3 flex justify-between items-start gap-2">
+    <div>
+      <h1 id="cardTitle" class="text-lg font-black text-white tracking-tight">Loading Card...</h1>
+      <p id="cardSubtitle" class="text-[11px] text-gray-400 font-medium">Aerus Home Wellness • Timonium, MD</p>
+    </div>
+    <span id="cardStatus" class="bg-blue-900/60 text-blue-300 border border-blue-700 text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wider">
+      Active
+    </span>
+  </div>
+
+  <!-- LED STATUS DISPLAY -->
+  <div class="led-display rounded-2xl p-3 text-center border border-blue-900/50 min-h-[48px] flex items-center justify-center">
+    <div id="ledOutput" class="text-xs font-bold text-emerald-400 tracking-wide transition-all">FOREVER CARD ENGINE READY ⚡</div>
+  </div>
+
+  <!-- ACTION BUTTON MATRIX -->
+  <div class="grid grid-cols-2 gap-2.5">
+    <button type="button" onclick="toggleFreshCardChat()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold p-3 rounded-2xl text-xs flex items-center justify-center gap-2 shadow-lg transition active:scale-95">
+      <i class="fa-solid fa-user-tie text-sm"></i>
+      <span>Talk to Fresh 🤵</span>
+    </button>
+    <a id="btnSms" href="#" class="bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold p-3 rounded-2xl text-xs flex items-center justify-center gap-2 border border-slate-700 shadow transition active:scale-95">
+      <i class="fa-solid fa-comment-sms text-emerald-400 text-sm"></i>
+      <span>Two-Way SMS</span>
+    </a>
+  </div>
+
+  <div id="invoiceActionContainer">
+    <button type="button" onclick="triggerProposalModal()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3 rounded-2xl text-xs flex items-center justify-center gap-2 shadow-lg transition active:scale-95">
+      <i class="fa-solid fa-file-invoice-dollar text-sm"></i>
+      <span id="invoiceBtnLabel">View Proposal / Invoice</span>
+    </button>
+  </div>
+
+  <!-- FRESH AI INTERACTION DRAWER -->
+  <div id="freshChatBox" class="hidden p-3 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
+    <div class="flex gap-1.5">
+      <input type="text" id="freshInput" placeholder="Ask Fresh about this card..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500">
+      <button type="button" onclick="sendFreshPrompt()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-2 rounded-xl text-xs transition active:scale-95">Send</button>
+    </div>
+    <div id="freshReply" class="hidden p-2.5 rounded-xl bg-slate-950 border-l-2 border-sky-500 text-[11px] text-sky-200 leading-relaxed"></div>
+  </div>
+
+  <!-- ATTACHED MEDIA SECTION -->
+  <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-3 space-y-2">
+    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center justify-between">
+      <span>📷 Attached Photos & Media</span>
+      <i class="fa-solid fa-paperclip text-slate-500"></i>
+    </div>
+    <div id="mediaContainer" class="text-xs text-gray-500 italic">No media attached yet.</div>
+  </div>
+
+  <!-- PAST NOTES & HISTORY STACK -->
+  <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-3 space-y-2">
+    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+      <span>📋 Full Notes & History Stack</span>
+      <i class="fa-solid fa-clock-rotate-left text-slate-500"></i>
+    </div>
+    <div id="historyStack" class="space-y-2 text-xs text-gray-300 max-h-48 overflow-y-auto pr-1">
+      <div class="p-2 bg-slate-950 rounded-xl border border-slate-800/60 text-[11px] leading-relaxed">
+        <span class="text-gray-500 text-[9px] block mb-0.5">System Genesis Log</span>
+        Forever Card initialized for customer tracking.
+      </div>
+    </div>
+  </div>
+
+  <!-- WATERMARK -->
+  <div class="text-center pt-2 border-t border-slate-800/60">
+    <p class="text-[10px] text-slate-500 font-mono tracking-wider">
+      Forever Card™ by Fresh TappyThing LLC
+    </p>
+  </div>
+</div>
+
+<!-- BOTTOM INPUT BAR -->
+<div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-40">
+  <div class="max-w-md mx-auto flex items-center gap-2">
+    <input type="text" id="unifiedInput" placeholder="Add note or update to card..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') submitCardNote()">
+    <button type="button" onclick="submitCardNote()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1">
+      <span>Log Note</span>
+      <i class="fa-solid fa-paper-plane"></i>
+    </button>
+  </div>
+</div>
+
+<script>
+var currentCardId = '';
+var currentCardTitle = 'Aerus Customer Card';
+
+window.onload = function() {
+  var params = new URLSearchParams(window.location.search);
+  currentCardId = params.get('id') || '';
+  var titleParam = params.get('title') || params.get('name');
+  
+  if (titleParam) {
+    currentCardTitle = decodeURIComponent(titleParam);
+    document.getElementById('cardTitle').innerText = currentCardTitle;
+  } else if (currentCardId) {
+    document.getElementById('cardTitle').innerText = 'Forever Card #' + currentCardId;
+  }
+
+  var smsMsg = 'Hello from Aerus Timonium regarding ' + currentCardTitle + '!';
+  var smsBtn = document.getElementById('btnSms');
+  if (smsBtn) {
+    smsBtn.href = 'sms:?body=' + encodeURIComponent(smsMsg);
+  }
+
+  if (currentCardId) {
+    fetchCardDetails(currentCardId);
+  }
+};
+
+function fetchCardDetails(itemId) {
+  fetch('/.netlify/functions/monday?board=18424728273&t=' + new Date().getTime())
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      var allItems = [];
+      if (data.groups && Array.isArray(data.groups)) {
+        data.groups.forEach(function(g) {
+          var gItems = (g.items_page && g.items_page.items) ? g.items_page.items : (g.items || []);
+          gItems.forEach(function(it) { it.group = { id: g.id, title: g.title || '' }; allItems.push(it); });
+        });
+      } else if (data.items && Array.isArray(data.items)) {
+        allItems = data.items;
+      }
+
+      var match = allItems.find(function(it) { return String(it.id) === String(itemId); });
+      if (match) {
+        currentCardTitle = match.name || match.title || currentCardTitle;
+        document.getElementById('cardTitle').innerText = currentCardTitle;
+        if (match.group && match.group.title) {
+          document.getElementById('cardSubtitle').innerText = 'Group: ' + match.group.title + ' • Aerus Timonium';
+        }
+      }
+    })
+    .catch(function(err) {
+      console.log('Card detail sync logged.', err);
+    });
+}
+
+function toggleFreshCardChat() {
+  var chatBox = document.getElementById('freshChatBox');
+  if (chatBox) { 
+    chatBox.classList.toggle('hidden'); 
+  }
+}
+
+function sendFreshPrompt() {
+  var inputEl = document.getElementById('freshInput');
+  var replyEl = document.getElementById('freshReply');
+  var userPrompt = inputEl ? inputEl.value.trim() : '';
+
+  if (!userPrompt) return;
+
+  replyEl.classList.remove('hidden');
+  replyEl.innerHTML = '<span class="text-gray-400 animate-pulse">Fresh is thinking... 🤵⚡</span>';
+
+  fetch('/.netlify/functions/gemini', {
