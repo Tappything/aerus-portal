@@ -297,7 +297,6 @@ window.onload = function() {
   }
 };
 
-// CHANGE 1: handlePhotoIntake (NO forced mic - pre-fills input & focuses)
 function handlePhotoIntake(fileInput) {
   if (fileInput.files && fileInput.files[0]) {
     var photoName = fileInput.files[0].name;
@@ -807,12 +806,15 @@ function renderItemCard(item) {
 
   return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 space-y-2" id="' + itemId + '">' +
     '<div class="flex justify-between items-center gap-2">' +
-      '<div class="flex-1 min-w-0"><p class="font-bold text-white text-xs truncate">' + title + '</p>' +
-      '<p class="text-[10px] text-gray-400">' + groupTitle + '</p></div>' +
+      '<div class="flex-1 min-w-0">' +
+        '<p class="font-bold text-white text-xs truncate">' + title + '</p>' +
+        '<p class="text-[10px] text-gray-400">' + groupTitle + '</p>' +
+      '</div>' +
       '<div class="flex items-center gap-1.5 shrink-0">' + actionHtml +
-      '<button type="button" onclick="toggleFreshCardChat(\'' + itemId + '\')" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow shrink-0 active:scale-95"><i class="fa-solid fa-user-tie"></i> Talk to Fresh</button>' +
+        '<button type="button" onclick="toggleFreshCardChat(\'' + itemId + '\')" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow shrink-0 active:scale-95"><i class="fa-solid fa-user-tie"></i> Talk to Fresh</button>' +
       '</div>' +
     '</div>' +
+    '<div class="text-[9px] text-slate-500 font-mono tracking-wider pt-0.5">Forever Card™ by Fresh TappyThing LLC</div>' +
     '<div id="fresh_chat_' + itemId + '" class="hidden pt-2 border-t border-gray-700/60 space-y-2">' +
       '<div class="flex gap-1.5">' +
         '<input type="text" id="fresh_input_' + itemId + '" placeholder="Ask Fresh about ' + title.replace(/"/g, '&quot;') + '..." class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500">' +
