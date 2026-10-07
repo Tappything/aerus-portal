@@ -123,7 +123,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   </div>
 
   <!-- SERVICE HISTORY (VISIBLE TO ALL) -->
-  <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-3 space-y-2">
+  <div id="serviceHistoryContainer" class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-3 space-y-2">
     <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center justify-between border-b border-slate-800/80 pb-1.5">
       <span>🛠 Service History & Timeline</span>
       <i class="fa-solid fa-clock-rotate-left text-slate-500"></i>
@@ -223,6 +223,35 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       </div>
     </div>
 
+    <!-- 4 MONDAY.JS LIVE QUEUES -->
+    <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
+        <span class="text-xs font-bold text-emerald-400">📥 COUNTER INTAKES</span>
+      </div>
+      <div id="staffIntakeItems" class="space-y-1.5 text-xs text-gray-300"><p class="text-gray-500 italic text-[11px]">Loading intakes...</p></div>
+    </div>
+
+    <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
+        <span class="text-xs font-bold text-amber-400">🛠️ ACTIVE BENCH QUEUE</span>
+      </div>
+      <div id="staffBenchItems" class="space-y-1.5 text-xs text-gray-300"><p class="text-gray-500 italic text-[11px]">Loading bench queue...</p></div>
+    </div>
+
+    <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
+        <span class="text-xs font-bold text-teal-400">🟢 READY WALL (Pickups)</span>
+      </div>
+      <div id="staffReadyItems" class="space-y-1.5 text-xs text-gray-300"><p class="text-gray-500 italic text-[11px]">Loading ready wall...</p></div>
+    </div>
+
+    <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
+        <span class="text-xs font-bold text-purple-400">🔩 PARTS NEEDED & ORDERS</span>
+      </div>
+      <div id="staffPartsItems" class="space-y-1.5 text-xs text-gray-300"><p class="text-gray-500 italic text-[11px]">Loading parts queue...</p></div>
+    </div>
+
     <!-- STAFF COMMUNICATION BOARD NOTES -->
     <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 space-y-2">
       <div class="text-[10px] font-black text-purple-400 uppercase tracking-wider flex items-center justify-between border-b border-slate-800 pb-1.5">
@@ -304,6 +333,9 @@ window.onload = function() {
     var invSec = document.getElementById('invoiceSection');
     if (invSec) invSec.classList.add('hidden');
 
+    var historyContainer = document.getElementById('serviceHistoryContainer');
+    if (historyContainer) historyContainer.style.display = 'none';
+
     var staffSec = document.getElementById('staffSection');
     if (staffSec) staffSec.classList.remove('hidden');
 
@@ -311,6 +343,8 @@ window.onload = function() {
     if (backLink) backLink.style.display = 'none';
 
     if (freshLabel) freshLabel.innerText = 'Talk to Fresh 🤵';
+
+    loadStaffQueues();
 
   } else if (isCustomerView) {
     // CUSTOMER VIEW
@@ -382,10 +416,70 @@ window.onload = function() {
     smsBtn.href = 'sms:?body=' + encodeURIComponent(smsMsg);
   }
 
-  if (currentCardId) {
+  if (currentCardId && !isStaffView) {
     fetchCardDetails(currentCardId);
   }
 };
+
+async function loadStaffQueues() {
+  try {
+    const res = await fetch('/.netlify/functions/monday?board=18424728273&t=' + new Date().getTime());
+    const data = await res.json();
+    var groups = data.groups || data.board?.groups || data;
+
+    var intakeItems = [];
+    var benchItems = [];
+    var readyItems = [];
+    var partsItems = [];
+
+    if (Array.isArray(groups)) {
+      groups.forEach(function(g) {
+        var gTitle = (g.title || '').toLowerCase();
+        var gId = g.id || '';
+        var items = (g.items_page && g.items_page.items) ? g.items_page.items : (g.items || []);
+
+        items.forEach(function(item) {
+          item.groupTitle = g.title || 'Queue';
+          if (gId === 'group_mm6b77as' || gTitle.includes('intake') || gTitle.includes('learning')) {
+            intakeItems.push(item);
+          } else if (gId === 'group_mm7mfbre' || gTitle.includes('empire') || gTitle.includes('bench')) {
+            benchItems.push(item);
+          } else if (gTitle.includes('ready')) {
+            readyItems.push(item);
+          } else if (gTitle.includes('parts') || gTitle.includes('order')) {
+            partsItems.push(item);
+          }
+        });
+      });
+    }
+
+    renderStaffQueue('staffIntakeItems', intakeItems, 'No active counter intakes.');
+    renderStaffQueue('staffBenchItems', benchItems, 'No active bench jobs.');
+    renderStaffQueue('staffReadyItems', readyItems, 'No pickups on ready wall.');
+    renderStaffQueue('staffPartsItems', partsItems, 'No parts orders pending.');
+
+  } catch (err) {
+    console.error('Error loading staff queues:', err);
+  }
+}
+
+function renderStaffQueue(elementId, items, emptyMsg) {
+  var container = document.getElementById(elementId);
+  if (!container) return;
+
+  if (!items || items.length === 0) {
+    container.innerHTML = '<p class="text-gray-500 italic text-[11px]">' + emptyMsg + '</p>';
+    return;
+  }
+
+  container.innerHTML = items.map(function(item) {
+    var title = item.name || item.title || 'Untitled Job';
+    return '<div class="p-2 bg-slate-950 rounded-xl border border-slate-800 flex justify-between items-center gap-2">' +
+      '<span class="font-bold text-white text-xs truncate">' + title + '</span>' +
+      '<button type="button" onclick="toggleFreshCardChat()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] shrink-0 flex items-center gap-1 shadow active:scale-95"><i class="fa-solid fa-user-tie"></i> Talk to Fresh</button>' +
+    '</div>';
+  }).join('');
+}
 
 function fetchCardDetails(itemId) {
   fetch('/.netlify/functions/monday?board=18424728273&t=' + new Date().getTime())
@@ -484,7 +578,7 @@ function handlePunch(type) {
   var pin = document.getElementById('staffPinInput').value;
   if (!pin || pin.length < 4) { alert('Please enter your 4-digit PIN.'); return; }
   var led = document.getElementById('ledOutput');
-  if (led) led.innerText = '⏱️ TIMECARD PUNCTION ' + type + ' AT ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  if (led) led.innerText = '⏱️ TIMECARD PUNCH ' + type + ' AT ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
   alert('⏱️ Timecard Punched ' + type + ' at ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
   document.getElementById('staffPinInput').value = '';
 }
