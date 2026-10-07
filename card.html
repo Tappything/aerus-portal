@@ -1,3 +1,6 @@
+<!-- ========================================== -->
+<!-- FILE 1: card.html                          -->
+<!-- ========================================== -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -176,6 +179,11 @@ function toggleFreshCardChat() {
   }
 }
 
+function triggerProposalModal() {
+  var customer = encodeURIComponent(currentCardTitle || 'Valued Customer');
+  window.location.href = '/?invoice=true&customer=' + customer;
+}
+
 function sendFreshPrompt() {
   var inputEl = document.getElementById('freshInput');
   var replyEl = document.getElementById('freshReply');
@@ -187,3 +195,49 @@ function sendFreshPrompt() {
   replyEl.innerHTML = '<span class="text-gray-400 animate-pulse">Fresh is thinking... 🤵⚡</span>';
 
   fetch('/.netlify/functions/gemini', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contextCard: currentCardTitle,
+      prompt: userPrompt
+    })
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    var responseText = data.reply || data.text || 'Fresh: Request processed for ' + currentCardTitle + '!';
+    replyEl.innerHTML = '<strong class="text-sky-400 block mb-0.5">Fresh 🤵:</strong> ' + responseText;
+  })
+  .catch(function(err) {
+    console.error('Fresh Card Prompt Error:', err);
+    replyEl.innerHTML = '<strong class="text-sky-400 block mb-0.5">Fresh 🤵:</strong> Error processing request.';
+  });
+}
+
+function submitCardNote() {
+  var inputEl = document.getElementById('unifiedInput');
+  var noteText = inputEl ? inputEl.value.trim() : '';
+  if (!noteText) return;
+
+  var historyEl = document.getElementById('historyStack');
+  if (historyEl) {
+    var newNoteHtml = '<div class="p-2 bg-slate-950 rounded-xl border border-slate-800/60 text-[11px] leading-relaxed">' +
+      '<span class="text-emerald-400 text-[9px] block mb-0.5">' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + ' — Logged Note</span>' +
+      noteText +
+      '</div>';
+    historyEl.innerHTML = newNoteHtml + historyEl.innerHTML;
+  }
+
+  fetch('/.netlify/functions/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      prompt: '📌 FOREVER CARD NOTE [' + currentCardTitle + ']: ' + noteText,
+      board_id: '18424728273'
+    })
+  });
+
+  if (inputEl) inputEl.value = '';
+}
+</script>
+</body>
+</html>
