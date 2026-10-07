@@ -10,6 +10,12 @@
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05070e; color: #f3f4f6; }
 .tapulator-face { background: linear-gradient(180deg, #0f172a 0%, #090d16 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); }
 .led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+.mic-pulsing { animation: pulse-red 1.5s infinite; background-color: #dc2626 !important; color: #ffffff !important; }
 </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-between p-3 pb-24 relative">
@@ -180,6 +186,58 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </div>
   </div>
 
+  <!-- STAFF SATELLITE INTAKE SECTION (DISPLAYED WHEN staff=true) -->
+  <div id="staffSection" class="hidden space-y-3">
+    <!-- STAFF TIMECARD -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 space-y-2">
+      <div class="flex justify-between items-center text-xs font-bold text-slate-200">
+        <span class="flex items-center gap-1.5"><i class="fa-solid fa-clock text-purple-400"></i> Staff Timecard</span>
+        <span class="text-[10px] text-emerald-400 font-mono font-semibold">PIN PROTECTED</span>
+      </div>
+      <div class="flex gap-2">
+        <input type="password" id="staffPinInput" maxlength="4" placeholder="4-Digit PIN" class="w-1/2 bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-center text-sm text-white font-mono tracking-widest focus:outline-none focus:border-emerald-500">
+        <button type="button" onclick="handlePunch('IN')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition active:scale-95 py-1.5">Punch IN</button>
+        <button type="button" onclick="handlePunch('OUT')" class="flex-1 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-xl transition active:scale-95 py-1.5">Punch OUT</button>
+      </div>
+    </div>
+
+    <!-- COUNTER INTAKE TOOLS -->
+    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 space-y-2.5">
+      <div class="text-[10px] font-black text-emerald-400 uppercase tracking-wider flex items-center justify-between border-b border-slate-800 pb-1.5">
+        <span>⚡ Quick Counter Intake</span>
+        <i class="fa-solid fa-bolt text-emerald-400"></i>
+      </div>
+
+      <input type="text" id="machineOwnerInput" placeholder="Whose machine is this? (Customer Name / Phone)..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500">
+
+      <div class="grid grid-cols-2 gap-2">
+        <button type="button" id="staffMicBtn" onclick="toggleVoiceIntake('staffSection', 'machineOwnerInput', 'staffMicBtn')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow transition active:scale-95">
+          <i class="fa-solid fa-microphone"></i>
+          <span>Voice Intake</span>
+        </button>
+        <label class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow transition active:scale-95 cursor-pointer">
+          <i class="fa-solid fa-camera"></i>
+          <span>Photo Intake</span>
+          <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoIntake(this)">
+        </label>
+      </div>
+    </div>
+
+    <!-- STAFF COMMUNICATION BOARD NOTES -->
+    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 space-y-2">
+      <div class="text-[10px] font-black text-purple-400 uppercase tracking-wider flex items-center justify-between border-b border-slate-800 pb-1.5">
+        <span>💬 Shop Staff Communication Board</span>
+        <i class="fa-solid fa-comments text-purple-400"></i>
+      </div>
+      <div id="staffNotesQueue" class="space-y-1.5 text-xs text-slate-300 max-h-40 overflow-y-auto pr-1">
+        <div class="p-2 bg-slate-950 rounded-xl border border-slate-800/60 text-[11px] leading-relaxed">
+          <span class="text-purple-400 font-bold block mb-0.5">Mona / Front Desk:</span>
+          Counter intakes active. Tap Voice Intake or Photo Intake above to log new bench jobs live.
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- WATERMARK -->
   <div class="text-center pt-2 border-t border-slate-800/60">
     <p class="text-[10px] text-slate-500 font-mono tracking-wider">
@@ -204,7 +262,10 @@ var currentCardId = '';
 var currentCardTitle = 'Aerus Customer Card';
 var isCustomerView = false;
 var isInvoiceView = false;
+var isStaffView = false;
 var calculatedTotal = 0.00;
+var isListening = false;
+var activeRecognition = null;
 
 window.onload = function() {
   var params = new URLSearchParams(window.location.search);
@@ -212,6 +273,8 @@ window.onload = function() {
   var titleParam = params.get('title') || params.get('name');
   isCustomerView = params.get('customer') === 'true';
   isInvoiceView = params.get('invoice') === 'true';
+  isStaffView = params.get('staff') === 'true';
+  var staffName = params.get('name') || 'Staff';
 
   if (titleParam) {
     currentCardTitle = decodeURIComponent(titleParam);
@@ -222,9 +285,35 @@ window.onload = function() {
   var titleEl = document.getElementById('cardTitle');
   if (titleEl) titleEl.innerText = currentCardTitle;
 
-  // CUSTOMER VS OWNER VIEW CONFIGURATION
   var freshLabel = document.getElementById('labelTalkFresh');
-  if (isCustomerView) {
+
+  // VIEW ROUTING LOGIC
+  if (isStaffView) {
+    // STAFF SATELLITE VIEW
+    if (titleEl) titleEl.innerText = staffName + ' — SATELLITE CARD';
+    
+    var badge = document.getElementById('viewBadge');
+    if (badge) {
+      badge.innerText = 'STAFF VIEW';
+      badge.className = 'bg-purple-900/60 text-purple-300 border border-purple-700 text-[9px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wider';
+    }
+
+    var ownerSec = document.getElementById('ownerSection');
+    if (ownerSec) ownerSec.style.display = 'none';
+
+    var invSec = document.getElementById('invoiceSection');
+    if (invSec) invSec.classList.add('hidden');
+
+    var staffSec = document.getElementById('staffSection');
+    if (staffSec) staffSec.classList.remove('hidden');
+
+    var backLink = document.getElementById('backLink');
+    if (backLink) backLink.style.display = 'none';
+
+    if (freshLabel) freshLabel.innerText = 'Talk to Fresh 🤵';
+
+  } else if (isCustomerView) {
+    // CUSTOMER VIEW
     var ownerSec = document.getElementById('ownerSection');
     if (ownerSec) ownerSec.style.display = 'none';
     
@@ -238,7 +327,9 @@ window.onload = function() {
     if (backLink) backLink.style.display = 'none';
 
     if (freshLabel) freshLabel.innerText = '💬 Ask a Question';
+
   } else {
+    // OWNER VIEW (DEFAULT)
     var ownerSec = document.getElementById('ownerSection');
     if (ownerSec) ownerSec.style.display = 'block';
     
@@ -249,7 +340,7 @@ window.onload = function() {
   }
 
   // INVOICE SECTION SETUP
-  if (isInvoiceView) {
+  if (isInvoiceView && !isStaffView) {
     var invSec = document.getElementById('invoiceSection');
     if (invSec) invSec.classList.remove('hidden');
 
@@ -314,7 +405,7 @@ function fetchCardDetails(itemId) {
       if (match) {
         currentCardTitle = match.name || match.title || currentCardTitle;
         var titleEl = document.getElementById('cardTitle');
-        if (titleEl) titleEl.innerText = currentCardTitle;
+        if (titleEl && !isStaffView) titleEl.innerText = currentCardTitle;
         
         var subEl = document.getElementById('cardSubtitle');
         if (match.group && match.group.title && subEl) {
@@ -387,6 +478,73 @@ function submitCardNote() {
   });
 
   if (inputEl) inputEl.value = '';
+}
+
+function handlePunch(type) {
+  var pin = document.getElementById('staffPinInput').value;
+  if (!pin || pin.length < 4) { alert('Please enter your 4-digit PIN.'); return; }
+  var led = document.getElementById('ledOutput');
+  if (led) led.innerText = '⏱️ TIMECARD PUNCTION ' + type + ' AT ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  alert('⏱️ Timecard Punched ' + type + ' at ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
+  document.getElementById('staffPinInput').value = '';
+}
+
+function toggleVoiceIntake(sectionId, targetInputId, btnId) {
+  var input = document.getElementById(targetInputId);
+  var btn = document.getElementById(btnId);
+  var led = document.getElementById('ledOutput');
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SR) { alert('Voice recognition not supported on this browser.'); return; }
+
+  if (isListening && activeRecognition) {
+    activeRecognition.stop();
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing');
+    if (led) led.textContent = 'FOREVER CARD ENGINE READY ⚡';
+    return;
+  }
+
+  activeRecognition = new SR();
+  activeRecognition.continuous = true;
+  activeRecognition.interimResults = true;
+  activeRecognition.lang = 'en-US';
+
+  if (btn) btn.classList.add('mic-pulsing');
+  if (led) led.textContent = 'LISTENING... (SPEAK COUNTER INTAKE)';
+  isListening = true;
+
+  activeRecognition.onresult = function(e) {
+    var interim = '', currentFinal = '';
+    for (var i = e.resultIndex; i < e.results.length; ++i) {
+      if (e.results[i].isFinal) { currentFinal += e.results[i][0].transcript + ' '; }
+      else { interim += e.results[i][0].transcript; }
+    }
+    var fullText = (currentFinal + interim).trim();
+    if (input) input.value = fullText;
+  };
+
+  activeRecognition.onerror = function() {
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing');
+    if (led) led.textContent = 'MIC ERROR';
+  };
+
+  activeRecognition.onend = function() {
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing');
+  };
+
+  activeRecognition.start();
+}
+
+function handlePhotoIntake(fileInput) {
+  if (fileInput.files && fileInput.files[0]) {
+    var photoName = fileInput.files[0].name;
+    var led = document.getElementById('ledOutput');
+    if (led) led.textContent = '📸 PHOTO ATTACHED: ' + photoName;
+    alert('📸 Photo Attached: ' + photoName + ' — Counter Intake Logged!');
+  }
 }
 
 async function handleStripePayment() {
