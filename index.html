@@ -1,6 +1,3 @@
-<!-- ========================================== -->
-<!-- FILE 2: index.html                         -->
-<!-- ========================================== -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -355,8 +352,10 @@ window.onload = function() {
   }
 
   if (isInvoice === 'true') {
-    var rawText = customerParam ? decodeURIComponent(customerParam) : '';
-    openInvoiceModal(rawText);
+    setTimeout(function() {
+      var rawText = customerParam ? decodeURIComponent(customerParam) : '';
+      openInvoiceModal(rawText);
+    }, 500);
   }
 };
 
@@ -1014,4 +1013,9 @@ function sendFreshCardPrompt(cardId, cardTitle) {
   })
   .catch(function(err) {
     console.error('Fresh Card Prompt Error:', err);
-    replyEl.innerHTML = '<strong class="text-sky-400 block mb-0.5">Fresh
+    replyEl.innerHTML = '<strong class="text-sky-400 block mb-0.5">Fresh 🤵:</strong> Error processing request.';
+  });
+}
+</script>
+</body>
+</html>
