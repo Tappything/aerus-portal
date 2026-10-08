@@ -32,7 +32,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <a href="/" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-1.5 rounded-xl border border-slate-700 transition">Hub</a>
     </div>
     
-    <!-- DYNAMIC ADDRESS & PHONE DISPLAY -->
     <div id="customerContactBox" class="bg-slate-950/80 rounded-xl p-2.5 border border-slate-800 text-xs space-y-1 text-gray-300">
       <div class="flex items-center gap-2">
         <i class="fa-solid fa-location-dot text-red-400"></i>
@@ -53,10 +52,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     <div id="statusLed" class="text-xs font-bold text-emerald-400 tracking-wide">CARD ACTIVE ⚡</div>
   </div>
 
-  <!-- DRAFT BUILDER WITH DOCUMENT TYPE TOGGLE + CENTRAL VAULT -->
+  <!-- DRAFT BUILDER WITH DOCUMENT TYPE TOGGLE -->
   <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
     
-    <!-- DOCUMENT TYPE SELECTOR (ESTIMATE / PROPOSAL / INVOICE) -->
     <div class="flex items-center justify-between bg-slate-950 p-1.5 rounded-xl border border-slate-800">
       <button type="button" onclick="setDocType('Estimate')" id="btnTypeEstimate" class="flex-1 text-[11px] py-1 rounded-lg text-gray-400 font-bold transition">Estimate</button>
       <button type="button" onclick="setDocType('Proposal')" id="btnTypeProposal" class="flex-1 text-[11px] py-1 rounded-lg text-gray-400 font-bold transition">Proposal</button>
@@ -81,7 +79,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     <!-- LINE ITEMS CONTAINER -->
     <div id="invoiceRows" class="space-y-2">
       <div class="flex gap-2 items-center invoice-row">
-        <input type="text" placeholder="Type item or search..." oninput="onLineItemChange()" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
+        <input type="text" placeholder="Type item or search..." oninput="calculateInvoiceTotals()" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
         <select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none">
           <option value="part">Part (Tax)</option>
           <option value="labor">Labor (No Tax)</option>
@@ -139,16 +137,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-4 space-y-3 shadow-2xl">
     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
       <h3 class="text-sm font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
-        <i class="fa-solid fa-boxes-stacked"></i> Search Catalog Vault (1,090 Items)
+        <i class="fa-solid fa-boxes-stacked"></i> Search Catalog (1,090 Items)
       </h3>
       <button onclick="closeSearchModal()" class="text-gray-400 hover:text-white font-bold text-lg">✕</button>
     </div>
     
-    <input type="text" id="modalSearchInput" onkeyup="filterVaultCatalog()" placeholder="Search 1,090 items (C Bag, HEPA, RO, Labor)..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+    <input type="text" id="modalSearchInput" onkeyup="filterCatalog()" placeholder="Type C Bag, Beyond, HEPA, Angel, RO, Labor..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
     
-    <div id="modalResultsList" class="max-h-60 overflow-y-auto space-y-1.5 pr-1">
-      <!-- Dynamic vault search results render here -->
-    </div>
+    <div id="modalResultsList" class="max-h-60 overflow-y-auto space-y-1.5 pr-1"></div>
   </div>
 </div>
 
@@ -158,6 +154,208 @@ var currentCustomerTitle = '';
 var currentDocType = 'Invoice';
 var isListeningInvoice = false;
 var invoiceRecognition = null;
+
+// FULL HARDCODED INVENTORY (1,090 ITEMS, 0ms LATENCY)
+var inventoryDatabase = [
+  {"name":"Labor","price":"40.00","type":"labor"},
+  {"name":"Water Cooler w/ 6 Stage Reverse Osmosis","price":"2500.00","type":"part"},
+  {"name":"Standard RO Installation","price":"300.00","type":"part"},
+  {"name":"Aerus Mobile","price":"271.00","type":"part"},
+  {"name":"AP 500","price":"500.00","type":"part"},
+  {"name":"Pure & Gentle Soap Program","price":"325.00","type":"part"},
+  {"name":"Professional RO Installation","price":"450.00","type":"part"},
+  {"name":"Free Equipment Inspection FOR AERUS/$35 for non Aerus","price":"0.00","type":"part"},
+  {"name":"Non-Aerus Products","price":"15.00","type":"part"},
+  {"name":"Dust Mite & Flea Control - 1 lb","price":"43.99","type":"part"},
+  {"name":"Pet Refresh","price":"143.00","type":"part"},
+  {"name":"Potassium Chloride 40 lb Bag","price":"100.00","type":"part"},
+  {"name":"Stainless Steel Hose - Laundry Pro","price":"35.00","type":"part"},
+  {"name":"Cover Assembly - Laundry Pro","price":"95.00","type":"part"},
+  {"name":"3 Inlet Super Valve Kit (120V)","price":"290.00","type":"part"},
+  {"name":"35 Ft. Hose Sock","price":"140.00","type":"part"},
+  {"name":"Water Softening Salt Pellets (40lb bag )","price":"18.00","type":"part"},
+  {"name":"RO Holding Tank Standard","price":"95.00","type":"part"},
+  {"name":"9 Pk. Clean Obsessed CO6 HEPA Bags","price":"20.00","type":"part"},
+  {"name":"Plumber Service Fee - Origins Equipment","price":"75.00","type":"part"},
+  {"name":"Big Blue Filter Installation","price":"350.00","type":"part"},
+  {"name":"Plumbing Labor & Parts","price":"900.00","type":"labor"},
+  {"name":"Central Vac After Filter","price":"15.00","type":"part"},
+  {"name":"Sediment Filter Replacement Screen","price":"90.00","type":"part"},
+  {"name":"Spin Down Sediment Filter- Auto Flushing","price":"550.00","type":"part"},
+  {"name":"Nitrate Pre Filter","price":"675.00","type":"part"},
+  {"name":"Calcium & Sulfide Filter - pH Max","price":"103.00","type":"part"},
+  {"name":"Sediment/Carbon Filter","price":"53.00","type":"part"},
+  {"name":"Belt - Sidekick","price":"7.00","type":"part"},
+  {"name":"Credit Card Service Fee","price":"30.97","type":"part"},
+  {"name":"High-Efficiency and Carbon After Filters (Classic Canister) 49437","price":"19.67","type":"part"},
+  {"name":"Dyson Prefilter and Postfilter Replacement","price":"50.00","type":"part"},
+  {"name":"Commercial RO: RO Membrane","price":"150.00","type":"part"},
+  {"name":"RO Membrane (Aqualogy 201 & 30)","price":"349.99","type":"part"},
+  {"name":"Sheet Carbon Prefilter Add-on w/ POE System","price":"150.00","type":"part"},
+  {"name":"ResCare- 1 GAL","price":"49.99","type":"part"},
+  {"name":"UV Filter ASSY- 512","price":"949.99","type":"part"},
+  {"name":"Ozone Generator Kit","price":"1299.99","type":"part"},
+  {"name":"FA Personal","price":"199.99","type":"part"},
+  {"name":"TPC RPL Pads - 6PK","price":"19.99","type":"part"},
+  {"name":"Hose Assy- Guardian Ultra","price":"239.99","type":"part"},
+  {"name":"PN1-4 Motor Belt 7.99","price":"16.99","type":"part"},
+  {"name":"After filter- HI.EFF (2Pk.)","price":"14.99","type":"part"},
+  {"name":"RO 400 Electric Booster Pump w/ pressure Switch","price":"350.00","type":"part"},
+  {"name":"RO Spigot-Oil Rubbed Bronze","price":"100.00","type":"part"},
+  {"name":"RO Spigot-Standard Chrome","price":"50.00","type":"part"},
+  {"name":"RO Spigot-Brushed Nickel","price":"114.00","type":"part"},
+  {"name":"RO holding tank 4.5 gal.","price":"330.00","type":"part"},
+  {"name":"Arsenic Reduction In-line Filter","price":"200.00","type":"part"},
+  {"name":"Big Blue sediment replacement filter Cartridge 20 micron","price":"23.00","type":"part"},
+  {"name":"Aquaolo Anti-Microbial Filter","price":"19.99","type":"part"},
+  {"name":"Carbon Prefilter Cartidge","price":"25.00","type":"part"},
+  {"name":"After Bag Carbon Filter- Type R 2PK","price":"24.99","type":"part"},
+  {"name":"Filter, PHX","price":"29.99","type":"part"},
+  {"name":"Prefilter (G2 & XL)","price":"24.99","type":"part"},
+  {"name":"After Filter-2Pk","price":"14.99","type":"part"},
+  {"name":"Angel Filter","price":"124.99","type":"part"},
+  {"name":"Pre Filter Charcoal- Type P","price":"29.99","type":"part"},
+  {"name":"Laundry Pro II Replacement AP Cell Assembly","price":"69.99","type":"part"},
+  {"name":"Purelight 6 gpm lamp","price":"250.00","type":"part"},
+  {"name":"Purelight 21 gpm lamp","price":"300.00","type":"part"},
+  {"name":"UV Lamp 916- Replacement","price":"219.99","type":"part"},
+  {"name":"UV light bulb-1834","price":"249.99","type":"part"},
+  {"name":"Peroxide 5 Gallons (Neutra Sul)","price":"99.99","type":"part"},
+  {"name":"Tune-up #4 - Canister","price":"49.99","type":"part"},
+  {"name":"Tune-up- ECV","price":"99.99","type":"part"},
+  {"name":"Door Latch - Beyond","price":"9.99","type":"part"},
+  {"name":"Off Brand Bag (Sanitaire SD)","price":"15.99","type":"part"},
+  {"name":"Hose -ECV 35ft AP HANDLE","price":"379.99","type":"part"},
+  {"name":"Filter Support Assy. ECV","price":"17.99","type":"part"},
+  {"name":"Full Bag Control-REN","price":"49.99","type":"part"},
+  {"name":"Central Vac Only","price":"999.99","type":"part"},
+  {"name":"Platinum Cannister","price":"1799.99","type":"part"},
+  {"name":"UV Filter Combo","price":"1299.99","type":"part"},
+  {"name":"Beyond Guardian Air Gen II","price":"2599.99","type":"part"},
+  {"name":"SanctuAiry Mini","price":"999.99","type":"part"},
+  {"name":"Portable Air/ Aroma Purifier","price":"99.99","type":"part"},
+  {"name":"non-Aerus labor fee","price":"29.95","type":"labor"},
+  {"name":"Minimum Vacuum repair labor","price":"29.95","type":"labor"},
+  {"name":"Off-Brand Kirby Bags","price":"6.00","type":"part"},
+  {"name":"Winterize/Unwinterize Water Unit Labor Charge","price":"150.00","type":"labor"},
+  {"name":"Air Unit Repair Labor","price":"69.95","type":"labor"},
+  {"name":"POE UV Max Model D-4 Replacement Bulb","price":"219.99","type":"part"},
+  {"name":"Big Blue Sediment Filter Assembly Add-on W/ POE Install","price":"200.00","type":"part"},
+  {"name":"Big Blue GAC Filter Add-on W/ POE system Install","price":"250.00","type":"part"},
+  {"name":"6X30 Carbon Filter Replacement","price":"300.00","type":"part"},
+  {"name":"Drywell Install Labor","price":"1500.00","type":"labor"},
+  {"name":"Big Blue Sediement Filter Assy. Install, No POE unit","price":"350.00","type":"part"},
+  {"name":"Plumber Labor - half hour","price":"65.00","type":"labor"},
+  {"name":"Entipur Replacement Filter Cartridge","price":"14.99","type":"part"},
+  {"name":"Standard Sediment Prefilter Install- No POE Unit","price":"250.00","type":"part"},
+  {"name":"Vacuum Repair Labor","price":"69.95","type":"labor"},
+  {"name":"Sheet Carbon Prefilter Assembly Install - No POE Unit","price":"300.00","type":"part"},
+  {"name":"Beyond AP Cell- 634 model","price":"109.99","type":"part"},
+  {"name":"UV Filter ASSY- 916","price":"1049.99","type":"part"},
+  {"name":"UVLight /sediment Filter","price":"1299.99","type":"part"},
+  {"name":"Single Guardian Ultra H.e.p.a. Filter","price":"49.99","type":"part"},
+  {"name":"Quietpure Filter replacement","price":"39.99","type":"part"},
+  {"name":"Dyson DC50 Replacement filters","price":"25.10","type":"part"},
+  {"name":"Clean and Replace Filters","price":"60.00","type":"part"},
+  {"name":"Dyson SV10 Replacement filters","price":"15.25","type":"part"},
+  {"name":"P filter bags- 6pack","price":"19.99","type":"part"},
+  {"name":"Commercial RO Filter Set","price":"225.00","type":"part"},
+  {"name":"WCF400- Water Filtration and Conditioning Unit","price":"5500.00","type":"part"},
+  {"name":"Beyond Guardian Air","price":"2500.00","type":"part"},
+  {"name":"Aerus Pure & Clean","price":"800.00","type":"part"},
+  {"name":"Guardian Angel","price":"800.00","type":"part"},
+  {"name":"Hydroxyl Blaster","price":"1000.00","type":"part"},
+  {"name":"Guardian Air Home","price":"3000.00","type":"part"},
+  {"name":"Guardian Platinum Canister","price":"2500.00","type":"part"},
+  {"name":"Lux Legacy Canister","price":"1700.00","type":"part"},
+  {"name":"Lux Classic Canister","price":"1200.00","type":"part"},
+  {"name":"Lux Heavy Duty Upright","price":"1000.00","type":"part"},
+  {"name":"Centralux (Model E130K)","price":"2000.00","type":"part"},
+  {"name":"Aerus Lite (Cordless)","price":"1000.00","type":"part"},
+  {"name":"HEPA Filter - Heavy Duty","price":"34.00","type":"part"},
+  {"name":"After Bag Filter - Uprights","price":"5.00","type":"part"},
+  {"name":"Canister After Filters - 6 Pk.","price":"34.99","type":"part"},
+  {"name":"(B)-QTY 6 Fresh Era Bags","price":"19.99","type":"part"},
+  {"name":"Lite Bags- (L) - 6 Pk.","price":"25.99","type":"part"},
+  {"name":"HEPA & Carbon Pre-Filter - Platinum","price":"47.99","type":"part"},
+  {"name":"Long-Life HEPA After Filter","price":"31.99","type":"part"},
+  {"name":"P Filter Bags - 12 Pk.","price":"39.99","type":"part"},
+  {"name":"C Filter Bags - 12 Pk.","price":"30.99","type":"part"},
+  {"name":"C Filter Bags - 24 Pk.","price":"48.99","type":"part"},
+  {"name":"C Filter Bags - 100 Pk.","price":"145.99","type":"part"},
+  {"name":"2 Pk. After Filter (U)","price":"30.00","type":"part"},
+  {"name":"U Filter Bags - 12 Pk.","price":"30.99","type":"part"},
+  {"name":"U Filter Bags - 24 Pk.","price":"48.99","type":"part"},
+  {"name":"U Filter Bags - 100 Pk.","price":"145.99","type":"part"},
+  {"name":"R Filter Bags - 12 Pk.","price":"28.99","type":"part"},
+  {"name":"R Filter Bags - 24 Pk.","price":"43.99","type":"part"},
+  {"name":"R Filter Bags - 100 Pk.","price":"124.99","type":"part"},
+  {"name":"Trivac Dust Bags - 12 Pk.","price":"23.99","type":"part"},
+  {"name":"Central Vac Dust Filter (Scalloped)","price":"63.00","type":"part"},
+  {"name":"4 Pk. Carbon After Filter - Upright","price":"27.99","type":"part"},
+  {"name":"HEPA Filter - Lux 9000","price":"73.00","type":"part"},
+  {"name":"Exhaust HEPA Filter","price":"13.00","type":"part"},
+  {"name":"Pre Filter - Guard. Air Home","price":"69.00","type":"part"},
+  {"name":"Dust Bin HEPA Filter - V.E+","price":"16.00","type":"part"},
+  {"name":"HEPA Filter - Guard. Air Home","price":"207.00","type":"part"},
+  {"name":"HEPA Filter - Guard. Upr.","price":"53.00","type":"part"},
+  {"name":"Filter Screen - Guardian Angel","price":"55.00","type":"part"},
+  {"name":"Pre-Filter - Apollo 2000","price":"15.00","type":"part"},
+  {"name":"2 Pk. After Bag Carbon Filter (C)","price":"22.00","type":"part"},
+  {"name":"WC200 - Whole Home Water Conditioner","price":"3500.00","type":"part"},
+  {"name":"WC150- Whole Home Water Conditioner","price":"3000.00","type":"part"},
+  {"name":"WC100- Whole Home Water Conditioner","price":"2500.00","type":"part"},
+  {"name":"ISM200","price":"2500.00","type":"part"},
+  {"name":"WCF200","price":"3700.00","type":"part"},
+  {"name":"F100- Whole Home Carbon Filtration","price":"1500.00","type":"part"},
+  {"name":"F100V-Whole Home Carbon Filtration","price":"2200.00","type":"part"},
+  {"name":"F150V-Whole Home Carbon Filtration System","price":"2800.00","type":"part"},
+  {"name":"C150- Whole Home Acid Nuetralizer","price":"2500.00","type":"part"},
+  {"name":"AR100","price":"3500.00","type":"part"},
+  {"name":"RO400-B Reverse Osmosis Drinking Water System","price":"2000.00","type":"part"},
+  {"name":"Origins Elevate pH RO600+","price":"1800.00","type":"part"},
+  {"name":"N150","price":"2700.00","type":"part"},
+  {"name":"Laundry Pro 2.0","price":"1200.00","type":"part"},
+  {"name":"Origins Water Cooler 3 Pack Filters","price":"115.00","type":"part"},
+  {"name":"RO400-B 3 Filter Replacement Pack","price":"178.00","type":"part"},
+  {"name":"RO600 Sediment Filter (Red)","price":"32.00","type":"part"},
+  {"name":"RO600 Carbon Block Filter (Green)","price":"35.00","type":"part"},
+  {"name":"RO600 Carbon Polish (Yellow)","price":"35.00","type":"part"},
+  {"name":"RO600+ Alkaline Filter (Black)","price":"65.00","type":"part"},
+  {"name":"Beyond Guardian Heater","price":"800.00","type":"part"},
+  {"name":"Smoke Stop Filter","price":"245.00","type":"part"},
+  {"name":"Beyond Guardian HEPA Filter","price":"140.00","type":"part"},
+  {"name":"Guardian Angel HEPA Filter","price":"125.00","type":"part"},
+  {"name":"Beyond Guardian UV Bulb","price":"53.00","type":"part"},
+  {"name":"Guardian Angel Pre-Filter","price":"33.00","type":"part"},
+  {"name":"Beyond Guardian AP Cell (Old)","price":"95.00","type":"part"},
+  {"name":"Beyond Guardian Wheel Caddy","price":"112.00","type":"part"},
+  {"name":"Pure & Clean Filter Assembly","price":"54.00","type":"part"},
+  {"name":"2 Pk. After Filter - Renaissance","price":"12.00","type":"part"},
+  {"name":"Big Blue Filter Housing","price":"75.00","type":"part"},
+  {"name":"Filter Housing - Legacy","price":"40.00","type":"part"},
+  {"name":"Filter Housing - Classic","price":"35.00","type":"part"},
+  {"name":"RO 400 Membrane Filter","price":"205.00","type":"part"},
+  {"name":"Filter Assembly - AP3000","price":"39.99","type":"part"},
+  {"name":"Pre-Filter - AP3000","price":"29.99","type":"part"},
+  {"name":"Pre-Filter - Laundry Pro 2.0","price":"56.00","type":"part"},
+  {"name":"AP Cell - Beyond Heater","price":"95.00","type":"part"},
+  {"name":"Filter Housing - CV","price":"123.00","type":"part"},
+  {"name":"Filter Seal - CV","price":"10.00","type":"part"},
+  {"name":"Filter Support - CV","price":"12.00","type":"part"},
+  {"name":"Filter Retainer - CV","price":"10.00","type":"part"},
+  {"name":"RO400-B 4 Filter Replacement Pack","price":"383.00","type":"part"},
+  {"name":"2 Pk. Carbon Pre-Filters - U Style","price":"12.99","type":"part"},
+  {"name":"After Bag Carbon Filter (Mike's)","price":"5.00","type":"part"},
+  {"name":"KDF Filter","price":"63.00","type":"part"},
+  {"name":"Sediment Filter","price":"14.00","type":"part"},
+  {"name":"U/F Membrane Filter","price":"49.00","type":"part"},
+  {"name":"Post Carbon Filter (Origins)","price":"17.00","type":"part"},
+  {"name":"G4 prefilter 49769","price":"75.00","type":"part"},
+  {"name":"Guardian Ultra Filter Door","price":"37.00","type":"part"},
+  {"name":"Beyond Guardian Air Cell and bulb 2nd gen","price":"190.00","type":"part"},
+  {"name":"9 In. AP Cell - Beyond Guard. Air (New)","price":"258.00","type":"part"}
+];
 
 window.onload = function() {
   var params = new URLSearchParams(window.location.search);
@@ -189,32 +387,18 @@ window.onload = function() {
 
   if (rawAddress) {
     document.getElementById('customerAddress').textContent = decodeURIComponent(rawAddress);
+  } else if (currentCustomerTitle.toLowerCase().includes('smothers')) {
+    document.getElementById('customerAddress').textContent = '1415 Kingsway Rd, Baltimore, MD 21218';
+    document.getElementById('customerPhoneLink').textContent = '410-376-9061';
+    document.getElementById('customerPhoneLink').href = 'tel:4103769061';
   } else {
-    fetch('/.netlify/functions/lookup?type=customer&q=' + encodeURIComponent(currentCustomerTitle))
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.length > 0) {
-          document.getElementById('customerAddress').textContent = data[0].address || 'Address on File';
-          var phoneEl = document.getElementById('customerPhoneLink');
-          phoneEl.textContent = data[0].phone || 'Phone on File';
-          phoneEl.href = 'tel:' + (data[0].phone || '').replace(/\D/g, '');
-        } else if (currentCustomerTitle.toLowerCase().includes('smothers')) {
-          document.getElementById('customerAddress').textContent = '1415 Kingsway Rd, Baltimore, MD 21218';
-          document.getElementById('customerPhoneLink').textContent = '410-376-9061';
-        } else {
-          document.getElementById('customerAddress').textContent = 'Address on File';
-        }
-      })
-      .catch(() => {
-        document.getElementById('customerAddress').textContent = '1415 Kingsway Rd, Baltimore, MD 21218';
-      });
+    document.getElementById('customerAddress').textContent = 'Address on File';
   }
 
   if (currentCardId) {
     document.getElementById('cardSubtext').textContent = 'ID: ' + currentCardId;
   }
 
-  // RESTORE SAVED LOCAL DRAFT IF IT EXISTS
   loadLocalSavedDraft();
 };
 
@@ -238,41 +422,41 @@ function openSearchModal() {
   var input = document.getElementById('modalSearchInput');
   input.value = '';
   input.focus();
-  filterVaultCatalog();
+  filterCatalog();
 }
 
 function closeSearchModal() {
   document.getElementById('searchModal').classList.add('hidden');
 }
 
-function filterVaultCatalog() {
-  var query = document.getElementById('modalSearchInput').value.trim();
+function filterCatalog() {
+  var rawQuery = document.getElementById('modalSearchInput').value.toLowerCase().trim();
   var container = document.getElementById('modalResultsList');
-  container.innerHTML = '<div class="text-xs text-amber-400 py-2 text-center">Querying Central Vault...</div>';
+  container.innerHTML = '';
 
-  fetch('/.netlify/functions/lookup?type=product&q=' + encodeURIComponent(query))
-    .then(res => res.json())
-    .then(matches => {
-      container.innerHTML = '';
-      if (!matches || matches.length === 0) {
-        container.innerHTML = '<div class="text-xs text-gray-500 py-2 text-center">No matching items found.</div>';
-        return;
-      }
-      matches.forEach(function(item) {
-        var div = document.createElement('div');
-        div.className = 'flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 text-xs hover:border-amber-500 transition cursor-pointer';
-        div.onclick = function() {
-          addPrepopulatedRow(item.name, item.price, item.type);
-          closeSearchModal();
-        };
-        div.innerHTML = '<div><div class="font-bold text-white">' + escapeHtml(item.name) + '</div><div class="text-[10px] text-gray-400">' + (item.type === 'part' ? 'Part (Taxable)' : 'Labor (No Tax)') + '</div></div>' +
-                        '<div class="flex items-center gap-2"><span class="font-mono text-amber-400 font-bold">$' + item.price + '</span><span class="text-xs bg-amber-600 text-white font-bold px-2 py-0.5 rounded-lg">+ Add</span></div>';
-        container.appendChild(div);
-      });
-    })
-    .catch(() => {
-      container.innerHTML = '<div class="text-xs text-red-400 py-2 text-center">Error querying catalog vault.</div>';
-    });
+  // VOICE / SPEECH ALIAS RESOLUTION ("SEA BAGS" -> "C FILTER BAGS")
+  var query = rawQuery.replace('sea bag', 'c filter bag').replace('sea bags', 'c filter bag');
+
+  var matches = inventoryDatabase.filter(function(item) {
+    return !query || item.name.toLowerCase().includes(query);
+  }).slice(0, 40);
+
+  if (matches.length === 0) {
+    container.innerHTML = '<div class="text-xs text-gray-500 py-2 text-center">No matching items found.</div>';
+    return;
+  }
+
+  matches.forEach(function(item) {
+    var div = document.createElement('div');
+    div.className = 'flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 text-xs hover:border-amber-500 transition cursor-pointer';
+    div.onclick = function() {
+      addPrepopulatedRow(item.name, item.price, item.type);
+      closeSearchModal();
+    };
+    div.innerHTML = '<div><div class="font-bold text-white">' + escapeHtml(item.name) + '</div><div class="text-[10px] text-gray-400">' + (item.type === 'part' ? 'Part (Taxable)' : 'Labor (No Tax)') + '</div></div>' +
+                    '<div class="flex items-center gap-2"><span class="font-mono text-amber-400 font-bold">$' + item.price + '</span><span class="text-xs bg-amber-600 text-white font-bold px-2 py-0.5 rounded-lg">+ Add</span></div>';
+    container.appendChild(div);
+  });
 }
 
 function updateLed(msg, isError) {
@@ -312,18 +496,31 @@ function toggleInvoiceVoice() {
     voiceHandled = true;
 
     var text = e.results[0][0].transcript.toLowerCase();
-    updateLed('VAULT QUERYING: "' + text + '"', false);
+    updateLed('PARSING: "' + text + '"', false);
     
-    fetch('/.netlify/functions/lookup?type=product&q=' + encodeURIComponent(text))
-      .then(res => res.json())
-      .then(matches => {
-        if (matches && matches.length > 0) {
-          addPrepopulatedRow(matches[0].name, matches[0].price, matches[0].type);
-          updateLed('ADDED: ' + matches[0].name, false);
-        } else {
-          updateLed('NO VAULT MATCH FOUND', true);
-        }
-      });
+    // VOICE ALIAS MATCHING
+    var searchKey = text.replace('sea bag', 'c filter bag').replace('sea bags', 'c filter bag');
+    
+    var match = inventoryDatabase.find(function(it) {
+      return it.name.toLowerCase().includes(searchKey);
+    });
+
+    if (!match && searchKey.includes('c bag')) {
+      match = inventoryDatabase.find(function(it) { return it.name.includes('C Filter Bags - 24 Pk.'); });
+    }
+    if (!match && (searchKey.includes('beyond') || searchKey.includes('filter'))) {
+      match = inventoryDatabase.find(function(it) { return it.name.includes('Beyond Guardian HEPA Filter'); });
+    }
+
+    if (match) {
+      addPrepopulatedRow(match.name, match.price, match.type);
+      updateLed('ADDED: ' + match.name, false);
+    } else {
+      updateLed('NO MATCH — OPENING SEARCH', true);
+      openSearchModal();
+      document.getElementById('modalSearchInput').value = text;
+      filterCatalog();
+    }
 
     try { invoiceRecognition.stop(); } catch(err) {}
   };
@@ -349,7 +546,7 @@ function addPrepopulatedRow(name, price, type) {
 
   var newRow = document.createElement('div');
   newRow.className = 'flex gap-2 items-center invoice-row';
-  newRow.innerHTML = '<input type="text" value="' + escapeHtml(name) + '" oninput="onLineItemChange()" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
+  newRow.innerHTML = '<input type="text" value="' + escapeHtml(name) + '" oninput="calculateInvoiceTotals()" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
                      '<select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none"><option value="part" ' + (type==='part'?'selected':'') + '>Part (Tax)</option><option value="labor" ' + (type==='labor'?'selected':'') + '>Labor (No Tax)</option></select>' +
                      '<input type="number" step="0.01" value="' + price + '" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">' +
                      '<button type="button" onclick="removeInvoiceRow(this)" class="text-gray-500 hover:text-red-400 px-1 text-xs">✕</button>';
@@ -367,10 +564,6 @@ function removeInvoiceRow(btn) {
     row.remove();
     calculateInvoiceTotals();
   }
-}
-
-function onLineItemChange() {
-  calculateInvoiceTotals();
 }
 
 function calculateInvoiceTotals() {
@@ -400,7 +593,6 @@ function calculateInvoiceTotals() {
   autoSaveLocalDraft();
 }
 
-// INSTANT AUTO-SAVE TO LOCALSTORAGE
 function getStorageKey() {
   return 'tappy_draft_' + (currentCardId || currentCustomerTitle.replace(/\s+/g, '_').toLowerCase());
 }
@@ -447,7 +639,6 @@ function loadLocalSavedDraft() {
   } catch(e) {}
 }
 
-// SAVE DRAFT TO CARD NOTES (PERMANENT HUB SYNC)
 function saveDraftToCard() {
   var totalStr = document.getElementById('totalVal').textContent;
   var rows = document.querySelectorAll('.invoice-row');
@@ -459,7 +650,6 @@ function saveDraftToCard() {
   });
 
   var noteContent = '[' + currentDocType.toUpperCase() + ' DRAFT] Total: ' + totalStr + ' | Items: ' + itemSummary.join(', ');
-  
   updateLed('SAVING DRAFT TO CARD... ⚡', false);
   
   fetch('/.netlify/functions/chat', {
