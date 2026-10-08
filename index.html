@@ -23,9 +23,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 .mic-pulsing { animation: pulse-red 1.5s infinite; background-color: #dc2626 !important; color: #ffffff !important; }
 </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-2 pb-24 relative">
+<body class="min-h-screen flex items-center justify-center p-2 pb-28 relative">
 
-<!-- COMPACT MASTER COMMAND HUB -->
+<!-- MASTER COMMAND HUB -->
 <div id="masterHubContainer" class="max-w-md w-full tapulator-face rounded-3xl p-4 relative space-y-3 shadow-2xl my-auto">
   
   <!-- CLEAN HEADER WITH FRESH AVATAR -->
@@ -37,12 +37,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         <p class="text-[10px] text-blue-400 font-bold uppercase tracking-wider mt-0.5">Powered by Fresh TappyThing</p>
       </div>
     </div>
-    <span id="statusLed" class="text-[9px] font-black text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2 py-0.5 rounded-full flex items-center gap-1">
-      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> ONLINE ⚡
+    <span id="statusLed" class="text-[9px] font-black text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> READY ⚡
     </span>
   </div>
 
-  <!-- MAIN NAVIGATION BUTTONS -->
+  <!-- MAIN NAVIGATION MATRIX -->
   <div class="space-y-2">
     <button type="button" onclick="openDrawer('Castle')" class="key-primary w-full rounded-xl p-3 text-left transition flex items-center justify-between shadow">
       <div>
@@ -50,7 +50,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
           <i class="fa-solid fa-chess-rook text-blue-300"></i>
           <span>1. Castle 🏰</span>
         </div>
-        <div class="text-[10px] text-blue-200 mt-0.5">Pre-loaded Utilities, Gas, Grocery & Banking Cards</div>
+        <div class="text-[10px] text-blue-200 mt-0.5">Utilities, Gas, Grocery & Banking Cards</div>
       </div>
       <i class="fa-solid fa-chevron-right text-blue-300 text-xs"></i>
     </button>
@@ -81,7 +81,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
           <span>4. Calendar 📅</span>
           <i class="fa-solid fa-calendar-day text-gray-500 text-[10px]"></i>
         </div>
-        <div class="text-[8px] text-gray-400">Live Schedule Sync</div>
+        <div class="text-[8px] text-gray-400">Live Agenda Sync</div>
       </button>
       <button type="button" onclick="openDrawer('BrainDump')" class="key-secondary rounded-xl p-2 text-left transition space-y-0.5">
         <div class="text-[10px] font-bold text-emerald-400 flex items-center justify-between">
@@ -144,14 +144,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   </div>
 </div>
 
-<!-- BOTTOM INPUT BAR -->
+<!-- BOTTOM INPUT BAR WITH AUTO-EXPANDING TEXT AREA -->
 <div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-2.5 z-40">
-  <div class="max-w-md mx-auto flex items-center gap-2">
-    <input type="text" id="unifiedInput" placeholder="Talk or type note..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') submitUnifiedInput()">
-    <button type="button" id="micBtn" onclick="toggleVoiceIntake()" class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-9 h-9 rounded-xl flex items-center justify-center border border-gray-700 transition shrink-0">
+  <div class="max-w-md mx-auto flex items-end gap-2">
+    <textarea id="unifiedInput" rows="1" placeholder="Talk or type note..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 resize-none max-h-28 overflow-y-auto" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); submitUnifiedInput(); }"></textarea>
+    <button type="button" id="micBtn" onclick="toggleVoiceIntake()" class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-9 h-9 rounded-xl flex items-center justify-center border border-gray-700 transition shrink-0 h-9">
       <i class="fa-solid fa-microphone text-sm"></i>
     </button>
-    <button type="button" onclick="submitUnifiedInput()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-2 rounded-xl text-xs transition shrink-0 flex items-center gap-1">
+    <button type="button" onclick="submitUnifiedInput()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-2 rounded-xl text-xs transition shrink-0 flex items-center justify-center h-9">
       <i class="fa-solid fa-paper-plane"></i>
     </button>
   </div>
@@ -164,12 +164,12 @@ var activeRecognition = null;
 
 var localPreloadedCards = {
   'castle': [
-    { title: '⛽ Gas Finder Card', group: 'Castle Utility', desc: 'Cheapest local gas finder active.' },
-    { title: '🛒 Grocery Savings Card', group: 'Castle Utility', desc: 'Auto ROI Grocery discount tracker.' },
-    { title: '💳 Banking & Bills Card', group: 'Castle Utility', desc: 'Central strategy & bill management.' }
+    { title: '⛽ Gas Finder Card', group: 'Castle Utility', phone: '410-555-0199', desc: 'Cheapest local gas finder active.' },
+    { title: '🛒 Grocery Savings Card', group: 'Castle Utility', phone: '410-555-0188', desc: 'Auto ROI Grocery discount tracker.' },
+    { title: '💳 Banking & Bills Card', group: 'Castle Utility', phone: '410-555-0177', desc: 'Central strategy & bill management.' }
   ],
   'calendar': [
-    { title: '📅 Today\'s Active Schedule', group: 'Calendar Sync', desc: 'Tap mic below to speak new appointments to Fresh.' }
+    { title: '📅 Today\'s Active Schedule', group: 'Calendar Sync', desc: 'Tap mic below to speak new appointments to Fresh.', calendarLink: true }
   ]
 };
 
@@ -200,7 +200,24 @@ async function loadDrawerItems(drawerName) {
   try {
     const res = await fetch('/.netlify/functions/monday?drawer=' + encodeURIComponent(drawerName) + '&board=18424728273&t=' + new Date().getTime());
     const data = await res.json();
-    var items = data.items || [];
+    
+    // EXTRACT ITEMS FROM GROUPS ARRAY (SISSY'S FIX)
+    var items = [];
+    if (data.items && Array.isArray(data.items)) {
+      items = data.items;
+    } else if (data.groups && Array.isArray(data.groups)) {
+      data.groups.forEach(function(g) {
+        if (g.items_page && g.items_page.items) {
+          g.items_page.items.forEach(function(it) {
+            items.push({
+              id: it.id,
+              title: it.name,
+              group: (it.group && it.group.title) ? it.group.title : g.title
+            });
+          });
+        }
+      });
+    }
 
     if (!items || items.length === 0) {
       if (localPreloadedCards[key]) {
@@ -226,8 +243,62 @@ function submitUnifiedInput(inputId) {
   var text = inputEl.value.trim();
   if (text) {
     inputEl.value = '';
+    inputEl.style.height = 'auto';
     sendToFresh(text, activeDrawerContext);
   }
+}
+
+function toggleVoiceIntake(drawerContext, targetInputId, targetBtnId) {
+  var targetDrawer = drawerContext || activeDrawerContext;
+  var input = document.getElementById(targetInputId || 'unifiedInput');
+  var btn = document.getElementById(targetBtnId || 'micBtn');
+  var led = document.getElementById('statusLed');
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SR) { alert('Voice recognition not supported in this browser.'); return; }
+
+  if (isListening && activeRecognition) {
+    activeRecognition.stop(); isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing');
+    if (led) led.textContent = 'READY ⚡';
+    return;
+  }
+
+  activeRecognition = new SR();
+  activeRecognition.continuous = true;
+  activeRecognition.interimResults = true;
+  activeRecognition.lang = 'en-US';
+
+  if (btn) btn.classList.add('mic-pulsing');
+  if (led) led.textContent = 'LISTENING...';
+  isListening = true;
+
+  activeRecognition.onresult = function(e) {
+    var interim = '', currentFinal = '';
+    for (var i = e.resultIndex; i < e.results.length; ++i) {
+      if (e.results[i].isFinal) { currentFinal += e.results[i][0].transcript + ' '; }
+      else { interim += e.results[i][0].transcript; }
+    }
+    var fullText = (currentFinal + interim).trim();
+    if (input) {
+      input.value = fullText;
+      input.style.height = 'auto';
+      input.style.height = input.scrollHeight + 'px';
+    }
+  };
+
+  activeRecognition.onerror = function() {
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing');
+    if (led) led.textContent = 'MIC ERROR';
+  };
+
+  activeRecognition.onend = function() {
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing');
+  };
+
+  activeRecognition.start();
 }
 
 function sendToFresh(promptText, drawerName) {
@@ -250,12 +321,26 @@ function renderItemCard(item) {
   var group = item.group || 'Active';
   var itemId = item.id || 'card_' + Math.random().toString(36).substr(2, 9);
   var cardUrl = '/card.html?id=' + encodeURIComponent(itemId) + '&title=' + encodeURIComponent(title);
+  var phone = item.phone || '';
+
+  var commsHtml = '';
+  if (phone) {
+    commsHtml = '<div class="flex items-center gap-2 pt-1.5 border-t border-gray-700/60 mt-1.5 text-[10px]">' +
+      '<a href="tel:' + phone + '" class="text-emerald-400 hover:underline flex items-center gap-1 font-bold"><i class="fa-solid fa-phone"></i> Call</a>' +
+      '<a href="sms:' + phone + '" class="text-sky-400 hover:underline flex items-center gap-1 font-bold"><i class="fa-solid fa-comment-sms"></i> Text</a>' +
+      '</div>';
+  } else if (item.calendarLink) {
+    commsHtml = '<div class="pt-1.5 border-t border-gray-700/60 mt-1.5 text-[10px]">' +
+      '<a href="https://calendar.google.com" target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-2.5 py-1 rounded-lg inline-flex items-center gap-1"><i class="fa-solid fa-calendar-plus"></i> Open Full Google Calendar</a>' +
+      '</div>';
+  }
 
   return '<div class="p-2.5 bg-gray-800 rounded-xl border border-gray-700 space-y-1">' +
     '<div class="flex justify-between items-center">' +
       '<a href="' + cardUrl + '" class="font-bold text-white text-xs hover:text-blue-400 transition">' + title + '</a>' +
       '<span class="text-[9px] bg-blue-900/60 text-blue-300 px-1.5 py-0.5 rounded">' + group + '</span>' +
     '</div>' +
+    commsHtml +
     '</div>';
 }
 </script>
