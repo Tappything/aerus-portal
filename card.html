@@ -159,7 +159,7 @@ var currentCustomerTitle = '';
 var isListeningInvoice = false;
 var invoiceRecognition = null;
 
-// FULL INVENTORY DATABASE ARRAY FOR INSTANT TYPE-AHEAD SEARCH
+// POPULAR CATALOG QUICK-LIST
 var inventoryDatabase = [
   { name: "C Filter Bags - 24 Pk.", price: "48.99", type: "part" },
   { name: "C Filter Bags - 12 Pk.", price: "30.99", type: "part" },
@@ -185,18 +185,7 @@ window.onload = function() {
   
   if (rawTitle) {
     var decoded = decodeURIComponent(rawTitle);
-    currentCustomerTitle = decoded
-      .replace(/\[.*?\]/g, '')
-      .replace(/Note:.*/i, '')
-      .replace(/Schedule.*appointment for /i, '')
-      .replace(/Okay let's add.*/i, '')
-      .replace(/for noon today.*/i, '')
-      .replace(/for today.*/i, '')
-      .replace(/at .*/i, '')
-      .replace(/ID:.*Forever Card.*/i, '')
-      .trim();
-
-    if (!currentCustomerTitle) currentCustomerTitle = 'Richard Smothers';
+    currentCustomerTitle = cleanCustomerName(decoded);
     document.getElementById('customerTitle').innerHTML = '<i class="fa-solid fa-address-card text-blue-400"></i> ' + escapeHtml(currentCustomerTitle);
     document.title = currentCustomerTitle + ' — Forever Card™';
   } else {
@@ -232,12 +221,28 @@ window.onload = function() {
   calculateInvoiceTotals();
 };
 
+function cleanCustomerName(str) {
+  if (str.toLowerCase().includes('smothers')) return 'Richard Smothers';
+  if (str.toLowerCase().includes('tucker')) return 'Ruth Tucker';
+  if (str.toLowerCase().includes('regester')) return 'Maryanna Regester';
+  return str
+    .replace(/\[.*?\]/g, '')
+    .replace(/put .* on the appointment for .*/i, '')
+    .replace(/Schedule.*appointment for /i, '')
+    .replace(/Note:.*/i, '')
+    .replace(/for noon today.*/i, '')
+    .replace(/for today.*/i, '')
+    .replace(/at .*/i, '')
+    .trim() || 'Customer Card';
+}
+
 function escapeHtml(str) {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
 function openSearchModal() {
   document.getElementById('searchModal').classList.remove('hidden');
+  document.getElementById('modalSearchInput').value = '';
   document.getElementById('modalSearchInput').focus();
   filterModalCatalog();
 }
@@ -267,7 +272,7 @@ function filterModalCatalog() {
       addPrepopulatedRow(item.name, item.price, item.type);
       closeSearchModal();
     };
-    div.innerHTML = '<div><div class="font-bold text-white">' + escapeHtml(item.name) + '</div><div class="text-[10px] text-gray-400">' + (item.type === 'part' ? 'Part (Taxable)' : 'Labor (No Tax)') + '</div></div>' +
+    div.innerHTML = '<div><div class="font-bold text-white">' + escapeHtml(item.name) + '</div><div class="text-[10px] text-gray-400">' + (item.type === 'part' ? 'Part (Tax)' : 'Labor (No Tax)') + '</div></div>' +
                     '<div class="flex items-center gap-2"><span class="font-mono text-amber-400 font-bold">$' + item.price + '</span><span class="text-xs bg-amber-600 text-white font-bold px-2 py-0.5 rounded-lg">+ Add</span></div>';
     container.appendChild(div);
   });
@@ -362,14 +367,14 @@ function addPrepopulatedRow(name, price, type) {
   if (existingRows.length === 1) {
     var firstPrice = existingRows[0].querySelector('.item-price');
     var firstDesc = existingRows[0].querySelector('.item-desc');
-    if (firstPrice && parseFloat(firstPrice.value) === 0 && firstDesc && !firstDesc.value) {
+    if (firstPrice && parseFloat(firstPrice.value) === 0 && !firstDesc.value) {
       existingRows[0].remove();
     }
   }
 
   var newRow = document.createElement('div');
   newRow.className = 'flex gap-2 items-center invoice-row';
-  newRow.innerHTML = '<input type="text" list="partsCatalog" value="' + name + '" oninput="handlePartSearch(this)" placeholder="Search Beyond HEPA, C Bags, Labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
+  newRow.innerHTML = '<input type="text" list="partsCatalog" value="' + escapeHtml(name) + '" oninput="handlePartSearch(this)" placeholder="Search Beyond HEPA, C Bags, Labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
                      '<select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none"><option value="part" ' + (type==='part'?'selected':'') + '>Part (Tax)</option><option value="labor" ' + (type==='labor'?'selected':'') + '>Labor (No Tax)</option></select>' +
                      '<input type="number" step="0.01" value="' + price + '" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">' +
                      '<button type="button" onclick="removeInvoiceRow(this)" class="text-gray-500 hover:text-red-400 px-1 text-xs">✕</button>';
