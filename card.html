@@ -52,7 +52,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     <div id="statusLed" class="text-xs font-bold text-emerald-400 tracking-wide">CARD ACTIVE ⚡</div>
   </div>
 
-  <!-- DRAFT INVOICE BUILDER WITH VOICE + FULL CATALOG SEARCH -->
+  <!-- DRAFT INVOICE BUILDER WITH VOICE + CENTRAL VAULT SEARCH -->
   <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
       <span class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -69,29 +69,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       </div>
     </div>
 
-    <!-- DATALIST FOR QUICK INLINE TYPING -->
-    <datalist id="partsCatalog">
-      <option value="C Filter Bags - 12 Pk." data-price="30.99" data-type="part">
-      <option value="C Filter Bags - 24 Pk." data-price="48.99" data-type="part">
-      <option value="C Filter Bags - 100 Pk." data-price="145.99" data-type="part">
-      <option value="P Filter Bags - 6 Pk." data-price="19.99" data-type="part">
-      <option value="P Filter Bags - 12 Pk." data-price="39.99" data-type="part">
-      <option value="U Filter Bags - 12 Pk." data-price="30.99" data-type="part">
-      <option value="U Filter Bags - 24 Pk." data-price="48.99" data-type="part">
-      <option value="U Filter Bags - 100 Pk." data-price="145.99" data-type="part">
-      <option value="R Filter Bags - 12 Pk." data-price="28.99" data-type="part">
-      <option value="R Filter Bags - 24 Pk." data-price="43.99" data-type="part">
-      <option value="R Filter Bags - 100 Pk." data-price="124.99" data-type="part">
-      <option value="Beyond Guardian HEPA Filter" data-price="140.00" data-type="part">
-      <option value="Guardian Angel HEPA Filter" data-price="125.00" data-type="part">
-      <option value="Beyond AP Cell- 634 model" data-price="109.99" data-type="part">
-      <option value="Bench Inspection & Diagnostic Labor" data-price="40.00" data-type="labor">
-    </datalist>
-
     <!-- LINE ITEMS CONTAINER -->
     <div id="invoiceRows" class="space-y-2">
       <div class="flex gap-2 items-center invoice-row">
-        <input type="text" list="partsCatalog" oninput="handlePartSearch(this)" placeholder="Search Beyond HEPA, C Bags, Labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
+        <input type="text" placeholder="Type item name or use search..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
         <select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none">
           <option value="part">Part (Tax)</option>
           <option value="labor">Labor (No Tax)</option>
@@ -146,15 +127,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-4 space-y-3 shadow-2xl">
     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
       <h3 class="text-sm font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
-        <i class="fa-solid fa-boxes-stacked"></i> Search Catalog
+        <i class="fa-solid fa-boxes-stacked"></i> Search Catalog Vault (1,090 Items)
       </h3>
       <button onclick="closeSearchModal()" class="text-gray-400 hover:text-white font-bold text-lg">✕</button>
     </div>
     
-    <input type="text" id="modalSearchInput" onkeyup="filterModalCatalog()" placeholder="Type C Bag, Beyond, HEPA, Angel..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+    <input type="text" id="modalSearchInput" onkeyup="filterVaultCatalog()" placeholder="Search 1,090 items (C Bag, HEPA, RO, Labor)..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
     
     <div id="modalResultsList" class="max-h-60 overflow-y-auto space-y-1.5 pr-1">
-      <!-- Dynamic search results render here -->
+      <!-- Dynamic vault search results render here -->
     </div>
   </div>
 </div>
@@ -164,29 +145,6 @@ var currentCardId = '';
 var currentCustomerTitle = '';
 var isListeningInvoice = false;
 var invoiceRecognition = null;
-
-// HARDCODED INVENTORY DATABASE FOR INSTANT ZERO-LATENCY SEARCH
-var inventoryDatabase = [
-  { name: "C Filter Bags - 12 Pk.", price: "30.99", type: "part" },
-  { name: "C Filter Bags - 24 Pk.", price: "48.99", type: "part" },
-  { name: "C Filter Bags - 100 Pk.", price: "145.99", type: "part" },
-  { name: "P Filter Bags - 6 Pk.", price: "19.99", type: "part" },
-  { name: "P Filter Bags - 12 Pk.", price: "39.99", type: "part" },
-  { name: "U Filter Bags - 12 Pk.", price: "30.99", type: "part" },
-  { name: "U Filter Bags - 24 Pk.", price: "48.99", type: "part" },
-  { name: "U Filter Bags - 100 Pk.", price: "145.99", type: "part" },
-  { name: "R Filter Bags - 12 Pk.", price: "28.99", type: "part" },
-  { name: "R Filter Bags - 24 Pk.", price: "43.99", type: "part" },
-  { name: "R Filter Bags - 100 Pk.", price: "124.99", type: "part" },
-  { name: "Beyond Guardian HEPA Filter", price: "140.00", type: "part" },
-  { name: "Guardian Angel HEPA Filter", price: "125.00", type: "part" },
-  { name: "Beyond AP Cell- 634 model", price: "109.99", type: "part" },
-  { name: "HEPA Filter - Guard. Air Home", price: "207.00", type: "part" },
-  { name: "Single Guardian Ultra H.e.p.a. Filter", price: "49.99", type: "part" },
-  { name: "UV Lamp 916- Replacement", price: "219.99", type: "part" },
-  { name: "Bench Inspection & Diagnostic Labor", price: "40.00", type: "labor" },
-  { name: "Standard RO Installation Labor", price: "300.00", type: "labor" }
-];
 
 window.onload = function() {
   var params = new URLSearchParams(window.location.search);
@@ -218,23 +176,25 @@ window.onload = function() {
 
   if (rawAddress) {
     document.getElementById('customerAddress').textContent = decodeURIComponent(rawAddress);
-  } else if (currentCustomerTitle.toLowerCase().includes('smothers')) {
-    document.getElementById('customerAddress').textContent = '1415 Kingsway Rd, Baltimore, MD 21218';
   } else {
-    document.getElementById('customerAddress').textContent = 'Address on File';
-  }
-
-  if (rawPhone) {
-    var cleanPhone = decodeURIComponent(rawPhone);
-    var phoneEl = document.getElementById('customerPhoneLink');
-    phoneEl.textContent = cleanPhone;
-    phoneEl.href = 'tel:' + cleanPhone.replace(/\D/g, '');
-  } else if (currentCustomerTitle.toLowerCase().includes('smothers')) {
-    var phoneEl = document.getElementById('customerPhoneLink');
-    phoneEl.textContent = '410-376-9061';
-    phoneEl.href = 'tel:4103769061';
-  } else {
-    document.getElementById('customerPhoneLink').textContent = 'Phone on File';
+    fetch('/.netlify/functions/lookup?type=customer&q=' + encodeURIComponent(currentCustomerTitle))
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.length > 0) {
+          document.getElementById('customerAddress').textContent = data[0].address || 'Address on File';
+          var phoneEl = document.getElementById('customerPhoneLink');
+          phoneEl.textContent = data[0].phone || 'Phone on File';
+          phoneEl.href = 'tel:' + (data[0].phone || '').replace(/\D/g, '');
+        } else if (currentCustomerTitle.toLowerCase().includes('smothers')) {
+          document.getElementById('customerAddress').textContent = '1415 Kingsway Rd, Baltimore, MD 21218';
+          document.getElementById('customerPhoneLink').textContent = '410-376-9061';
+        } else {
+          document.getElementById('customerAddress').textContent = 'Address on File';
+        }
+      })
+      .catch(() => {
+        document.getElementById('customerAddress').textContent = '1415 Kingsway Rd, Baltimore, MD 21218';
+      });
   }
 
   if (currentCardId) {
@@ -253,58 +213,41 @@ function openSearchModal() {
   var input = document.getElementById('modalSearchInput');
   input.value = '';
   input.focus();
-  filterModalCatalog();
+  filterVaultCatalog();
 }
 
 function closeSearchModal() {
   document.getElementById('searchModal').classList.add('hidden');
 }
 
-function filterModalCatalog() {
-  var query = document.getElementById('modalSearchInput').value.toLowerCase().trim();
+function filterVaultCatalog() {
+  var query = document.getElementById('modalSearchInput').value.trim();
   var container = document.getElementById('modalResultsList');
-  container.innerHTML = '';
+  container.innerHTML = '<div class="text-xs text-amber-400 py-2 text-center">Querying Central Vault...</div>';
 
-  var matches = inventoryDatabase.filter(function(item) {
-    return !query || item.name.toLowerCase().includes(query);
-  });
-
-  if (matches.length === 0) {
-    container.innerHTML = '<div class="text-xs text-gray-500 py-2 text-center">No matching items found.</div>';
-    return;
-  }
-
-  matches.forEach(function(item) {
-    var div = document.createElement('div');
-    div.className = 'flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 text-xs hover:border-amber-500 transition cursor-pointer';
-    div.onclick = function() {
-      addPrepopulatedRow(item.name, item.price, item.type);
-      closeSearchModal();
-    };
-    div.innerHTML = '<div><div class="font-bold text-white">' + escapeHtml(item.name) + '</div><div class="text-[10px] text-gray-400">' + (item.type === 'part' ? 'Part (Taxable)' : 'Labor (No Tax)') + '</div></div>' +
-                    '<div class="flex items-center gap-2"><span class="font-mono text-amber-400 font-bold">$' + item.price + '</span><span class="text-xs bg-amber-600 text-white font-bold px-2 py-0.5 rounded-lg">+ Add</span></div>';
-    container.appendChild(div);
-  });
-}
-
-function handlePartSearch(inputEl) {
-  var val = inputEl.value;
-  var options = document.querySelectorAll('#partsCatalog option');
-  var row = inputEl.closest('.invoice-row');
-  
-  options.forEach(function(opt) {
-    if (opt.value === val) {
-      var price = opt.getAttribute('data-price');
-      var type = opt.getAttribute('data-type');
-      if (row) {
-        var priceInput = row.querySelector('.item-price');
-        var typeSelect = row.querySelector('.item-type');
-        if (priceInput) priceInput.value = price;
-        if (typeSelect) typeSelect.value = type;
-        calculateInvoiceTotals();
+  fetch('/.netlify/functions/lookup?type=product&q=' + encodeURIComponent(query))
+    .then(res => res.json())
+    .then(matches => {
+      container.innerHTML = '';
+      if (!matches || matches.length === 0) {
+        container.innerHTML = '<div class="text-xs text-gray-500 py-2 text-center">No matching items found.</div>';
+        return;
       }
-    }
-  });
+      matches.forEach(function(item) {
+        var div = document.createElement('div');
+        div.className = 'flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 text-xs hover:border-amber-500 transition cursor-pointer';
+        div.onclick = function() {
+          addPrepopulatedRow(item.name, item.price, item.type);
+          closeSearchModal();
+        };
+        div.innerHTML = '<div><div class="font-bold text-white">' + escapeHtml(item.name) + '</div><div class="text-[10px] text-gray-400">' + (item.type === 'part' ? 'Part (Taxable)' : 'Labor (No Tax)') + '</div></div>' +
+                        '<div class="flex items-center gap-2"><span class="font-mono text-amber-400 font-bold">$' + item.price + '</span><span class="text-xs bg-amber-600 text-white font-bold px-2 py-0.5 rounded-lg">+ Add</span></div>';
+        container.appendChild(div);
+      });
+    })
+    .catch(() => {
+      container.innerHTML = '<div class="text-xs text-red-400 py-2 text-center">Error querying catalog vault.</div>';
+    });
 }
 
 function updateLed(msg, isError) {
@@ -344,19 +287,18 @@ function toggleInvoiceVoice() {
     voiceHandled = true;
 
     var text = e.results[0][0].transcript.toLowerCase();
-    updateLed('PARSING: "' + text + '"', false);
+    updateLed('VAULT QUERYING: "' + text + '"', false);
     
-    if (text.includes('angel')) {
-      addPrepopulatedRow('Guardian Angel HEPA Filter', '125.00', 'part');
-    } else if (text.includes('beyond filter') || text.includes('beyond air filter') || text.includes('beyond hepa')) {
-      addPrepopulatedRow('Beyond Guardian HEPA Filter', '140.00', 'part');
-    } else if (text.includes('c bag') || text.includes('c bags') || text.includes('24 c')) {
-      addPrepopulatedRow('C Filter Bags - 24 Pk.', '48.99', 'part');
-    } else if (text.includes('cell') || text.includes('ap cell') || text.includes('beyond cell')) {
-      addPrepopulatedRow('Beyond AP Cell- 634 model', '109.99', 'part');
-    } else if (text.includes('labor') || text.includes('service') || text.includes('diagnostic')) {
-      addPrepopulatedRow('Bench Inspection & Diagnostic Labor', '40.00', 'labor');
-    }
+    fetch('/.netlify/functions/lookup?type=product&q=' + encodeURIComponent(text))
+      .then(res => res.json())
+      .then(matches => {
+        if (matches && matches.length > 0) {
+          addPrepopulatedRow(matches[0].name, matches[0].price, matches[0].type);
+          updateLed('ADDED: ' + matches[0].name, false);
+        } else {
+          updateLed('NO VAULT MATCH FOUND', true);
+        }
+      });
 
     try { invoiceRecognition.stop(); } catch(err) {}
   };
@@ -364,7 +306,6 @@ function toggleInvoiceVoice() {
   invoiceRecognition.onend = function() {
     isListeningInvoice = false;
     if (btn) btn.classList.remove('mic-pulsing');
-    updateLed('INVOICE UPDATED ⚡', false);
   };
 
   invoiceRecognition.start();
@@ -383,7 +324,7 @@ function addPrepopulatedRow(name, price, type) {
 
   var newRow = document.createElement('div');
   newRow.className = 'flex gap-2 items-center invoice-row';
-  newRow.innerHTML = '<input type="text" list="partsCatalog" value="' + name + '" oninput="handlePartSearch(this)" placeholder="Search Beyond HEPA, C Bags, Labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
+  newRow.innerHTML = '<input type="text" value="' + escapeHtml(name) + '" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
                      '<select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none"><option value="part" ' + (type==='part'?'selected':'') + '>Part (Tax)</option><option value="labor" ' + (type==='labor'?'selected':'') + '>Labor (No Tax)</option></select>' +
                      '<input type="number" step="0.01" value="' + price + '" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">' +
                      '<button type="button" onclick="removeInvoiceRow(this)" class="text-gray-500 hover:text-red-400 px-1 text-xs">✕</button>';
