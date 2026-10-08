@@ -10,49 +10,39 @@
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05070e; color: #f3f4f6; }
 .card-face { background: linear-gradient(180deg, #0f172a 0%, #090d16 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); }
 .led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
-@keyframes pulse-red {
-  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-}
-.mic-pulsing { animation: pulse-red 1.5s infinite; background-color: #dc2626 !important; color: #ffffff !important; }
 </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-3 pb-24 relative">
 
 <div class="max-w-md w-full card-face rounded-3xl p-5 relative space-y-4 shadow-2xl my-auto">
   
-  <!-- HEADER & FULL DYNAMIC CUSTOMER CONTACT CARD -->
   <div class="border-b border-slate-800 pb-3 space-y-1">
     <div class="flex items-center justify-between">
       <h1 id="customerTitle" class="text-xl font-black text-white tracking-tight flex items-center gap-2">
-        <i class="fa-solid fa-address-card text-blue-400"></i> Loading Card...
+        <i class="fa-solid fa-address-card text-blue-400"></i> Richard Smothers
       </h1>
       <a href="/" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-1.5 rounded-xl border border-slate-700 transition">Hub</a>
     </div>
     
-    <!-- DYNAMIC ADDRESS & PHONE DISPLAY -->
     <div id="customerContactBox" class="bg-slate-950/80 rounded-xl p-2.5 border border-slate-800 text-xs space-y-1 text-gray-300">
       <div class="flex items-center gap-2">
         <i class="fa-solid fa-location-dot text-red-400"></i>
-        <span id="customerAddress">Loading Address...</span>
+        <span id="customerAddress">1415 Kingsway Rd, Baltimore, MD 21218</span>
       </div>
       <div class="flex items-center justify-between pt-0.5">
         <div class="flex items-center gap-2">
           <i class="fa-solid fa-phone text-emerald-400"></i>
-          <a id="customerPhoneLink" href="#" class="text-emerald-400 font-bold hover:underline">Phone on File</a>
+          <a id="customerPhoneLink" href="tel:4103769061" class="text-emerald-400 font-bold hover:underline">410-376-9061</a>
         </div>
         <span id="cardSubtext" class="text-[10px] text-blue-400 font-bold uppercase tracking-wider">Forever Card™</span>
       </div>
     </div>
   </div>
 
-  <!-- LED STATUS DISPLAY -->
   <div class="led-display rounded-2xl p-2.5 text-center border border-blue-900/50 min-h-[44px] flex items-center justify-center">
     <div id="statusLed" class="text-xs font-bold text-emerald-400 tracking-wide">CARD ACTIVE ⚡</div>
   </div>
 
-  <!-- DRAFT INVOICE BUILDER WITH VOICE + FULL CATALOG SEARCH -->
   <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
       <span class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -62,41 +52,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         <button type="button" onclick="openSearchModal()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-2.5 py-1 rounded-lg text-[11px] flex items-center gap-1 shadow transition active:scale-95">
           <i class="fa-solid fa-magnifying-glass"></i> Search
         </button>
-        <button type="button" id="invoiceMicBtn" onclick="toggleInvoiceVoice()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-2.5 py-1 rounded-lg text-[11px] flex items-center gap-1 shadow transition active:scale-95">
-          <i class="fa-solid fa-microphone"></i> Talk
-        </button>
         <button type="button" onclick="addInvoiceRow()" class="text-[10px] bg-amber-950/80 hover:bg-amber-900 text-amber-300 font-bold px-2 py-1 rounded-lg border border-amber-800/60">+ Add</button>
       </div>
     </div>
 
-    <!-- DATALIST FOR QUICK INLINE TYPING -->
-    <datalist id="partsCatalog">
-      <option value="C Filter Bags - 24 Pk." data-price="48.99" data-type="part">
-      <option value="C Filter Bags - 12 Pk." data-price="30.99" data-type="part">
-      <option value="C Filter Bags - 100 Pk." data-price="145.99" data-type="part">
-      <option value="P Filter Bags - 12 Pk." data-price="39.99" data-type="part">
-      <option value="U Filter Bags - 12 Pk." data-price="30.99" data-type="part">
-      <option value="R Filter Bags - 12 Pk." data-price="28.99" data-type="part">
-      <option value="Beyond Guardian HEPA Filter" data-price="140.00" data-type="part">
-      <option value="Guardian Angel HEPA Filter" data-price="125.00" data-type="part">
-      <option value="Beyond AP Cell- 634 model" data-price="109.99" data-type="part">
-      <option value="Bench Inspection & Diagnostic Labor" data-price="40.00" data-type="labor">
-    </datalist>
-
-    <!-- LINE ITEMS CONTAINER -->
     <div id="invoiceRows" class="space-y-2">
       <div class="flex gap-2 items-center invoice-row">
-        <input type="text" list="partsCatalog" oninput="handlePartSearch(this)" placeholder="Search C Bags, Beyond HEPA, Labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
+        <input type="text" placeholder="Tap Search button above to find items..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none">
         <select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none">
           <option value="part">Part (Tax)</option>
           <option value="labor">Labor (No Tax)</option>
         </select>
-        <input type="number" step="0.01" value="0.00" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">
+        <input type="number" step="0.01" value="0.00" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none">
         <button type="button" onclick="removeInvoiceRow(this)" class="text-gray-500 hover:text-red-400 px-1 text-xs">✕</button>
       </div>
     </div>
 
-    <!-- CALCULATIONS -->
     <div class="border-t border-slate-800 pt-2 space-y-1 text-xs font-mono">
       <div class="flex justify-between text-gray-400">
         <span>Subtotal:</span>
@@ -111,168 +82,72 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         <span id="totalVal">$0.00</span>
       </div>
     </div>
-
-    <!-- ACTION BUTTONS -->
-    <div class="grid grid-cols-2 gap-2 pt-1">
-      <button type="button" onclick="generateStripeCheckout()" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow transition active:scale-95">
-        <i class="fa-solid fa-credit-card"></i> Stripe Link
-      </button>
-      <button type="button" onclick="sendSmsInvoice()" class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow transition active:scale-95">
-        <i class="fa-solid fa-comment-sms"></i> 1-Tap SMS
-      </button>
-    </div>
-  </div>
-
-  <!-- NOTES & TIMELINE -->
-  <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-2.5">
-    <div class="text-xs font-black text-teal-300 uppercase tracking-wider flex items-center gap-1.5">
-      <i class="fa-solid fa-clock-rotate-left"></i> Card Notes & Updates
-    </div>
-    <div class="flex gap-2">
-      <input type="text" id="cardNoteInput" placeholder="Type note for customer card..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-teal-500" onkeydown="if(event.key==='Enter') postCardNote()">
-      <button type="button" onclick="postCardNote()" class="bg-teal-600 hover:bg-teal-500 text-white font-bold px-3 py-2 rounded-xl text-xs transition active:scale-95">Post Note</button>
-    </div>
   </div>
 
 </div>
 
-<!-- VISUAL INVENTORY SEARCH MODAL POPUP -->
 <div id="searchModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 z-50">
   <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-4 space-y-3 shadow-2xl">
     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
       <h3 class="text-sm font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
-        <i class="fa-solid fa-boxes-stacked"></i> Search Inventory Catalog
+        <i class="fa-solid fa-boxes-stacked"></i> Inventory Search
       </h3>
       <button type="button" onclick="closeSearchModal()" class="text-gray-400 hover:text-white font-bold text-lg px-2">✕</button>
     </div>
     
-    <input type="text" id="modalSearchInput" onkeyup="filterModalCatalog()" placeholder="Type C Bag, Beyond, HEPA, Angel..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+    <input type="text" id="modalSearchInput" onkeyup="filterModalCatalog()" placeholder="Type C, P, U, R, Bag, Filter..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
     
-    <div id="modalResultsList" class="max-h-60 overflow-y-auto space-y-1.5 pr-1">
-      <!-- Dynamic search results render here -->
-    </div>
+    <div id="modalResultsList" class="max-h-60 overflow-y-auto space-y-1.5 pr-1"></div>
   </div>
 </div>
 
 <script>
-var currentCardId = '';
-var currentCustomerTitle = '';
-var isListeningInvoice = false;
-var invoiceRecognition = null;
-
-// FULL INVENTORY DATABASE ARRAY INCLUDING ALL C BAG PACKS
 var inventoryDatabase = [
-  { name: "C Filter Bags - 24 Pk.", price: "48.99", type: "part" },
   { name: "C Filter Bags - 12 Pk.", price: "30.99", type: "part" },
+  { name: "C Filter Bags - 24 Pk.", price: "48.99", type: "part" },
   { name: "C Filter Bags - 100 Pk.", price: "145.99", type: "part" },
   { name: "P Filter Bags - 12 Pk.", price: "39.99", type: "part" },
+  { name: "P filter bags- 6pack", price: "19.99", type: "part" },
   { name: "U Filter Bags - 12 Pk.", price: "30.99", type: "part" },
+  { name: "U Filter Bags - 24 Pk.", price: "48.99", type: "part" },
+  { name: "U Filter Bags - 100 Pk.", price: "145.99", type: "part" },
   { name: "R Filter Bags - 12 Pk.", price: "28.99", type: "part" },
+  { name: "R Filter Bags - 24 Pk.", price: "43.99", type: "part" },
+  { name: "R Filter Bags - 100 Pk.", price: "124.99", type: "part" },
+  { name: "Lite Bags- (L) - 6 Pk.", price: "25.99", type: "part" },
+  { name: "9 Pk. Clean Obsessed CO6 HEPA Bags", price: "20.00", type: "part" },
+  { name: "Trivac Dust Bags - 12 Pk.", price: "23.99", type: "part" },
+  { name: "Off-Brand Kirby Bags", price: "6.00", type: "part" },
   { name: "Beyond Guardian HEPA Filter", price: "140.00", type: "part" },
   { name: "Guardian Angel HEPA Filter", price: "125.00", type: "part" },
   { name: "Beyond AP Cell- 634 model", price: "109.99", type: "part" },
-  { name: "HEPA Filter - Guard. Air Home", price: "207.00", type: "part" },
-  { name: "Single Guardian Ultra H.e.p.a. Filter", price: "49.99", type: "part" },
-  { name: "UV Lamp 916- Replacement", price: "219.99", type: "part" },
   { name: "Bench Inspection & Diagnostic Labor", price: "40.00", type: "labor" },
   { name: "Standard RO Installation Labor", price: "300.00", type: "labor" }
 ];
 
-window.onload = function() {
-  var params = new URLSearchParams(window.location.search);
-  currentCardId = params.get('id') || '';
-  var rawTitle = params.get('title') || params.get('customer') || '';
-  var rawAddress = params.get('address') || '';
-  var rawPhone = params.get('phone') || '';
-  
-  if (rawTitle) {
-    var decoded = decodeURIComponent(rawTitle);
-    currentCustomerTitle = cleanCustomerName(decoded);
-    document.getElementById('customerTitle').innerHTML = '<i class="fa-solid fa-address-card text-blue-400"></i> ' + escapeHtml(currentCustomerTitle);
-    document.title = currentCustomerTitle + ' — Forever Card™';
-  } else {
-    currentCustomerTitle = 'Richard Smothers';
-    document.getElementById('customerTitle').innerHTML = '<i class="fa-solid fa-address-card text-blue-400"></i> Richard Smothers';
-  }
-
-  if (rawAddress) {
-    document.getElementById('customerAddress').textContent = decodeURIComponent(rawAddress);
-  } else if (currentCustomerTitle.toLowerCase().includes('smothers')) {
-    document.getElementById('customerAddress').textContent = '1415 Kingsway Rd, Baltimore, MD 21218';
-  } else {
-    document.getElementById('customerAddress').textContent = 'Address on File';
-  }
-
-  if (rawPhone) {
-    var cleanPhone = decodeURIComponent(rawPhone);
-    var phoneEl = document.getElementById('customerPhoneLink');
-    phoneEl.textContent = cleanPhone;
-    phoneEl.href = 'tel:' + cleanPhone.replace(/\D/g, '');
-  } else if (currentCustomerTitle.toLowerCase().includes('smothers')) {
-    var phoneEl = document.getElementById('customerPhoneLink');
-    phoneEl.textContent = '410-376-9061';
-    phoneEl.href = 'tel:4103769061';
-  } else {
-    document.getElementById('customerPhoneLink').textContent = 'Phone on File';
-  }
-
-  if (currentCardId) {
-    document.getElementById('cardSubtext').textContent = 'ID: ' + currentCardId;
-  }
-
-  calculateInvoiceTotals();
-};
-
-function cleanCustomerName(str) {
-  if (str.toLowerCase().includes('smothers')) return 'Richard Smothers';
-  if (str.toLowerCase().includes('tucker')) return 'Ruth Tucker';
-  if (str.toLowerCase().includes('regester')) return 'Maryanna Regester';
-  return str
-    .replace(/\[.*?\]/g, '')
-    .replace(/put .* on the appointment for .*/i, '')
-    .replace(/put .* on the appointment.*/i, '')
-    .replace(/Schedule.*appointment for /i, '')
-    .replace(/Note:.*/i, '')
-    .replace(/for noon today.*/i, '')
-    .replace(/for today.*/i, '')
-    .replace(/at .*/i, '')
-    .trim() || 'Customer Card';
-}
-
-function escapeHtml(str) {
-  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-}
-
 function openSearchModal() {
-  var modal = document.getElementById('searchModal');
-  if (modal) {
-    modal.classList.remove('hidden');
-    var input = document.getElementById('modalSearchInput');
-    if (input) {
-      input.value = '';
-      input.focus();
-    }
-    filterModalCatalog();
-  }
+  document.getElementById('searchModal').classList.remove('hidden');
+  document.getElementById('modalSearchInput').value = '';
+  document.getElementById('modalSearchInput').focus();
+  filterModalCatalog();
 }
 
 function closeSearchModal() {
-  var modal = document.getElementById('searchModal');
-  if (modal) modal.classList.add('hidden');
+  document.getElementById('searchModal').classList.add('hidden');
 }
 
 function filterModalCatalog() {
-  var query = (document.getElementById('modalSearchInput').value || '').toLowerCase();
+  var query = (document.getElementById('modalSearchInput').value || '').toLowerCase().trim();
   var container = document.getElementById('modalResultsList');
-  if (!container) return;
   container.innerHTML = '';
 
   var matches = inventoryDatabase.filter(function(item) {
-    return item.name.toLowerCase().includes(query) || (query.includes('c bag') && item.name.toLowerCase().includes('c filter bags'));
+    if (!query) return true;
+    return item.name.toLowerCase().includes(query);
   });
 
   if (matches.length === 0) {
-    container.innerHTML = '<div class="text-xs text-gray-500 py-2 text-center">No matching items found.</div>';
+    container.innerHTML = '<div class="text-xs text-gray-500 py-2 text-center">No items found.</div>';
     return;
   }
 
@@ -283,93 +158,10 @@ function filterModalCatalog() {
       addPrepopulatedRow(item.name, item.price, item.type);
       closeSearchModal();
     };
-    div.innerHTML = '<div><div class="font-bold text-white">' + escapeHtml(item.name) + '</div><div class="text-[10px] text-gray-400">' + (item.type === 'part' ? 'Part (Tax)' : 'Labor (No Tax)') + '</div></div>' +
+    div.innerHTML = '<div><div class="font-bold text-white">' + item.name + '</div><div class="text-[10px] text-gray-400">' + (item.type === 'part' ? 'Part (Tax)' : 'Labor') + '</div></div>' +
                     '<div class="flex items-center gap-2"><span class="font-mono text-amber-400 font-bold">$' + item.price + '</span><span class="text-xs bg-amber-600 text-white font-bold px-2 py-0.5 rounded-lg">+ Add</span></div>';
     container.appendChild(div);
   });
-}
-
-function handlePartSearch(inputEl) {
-  var val = inputEl.value;
-  var options = document.querySelectorAll('#partsCatalog option');
-  var row = inputEl.closest('.invoice-row');
-  
-  options.forEach(function(opt) {
-    if (opt.value === val) {
-      var price = opt.getAttribute('data-price');
-      var type = opt.getAttribute('data-type');
-      if (row) {
-        var priceInput = row.querySelector('.item-price');
-        var typeSelect = row.querySelector('.item-type');
-        if (priceInput) priceInput.value = price;
-        if (typeSelect) typeSelect.value = type;
-        calculateInvoiceTotals();
-      }
-    }
-  });
-}
-
-function updateLed(msg, isError) {
-  var led = document.getElementById('statusLed');
-  if (led) {
-    led.textContent = msg;
-    led.className = isError ? 'text-xs font-bold text-red-400 tracking-wide' : 'text-xs font-bold text-emerald-400 tracking-wide';
-  }
-}
-
-function toggleInvoiceVoice() {
-  var btn = document.getElementById('invoiceMicBtn');
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert('Voice recognition not supported in this browser.'); return; }
-
-  if (isListeningInvoice && invoiceRecognition) {
-    invoiceRecognition.stop();
-    isListeningInvoice = false;
-    if (btn) btn.classList.remove('mic-pulsing');
-    updateLed('CARD ACTIVE ⚡', false);
-    return;
-  }
-
-  invoiceRecognition = new SR();
-  invoiceRecognition.lang = 'en-US';
-  invoiceRecognition.continuous = false;
-  invoiceRecognition.interimResults = false;
-
-  if (btn) btn.classList.add('mic-pulsing');
-  updateLed('DICTATE INVOICE ITEMS...', false);
-  isListeningInvoice = true;
-
-  var voiceHandled = false;
-
-  invoiceRecognition.onresult = function(e) {
-    if (voiceHandled) return;
-    voiceHandled = true;
-
-    var text = e.results[0][0].transcript.toLowerCase();
-    updateLed('PARSING: "' + text + '"', false);
-    
-    if (text.includes('angel')) {
-      addPrepopulatedRow('Guardian Angel HEPA Filter', '125.00', 'part');
-    } else if (text.includes('beyond filter') || text.includes('beyond air filter') || text.includes('beyond hepa')) {
-      addPrepopulatedRow('Beyond Guardian HEPA Filter', '140.00', 'part');
-    } else if (text.includes('c bag') || text.includes('c bags') || text.includes('24 c')) {
-      addPrepopulatedRow('C Filter Bags - 24 Pk.', '48.99', 'part');
-    } else if (text.includes('cell') || text.includes('ap cell') || text.includes('beyond cell')) {
-      addPrepopulatedRow('Beyond AP Cell- 634 model', '109.99', 'part');
-    } else if (text.includes('labor') || text.includes('service') || text.includes('diagnostic')) {
-      addPrepopulatedRow('Bench Inspection & Diagnostic Labor', '40.00', 'labor');
-    }
-
-    try { invoiceRecognition.stop(); } catch(err) {}
-  };
-
-  invoiceRecognition.onend = function() {
-    isListeningInvoice = false;
-    if (btn) btn.classList.remove('mic-pulsing');
-    updateLed('INVOICE UPDATED ⚡', false);
-  };
-
-  invoiceRecognition.start();
 }
 
 function addPrepopulatedRow(name, price, type) {
@@ -385,9 +177,9 @@ function addPrepopulatedRow(name, price, type) {
 
   var newRow = document.createElement('div');
   newRow.className = 'flex gap-2 items-center invoice-row';
-  newRow.innerHTML = '<input type="text" list="partsCatalog" value="' + escapeHtml(name) + '" oninput="handlePartSearch(this)" placeholder="Search C Bags, Beyond HEPA, Labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
+  newRow.innerHTML = '<input type="text" value="' + name + '" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none">' +
                      '<select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none"><option value="part" ' + (type==='part'?'selected':'') + '>Part (Tax)</option><option value="labor" ' + (type==='labor'?'selected':'') + '>Labor (No Tax)</option></select>' +
-                     '<input type="number" step="0.01" value="' + price + '" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">' +
+                     '<input type="number" step="0.01" value="' + price + '" oninput="calculateInvoiceTotals()" class="w-20 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none">' +
                      '<button type="button" onclick="removeInvoiceRow(this)" class="text-gray-500 hover:text-red-400 px-1 text-xs">✕</button>';
   rowsContainer.appendChild(newRow);
   calculateInvoiceTotals();
@@ -428,78 +220,6 @@ function calculateInvoiceTotals() {
   document.getElementById('subtotalVal').textContent = '$' + subtotal.toFixed(2);
   document.getElementById('taxVal').textContent = '$' + tax.toFixed(2);
   document.getElementById('totalVal').textContent = '$' + total.toFixed(2);
-}
-
-function generateStripeCheckout() {
-  var totalStr = document.getElementById('totalVal').textContent;
-  updateLed('GENERATING STRIPE LINK... ⚡', false);
-  
-  fetch('/.netlify/functions/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      prompt: "GENERATE_STRIPE_LINK",
-      customer: currentCustomerTitle,
-      card_id: currentCardId,
-      amount: totalStr
-    })
-  })
-  .then(function(res) { return res.json(); })
-  .then(function(data) {
-    updateLed('STRIPE READY: ' + (data.url || 'Link Created!'), false);
-  })
-  .catch(function() {
-    updateLed('STRIPE LINK READY ⚡', false);
-  });
-}
-
-function sendSmsInvoice() {
-  var totalStr = document.getElementById('totalVal').textContent;
-  updateLed('SENDING SMS INVOICE... 📱', false);
-  
-  fetch('/.netlify/functions/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      prompt: "SEND_SMS_INVOICE",
-      customer: currentCustomerTitle,
-      card_id: currentCardId,
-      amount: totalStr
-    })
-  })
-  .then(function(res) { return res.json(); })
-  .then(function(data) {
-    updateLed('SMS SENT SUCCESSFULLY ⚡', false);
-  })
-  .catch(function() {
-    updateLed('SMS SENT ⚡', false);
-  });
-}
-
-function postCardNote() {
-  var input = document.getElementById('cardNoteInput');
-  var noteText = input ? input.value.trim() : '';
-  if (!noteText) return;
-
-  updateLed('POSTING NOTE... ⚡', false);
-  input.value = '';
-
-  fetch('/.netlify/functions/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      prompt: "[" + currentCustomerTitle + "] Note: " + noteText,
-      card_id: currentCardId,
-      board_id: '18424728273'
-    })
-  })
-  .then(function(res) { return res.json(); })
-  .then(function(data) {
-    updateLed('NOTE POSTED TO CARD ⚡', false);
-  })
-  .catch(function() {
-    updateLed('NOTE POSTED ⚡', false);
-  });
 }
 </script>
 </body>
