@@ -267,11 +267,16 @@ function toggleInvoiceVoice() {
   updateLed('DICTATE INVOICE ITEMS...', false);
   isListeningInvoice = true;
 
+  var voiceHandled = false;
+
   invoiceRecognition.onresult = function(e) {
+    if (voiceHandled) return;
+    voiceHandled = true;
+
     var text = e.results[0][0].transcript.toLowerCase();
     updateLed('PARSING: "' + text + '"', false);
     
-    // EXCLUSIVE MATCHING — ADDS EXACTLY 1 ITEM PER SPOKEN PHRASE
+    // EXCLUSIVE MATCHING & DEBOUNCED SINGLE-ITEM ENTRY
     if (text.includes('angel')) {
       addPrepopulatedRow('Guardian Angel HEPA Filter', '125.00', 'part');
     } else if (text.includes('beyond filter') || text.includes('beyond air filter') || text.includes('beyond hepa')) {
@@ -285,6 +290,8 @@ function toggleInvoiceVoice() {
     } else if (text.includes('labor') || text.includes('service') || text.includes('diagnostic') || text.includes('bench')) {
       addPrepopulatedRow('Bench Inspection & Diagnostic Labor', '40.00', 'labor');
     }
+
+    try { invoiceRecognition.stop(); } catch(err) {}
   };
 
   invoiceRecognition.onend = function() {
