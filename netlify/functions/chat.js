@@ -1,175 +1,200 @@
-const fs = require('fs');
-const path = require('path');
+// netlify/functions/chat.js
+const https = require('https');
 
-// Global cache for customer database in RAM
-let customerDatabase = null;
-
-// Pure native JS CSV parser - ZERO external packages needed!
-function loadCustomerDatabase() {
-  if (customerDatabase) return customerDatabase;
-
-  const csvFilePath = path.join(__dirname, 'export_export (34).csv');
-  if (!fs.existsSync(csvFilePath)) {
-    console.warn('Customer CSV file not found at path:', csvFilePath);
-    customerDatabase = [];
-    return customerDatabase;
-  }
-
-  try {
-    const fileContent = fs.readFileSync(csvFilePath, 'utf8');
-    const lines = fileContent.split('\n');
-    const records = [];
-
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (!line) continue;
-      
-      // Native CSV regex split supporting quoted commas
-      const cols = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
-      if (cols && cols.length >= 2) {
-        const clientNum = (cols[0] || '').replace(/"/g, '').trim();
-        const name = (cols[1] || '').replace(/"/g, '').trim();
-        const phone = (cols[4] || '').replace(/"/g, '').trim();
-        const address = (cols[3] || '').replace(/"/g, '').trim();
-
-        if (name) {
-          records.push({
-            clientNum: clientNum,
-            name: name,
-            address: address,
-            phoneRaw: phone,
-            phoneClean: phone.replace(/\D/g, '')
-          });
-        }
+function mondayApi(query, variables = {}) {
+  const apiKey = process.env.MONDAY_API_KEY || '';
+  return new Promise((resolve, reject) => {
+    const data = JSON.stringify({ query, variables });
+    const req = https.request('https://api.monday.com/v2', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': apiKey,
+        'API-Version': '2023-10'
       }
-    }
-
-    customerDatabase = records;
-    console.log(`Loaded ${customerDatabase.length} customer records into memory.`);
-  } catch (err) {
-    console.error('Error reading customer CSV:', err);
-    customerDatabase = [];
-  }
-
-  return customerDatabase;
+    }, (res) => {
+      let body = '';
+      res.on('data', chunk => body += chunk);
+      res.on('end', () => {
+        try {
+          resolve(JSON.parse(body));
+        } catch (e) {
+          resolve({ error: body });
+        }
+      });
+    });
+    req.on('error', reject);
+    req.write(data);
+    req.end();
+  });
 }
 
-exports.handler = async function (event, context) {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+exports.handler = async (event) => {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Content-Type': 'application/json'
+  };
+
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
   }
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const prompt = body.prompt || '';
-    const boardId = body.board_id || '18424728273';
+    const { prompt = '', card_id, board_id = '18424728273', customer = '', amount = '', doc_type = 'Invoice' } = body;
     const apiKey = process.env.MONDAY_API_KEY;
 
-    if (!prompt) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Prompt is required' })
-      };
-    }
-
-    // Load customer database into RAM
-    const db = loadCustomerDatabase();
-
-    // 1. HANDLE MOVE_CARD MUTATION
-    if (prompt === 'MOVE_CARD') {
-      const itemId = body.item_id;
-      const groupId = body.group_id;
-
-      if (!itemId || !groupId) {
-        return {
-          statusCode: 400,
-          body: JSON.stringify({ error: 'item_id and group_id are required for MOVE_CARD' })
-        };
-      }
-
-      const moveQuery = `
-        mutation ($itemId: ID!, $groupId: String!) {
-          move_item_to_group (item_id: $itemId, group_id: $groupId) {
+    // RULE 1: IF CARD_ID IS PRESENT -> POST UPDATE DIRECTLY TO EXISTING CARD (NEVER CREATE NEW ITEM)
+    if (card_id && String(card_id).trim() !== '') {
+      const updateMutation = `
+        mutation ($itemId: ID!, $body: String!) {
+          create_update (item_id: $itemId, body: $body) {
             id
           }
         }
       `;
+      
+      let noteText = prompt;
+      if (prompt === "GENERATE_STRIPE_LINK") {
+        noteText = `[STRIPE LINK REQUESTED] ${doc_type} Total: ${amount}`;
+      } else if (prompt === "SEND_SMS_INVOICE") {
+        noteText = `[SMS SENT] ${doc_type} Total: ${amount}`;
+      }
 
-      const moveResponse = await fetch('https://api.monday.com/v2', {
-        method: 'POST',
-        headers: {
-          'Authorization': apiKey,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ query: moveQuery, variables: { itemId, groupId } })
+      const res = await mondayApi(updateMutation, {
+        itemId: String(card_id),
+        body: noteText
       });
-
-      const moveData = await moveResponse.json();
 
       return {
         statusCode: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
-          reply: 'Card Routed! ⚡',
-          item: moveData.data ? moveData.data.move_item_to_group : null
+          status: 'success',
+          action: 'create_update',
+          card_id: card_id,
+          result: res
         })
       };
     }
 
-    // 2. REAL-TIME CUSTOMER LOOKUP
-    let matchedCustomer = null;
-    const extractedDigits = prompt.replace(/\D/g, '');
+    // RULE 2: EXTRACT CUSTOMER NAME & QUERY MONDAY BOARD TO FIND EXISTING FOREVER CARD
+    let extractedName = customer;
+    if (!extractedName && prompt.includes('[')) {
+      const match = prompt.match(/\[(.*?)\]/);
+      if (match) extractedName = match[1];
+    }
+    
+    extractedName = (extractedName || '')
+      .replace(/Note:.*/i, '')
+      .replace(/Schedule.*appointment for /i, '')
+      .replace(/Okay let's add.*/i, '')
+      .replace(/for noon today.*/i, '')
+      .replace(/for today.*/i, '')
+      .replace(/at .*/i, '')
+      .trim();
 
-    if (extractedDigits.length >= 7) {
-      matchedCustomer = db.find(c => c.phoneClean && extractedDigits.includes(c.phoneClean));
+    let targetCardId = null;
+
+    if (extractedName && apiKey) {
+      const searchQuery = `
+        query ($boardId: [ID!], $itemName: String!) {
+          boards (ids: $boardId) {
+            items_page (query: {rules: [{column_id: "name", compare_value: [$itemName], operator: contains_text}]}) {
+              items {
+                id
+                name
+              }
+            }
+          }
+        }
+      `;
+      
+      const searchRes = await mondayApi(searchQuery, {
+        boardId: [board_id],
+        itemName: extractedName
+      });
+
+      const items = searchRes?.data?.boards?.[0]?.items_page?.items || [];
+      if (items.length > 0) {
+        targetCardId = items[0].id;
+      }
     }
 
-    if (!matchedCustomer && prompt.length > 2) {
-      const promptLower = prompt.toLowerCase();
-      matchedCustomer = db.find(c => c.name && promptLower.includes(c.name.toLowerCase()));
+    // IF FOREVER CARD EXISTS -> CONSOLIDATE UPDATE ON EXISTING CARD
+    if (targetCardId) {
+      const updateMutation = `
+        mutation ($itemId: ID!, $body: String!) {
+          create_update (item_id: $itemId, body: $body) {
+            id
+          }
+        }
+      `;
+      const res = await mondayApi(updateMutation, {
+        itemId: String(targetCardId),
+        body: prompt
+      });
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          status: 'success',
+          action: 'create_update',
+          card_id: targetCardId,
+          matched_customer: extractedName,
+          result: res
+        })
+      };
     }
 
-    let finalItemName = prompt;
-    if (matchedCustomer) {
-      finalItemName = `${prompt} | 📍 ${matchedCustomer.address} | 📞 ${matchedCustomer.phoneRaw} | Client #${matchedCustomer.clientNum}`;
-    }
-
-    const groupId = 'group_mm6b77as'; // Learning Drawer
-
-    const query = `
-      mutation ($boardId: ID!, $groupId: String!, $itemName: String!) {
-        create_item (board_id: $boardId, group_id: $groupId, item_name: $itemName) {
+    // IF NO CARD EXISTS -> CREATE ONE NEW MASTER FOREVER CARD
+    const createMutation = `
+      mutation ($boardId: ID!, $itemName: String!) {
+        create_item (board_id: $boardId, item_name: $itemName) {
           id
-          name
         }
       }
     `;
-
-    const response = await fetch('https://api.monday.com/v2', {
-      method: 'POST',
-      headers: {
-        'Authorization': apiKey,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ query, variables: { boardId, groupId, itemName: finalItemName } })
+    const newItemName = extractedName || prompt.slice(0, 50) || 'New Customer Intake';
+    const createRes = await mondayApi(createMutation, {
+      boardId: board_id,
+      itemName: newItemName
     });
 
-    const resData = await response.json();
+    const newCardId = createRes?.data?.create_item?.id;
+
+    if (newCardId) {
+      const updateMutation = `
+        mutation ($itemId: ID!, $body: String!) {
+          create_update (item_id: $itemId, body: $body) {
+            id
+          }
+        }
+      `;
+      await mondayApi(updateMutation, {
+        itemId: String(newCardId),
+        body: prompt
+      });
+    }
 
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({
-        reply: matchedCustomer ? 'Logged with Customer Auto-Lookup! ⚡' : 'Logged! ⚡',
-        item: resData.data ? resData.data.create_item : null,
-        matchedCustomer: matchedCustomer || null
+        status: 'success',
+        action: 'create_item',
+        card_id: newCardId,
+        result: createRes
       })
     };
-  } catch (error) {
-    console.error('Chat function error:', error);
+
+  } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Internal Server Error', message: error.message })
+      headers,
+      body: JSON.stringify({ error: err.message })
     };
   }
 };
