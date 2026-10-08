@@ -10,21 +10,41 @@
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05070e; color: #f3f4f6; }
 .card-face { background: linear-gradient(180deg, #0f172a 0%, #090d16 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); }
 .led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+.mic-pulsing { animation: pulse-red 1.5s infinite; background-color: #dc2626 !important; color: #ffffff !important; }
 </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-3 pb-24 relative">
 
 <div class="max-w-md w-full card-face rounded-3xl p-5 relative space-y-4 shadow-2xl my-auto">
   
-  <!-- HEADER & DYNAMIC CUSTOMER TITLE -->
-  <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-    <div>
+  <!-- HEADER & FULL CUSTOMER CONTACT CARD -->
+  <div class="border-b border-slate-800 pb-3 space-y-1">
+    <div class="flex items-center justify-between">
       <h1 id="customerTitle" class="text-xl font-black text-white tracking-tight flex items-center gap-2">
-        <i class="fa-solid fa-address-card text-blue-400"></i> Loading Card...
+        <i class="fa-solid fa-address-card text-blue-400"></i> Customer Card
       </h1>
-      <p id="cardSubtext" class="text-[11px] text-blue-400 font-bold uppercase tracking-wider">Forever Card™ • Dynamic Customer Hub</p>
+      <a href="/" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-1.5 rounded-xl border border-slate-700 transition">Hub</a>
     </div>
-    <a href="/" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-1.5 rounded-xl border border-slate-700 transition">Hub</a>
+    
+    <!-- DYNAMIC ADDRESS & PHONE DISPLAY -->
+    <div id="customerContactBox" class="bg-slate-950/80 rounded-xl p-2.5 border border-slate-800 text-xs space-y-1 text-gray-300">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-location-dot text-red-400"></i>
+        <span id="customerAddress">Customer Address</span>
+      </div>
+      <div class="flex items-center justify-between pt-0.5">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-phone text-emerald-400"></i>
+          <a id="customerPhoneLink" href="#" class="text-emerald-400 font-bold hover:underline">Phone on File</a>
+        </div>
+        <span id="cardSubtext" class="text-[10px] text-blue-400 font-bold uppercase tracking-wider">Forever Card™</span>
+      </div>
+    </div>
   </div>
 
   <!-- LED STATUS DISPLAY -->
@@ -41,11 +61,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <button type="button" onclick="addInvoiceRow()" class="text-[10px] bg-amber-950/80 hover:bg-amber-900 text-amber-300 font-bold px-2 py-1 rounded-lg border border-amber-800/60">+ Add Item</button>
     </div>
 
+    <!-- LIVE CATALOG DATALIST -->
+    <datalist id="partsCatalog">
+      <option value="Beyond AP Cell- 634 model" data-price="109.99" data-type="part">Beyond AP Cell ($109.99)</option>
+      <option value="Single Guardian Ultra H.e.p.a. Filter" data-price="49.99" data-type="part">Guardian Ultra HEPA ($49.99)</option>
+      <option value="Laundry Pro II AP Cell Assembly" data-price="69.99" data-type="part">Laundry Pro AP Cell ($69.99)</option>
+      <option value="UV Lamp 916- Replacement" data-price="219.99" data-type="part">UV Lamp 916 ($219.99)</option>
+      <option value="Bench Inspection & Diagnostic Labor" data-price="40.00" data-type="labor">Service / Diagnostic Labor ($40.00)</option>
+    </datalist>
+
     <!-- LINE ITEMS CONTAINER -->
     <div id="invoiceRows" class="space-y-2">
-      <!-- Clean Blank Starting Row -->
+      <!-- Dynamic Search Row -->
       <div class="flex gap-2 items-center invoice-row">
-        <input type="text" placeholder="Item description" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
+        <input type="text" list="partsCatalog" oninput="handlePartSearch(this)" placeholder="Search parts or labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
         <select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none">
           <option value="part">Part (Taxable)</option>
           <option value="labor">Labor (No Tax)</option>
@@ -82,13 +111,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </div>
   </div>
 
-  <!-- NOTES & TIMELINE -->
+  <!-- NOTES & VOICE INTAKE BAR -->
   <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-2.5">
-    <div class="text-xs font-black text-teal-300 uppercase tracking-wider flex items-center gap-1.5">
-      <i class="fa-solid fa-clock-rotate-left"></i> Card Notes &amp; Updates
+    <div class="text-xs font-black text-teal-300 uppercase tracking-wider flex items-center justify-between">
+      <span class="flex items-center gap-1.5"><i class="fa-solid fa-microphone text-teal-400"></i> Card Notes &amp; Voice Dictation</span>
+      <span class="text-[10px] text-teal-400/80">Tap Mic To Speak</span>
     </div>
-    <div class="flex gap-2">
+    <div class="flex gap-2 items-center">
       <input type="text" id="cardNoteInput" placeholder="Type or dictate note..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-teal-500" onkeydown="if(event.key==='Enter') postCardNote()">
+      <button type="button" id="cardMicBtn" onclick="toggleCardVoice()" class="bg-teal-700 hover:bg-teal-600 text-white w-10 h-10 rounded-xl flex items-center justify-center border border-teal-500 shadow transition shrink-0 active:scale-95">
+        <i class="fa-solid fa-microphone text-sm"></i>
+      </button>
       <button type="button" onclick="postCardNote()" class="bg-teal-600 hover:bg-teal-500 text-white font-bold px-3 py-2 rounded-xl text-xs transition active:scale-95">Post</button>
     </div>
   </div>
@@ -99,15 +132,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 <script>
 var currentCardId = '';
 var currentCustomerTitle = '';
+var isListening = false;
+var activeRecognition = null;
 
 window.onload = function() {
   var params = new URLSearchParams(window.location.search);
   currentCardId = params.get('id') || '';
   var rawTitle = params.get('title') || params.get('customer') || '';
+  var rawAddress = params.get('address') || '';
+  var rawPhone = params.get('phone') || '';
   
   if (rawTitle) {
     var decoded = decodeURIComponent(rawTitle);
-    // STRIP VOICE PROMPTS DOWN TO CLEAN CUSTOMER NAME
     currentCustomerTitle = decoded
       .replace(/Schedule.*appointment for /i, '')
       .replace(/for noon today.*/i, '')
@@ -125,8 +161,18 @@ window.onload = function() {
     document.getElementById('customerTitle').innerHTML = '<i class="fa-solid fa-address-card text-blue-400"></i> Customer Card';
   }
 
+  if (rawAddress) {
+    document.getElementById('customerAddress').textContent = decodeURIComponent(rawAddress);
+  }
+  if (rawPhone) {
+    var cleanPhone = decodeURIComponent(rawPhone);
+    var phoneEl = document.getElementById('customerPhoneLink');
+    phoneEl.textContent = cleanPhone;
+    phoneEl.href = 'tel:' + cleanPhone.replace(/\D/g, '');
+  }
+
   if (currentCardId) {
-    document.getElementById('cardSubtext').textContent = 'ID: ' + currentCardId + ' • Forever Card™';
+    document.getElementById('cardSubtext').textContent = 'ID: ' + currentCardId;
   }
 
   calculateInvoiceTotals();
@@ -134,6 +180,26 @@ window.onload = function() {
 
 function escapeHtml(str) {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function handlePartSearch(inputEl) {
+  var val = inputEl.value;
+  var options = document.querySelectorAll('#partsCatalog option');
+  var row = inputEl.closest('.invoice-row');
+  
+  options.forEach(function(opt) {
+    if (opt.value === val) {
+      var price = opt.getAttribute('data-price');
+      var type = opt.getAttribute('data-type');
+      if (row) {
+        var priceInput = row.querySelector('.item-price');
+        var typeSelect = row.querySelector('.item-type');
+        if (priceInput) priceInput.value = price;
+        if (typeSelect) typeSelect.value = type;
+        calculateInvoiceTotals();
+      }
+    }
+  });
 }
 
 function updateLed(msg, isError) {
@@ -144,11 +210,48 @@ function updateLed(msg, isError) {
   }
 }
 
+function toggleCardVoice() {
+  var input = document.getElementById('cardNoteInput');
+  var btn = document.getElementById('cardMicBtn');
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SR) { alert('Voice not supported on this browser.'); return; }
+
+  if (isListening && activeRecognition) {
+    activeRecognition.stop();
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing');
+    updateLed('CARD ACTIVE ⚡', false);
+    return;
+  }
+
+  activeRecognition = new SR();
+  activeRecognition.lang = 'en-US';
+  activeRecognition.interimResults = true;
+
+  if (btn) btn.classList.add('mic-pulsing');
+  updateLed('LISTENING... (SPEAK NOTE)', false);
+  isListening = true;
+
+  activeRecognition.onresult = function(e) {
+    var transcript = Array.from(e.results).map(r => r[0].transcript).join('');
+    if (input) input.value = transcript;
+  };
+
+  activeRecognition.onend = function() {
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing');
+    updateLed('NOTE DICTATED ⚡', false);
+  };
+
+  activeRecognition.start();
+}
+
 function addInvoiceRow() {
   var rowsContainer = document.getElementById('invoiceRows');
   var newRow = document.createElement('div');
   newRow.className = 'flex gap-2 items-center invoice-row';
-  newRow.innerHTML = '<input type="text" placeholder="Item description" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
+  newRow.innerHTML = '<input type="text" list="partsCatalog" oninput="handlePartSearch(this)" placeholder="Search parts or labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
                      '<select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none"><option value="part">Part (Taxable)</option><option value="labor">Labor (No Tax)</option></select>' +
                      '<input type="number" step="0.01" value="0.00" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">' +
                      '<button type="button" onclick="removeInvoiceRow(this)" class="text-gray-500 hover:text-red-400 px-1 text-xs">✕</button>';
