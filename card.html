@@ -10,19 +10,13 @@
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05070e; color: #f3f4f6; }
 .card-face { background: linear-gradient(180deg, #0f172a 0%, #090d16 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); }
 .led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
-@keyframes pulse-red {
-  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-}
-.mic-pulsing { animation: pulse-red 1.5s infinite; background-color: #dc2626 !important; color: #ffffff !important; }
 </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-3 pb-24 relative">
 
 <div class="max-w-md w-full card-face rounded-3xl p-5 relative space-y-4 shadow-2xl my-auto">
   
-  <!-- HEADER & FULL CUSTOMER CONTACT CARD -->
+  <!-- HEADER & FULL DYNAMIC CUSTOMER CONTACT CARD -->
   <div class="border-b border-slate-800 pb-3 space-y-1">
     <div class="flex items-center justify-between">
       <h1 id="customerTitle" class="text-xl font-black text-white tracking-tight flex items-center gap-2">
@@ -52,34 +46,34 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     <div id="statusLed" class="text-xs font-bold text-emerald-400 tracking-wide">CARD ACTIVE ⚡</div>
   </div>
 
-  <!-- DRAFT INVOICE BUILDER WITH VOICE INTAKE -->
+  <!-- DRAFT INVOICE BUILDER WITH CATEGORIZED CATALOG SEARCH -->
   <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
       <span class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-        <i class="fa-solid fa-file-invoice-dollar"></i> Voice &amp; Draft Invoice Builder
+        <i class="fa-solid fa-file-invoice-dollar"></i> Draft Invoice Builder
       </span>
-      <div class="flex gap-1.5 items-center">
-        <button type="button" id="invoiceMicBtn" onclick="toggleInvoiceVoice()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-2.5 py-1 rounded-lg text-[11px] flex items-center gap-1 shadow transition active:scale-95">
-          <i class="fa-solid fa-microphone"></i> Dictate Items
-        </button>
-        <button type="button" onclick="addInvoiceRow()" class="text-[10px] bg-amber-950/80 hover:bg-amber-900 text-amber-300 font-bold px-2 py-1 rounded-lg border border-amber-800/60">+ Add Item</button>
-      </div>
+      <button type="button" onclick="addInvoiceRow()" class="text-[10px] bg-amber-950/80 hover:bg-amber-900 text-amber-300 font-bold px-2 py-1 rounded-lg border border-amber-800/60">+ Add Item</button>
     </div>
 
-    <!-- LIVE CATALOG DATALIST -->
+    <!-- LIVE PARTS CATALOG DATALIST -->
     <datalist id="partsCatalog">
-      <option value="Beyond AP Cell- 634 model" data-price="109.99" data-type="part">Beyond AP Cell ($109.99)</option>
-      <option value="Single Guardian Ultra H.e.p.a. Filter" data-price="49.99" data-type="part">Guardian Ultra HEPA ($49.99)</option>
-      <option value="Laundry Pro II AP Cell Assembly" data-price="69.99" data-type="part">Laundry Pro AP Cell ($69.99)</option>
-      <option value="UV Lamp 916- Replacement" data-price="219.99" data-type="part">UV Lamp 916 ($219.99)</option>
-      <option value="Bench Inspection & Diagnostic Labor" data-price="40.00" data-type="labor">Service / Diagnostic Labor ($40.00)</option>
+      <option value="Beyond AP Cell- 634 model" data-price="109.99" data-type="part">Beyond AP Cell [$109.99] (Beyond Supplies)</option>
+      <option value="Single Guardian Ultra H.e.p.a. Filter" data-price="49.99" data-type="part">Guardian Ultra HEPA [$49.99] (Lux Supplies)</option>
+      <option value="Laundry Pro II Replacement AP Cell Assembly" data-price="69.99" data-type="part">Laundry Pro AP Cell [$69.99] (Beyond Parts)</option>
+      <option value="UV Lamp 916- Replacement" data-price="219.99" data-type="part">UV Lamp 916 [$219.99] (UV Supplies)</option>
+      <option value="Labor" data-price="40.00" data-type="labor">Equipment Disassembly & Diagnostic Labor [$40.00] (Labor)</option>
+      <option value="Aerus Mobile" data-price="271.00" data-type="part">Aerus Mobile [$271.00] (Beyond by Aerus)</option>
+      <option value="White Filter Housing - Legacy" data-price="21.00" data-type="part">White Filter Housing [$21.00] (Water Filtration)</option>
+      <option value="Sediment/Carbon Filter" data-price="53.00" data-type="part">Sediment/Carbon Filter [$53.00] (Water Filtration)</option>
+      <option value="High-Efficiency and Carbon After Filters 49437" data-price="19.67" data-type="part">Classic Canister Carbon After Filter [$19.67] (Lux Supplies)</option>
+      <option value="Standard Carbon Pre-Filter Add-On" data-price="450.00" data-type="part">Carbon Pre-Filter Add-On [$450.00] (Water Components)</option>
     </datalist>
 
     <!-- LINE ITEMS CONTAINER -->
     <div id="invoiceRows" class="space-y-2">
       <!-- Dynamic Search Row -->
       <div class="flex gap-2 items-center invoice-row">
-        <input type="text" list="partsCatalog" oninput="handlePartSearch(this)" placeholder="Search parts or labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
+        <input type="text" list="partsCatalog" oninput="handlePartSearch(this)" placeholder="Type part name or search..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
         <select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none">
           <option value="part">Part (Taxable)</option>
           <option value="labor">Labor (No Tax)</option>
@@ -122,7 +116,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <i class="fa-solid fa-clock-rotate-left"></i> Card Notes &amp; Updates
     </div>
     <div class="flex gap-2">
-      <input type="text" id="cardNoteInput" placeholder="Type note for history..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-teal-500" onkeydown="if(event.key==='Enter') postCardNote()">
+      <input type="text" id="cardNoteInput" placeholder="Type note for customer card..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-teal-500" onkeydown="if(event.key==='Enter') postCardNote()">
       <button type="button" onclick="postCardNote()" class="bg-teal-600 hover:bg-teal-500 text-white font-bold px-3 py-2 rounded-xl text-xs transition active:scale-95">Post Note</button>
     </div>
   </div>
@@ -133,8 +127,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 <script>
 var currentCardId = '';
 var currentCustomerTitle = '';
-var isListeningInvoice = false;
-var invoiceRecognition = null;
 
 window.onload = function() {
   var params = new URLSearchParams(window.location.search);
@@ -211,65 +203,11 @@ function updateLed(msg, isError) {
   }
 }
 
-function toggleInvoiceVoice() {
-  var btn = document.getElementById('invoiceMicBtn');
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-  if (!SR) { alert('Voice recognition not supported in this browser.'); return; }
-
-  if (isListeningInvoice && invoiceRecognition) {
-    invoiceRecognition.stop();
-    isListeningInvoice = false;
-    if (btn) btn.classList.remove('mic-pulsing');
-    updateLed('CARD ACTIVE ⚡', false);
-    return;
-  }
-
-  invoiceRecognition = new SR();
-  invoiceRecognition.lang = 'en-US';
-  invoiceRecognition.continuous = false; // FIX #2: Stop listening immediately when speech ends
-  invoiceRecognition.interimResults = false;
-
-  if (btn) btn.classList.add('mic-pulsing');
-  updateLed('DICTATE INVOICE ITEMS...', false);
-  isListeningInvoice = true;
-
-  invoiceRecognition.onresult = function(e) {
-    var text = e.results[0][0].transcript.toLowerCase();
-    updateLed('PARSING: "' + text + '"', false);
-    
-    // FIX #1: Clear previous rows before adding newly dictated items to prevent duplicates
-    document.getElementById('invoiceRows').innerHTML = '';
-
-    // FIX #3: Parse specific spoken items cleanly into exactly 1 row per match
-    if (text.includes('cell') || text.includes('ap cell') || text.includes('beyond')) {
-      addPrepopulatedRow('Beyond AP Cell- 634 model', '109.99', 'part');
-    }
-    if (text.includes('filter') || text.includes('hepa') || text.includes('guardian')) {
-      addPrepopulatedRow('Single Guardian Ultra H.e.p.a. Filter', '49.99', 'part');
-    }
-    if (text.includes('lamp') || text.includes('uv') || text.includes('bulb')) {
-      addPrepopulatedRow('UV Lamp 916- Replacement', '219.99', 'part');
-    }
-    if (text.includes('labor') || text.includes('service') || text.includes('diagnostic') || text.includes('bench')) {
-      addPrepopulatedRow('Bench Inspection & Diagnostic Labor', '40.00', 'labor');
-    }
-  };
-
-  invoiceRecognition.onend = function() {
-    isListeningInvoice = false;
-    if (btn) btn.classList.remove('mic-pulsing');
-    updateLed('INVOICE UPDATED ⚡', false);
-  };
-
-  invoiceRecognition.start();
-}
-
 function addPrepopulatedRow(name, price, type) {
   var rowsContainer = document.getElementById('invoiceRows');
   var newRow = document.createElement('div');
   newRow.className = 'flex gap-2 items-center invoice-row';
-  newRow.innerHTML = '<input type="text" list="partsCatalog" value="' + name + '" oninput="handlePartSearch(this)" placeholder="Search parts or labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
+  newRow.innerHTML = '<input type="text" list="partsCatalog" value="' + name + '" oninput="handlePartSearch(this)" placeholder="Type part name or search..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
                      '<select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none"><option value="part" ' + (type==='part'?'selected':'') + '>Part (Taxable)</option><option value="labor" ' + (type==='labor'?'selected':'') + '>Labor (No Tax)</option></select>' +
                      '<input type="number" step="0.01" value="' + price + '" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">' +
                      '<button type="button" onclick="removeInvoiceRow(this)" class="text-gray-500 hover:text-red-400 px-1 text-xs">✕</button>';
