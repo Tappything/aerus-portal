@@ -227,6 +227,7 @@ function toggleInvoiceVoice() {
 
   invoiceRecognition = new SR();
   invoiceRecognition.lang = 'en-US';
+  invoiceRecognition.continuous = false; // FIX #2: Stop listening immediately when speech ends
   invoiceRecognition.interimResults = false;
 
   if (btn) btn.classList.add('mic-pulsing');
@@ -237,7 +238,10 @@ function toggleInvoiceVoice() {
     var text = e.results[0][0].transcript.toLowerCase();
     updateLed('PARSING: "' + text + '"', false);
     
-    // Voice Parsing Logic for Parts & Labor
+    // FIX #1: Clear previous rows before adding newly dictated items to prevent duplicates
+    document.getElementById('invoiceRows').innerHTML = '';
+
+    // FIX #3: Parse specific spoken items cleanly into exactly 1 row per match
     if (text.includes('cell') || text.includes('ap cell') || text.includes('beyond')) {
       addPrepopulatedRow('Beyond AP Cell- 634 model', '109.99', 'part');
     }
@@ -247,7 +251,7 @@ function toggleInvoiceVoice() {
     if (text.includes('lamp') || text.includes('uv') || text.includes('bulb')) {
       addPrepopulatedRow('UV Lamp 916- Replacement', '219.99', 'part');
     }
-    if (text.includes('labor') || text.includes('service') || text.includes('diagnostic')) {
+    if (text.includes('labor') || text.includes('service') || text.includes('diagnostic') || text.includes('bench')) {
       addPrepopulatedRow('Bench Inspection & Diagnostic Labor', '40.00', 'labor');
     }
   };
