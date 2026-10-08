@@ -59,45 +59,35 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         <i class="fa-solid fa-file-invoice-dollar"></i> Draft Invoice Builder
       </span>
       <div class="flex gap-1.5 items-center">
+        <button type="button" onclick="openSearchModal()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-2.5 py-1 rounded-lg text-[11px] flex items-center gap-1 shadow transition active:scale-95">
+          <i class="fa-solid fa-magnifying-glass"></i> Search
+        </button>
         <button type="button" id="invoiceMicBtn" onclick="toggleInvoiceVoice()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-2.5 py-1 rounded-lg text-[11px] flex items-center gap-1 shadow transition active:scale-95">
           <i class="fa-solid fa-microphone"></i> Talk
         </button>
-        <button type="button" onclick="addInvoiceRow()" class="text-[10px] bg-amber-950/80 hover:bg-amber-900 text-amber-300 font-bold px-2 py-1 rounded-lg border border-amber-800/60">+ Add Item</button>
+        <button type="button" onclick="addInvoiceRow()" class="text-[10px] bg-amber-950/80 hover:bg-amber-900 text-amber-300 font-bold px-2 py-1 rounded-lg border border-amber-800/60">+ Add</button>
       </div>
     </div>
 
-    <!-- COMPLETE AERUS / BEYOND PARTS CATALOG DATALIST -->
+    <!-- DATALIST FOR QUICK INLINE TYPING -->
     <datalist id="partsCatalog">
-      <!-- BEYOND & AIR PURIFIER FILTERS -->
-      <option value="Beyond Guardian HEPA Filter" data-price="140.00" data-type="part">Beyond Guardian HEPA Filter [$140.00]</option>
-      <option value="Guardian Angel HEPA Filter" data-price="125.00" data-type="part">Guardian Angel HEPA Filter [$125.00]</option>
-      <option value="Beyond AP Cell- 634 model" data-price="109.99" data-type="part">Beyond AP Cell [$109.99]</option>
-      <option value="HEPA Filter - Guard. Air Home" data-price="207.00" data-type="part">Guardian Air Home HEPA Filter [$207.00]</option>
-      <option value="Single Guardian Ultra H.e.p.a. Filter" data-price="49.99" data-type="part">Guardian Ultra HEPA Filter [$49.99]</option>
-
-      <!-- LAUNDRY PRO & UV BULBS -->
-      <option value="Laundry Pro II Replacement AP Cell Assembly" data-price="69.99" data-type="part">Laundry Pro AP Cell Assembly [$69.99]</option>
-      <option value="UV Lamp 916- Replacement" data-price="219.99" data-type="part">UV Lamp 916 Replacement [$219.99]</option>
-      <option value="Purelight 6 gpm lamp" data-price="250.00" data-type="part">Purelight 6 GPM UV Lamp [$250.00]</option>
-
-      <!-- LABOR & SERVICES -->
-      <option value="Bench Inspection & Diagnostic Labor" data-price="40.00" data-type="labor">Equipment Disassembly & Diagnostic Labor [$40.00]</option>
-      <option value="Standard RO Installation" data-price="300.00" data-type="labor">Standard RO Installation Labor [$300.00]</option>
-
-      <!-- POPULAR VACUUM BAGS & SUPPLIES -->
-      <option value="9 Pk. Clean Obsessed CO6 HEPA Bags" data-price="20.00" data-type="part">9 Pk Clean Obsessed CO6 HEPA Bags [$20.00]</option>
-      <option value="HEPA Filter - Heavy Duty" data-price="34.00" data-type="part">Lux Heavy Duty HEPA Filter [$34.00]</option>
-      <option value="HEPA & Carbon Pre-Filter - Platinum" data-price="47.99" data-type="part">Lux Platinum HEPA & Carbon Pre-Filter [$47.99]</option>
-      <option value="Long-Life HEPA After Filter" data-price="31.99" data-type="part">Lux Long-Life HEPA After Filter [$31.99]</option>
+      <option value="Beyond Guardian HEPA Filter" data-price="140.00" data-type="part">
+      <option value="C Filter Bags - 24 Pk." data-price="48.99" data-type="part">
+      <option value="C Filter Bags - 12 Pk." data-price="30.99" data-type="part">
+      <option value="P Filter Bags - 12 Pk." data-price="39.99" data-type="part">
+      <option value="U Filter Bags - 12 Pk." data-price="30.99" data-type="part">
+      <option value="R Filter Bags - 12 Pk." data-price="28.99" data-type="part">
+      <option value="Guardian Angel HEPA Filter" data-price="125.00" data-type="part">
+      <option value="Beyond AP Cell- 634 model" data-price="109.99" data-type="part">
+      <option value="Bench Inspection & Diagnostic Labor" data-price="40.00" data-type="labor">
     </datalist>
 
     <!-- LINE ITEMS CONTAINER -->
     <div id="invoiceRows" class="space-y-2">
-      <!-- Clean Initial Row -->
       <div class="flex gap-2 items-center invoice-row">
-        <input type="text" list="partsCatalog" oninput="handlePartSearch(this)" placeholder="Search Beyond HEPA, Cell, Labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
+        <input type="text" list="partsCatalog" oninput="handlePartSearch(this)" placeholder="Search Beyond HEPA, C Bags, Labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
         <select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none">
-          <option value="part">Part (Taxable)</option>
+          <option value="part">Part (Tax)</option>
           <option value="labor">Labor (No Tax)</option>
         </select>
         <input type="number" step="0.01" value="0.00" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">
@@ -124,10 +114,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     <!-- ACTION BUTTONS -->
     <div class="grid grid-cols-2 gap-2 pt-1">
       <button type="button" onclick="generateStripeCheckout()" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow transition active:scale-95">
-        <i class="fa-solid fa-credit-card"></i> Stripe Checkout
+        <i class="fa-solid fa-credit-card"></i> Stripe Link
       </button>
       <button type="button" onclick="sendSmsInvoice()" class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow transition active:scale-95">
-        <i class="fa-solid fa-comment-sms"></i> 1-Tap SMS Link
+        <i class="fa-solid fa-comment-sms"></i> 1-Tap SMS
       </button>
     </div>
   </div>
@@ -135,7 +125,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   <!-- NOTES & TIMELINE -->
   <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-2.5">
     <div class="text-xs font-black text-teal-300 uppercase tracking-wider flex items-center gap-1.5">
-      <i class="fa-solid fa-clock-rotate-left"></i> Card Notes &amp; Updates
+      <i class="fa-solid fa-clock-rotate-left"></i> Card Notes & Updates
     </div>
     <div class="flex gap-2">
       <input type="text" id="cardNoteInput" placeholder="Type note for customer card..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-teal-500" onkeydown="if(event.key==='Enter') postCardNote()">
@@ -145,12 +135,46 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
 </div>
 
-<!-- SINGLE MINIMAL SCRIPT ENGINE -->
+<!-- VISUAL INVENTORY SEARCH MODAL POPUP -->
+<div id="searchModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+  <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-4 space-y-3 shadow-2xl">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+      <h3 class="text-sm font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
+        <i class="fa-solid fa-boxes-stacked"></i> Search Catalog
+      </h3>
+      <button onclick="closeSearchModal()" class="text-gray-400 hover:text-white font-bold text-lg">✕</button>
+    </div>
+    
+    <input type="text" id="modalSearchInput" onkeyup="filterModalCatalog()" placeholder="Type C Bag, Beyond, HEPA, Angel..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+    
+    <div id="modalResultsList" class="max-h-60 overflow-y-auto space-y-1.5 pr-1">
+      <!-- Dynamic search results render here -->
+    </div>
+  </div>
+</div>
+
 <script>
 var currentCardId = '';
 var currentCustomerTitle = '';
 var isListeningInvoice = false;
 var invoiceRecognition = null;
+
+// FULL INVENTORY DATABASE ARRAY FOR INSTANT TYPE-AHEAD SEARCH
+var inventoryDatabase = [
+  { name: "C Filter Bags - 24 Pk.", price: "48.99", type: "part" },
+  { name: "C Filter Bags - 12 Pk.", price: "30.99", type: "part" },
+  { name: "P Filter Bags - 12 Pk.", price: "39.99", type: "part" },
+  { name: "U Filter Bags - 12 Pk.", price: "30.99", type: "part" },
+  { name: "R Filter Bags - 12 Pk.", price: "28.99", type: "part" },
+  { name: "Beyond Guardian HEPA Filter", price: "140.00", type: "part" },
+  { name: "Guardian Angel HEPA Filter", price: "125.00", type: "part" },
+  { name: "Beyond AP Cell- 634 model", price: "109.99", type: "part" },
+  { name: "HEPA Filter - Guard. Air Home", price: "207.00", type: "part" },
+  { name: "Single Guardian Ultra H.e.p.a. Filter", price: "49.99", type: "part" },
+  { name: "UV Lamp 916- Replacement", price: "219.99", type: "part" },
+  { name: "Bench Inspection & Diagnostic Labor", price: "40.00", type: "labor" },
+  { name: "Standard RO Installation Labor", price: "300.00", type: "labor" }
+];
 
 window.onload = function() {
   var params = new URLSearchParams(window.location.search);
@@ -161,8 +185,6 @@ window.onload = function() {
   
   if (rawTitle) {
     var decoded = decodeURIComponent(rawTitle);
-    
-    // CLEAN STRIP ALL PROMPT TEXT / NOTES / BRACKETS DOWN TO JUST CUSTOMER NAME
     currentCustomerTitle = decoded
       .replace(/\[.*?\]/g, '')
       .replace(/Note:.*/i, '')
@@ -175,7 +197,6 @@ window.onload = function() {
       .trim();
 
     if (!currentCustomerTitle) currentCustomerTitle = 'Richard Smothers';
-
     document.getElementById('customerTitle').innerHTML = '<i class="fa-solid fa-address-card text-blue-400"></i> ' + escapeHtml(currentCustomerTitle);
     document.title = currentCustomerTitle + ' — Forever Card™';
   } else {
@@ -183,7 +204,6 @@ window.onload = function() {
     document.getElementById('customerTitle').innerHTML = '<i class="fa-solid fa-address-card text-blue-400"></i> Richard Smothers';
   }
 
-  // AUTO POPULATE ADDRESS & PHONE (DEFAULTS TO RICHARD SMOTHERS IF ID MATCHES)
   if (rawAddress) {
     document.getElementById('customerAddress').textContent = decodeURIComponent(rawAddress);
   } else if (currentCustomerTitle.toLowerCase().includes('smothers')) {
@@ -214,6 +234,43 @@ window.onload = function() {
 
 function escapeHtml(str) {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function openSearchModal() {
+  document.getElementById('searchModal').classList.remove('hidden');
+  document.getElementById('modalSearchInput').focus();
+  filterModalCatalog();
+}
+
+function closeSearchModal() {
+  document.getElementById('searchModal').classList.add('hidden');
+}
+
+function filterModalCatalog() {
+  var query = document.getElementById('modalSearchInput').value.toLowerCase();
+  var container = document.getElementById('modalResultsList');
+  container.innerHTML = '';
+
+  var matches = inventoryDatabase.filter(function(item) {
+    return item.name.toLowerCase().includes(query);
+  });
+
+  if (matches.length === 0) {
+    container.innerHTML = '<div class="text-xs text-gray-500 py-2 text-center">No matching items found.</div>';
+    return;
+  }
+
+  matches.forEach(function(item) {
+    var div = document.createElement('div');
+    div.className = 'flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 text-xs hover:border-amber-500 transition cursor-pointer';
+    div.onclick = function() {
+      addPrepopulatedRow(item.name, item.price, item.type);
+      closeSearchModal();
+    };
+    div.innerHTML = '<div><div class="font-bold text-white">' + escapeHtml(item.name) + '</div><div class="text-[10px] text-gray-400">' + (item.type === 'part' ? 'Part (Taxable)' : 'Labor (No Tax)') + '</div></div>' +
+                    '<div class="flex items-center gap-2"><span class="font-mono text-amber-400 font-bold">$' + item.price + '</span><span class="text-xs bg-amber-600 text-white font-bold px-2 py-0.5 rounded-lg">+ Add</span></div>';
+    container.appendChild(div);
+  });
 }
 
 function handlePartSearch(inputEl) {
@@ -247,7 +304,6 @@ function updateLed(msg, isError) {
 function toggleInvoiceVoice() {
   var btn = document.getElementById('invoiceMicBtn');
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-
   if (!SR) { alert('Voice recognition not supported in this browser.'); return; }
 
   if (isListeningInvoice && invoiceRecognition) {
@@ -276,18 +332,15 @@ function toggleInvoiceVoice() {
     var text = e.results[0][0].transcript.toLowerCase();
     updateLed('PARSING: "' + text + '"', false);
     
-    // EXCLUSIVE MATCHING & DEBOUNCED SINGLE-ITEM ENTRY
     if (text.includes('angel')) {
       addPrepopulatedRow('Guardian Angel HEPA Filter', '125.00', 'part');
     } else if (text.includes('beyond filter') || text.includes('beyond air filter') || text.includes('beyond hepa')) {
       addPrepopulatedRow('Beyond Guardian HEPA Filter', '140.00', 'part');
+    } else if (text.includes('c bag') || text.includes('c bags') || text.includes('24 c')) {
+      addPrepopulatedRow('C Filter Bags - 24 Pk.', '48.99', 'part');
     } else if (text.includes('cell') || text.includes('ap cell') || text.includes('beyond cell')) {
       addPrepopulatedRow('Beyond AP Cell- 634 model', '109.99', 'part');
-    } else if (text.includes('guardian filter') || text.includes('guardian ultra')) {
-      addPrepopulatedRow('Single Guardian Ultra H.e.p.a. Filter', '49.99', 'part');
-    } else if (text.includes('lamp') || text.includes('uv') || text.includes('bulb')) {
-      addPrepopulatedRow('UV Lamp 916- Replacement', '219.99', 'part');
-    } else if (text.includes('labor') || text.includes('service') || text.includes('diagnostic') || text.includes('bench')) {
+    } else if (text.includes('labor') || text.includes('service') || text.includes('diagnostic')) {
       addPrepopulatedRow('Bench Inspection & Diagnostic Labor', '40.00', 'labor');
     }
 
@@ -305,8 +358,6 @@ function toggleInvoiceVoice() {
 
 function addPrepopulatedRow(name, price, type) {
   var rowsContainer = document.getElementById('invoiceRows');
-  
-  // CLEAR EMPTY $0.00 INITIAL PLACEHOLDER ROW IF PRESENT
   var existingRows = rowsContainer.querySelectorAll('.invoice-row');
   if (existingRows.length === 1) {
     var firstPrice = existingRows[0].querySelector('.item-price');
@@ -318,8 +369,8 @@ function addPrepopulatedRow(name, price, type) {
 
   var newRow = document.createElement('div');
   newRow.className = 'flex gap-2 items-center invoice-row';
-  newRow.innerHTML = '<input type="text" list="partsCatalog" value="' + name + '" oninput="handlePartSearch(this)" placeholder="Search Beyond HEPA, Cell, Labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
-                     '<select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none"><option value="part" ' + (type==='part'?'selected':'') + '>Part (Taxable)</option><option value="labor" ' + (type==='labor'?'selected':'') + '>Labor (No Tax)</option></select>' +
+  newRow.innerHTML = '<input type="text" list="partsCatalog" value="' + name + '" oninput="handlePartSearch(this)" placeholder="Search Beyond HEPA, C Bags, Labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
+                     '<select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none"><option value="part" ' + (type==='part'?'selected':'') + '>Part (Tax)</option><option value="labor" ' + (type==='labor'?'selected':'') + '>Labor (No Tax)</option></select>' +
                      '<input type="number" step="0.01" value="' + price + '" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">' +
                      '<button type="button" onclick="removeInvoiceRow(this)" class="text-gray-500 hover:text-red-400 px-1 text-xs">✕</button>';
   rowsContainer.appendChild(newRow);
@@ -346,7 +397,6 @@ function calculateInvoiceTotals() {
   rows.forEach(function(row) {
     var priceInput = row.querySelector('.item-price');
     var typeSelect = row.querySelector('.item-type');
-    
     var val = parseFloat(priceInput ? priceInput.value : 0) || 0;
     var itemType = typeSelect ? typeSelect.value : 'part';
 
