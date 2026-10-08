@@ -28,7 +28,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 <!-- MASTER COMMAND HUB -->
 <div id="masterHubContainer" class="max-w-md w-full tapulator-face rounded-3xl p-4 relative space-y-3 shadow-2xl my-auto">
   
-  <!-- CLEAN HEADER WITH FRESH AVATAR -->
+  <!-- CLEAN HEADER -->
   <div class="flex items-center justify-between border-b border-slate-800 pb-2">
     <div class="flex items-center gap-2.5">
       <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-10 h-10 rounded-full border-2 border-blue-400 block shadow-lg object-cover ring-1 ring-blue-500/30" alt="Fresh Avatar" onError="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Fresh&background=3b82f6&color=fff'">
@@ -42,7 +42,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </span>
   </div>
 
-  <!-- MAIN NAVIGATION MATRIX -->
+  <!-- NAVIGATION MATRIX -->
   <div class="space-y-2">
     <button type="button" onclick="openDrawer('Castle')" class="key-primary w-full rounded-xl p-3 text-left transition flex items-center justify-between shadow">
       <div>
@@ -110,13 +110,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <i class="fa-solid fa-arrow-right text-sky-200 text-xs"></i>
     </button>
   </div>
-
-  <div class="text-center pt-0.5">
-    <button type="button" onclick="alert('Sales Rep Portal: Contact William Sullivan at william@towsonhealthyhomes.com')" class="text-[9px] text-gray-500 hover:text-gray-400 transition underline tracking-wider">Sales Rep Portal</button>
-  </div>
 </div>
 
-<!-- ONE SINGLE MODAL CONTAINER (SISSY RULE #1) -->
+<!-- SINGLE DRAWER MODAL -->
 <div id="drawerModal" style="display:none;" class="fixed inset-0 bg-black/95 z-50 flex flex-col p-3 backdrop-blur-md justify-between">
   <div class="max-w-md w-full mx-auto flex flex-col h-full">
     <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-2 shrink-0">
@@ -144,7 +140,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   </div>
 </div>
 
-<!-- BOTTOM INPUT BAR WITH AUTO-EXPANDING TEXT AREA -->
+<!-- BOTTOM AUTO-EXPANDING INTAKE BAR -->
 <div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-2.5 z-40">
   <div class="max-w-md mx-auto flex items-end gap-2">
     <textarea id="unifiedInput" rows="1" placeholder="Talk or type note..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 resize-none max-h-28 overflow-y-auto" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); submitUnifiedInput(); }"></textarea>
@@ -164,12 +160,12 @@ var activeRecognition = null;
 
 var localPreloadedCards = {
   'castle': [
-    { title: '⛽ Gas Finder Card', group: 'Castle Utility', phone: '410-555-0199', desc: 'Cheapest local gas finder active.' },
-    { title: '🛒 Grocery Savings Card', group: 'Castle Utility', phone: '410-555-0188', desc: 'Auto ROI Grocery discount tracker.' },
-    { title: '💳 Banking & Bills Card', group: 'Castle Utility', phone: '410-555-0177', desc: 'Central strategy & bill management.' }
+    { title: '⛽ Gas Finder Card', group: 'Castle Utility', phone: '410-555-0199' },
+    { title: '🛒 Grocery Savings Card', group: 'Castle Utility', phone: '410-555-0188' },
+    { title: '💳 Banking & Bills Card', group: 'Castle Utility', phone: '410-555-0177' }
   ],
   'calendar': [
-    { title: '📅 Today\'s Active Schedule', group: 'Calendar Sync', desc: 'Tap below to launch Google Calendar or speak an appointment to Fresh.', calendarLink: true }
+    { title: '📅 Today\'s Active Schedule', group: 'Calendar Sync', calendarLink: true }
   ]
 };
 
@@ -201,7 +197,6 @@ async function loadDrawerItems(drawerName) {
     const res = await fetch('/.netlify/functions/monday?drawer=' + encodeURIComponent(drawerName) + '&board=18424728273&t=' + new Date().getTime());
     const data = await res.json();
     
-    // EXTRACT ITEMS FROM GROUPS ARRAY (SISSY'S FIX)
     var items = [];
     if (data.items && Array.isArray(data.items)) {
       items = data.items;
@@ -209,8 +204,8 @@ async function loadDrawerItems(drawerName) {
       data.groups.forEach(function(g) {
         if (g.items_page && g.items_page.items) {
           g.items_page.items.forEach(function(it) {
-            // FILTER OUT CLOSED/ARCHIVED ITEMS TO KILL LANDFILLS (SISSY RULE #1)
             var nameLower = (it.name || '').toLowerCase();
+            // FILTER OUT CLOSED/ARCHIVED ITEMS TO KILL LANDFILLS
             if (!nameLower.includes('archive') && !nameLower.includes('completed') && !nameLower.includes('closed') && !nameLower.includes('done')) {
               items.push({
                 id: it.id,
@@ -253,7 +248,6 @@ function submitUnifiedInput(inputId) {
 }
 
 function toggleVoiceIntake(drawerContext, targetInputId, targetBtnId) {
-  var targetDrawer = drawerContext || activeDrawerContext;
   var input = document.getElementById(targetInputId || 'unifiedInput');
   var btn = document.getElementById(targetBtnId || 'micBtn');
   var led = document.getElementById('statusLed');
