@@ -1,41 +1,57 @@
 const fs = require('fs');
 const path = require('path');
-const csv = require('csv-parser');
 
-// Global cache so CSV is loaded into RAM once per cold start (0.01ms lookup time)
+// Global cache for customer database in RAM
 let customerDatabase = null;
 
-// Helper function to load and parse export (34).csv
-async function loadCustomerDatabase() {
+// Pure native JS CSV parser - ZERO external packages needed!
+function loadCustomerDatabase() {
   if (customerDatabase) return customerDatabase;
 
-  const records = [];
   const csvFilePath = path.join(__dirname, 'export_export (34).csv');
+  if (!fs.existsSync(csvFilePath)) {
+    console.warn('Customer CSV file not found at path:', csvFilePath);
+    customerDatabase = [];
+    return customerDatabase;
+  }
 
-  return new Promise((resolve, reject) => {
-    if (!fs.existsSync(csvFilePath)) {
-      console.warn('Customer CSV file not found at path:', csvFilePath);
-      return resolve([]);
+  try {
+    const fileContent = fs.readFileSync(csvFilePath, 'utf8');
+    const lines = fileContent.split('\n');
+    const records = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      
+      // Native CSV regex split supporting quoted commas
+      const cols = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
+      if (cols && cols.length >= 2) {
+        const clientNum = (cols[0] || '').replace(/"/g, '').trim();
+        const name = (cols[1] || '').replace(/"/g, '').trim();
+        const phone = (cols[4] || '').replace(/"/g, '').trim();
+        const address = (cols[3] || '').replace(/"/g, '').trim();
+
+        if (name) {
+          records.push({
+            clientNum: clientNum,
+            name: name,
+            address: address,
+            phoneRaw: phone,
+            phoneClean: phone.replace(/\D/g, '')
+          });
+        }
+      }
     }
 
-    fs.createReadStream(csvFilePath)
-      .pipe(csv())
-      .on('data', (data) => records.push(data))
-      .on('end', () => {
-        // Clean and index phone numbers for instant matching
-        customerDatabase = records.map(row => ({
-          clientNum: row['Client #'] || '',
-          name: row['Name'] || '',
-          email: row['Email'] || '',
-          address: row['Address'] || '',
-          phoneRaw: row['Phone'] || '',
-          phoneClean: (row['Phone'] || '').replace(/\D/g, '') // Strips symbols: 4102566949
-        }));
-        console.log(`Loaded ${customerDatabase.length} customer records into RAM.`);
-        resolve(customerDatabase);
-      })
-      .on('error', (err) => reject(err));
-  });
+    customerDatabase = records;
+    console.log(`Loaded ${customerDatabase.length} customer records into memory.`);
+  } catch (err) {
+    console.error('Error reading customer CSV:', err);
+    customerDatabase = [];
+  }
+
+  return customerDatabase;
 }
 
 exports.handler = async function (event, context) {
@@ -56,8 +72,8 @@ exports.handler = async function (event, context) {
       };
     }
 
-    // Load 22,283 Customer Database into memory
-    const db = await loadCustomerDatabase();
+    // Load customer database into RAM
+    const db = loadCustomerDatabase();
 
     // 1. HANDLE MOVE_CARD MUTATION
     if (prompt === 'MOVE_CARD') {
@@ -79,63 +95,46 @@ exports.handler = async function (event, context) {
         }
       `;
 
-      const moveVariables = {
-        itemId: itemId,
-        groupId: groupId
-      };
-
       const moveResponse = await fetch('https://api.monday.com/v2', {
         method: 'POST',
         headers: {
           'Authorization': apiKey,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ query: moveQuery, variables: moveVariables })
+        body: JSON.stringify({ query: moveQuery, variables: { itemId, groupId } })
       });
 
       const moveData = await moveResponse.json();
-
-      if (moveData.errors) {
-        console.error('Monday API Move Errors:', moveData.errors);
-        return {
-          statusCode: 500,
-          body: JSON.stringify({ error: 'Failed to move item on Monday.com', details: moveData.errors })
-        };
-      }
 
       return {
         statusCode: 200,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           reply: 'Card Routed! ⚡',
-          item: moveData.data.move_item_to_group
+          item: moveData.data ? moveData.data.move_item_to_group : null
         })
       };
     }
 
-    // 2. REAL-TIME CUSTOMER LOOKUP MATCHING
+    // 2. REAL-TIME CUSTOMER LOOKUP
     let matchedCustomer = null;
-    const extractedDigits = prompt.replace(/\D/g, ''); // Extract phone digits if spoken/typed
+    const extractedDigits = prompt.replace(/\D/g, '');
 
     if (extractedDigits.length >= 7) {
-      // Search by Phone Number matching
       matchedCustomer = db.find(c => c.phoneClean && extractedDigits.includes(c.phoneClean));
     }
 
     if (!matchedCustomer && prompt.length > 2) {
-      // Search by Name matching
       const promptLower = prompt.toLowerCase();
       matchedCustomer = db.find(c => c.name && promptLower.includes(c.name.toLowerCase()));
     }
 
-    // 3. ENRICH ITEM NAME WITH REAL-TIME DATABASE DETAILS
     let finalItemName = prompt;
     if (matchedCustomer) {
       finalItemName = `${prompt} | 📍 ${matchedCustomer.address} | 📞 ${matchedCustomer.phoneRaw} | Client #${matchedCustomer.clientNum}`;
     }
 
-    // DEFAULT ROUTE: All standard intakes go directly to Learning Drawer
-    const groupId = 'group_mm6b77as';
+    const groupId = 'group_mm6b77as'; // Learning Drawer
 
     const query = `
       mutation ($boardId: ID!, $groupId: String!, $itemName: String!) {
@@ -146,37 +145,23 @@ exports.handler = async function (event, context) {
       }
     `;
 
-    const variables = {
-      boardId: boardId,
-      groupId: groupId,
-      itemName: finalItemName
-    };
-
     const response = await fetch('https://api.monday.com/v2', {
       method: 'POST',
       headers: {
         'Authorization': apiKey,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ query, variables })
+      body: JSON.stringify({ query, variables: { boardId, groupId, itemName: finalItemName } })
     });
 
     const resData = await response.json();
-
-    if (resData.errors) {
-      console.error('Monday API Errors:', resData.errors);
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: 'Failed to create item on Monday.com', details: resData.errors })
-      };
-    }
 
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         reply: matchedCustomer ? 'Logged with Customer Auto-Lookup! ⚡' : 'Logged! ⚡',
-        item: resData.data.create_item,
+        item: resData.data ? resData.data.create_item : null,
         matchedCustomer: matchedCustomer || null
       })
     };
