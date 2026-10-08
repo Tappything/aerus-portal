@@ -9,9 +9,9 @@
 <style>
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05070e; color: #f3f4f6; }
 .tapulator-face { background: linear-gradient(180deg, #0f172a 0%, #090d16 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); }
-.led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
 .key-primary { background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%); border: 1px solid #3b82f6; box-shadow: 0 4px 14px rgba(29, 78, 216, 0.4); cursor: pointer; }
 .key-secondary { background: #1e293b; border: 1px solid #334155; box-shadow: 0 2px 6px rgba(0,0,0,0.4); cursor: pointer; }
+.key-secondary:hover { background: #273549; }
 .key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; cursor: pointer; }
 .key-pinball { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: 1px solid #8b5cf6; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); cursor: pointer; }
 .key-proposal { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); border: 1px solid #38bdf8; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4); cursor: pointer; }
@@ -27,23 +27,32 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
 <!-- COMPACT MASTER COMMAND HUB -->
 <div id="masterHubContainer" class="max-w-md w-full tapulator-face rounded-3xl p-4 relative space-y-3 shadow-2xl my-auto">
+  
+  <!-- CLEAN HEADER WITH FRESH AVATAR -->
   <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-    <div class="flex items-center gap-2">
-      <div class="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center font-black text-white text-sm">F</div>
+    <div class="flex items-center gap-2.5">
+      <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-10 h-10 rounded-full border-2 border-blue-400 block shadow-lg object-cover ring-1 ring-blue-500/30" alt="Fresh Avatar" onError="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Fresh&background=3b82f6&color=fff'">
       <div>
-        <h1 class="text-sm font-black text-white tracking-tight leading-none">FOREVER CARD™</h1>
-        <p class="text-[9px] text-blue-400 font-bold uppercase tracking-wider">Powered by Fresh TappyThing</p>
+        <h1 class="text-base font-black text-white tracking-tight leading-none">FOREVER CARD™</h1>
+        <p class="text-[10px] text-blue-400 font-bold uppercase tracking-wider mt-0.5">Powered by Fresh TappyThing</p>
       </div>
     </div>
-    <span class="text-[9px] font-black text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2 py-0.5 rounded-full flex items-center gap-1">
-      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> ONLINE
+    <span id="statusLed" class="text-[9px] font-black text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2 py-0.5 rounded-full flex items-center gap-1">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> READY ⚡
     </span>
   </div>
 
-  <div class="led-display rounded-xl p-2 text-center border border-blue-900/50 min-h-[42px] flex items-center justify-center">
-    <div id="ledOutput" class="text-xs font-bold text-emerald-400 tracking-wide transition-all">POCKET CHIEF OF STAFF READY ⚡</div>
+  <!-- SATELLITE CARDS QUICK ACCESS -->
+  <div class="grid grid-cols-2 gap-2">
+    <a href="?staff=mona" class="bg-slate-900 hover:bg-slate-800 text-emerald-400 border border-slate-800 rounded-xl p-2 text-center text-xs font-bold transition flex items-center justify-center gap-1.5">
+      <i class="fa-solid fa-desktop"></i> Mona Intake Card
+    </a>
+    <a href="?staff=chris" class="bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 rounded-xl p-2 text-center text-xs font-bold transition flex items-center justify-center gap-1.5">
+      <i class="fa-solid fa-wrench"></i> Chris Bench Card
+    </a>
   </div>
 
+  <!-- MAIN NAVIGATION BUTTONS -->
   <div class="space-y-2">
     <button type="button" onclick="openDrawer('Castle')" class="key-primary w-full rounded-xl p-3 text-left transition flex items-center justify-between shadow">
       <div>
@@ -51,7 +60,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
           <i class="fa-solid fa-chess-rook text-blue-300"></i>
           <span>1. Castle 🏰</span>
         </div>
-        <div class="text-[10px] text-blue-200 mt-0.5">Pre-loaded Utilities, Gas, Grocery & Bills</div>
+        <div class="text-[10px] text-blue-200 mt-0.5">Pre-loaded Utilities, Gas, Grocery & Banking Cards</div>
       </div>
       <i class="fa-solid fa-chevron-right text-blue-300 text-xs"></i>
     </button>
@@ -82,21 +91,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
           <span>4. Calendar 📅</span>
           <i class="fa-solid fa-calendar-day text-gray-500 text-[10px]"></i>
         </div>
-        <div class="text-[8px] text-gray-400">Live Schedule</div>
+        <div class="text-[8px] text-gray-400">Live Agenda & Sync</div>
       </button>
-      <button type="button" onclick="openDrawer('Vault')" class="key-secondary rounded-xl p-2 text-left transition space-y-0.5">
-        <div class="text-[10px] font-bold text-blue-400 flex items-center justify-between">
-          <span>5. Vault 🌐</span>
-          <i class="fa-solid fa-share-nodes text-gray-500 text-[10px]"></i>
+      <button type="button" onclick="openDrawer('BrainDump')" class="key-secondary rounded-xl p-2 text-left transition space-y-0.5">
+        <div class="text-[10px] font-bold text-emerald-400 flex items-center justify-between">
+          <span>5. Brain Dump 🧠</span>
+          <i class="fa-solid fa-brain text-emerald-500 text-[10px]"></i>
         </div>
-        <div class="text-[8px] text-gray-400">Records Archive</div>
+        <div class="text-[8px] text-gray-400">Raw Voice Pile</div>
       </button>
       <button type="button" onclick="openDrawer('Pinball')" class="key-pinball rounded-xl p-2 text-left transition space-y-0.5">
         <div class="text-[10px] font-bold text-purple-200 flex items-center justify-between">
           <span>6. Pinball 🎯</span>
           <i class="fa-solid fa-bolt text-yellow-400 text-[10px]"></i>
         </div>
-        <div class="text-[8px] text-purple-200/80">Voice Execution</div>
+        <div class="text-[8px] text-purple-200/80">Action Queue</div>
       </button>
     </div>
 
@@ -117,7 +126,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   </div>
 </div>
 
-<!-- DRAWER MODAL WITH LOCAL FALLBACKS -->
+<!-- DRAWER MODAL -->
 <div id="drawerModal" style="display:none;" class="fixed inset-0 bg-black/95 z-50 flex flex-col p-3 backdrop-blur-md justify-between">
   <div class="max-w-md w-full mx-auto flex flex-col h-full">
     <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-2 shrink-0">
@@ -168,6 +177,9 @@ var localPreloadedCards = {
     { title: '⛽ Gas Finder Card', group: 'Castle Utility', desc: 'Cheapest local gas finder active.' },
     { title: '🛒 Grocery Savings Card', group: 'Castle Utility', desc: 'Auto ROI Grocery discount tracker.' },
     { title: '💳 Banking & Bills Card', group: 'Castle Utility', desc: 'Central strategy & bill management.' }
+  ],
+  'calendar': [
+    { title: '📅 Today\'s Active Schedule', group: 'Calendar Sync', desc: 'Tap mic below to speak new appointments to Fresh.' }
   ]
 };
 
@@ -205,7 +217,7 @@ async function loadDrawerItems(drawerName) {
         contentEl.innerHTML = localPreloadedCards[key].map(renderItemCard).join('');
         return;
       }
-      contentEl.innerHTML = '<div class="p-4 text-center text-gray-500"><p class="text-xs">No cards in ' + drawerName + ' yet.</p><p class="text-[10px] text-gray-600">Speak below to create one!</p></div>';
+      contentEl.innerHTML = '<div class="p-4 text-center text-gray-500"><p class="text-xs">No active cards in ' + drawerName + '.</p><p class="text-[10px] text-gray-600">Speak below to create one!</p></div>';
       return;
     }
     contentEl.innerHTML = items.map(renderItemCard).join('');
@@ -229,7 +241,7 @@ function submitUnifiedInput(inputId) {
 }
 
 function sendToFresh(promptText, drawerName) {
-  var led = document.getElementById('ledOutput');
+  var led = document.getElementById('statusLed');
   if (led) led.textContent = 'PROCESSING... ⚡';
 
   fetch('/.netlify/functions/chat', {
@@ -238,7 +250,7 @@ function sendToFresh(promptText, drawerName) {
     body: JSON.stringify({ prompt: (drawerName ? '[' + drawerName + '] ' : '') + promptText, board_id: '18424728273' })
   }).then(function() {
     if (led) led.textContent = 'LOGGED! ⚡';
-    setTimeout(function() { if (led) led.textContent = 'POCKET CHIEF OF STAFF READY ⚡'; }, 2000);
+    setTimeout(function() { if (led) led.textContent = 'READY ⚡'; }, 2000);
     if (activeDrawerContext) loadDrawerItems(activeDrawerContext);
   });
 }
@@ -246,9 +258,12 @@ function sendToFresh(promptText, drawerName) {
 function renderItemCard(item) {
   var title = item.title || item.name || 'Forever Card';
   var group = item.group || 'Active';
+  var itemId = item.id || 'card_' + Math.random().toString(36).substr(2, 9);
+  var cardUrl = '/card.html?id=' + encodeURIComponent(itemId) + '&title=' + encodeURIComponent(title);
+
   return '<div class="p-2.5 bg-gray-800 rounded-xl border border-gray-700 space-y-1">' +
     '<div class="flex justify-between items-center">' +
-      '<span class="font-bold text-white text-xs">' + title + '</span>' +
+      '<a href="' + cardUrl + '" class="font-bold text-white text-xs hover:text-blue-400 transition">' + title + '</a>' +
       '<span class="text-[9px] bg-blue-900/60 text-blue-300 px-1.5 py-0.5 rounded">' + group + '</span>' +
     '</div>' +
     '</div>';
