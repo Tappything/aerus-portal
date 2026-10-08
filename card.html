@@ -76,10 +76,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       </div>
     </div>
 
+    <!-- NATIVE AUTOCOMPLETE DATALIST FOR ALL 1,090 ITEMS -->
+    <datalist id="partsCatalog"></datalist>
+
     <!-- LINE ITEMS CONTAINER -->
     <div id="invoiceRows" class="space-y-2">
       <div class="flex gap-2 items-center invoice-row">
-        <input type="text" placeholder="Type item or search..." oninput="calculateInvoiceTotals()" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
+        <input type="text" list="partsCatalog" placeholder="Type item name..." oninput="handleInRowSearch(this)" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
         <select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none">
           <option value="part">Part (Tax)</option>
           <option value="labor">Labor (No Tax)</option>
@@ -110,10 +113,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <button type="button" onclick="saveDraftToCard()" class="bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-800/50 font-bold py-2 px-1.5 rounded-xl text-[11px] flex items-center justify-center gap-1 shadow transition active:scale-95">
         <i class="fa-solid fa-floppy-disk"></i> Save Draft
       </button>
-      <button type="button" onclick="generateStripeCheckout()" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-2 px-1.5 rounded-xl text-[11px] flex items-center justify-center gap-1 shadow transition active:scale-95">
-        <i class="fa-solid fa-credit-card"></i> Stripe Link
+      <button type="button" onclick="generateStripeCheckout()" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-2 px-3 rounded-xl text-[11px] flex items-center justify-center gap-1 shadow transition active:scale-95">
+        <i class="fa-solid fa-credit-card"></i> Stripe
       </button>
-      <button type="button" onclick="sendSmsInvoice()" class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold py-2 px-1.5 rounded-xl text-[11px] flex items-center justify-center gap-1 shadow transition active:scale-95">
+      <button type="button" onclick="sendSmsInvoice()" class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-[11px] flex items-center justify-center gap-1 shadow transition active:scale-95">
         <i class="fa-solid fa-comment-sms"></i> 1-Tap SMS
       </button>
     </div>
@@ -142,7 +145,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <button onclick="closeSearchModal()" class="text-gray-400 hover:text-white font-bold text-lg">✕</button>
     </div>
     
-    <input type="text" id="modalSearchInput" onkeyup="filterCatalog()" placeholder="Type C Bag, Beyond, HEPA, Angel, RO, Labor..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+    <input type="text" id="modalSearchInput" onkeyup="filterCatalogModal()" placeholder="Type C Bag, Beyond, HEPA, Angel, RO, Labor..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
     
     <div id="modalResultsList" class="max-h-60 overflow-y-auto space-y-1.5 pr-1"></div>
   </div>
@@ -399,8 +402,23 @@ window.onload = function() {
     document.getElementById('cardSubtext').textContent = 'ID: ' + currentCardId;
   }
 
+  // POPULATE NATIVE DATALIST WITH ALL 1,090 CATALOG ITEMS
+  populateDatalist();
+
   loadLocalSavedDraft();
 };
+
+function populateDatalist() {
+  var dl = document.getElementById('partsCatalog');
+  if (!dl) return;
+  dl.innerHTML = '';
+  inventoryDatabase.forEach(function(item) {
+    var opt = document.createElement('option');
+    opt.value = item.name;
+    opt.label = '$' + item.price + ' (' + (item.type === 'part' ? 'Part' : 'Labor') + ')';
+    dl.appendChild(opt);
+  });
+}
 
 function escapeHtml(str) {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
@@ -422,24 +440,51 @@ function openSearchModal() {
   var input = document.getElementById('modalSearchInput');
   input.value = '';
   input.focus();
-  filterCatalog();
+  filterCatalogModal();
 }
 
 function closeSearchModal() {
   document.getElementById('searchModal').classList.add('hidden');
 }
 
-function filterCatalog() {
-  var rawQuery = document.getElementById('modalSearchInput').value.toLowerCase().trim();
+// BULLETPROOF MULTI-WORD FUZZY SEARCH ENGINE
+function searchCatalog(query) {
+  if (!query || !query.trim()) return inventoryDatabase.slice(0, 40);
+
+  var normQ = query.toLowerCase()
+    .replace(/\bsea\b/g, 'c')
+    .replace(/\bsee\b/g, 'c')
+    .replace(/\bbags\b/g, 'bag');
+
+  var tokens = normQ.split(/\s+/).filter(Boolean);
+  if (tokens.length === 0) return inventoryDatabase.slice(0, 40);
+
+  var scored = [];
+  inventoryDatabase.forEach(function(item) {
+    var normItem = item.name.toLowerCase().replace(/\bbags\b/g, 'bag');
+    var allMatched = tokens.every(function(t) {
+      return normItem.indexOf(t) !== -1;
+    });
+
+    if (allMatched) {
+      var score = 0;
+      if (normItem.indexOf(tokens[0]) === 0) score += 100;
+      if (normItem.indexOf(normQ) !== -1) score += 50;
+      score += (100 - item.name.length);
+      scored.push({ item: item, score: score });
+    }
+  });
+
+  scored.sort(function(a, b) { return b.score - a.score; });
+  return scored.map(function(s) { return s.item; }).slice(0, 40);
+}
+
+function filterCatalogModal() {
+  var rawQuery = document.getElementById('modalSearchInput').value;
   var container = document.getElementById('modalResultsList');
   container.innerHTML = '';
 
-  // VOICE / SPEECH ALIAS RESOLUTION ("SEA BAGS" -> "C FILTER BAGS")
-  var query = rawQuery.replace('sea bag', 'c filter bag').replace('sea bags', 'c filter bag');
-
-  var matches = inventoryDatabase.filter(function(item) {
-    return !query || item.name.toLowerCase().includes(query);
-  }).slice(0, 40);
+  var matches = searchCatalog(rawQuery);
 
   if (matches.length === 0) {
     container.innerHTML = '<div class="text-xs text-gray-500 py-2 text-center">No matching items found.</div>';
@@ -457,6 +502,26 @@ function filterCatalog() {
                     '<div class="flex items-center gap-2"><span class="font-mono text-amber-400 font-bold">$' + item.price + '</span><span class="text-xs bg-amber-600 text-white font-bold px-2 py-0.5 rounded-lg">+ Add</span></div>';
     container.appendChild(div);
   });
+}
+
+// IN-ROW REAL-TIME LOOKUP AND PRICE FILLING
+function handleInRowSearch(inputEl) {
+  var val = inputEl.value.trim();
+  var row = inputEl.closest('.invoice-row');
+  
+  // Exact match from datalist or typing
+  var match = inventoryDatabase.find(function(it) {
+    return it.name.toLowerCase() === val.toLowerCase();
+  });
+
+  if (match && row) {
+    var priceInput = row.querySelector('.item-price');
+    var typeSelect = row.querySelector('.item-type');
+    if (priceInput) priceInput.value = match.price;
+    if (typeSelect) typeSelect.value = match.type;
+  }
+
+  calculateInvoiceTotals();
 }
 
 function updateLed(msg, isError) {
@@ -495,31 +560,19 @@ function toggleInvoiceVoice() {
     if (voiceHandled) return;
     voiceHandled = true;
 
-    var text = e.results[0][0].transcript.toLowerCase();
+    var text = e.results[0][0].transcript;
     updateLed('PARSING: "' + text + '"', false);
     
-    // VOICE ALIAS MATCHING
-    var searchKey = text.replace('sea bag', 'c filter bag').replace('sea bags', 'c filter bag');
-    
-    var match = inventoryDatabase.find(function(it) {
-      return it.name.toLowerCase().includes(searchKey);
-    });
+    var matches = searchCatalog(text);
 
-    if (!match && searchKey.includes('c bag')) {
-      match = inventoryDatabase.find(function(it) { return it.name.includes('C Filter Bags - 24 Pk.'); });
-    }
-    if (!match && (searchKey.includes('beyond') || searchKey.includes('filter'))) {
-      match = inventoryDatabase.find(function(it) { return it.name.includes('Beyond Guardian HEPA Filter'); });
-    }
-
-    if (match) {
-      addPrepopulatedRow(match.name, match.price, match.type);
-      updateLed('ADDED: ' + match.name, false);
+    if (matches.length > 0) {
+      addPrepopulatedRow(matches[0].name, matches[0].price, matches[0].type);
+      updateLed('ADDED: ' + matches[0].name, false);
     } else {
       updateLed('NO MATCH — OPENING SEARCH', true);
       openSearchModal();
       document.getElementById('modalSearchInput').value = text;
-      filterCatalog();
+      filterCatalogModal();
     }
 
     try { invoiceRecognition.stop(); } catch(err) {}
@@ -546,7 +599,7 @@ function addPrepopulatedRow(name, price, type) {
 
   var newRow = document.createElement('div');
   newRow.className = 'flex gap-2 items-center invoice-row';
-  newRow.innerHTML = '<input type="text" value="' + escapeHtml(name) + '" oninput="calculateInvoiceTotals()" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
+  newRow.innerHTML = '<input type="text" list="partsCatalog" value="' + escapeHtml(name) + '" oninput="handleInRowSearch(this)" placeholder="Type item name..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
                      '<select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none"><option value="part" ' + (type==='part'?'selected':'') + '>Part (Tax)</option><option value="labor" ' + (type==='labor'?'selected':'') + '>Labor (No Tax)</option></select>' +
                      '<input type="number" step="0.01" value="' + price + '" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">' +
                      '<button type="button" onclick="removeInvoiceRow(this)" class="text-gray-500 hover:text-red-400 px-1 text-xs">✕</button>';
