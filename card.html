@@ -71,12 +71,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
     <!-- DATALIST FOR QUICK INLINE TYPING -->
     <datalist id="partsCatalog">
-      <option value="Beyond Guardian HEPA Filter" data-price="140.00" data-type="part">
       <option value="C Filter Bags - 24 Pk." data-price="48.99" data-type="part">
       <option value="C Filter Bags - 12 Pk." data-price="30.99" data-type="part">
+      <option value="C Filter Bags - 100 Pk." data-price="145.99" data-type="part">
       <option value="P Filter Bags - 12 Pk." data-price="39.99" data-type="part">
       <option value="U Filter Bags - 12 Pk." data-price="30.99" data-type="part">
       <option value="R Filter Bags - 12 Pk." data-price="28.99" data-type="part">
+      <option value="Beyond Guardian HEPA Filter" data-price="140.00" data-type="part">
       <option value="Guardian Angel HEPA Filter" data-price="125.00" data-type="part">
       <option value="Beyond AP Cell- 634 model" data-price="109.99" data-type="part">
       <option value="Bench Inspection & Diagnostic Labor" data-price="40.00" data-type="labor">
@@ -85,7 +86,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     <!-- LINE ITEMS CONTAINER -->
     <div id="invoiceRows" class="space-y-2">
       <div class="flex gap-2 items-center invoice-row">
-        <input type="text" list="partsCatalog" oninput="handlePartSearch(this)" placeholder="Search Beyond HEPA, C Bags, Labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
+        <input type="text" list="partsCatalog" oninput="handlePartSearch(this)" placeholder="Search C Bags, Beyond HEPA, Labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
         <select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none">
           <option value="part">Part (Tax)</option>
           <option value="labor">Labor (No Tax)</option>
@@ -136,13 +137,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 </div>
 
 <!-- VISUAL INVENTORY SEARCH MODAL POPUP -->
-<div id="searchModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+<div id="searchModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 z-50">
   <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-4 space-y-3 shadow-2xl">
     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
       <h3 class="text-sm font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
-        <i class="fa-solid fa-boxes-stacked"></i> Search Catalog
+        <i class="fa-solid fa-boxes-stacked"></i> Search Inventory Catalog
       </h3>
-      <button onclick="closeSearchModal()" class="text-gray-400 hover:text-white font-bold text-lg">✕</button>
+      <button type="button" onclick="closeSearchModal()" class="text-gray-400 hover:text-white font-bold text-lg px-2">✕</button>
     </div>
     
     <input type="text" id="modalSearchInput" onkeyup="filterModalCatalog()" placeholder="Type C Bag, Beyond, HEPA, Angel..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
@@ -159,10 +160,11 @@ var currentCustomerTitle = '';
 var isListeningInvoice = false;
 var invoiceRecognition = null;
 
-// POPULAR CATALOG QUICK-LIST
+// FULL INVENTORY DATABASE ARRAY INCLUDING ALL C BAG PACKS
 var inventoryDatabase = [
   { name: "C Filter Bags - 24 Pk.", price: "48.99", type: "part" },
   { name: "C Filter Bags - 12 Pk.", price: "30.99", type: "part" },
+  { name: "C Filter Bags - 100 Pk.", price: "145.99", type: "part" },
   { name: "P Filter Bags - 12 Pk.", price: "39.99", type: "part" },
   { name: "U Filter Bags - 12 Pk.", price: "30.99", type: "part" },
   { name: "R Filter Bags - 12 Pk.", price: "28.99", type: "part" },
@@ -228,6 +230,7 @@ function cleanCustomerName(str) {
   return str
     .replace(/\[.*?\]/g, '')
     .replace(/put .* on the appointment for .*/i, '')
+    .replace(/put .* on the appointment.*/i, '')
     .replace(/Schedule.*appointment for /i, '')
     .replace(/Note:.*/i, '')
     .replace(/for noon today.*/i, '')
@@ -241,23 +244,31 @@ function escapeHtml(str) {
 }
 
 function openSearchModal() {
-  document.getElementById('searchModal').classList.remove('hidden');
-  document.getElementById('modalSearchInput').value = '';
-  document.getElementById('modalSearchInput').focus();
-  filterModalCatalog();
+  var modal = document.getElementById('searchModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    var input = document.getElementById('modalSearchInput');
+    if (input) {
+      input.value = '';
+      input.focus();
+    }
+    filterModalCatalog();
+  }
 }
 
 function closeSearchModal() {
-  document.getElementById('searchModal').classList.add('hidden');
+  var modal = document.getElementById('searchModal');
+  if (modal) modal.classList.add('hidden');
 }
 
 function filterModalCatalog() {
-  var query = document.getElementById('modalSearchInput').value.toLowerCase();
+  var query = (document.getElementById('modalSearchInput').value || '').toLowerCase();
   var container = document.getElementById('modalResultsList');
+  if (!container) return;
   container.innerHTML = '';
 
   var matches = inventoryDatabase.filter(function(item) {
-    return item.name.toLowerCase().includes(query);
+    return item.name.toLowerCase().includes(query) || (query.includes('c bag') && item.name.toLowerCase().includes('c filter bags'));
   });
 
   if (matches.length === 0) {
@@ -374,7 +385,7 @@ function addPrepopulatedRow(name, price, type) {
 
   var newRow = document.createElement('div');
   newRow.className = 'flex gap-2 items-center invoice-row';
-  newRow.innerHTML = '<input type="text" list="partsCatalog" value="' + escapeHtml(name) + '" oninput="handlePartSearch(this)" placeholder="Search Beyond HEPA, C Bags, Labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
+  newRow.innerHTML = '<input type="text" list="partsCatalog" value="' + escapeHtml(name) + '" oninput="handlePartSearch(this)" placeholder="Search C Bags, Beyond HEPA, Labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
                      '<select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none"><option value="part" ' + (type==='part'?'selected':'') + '>Part (Tax)</option><option value="labor" ' + (type==='labor'?'selected':'') + '>Labor (No Tax)</option></select>' +
                      '<input type="number" step="0.01" value="' + price + '" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">' +
                      '<button type="button" onclick="removeInvoiceRow(this)" class="text-gray-500 hover:text-red-400 px-1 text-xs">✕</button>';
