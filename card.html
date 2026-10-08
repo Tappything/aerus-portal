@@ -52,7 +52,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     <div id="statusLed" class="text-xs font-bold text-emerald-400 tracking-wide">CARD ACTIVE ⚡</div>
   </div>
 
-  <!-- DRAFT INVOICE BUILDER WITH VOICE + CATALOG SEARCH -->
+  <!-- DRAFT INVOICE BUILDER WITH VOICE + FULL CATALOG SEARCH -->
   <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
       <span class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -66,25 +66,35 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       </div>
     </div>
 
-    <!-- LIVE PARTS CATALOG DATALIST -->
+    <!-- COMPLETE AERUS / BEYOND PARTS CATALOG DATALIST -->
     <datalist id="partsCatalog">
-      <option value="Beyond AP Cell- 634 model" data-price="109.99" data-type="part">Beyond AP Cell ($109.99)</option>
-      <option value="Single Guardian Ultra H.e.p.a. Filter" data-price="49.99" data-type="part">Guardian Ultra HEPA ($49.99)</option>
-      <option value="Laundry Pro II Replacement AP Cell Assembly" data-price="69.99" data-type="part">Laundry Pro AP Cell ($69.99)</option>
-      <option value="UV Lamp 916- Replacement" data-price="219.99" data-type="part">UV Lamp 916 ($219.99)</option>
-      <option value="Bench Inspection & Diagnostic Labor" data-price="40.00" data-type="labor">Service / Diagnostic Labor ($40.00)</option>
-      <option value="Aerus Mobile" data-price="271.00" data-type="part">Aerus Mobile ($271.00)</option>
-      <option value="White Filter Housing - Legacy" data-price="21.00" data-type="part">White Filter Housing ($21.00)</option>
-      <option value="Sediment/Carbon Filter" data-price="53.00" data-type="part">Sediment/Carbon Filter ($53.00)</option>
-      <option value="High-Efficiency and Carbon After Filters 49437" data-price="19.67" data-type="part">Classic Canister Carbon After Filter ($19.67)</option>
-      <option value="Standard Carbon Pre-Filter Add-On" data-price="450.00" data-type="part">Carbon Pre-Filter Add-On ($450.00)</option>
+      <!-- BEYOND & AIR PURIFIER FILTERS -->
+      <option value="Beyond Guardian HEPA Filter" data-price="140.00" data-type="part">Beyond Guardian HEPA Filter [$140.00]</option>
+      <option value="Guardian Angel HEPA Filter" data-price="125.00" data-type="part">Guardian Angel HEPA Filter [$125.00]</option>
+      <option value="Beyond AP Cell- 634 model" data-price="109.99" data-type="part">Beyond AP Cell [$109.99]</option>
+      <option value="HEPA Filter - Guard. Air Home" data-price="207.00" data-type="part">Guardian Air Home HEPA Filter [$207.00]</option>
+      <option value="Single Guardian Ultra H.e.p.a. Filter" data-price="49.99" data-type="part">Guardian Ultra HEPA Filter [$49.99]</option>
+
+      <!-- LAUNDRY PRO & UV BULBS -->
+      <option value="Laundry Pro II Replacement AP Cell Assembly" data-price="69.99" data-type="part">Laundry Pro AP Cell Assembly [$69.99]</option>
+      <option value="UV Lamp 916- Replacement" data-price="219.99" data-type="part">UV Lamp 916 Replacement [$219.99]</option>
+      <option value="Purelight 6 gpm lamp" data-price="250.00" data-type="part">Purelight 6 GPM UV Lamp [$250.00]</option>
+
+      <!-- LABOR & SERVICES -->
+      <option value="Bench Inspection & Diagnostic Labor" data-price="40.00" data-type="labor">Equipment Disassembly & Diagnostic Labor [$40.00]</option>
+      <option value="Standard RO Installation" data-price="300.00" data-type="labor">Standard RO Installation Labor [$300.00]</option>
+
+      <!-- POPULAR VACUUM BAGS & SUPPLIES -->
+      <option value="9 Pk. Clean Obsessed CO6 HEPA Bags" data-price="20.00" data-type="part">9 Pk Clean Obsessed CO6 HEPA Bags [$20.00]</option>
+      <option value="HEPA Filter - Heavy Duty" data-price="34.00" data-type="part">Lux Heavy Duty HEPA Filter [$34.00]</option>
+      <option value="HEPA & Carbon Pre-Filter - Platinum" data-price="47.99" data-type="part">Lux Platinum HEPA & Carbon Pre-Filter [$47.99]</option>
+      <option value="Long-Life HEPA After Filter" data-price="31.99" data-type="part">Lux Long-Life HEPA After Filter [$31.99]</option>
     </datalist>
 
     <!-- LINE ITEMS CONTAINER -->
     <div id="invoiceRows" class="space-y-2">
-      <!-- Dynamic Search Row -->
       <div class="flex gap-2 items-center invoice-row">
-        <input type="text" list="partsCatalog" oninput="handlePartSearch(this)" placeholder="Search parts or talk..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
+        <input type="text" list="partsCatalog" oninput="handlePartSearch(this)" placeholder="Search Beyond HEPA, Cell, Labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
         <select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none">
           <option value="part">Part (Taxable)</option>
           <option value="labor">Labor (No Tax)</option>
@@ -246,10 +256,15 @@ function toggleInvoiceVoice() {
     // Clear rows to avoid duplicate stacking
     document.getElementById('invoiceRows').innerHTML = '';
 
-    if (text.includes('cell') || text.includes('ap cell') || text.includes('beyond')) {
+    if (text.includes('angel')) {
+      addPrepopulatedRow('Guardian Angel HEPA Filter', '125.00', 'part');
+    } else if (text.includes('beyond filter') || text.includes('beyond hepa')) {
+      addPrepopulatedRow('Beyond Guardian HEPA Filter', '140.00', 'part');
+    } else if (text.includes('cell') || text.includes('ap cell') || text.includes('beyond')) {
       addPrepopulatedRow('Beyond AP Cell- 634 model', '109.99', 'part');
     }
-    if (text.includes('filter') || text.includes('hepa') || text.includes('guardian')) {
+
+    if (text.includes('guardian filter') || text.includes('guardian ultra')) {
       addPrepopulatedRow('Single Guardian Ultra H.e.p.a. Filter', '49.99', 'part');
     }
     if (text.includes('lamp') || text.includes('uv') || text.includes('bulb')) {
