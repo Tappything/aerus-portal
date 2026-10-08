@@ -271,22 +271,18 @@ function toggleInvoiceVoice() {
     var text = e.results[0][0].transcript.toLowerCase();
     updateLed('PARSING: "' + text + '"', false);
     
-    // CRITICAL FIX: DO NOT CLEAR INVOICEROWS! APPEND NEW ITEMS TO EXISTING INVOICE!
+    // EXCLUSIVE MATCHING — ADDS EXACTLY 1 ITEM PER SPOKEN PHRASE
     if (text.includes('angel')) {
       addPrepopulatedRow('Guardian Angel HEPA Filter', '125.00', 'part');
     } else if (text.includes('beyond filter') || text.includes('beyond air filter') || text.includes('beyond hepa')) {
       addPrepopulatedRow('Beyond Guardian HEPA Filter', '140.00', 'part');
     } else if (text.includes('cell') || text.includes('ap cell') || text.includes('beyond cell')) {
       addPrepopulatedRow('Beyond AP Cell- 634 model', '109.99', 'part');
-    }
-
-    if (text.includes('guardian filter') || text.includes('guardian ultra')) {
+    } else if (text.includes('guardian filter') || text.includes('guardian ultra')) {
       addPrepopulatedRow('Single Guardian Ultra H.e.p.a. Filter', '49.99', 'part');
-    }
-    if (text.includes('lamp') || text.includes('uv') || text.includes('bulb')) {
+    } else if (text.includes('lamp') || text.includes('uv') || text.includes('bulb')) {
       addPrepopulatedRow('UV Lamp 916- Replacement', '219.99', 'part');
-    }
-    if (text.includes('labor') || text.includes('service') || text.includes('diagnostic') || text.includes('bench')) {
+    } else if (text.includes('labor') || text.includes('service') || text.includes('diagnostic') || text.includes('bench')) {
       addPrepopulatedRow('Bench Inspection & Diagnostic Labor', '40.00', 'labor');
     }
   };
