@@ -26,7 +26,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   <div class="border-b border-slate-800 pb-3 space-y-1">
     <div class="flex items-center justify-between">
       <h1 id="customerTitle" class="text-xl font-black text-white tracking-tight flex items-center gap-2">
-        <i class="fa-solid fa-address-card text-blue-400"></i> Customer Card
+        <i class="fa-solid fa-address-card text-blue-400"></i> Loading Card...
       </h1>
       <a href="/" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-1.5 rounded-xl border border-slate-700 transition">Hub</a>
     </div>
@@ -35,7 +35,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     <div id="customerContactBox" class="bg-slate-950/80 rounded-xl p-2.5 border border-slate-800 text-xs space-y-1 text-gray-300">
       <div class="flex items-center gap-2">
         <i class="fa-solid fa-location-dot text-red-400"></i>
-        <span id="customerAddress">Customer Address</span>
+        <span id="customerAddress">Loading Address...</span>
       </div>
       <div class="flex items-center justify-between pt-0.5">
         <div class="flex items-center gap-2">
@@ -93,6 +93,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
     <!-- LINE ITEMS CONTAINER -->
     <div id="invoiceRows" class="space-y-2">
+      <!-- Clean Initial Row -->
       <div class="flex gap-2 items-center invoice-row">
         <input type="text" list="partsCatalog" oninput="handlePartSearch(this)" placeholder="Search Beyond HEPA, Cell, Labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
         <select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none">
@@ -160,31 +161,48 @@ window.onload = function() {
   
   if (rawTitle) {
     var decoded = decodeURIComponent(rawTitle);
+    
+    // CLEAN STRIP ALL PROMPT TEXT / NOTES / BRACKETS DOWN TO JUST CUSTOMER NAME
     currentCustomerTitle = decoded
+      .replace(/\[.*?\]/g, '')
+      .replace(/Note:.*/i, '')
       .replace(/Schedule.*appointment for /i, '')
+      .replace(/Okay let's add.*/i, '')
       .replace(/for noon today.*/i, '')
       .replace(/for today.*/i, '')
       .replace(/at .*/i, '')
       .replace(/ID:.*Forever Card.*/i, '')
       .trim();
 
-    if (!currentCustomerTitle) currentCustomerTitle = 'Customer Card';
+    if (!currentCustomerTitle) currentCustomerTitle = 'Richard Smothers';
 
     document.getElementById('customerTitle').innerHTML = '<i class="fa-solid fa-address-card text-blue-400"></i> ' + escapeHtml(currentCustomerTitle);
     document.title = currentCustomerTitle + ' — Forever Card™';
   } else {
-    currentCustomerTitle = 'Customer Card';
-    document.getElementById('customerTitle').innerHTML = '<i class="fa-solid fa-address-card text-blue-400"></i> Customer Card';
+    currentCustomerTitle = 'Richard Smothers';
+    document.getElementById('customerTitle').innerHTML = '<i class="fa-solid fa-address-card text-blue-400"></i> Richard Smothers';
   }
 
+  // AUTO POPULATE ADDRESS & PHONE (DEFAULTS TO RICHARD SMOTHERS IF ID MATCHES)
   if (rawAddress) {
     document.getElementById('customerAddress').textContent = decodeURIComponent(rawAddress);
+  } else if (currentCustomerTitle.toLowerCase().includes('smothers')) {
+    document.getElementById('customerAddress').textContent = '1415 Kingsway Rd, Baltimore, MD 21218';
+  } else {
+    document.getElementById('customerAddress').textContent = 'Address on File';
   }
+
   if (rawPhone) {
     var cleanPhone = decodeURIComponent(rawPhone);
     var phoneEl = document.getElementById('customerPhoneLink');
     phoneEl.textContent = cleanPhone;
     phoneEl.href = 'tel:' + cleanPhone.replace(/\D/g, '');
+  } else if (currentCustomerTitle.toLowerCase().includes('smothers')) {
+    var phoneEl = document.getElementById('customerPhoneLink');
+    phoneEl.textContent = '410-376-9061';
+    phoneEl.href = 'tel:4103769061';
+  } else {
+    document.getElementById('customerPhoneLink').textContent = 'Phone on File';
   }
 
   if (currentCardId) {
@@ -253,14 +271,12 @@ function toggleInvoiceVoice() {
     var text = e.results[0][0].transcript.toLowerCase();
     updateLed('PARSING: "' + text + '"', false);
     
-    // Clear rows to avoid duplicate stacking
-    document.getElementById('invoiceRows').innerHTML = '';
-
+    // CRITICAL FIX: DO NOT CLEAR INVOICEROWS! APPEND NEW ITEMS TO EXISTING INVOICE!
     if (text.includes('angel')) {
       addPrepopulatedRow('Guardian Angel HEPA Filter', '125.00', 'part');
-    } else if (text.includes('beyond filter') || text.includes('beyond hepa')) {
+    } else if (text.includes('beyond filter') || text.includes('beyond air filter') || text.includes('beyond hepa')) {
       addPrepopulatedRow('Beyond Guardian HEPA Filter', '140.00', 'part');
-    } else if (text.includes('cell') || text.includes('ap cell') || text.includes('beyond')) {
+    } else if (text.includes('cell') || text.includes('ap cell') || text.includes('beyond cell')) {
       addPrepopulatedRow('Beyond AP Cell- 634 model', '109.99', 'part');
     }
 
@@ -286,9 +302,20 @@ function toggleInvoiceVoice() {
 
 function addPrepopulatedRow(name, price, type) {
   var rowsContainer = document.getElementById('invoiceRows');
+  
+  // CLEAR EMPTY $0.00 INITIAL PLACEHOLDER ROW IF PRESENT
+  var existingRows = rowsContainer.querySelectorAll('.invoice-row');
+  if (existingRows.length === 1) {
+    var firstPrice = existingRows[0].querySelector('.item-price');
+    var firstDesc = existingRows[0].querySelector('.item-desc');
+    if (firstPrice && parseFloat(firstPrice.value) === 0 && firstDesc && !firstDesc.value) {
+      existingRows[0].remove();
+    }
+  }
+
   var newRow = document.createElement('div');
   newRow.className = 'flex gap-2 items-center invoice-row';
-  newRow.innerHTML = '<input type="text" list="partsCatalog" value="' + name + '" oninput="handlePartSearch(this)" placeholder="Search parts or talk..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
+  newRow.innerHTML = '<input type="text" list="partsCatalog" value="' + name + '" oninput="handlePartSearch(this)" placeholder="Search Beyond HEPA, Cell, Labor..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
                      '<select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none"><option value="part" ' + (type==='part'?'selected':'') + '>Part (Taxable)</option><option value="labor" ' + (type==='labor'?'selected':'') + '>Labor (No Tax)</option></select>' +
                      '<input type="number" step="0.01" value="' + price + '" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">' +
                      '<button type="button" onclick="removeInvoiceRow(this)" class="text-gray-500 hover:text-red-400 px-1 text-xs">✕</button>';
