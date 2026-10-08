@@ -3,14 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Forever Card™ — TappyThing</title>
+<title>Forever Card™ — Powered by Fresh TappyThing</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05070e; color: #f3f4f6; }
 .tapulator-face { background: linear-gradient(180deg, #0f172a 0%, #090d16 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); }
 .led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
-.f-badge { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: 2px solid #60a5fa; box-shadow: 0 0 15px rgba(37, 99, 235, 0.5); }
+.key-primary { background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%); border: 1px solid #3b82f6; box-shadow: 0 4px 14px rgba(29, 78, 216, 0.4); cursor: pointer; }
+.key-primary:active { transform: scale(0.98); }
+.key-secondary { background: #1e293b; border: 1px solid #334155; box-shadow: 0 2px 6px rgba(0,0,0,0.4); cursor: pointer; }
+.key-secondary:hover { background: #273549; }
+.key-accent { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); border: 1px solid #14b8a6; cursor: pointer; }
+.key-pinball { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: 1px solid #8b5cf6; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); cursor: pointer; }
+.key-proposal { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); border: 1px solid #38bdf8; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4); cursor: pointer; }
 @keyframes pulse-red {
   0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
   70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
@@ -19,564 +25,532 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 .mic-pulsing { animation: pulse-red 1.5s infinite; background-color: #dc2626 !important; color: #ffffff !important; }
 </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-between p-3 pb-24 relative">
+<body class="min-h-screen flex items-center justify-center p-3 pb-28 relative">
 
-<!-- TOP HEADER NAVIGATION -->
-<div class="max-w-md w-full flex justify-between items-center py-2 px-1">
-  <a href="/" id="backLink" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-1.5 active:scale-95 transition">
-    <i class="fa-solid fa-arrow-left text-blue-400"></i> <span id="backLinkLabel">Back to Hub</span>
-  </a>
-  <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-1.5 bg-emerald-950/40 border border-emerald-800/40 px-2.5 py-1 rounded-full">
-    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-    LIVE FOREVER CARD™
-  </span>
-</div>
-
-<!-- FOREVER CARD MAIN CONTAINER (1-SCREEN RULE) -->
-<div class="max-w-md w-full tapulator-face rounded-3xl p-5 relative space-y-4 shadow-2xl my-auto">
-
-  <!-- BRAND LOGO & SHARP F-CARD HEADER -->
-  <div class="border-b border-slate-800 pb-3 space-y-2">
-    <div class="flex justify-between items-center">
-      <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl f-badge flex items-center justify-center font-black text-xl text-white tracking-tighter">
-          F
-        </div>
-        <div>
-          <div class="text-[10px] font-black text-blue-400 uppercase tracking-widest">FOREVER CARD™</div>
-          <div class="text-[9px] text-gray-400 font-medium">Powered by Fresh TappyThing</div>
-        </div>
-      </div>
-      <span id="viewBadge" class="bg-blue-900/60 text-blue-300 border border-blue-700 text-[9px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wider">
-        OWNER VIEW
-      </span>
-    </div>
-
-    <div class="flex justify-between items-start gap-2 pt-1">
-      <div>
-        <h1 id="cardTitle" class="text-xl font-black text-white tracking-tight leading-tight">Loading Card...</h1>
-        <p id="cardSubtitle" class="text-[11px] text-gray-400 font-medium">Aerus Home Wellness • Timonium, MD</p>
-      </div>
-      <span id="cardStatus" class="bg-emerald-950/60 text-emerald-400 border border-emerald-800/60 text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wider shrink-0">
-        Active
-      </span>
-    </div>
-
-    <!-- TAB FLIP CONTROLLER (PUBLIC / PRIVATE VIEWS) -->
-    <div id="tabFlipContainer" class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 gap-1 pt-1 mt-2">
-      <button type="button" id="tabPublicBtn" onclick="switchCardTab('public')" class="flex-1 py-1 text-[10px] font-bold rounded-lg bg-blue-600 text-white transition active:scale-95">
-        🌐 Public View
-      </button>
-      <button type="button" id="tabPrivateBtn" onclick="switchCardTab('private')" class="flex-1 py-1 text-[10px] font-bold rounded-lg text-slate-400 hover:text-white transition active:scale-95">
-        🔒 Private Deck
-      </button>
-    </div>
+<!-- MASTER COMMAND HUB -->
+<div id="masterHubContainer" class="max-w-md w-full tapulator-face rounded-3xl p-5 relative space-y-4 shadow-2xl my-auto">
+  <div class="text-center">
+    <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-16 h-16 rounded-full border-2 border-blue-400 mx-auto mb-1 block shadow-xl shadow-blue-500/20 object-cover ring-2 ring-blue-500/20" alt="Fresh Avatar" onError="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Fresh&background=3b82f6&color=fff'">
+    <h1 class="text-2xl font-black text-white tracking-tight">FOREVER CARD™</h1>
+    <p class="text-[11px] text-blue-400 font-bold uppercase tracking-wider">Powered by Fresh TappyThing</p>
   </div>
 
-  <!-- LED STATUS DISPLAY -->
-  <div class="led-display rounded-2xl p-3 text-center border border-blue-900/50 min-h-[48px] flex items-center justify-center">
-    <div id="ledOutput" class="text-xs font-bold text-emerald-400 tracking-wide transition-all">FOREVER CARD ENGINE READY ⚡</div>
+  <div class="led-display rounded-2xl p-3 text-center border border-blue-900/50 min-h-[52px] flex items-center justify-center">
+    <div id="ledOutput" class="text-xs font-bold text-emerald-400 tracking-wide transition-all">POCKET CHIEF OF STAFF READY ⚡</div>
   </div>
 
-  <!-- 1-TAP OUTBOUND COMMUNICATION ACTION MATRIX -->
-  <div class="grid grid-cols-3 gap-2">
-    <a id="btnCall" href="tel:4108821027" class="bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold p-2.5 rounded-2xl text-[11px] flex flex-col items-center justify-center gap-1 border border-slate-700 shadow transition active:scale-95">
-      <i class="fa-solid fa-phone text-blue-400 text-sm"></i>
-      <span>Call</span>
-    </a>
-    <a id="btnSms" href="#" class="bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold p-2.5 rounded-2xl text-[11px] flex flex-col items-center justify-center gap-1 border border-slate-700 shadow transition active:scale-95">
-      <i class="fa-solid fa-comment-sms text-emerald-400 text-sm"></i>
-      <span>Text</span>
-    </a>
-    <a id="btnEmail" href="#" class="bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold p-2.5 rounded-2xl text-[11px] flex flex-col items-center justify-center gap-1 border border-slate-700 shadow transition active:scale-95">
-      <i class="fa-solid fa-envelope text-purple-400 text-sm"></i>
-      <span>Email</span>
-    </a>
-  </div>
-
-  <button type="button" id="btnTalkFresh" onclick="toggleFreshCardChat()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold p-3 rounded-2xl text-xs flex items-center justify-center gap-2 shadow-lg transition active:scale-95">
-    <i class="fa-solid fa-user-tie text-sm"></i>
-    <span id="labelTalkFresh">Talk to Fresh 🤵</span>
+  <button type="button" onclick="openFeaturesModal()" class="w-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 font-semibold py-1.5 rounded-xl text-[11px] border border-slate-700/60 uppercase tracking-wider transition flex items-center justify-center gap-1.5">
+    <i class="fa-solid fa-list-check text-slate-400 text-xs"></i>
+    <span>[ FEATURES, BENEFITS &amp; SOUL 🎭 ]</span>
   </button>
 
-  <!-- INVOICE SECTION (CUSTOMER / PUBLIC VIEW) -->
-  <div id="invoiceSection" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-    <div class="border-b border-slate-800 pb-2 flex justify-between items-start">
+  <div class="space-y-2.5">
+    <button type="button" onclick="openDrawer('Castle')" class="key-primary w-full rounded-2xl p-3.5 text-left transition flex items-center justify-between shadow-lg">
       <div>
-        <h2 class="text-xs font-black text-white uppercase tracking-wider">Clean Environment LLC</h2>
-        <p class="text-[10px] text-blue-400 font-bold">Aerus of Towson • Timonium, MD</p>
-        <p class="text-[9px] text-slate-400">410-882-1027 | william@towsonhealthyhomes.com</p>
-      </div>
-      <div class="text-right">
-        <span class="inline-block px-2 py-0.5 rounded text-[9px] font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">INVOICE</span>
-        <p id="invNumberDisplay" class="text-xs font-mono font-bold text-blue-300 mt-1">TT-0001</p>
-      </div>
-    </div>
-
-    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/80 space-y-1.5 text-xs">
-      <div class="flex justify-between items-center text-slate-200">
-        <span id="invServiceDisplay" class="font-bold">Labor Burnt Wire Repair</span>
-        <span id="invBaseDisplay" class="font-bold">$50.00</span>
-      </div>
-      <div class="flex justify-between items-center text-[10px] text-slate-400 border-t border-slate-800/60 pt-1">
-        <span id="invTaxLabel">Maryland Tax (0%)</span>
-        <span id="invTaxDisplay">$0.00</span>
-      </div>
-      <div class="flex justify-between items-center border-t border-slate-700 pt-1.5 font-black text-sm text-emerald-400">
-        <span>Total Due:</span>
-        <span id="invTotalDisplay">$50.00</span>
-      </div>
-    </div>
-
-    <!-- PAYMENT METHODS -->
-    <div class="space-y-2">
-      <button id="btnStripePay" onclick="handleStripePayment()" class="w-full py-3 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-black text-xs flex items-center justify-center gap-2 shadow-lg transition active:scale-95">
-        <i class="fa-solid fa-credit-card"></i>
-        <span>TAP TO PAY ONLINE (STRIPE)</span>
-      </button>
-      <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/60 text-[10px] text-slate-300 space-y-1">
-        <div class="font-bold text-slate-200 uppercase text-[9px]">Alternative Payment Options:</div>
-        <div>• Checks Payable To: <strong class="text-white">Clean Environment LLC</strong></div>
-        <div>• Zelle: <strong class="text-white">williamanyvac@gmail.com</strong></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- FRESH AI INTERACTION DRAWER -->
-  <div id="freshChatBox" class="hidden p-3 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
-    <div class="flex gap-1.5">
-      <input type="text" id="freshInput" placeholder="Ask Fresh about this card..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500" onkeydown="if(event.key==='Enter') sendFreshPrompt()">
-      <button type="button" onclick="sendFreshPrompt()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-2 rounded-xl text-xs transition active:scale-95">Send</button>
-    </div>
-    <div id="freshReply" class="hidden p-2.5 rounded-xl bg-slate-950 border-l-2 border-sky-500 text-[11px] text-sky-200 leading-relaxed"></div>
-  </div>
-
-  <!-- SERVICE HISTORY (PUBLIC / COMMON DECK) -->
-  <div id="serviceHistoryContainer" class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-3 space-y-2">
-    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center justify-between border-b border-slate-800/80 pb-1.5">
-      <span>🛠 Service History & Timeline</span>
-      <i class="fa-solid fa-clock-rotate-left text-slate-500"></i>
-    </div>
-    <div id="historyStack" class="space-y-2 text-xs text-gray-300 max-h-48 overflow-y-auto pr-1">
-      <div class="p-2 bg-slate-950 rounded-xl border border-slate-800/60 text-[11px] leading-relaxed">
-        <span class="text-gray-500 text-[9px] block mb-0.5">System Genesis Log</span>
-        Forever Card initialized for customer tracking.
-      </div>
-    </div>
-  </div>
-
-  <!-- OWNER VIEW ONLY SECTIONS (PRIVATE DECK) -->
-  <div id="ownerSection" class="space-y-3">
-    <!-- INTERNAL NOTES -->
-    <div class="bg-amber-950/20 border border-amber-900/40 rounded-2xl p-3 space-y-2">
-      <div class="text-[10px] font-bold text-amber-400 uppercase tracking-wider flex items-center justify-between border-b border-amber-900/40 pb-1.5">
-        <span>🔒 Owner Internal Notes (Private)</span>
-        <i class="fa-solid fa-lock text-amber-500"></i>
-      </div>
-      <div id="internalNotesStack" class="space-y-1.5 text-xs text-amber-200/90 max-h-36 overflow-y-auto pr-1">
-        <div class="p-2 bg-slate-950/80 rounded-xl border border-amber-900/30 text-[11px]">
-          Internal account verified. Regular maintenance schedule active.
+        <div class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-chess-rook text-blue-300"></i>
+          <span>1. Castle 🏰</span>
         </div>
+        <div class="text-[11px] text-blue-200 mt-0.5">Personal, Family, Bills &amp; Strategy</div>
       </div>
-    </div>
+      <i class="fa-solid fa-chevron-right text-blue-300 text-sm"></i>
+    </button>
 
-    <!-- INTERNAL COST BREAKDOWN -->
-    <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-3 space-y-1.5 text-xs">
-      <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between border-b border-slate-800/80 pb-1">
-        <span>📊 Owner Cost & Margin Breakdown</span>
-        <i class="fa-solid fa-calculator text-slate-500"></i>
-      </div>
-      <div class="flex justify-between text-slate-300 pt-1">
-        <span>Est. Parts Cost:</span>
-        <span id="costParts" class="font-mono">$0.00</span>
-      </div>
-      <div class="flex justify-between text-slate-300">
-        <span>Bench Labor Cost:</span>
-        <span id="costLabor" class="font-mono">$15.00</span>
-      </div>
-      <div class="flex justify-between border-t border-slate-800 pt-1 text-emerald-400 font-bold">
-        <span>Est. Gross Margin:</span>
-        <span id="costMargin" class="font-mono">$35.00 (70%)</span>
-      </div>
-    </div>
-
-    <!-- PINBALL TRIAGE BUTTONS -->
-    <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-3 space-y-2">
-      <div class="text-[10px] font-bold text-purple-400 uppercase tracking-wider">🎯 Pinball Quick Triage</div>
-      <div class="grid grid-cols-4 gap-1.5 text-[10px]">
-        <button type="button" onclick="triageCard('group_mm7maw66', 'Calendar')" class="px-2 py-1.5 bg-blue-900/60 hover:bg-blue-800 text-blue-200 border border-blue-700 rounded-xl font-bold active:scale-95">📅 Cal</button>
-        <button type="button" onclick="triageCard('group_mm7mfbre', 'Empire')" class="px-2 py-1.5 bg-amber-900/60 hover:bg-amber-800 text-amber-200 border border-amber-700 rounded-xl font-bold active:scale-95">👑 Emp</button>
-        <button type="button" onclick="triageCard('group_mm7myd0b', 'Pipeline')" class="px-2 py-1.5 bg-teal-900/60 hover:bg-teal-800 text-teal-200 border border-teal-700 rounded-xl font-bold active:scale-95">🚀 Pipe</button>
-        <button type="button" onclick="triageCard('group_mm7mv0yv', 'Castle')" class="px-2 py-1.5 bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-700 rounded-xl font-bold active:scale-95">🏰 Castle</button>
-      </div>
-      <button type="button" onclick="archiveCard()" class="w-full py-1.5 mt-1 bg-red-950/40 hover:bg-red-900/60 text-red-300 border border-red-800/50 rounded-xl text-[10px] font-bold transition active:scale-95">
-        📦 Archive Forever Card
+    <div class="grid grid-cols-5 gap-2.5">
+      <button type="button" onclick="openDrawer('Empire')" class="key-secondary col-span-3 rounded-2xl p-3 text-left transition flex flex-col justify-between min-h-[85px] shadow-sm">
+        <div>
+          <div class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center justify-between">
+            <span>2. Empire 👑</span>
+            <i class="fa-solid fa-crown text-amber-500"></i>
+          </div>
+          <div class="text-[10px] text-gray-400 font-medium mt-0.5">Bench Repairs &amp; Ops</div>
+        </div>
+        <div class="text-[9px] text-amber-300/80 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/40 inline-block w-fit">🛠 Workbench &amp; Ready Wall</div>
+      </button>
+      <button type="button" onclick="openDrawer('Pipeline')" class="key-accent col-span-2 rounded-2xl p-3 text-left transition flex flex-col justify-between min-h-[85px] shadow-sm">
+        <div class="text-xs font-black text-teal-200 uppercase tracking-wide flex items-center justify-between">
+          <span>3. Pipeline 🚀</span>
+          <i class="fa-solid fa-rocket text-teal-400"></i>
+        </div>
+        <div class="text-[10px] text-teal-100 font-medium">Leads &amp; Intakes</div>
       </button>
     </div>
-  </div>
 
-  <!-- STAFF SATELLITE INTAKE SECTION (MONA & CHRIS VIEW) -->
-  <div id="staffSection" class="hidden space-y-3">
-    <!-- STAFF TIMECARD -->
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 space-y-2">
-      <div class="flex justify-between items-center text-xs font-bold text-slate-200">
-        <span class="flex items-center gap-1.5"><i class="fa-solid fa-clock text-purple-400"></i> Staff Timecard</span>
-        <span class="text-[10px] text-emerald-400 font-mono font-semibold">PIN PROTECTED</span>
-      </div>
-      <div class="flex gap-2">
-        <input type="password" id="staffPinInput" maxlength="4" placeholder="4-Digit PIN" class="w-1/2 bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-center text-sm text-white font-mono tracking-widest focus:outline-none focus:border-emerald-500">
-        <button type="button" onclick="handlePunch('IN')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition active:scale-95 py-1.5">Punch IN</button>
-        <button type="button" onclick="handlePunch('OUT')" class="flex-1 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-xl transition active:scale-95 py-1.5">Punch OUT</button>
-      </div>
-    </div>
-
-    <!-- COUNTER INTAKE TOOLS -->
-    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 space-y-2.5">
-      <div class="text-[10px] font-black text-emerald-400 uppercase tracking-wider flex items-center justify-between border-b border-slate-800 pb-1.5">
-        <span>⚡ Quick Counter Intake</span>
-        <i class="fa-solid fa-bolt text-emerald-400"></i>
-      </div>
-
-      <input type="text" id="machineOwnerInput" placeholder="Whose machine is this? (Customer Name / Phone)..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500">
-
-      <div class="grid grid-cols-2 gap-2">
-        <button type="button" id="staffMicBtn" onclick="toggleVoiceIntake('staffSection', 'machineOwnerInput', 'staffMicBtn')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow transition active:scale-95">
-          <i class="fa-solid fa-microphone"></i>
-          <span>Voice Intake</span>
-        </button>
-        <label class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow transition active:scale-95 cursor-pointer">
-          <i class="fa-solid fa-camera"></i>
-          <span>Photo Intake</span>
-          <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoIntake(this)">
-        </label>
-      </div>
-    </div>
-
-    <!-- 4 MONDAY.JS LIVE QUEUES -->
-    <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
-        <span class="text-xs font-bold text-emerald-400">📥 COUNTER INTAKES</span>
-      </div>
-      <div id="staffIntakeItems" class="space-y-1.5 text-xs text-gray-300"><p class="text-gray-500 italic text-[11px]">Loading intakes...</p></div>
-    </div>
-
-    <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
-        <span class="text-xs font-bold text-amber-400">🛠️ ACTIVE BENCH QUEUE</span>
-      </div>
-      <div id="staffBenchItems" class="space-y-1.5 text-xs text-gray-300"><p class="text-gray-500 italic text-[11px]">Loading bench queue...</p></div>
-    </div>
-
-    <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
-        <span class="text-xs font-bold text-teal-400">🟢 READY WALL (Pickups)</span>
-      </div>
-      <div id="staffReadyItems" class="space-y-1.5 text-xs text-gray-300"><p class="text-gray-500 italic text-[11px]">Loading ready wall...</p></div>
-    </div>
-
-    <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
-        <span class="text-xs font-bold text-purple-400">🔩 PARTS NEEDED & ORDERS</span>
-      </div>
-      <div id="staffPartsItems" class="space-y-1.5 text-xs text-gray-300"><p class="text-gray-500 italic text-[11px]">Loading parts queue...</p></div>
-    </div>
-
-    <!-- STAFF COMMUNICATION BOARD NOTES -->
-    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 space-y-2">
-      <div class="text-[10px] font-black text-purple-400 uppercase tracking-wider flex items-center justify-between border-b border-slate-800 pb-1.5">
-        <span>💬 Shop Staff Communication Board</span>
-        <i class="fa-solid fa-comments text-purple-400"></i>
-      </div>
-      <div id="staffNotesQueue" class="space-y-1.5 text-xs text-slate-300 max-h-40 overflow-y-auto pr-1">
-        <div class="p-2 bg-slate-950 rounded-xl border border-slate-800/60 text-[11px] leading-relaxed">
-          <span class="text-purple-400 font-bold block mb-0.5">Mona / Front Desk:</span>
-          Counter intakes active. Tap Voice Intake or Photo Intake above to log new bench jobs live.
+    <div class="grid grid-cols-3 gap-2">
+      <button type="button" onclick="openDrawer('Calendar')" class="key-secondary rounded-xl p-2.5 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
+          <span>4. Calendar 📅</span>
+          <i class="fa-solid fa-calendar-day text-gray-500 text-xs"></i>
         </div>
-      </div>
+        <div class="text-[9px] text-gray-400">Today's Agenda</div>
+      </button>
+      <button type="button" onclick="openDrawer('Vault')" class="key-secondary rounded-xl p-2.5 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-blue-400 flex items-center justify-between">
+          <span>5. Vault 🌐</span>
+          <i class="fa-solid fa-share-nodes text-gray-500 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-gray-400">22.2k Records</div>
+      </button>
+      <button type="button" onclick="openDrawer('Pinball')" class="key-pinball rounded-xl p-2.5 text-left transition space-y-1">
+        <div class="text-[11px] font-bold text-purple-200 flex items-center justify-between">
+          <span>6. Pinball 🎯</span>
+          <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
+        </div>
+        <div class="text-[9px] text-purple-200/80">Action Queue</div>
+      </button>
     </div>
+
+    <button type="button" onclick="window.location.href='/proposal.html'" class="key-proposal w-full rounded-2xl p-3 text-left transition flex items-center justify-between shadow-lg">
+      <div>
+        <div class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-bullseye text-sky-200"></i>
+          <span>7. Estimates &amp; Proposals 🎯</span>
+        </div>
+        <div class="text-[10px] text-sky-100 mt-0.5">Universal Deal &amp; Proposal Closer • Build &amp; Send</div>
+      </div>
+      <i class="fa-solid fa-arrow-right text-sky-200 text-xs"></i>
+    </button>
   </div>
 
-  <!-- WATERMARK -->
-  <div class="text-center pt-2 border-t border-slate-800/60">
-    <p class="text-[10px] text-slate-500 font-mono tracking-wider">
-      Forever Card™ by Fresh TappyThing LLC
-    </p>
+  <div class="text-center pt-1">
+    <button type="button" onclick="alert('Sales Rep Portal: Contact William Sullivan at william@towsonhealthyhomes.com')" class="text-[10px] text-gray-500 hover:text-gray-400 transition underline tracking-wider">Sales Rep Portal</button>
+  </div>
+</div>
+
+<!-- STAFF SATELLITE CARD -->
+<div id="staffCardContainer" style="display:none;" class="max-w-md w-full tapulator-face rounded-3xl p-5 relative space-y-4 shadow-2xl my-auto">
+  <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+    <div>
+      <h2 id="staffCardHeader" class="text-base font-black text-white flex items-center gap-1.5">
+        <span class="text-emerald-400">⚡</span> STAFF INTAKE &amp; OPS CARD
+      </h2>
+      <p class="text-[10px] text-gray-400">Aerus Timonium • Dedicated Shop Card</p>
+    </div>
+    <a href="?" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700 font-bold">Master Hub</a>
+  </div>
+  <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 space-y-2">
+    <div class="flex justify-between items-center text-xs font-bold text-slate-200">
+      <span>⏱ Staff Timecard</span>
+      <span class="text-[10px] text-emerald-400 font-mono font-semibold">PIN PROTECTED</span>
+    </div>
+    <div class="flex gap-2">
+      <input type="password" id="staffPinInput" maxlength="4" placeholder="4-Digit PIN" class="w-1/2 bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-center text-sm text-white font-mono tracking-widest focus:outline-none focus:border-emerald-500">
+      <button onclick="handlePunch('IN')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition active:scale-95">Punch IN</button>
+      <button onclick="handlePunch('OUT')" class="flex-1 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-xl transition active:scale-95">Punch OUT</button>
+    </div>
+  </div>
+  <div class="space-y-2.5 max-h-[60vh] overflow-y-auto pr-1">
+    <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
+        <span class="text-xs font-bold text-emerald-400">📥 Counter Intakes</span>
+      </div>
+      <div id="staffIntakeItems" class="space-y-1.5 text-xs text-gray-300"></div>
+    </div>
+    <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
+        <span class="text-xs font-bold text-amber-400">🛠️ Active Bench Queue</span>
+      </div>
+      <div id="staffBenchItems" class="space-y-1.5 text-xs text-gray-300"></div>
+    </div>
+    <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
+        <span class="text-xs font-bold text-teal-400">🟢 Ready Wall (Pickups)</span>
+      </div>
+      <div id="staffReadyItems" class="space-y-1.5 text-xs text-gray-300"></div>
+    </div>
+    <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
+        <span class="text-xs font-bold text-purple-400">🔩 Parts Needed &amp; Orders</span>
+      </div>
+      <div id="staffPartsItems" class="space-y-1.5 text-xs text-gray-300"></div>
+    </div>
+  </div>
+</div>
+
+<!-- DRAWER MODAL -->
+<div id="drawerModal" style="display:none;" class="fixed inset-0 bg-black/95 z-50 flex flex-col p-4 backdrop-blur-md justify-between">
+  <div class="max-w-md w-full mx-auto flex flex-col h-full">
+    <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-3 shrink-0">
+      <h3 id="drawerTitle" class="text-base font-black text-white flex items-center gap-2">
+        <i class="fa-solid fa-folder-open text-blue-400"></i> Drawer
+      </h3>
+      <button type="button" onclick="closeDrawer()" class="text-gray-400 hover:text-white font-bold text-xs bg-gray-800 px-3 py-1.5 rounded-lg active:scale-95">✕ Close</button>
+    </div>
+    
+    <!-- PINBALL VOICE HERO CONTROLLER -->
+    <div id="pinballVoiceHero" style="display:none;" class="mb-3 p-3 bg-purple-950/60 border border-purple-600/50 rounded-2xl shrink-0 flex items-center justify-between gap-3 shadow-lg">
+      <div class="flex-1">
+        <div class="text-xs font-black text-purple-200 uppercase tracking-wider flex items-center gap-1.5">
+          <i class="fa-solid fa-bolt text-yellow-400"></i> Pinball Voice Hero
+        </div>
+        <p class="text-[10px] text-purple-300/80">Tap mic to speak task updates &amp; completions directly to Pinball.</p>
+      </div>
+      <button type="button" id="pinballMicBtn" onclick="toggleVoiceIntake('Pinball', null, 'pinballMicBtn')" class="bg-purple-600 hover:bg-purple-500 text-white w-11 h-11 rounded-xl flex items-center justify-center border border-purple-400 shadow-md transition shrink-0 active:scale-95">
+        <i class="fa-solid fa-microphone text-lg"></i>
+      </button>
+    </div>
+
+    <div id="drawerContent" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300">
+      <p class="text-center text-gray-500 pt-8">Loading cards...</p>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES MODAL -->
+<div id="featuresModal" style="display:none;" class="fixed inset-0 bg-black/95 z-50 flex flex-col p-4 justify-center backdrop-blur-md overflow-y-auto">
+  <div class="bg-gray-900 border border-slate-700/60 rounded-3xl p-5 max-w-sm mx-auto space-y-4 text-left shadow-2xl max-h-[85vh] overflow-y-auto my-auto">
+    <div class="flex items-center justify-between border-b border-gray-800 pb-2">
+      <h3 class="text-sm font-black text-white flex items-center gap-2"><i class="fa-solid fa-mobile-screen-button text-blue-400"></i> Pocket Chief of Staff</h3>
+      <button type="button" onclick="closeFeaturesModal()" class="text-gray-400 hover:text-white text-xs bg-gray-800 px-2.5 py-1 rounded-lg">✕</button>
+    </div>
+    <div class="space-y-2 text-[11px] text-gray-300">
+      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800"><strong class="text-emerald-400">1. Living Fractal Forever Cards:</strong> Permanent digital homes for every customer.</div>
+      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800"><strong class="text-blue-400">2. 1-Tap Voice &amp; Video Intake:</strong> 5-second diagnostics routed straight to the bench.</div>
+      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800"><strong class="text-amber-400">3. Smart Invoicing:</strong> Auto-detects Invoice vs Estimate vs Proposal. 1-tap Stripe payment.</div>
+      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800"><strong class="text-purple-400">4. Staff Satellites:</strong> Mona and Chris get their own work seats without touching your cockpit.</div>
+      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800"><strong class="text-emerald-400">5. 🛒 ROI Grocery Savings Card:</strong> Saves $100-150/month on groceries. Subscription pays for itself automatically.</div>
+      <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800"><strong class="text-yellow-400">6. ⛽ ROI Gas Finder Card:</strong> Live cheapest gas within 5 miles. Saves $30-50/month on autopilot.</div>
+    </div>
+    <div class="pt-2 text-[10px] text-gray-400 border-t border-gray-800 space-y-1">
+      <div class="font-bold text-gray-300 uppercase tracking-wider">Cast &amp; Personalities 🎭:</div>
+      <div><strong>Fresh:</strong> Digital Coordinator | <strong>Sissy:</strong> Technical Engine</div>
+      <div><strong>Nush:</strong> Strategy | <strong>Squash:</strong> Sales Guru &amp; Coach | <strong>L:</strong> Financial Advisor | <strong>Yogi:</strong> Wellness Guide</div>
+    </div>
+    <button type="button" onclick="closeFeaturesModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 rounded-xl text-xs uppercase tracking-wider transition">Got It</button>
   </div>
 </div>
 
 <!-- BOTTOM INPUT BAR -->
 <div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-3 z-40">
   <div class="max-w-md mx-auto flex items-center gap-2">
-    <input type="text" id="unifiedInput" placeholder="Add note or update to card..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') submitCardNote()">
-    <button type="button" onclick="submitCardNote()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1">
-      <span>Log Note</span>
+    <label class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0">
+      <i class="fa-solid fa-camera text-base"></i>
+      <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoIntake(this)">
+    </label>
+    <label class="bg-gray-800 hover:bg-gray-700 text-purple-400 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer border border-gray-700 transition shrink-0">
+      <i class="fa-solid fa-video text-base"></i>
+      <input type="file" accept="video/*" capture="environment" class="hidden" onchange="handleMediaInput(this, 'Video')">
+    </label>
+    <input type="text" id="unifiedInput" placeholder="Talk, type, snap, or video..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter') submitUnifiedInput()">
+    <button type="button" id="micBtn" onclick="toggleVoiceIntake()" class="bg-gray-800 hover:bg-gray-700 text-blue-400 w-10 h-10 rounded-xl flex items-center justify-center border border-gray-700 transition shrink-0">
+      <i class="fa-solid fa-microphone text-base"></i>
+    </button>
+    <button type="button" onclick="submitUnifiedInput()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3.5 py-2.5 rounded-xl text-xs transition shrink-0 flex items-center gap-1">
       <i class="fa-solid fa-paper-plane"></i>
     </button>
   </div>
 </div>
 
+<!-- SISSY'S BATTLE-HARDENED JAVASCRIPT ENGINE -->
 <script>
-var currentCardId = '';
-var currentCardTitle = 'Aerus Customer Card';
-var isCustomerView = false;
-var isInvoiceView = false;
-var isStaffView = false;
-var calculatedTotal = 0.00;
+var activeDrawerContext = '';
 var isListening = false;
 var activeRecognition = null;
+var silenceTimer = null;
+var currentPaymentUrl = '';
+var currentInvoiceTotal = 0;
+var currentCustomerName = '';
+var currentCleanItem = '';
+var currentInvoiceCounter = 1;
+
+var groupIdMap = {
+  'calendar': ['group_mm7maw66'],
+  'castle': ['group_mm7mv0yv'],
+  'empire': ['group_mm7mfbre'],
+  'pipeline': ['group_mm7myd0b'],
+  'vault': ['group_mm6xs2fx'],
+  'pinball': ['group_mm7mmekt', 'group_mm6b77as']
+};
 
 window.onload = function() {
   var params = new URLSearchParams(window.location.search);
-  currentCardId = params.get('id') || '';
-  var titleParam = params.get('title') || params.get('name');
-  isCustomerView = params.get('customer') === 'true';
-  isInvoiceView = params.get('invoice') === 'true';
-  isStaffView = params.get('staff') === 'true';
-  var staffName = params.get('name') || 'Staff';
+  var staffParam = params.get('staff') || params.get('card');
+  var isInvoice = params.get('invoice');
+  var customerParam = params.get('customer');
 
-  if (titleParam) {
-    currentCardTitle = decodeURIComponent(titleParam);
-  } else if (currentCardId) {
-    currentCardTitle = 'Forever Card #' + currentCardId;
-  }
-  
-  var titleEl = document.getElementById('cardTitle');
-  if (titleEl) titleEl.innerText = currentCardTitle;
-
-  var freshLabel = document.getElementById('labelTalkFresh');
-
-  // VIEW ROUTING LOGIC
-  if (isStaffView) {
-    // STAFF SATELLITE VIEW (MONA & CHRIS)
-    if (titleEl) titleEl.innerText = staffName + ' — SATELLITE CARD';
-    
-    var badge = document.getElementById('viewBadge');
-    if (badge) {
-      badge.innerText = 'STAFF VIEW';
-      badge.className = 'bg-purple-900/60 text-purple-300 border border-purple-700 text-[9px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wider';
-    }
-
-    var tabContainer = document.getElementById('tabFlipContainer');
-    if (tabContainer) tabContainer.style.display = 'none';
-
-    var ownerSec = document.getElementById('ownerSection');
-    if (ownerSec) ownerSec.style.display = 'none';
-
-    var invSec = document.getElementById('invoiceSection');
-    if (invSec) invSec.classList.add('hidden');
-
-    var historyContainer = document.getElementById('serviceHistoryContainer');
-    if (historyContainer) historyContainer.style.display = 'none';
-
-    var staffSec = document.getElementById('staffSection');
-    if (staffSec) staffSec.classList.remove('hidden');
-
-    var backLink = document.getElementById('backLink');
-    if (backLink) backLink.style.display = 'none';
-
-    if (freshLabel) freshLabel.innerText = 'Talk to Fresh 🤵';
-
-    loadStaffQueues();
-
-  } else if (isCustomerView) {
-    // CUSTOMER VIEW
-    var ownerSec = document.getElementById('ownerSection');
-    if (ownerSec) ownerSec.style.display = 'none';
-    
-    var badge = document.getElementById('viewBadge');
-    if (badge) {
-      badge.innerText = 'CUSTOMER VIEW';
-      badge.className = 'bg-emerald-900/60 text-emerald-300 border border-emerald-700 text-[9px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wider';
-    }
-    
-    var backLink = document.getElementById('backLink');
-    if (backLink) backLink.style.display = 'none';
-
-    if (freshLabel) freshLabel.innerText = '💬 Ask a Question';
-
+  if (staffParam) {
+    document.getElementById('masterHubContainer').style.display = 'none';
+    document.getElementById('staffCardContainer').style.display = 'block';
+    document.getElementById('staffCardHeader').innerHTML = '<span class="text-emerald-400">⚡</span> ' + staffParam.toUpperCase().replace('-', ' ') + ' SATELLITE CARD';
   } else {
-    // OWNER VIEW (DEFAULT)
-    var ownerSec = document.getElementById('ownerSection');
-    if (ownerSec) ownerSec.style.display = 'block';
-    
-    var badge = document.getElementById('viewBadge');
-    if (badge) badge.innerText = 'OWNER VIEW';
-
-    if (freshLabel) freshLabel.innerText = 'Talk to Fresh 🤵';
+    document.getElementById('masterHubContainer').style.display = 'block';
+    document.getElementById('staffCardContainer').style.display = 'none';
   }
 
-  // INVOICE SECTION SETUP
-  if (isInvoiceView && !isStaffView) {
-    var invSec = document.getElementById('invoiceSection');
-    if (invSec) invSec.classList.remove('hidden');
-
-    var invNum = params.get('invoicenum') || 'TT-0001';
-    var rawAmount = parseFloat(params.get('amount') || '50.00');
-    var rawService = params.get('service') || 'Labor Burnt Wire Repair';
-    
-    var numEl = document.getElementById('invNumberDisplay');
-    if (numEl) numEl.innerText = invNum;
-    
-    var srvEl = document.getElementById('invServiceDisplay');
-    if (srvEl) srvEl.innerText = rawService;
-    
-    var baseEl = document.getElementById('invBaseDisplay');
-    if (baseEl) baseEl.innerText = '$' + rawAmount.toFixed(2);
-
-    // MARYLAND TAX LOGIC (0% labor, 6% products)
-    var serviceLower = rawService.toLowerCase();
-    var taxableKeywords = ["bag", "filter", "part", "product", "purifier", "unit", "machine", "sale"];
-    var isTaxable = taxableKeywords.some(function(kw) { return serviceLower.includes(kw); });
-
-    var taxAmount = isTaxable ? (rawAmount * 0.06) : 0.00;
-    calculatedTotal = rawAmount + taxAmount;
-
-    var taxLabel = document.getElementById('invTaxLabel');
-    if (taxLabel) taxLabel.innerText = isTaxable ? 'Maryland Tax (6%)' : 'Maryland Tax (Labor Only - 0%)';
-    
-    var taxDisp = document.getElementById('invTaxDisplay');
-    if (taxDisp) taxDisp.innerText = '$' + taxAmount.toFixed(2);
-    
-    var totalDisp = document.getElementById('invTotalDisplay');
-    if (totalDisp) totalDisp.innerText = '$' + calculatedTotal.toFixed(2);
-  }
-
-  // CONFIGURE 1-TAP OUTBOUND COMMUNICATION
-  var smsMsg = 'Hello from Aerus Timonium regarding ' + currentCardTitle + '!';
-  var emailSubj = 'Aerus Timonium — ' + currentCardTitle;
-  var emailBody = 'Hello,\n\nFollowing up regarding your Forever Card (' + currentCardTitle + ').\n\nThank you,\nAerus Timonium';
-
-  var smsBtn = document.getElementById('btnSms');
-  if (smsBtn) smsBtn.href = 'sms:?body=' + encodeURIComponent(smsMsg);
-
-  var emailBtn = document.getElementById('btnEmail');
-  if (emailBtn) emailBtn.href = 'mailto:william@towsonhealthyhomes.com?subject=' + encodeURIComponent(emailSubj) + '&body=' + encodeURIComponent(emailBody);
-
-  if (currentCardId && !isStaffView) {
-    fetchCardDetails(currentCardId);
+  if (isInvoice === 'true') {
+    setTimeout(function() {
+      var rawText = customerParam ? decodeURIComponent(customerParam) : '';
+      openInvoiceModal(rawText);
+    }, 500);
   }
 };
 
-function switchCardTab(tabName) {
-  var publicBtn = document.getElementById('tabPublicBtn');
-  var privateBtn = document.getElementById('tabPrivateBtn');
-  var ownerSec = document.getElementById('ownerSection');
-  var historySec = document.getElementById('serviceHistoryContainer');
+function openDrawer(drawerName) {
+  activeDrawerContext = drawerName;
+  document.getElementById('drawerTitle').innerHTML = '<i class="fa-solid fa-folder-open text-blue-400"></i> ' + drawerName + ' Drawer';
+  document.getElementById('drawerContent').innerHTML = '<p class="text-center text-gray-500 pt-8">Loading cards... ⚡</p>';
+  
+  var pinballHero = document.getElementById('pinballVoiceHero');
+  if (pinballHero) {
+    pinballHero.style.display = (drawerName && drawerName.toLowerCase() === 'pinball') ? 'flex' : 'none';
+  }
 
-  if (tabName === 'private') {
-    if (ownerSec) ownerSec.style.display = 'block';
-    if (historySec) historySec.style.display = 'none';
-    if (publicBtn) { publicBtn.className = 'flex-1 py-1 text-[10px] font-bold rounded-lg text-slate-400 hover:text-white transition active:scale-95'; }
-    if (privateBtn) { privateBtn.className = 'flex-1 py-1 text-[10px] font-bold rounded-lg bg-blue-600 text-white transition active:scale-95'; }
-  } else {
-    if (ownerSec && isCustomerView) ownerSec.style.display = 'none';
-    if (historySec) historySec.style.display = 'block';
-    if (publicBtn) { publicBtn.className = 'flex-1 py-1 text-[10px] font-bold rounded-lg bg-blue-600 text-white transition active:scale-95'; }
-    if (privateBtn) { privateBtn.className = 'flex-1 py-1 text-[10px] font-bold rounded-lg text-slate-400 hover:text-white transition active:scale-95'; }
+  document.getElementById('drawerModal').style.display = 'flex';
+  loadDrawerItems(drawerName);
+}
+
+function closeDrawer() {
+  document.getElementById('drawerModal').style.display = 'none';
+  activeDrawerContext = '';
+  if (isListening && activeRecognition) {
+    activeRecognition.stop();
+    isListening = false;
   }
 }
 
-async function loadStaffQueues() {
+function openFeaturesModal() { document.getElementById('featuresModal').style.display = 'flex'; }
+function closeFeaturesModal() { document.getElementById('featuresModal').style.display = 'none'; }
+
+async function loadDrawerItems(drawerName) {
+  var contentEl = document.getElementById('drawerContent');
+  if (!contentEl) return;
+  
+  var key = drawerName ? drawerName.toLowerCase() : '';
+  var targetGroupIds = groupIdMap[key] || [];
+
   try {
-    const res = await fetch('/.netlify/functions/monday?board=18424728273&t=' + new Date().getTime());
+    const res = await fetch('/.netlify/functions/monday?drawer=' + encodeURIComponent(drawerName) + '&board=18424728273&t=' + new Date().getTime());
     const data = await res.json();
-    var groups = data.groups || data.board?.groups || data;
 
-    var intakeItems = [];
-    var benchItems = [];
-    var readyItems = [];
-    var partsItems = [];
+    var groups = data.groups || data.board?.groups || [];
+    var items = [];
 
-    if (Array.isArray(groups)) {
+    if (Array.isArray(groups) && groups.length > 0) {
       groups.forEach(function(g) {
-        var gTitle = (g.title || '').toLowerCase();
-        var gId = g.id || '';
-        var items = (g.items_page && g.items_page.items) ? g.items_page.items : (g.items || []);
-
-        items.forEach(function(item) {
-          item.groupTitle = g.title || 'Queue';
-          if (gId === 'group_mm6b77as' || gTitle.includes('intake') || gTitle.includes('learning')) {
-            intakeItems.push(item);
-          } else if (gId === 'group_mm7mfbre' || gTitle.includes('empire') || gTitle.includes('bench')) {
-            benchItems.push(item);
-          } else if (gTitle.includes('ready')) {
-            readyItems.push(item);
-          } else if (gTitle.includes('parts') || gTitle.includes('order')) {
-            partsItems.push(item);
-          }
-        });
+        var isMatch = targetGroupIds.length === 0 || targetGroupIds.includes(g.id) || (g.title && g.title.toLowerCase().includes(key));
+        if (isMatch) {
+          var gItems = (g.items_page && g.items_page.items) ? g.items_page.items : (g.items || []);
+          gItems.forEach(function(item) {
+            item.group = g.title || drawerName;
+            items.push(item);
+          });
+        }
       });
+    } else if (Array.isArray(data.items)) {
+      items = data.items;
     }
 
-    renderStaffQueue('staffIntakeItems', intakeItems, 'No active counter intakes.');
-    renderStaffQueue('staffBenchItems', benchItems, 'No active bench jobs.');
-    renderStaffQueue('staffReadyItems', readyItems, 'No pickups on ready wall.');
-    renderStaffQueue('staffPartsItems', partsItems, 'No parts orders pending.');
-
+    if (!items || items.length === 0) {
+      contentEl.innerHTML = '<div class="p-6 text-center text-gray-500 space-y-2"><p class="text-xs">No active cards in ' + drawerName + '.</p><p class="text-[10px] text-gray-600">Speak or type below to create a new card.</p></div>';
+      return;
+    }
+    contentEl.innerHTML = items.map(renderItemCard).join('');
   } catch (err) {
-    console.error('Error loading staff queues:', err);
+    console.error('Error loading drawer items:', err);
+    contentEl.innerHTML = '<div class="p-4 bg-slate-900 border border-slate-800 rounded-xl text-center"><p class="text-xs text-amber-400 font-bold mb-1">⚡ ' + drawerName + ' Drawer</p><p class="text-[11px] text-gray-400">Ready for new cards via voice or text.</p></div>';
   }
 }
 
-function renderStaffQueue(elementId, items, emptyMsg) {
-  var container = document.getElementById(elementId);
-  if (!container) return;
+function handlePhotoIntake(fileInput) {
+  if (fileInput.files && fileInput.files[0]) {
+    var photoName = fileInput.files[0].name;
+    var inputEl = document.getElementById('unifiedInput');
+    if (inputEl) {
+      inputEl.value = 'Photo: ' + photoName + ' | ';
+      inputEl.focus();
+    }
+    flashLed('📸 Photo Attached: ' + photoName);
+  }
+}
 
-  if (!items || items.length === 0) {
-    container.innerHTML = '<p class="text-gray-500 italic text-[11px]">' + emptyMsg + '</p>';
+function toggleVoiceIntake(drawerContext, targetInputId, targetBtnId) {
+  var targetDrawer = drawerContext || activeDrawerContext;
+  var input = document.getElementById(targetInputId || 'unifiedInput');
+  var btn = document.getElementById(targetBtnId || 'micBtn');
+  var output = document.getElementById('ledOutput');
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SR) { 
+    alert('Voice recognition is not supported in this browser. Please use Chrome or Safari.'); 
+    return; 
+  }
+
+  if (isListening && activeRecognition) {
+    activeRecognition.stop();
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing');
+    if (output) output.textContent = 'POCKET CHIEF OF STAFF READY ⚡';
+    if (silenceTimer) clearTimeout(silenceTimer);
     return;
   }
 
-  container.innerHTML = items.map(function(item) {
-    var title = item.name || item.title || 'Untitled Job';
-    return '<div class="p-2 bg-slate-950 rounded-xl border border-slate-800 flex justify-between items-center gap-2">' +
-      '<span class="font-bold text-white text-xs truncate">' + title + '</span>' +
-      '<button type="button" onclick="toggleFreshCardChat()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] shrink-0 flex items-center gap-1 shadow active:scale-95"><i class="fa-solid fa-user-tie"></i> Talk to Fresh</button>' +
-    '</div>';
-  }).join('');
+  activeRecognition = new SR();
+  activeRecognition.continuous = true;
+  activeRecognition.interimResults = true;
+  activeRecognition.lang = 'en-US';
+
+  if (btn) btn.classList.add('mic-pulsing');
+  if (output) output.textContent = 'LISTENING... (SPEAK FREELY)';
+  isListening = true;
+
+  var accumulated = '';
+
+  activeRecognition.onresult = function(e) {
+    var interim = '', currentFinal = '';
+    for (var i = e.resultIndex; i < e.results.length; ++i) {
+      if (e.results[i].isFinal) { currentFinal += e.results[i][0].transcript + ' '; }
+      else { interim += e.results[i][0].transcript; }
+    }
+    accumulated += currentFinal;
+    var fullText = (accumulated + interim).trim();
+    if (input) input.value = fullText;
+
+    if (silenceTimer) clearTimeout(silenceTimer);
+    silenceTimer = setTimeout(function() {
+      if (fullText.length > 0 && isListening) {
+        if (output) output.textContent = 'PROCESSING... ⚡';
+        sendToFresh(fullText, targetDrawer);
+        if (input) input.value = '';
+        if (activeRecognition) activeRecognition.stop();
+        isListening = false;
+        if (btn) btn.classList.remove('mic-pulsing');
+      }
+    }, 2500);
+  };
+
+  activeRecognition.onerror = function() {
+    isListening = false;
+    if (btn) btn.classList.remove('mic-pulsing');
+    if (output) output.textContent = 'MIC ERROR — TAP TO RETRY';
+    if (silenceTimer) clearTimeout(silenceTimer);
+  };
+
+  activeRecognition.onend = function() {
+    if (isListening) {
+      try { activeRecognition.start(); } catch(err) { isListening = false; if (btn) btn.classList.remove('mic-pulsing'); }
+    } else {
+      if (btn) btn.classList.remove('mic-pulsing');
+    }
+  };
+
+  activeRecognition.start();
 }
 
-function fetchCardDetails(itemId) {
-  fetch('/.netlify/functions/monday?board=18424728273&t=' + new Date().getTime())
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      var allItems = [];
-      if (data.groups && Array.isArray(data.groups)) {
-        data.groups.forEach(function(g) {
-          var gItems = (g.items_page && g.items_page.items) ? g.items_page.items : (g.items || []);
-          gItems.forEach(function(it) { it.group = { id: g.id, title: g.title || '' }; allItems.push(it); });
-        });
-      } else if (data.items && Array.isArray(data.items)) {
-        allItems = data.items;
-      }
-
-      var match = allItems.find(function(it) { return String(it.id) === String(itemId); });
-      if (match) {
-        currentCardTitle = match.name || match.title || currentCardTitle;
-        var titleEl = document.getElementById('cardTitle');
-        if (titleEl && !isStaffView) titleEl.innerText = currentCardTitle;
-        
-        var subEl = document.getElementById('cardSubtitle');
-        if (match.group && match.group.title && subEl) {
-          subEl.innerText = 'Group: ' + match.group.title + ' • Aerus Timonium';
-        }
-      }
-    })
-    .catch(function(err) {
-      console.log('Card detail sync logged.', err);
-    });
-}
-
-function toggleFreshCardChat() {
-  var chatBox = document.getElementById('freshChatBox');
-  if (chatBox) { 
-    chatBox.classList.toggle('hidden'); 
+function submitUnifiedInput(inputId) {
+  var inputEl = document.getElementById(inputId || 'unifiedInput');
+  if (!inputEl) return;
+  var text = inputEl.value.trim();
+  if (text) {
+    inputEl.value = '';
+    inputEl.blur();
+    sendToFresh(text, activeDrawerContext);
   }
 }
 
-function sendFreshPrompt() {
-  var inputEl = document.getElementById('freshInput');
-  var replyEl = document.getElementById('freshReply');
+function flashLed(msg) {
+  var output = document.getElementById('ledOutput');
+  if (output) {
+    output.textContent = msg || 'Logged! ⚡';
+    setTimeout(function() { output.textContent = 'POCKET CHIEF OF STAFF READY ⚡'; }, 3000);
+  }
+}
+
+async function moveCard(itemId, targetGroupId) {
+  flashLed('Routing card... ⚡');
+  try {
+    const res = await fetch('/.netlify/functions/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: "MOVE_CARD",
+        item_id: itemId,
+        group_id: targetGroupId,
+        board_id: '18424728273'
+      })
+    });
+    flashLed('Routed! ⚡');
+    if (activeDrawerContext) {
+      setTimeout(function() { loadDrawerItems(activeDrawerContext); }, 800);
+    }
+  } catch (err) {
+    flashLed('Error moving card');
+  }
+}
+
+function sendToFresh(promptText, drawerName) {
+  var led = document.getElementById('ledOutput');
+  if (led) led.textContent = 'PROCESSING... ⚡';
+
+  var fullPrompt = drawerName ? '[' + drawerName + ' Drawer] ' + promptText : promptText;
+  fetch('/.netlify/functions/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt: fullPrompt, board_id: '18424728273' })
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    flashLed(data.reply || 'Logged to Forever Card! ⚡');
+    if (activeDrawerContext) { 
+      setTimeout(function() { loadDrawerItems(activeDrawerContext); }, 1200); 
+    }
+  })
+  .catch(function() {
+    flashLed('Logged! ⚡');
+    if (activeDrawerContext) { 
+      setTimeout(function() { loadDrawerItems(activeDrawerContext); }, 1200); 
+    }
+  });
+}
+
+function renderItemCard(item) {
+  var title = item.name || item.title || 'Untitled Card';
+  var itemId = item.id || 'card_' + Math.random().toString(36).substr(2, 9);
+  var cardUrl = '/card.html?id=' + encodeURIComponent(itemId) + '&title=' + encodeURIComponent(title);
+  var groupTitle = item.group ? (item.group.title || item.group) : 'Active Card';
+
+  var triageHtml = '';
+  if (activeDrawerContext && activeDrawerContext.toLowerCase() === 'pinball') {
+    triageHtml = '<div class="flex gap-1.5 pt-2 mt-2 border-t border-gray-700/60 text-[10px]">' +
+      '<button type="button" onclick="moveCard(\'' + itemId + '\', \'group_mm7maw66\')" class="px-2 py-1 bg-blue-900/60 hover:bg-blue-800 text-blue-200 border border-blue-700 rounded-lg font-bold flex-1 active:scale-95">📅 Cal</button>' +
+      '<button type="button" onclick="moveCard(\'' + itemId + '\', \'group_mm7mfbre\')" class="px-2 py-1 bg-amber-900/60 hover:bg-amber-800 text-amber-200 border border-amber-700 rounded-lg font-bold flex-1 active:scale-95">👑 Emp</button>' +
+      '<button type="button" onclick="moveCard(\'' + itemId + '\', \'group_mm7myd0b\')" class="px-2 py-1 bg-teal-900/60 hover:bg-teal-800 text-teal-200 border border-teal-700 rounded-lg font-bold flex-1 active:scale-95">🚀 Pipe</button>' +
+      '<button type="button" onclick="moveCard(\'' + itemId + '\', \'group_mm7mv0yv\')" class="px-2 py-1 bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-700 rounded-lg font-bold flex-1 active:scale-95">🏰 Castle</button>' +
+      '</div>';
+  }
+
+  return '<div class="p-3 bg-gray-800 rounded-xl border border-gray-700 space-y-2" id="' + itemId + '">' +
+    '<div class="flex justify-between items-center gap-2">' +
+      '<div class="flex-1 min-w-0">' +
+        '<a href="' + cardUrl + '" class="font-bold text-white text-xs truncate hover:text-blue-400 transition flex items-center gap-1.5">' +
+          '<span class="truncate">' + title + '</span>' +
+          '<i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-blue-400 shrink-0"></i>' +
+        '</a>' +
+        '<p class="text-[10px] text-gray-400 mt-0.5">' + groupTitle + '</p>' +
+      '</div>' +
+      '<div class="flex items-center gap-1.5 shrink-0">' +
+        '<button type="button" onclick="toggleFreshCardChat(\'' + itemId + '\')" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-2.5 py-1 rounded-lg text-[10px] transition flex items-center gap-1 shadow shrink-0 active:scale-95"><i class="fa-solid fa-user-tie"></i> Talk</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="text-[9px] text-slate-500 font-mono tracking-wider pt-0.5">Forever Card™ by Fresh TappyThing LLC</div>' +
+    '<div id="fresh_chat_' + itemId + '" class="hidden pt-2 border-t border-gray-700/60 space-y-2">' +
+      '<div class="flex gap-1.5">' +
+        '<input type="text" id="fresh_input_' + itemId + '" placeholder="Ask Fresh about this card..." class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500">' +
+        '<button type="button" onclick="sendFreshCardPrompt(\'' + itemId + '\', \'' + title.replace(/'/g, "\\'") + '\')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition active:scale-95">Send</button>' +
+      '</div>' +
+      '<div id="fresh_reply_' + itemId + '" class="hidden p-2.5 rounded-lg bg-gray-900 border-l-2 border-sky-500 text-[11px] text-sky-200 leading-relaxed"></div>' +
+    '</div>' +
+    triageHtml +
+    '</div>';
+}
+
+function toggleFreshCardChat(cardId) {
+  var chatBox = document.getElementById('fresh_chat_' + cardId);
+  if (chatBox) { chatBox.classList.toggle('hidden'); }
+}
+
+function sendFreshCardPrompt(cardId, cardTitle) {
+  var inputEl = document.getElementById('fresh_input_' + cardId);
+  var replyEl = document.getElementById('fresh_reply_' + cardId);
   var userPrompt = inputEl ? inputEl.value.trim() : '';
 
   if (!userPrompt) return;
@@ -588,183 +562,19 @@ function sendFreshPrompt() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      contextCard: currentCardTitle,
+      contextCard: cardTitle,
       prompt: userPrompt
     })
   })
   .then(function(res) { return res.json(); })
   .then(function(data) {
-    var responseText = data.reply || data.text || 'Fresh: Request processed for ' + currentCardTitle + '!';
+    var responseText = data.reply || data.text || 'Fresh: Request processed for ' + cardTitle + '!';
     replyEl.innerHTML = '<strong class="text-sky-400 block mb-0.5">Fresh 🤵:</strong> ' + responseText;
   })
   .catch(function(err) {
     console.error('Fresh Card Prompt Error:', err);
     replyEl.innerHTML = '<strong class="text-sky-400 block mb-0.5">Fresh 🤵:</strong> Error processing request.';
   });
-}
-
-function submitCardNote() {
-  var inputEl = document.getElementById('unifiedInput');
-  var noteText = inputEl ? inputEl.value.trim() : '';
-  if (!noteText) return;
-
-  var historyEl = document.getElementById('historyStack');
-  if (historyEl) {
-    var newNoteHtml = '<div class="p-2 bg-slate-950 rounded-xl border border-slate-800/60 text-[11px] leading-relaxed">' +
-      '<span class="text-emerald-400 text-[9px] block mb-0.5">' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + ' — Logged Note</span>' +
-      noteText +
-      '</div>';
-    historyEl.innerHTML = newNoteHtml + historyEl.innerHTML;
-  }
-
-  fetch('/.netlify/functions/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      prompt: '📌 FOREVER CARD NOTE [' + currentCardTitle + ']: ' + noteText,
-      board_id: '18424728273'
-    })
-  });
-
-  if (inputEl) inputEl.value = '';
-}
-
-function handlePunch(type) {
-  var pin = document.getElementById('staffPinInput').value;
-  if (!pin || pin.length < 4) { alert('Please enter your 4-digit PIN.'); return; }
-  var led = document.getElementById('ledOutput');
-  if (led) led.innerText = '⏱️ TIMECARD PUNCH ' + type + ' AT ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-  alert('⏱️ Timecard Punched ' + type + ' at ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
-  document.getElementById('staffPinInput').value = '';
-}
-
-function toggleVoiceIntake(sectionId, targetInputId, btnId) {
-  var input = document.getElementById(targetInputId);
-  var btn = document.getElementById(btnId);
-  var led = document.getElementById('ledOutput');
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-  if (!SR) { alert('Voice recognition not supported on this browser.'); return; }
-
-  if (isListening && activeRecognition) {
-    activeRecognition.stop();
-    isListening = false;
-    if (btn) btn.classList.remove('mic-pulsing');
-    if (led) led.textContent = 'FOREVER CARD ENGINE READY ⚡';
-    return;
-  }
-
-  activeRecognition = new SR();
-  activeRecognition.continuous = true;
-  activeRecognition.interimResults = true;
-  activeRecognition.lang = 'en-US';
-
-  if (btn) btn.classList.add('mic-pulsing');
-  if (led) led.textContent = 'LISTENING... (SPEAK COUNTER INTAKE)';
-  isListening = true;
-
-  activeRecognition.onresult = function(e) {
-    var interim = '', currentFinal = '';
-    for (var i = e.resultIndex; i < e.results.length; ++i) {
-      if (e.results[i].isFinal) { currentFinal += e.results[i][0].transcript + ' '; }
-      else { interim += e.results[i][0].transcript; }
-    }
-    var fullText = (currentFinal + interim).trim();
-    if (input) input.value = fullText;
-  };
-
-  activeRecognition.onerror = function() {
-    isListening = false;
-    if (btn) btn.classList.remove('mic-pulsing');
-    if (led) led.textContent = 'MIC ERROR';
-  };
-
-  activeRecognition.onend = function() {
-    isListening = false;
-    if (btn) btn.classList.remove('mic-pulsing');
-  };
-
-  activeRecognition.start();
-}
-
-function handlePhotoIntake(fileInput) {
-  if (fileInput.files && fileInput.files[0]) {
-    var photoName = fileInput.files[0].name;
-    var led = document.getElementById('ledOutput');
-    if (led) led.textContent = '📸 PHOTO ATTACHED: ' + photoName;
-    alert('📸 Photo Attached: ' + photoName + ' — Counter Intake Logged!');
-  }
-}
-
-async function handleStripePayment() {
-  var payBtn = document.getElementById('btnStripePay');
-  if (payBtn) payBtn.innerText = 'GENERATING CHECKOUT...';
-
-  var serviceName = 'Aerus Equipment & Service';
-  var srvEl = document.getElementById('invServiceDisplay');
-  if (srvEl && srvEl.innerText) serviceName = srvEl.innerText;
-
-  try {
-    var response = await fetch('/.netlify/functions/stripe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        amount: calculatedTotal,
-        description: serviceName,
-        customer: currentCardTitle
-      })
-    });
-    var data = await response.json();
-    if (data.url) {
-      if (payBtn) payBtn.innerText = 'TAP TO PAY ONLINE (STRIPE)';
-      window.open(data.url, '_blank');
-    } else {
-      if (payBtn) payBtn.innerText = 'CHECKOUT UNAVAILABLE';
-    }
-  } catch (err) {
-    if (payBtn) payBtn.innerText = 'ERROR — TRY AGAIN';
-  }
-}
-
-function triageCard(targetGroupId, groupName) {
-  var led = document.getElementById('ledOutput');
-  if (led) led.innerText = 'ROUTING TO ' + groupName.toUpperCase() + '... ⚡';
-  
-  fetch('/.netlify/functions/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      prompt: "MOVE_CARD",
-      item_id: currentCardId,
-      group_id: targetGroupId,
-      board_id: '18424728273'
-    })
-  }).then(function() {
-    if (led) led.innerText = 'CARD ROUTED TO ' + groupName.toUpperCase() + '! ⚡';
-  });
-}
-
-function archiveCard() {
-  if (confirm('Archive this Forever Card?')) {
-    var led = document.getElementById('ledOutput');
-    if (led) led.innerText = 'ARCHIVING CARD... ⚡';
-    
-    fetch('/.netlify/functions/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        prompt: "MOVE_CARD",
-        item_id: currentCardId,
-        group_id: "group_mm6xs2fx",
-        board_id: '18424728273'
-      })
-    }).then(function() {
-      if (led) led.innerText = 'CARD ARCHIVED! ⚡';
-      setTimeout(function() {
-        window.location.href = '/';
-      }, 1000);
-    });
-  }
 }
 </script>
 </body>
