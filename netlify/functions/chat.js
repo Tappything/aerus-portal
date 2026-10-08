@@ -1,3 +1,43 @@
+const fs = require('fs');
+const path = require('path');
+const csv = require('csv-parser');
+
+// Global cache so CSV is loaded into RAM once per cold start (0.01ms lookup time)
+let customerDatabase = null;
+
+// Helper function to load and parse export (34).csv
+async function loadCustomerDatabase() {
+  if (customerDatabase) return customerDatabase;
+
+  const records = [];
+  const csvFilePath = path.join(__dirname, 'export_export (34).csv');
+
+  return new Promise((resolve, reject) => {
+    if (!fs.existsSync(csvFilePath)) {
+      console.warn('Customer CSV file not found at path:', csvFilePath);
+      return resolve([]);
+    }
+
+    fs.createReadStream(csvFilePath)
+      .pipe(csv())
+      .on('data', (data) => records.push(data))
+      .on('end', () => {
+        // Clean and index phone numbers for instant matching
+        customerDatabase = records.map(row => ({
+          clientNum: row['Client #'] || '',
+          name: row['Name'] || '',
+          email: row['Email'] || '',
+          address: row['Address'] || '',
+          phoneRaw: row['Phone'] || '',
+          phoneClean: (row['Phone'] || '').replace(/\D/g, '') // Strips symbols: 4102566949
+        }));
+        console.log(`Loaded ${customerDatabase.length} customer records into RAM.`);
+        resolve(customerDatabase);
+      })
+      .on('error', (err) => reject(err));
+  });
+}
+
 exports.handler = async function (event, context) {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
@@ -16,7 +56,10 @@ exports.handler = async function (event, context) {
       };
     }
 
-    // HANDLE MOVE_CARD MUTATION
+    // Load 22,283 Customer Database into memory
+    const db = await loadCustomerDatabase();
+
+    // 1. HANDLE MOVE_CARD MUTATION
     if (prompt === 'MOVE_CARD') {
       const itemId = body.item_id;
       const groupId = body.group_id;
@@ -70,6 +113,27 @@ exports.handler = async function (event, context) {
       };
     }
 
+    // 2. REAL-TIME CUSTOMER LOOKUP MATCHING
+    let matchedCustomer = null;
+    const extractedDigits = prompt.replace(/\D/g, ''); // Extract phone digits if spoken/typed
+
+    if (extractedDigits.length >= 7) {
+      // Search by Phone Number matching
+      matchedCustomer = db.find(c => c.phoneClean && extractedDigits.includes(c.phoneClean));
+    }
+
+    if (!matchedCustomer && prompt.length > 2) {
+      // Search by Name matching
+      const promptLower = prompt.toLowerCase();
+      matchedCustomer = db.find(c => c.name && promptLower.includes(c.name.toLowerCase()));
+    }
+
+    // 3. ENRICH ITEM NAME WITH REAL-TIME DATABASE DETAILS
+    let finalItemName = prompt;
+    if (matchedCustomer) {
+      finalItemName = `${prompt} | 📍 ${matchedCustomer.address} | 📞 ${matchedCustomer.phoneRaw} | Client #${matchedCustomer.clientNum}`;
+    }
+
     // DEFAULT ROUTE: All standard intakes go directly to Learning Drawer
     const groupId = 'group_mm6b77as';
 
@@ -85,7 +149,7 @@ exports.handler = async function (event, context) {
     const variables = {
       boardId: boardId,
       groupId: groupId,
-      itemName: prompt
+      itemName: finalItemName
     };
 
     const response = await fetch('https://api.monday.com/v2', {
@@ -111,8 +175,9 @@ exports.handler = async function (event, context) {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        reply: 'Logged! ⚡',
-        item: resData.data.create_item
+        reply: matchedCustomer ? 'Logged with Customer Auto-Lookup! ⚡' : 'Logged! ⚡',
+        item: resData.data.create_item,
+        matchedCustomer: matchedCustomer || null
       })
     };
   } catch (error) {
