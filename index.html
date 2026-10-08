@@ -28,13 +28,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 <!-- MASTER COMMAND HUB -->
 <div id="masterHubContainer" class="max-w-md w-full tapulator-face rounded-3xl p-4 relative space-y-3 shadow-2xl my-auto">
   
-  <!-- CLEAN HEADER -->
+  <!-- CLEAN HEADER WITH PROMINENT LOGO & FRESH AVATAR -->
   <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-    <div class="flex items-center gap-2.5">
-      <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-10 h-10 rounded-full border-2 border-blue-400 block shadow-lg object-cover ring-1 ring-blue-500/30" alt="Fresh Avatar" onError="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Fresh&background=3b82f6&color=fff'">
+    <div class="flex items-center gap-3">
+      <img src="/Gemini_Generated_Image_u1q8jwu1q8jwu1q8.jpg" class="w-12 h-12 rounded-full border-2 border-blue-400 block shadow-lg object-cover ring-2 ring-blue-500/40" alt="Fresh Avatar" onError="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Fresh&background=3b82f6&color=fff'">
       <div>
-        <h1 class="text-base font-black text-white tracking-tight leading-none">FOREVER CARD™</h1>
-        <p class="text-[10px] text-blue-400 font-bold uppercase tracking-wider mt-0.5">Powered by Fresh TappyThing</p>
+        <h1 class="text-lg font-black text-white tracking-tight leading-none">FOREVER CARD™</h1>
+        <p class="text-[11px] text-blue-400 font-bold uppercase tracking-wider mt-0.5">Powered by Fresh TappyThing</p>
       </div>
     </div>
     <span id="statusLed" class="text-[9px] font-black text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2.5 py-1 rounded-full flex items-center gap-1.5">
@@ -42,7 +42,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </span>
   </div>
 
-  <!-- NAVIGATION MATRIX -->
+  <!-- MAIN NAVIGATION MATRIX -->
   <div class="space-y-2">
     <button type="button" onclick="openDrawer('Castle')" class="key-primary w-full rounded-xl p-3 text-left transition flex items-center justify-between shadow">
       <div>
@@ -76,13 +76,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </div>
 
     <div class="grid grid-cols-3 gap-2">
-      <button type="button" onclick="openDrawer('Calendar')" class="key-secondary rounded-xl p-2 text-left transition space-y-0.5">
+      <!-- BUTTON 4: DIRECT UNHOOKED CALENDAR LAUNCH (ZERO LOOPS) -->
+      <button type="button" onclick="window.open('https://calendar.google.com', '_blank')" class="key-secondary rounded-xl p-2 text-left transition space-y-0.5">
         <div class="text-[10px] font-bold text-blue-400 flex items-center justify-between">
           <span>4. Calendar 📅</span>
           <i class="fa-solid fa-calendar-day text-gray-500 text-[10px]"></i>
         </div>
-        <div class="text-[8px] text-gray-400">Live Agenda Sync</div>
+        <div class="text-[8px] text-gray-400">Live Schedule ↗</div>
       </button>
+
       <button type="button" onclick="openDrawer('BrainDump')" class="key-secondary rounded-xl p-2 text-left transition space-y-0.5">
         <div class="text-[10px] font-bold text-emerald-400 flex items-center justify-between">
           <span>5. Brain Dump 🧠</span>
@@ -110,9 +112,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
       <i class="fa-solid fa-arrow-right text-sky-200 text-xs"></i>
     </button>
   </div>
+
+  <div class="text-center pt-0.5">
+    <button type="button" onclick="alert('Sales Rep Portal: Contact William Sullivan at william@towsonhealthyhomes.com')" class="text-[9px] text-gray-500 hover:text-gray-400 transition underline tracking-wider">Sales Rep Portal</button>
+  </div>
 </div>
 
-<!-- SINGLE DRAWER MODAL -->
+<!-- SINGLE MODAL CONTAINER -->
 <div id="drawerModal" style="display:none;" class="fixed inset-0 bg-black/95 z-50 flex flex-col p-3 backdrop-blur-md justify-between">
   <div class="max-w-md w-full mx-auto flex flex-col h-full">
     <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-2 shrink-0">
@@ -140,7 +146,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   </div>
 </div>
 
-<!-- BOTTOM AUTO-EXPANDING INTAKE BAR -->
+<!-- BOTTOM INPUT BAR WITH AUTO-EXPANDING TEXT AREA -->
 <div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-2.5 z-40">
   <div class="max-w-md mx-auto flex items-end gap-2">
     <textarea id="unifiedInput" rows="1" placeholder="Talk or type note..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 resize-none max-h-28 overflow-y-auto" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); submitUnifiedInput(); }"></textarea>
@@ -160,12 +166,9 @@ var activeRecognition = null;
 
 var localPreloadedCards = {
   'castle': [
-    { title: '⛽ Gas Finder Card', group: 'Castle Utility', phone: '410-555-0199' },
-    { title: '🛒 Grocery Savings Card', group: 'Castle Utility', phone: '410-555-0188' },
-    { title: '💳 Banking & Bills Card', group: 'Castle Utility', phone: '410-555-0177' }
-  ],
-  'calendar': [
-    { title: '📅 Today\'s Active Schedule', group: 'Calendar Sync', calendarLink: true }
+    { title: '⛽ Gas Finder Card', group: 'Castle Utility', phone: '410-555-0199', desc: 'Cheapest local gas finder active.' },
+    { title: '🛒 Grocery Savings Card', group: 'Castle Utility', phone: '410-555-0188', desc: 'Auto ROI Grocery discount tracker.' },
+    { title: '💳 Banking & Bills Card', group: 'Castle Utility', phone: '410-555-0177', desc: 'Central strategy & bill management.' }
   ]
 };
 
@@ -205,7 +208,7 @@ async function loadDrawerItems(drawerName) {
         if (g.items_page && g.items_page.items) {
           g.items_page.items.forEach(function(it) {
             var nameLower = (it.name || '').toLowerCase();
-            // FILTER OUT CLOSED/ARCHIVED ITEMS TO KILL LANDFILLS
+            // FILTER OUT CLOSED/ARCHIVED LANDFILL ITEMS
             if (!nameLower.includes('archive') && !nameLower.includes('completed') && !nameLower.includes('closed') && !nameLower.includes('done')) {
               items.push({
                 id: it.id,
@@ -248,6 +251,7 @@ function submitUnifiedInput(inputId) {
 }
 
 function toggleVoiceIntake(drawerContext, targetInputId, targetBtnId) {
+  var targetDrawer = drawerContext || activeDrawerContext;
   var input = document.getElementById(targetInputId || 'unifiedInput');
   var btn = document.getElementById(targetBtnId || 'micBtn');
   var led = document.getElementById('statusLed');
@@ -326,10 +330,6 @@ function renderItemCard(item) {
     commsHtml = '<div class="flex items-center gap-2 pt-1.5 border-t border-gray-700/60 mt-1.5 text-[10px]">' +
       '<a href="tel:' + phone + '" class="text-emerald-400 hover:underline flex items-center gap-1 font-bold"><i class="fa-solid fa-phone"></i> Call</a>' +
       '<a href="sms:' + phone + '" class="text-sky-400 hover:underline flex items-center gap-1 font-bold"><i class="fa-solid fa-comment-sms"></i> Text</a>' +
-      '</div>';
-  } else if (item.calendarLink) {
-    commsHtml = '<div class="pt-1.5 border-t border-gray-700/60 mt-1.5 text-[10px]">' +
-      '<a href="https://calendar.google.com" target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-2.5 py-1 rounded-lg inline-flex items-center gap-1"><i class="fa-solid fa-calendar-plus"></i> Launch Google Calendar App</a>' +
       '</div>';
   }
 
