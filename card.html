@@ -10,6 +10,7 @@
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05070e; color: #f3f4f6; }
 .tapulator-face { background: linear-gradient(180deg, #0f172a 0%, #090d16 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); }
 .led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
+.f-badge { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: 2px solid #60a5fa; box-shadow: 0 0 15px rgba(37, 99, 235, 0.5); }
 @keyframes pulse-red {
   0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
   70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
@@ -31,25 +32,44 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
   </span>
 </div>
 
-<!-- FOREVER CARD MAIN CONTAINER -->
+<!-- FOREVER CARD MAIN CONTAINER (1-SCREEN RULE) -->
 <div class="max-w-md w-full tapulator-face rounded-3xl p-5 relative space-y-4 shadow-2xl my-auto">
 
-  <!-- BRAND LOGO & LARGE CUSTOMER TITLE -->
+  <!-- BRAND LOGO & SHARP F-CARD HEADER -->
   <div class="border-b border-slate-800 pb-3 space-y-2">
     <div class="flex justify-between items-center">
-      <img src="/LG_AL_AerusLogo_2387C.svg" alt="Aerus Logo" class="h-8 w-auto object-contain" onError="this.style.display='none'">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl f-badge flex items-center justify-center font-black text-xl text-white tracking-tighter">
+          F
+        </div>
+        <div>
+          <div class="text-[10px] font-black text-blue-400 uppercase tracking-widest">FOREVER CARD™</div>
+          <div class="text-[9px] text-gray-400 font-medium">Powered by Fresh TappyThing</div>
+        </div>
+      </div>
       <span id="viewBadge" class="bg-blue-900/60 text-blue-300 border border-blue-700 text-[9px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wider">
         OWNER VIEW
       </span>
     </div>
+
     <div class="flex justify-between items-start gap-2 pt-1">
       <div>
         <h1 id="cardTitle" class="text-xl font-black text-white tracking-tight leading-tight">Loading Card...</h1>
         <p id="cardSubtitle" class="text-[11px] text-gray-400 font-medium">Aerus Home Wellness • Timonium, MD</p>
       </div>
-      <span id="cardStatus" class="bg-emerald-950/60 text-emerald-400 border border-emerald-800/60 text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wider">
+      <span id="cardStatus" class="bg-emerald-950/60 text-emerald-400 border border-emerald-800/60 text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wider shrink-0">
         Active
       </span>
+    </div>
+
+    <!-- TAB FLIP CONTROLLER (PUBLIC / PRIVATE VIEWS) -->
+    <div id="tabFlipContainer" class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 gap-1 pt-1 mt-2">
+      <button type="button" id="tabPublicBtn" onclick="switchCardTab('public')" class="flex-1 py-1 text-[10px] font-bold rounded-lg bg-blue-600 text-white transition active:scale-95">
+        🌐 Public View
+      </button>
+      <button type="button" id="tabPrivateBtn" onclick="switchCardTab('private')" class="flex-1 py-1 text-[10px] font-bold rounded-lg text-slate-400 hover:text-white transition active:scale-95">
+        🔒 Private Deck
+      </button>
     </div>
   </div>
 
@@ -58,19 +78,28 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     <div id="ledOutput" class="text-xs font-bold text-emerald-400 tracking-wide transition-all">FOREVER CARD ENGINE READY ⚡</div>
   </div>
 
-  <!-- ACTION BUTTON MATRIX -->
-  <div class="grid grid-cols-2 gap-2.5">
-    <button type="button" id="btnTalkFresh" onclick="toggleFreshCardChat()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold p-3 rounded-2xl text-xs flex items-center justify-center gap-2 shadow-lg transition active:scale-95">
-      <i class="fa-solid fa-user-tie text-sm"></i>
-      <span id="labelTalkFresh">Talk to Fresh 🤵</span>
-    </button>
-    <a id="btnSms" href="#" class="bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold p-3 rounded-2xl text-xs flex items-center justify-center gap-2 border border-slate-700 shadow transition active:scale-95">
+  <!-- 1-TAP OUTBOUND COMMUNICATION ACTION MATRIX -->
+  <div class="grid grid-cols-3 gap-2">
+    <a id="btnCall" href="tel:4108821027" class="bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold p-2.5 rounded-2xl text-[11px] flex flex-col items-center justify-center gap-1 border border-slate-700 shadow transition active:scale-95">
+      <i class="fa-solid fa-phone text-blue-400 text-sm"></i>
+      <span>Call</span>
+    </a>
+    <a id="btnSms" href="#" class="bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold p-2.5 rounded-2xl text-[11px] flex flex-col items-center justify-center gap-1 border border-slate-700 shadow transition active:scale-95">
       <i class="fa-solid fa-comment-sms text-emerald-400 text-sm"></i>
-      <span>Two-Way SMS</span>
+      <span>Text</span>
+    </a>
+    <a id="btnEmail" href="#" class="bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold p-2.5 rounded-2xl text-[11px] flex flex-col items-center justify-center gap-1 border border-slate-700 shadow transition active:scale-95">
+      <i class="fa-solid fa-envelope text-purple-400 text-sm"></i>
+      <span>Email</span>
     </a>
   </div>
 
-  <!-- INVOICE SECTION (DISPLAYED WHEN invoice=true) -->
+  <button type="button" id="btnTalkFresh" onclick="toggleFreshCardChat()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold p-3 rounded-2xl text-xs flex items-center justify-center gap-2 shadow-lg transition active:scale-95">
+    <i class="fa-solid fa-user-tie text-sm"></i>
+    <span id="labelTalkFresh">Talk to Fresh 🤵</span>
+  </button>
+
+  <!-- INVOICE SECTION (CUSTOMER / PUBLIC VIEW) -->
   <div id="invoiceSection" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
     <div class="border-b border-slate-800 pb-2 flex justify-between items-start">
       <div>
@@ -122,7 +151,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     <div id="freshReply" class="hidden p-2.5 rounded-xl bg-slate-950 border-l-2 border-sky-500 text-[11px] text-sky-200 leading-relaxed"></div>
   </div>
 
-  <!-- SERVICE HISTORY (VISIBLE TO ALL) -->
+  <!-- SERVICE HISTORY (PUBLIC / COMMON DECK) -->
   <div id="serviceHistoryContainer" class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-3 space-y-2">
     <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center justify-between border-b border-slate-800/80 pb-1.5">
       <span>🛠 Service History & Timeline</span>
@@ -136,7 +165,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </div>
   </div>
 
-  <!-- OWNER VIEW ONLY SECTIONS -->
+  <!-- OWNER VIEW ONLY SECTIONS (PRIVATE DECK) -->
   <div id="ownerSection" class="space-y-3">
     <!-- INTERNAL NOTES -->
     <div class="bg-amber-950/20 border border-amber-900/40 rounded-2xl p-3 space-y-2">
@@ -186,7 +215,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
     </div>
   </div>
 
-  <!-- STAFF SATELLITE INTAKE SECTION (DISPLAYED WHEN staff=true) -->
+  <!-- STAFF SATELLITE INTAKE SECTION (MONA & CHRIS VIEW) -->
   <div id="staffSection" class="hidden space-y-3">
     <!-- STAFF TIMECARD -->
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 space-y-2">
@@ -318,7 +347,7 @@ window.onload = function() {
 
   // VIEW ROUTING LOGIC
   if (isStaffView) {
-    // STAFF SATELLITE VIEW
+    // STAFF SATELLITE VIEW (MONA & CHRIS)
     if (titleEl) titleEl.innerText = staffName + ' — SATELLITE CARD';
     
     var badge = document.getElementById('viewBadge');
@@ -326,6 +355,9 @@ window.onload = function() {
       badge.innerText = 'STAFF VIEW';
       badge.className = 'bg-purple-900/60 text-purple-300 border border-purple-700 text-[9px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wider';
     }
+
+    var tabContainer = document.getElementById('tabFlipContainer');
+    if (tabContainer) tabContainer.style.display = 'none';
 
     var ownerSec = document.getElementById('ownerSection');
     if (ownerSec) ownerSec.style.display = 'none';
@@ -409,17 +441,40 @@ window.onload = function() {
     if (totalDisp) totalDisp.innerText = '$' + calculatedTotal.toFixed(2);
   }
 
-  // CONFIGURE SMS LINK
+  // CONFIGURE 1-TAP OUTBOUND COMMUNICATION
   var smsMsg = 'Hello from Aerus Timonium regarding ' + currentCardTitle + '!';
+  var emailSubj = 'Aerus Timonium — ' + currentCardTitle;
+  var emailBody = 'Hello,\n\nFollowing up regarding your Forever Card (' + currentCardTitle + ').\n\nThank you,\nAerus Timonium';
+
   var smsBtn = document.getElementById('btnSms');
-  if (smsBtn) {
-    smsBtn.href = 'sms:?body=' + encodeURIComponent(smsMsg);
-  }
+  if (smsBtn) smsBtn.href = 'sms:?body=' + encodeURIComponent(smsMsg);
+
+  var emailBtn = document.getElementById('btnEmail');
+  if (emailBtn) emailBtn.href = 'mailto:william@towsonhealthyhomes.com?subject=' + encodeURIComponent(emailSubj) + '&body=' + encodeURIComponent(emailBody);
 
   if (currentCardId && !isStaffView) {
     fetchCardDetails(currentCardId);
   }
 };
+
+function switchCardTab(tabName) {
+  var publicBtn = document.getElementById('tabPublicBtn');
+  var privateBtn = document.getElementById('tabPrivateBtn');
+  var ownerSec = document.getElementById('ownerSection');
+  var historySec = document.getElementById('serviceHistoryContainer');
+
+  if (tabName === 'private') {
+    if (ownerSec) ownerSec.style.display = 'block';
+    if (historySec) historySec.style.display = 'none';
+    if (publicBtn) { publicBtn.className = 'flex-1 py-1 text-[10px] font-bold rounded-lg text-slate-400 hover:text-white transition active:scale-95'; }
+    if (privateBtn) { privateBtn.className = 'flex-1 py-1 text-[10px] font-bold rounded-lg bg-blue-600 text-white transition active:scale-95'; }
+  } else {
+    if (ownerSec && isCustomerView) ownerSec.style.display = 'none';
+    if (historySec) historySec.style.display = 'block';
+    if (publicBtn) { publicBtn.className = 'flex-1 py-1 text-[10px] font-bold rounded-lg bg-blue-600 text-white transition active:scale-95'; }
+    if (privateBtn) { privateBtn.className = 'flex-1 py-1 text-[10px] font-bold rounded-lg text-slate-400 hover:text-white transition active:scale-95'; }
+  }
+}
 
 async function loadStaffQueues() {
   try {
