@@ -513,7 +513,6 @@ function filterCatalogModal() {
   });
 }
 
-// IN-ROW REAL-TIME LOOKUP AND PRICE FILLING
 function handleInRowSearch(inputEl) {
   var val = inputEl.value.trim();
   var row = inputEl.closest('.invoice-row');
@@ -768,7 +767,7 @@ function generateStripeCheckout() {
 
 async function sendSmsInvoice() {
   var totalStr = document.getElementById('totalVal').textContent;
-  updateLed('PREPARING 1-TAP SMS... 📱', false);
+  updateLed('PREPARING PROPOSAL/INVOICE... 📱', false);
 
   if (!activeStripeUrl) {
     await generateStripeCheckout();
@@ -790,13 +789,28 @@ async function sendSmsInvoice() {
                     'Total Due: ' + totalStr + '\n' +
                     'Pay via Stripe: ' + (activeStripeUrl || 'https://checkout.stripe.com/pay');
 
-  var rawPhone = document.getElementById('customerPhoneLink').textContent.replace(/[^0-9]/g, '');
-  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  var separator = isIOS ? '&body=' : '?body=';
-  var smsUrl = 'sms:' + rawPhone + separator + encodeURIComponent(messageBody);
+  var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-  updateLed('SMS LAUNCHED ⚡', false);
-  window.location.href = smsUrl;
+  if (isMobile) {
+    // MOBILE / TABLET: Launch Native SMS App
+    var rawPhone = document.getElementById('customerPhoneLink').textContent.replace(/[^0-9]/g, '');
+    var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    var separator = isIOS ? '&body=' : '?body=';
+    var smsUrl = 'sms:' + rawPhone + separator + encodeURIComponent(messageBody);
+
+    updateLed('MOBILE SMS LAUNCHED ⚡', false);
+    window.location.href = smsUrl;
+  } else {
+    // DESKTOP / LAPTOP: Copy Clean Text & Stripe Link directly to Clipboard
+    try {
+      await navigator.clipboard.writeText(messageBody);
+      updateLed('PROPOSAL & STRIPE LINK COPIED TO CLIPBOARD! 📋⚡', false);
+      alert('Desktop Detected:\n\nProposal summary & Stripe link copied directly to your clipboard!\n\nYou can now paste it directly into an email or text message.');
+    } catch(err) {
+      updateLed('STRIPE LINK READY: ' + activeStripeUrl, false);
+      alert('Stripe Link Ready:\n\n' + activeStripeUrl);
+    }
+  }
 }
 
 function postCardNote() {
