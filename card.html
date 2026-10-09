@@ -17,6 +17,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 }
 .mic-pulsing { animation: pulse-red 1.5s infinite; background-color: #dc2626 !important; color: #ffffff !important; }
 .type-btn-active { background-color: #f59e0b !important; color: #000000 !important; font-weight: 900 !important; }
+.category-btn-active { background-color: #0284c7 !important; color: #ffffff !important; font-weight: 800 !important; }
 </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-3 pb-24 relative">
@@ -24,7 +25,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 <div class="max-w-md w-full card-face rounded-3xl p-5 relative space-y-4 shadow-2xl my-auto">
   
   <!-- HEADER & FULL DYNAMIC CUSTOMER CONTACT CARD -->
-  <div class="border-b border-slate-800 pb-3 space-y-1">
+  <div class="border-b border-slate-800 pb-3 space-y-2">
     <div class="flex items-center justify-between">
       <h1 id="customerTitle" class="text-xl font-black text-white tracking-tight flex items-center gap-2">
         <i class="fa-solid fa-address-card text-blue-400"></i> Loading Card...
@@ -44,6 +45,29 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
         </div>
         <span id="cardSubtext" class="text-[10px] text-blue-400 font-bold uppercase tracking-wider">Forever Card™</span>
       </div>
+    </div>
+
+    <!-- 1. SERVICE CATEGORY TOGGLE -->
+    <div class="flex items-center justify-between bg-slate-950 p-1 rounded-xl border border-slate-800 text-[10px]">
+      <button type="button" onclick="setServiceCategory('Vacuum Repair')" id="btnCatVacuum" class="flex-1 py-1 rounded-lg text-gray-400 font-bold transition category-btn-active">🧹 Vac Repair</button>
+      <button type="button" onclick="setServiceCategory('Water Treatment')" id="btnCatWater" class="flex-1 py-1 rounded-lg text-gray-400 font-bold transition">💧 Water</button>
+      <button type="button" onclick="setServiceCategory('Air Purification')" id="btnCatAir" class="flex-1 py-1 rounded-lg text-gray-400 font-bold transition">💨 Air Purifier</button>
+    </div>
+
+    <!-- 2. PHYSICAL STAGE / LOCATION DROPDOWN (MATCHES MONDAY 7 GROUPS) -->
+    <div class="bg-slate-950/90 p-2 rounded-xl border border-slate-800 flex items-center justify-between gap-2 text-xs">
+      <label class="text-[10px] font-black text-amber-400 uppercase tracking-wider flex items-center gap-1 shrink-0">
+        <i class="fa-solid fa-location-crosshairs"></i> Stage:
+      </label>
+      <select id="stageSelect" onchange="updateStageLocation(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white font-bold focus:outline-none focus:border-amber-500">
+        <option value="1. 🚗 William's Vehicle / Field Pickups">1. 🚗 William's Vehicle / Field Pickups</option>
+        <option value="2. 📥 Counter Intake / Showroom">2. 📥 Counter Intake / Showroom</option>
+        <option value="3. 🛠️ Mike's Workbench (Active Queue)">3. 🛠️ Mike's Workbench (Active Queue)</option>
+        <option value="4. 🛒 Parts Staging (FOAS / Desco / Amazon)">4. 🛒 Parts Staging (FOAS / Desco / Amazon)</option>
+        <option value="5. 🔩 Parts In Shop — Ready for Bench">5. 🔩 Parts In Shop — Ready for Bench</option>
+        <option value="6. 🔧 Ready Wall — Pickup & Delivery">6. 🔧 Ready Wall — Pickup & Delivery</option>
+        <option value="7. 📦 Archive — Completed & Paid">7. 📦 Archive — Completed & Paid</option>
+      </select>
     </div>
   </div>
 
@@ -91,7 +115,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
           <input type="number" step="0.01" value="0.00" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-900 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">
           <button type="button" onclick="removeInvoiceRow(this)" class="text-gray-500 hover:text-red-400 px-1 text-xs">✕</button>
         </div>
-        <input type="text" placeholder="+ Note / warranty..." oninput="autoSaveLocalDraft()" class="w-full bg-slate-900/60 border border-slate-800 rounded-lg px-2 py-1 text-[10px] text-gray-300 item-note focus:outline-none focus:border-amber-500/50">
+        
+        <!-- 3. SUPPLIER TAG + NOTE INPUT -->
+        <div class="flex gap-1.5 items-center">
+          <select class="bg-slate-900 border border-slate-800 rounded-lg px-1.5 py-1 text-[9px] text-amber-400 font-bold item-supplier focus:outline-none" onchange="autoSaveLocalDraft()">
+            <option value="">Supplier</option>
+            <option value="FOAS">FOAS</option>
+            <option value="Desco">Desco</option>
+            <option value="Amazon">Amazon</option>
+          </select>
+          <input type="text" placeholder="+ Note / warranty..." oninput="autoSaveLocalDraft()" class="flex-1 bg-slate-900/60 border border-slate-800 rounded-lg px-2 py-1 text-[10px] text-gray-300 item-note focus:outline-none focus:border-amber-500/50">
+        </div>
       </div>
     </div>
 
@@ -158,6 +192,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 var currentCardId = '';
 var currentCustomerTitle = '';
 var currentDocType = 'Invoice';
+var currentServiceCategory = 'Vacuum Repair';
+var currentStageLocation = "1. 🚗 William's Vehicle / Field Pickups";
 var isListeningInvoice = false;
 var invoiceRecognition = null;
 var activeStripeUrl = '';
@@ -384,20 +420,19 @@ window.onload = function() {
       .replace(/ID:.*Forever Card.*/i, '')
       .trim();
 
-    if (!currentCustomerTitle) currentCustomerTitle = 'Richard Smothers';
+    if (!currentCustomerTitle) currentCustomerTitle = 'Ruth Tucker';
     document.getElementById('customerTitle').innerHTML = '<i class="fa-solid fa-address-card text-blue-400"></i> ' + escapeHtml(currentCustomerTitle);
     document.title = currentCustomerTitle + ' — Forever Card™';
   } else {
-    currentCustomerTitle = 'Richard Smothers';
-    document.getElementById('customerTitle').innerHTML = '<i class="fa-solid fa-address-card text-blue-400"></i> Richard Smothers';
+    currentCustomerTitle = 'Ruth Tucker';
+    document.getElementById('customerTitle').innerHTML = '<i class="fa-solid fa-address-card text-blue-400"></i> Ruth Tucker';
   }
 
   if (rawAddress) {
     document.getElementById('customerAddress').textContent = decodeURIComponent(rawAddress);
-  } else if (currentCustomerTitle.toLowerCase().includes('smothers')) {
-    document.getElementById('customerAddress').textContent = '1415 Kingsway Rd, Baltimore, MD 21218';
-    document.getElementById('customerPhoneLink').textContent = '410-376-9061';
-    document.getElementById('customerPhoneLink').href = 'tel:4103769061';
+  } else if (currentCustomerTitle.toLowerCase().includes('tucker')) {
+    document.getElementById('customerAddress').textContent = 'Address on File';
+    document.getElementById('customerPhoneLink').textContent = 'Phone on File';
   } else {
     document.getElementById('customerAddress').textContent = 'Address on File';
   }
@@ -411,9 +446,7 @@ window.onload = function() {
     document.getElementById('cardSubtext').textContent = 'ID: ' + currentCardId;
   }
 
-  // POPULATE NATIVE DATALIST WITH ALL 1,090 CATALOG ITEMS
   populateDatalist();
-
   loadLocalSavedDraft();
 };
 
@@ -433,6 +466,21 @@ function escapeHtml(str) {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
+function setServiceCategory(cat) {
+  currentServiceCategory = cat;
+  document.getElementById('btnCatVacuum').className = 'flex-1 py-1 rounded-lg text-gray-400 font-bold transition ' + (cat === 'Vacuum Repair' ? 'category-btn-active' : '');
+  document.getElementById('btnCatWater').className = 'flex-1 py-1 rounded-lg text-gray-400 font-bold transition ' + (cat === 'Water Treatment' ? 'category-btn-active' : '');
+  document.getElementById('btnCatAir').className = 'flex-1 py-1 rounded-lg text-gray-400 font-bold transition ' + (cat === 'Air Purification' ? 'category-btn-active' : '');
+  updateLed('CATEGORY: ' + cat.toUpperCase(), false);
+  autoSaveLocalDraft();
+}
+
+function updateStageLocation(stageVal) {
+  currentStageLocation = stageVal;
+  updateLed('STAGE: ' + stageVal, false);
+  autoSaveLocalDraft();
+}
+
 function setDocType(type) {
   currentDocType = type;
   document.getElementById('btnTypeEstimate').className = 'flex-1 text-[11px] py-1 rounded-lg font-bold transition ' + (type === 'Estimate' ? 'type-btn-active' : 'text-gray-400');
@@ -440,7 +488,7 @@ function setDocType(type) {
   document.getElementById('btnTypeInvoice').className = 'flex-1 text-[11px] py-1 rounded-lg font-bold transition ' + (type === 'Invoice' ? 'type-btn-active' : 'text-gray-400');
   
   document.getElementById('docTitleLabel').innerHTML = '<i class="fa-solid fa-file-invoice-dollar"></i> Draft ' + type;
-  updateLed('DOC TYPE SET TO ' + type.toUpperCase() + ' ⚡', false);
+  updateLed('DOC TYPE: ' + type.toUpperCase(), false);
   autoSaveLocalDraft();
 }
 
@@ -456,7 +504,6 @@ function closeSearchModal() {
   document.getElementById('searchModal').classList.add('hidden');
 }
 
-// BULLETPROOF MULTI-WORD FUZZY SEARCH ENGINE
 function searchCatalog(query) {
   if (!query || !query.trim()) return inventoryDatabase.slice(0, 40);
 
@@ -504,7 +551,7 @@ function filterCatalogModal() {
     var div = document.createElement('div');
     div.className = 'flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 text-xs hover:border-amber-500 transition cursor-pointer';
     div.onclick = function() {
-      addPrepopulatedRow(item.name, item.price, item.type, '');
+      addPrepopulatedRow(item.name, item.price, item.type, '', '');
       closeSearchModal();
     };
     div.innerHTML = '<div><div class="font-bold text-white">' + escapeHtml(item.name) + '</div><div class="text-[10px] text-gray-400">' + (item.type === 'part' ? 'Part (Taxable)' : 'Labor (No Tax)') + '</div></div>' +
@@ -573,7 +620,7 @@ function toggleInvoiceVoice() {
     var matches = searchCatalog(text);
 
     if (matches.length > 0) {
-      addPrepopulatedRow(matches[0].name, matches[0].price, matches[0].type, '');
+      addPrepopulatedRow(matches[0].name, matches[0].price, matches[0].type, '', '');
       updateLed('ADDED: ' + matches[0].name, false);
     } else {
       updateLed('NO MATCH — OPENING SEARCH', true);
@@ -593,7 +640,7 @@ function toggleInvoiceVoice() {
   invoiceRecognition.start();
 }
 
-function addPrepopulatedRow(name, price, type, note) {
+function addPrepopulatedRow(name, price, type, note, supplier) {
   var rowsContainer = document.getElementById('invoiceRows');
   var existingRows = rowsContainer.querySelectorAll('.invoice-row');
   if (existingRows.length === 1) {
@@ -612,13 +659,21 @@ function addPrepopulatedRow(name, price, type, note) {
                      '<input type="number" step="0.01" value="' + price + '" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-900 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">' +
                      '<button type="button" onclick="removeInvoiceRow(this)" class="text-gray-500 hover:text-red-400 px-1 text-xs">✕</button>' +
                      '</div>' +
-                     '<input type="text" value="' + escapeHtml(note || '') + '" placeholder="+ Note / warranty..." oninput="autoSaveLocalDraft()" class="w-full bg-slate-900/60 border border-slate-800 rounded-lg px-2 py-1 text-[10px] text-gray-300 item-note focus:outline-none focus:border-amber-500/50">';
+                     '<div class="flex gap-1.5 items-center">' +
+                     '<select class="bg-slate-900 border border-slate-800 rounded-lg px-1.5 py-1 text-[9px] text-amber-400 font-bold item-supplier focus:outline-none" onchange="autoSaveLocalDraft()">' +
+                     '<option value="" ' + (!supplier?'selected':'') + '>Supplier</option>' +
+                     '<option value="FOAS" ' + (supplier==='FOAS'?'selected':'') + '>FOAS</option>' +
+                     '<option value="Desco" ' + (supplier==='Desco'?'selected':'') + '>Desco</option>' +
+                     '<option value="Amazon" ' + (supplier==='Amazon'?'selected':'') + '>Amazon</option>' +
+                     '</select>' +
+                     '<input type="text" value="' + escapeHtml(note || '') + '" placeholder="+ Note / warranty..." oninput="autoSaveLocalDraft()" class="flex-1 bg-slate-900/60 border border-slate-800 rounded-lg px-2 py-1 text-[10px] text-gray-300 item-note focus:outline-none focus:border-amber-500/50">' +
+                     '</div>';
   rowsContainer.appendChild(newRow);
   calculateInvoiceTotals();
 }
 
 function addInvoiceRow() {
-  addPrepopulatedRow('', '0.00', 'part', '');
+  addPrepopulatedRow('', '0.00', 'part', '', '');
 }
 
 function removeInvoiceRow(btn) {
@@ -668,13 +723,16 @@ function autoSaveLocalDraft() {
     var type = row.querySelector('.item-type').value;
     var price = row.querySelector('.item-price').value;
     var note = row.querySelector('.item-note') ? row.querySelector('.item-note').value : '';
+    var supplier = row.querySelector('.item-supplier') ? row.querySelector('.item-supplier').value : '';
     if (desc || parseFloat(price) > 0) {
-      items.push({ name: desc, type: type, price: price, note: note });
+      items.push({ name: desc, type: type, price: price, note: note, supplier: supplier });
     }
   });
 
   var payload = {
     docType: currentDocType,
+    serviceCategory: currentServiceCategory,
+    stageLocation: document.getElementById('stageSelect') ? document.getElementById('stageSelect').value : currentStageLocation,
     items: items,
     subtotal: document.getElementById('subtotalVal').textContent,
     tax: document.getElementById('taxVal').textContent,
@@ -693,11 +751,16 @@ function loadLocalSavedDraft() {
     if (saved) {
       var data = JSON.parse(saved);
       if (data.docType) setDocType(data.docType);
+      if (data.serviceCategory) setServiceCategory(data.serviceCategory);
+      if (data.stageLocation && document.getElementById('stageSelect')) {
+        document.getElementById('stageSelect').value = data.stageLocation;
+        currentStageLocation = data.stageLocation;
+      }
       if (data.items && data.items.length > 0) {
         var container = document.getElementById('invoiceRows');
         container.innerHTML = '';
         data.items.forEach(function(it) {
-          addPrepopulatedRow(it.name, it.price, it.type, it.note || '');
+          addPrepopulatedRow(it.name, it.price, it.type, it.note || '', it.supplier || '');
         });
         updateLed('SAVED DRAFT RESTORED ⚡', false);
       }
@@ -707,33 +770,36 @@ function loadLocalSavedDraft() {
 
 function saveDraftToCard() {
   var totalStr = document.getElementById('totalVal').textContent;
+  var currentStage = document.getElementById('stageSelect') ? document.getElementById('stageSelect').value : currentStageLocation;
   var rows = document.querySelectorAll('.invoice-row');
   var itemSummary = [];
   rows.forEach(function(row) {
     var desc = row.querySelector('.item-desc').value;
     var price = row.querySelector('.item-price').value;
     var note = row.querySelector('.item-note') ? row.querySelector('.item-note').value : '';
-    if (desc) itemSummary.push(desc + ' ($' + price + ')' + (note ? ' [' + note + ']' : ''));
+    var supplier = row.querySelector('.item-supplier') ? row.querySelector('.item-supplier').value : '';
+    if (desc) itemSummary.push(desc + ' ($' + price + ')' + (supplier ? ' [' + supplier + ']' : '') + (note ? ' (' + note + ')' : ''));
   });
 
-  var noteContent = '[' + currentDocType.toUpperCase() + ' DRAFT] Total: ' + totalStr + ' | Items: ' + itemSummary.join(', ');
+  var noteContent = '[' + currentDocType.toUpperCase() + ' | ' + currentServiceCategory + ' | Stage: ' + currentStage + '] Total: ' + totalStr + ' | Items: ' + itemSummary.join(', ');
   updateLed('SAVING DRAFT TO CARD... ⚡', false);
   
   fetch('/.netlify/functions/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      prompt: "[" + currentCustomerTitle + "] Note: " + noteContent,
+      prompt: "[" + currentCustomerTitle + "] " + noteContent,
       card_id: currentCardId,
+      stage: currentStage,
       board_id: '18424728273'
     })
   })
   .then(function(res) { return res.json(); })
   .then(function() {
-    updateLed('DRAFT SAVED TO CARD NOTES ⚡', false);
+    updateLed('CARD DRAFT SAVED ⚡', false);
   })
   .catch(function() {
-    updateLed('DRAFT SAVED LOCALLY & TO CARD ⚡', false);
+    updateLed('SAVED LOCALLY & TO CARD ⚡', false);
   });
 }
 
@@ -767,6 +833,7 @@ function generateStripeCheckout() {
 
 async function sendSmsInvoice() {
   var totalStr = document.getElementById('totalVal').textContent;
+  var currentStage = document.getElementById('stageSelect') ? document.getElementById('stageSelect').value : currentStageLocation;
   updateLed('PREPARING PROPOSAL/INVOICE... 📱', false);
 
   if (!activeStripeUrl) {
@@ -784,7 +851,7 @@ async function sendSmsInvoice() {
     }
   });
 
-  var messageBody = 'Hi ' + currentCustomerTitle + ',\nHere is your Aerus ' + currentDocType + ':\n\n' +
+  var messageBody = 'Hi ' + currentCustomerTitle + ',\nHere is your Aerus ' + currentDocType + ' (' + currentServiceCategory + '):\n\n' +
                     lineItemsText.join('\n') + '\n\n' +
                     'Total Due: ' + totalStr + '\n' +
                     'Pay via Stripe: ' + (activeStripeUrl || 'https://checkout.stripe.com/pay');
@@ -792,7 +859,6 @@ async function sendSmsInvoice() {
   var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   if (isMobile) {
-    // MOBILE / TABLET: Launch Native SMS App
     var rawPhone = document.getElementById('customerPhoneLink').textContent.replace(/[^0-9]/g, '');
     var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     var separator = isIOS ? '&body=' : '?body=';
@@ -801,7 +867,6 @@ async function sendSmsInvoice() {
     updateLed('MOBILE SMS LAUNCHED ⚡', false);
     window.location.href = smsUrl;
   } else {
-    // DESKTOP / LAPTOP: Copy Clean Text & Stripe Link directly to Clipboard
     try {
       await navigator.clipboard.writeText(messageBody);
       updateLed('PROPOSAL & STRIPE LINK COPIED TO CLIPBOARD! 📋⚡', false);
