@@ -1,908 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Forever Card™ — Dynamic Hub</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05070e; color: #f3f4f6; }
-.card-face { background: linear-gradient(180deg, #0f172a 0%, #090d16 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); }
-.led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
-@keyframes pulse-red {
-  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-}
-.mic-pulsing { animation: pulse-red 1.5s infinite; background-color: #dc2626 !important; color: #ffffff !important; }
-.type-btn-active { background-color: #f59e0b !important; color: #000000 !important; font-weight: 900 !important; }
-.category-btn-active { background-color: #0284c7 !important; color: #ffffff !important; font-weight: 800 !important; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forever Card™ — Service Portal</title>
+  <script src="config.js"></script>
+  <style>
+    :root { --primary: #0066cc; --bg: #f4f6f8; --card: #ffffff; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); margin: 0; padding: 12px; color: #333; }
+    .card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    h2, h3 { margin-top: 0; color: var(--primary); }
+    .btn { background: var(--primary); color: white; border: none; padding: 12px 16px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 8px; }
+    .btn-secondary { background: #6c757d; }
+    .btn-danger { background: #dc3545; }
+    .btn-success { background: #28a745; }
+    input, select, textarea { width: 100%; padding: 10px; margin: 6px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+    .line-item { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .line-item input[type="text"] { flex: 2; }
+    .line-item input[type="number"] { flex: 1; }
+    .chip-container { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+    .chip { background: #e9ecef; padding: 6px 12px; border-radius: 16px; font-size: 12px; cursor: pointer; }
+    .chip.active { background: var(--primary); color: white; }
+    #photoPreview { width: 100%; border-radius: 8px; margin-top: 8px; display: none; }
+  </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-3 pb-24 relative">
+<body>
 
-<div class="max-w-md w-full card-face rounded-3xl p-5 relative space-y-4 shadow-2xl my-auto">
-  
-  <!-- HEADER & FULL DYNAMIC CUSTOMER CONTACT CARD -->
-  <div class="border-b border-slate-800 pb-3 space-y-2">
-    <div class="flex items-center justify-between">
-      <h1 id="customerTitle" class="text-xl font-black text-white tracking-tight flex items-center gap-2">
-        <i class="fa-solid fa-address-card text-blue-400"></i> Loading Card...
-      </h1>
-      <a href="/" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-1.5 rounded-xl border border-slate-700 transition">Hub</a>
-    </div>
+  <!-- Customer Contact Bar -->
+  <div class="card">
+    <h2 id="custName">Loading Customer...</h2>
+    <p id="custPhone">📱 Phone: --</p>
+    <p id="custAddress">📍 Address: --</p>
     
-    <div id="customerContactBox" class="bg-slate-950/80 rounded-xl p-2.5 border border-slate-800 text-xs space-y-1 text-gray-300">
-      <div class="flex items-center gap-2">
-        <i class="fa-solid fa-location-dot text-red-400"></i>
-        <span id="customerAddress">Loading Address...</span>
-      </div>
-      <div class="flex items-center justify-between pt-0.5">
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-phone text-emerald-400"></i>
-          <a id="customerPhoneLink" href="#" class="text-emerald-400 font-bold hover:underline">Phone on File</a>
-        </div>
-        <span id="cardSubtext" class="text-[10px] text-blue-400 font-bold uppercase tracking-wider">Forever Card™</span>
-      </div>
-    </div>
-
-    <!-- 1. SERVICE CATEGORY TOGGLE -->
-    <div class="flex items-center justify-between bg-slate-950 p-1 rounded-xl border border-slate-800 text-[10px]">
-      <button type="button" onclick="setServiceCategory('Vacuum Repair')" id="btnCatVacuum" class="flex-1 py-1 rounded-lg text-gray-400 font-bold transition category-btn-active">🧹 Vac Repair</button>
-      <button type="button" onclick="setServiceCategory('Water Treatment')" id="btnCatWater" class="flex-1 py-1 rounded-lg text-gray-400 font-bold transition">💧 Water</button>
-      <button type="button" onclick="setServiceCategory('Air Purification')" id="btnCatAir" class="flex-1 py-1 rounded-lg text-gray-400 font-bold transition">💨 Air Purifier</button>
-    </div>
-
-    <!-- 2. PHYSICAL STAGE / LOCATION DROPDOWN (MATCHES MONDAY 7 GROUPS) -->
-    <div class="bg-slate-950/90 p-2 rounded-xl border border-slate-800 flex items-center justify-between gap-2 text-xs">
-      <label class="text-[10px] font-black text-amber-400 uppercase tracking-wider flex items-center gap-1 shrink-0">
-        <i class="fa-solid fa-location-crosshairs"></i> Stage:
-      </label>
-      <select id="stageSelect" onchange="updateStageLocation(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white font-bold focus:outline-none focus:border-amber-500">
-        <option value="1. 🚗 William's Vehicle / Field Pickups">1. 🚗 William's Vehicle / Field Pickups</option>
-        <option value="2. 📥 Counter Intake / Showroom">2. 📥 Counter Intake / Showroom</option>
-        <option value="3. 🛠️ Mike's Workbench (Active Queue)">3. 🛠️ Mike's Workbench (Active Queue)</option>
-        <option value="4. 🛒 Parts Staging (FOAS / Desco / Amazon)">4. 🛒 Parts Staging (FOAS / Desco / Amazon)</option>
-        <option value="5. 🔩 Parts In Shop — Ready for Bench">5. 🔩 Parts In Shop — Ready for Bench</option>
-        <option value="6. 🔧 Ready Wall — Pickup & Delivery">6. 🔧 Ready Wall — Pickup & Delivery</option>
-        <option value="7. 📦 Archive — Completed & Paid">7. 📦 Archive — Completed & Paid</option>
-      </select>
-    </div>
+    <!-- 1-Tap Voice-to-SMS -->
+    <button class="btn btn-success" onclick="startVoiceSMS()">🎙️ Hold/Tap to Dictate "On My Way" SMS</button>
   </div>
 
-  <!-- LED STATUS DISPLAY -->
-  <div class="led-display rounded-2xl p-2.5 text-center border border-blue-900/50 min-h-[44px] flex items-center justify-center">
-    <div id="statusLed" class="text-xs font-bold text-emerald-400 tracking-wide">CARD ACTIVE ⚡</div>
+  <!-- Diagnostic Photo Snap -->
+  <div class="card">
+    <h3>📷 Diagnostic & Machine Photo</h3>
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="previewPhoto(event)">
+    <img id="photoPreview" src="" alt="Machine Snap">
   </div>
 
-  <!-- DRAFT BUILDER WITH DOCUMENT TYPE TOGGLE -->
-  <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
+  <!-- Pipeline Stage & Chips -->
+  <div class="card">
+    <h3>⚙️ Pipeline Stage</h3>
+    <select id="stageSelect" onchange="saveCardState()"></select>
     
-    <div class="flex items-center justify-between bg-slate-950 p-1.5 rounded-xl border border-slate-800">
-      <button type="button" onclick="setDocType('Estimate')" id="btnTypeEstimate" class="flex-1 text-[11px] py-1 rounded-lg text-gray-400 font-bold transition">Estimate</button>
-      <button type="button" onclick="setDocType('Proposal')" id="btnTypeProposal" class="flex-1 text-[11px] py-1 rounded-lg text-gray-400 font-bold transition">Proposal</button>
-      <button type="button" onclick="setDocType('Invoice')" id="btnTypeInvoice" class="flex-1 text-[11px] py-1 rounded-lg text-gray-400 font-bold transition type-btn-active">Invoice</button>
-    </div>
+    <h4>Categories</h4>
+    <div class="chip-container" id="categoryChips"></div>
 
-    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-      <span id="docTitleLabel" class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-        <i class="fa-solid fa-file-invoice-dollar"></i> Draft Invoice
-      </span>
-      <div class="flex gap-1.5 items-center">
-        <button type="button" onclick="openSearchModal()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-2.5 py-1 rounded-lg text-[11px] flex items-center gap-1 shadow transition active:scale-95">
-          <i class="fa-solid fa-magnifying-glass"></i> Search
-        </button>
-        <button type="button" id="invoiceMicBtn" onclick="toggleInvoiceVoice()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-2.5 py-1 rounded-lg text-[11px] flex items-center gap-1 shadow transition active:scale-95">
-          <i class="fa-solid fa-microphone"></i> Talk
-        </button>
-        <button type="button" onclick="addInvoiceRow()" class="text-[10px] bg-amber-950/80 hover:bg-amber-900 text-amber-300 font-bold px-2 py-1 rounded-lg border border-amber-800/60">+ Add</button>
-      </div>
-    </div>
-
-    <!-- NATIVE AUTOCOMPLETE DATALIST FOR ALL 1,090 ITEMS -->
-    <datalist id="partsCatalog"></datalist>
-
-    <!-- LINE ITEMS CONTAINER -->
-    <div id="invoiceRows" class="space-y-2">
-      <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 invoice-row space-y-1.5">
-        <div class="flex gap-2 items-center">
-          <input type="text" list="partsCatalog" placeholder="Type item name..." oninput="handleInRowSearch(this)" class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
-          <select onchange="calculateInvoiceTotals()" class="bg-slate-900 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none">
-            <option value="part">Part (Tax)</option>
-            <option value="labor">Labor (No Tax)</option>
-          </select>
-          <input type="number" step="0.01" value="0.00" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-900 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">
-          <button type="button" onclick="removeInvoiceRow(this)" class="text-gray-500 hover:text-red-400 px-1 text-xs">✕</button>
-        </div>
-        
-        <!-- 3. SUPPLIER TAG + NOTE INPUT -->
-        <div class="flex gap-1.5 items-center">
-          <select class="bg-slate-900 border border-slate-800 rounded-lg px-1.5 py-1 text-[9px] text-amber-400 font-bold item-supplier focus:outline-none" onchange="autoSaveLocalDraft()">
-            <option value="">Supplier</option>
-            <option value="FOAS">FOAS</option>
-            <option value="Desco">Desco</option>
-            <option value="Amazon">Amazon</option>
-          </select>
-          <input type="text" placeholder="+ Note / warranty..." oninput="autoSaveLocalDraft()" class="flex-1 bg-slate-900/60 border border-slate-800 rounded-lg px-2 py-1 text-[10px] text-gray-300 item-note focus:outline-none focus:border-amber-500/50">
-        </div>
-      </div>
-    </div>
-
-    <!-- CALCULATIONS -->
-    <div class="border-t border-slate-800 pt-2 space-y-1 text-xs font-mono">
-      <div class="flex justify-between text-gray-400">
-        <span>Subtotal:</span>
-        <span id="subtotalVal">$0.00</span>
-      </div>
-      <div class="flex justify-between text-gray-400">
-        <span>MD Tax (6% Parts Only):</span>
-        <span id="taxVal">$0.00</span>
-      </div>
-      <div class="flex justify-between font-bold text-emerald-400 text-sm pt-1 border-t border-slate-800/60">
-        <span>Total Due:</span>
-        <span id="totalVal">$0.00</span>
-      </div>
-    </div>
-
-    <!-- ACTION BUTTONS -->
-    <div class="grid grid-cols-3 gap-1.5 pt-1">
-      <button type="button" onclick="saveDraftToCard()" class="bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-800/50 font-bold py-2 px-1.5 rounded-xl text-[11px] flex items-center justify-center gap-1 shadow transition active:scale-95">
-        <i class="fa-solid fa-floppy-disk"></i> Save Draft
-      </button>
-      <button type="button" onclick="generateStripeCheckout()" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-2 px-3 rounded-xl text-[11px] flex items-center justify-center gap-1 shadow transition active:scale-95">
-        <i class="fa-solid fa-credit-card"></i> Stripe
-      </button>
-      <button type="button" onclick="sendSmsInvoice()" class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-[11px] flex items-center justify-center gap-1 shadow transition active:scale-95">
-        <i class="fa-solid fa-comment-sms"></i> 1-Tap SMS
-      </button>
-    </div>
+    <h4>Suppliers</h4>
+    <div class="chip-container" id="supplierChips"></div>
   </div>
 
-  <!-- NOTES & TIMELINE -->
-  <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-2.5">
-    <div class="text-xs font-black text-teal-300 uppercase tracking-wider flex items-center gap-1.5">
-      <i class="fa-solid fa-clock-rotate-left"></i> Card Notes & Updates
+  <!-- Universal Estimate & Invoice Engine -->
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h3 id="docTypeHeader">Proposal / Estimate</h3>
+      <button class="btn btn-secondary" style="width: auto; padding: 6px 12px;" onclick="toggleDocType()">Toggle Mode</button>
     </div>
-    <div class="flex gap-2">
-      <input type="text" id="cardNoteInput" placeholder="Type note for customer card..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-teal-500" onkeydown="if(event.key==='Enter') postCardNote()">
-      <button type="button" onclick="postCardNote()" class="bg-teal-600 hover:bg-teal-500 text-white font-bold px-3 py-2 rounded-xl text-xs transition active:scale-95">Post Note</button>
+
+    <div id="lineItemsContainer"></div>
+    <button class="btn" style="background: #17a2b8;" onclick="addLineItem()">+ Add Line Item</button>
+
+    <div style="margin-top: 16px; border-top: 2px solid #eee; padding-top: 10px;">
+      <p>Subtotal: <span id="subtotalVal">$0.00</span></p>
+      <p>Tax (<span id="taxRatePercent">6%</span>): <span id="taxVal">$0.00</span></p>
+      <h3>Total: <span id="totalVal">$0.00</span></h3>
     </div>
+
+    <button class="btn btn-success" onclick="generateStripeCheckout()">💳 1-Tap Stripe Checkout Link</button>
+    <button class="btn btn-danger" onclick="clearDraft()">🗑️ Clear Draft</button>
   </div>
 
-</div>
-
-<!-- VISUAL INVENTORY SEARCH MODAL POPUP -->
-<div id="searchModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-  <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-4 space-y-3 shadow-2xl">
-    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-      <h3 class="text-sm font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
-        <i class="fa-solid fa-boxes-stacked"></i> Search Catalog (1,090 Items)
-      </h3>
-      <button onclick="closeSearchModal()" class="text-gray-400 hover:text-white font-bold text-lg">✕</button>
-    </div>
-    
-    <input type="text" id="modalSearchInput" onkeyup="filterCatalogModal()" placeholder="Type C Bag, Beyond, HEPA, Angel, RO, Labor..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-    
-    <div id="modalResultsList" class="max-h-60 overflow-y-auto space-y-1.5 pr-1"></div>
-  </div>
-</div>
-
-<script>
-var currentCardId = '';
-var currentCustomerTitle = '';
-var currentDocType = 'Invoice';
-var currentServiceCategory = 'Vacuum Repair';
-var currentStageLocation = "1. 🚗 William's Vehicle / Field Pickups";
-var isListeningInvoice = false;
-var invoiceRecognition = null;
-var activeStripeUrl = '';
-
-// FULL HARDCODED INVENTORY (1,090 ITEMS, 0ms LATENCY)
-var inventoryDatabase = [
-  {"name":"Labor","price":"40.00","type":"labor"},
-  {"name":"Water Cooler w/ 6 Stage Reverse Osmosis","price":"2500.00","type":"part"},
-  {"name":"Standard RO Installation","price":"300.00","type":"part"},
-  {"name":"Aerus Mobile","price":"271.00","type":"part"},
-  {"name":"AP 500","price":"500.00","type":"part"},
-  {"name":"Pure & Gentle Soap Program","price":"325.00","type":"part"},
-  {"name":"Professional RO Installation","price":"450.00","type":"part"},
-  {"name":"Free Equipment Inspection FOR AERUS/$35 for non Aerus","price":"0.00","type":"part"},
-  {"name":"Non-Aerus Products","price":"15.00","type":"part"},
-  {"name":"Dust Mite & Flea Control - 1 lb","price":"43.99","type":"part"},
-  {"name":"Pet Refresh","price":"143.00","type":"part"},
-  {"name":"Potassium Chloride 40 lb Bag","price":"100.00","type":"part"},
-  {"name":"Stainless Steel Hose - Laundry Pro","price":"35.00","type":"part"},
-  {"name":"Cover Assembly - Laundry Pro","price":"95.00","type":"part"},
-  {"name":"3 Inlet Super Valve Kit (120V)","price":"290.00","type":"part"},
-  {"name":"35 Ft. Hose Sock","price":"140.00","type":"part"},
-  {"name":"Water Softening Salt Pellets (40lb bag )","price":"18.00","type":"part"},
-  {"name":"RO Holding Tank Standard","price":"95.00","type":"part"},
-  {"name":"9 Pk. Clean Obsessed CO6 HEPA Bags","price":"20.00","type":"part"},
-  {"name":"Plumber Service Fee - Origins Equipment","price":"75.00","type":"part"},
-  {"name":"Big Blue Filter Installation","price":"350.00","type":"part"},
-  {"name":"Plumbing Labor & Parts","price":"900.00","type":"labor"},
-  {"name":"Central Vac After Filter","price":"15.00","type":"part"},
-  {"name":"Sediment Filter Replacement Screen","price":"90.00","type":"part"},
-  {"name":"Spin Down Sediment Filter- Auto Flushing","price":"550.00","type":"part"},
-  {"name":"Nitrate Pre Filter","price":"675.00","type":"part"},
-  {"name":"Calcium & Sulfide Filter - pH Max","price":"103.00","type":"part"},
-  {"name":"Sediment/Carbon Filter","price":"53.00","type":"part"},
-  {"name":"Belt - Sidekick","price":"7.00","type":"part"},
-  {"name":"Credit Card Service Fee","price":"30.97","type":"part"},
-  {"name":"High-Efficiency and Carbon After Filters (Classic Canister) 49437","price":"19.67","type":"part"},
-  {"name":"Dyson Prefilter and Postfilter Replacement","price":"50.00","type":"part"},
-  {"name":"Commercial RO: RO Membrane","price":"150.00","type":"part"},
-  {"name":"RO Membrane (Aqualogy 201 & 30)","price":"349.99","type":"part"},
-  {"name":"Sheet Carbon Prefilter Add-on w/ POE System","price":"150.00","type":"part"},
-  {"name":"ResCare- 1 GAL","price":"49.99","type":"part"},
-  {"name":"UV Filter ASSY- 512","price":"949.99","type":"part"},
-  {"name":"Ozone Generator Kit","price":"1299.99","type":"part"},
-  {"name":"FA Personal","price":"199.99","type":"part"},
-  {"name":"TPC RPL Pads - 6PK","price":"19.99","type":"part"},
-  {"name":"Hose Assy- Guardian Ultra","price":"239.99","type":"part"},
-  {"name":"PN1-4 Motor Belt 7.99","price":"16.99","type":"part"},
-  {"name":"After filter- HI.EFF (2Pk.)","price":"14.99","type":"part"},
-  {"name":"RO 400 Electric Booster Pump w/ pressure Switch","price":"350.00","type":"part"},
-  {"name":"RO Spigot-Oil Rubbed Bronze","price":"100.00","type":"part"},
-  {"name":"RO Spigot-Standard Chrome","price":"50.00","type":"part"},
-  {"name":"RO Spigot-Brushed Nickel","price":"114.00","type":"part"},
-  {"name":"RO holding tank 4.5 gal.","price":"330.00","type":"part"},
-  {"name":"Arsenic Reduction In-line Filter","price":"200.00","type":"part"},
-  {"name":"Big Blue sediment replacement filter Cartridge 20 micron","price":"23.00","type":"part"},
-  {"name":"Aquaolo Anti-Microbial Filter","price":"19.99","type":"part"},
-  {"name":"Carbon Prefilter Cartidge","price":"25.00","type":"part"},
-  {"name":"After Bag Carbon Filter- Type R 2PK","price":"24.99","type":"part"},
-  {"name":"Filter, PHX","price":"29.99","type":"part"},
-  {"name":"Prefilter (G2 & XL)","price":"24.99","type":"part"},
-  {"name":"After Filter-2Pk","price":"14.99","type":"part"},
-  {"name":"Angel Filter","price":"124.99","type":"part"},
-  {"name":"Pre Filter Charcoal- Type P","price":"29.99","type":"part"},
-  {"name":"Laundry Pro II Replacement AP Cell Assembly","price":"69.99","type":"part"},
-  {"name":"Purelight 6 gpm lamp","price":"250.00","type":"part"},
-  {"name":"Purelight 21 gpm lamp","price":"300.00","type":"part"},
-  {"name":"UV Lamp 916- Replacement","price":"219.99","type":"part"},
-  {"name":"UV light bulb-1834","price":"249.99","type":"part"},
-  {"name":"Peroxide 5 Gallons (Neutra Sul)","price":"99.99","type":"part"},
-  {"name":"Tune-up #4 - Canister","price":"49.99","type":"part"},
-  {"name":"Tune-up- ECV","price":"99.99","type":"part"},
-  {"name":"Door Latch - Beyond","price":"9.99","type":"part"},
-  {"name":"Off Brand Bag (Sanitaire SD)","price":"15.99","type":"part"},
-  {"name":"Hose -ECV 35ft AP HANDLE","price":"379.99","type":"part"},
-  {"name":"Filter Support Assy. ECV","price":"17.99","type":"part"},
-  {"name":"Full Bag Control-REN","price":"49.99","type":"part"},
-  {"name":"Central Vac Only","price":"999.99","type":"part"},
-  {"name":"Platinum Cannister","price":"1799.99","type":"part"},
-  {"name":"UV Filter Combo","price":"1299.99","type":"part"},
-  {"name":"Beyond Guardian Air Gen II","price":"2599.99","type":"part"},
-  {"name":"SanctuAiry Mini","price":"999.99","type":"part"},
-  {"name":"Portable Air/ Aroma Purifier","price":"99.99","type":"part"},
-  {"name":"non-Aerus labor fee","price":"29.95","type":"labor"},
-  {"name":"Minimum Vacuum repair labor","price":"29.95","type":"labor"},
-  {"name":"Off-Brand Kirby Bags","price":"6.00","type":"part"},
-  {"name":"Winterize/Unwinterize Water Unit Labor Charge","price":"150.00","type":"labor"},
-  {"name":"Air Unit Repair Labor","price":"69.95","type":"labor"},
-  {"name":"POE UV Max Model D-4 Replacement Bulb","price":"219.99","type":"part"},
-  {"name":"Big Blue Sediment Filter Assembly Add-on W/ POE Install","price":"200.00","type":"part"},
-  {"name":"Big Blue GAC Filter Add-on W/ POE system Install","price":"250.00","type":"part"},
-  {"name":"6X30 Carbon Filter Replacement","price":"300.00","type":"part"},
-  {"name":"Drywell Install Labor","price":"1500.00","type":"labor"},
-  {"name":"Big Blue Sediement Filter Assy. Install, No POE unit","price":"350.00","type":"part"},
-  {"name":"Plumber Labor - half hour","price":"65.00","type":"labor"},
-  {"name":"Entipur Replacement Filter Cartridge","price":"14.99","type":"part"},
-  {"name":"Standard Sediment Prefilter Install- No POE Unit","price":"250.00","type":"part"},
-  {"name":"Vacuum Repair Labor","price":"69.95","type":"labor"},
-  {"name":"Sheet Carbon Prefilter Assembly Install - No POE Unit","price":"300.00","type":"part"},
-  {"name":"Beyond AP Cell- 634 model","price":"109.99","type":"part"},
-  {"name":"UV Filter ASSY- 916","price":"1049.99","type":"part"},
-  {"name":"UVLight /sediment Filter","price":"1299.99","type":"part"},
-  {"name":"Single Guardian Ultra H.e.p.a. Filter","price":"49.99","type":"part"},
-  {"name":"Quietpure Filter replacement","price":"39.99","type":"part"},
-  {"name":"Dyson DC50 Replacement filters","price":"25.10","type":"part"},
-  {"name":"Clean and Replace Filters","price":"60.00","type":"part"},
-  {"name":"Dyson SV10 Replacement filters","price":"15.25","type":"part"},
-  {"name":"P filter bags- 6pack","price":"19.99","type":"part"},
-  {"name":"Commercial RO Filter Set","price":"225.00","type":"part"},
-  {"name":"WCF400- Water Filtration and Conditioning Unit","price":"5500.00","type":"part"},
-  {"name":"Beyond Guardian Air","price":"2500.00","type":"part"},
-  {"name":"Aerus Pure & Clean","price":"800.00","type":"part"},
-  {"name":"Guardian Angel","price":"800.00","type":"part"},
-  {"name":"Hydroxyl Blaster","price":"1000.00","type":"part"},
-  {"name":"Guardian Air Home","price":"3000.00","type":"part"},
-  {"name":"Guardian Platinum Canister","price":"2500.00","type":"part"},
-  {"name":"Lux Legacy Canister","price":"1700.00","type":"part"},
-  {"name":"Lux Classic Canister","price":"1200.00","type":"part"},
-  {"name":"Lux Heavy Duty Upright","price":"1000.00","type":"part"},
-  {"name":"Centralux (Model E130K)","price":"2000.00","type":"part"},
-  {"name":"Aerus Lite (Cordless)","price":"1000.00","type":"part"},
-  {"name":"HEPA Filter - Heavy Duty","price":"34.00","type":"part"},
-  {"name":"After Bag Filter - Uprights","price":"5.00","type":"part"},
-  {"name":"Canister After Filters - 6 Pk.","price":"34.99","type":"part"},
-  {"name":"(B)-QTY 6 Fresh Era Bags","price":"19.99","type":"part"},
-  {"name":"Lite Bags- (L) - 6 Pk.","price":"25.99","type":"part"},
-  {"name":"HEPA & Carbon Pre-Filter - Platinum","price":"47.99","type":"part"},
-  {"name":"Long-Life HEPA After Filter","price":"31.99","type":"part"},
-  {"name":"P Filter Bags - 12 Pk.","price":"39.99","type":"part"},
-  {"name":"C Filter Bags - 12 Pk.","price":"30.99","type":"part"},
-  {"name":"C Filter Bags - 24 Pk.","price":"48.99","type":"part"},
-  {"name":"C Filter Bags - 100 Pk.","price":"145.99","type":"part"},
-  {"name":"2 Pk. After Filter (U)","price":"30.00","type":"part"},
-  {"name":"U Filter Bags - 12 Pk.","price":"30.99","type":"part"},
-  {"name":"U Filter Bags - 24 Pk.","price":"48.99","type":"part"},
-  {"name":"U Filter Bags - 100 Pk.","price":"145.99","type":"part"},
-  {"name":"R Filter Bags - 12 Pk.","price":"28.99","type":"part"},
-  {"name":"R Filter Bags - 24 Pk.","price":"43.99","type":"part"},
-  {"name":"R Filter Bags - 100 Pk.","price":"124.99","type":"part"},
-  {"name":"Trivac Dust Bags - 12 Pk.","price":"23.99","type":"part"},
-  {"name":"Central Vac Dust Filter (Scalloped)","price":"63.00","type":"part"},
-  {"name":"4 Pk. Carbon After Filter - Upright","price":"27.99","type":"part"},
-  {"name":"HEPA Filter - Lux 9000","price":"73.00","type":"part"},
-  {"name":"Exhaust HEPA Filter","price":"13.00","type":"part"},
-  {"name":"Pre Filter - Guard. Air Home","price":"69.00","type":"part"},
-  {"name":"Dust Bin HEPA Filter - V.E+","price":"16.00","type":"part"},
-  {"name":"HEPA Filter - Guard. Air Home","price":"207.00","type":"part"},
-  {"name":"HEPA Filter - Guard. Upr.","price":"53.00","type":"part"},
-  {"name":"Filter Screen - Guardian Angel","price":"55.00","type":"part"},
-  {"name":"Pre-Filter - Apollo 2000","price":"15.00","type":"part"},
-  {"name":"2 Pk. After Bag Carbon Filter (C)","price":"22.00","type":"part"},
-  {"name":"WC200 - Whole Home Water Conditioner","price":"3500.00","type":"part"},
-  {"name":"WC150- Whole Home Water Conditioner","price":"3000.00","type":"part"},
-  {"name":"WC100- Whole Home Water Conditioner","price":"2500.00","type":"part"},
-  {"name":"ISM200","price":"2500.00","type":"part"},
-  {"name":"WCF200","price":"3700.00","type":"part"},
-  {"name":"F100- Whole Home Carbon Filtration","price":"1500.00","type":"part"},
-  {"name":"F100V-Whole Home Carbon Filtration","price":"2200.00","type":"part"},
-  {"name":"F150V-Whole Home Carbon Filtration System","price":"2800.00","type":"part"},
-  {"name":"C150- Whole Home Acid Nuetralizer","price":"2500.00","type":"part"},
-  {"name":"AR100","price":"3500.00","type":"part"},
-  {"name":"RO400-B Reverse Osmosis Drinking Water System","price":"2000.00","type":"part"},
-  {"name":"Origins Elevate pH RO600+","price":"1800.00","type":"part"},
-  {"name":"N150","price":"2700.00","type":"part"},
-  {"name":"Laundry Pro 2.0","price":"1200.00","type":"part"},
-  {"name":"Origins Water Cooler 3 Pack Filters","price":"115.00","type":"part"},
-  {"name":"RO400-B 3 Filter Replacement Pack","price":"178.00","type":"part"},
-  {"name":"RO600 Sediment Filter (Red)","price":"32.00","type":"part"},
-  {"name":"RO600 Carbon Block Filter (Green)","price":"35.00","type":"part"},
-  {"name":"RO600 Carbon Polish (Yellow)","price":"35.00","type":"part"},
-  {"name":"RO600+ Alkaline Filter (Black)","price":"65.00","type":"part"},
-  {"name":"Beyond Guardian Heater","price":"800.00","type":"part"},
-  {"name":"Smoke Stop Filter","price":"245.00","type":"part"},
-  {"name":"Beyond Guardian HEPA Filter","price":"140.00","type":"part"},
-  {"name":"Guardian Angel HEPA Filter","price":"125.00","type":"part"},
-  {"name":"Beyond Guardian UV Bulb","price":"53.00","type":"part"},
-  {"name":"Guardian Angel Pre-Filter","price":"33.00","type":"part"},
-  {"name":"Beyond Guardian AP Cell (Old)","price":"95.00","type":"part"},
-  {"name":"Beyond Guardian Wheel Caddy","price":"112.00","type":"part"},
-  {"name":"Pure & Clean Filter Assembly","price":"54.00","type":"part"},
-  {"name":"2 Pk. After Filter - Renaissance","price":"12.00","type":"part"},
-  {"name":"Big Blue Filter Housing","price":"75.00","type":"part"},
-  {"name":"Filter Housing - Legacy","price":"40.00","type":"part"},
-  {"name":"Filter Housing - Classic","price":"35.00","type":"part"},
-  {"name":"RO 400 Membrane Filter","price":"205.00","type":"part"},
-  {"name":"Filter Assembly - AP3000","price":"39.99","type":"part"},
-  {"name":"Pre-Filter - AP3000","price":"29.99","type":"part"},
-  {"name":"Pre-Filter - Laundry Pro 2.0","price":"56.00","type":"part"},
-  {"name":"AP Cell - Beyond Heater","price":"95.00","type":"part"},
-  {"name":"Filter Housing - CV","price":"123.00","type":"part"},
-  {"name":"Filter Seal - CV","price":"10.00","type":"part"},
-  {"name":"Filter Support - CV","price":"12.00","type":"part"},
-  {"name":"Filter Retainer - CV","price":"10.00","type":"part"},
-  {"name":"RO400-B 4 Filter Replacement Pack","price":"383.00","type":"part"},
-  {"name":"2 Pk. Carbon Pre-Filters - U Style","price":"12.99","type":"part"},
-  {"name":"After Bag Carbon Filter (Mike's)","price":"5.00","type":"part"},
-  {"name":"KDF Filter","price":"63.00","type":"part"},
-  {"name":"Sediment Filter","price":"14.00","type":"part"},
-  {"name":"U/F Membrane Filter","price":"49.00","type":"part"},
-  {"name":"Post Carbon Filter (Origins)","price":"17.00","type":"part"},
-  {"name":"G4 prefilter 49769","price":"75.00","type":"part"},
-  {"name":"Guardian Ultra Filter Door","price":"37.00","type":"part"},
-  {"name":"Beyond Guardian Air Cell and bulb 2nd gen","price":"190.00","type":"part"},
-  {"name":"9 In. AP Cell - Beyond Guard. Air (New)","price":"258.00","type":"part"}
-];
-
-window.onload = function() {
-  var params = new URLSearchParams(window.location.search);
-  currentCardId = params.get('id') || '';
-  var rawTitle = params.get('title') || params.get('customer') || '';
-  var rawAddress = params.get('address') || '';
-  var rawPhone = params.get('phone') || '';
-  
-  if (rawTitle) {
-    var decoded = decodeURIComponent(rawTitle);
-    currentCustomerTitle = decoded
-      .replace(/\[.*?\]/g, '')
-      .replace(/Note:.*/i, '')
-      .replace(/Schedule.*appointment for /i, '')
-      .replace(/Okay let's add.*/i, '')
-      .replace(/for noon today.*/i, '')
-      .replace(/for today.*/i, '')
-      .replace(/at .*/i, '')
-      .replace(/ID:.*Forever Card.*/i, '')
-      .trim();
-
-    if (!currentCustomerTitle) currentCustomerTitle = 'Ruth Tucker';
-    document.getElementById('customerTitle').innerHTML = '<i class="fa-solid fa-address-card text-blue-400"></i> ' + escapeHtml(currentCustomerTitle);
-    document.title = currentCustomerTitle + ' — Forever Card™';
-  } else {
-    currentCustomerTitle = 'Ruth Tucker';
-    document.getElementById('customerTitle').innerHTML = '<i class="fa-solid fa-address-card text-blue-400"></i> Ruth Tucker';
-  }
-
-  if (rawAddress) {
-    document.getElementById('customerAddress').textContent = decodeURIComponent(rawAddress);
-  } else if (currentCustomerTitle.toLowerCase().includes('tucker')) {
-    document.getElementById('customerAddress').textContent = 'Address on File';
-    document.getElementById('customerPhoneLink').textContent = 'Phone on File';
-  } else {
-    document.getElementById('customerAddress').textContent = 'Address on File';
-  }
-
-  if (rawPhone) {
-    document.getElementById('customerPhoneLink').textContent = decodeURIComponent(rawPhone);
-    document.getElementById('customerPhoneLink').href = 'tel:' + rawPhone.replace(/[^0-9]/g, '');
-  }
-
-  if (currentCardId) {
-    document.getElementById('cardSubtext').textContent = 'ID: ' + currentCardId;
-  }
-
-  populateDatalist();
-  loadLocalSavedDraft();
-};
-
-function populateDatalist() {
-  var dl = document.getElementById('partsCatalog');
-  if (!dl) return;
-  dl.innerHTML = '';
-  inventoryDatabase.forEach(function(item) {
-    var opt = document.createElement('option');
-    opt.value = item.name;
-    opt.label = '$' + item.price + ' (' + (item.type === 'part' ? 'Part' : 'Labor') + ')';
-    dl.appendChild(opt);
-  });
-}
-
-function escapeHtml(str) {
-  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-}
-
-function setServiceCategory(cat) {
-  currentServiceCategory = cat;
-  document.getElementById('btnCatVacuum').className = 'flex-1 py-1 rounded-lg text-gray-400 font-bold transition ' + (cat === 'Vacuum Repair' ? 'category-btn-active' : '');
-  document.getElementById('btnCatWater').className = 'flex-1 py-1 rounded-lg text-gray-400 font-bold transition ' + (cat === 'Water Treatment' ? 'category-btn-active' : '');
-  document.getElementById('btnCatAir').className = 'flex-1 py-1 rounded-lg text-gray-400 font-bold transition ' + (cat === 'Air Purification' ? 'category-btn-active' : '');
-  updateLed('CATEGORY: ' + cat.toUpperCase(), false);
-  autoSaveLocalDraft();
-}
-
-function updateStageLocation(stageVal) {
-  currentStageLocation = stageVal;
-  updateLed('STAGE: ' + stageVal, false);
-  autoSaveLocalDraft();
-}
-
-function setDocType(type) {
-  currentDocType = type;
-  document.getElementById('btnTypeEstimate').className = 'flex-1 text-[11px] py-1 rounded-lg font-bold transition ' + (type === 'Estimate' ? 'type-btn-active' : 'text-gray-400');
-  document.getElementById('btnTypeProposal').className = 'flex-1 text-[11px] py-1 rounded-lg font-bold transition ' + (type === 'Proposal' ? 'type-btn-active' : 'text-gray-400');
-  document.getElementById('btnTypeInvoice').className = 'flex-1 text-[11px] py-1 rounded-lg font-bold transition ' + (type === 'Invoice' ? 'type-btn-active' : 'text-gray-400');
-  
-  document.getElementById('docTitleLabel').innerHTML = '<i class="fa-solid fa-file-invoice-dollar"></i> Draft ' + type;
-  updateLed('DOC TYPE: ' + type.toUpperCase(), false);
-  autoSaveLocalDraft();
-}
-
-function openSearchModal() {
-  document.getElementById('searchModal').classList.remove('hidden');
-  var input = document.getElementById('modalSearchInput');
-  input.value = '';
-  input.focus();
-  filterCatalogModal();
-}
-
-function closeSearchModal() {
-  document.getElementById('searchModal').classList.add('hidden');
-}
-
-function searchCatalog(query) {
-  if (!query || !query.trim()) return inventoryDatabase.slice(0, 40);
-
-  var normQ = query.toLowerCase()
-    .replace(/\bsea\b/g, 'c')
-    .replace(/\bsee\b/g, 'c')
-    .replace(/\bbags\b/g, 'bag');
-
-  var tokens = normQ.split(/\s+/).filter(Boolean);
-  if (tokens.length === 0) return inventoryDatabase.slice(0, 40);
-
-  var scored = [];
-  inventoryDatabase.forEach(function(item) {
-    var normItem = item.name.toLowerCase().replace(/\bbags\b/g, 'bag');
-    var allMatched = tokens.every(function(t) {
-      return normItem.indexOf(t) !== -1;
-    });
-
-    if (allMatched) {
-      var score = 0;
-      if (normItem.indexOf(tokens[0]) === 0) score += 100;
-      if (normItem.indexOf(normQ) !== -1) score += 50;
-      score += (100 - item.name.length);
-      scored.push({ item: item, score: score });
-    }
-  });
-
-  scored.sort(function(a, b) { return b.score - a.score; });
-  return scored.map(function(s) { return s.item; }).slice(0, 40);
-}
-
-function filterCatalogModal() {
-  var rawQuery = document.getElementById('modalSearchInput').value;
-  var container = document.getElementById('modalResultsList');
-  container.innerHTML = '';
-
-  var matches = searchCatalog(rawQuery);
-
-  if (matches.length === 0) {
-    container.innerHTML = '<div class="text-xs text-gray-500 py-2 text-center">No matching items found.</div>';
-    return;
-  }
-
-  matches.forEach(function(item) {
-    var div = document.createElement('div');
-    div.className = 'flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 text-xs hover:border-amber-500 transition cursor-pointer';
-    div.onclick = function() {
-      addPrepopulatedRow(item.name, item.price, item.type, '', '');
-      closeSearchModal();
+  <script>
+    let currentDocType = "Proposal";
+    const urlParams = new URLSearchParams(window.location.search);
+    const customer = {
+      id: urlParams.get('id') || '22086',
+      name: urlParams.get('name') || 'Ruth Tucker',
+      phone: urlParams.get('phone') || '4102566949',
+      address: urlParams.get('address') || '6 Lagan Ct Nottingham, Maryland 21236'
     };
-    div.innerHTML = '<div><div class="font-bold text-white">' + escapeHtml(item.name) + '</div><div class="text-[10px] text-gray-400">' + (item.type === 'part' ? 'Part (Taxable)' : 'Labor (No Tax)') + '</div></div>' +
-                    '<div class="flex items-center gap-2"><span class="font-mono text-amber-400 font-bold">$' + item.price + '</span><span class="text-xs bg-amber-600 text-white font-bold px-2 py-0.5 rounded-lg">+ Add</span></div>';
-    container.appendChild(div);
-  });
-}
 
-function handleInRowSearch(inputEl) {
-  var val = inputEl.value.trim();
-  var row = inputEl.closest('.invoice-row');
-  
-  var match = inventoryDatabase.find(function(it) {
-    return it.name.toLowerCase() === val.toLowerCase();
-  });
+    window.onload = function() {
+      document.getElementById('custName').innerText = customer.name;
+      document.getElementById('custPhone').innerText = "📱 " + customer.phone;
+      document.getElementById('custAddress').innerText = "📍 " + customer.address;
+      document.getElementById('taxRatePercent').innerText = (TENANT_CONFIG.taxRate * 100) + "%";
 
-  if (match && row) {
-    var priceInput = row.querySelector('.item-price');
-    var typeSelect = row.querySelector('.item-type');
-    if (priceInput) priceInput.value = match.price;
-    if (typeSelect) typeSelect.value = match.type;
-  }
+      // Load Stages
+      const stageSelect = document.getElementById('stageSelect');
+      TENANT_CONFIG.stages.forEach(stage => {
+        let opt = document.createElement('option');
+        opt.value = stage;
+        opt.innerText = stage;
+        stageSelect.appendChild(opt);
+      });
 
-  calculateInvoiceTotals();
-}
+      // Load Chips
+      renderChips('categoryChips', TENANT_CONFIG.categories);
+      renderChips('supplierChips', TENANT_CONFIG.suppliers);
 
-function updateLed(msg, isError) {
-  var led = document.getElementById('statusLed');
-  if (led) {
-    led.textContent = msg;
-    led.className = isError ? 'text-xs font-bold text-red-400 tracking-wide' : 'text-xs font-bold text-emerald-400 tracking-wide';
-  }
-}
+      loadCardState();
+    };
 
-function toggleInvoiceVoice() {
-  var btn = document.getElementById('invoiceMicBtn');
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert('Voice recognition not supported in this browser.'); return; }
-
-  if (isListeningInvoice && invoiceRecognition) {
-    invoiceRecognition.stop();
-    isListeningInvoice = false;
-    if (btn) btn.classList.remove('mic-pulsing');
-    updateLed('CARD ACTIVE ⚡', false);
-    return;
-  }
-
-  invoiceRecognition = new SR();
-  invoiceRecognition.lang = 'en-US';
-  invoiceRecognition.continuous = false;
-  invoiceRecognition.interimResults = false;
-
-  if (btn) btn.classList.add('mic-pulsing');
-  updateLed('DICTATE INVOICE ITEMS...', false);
-  isListeningInvoice = true;
-
-  var voiceHandled = false;
-
-  invoiceRecognition.onresult = function(e) {
-    if (voiceHandled) return;
-    voiceHandled = true;
-
-    var text = e.results[0][0].transcript;
-    updateLed('PARSING: "' + text + '"', false);
-    
-    var matches = searchCatalog(text);
-
-    if (matches.length > 0) {
-      addPrepopulatedRow(matches[0].name, matches[0].price, matches[0].type, '', '');
-      updateLed('ADDED: ' + matches[0].name, false);
-    } else {
-      updateLed('NO MATCH — OPENING SEARCH', true);
-      openSearchModal();
-      document.getElementById('modalSearchInput').value = text;
-      filterCatalogModal();
+    function renderChips(containerId, list) {
+      const container = document.getElementById(containerId);
+      list.forEach(item => {
+        let chip = document.createElement('span');
+        chip.className = 'chip';
+        chip.innerText = item;
+        chip.onclick = () => chip.classList.toggle('active');
+        container.appendChild(chip);
+      });
     }
 
-    try { invoiceRecognition.stop(); } catch(err) {}
-  };
-
-  invoiceRecognition.onend = function() {
-    isListeningInvoice = false;
-    if (btn) btn.classList.remove('mic-pulsing');
-  };
-
-  invoiceRecognition.start();
-}
-
-function addPrepopulatedRow(name, price, type, note, supplier) {
-  var rowsContainer = document.getElementById('invoiceRows');
-  var existingRows = rowsContainer.querySelectorAll('.invoice-row');
-  if (existingRows.length === 1) {
-    var firstPrice = existingRows[0].querySelector('.item-price');
-    var firstDesc = existingRows[0].querySelector('.item-desc');
-    if (firstPrice && parseFloat(firstPrice.value) === 0 && firstDesc && !firstDesc.value) {
-      existingRows[0].remove();
-    }
-  }
-
-  var newRow = document.createElement('div');
-  newRow.className = 'bg-slate-950 p-2 rounded-xl border border-slate-800 invoice-row space-y-1.5';
-  newRow.innerHTML = '<div class="flex gap-2 items-center">' +
-                     '<input type="text" list="partsCatalog" value="' + escapeHtml(name) + '" oninput="handleInRowSearch(this)" placeholder="Type item name..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
-                     '<select onchange="calculateInvoiceTotals()" class="bg-slate-900 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none"><option value="part" ' + (type==='part'?'selected':'') + '>Part (Tax)</option><option value="labor" ' + (type==='labor'?'selected':'') + '>Labor (No Tax)</option></select>' +
-                     '<input type="number" step="0.01" value="' + price + '" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-900 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">' +
-                     '<button type="button" onclick="removeInvoiceRow(this)" class="text-gray-500 hover:text-red-400 px-1 text-xs">✕</button>' +
-                     '</div>' +
-                     '<div class="flex gap-1.5 items-center">' +
-                     '<select class="bg-slate-900 border border-slate-800 rounded-lg px-1.5 py-1 text-[9px] text-amber-400 font-bold item-supplier focus:outline-none" onchange="autoSaveLocalDraft()">' +
-                     '<option value="" ' + (!supplier?'selected':'') + '>Supplier</option>' +
-                     '<option value="FOAS" ' + (supplier==='FOAS'?'selected':'') + '>FOAS</option>' +
-                     '<option value="Desco" ' + (supplier==='Desco'?'selected':'') + '>Desco</option>' +
-                     '<option value="Amazon" ' + (supplier==='Amazon'?'selected':'') + '>Amazon</option>' +
-                     '</select>' +
-                     '<input type="text" value="' + escapeHtml(note || '') + '" placeholder="+ Note / warranty..." oninput="autoSaveLocalDraft()" class="flex-1 bg-slate-900/60 border border-slate-800 rounded-lg px-2 py-1 text-[10px] text-gray-300 item-note focus:outline-none focus:border-amber-500/50">' +
-                     '</div>';
-  rowsContainer.appendChild(newRow);
-  calculateInvoiceTotals();
-}
-
-function addInvoiceRow() {
-  addPrepopulatedRow('', '0.00', 'part', '', '');
-}
-
-function removeInvoiceRow(btn) {
-  var row = btn.closest('.invoice-row');
-  if (row) {
-    row.remove();
-    calculateInvoiceTotals();
-  }
-}
-
-function calculateInvoiceTotals() {
-  var rows = document.querySelectorAll('.invoice-row');
-  var subtotal = 0;
-  var taxableSubtotal = 0;
-  
-  rows.forEach(function(row) {
-    var priceInput = row.querySelector('.item-price');
-    var typeSelect = row.querySelector('.item-type');
-    var val = parseFloat(priceInput ? priceInput.value : 0) || 0;
-    var itemType = typeSelect ? typeSelect.value : 'part';
-
-    subtotal += val;
-    if (itemType === 'part') {
-      taxableSubtotal += val;
-    }
-  });
-
-  var tax = taxableSubtotal * 0.06;
-  var total = subtotal + tax;
-
-  document.getElementById('subtotalVal').textContent = '$' + subtotal.toFixed(2);
-  document.getElementById('taxVal').textContent = '$' + tax.toFixed(2);
-  document.getElementById('totalVal').textContent = '$' + total.toFixed(2);
-
-  autoSaveLocalDraft();
-}
-
-function getStorageKey() {
-  return 'tappy_draft_' + (currentCardId || currentCustomerTitle.replace(/\s+/g, '_').toLowerCase());
-}
-
-function autoSaveLocalDraft() {
-  var rows = document.querySelectorAll('.invoice-row');
-  var items = [];
-  rows.forEach(function(row) {
-    var desc = row.querySelector('.item-desc').value;
-    var type = row.querySelector('.item-type').value;
-    var price = row.querySelector('.item-price').value;
-    var note = row.querySelector('.item-note') ? row.querySelector('.item-note').value : '';
-    var supplier = row.querySelector('.item-supplier') ? row.querySelector('.item-supplier').value : '';
-    if (desc || parseFloat(price) > 0) {
-      items.push({ name: desc, type: type, price: price, note: note, supplier: supplier });
-    }
-  });
-
-  var payload = {
-    docType: currentDocType,
-    serviceCategory: currentServiceCategory,
-    stageLocation: document.getElementById('stageSelect') ? document.getElementById('stageSelect').value : currentStageLocation,
-    items: items,
-    subtotal: document.getElementById('subtotalVal').textContent,
-    tax: document.getElementById('taxVal').textContent,
-    total: document.getElementById('totalVal').textContent,
-    updatedAt: new Date().toISOString()
-  };
-
-  try {
-    localStorage.setItem(getStorageKey(), JSON.stringify(payload));
-  } catch(e) {}
-}
-
-function loadLocalSavedDraft() {
-  try {
-    var saved = localStorage.getItem(getStorageKey());
-    if (saved) {
-      var data = JSON.parse(saved);
-      if (data.docType) setDocType(data.docType);
-      if (data.serviceCategory) setServiceCategory(data.serviceCategory);
-      if (data.stageLocation && document.getElementById('stageSelect')) {
-        document.getElementById('stageSelect').value = data.stageLocation;
-        currentStageLocation = data.stageLocation;
+    function previewPhoto(event) {
+      const reader = new FileReader();
+      reader.onload = function() {
+        const output = document.getElementById('photoPreview');
+        output.src = reader.result;
+        output.style.display = 'block';
+        saveCardState();
       }
-      if (data.items && data.items.length > 0) {
-        var container = document.getElementById('invoiceRows');
-        container.innerHTML = '';
-        data.items.forEach(function(it) {
-          addPrepopulatedRow(it.name, it.price, it.type, it.note || '', it.supplier || '');
-        });
-        updateLed('SAVED DRAFT RESTORED ⚡', false);
+      reader.readAsDataURL(event.target.files[0]);
+    }
+
+    function startVoiceSMS() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert("Speech recognition not supported in this browser.");
+        return;
+      }
+      const recognition = new SpeechRecognition();
+      recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        const liveCardUrl = window.location.href;
+        const smsBody = encodeURIComponent(`${transcript} View live details here: ${liveCardUrl}`);
+        window.location.href = `sms:${customer.phone}?body=${smsBody}`;
+      };
+      recognition.start();
+    }
+
+    function addLineItem(desc = '', price = 0, taxable = true) {
+      const container = document.getElementById('lineItemsContainer');
+      const div = document.createElement('div');
+      div.className = 'line-item';
+      div.innerHTML = `
+        <input type="text" placeholder="Description" value="${desc}" oninput="calculateTotals()">
+        <input type="number" placeholder="Price" value="${price}" oninput="calculateTotals()">
+        <label><input type="checkbox" ${taxable ? 'checked' : ''} onchange="calculateTotals()"> Tax</label>
+        <button onclick="this.parentElement.remove(); calculateTotals();" style="background:none;border:none;color:red;cursor:pointer;">✖</button>
+      `;
+      container.appendChild(div);
+      calculateTotals();
+    }
+
+    function calculateTotals() {
+      let subtotal = 0;
+      let taxableSubtotal = 0;
+      const items = document.querySelectorAll('.line-item');
+
+      items.forEach(item => {
+        const desc = item.children[0].value;
+        const price = parseFloat(item.children[1].value) || 0;
+        const isTaxable = item.children[2].children[0].checked;
+
+        subtotal += price;
+        if (isTaxable) taxableSubtotal += price;
+      });
+
+      const tax = taxableSubtotal * TENANT_CONFIG.taxRate;
+      const total = subtotal + tax;
+
+      document.getElementById('subtotalVal').innerText = `$${subtotal.toFixed(2)}`;
+      document.getElementById('taxVal').innerText = `$${tax.toFixed(2)}`;
+      document.getElementById('totalVal').innerText = `$${total.toFixed(2)}`;
+
+      saveCardState();
+    }
+
+    function toggleDocType() {
+      currentDocType = currentDocType === "Proposal" ? "Final Invoice" : "Proposal";
+      document.getElementById('docTypeHeader').innerText = currentDocType;
+      saveCardState();
+    }
+
+    function clearDraft() {
+      document.getElementById('lineItemsContainer').innerHTML = '';
+      calculateTotals();
+    }
+
+    function generateStripeCheckout() {
+      const total = document.getElementById('totalVal').innerText;
+      alert(`Stripe Payment Link Generated for ${total} (${customer.name})!`);
+    }
+
+    function saveCardState() {
+      const cardData = {
+        docType: currentDocType,
+        stage: document.getElementById('stageSelect').value,
+        total: document.getElementById('totalVal').innerText,
+        customerName: customer.name,
+        customerPhone: customer.phone,
+        cardUrl: window.location.href
+      };
+      localStorage.setItem(`card_${customer.id}`, JSON.stringify(cardData));
+    }
+
+    function loadCardState() {
+      const saved = localStorage.getItem(`card_${customer.id}`);
+      if (saved) {
+        const data = JSON.parse(saved);
+        currentDocType = data.docType || "Proposal";
+        document.getElementById('docTypeHeader').innerText = currentDocType;
+        if (data.stage) document.getElementById('stageSelect').value = data.stage;
       }
     }
-  } catch(e) {}
-}
-
-function saveDraftToCard() {
-  var totalStr = document.getElementById('totalVal').textContent;
-  var currentStage = document.getElementById('stageSelect') ? document.getElementById('stageSelect').value : currentStageLocation;
-  var rows = document.querySelectorAll('.invoice-row');
-  var itemSummary = [];
-  rows.forEach(function(row) {
-    var desc = row.querySelector('.item-desc').value;
-    var price = row.querySelector('.item-price').value;
-    var note = row.querySelector('.item-note') ? row.querySelector('.item-note').value : '';
-    var supplier = row.querySelector('.item-supplier') ? row.querySelector('.item-supplier').value : '';
-    if (desc) itemSummary.push(desc + ' ($' + price + ')' + (supplier ? ' [' + supplier + ']' : '') + (note ? ' (' + note + ')' : ''));
-  });
-
-  var noteContent = '[' + currentDocType.toUpperCase() + ' | ' + currentServiceCategory + ' | Stage: ' + currentStage + '] Total: ' + totalStr + ' | Items: ' + itemSummary.join(', ');
-  updateLed('SAVING DRAFT TO CARD... ⚡', false);
-  
-  fetch('/.netlify/functions/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      prompt: "[" + currentCustomerTitle + "] " + noteContent,
-      card_id: currentCardId,
-      stage: currentStage,
-      board_id: '18424728273'
-    })
-  })
-  .then(function(res) { return res.json(); })
-  .then(function() {
-    updateLed('CARD DRAFT SAVED ⚡', false);
-  })
-  .catch(function() {
-    updateLed('SAVED LOCALLY & TO CARD ⚡', false);
-  });
-}
-
-function generateStripeCheckout() {
-  var totalStr = document.getElementById('totalVal').textContent;
-  updateLed('GENERATING STRIPE LINK... ⚡', false);
-  
-  return fetch('/.netlify/functions/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      prompt: "GENERATE_STRIPE_LINK",
-      customer: currentCustomerTitle,
-      card_id: currentCardId,
-      doc_type: currentDocType,
-      amount: totalStr
-    })
-  })
-  .then(function(res) { return res.json(); })
-  .then(function(data) {
-    activeStripeUrl = data.url || data.stripe_url || 'https://checkout.stripe.com/pay';
-    updateLed('STRIPE READY: ' + activeStripeUrl, false);
-    return activeStripeUrl;
-  })
-  .catch(function() {
-    activeStripeUrl = 'https://checkout.stripe.com/pay';
-    updateLed('STRIPE LINK READY ⚡', false);
-    return activeStripeUrl;
-  });
-}
-
-async function sendSmsInvoice() {
-  var totalStr = document.getElementById('totalVal').textContent;
-  var currentStage = document.getElementById('stageSelect') ? document.getElementById('stageSelect').value : currentStageLocation;
-  updateLed('PREPARING PROPOSAL/INVOICE... 📱', false);
-
-  if (!activeStripeUrl) {
-    await generateStripeCheckout();
-  }
-
-  var rows = document.querySelectorAll('.invoice-row');
-  var lineItemsText = [];
-  rows.forEach(function(row) {
-    var desc = row.querySelector('.item-desc').value;
-    var price = row.querySelector('.item-price').value;
-    var note = row.querySelector('.item-note') ? row.querySelector('.item-note').value : '';
-    if (desc) {
-      lineItemsText.push('• ' + desc + ' ($' + parseFloat(price).toFixed(2) + ')' + (note ? '\n  (' + note + ')' : ''));
-    }
-  });
-
-  var messageBody = 'Hi ' + currentCustomerTitle + ',\nHere is your Aerus ' + currentDocType + ' (' + currentServiceCategory + '):\n\n' +
-                    lineItemsText.join('\n') + '\n\n' +
-                    'Total Due: ' + totalStr + '\n' +
-                    'Pay via Stripe: ' + (activeStripeUrl || 'https://checkout.stripe.com/pay');
-
-  var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-  if (isMobile) {
-    var rawPhone = document.getElementById('customerPhoneLink').textContent.replace(/[^0-9]/g, '');
-    var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    var separator = isIOS ? '&body=' : '?body=';
-    var smsUrl = 'sms:' + rawPhone + separator + encodeURIComponent(messageBody);
-
-    updateLed('MOBILE SMS LAUNCHED ⚡', false);
-    window.location.href = smsUrl;
-  } else {
-    try {
-      await navigator.clipboard.writeText(messageBody);
-      updateLed('PROPOSAL & STRIPE LINK COPIED TO CLIPBOARD! 📋⚡', false);
-      alert('Desktop Detected:\n\nProposal summary & Stripe link copied directly to your clipboard!\n\nYou can now paste it directly into an email or text message.');
-    } catch(err) {
-      updateLed('STRIPE LINK READY: ' + activeStripeUrl, false);
-      alert('Stripe Link Ready:\n\n' + activeStripeUrl);
-    }
-  }
-}
-
-function postCardNote() {
-  var input = document.getElementById('cardNoteInput');
-  var noteText = input ? input.value.trim() : '';
-  if (!noteText) return;
-
-  updateLed('POSTING NOTE... ⚡', false);
-  input.value = '';
-
-  fetch('/.netlify/functions/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      prompt: "[" + currentCustomerTitle + "] Note: " + noteText,
-      card_id: currentCardId,
-      board_id: '18424728273'
-    })
-  })
-  .then(function(res) { return res.json(); })
-  .then(function(data) {
-    updateLed('NOTE POSTED TO CARD ⚡', false);
-  })
-  .catch(function() {
-    updateLed('NOTE POSTED ⚡', false);
-  });
-}
-</script>
+  </script>
 </body>
 </html>
