@@ -50,7 +50,7 @@
 
     <!-- HERO SEARCH BOX -->
     <div class="space-y-1.5 text-left bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5">
-      <label class="text-[11px] font-black text-gray-300 uppercase tracking-wider block">Customer Vault Search (23,000+)</label>
+      <label class="text-[11px] font-black text-gray-300 uppercase tracking-wider block">Customer Vault Search (22,283+)</label>
       <div class="relative">
         <input 
           type="text" 
@@ -118,7 +118,6 @@
       const text = e.results[0][0].transcript;
       updateLed('PROCESSING: "' + text + '"', false);
       
-      // Post direct command to netlify chat backend
       fetch('/.netlify/functions/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -130,7 +129,6 @@
         renderActiveWorkingHub();
       })
       .catch(() => {
-        // Fallback: put voice text straight into search box
         document.getElementById('vaultSearch').value = text;
         handleVaultSearch(text);
         updateLed('SEARCHED VAULT FOR: ' + text, false);
@@ -160,7 +158,8 @@
         renderSearchResults(data.customers || data.results || []);
       } catch (err) {
         renderSearchResults([
-          { id: "13238553775", name: "Richard Smothers", phone: "410-376-9061", address: "1415 Kingsway Rd, Baltimore, MD" },
+          { id: "23455", name: "Claire Hartman", phone: "443-336-6380", address: "1902 Corbridge Ln Monkton, MD" },
+          { id: "13238553775", name: "Ruth Tucker", phone: "410-376-9061", address: "Address on File" },
           { id: "20525", name: "Aranza Rodriguez", phone: "410-960-9980", address: "1408 Charmuth Rd, Timonium, MD" },
           { id: "1276", name: "Paul Schwab", phone: "410-555-0188", address: "Address on File" }
         ].filter(c => c.name.toLowerCase().includes(query.toLowerCase()) || c.phone.includes(query)));
@@ -192,8 +191,20 @@
     });
   }
 
-  function openCard(id, customer, phone, address) {
-    window.location.href = `card.html?id=${encodeURIComponent(id || '')}&customer=${encodeURIComponent(customer || '')}&phone=${encodeURIComponent(phone || '')}&address=${encodeURIComponent(address || '')}`;
+  function openCard(id, customerName, phone, address) {
+    window.location.href = `card.html?id=${encodeURIComponent(id || '')}&title=${encodeURIComponent(customerName || '')}&phone=${encodeURIComponent(phone || '')}&address=${encodeURIComponent(address || '')}`;
+  }
+
+  function formatCleanName(rawKey) {
+    let clean = rawKey.replace('tappy_draft_', '').replace(/_/g, ' ');
+    // If key is pure numeric ID, resolve to human title fallback
+    if (/^\d+$/.test(clean.trim())) {
+      if (clean.trim() === '13238553775') return 'Ruth Tucker';
+      if (clean.trim() === '20525') return 'Aranza Rodriguez';
+      if (clean.trim() === '1276') return 'Paul Schwab';
+      return 'Customer #' + clean.trim();
+    }
+    return clean;
   }
 
   function renderActiveWorkingHub() {
@@ -213,18 +224,22 @@
     keys.forEach(k => {
       try {
         let data = JSON.parse(localStorage.getItem(k));
-        let rawName = k.replace('tappy_draft_', '').replace(/_/g, ' ');
+        let displayName = data.customerTitle || formatCleanName(k);
+        let phoneVal = data.phone || '';
+        let addressVal = data.address || '';
+        let rawId = k.replace('tappy_draft_', '');
+
         container.innerHTML += `
           <div class="flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800">
             <div>
-              <div class="font-bold text-white capitalize text-xs">${rawName}</div>
-              <div class="text-[10px] text-gray-400 flex gap-2">
+              <div class="font-bold text-white capitalize text-xs">${displayName}</div>
+              <div class="text-[10px] text-gray-400 flex gap-2 mt-0.5">
                 <span class="text-amber-400 font-bold">${data.docType || 'Draft'}</span>
                 <span>•</span>
                 <span class="text-emerald-400 font-mono font-bold">${data.total || '$0.00'}</span>
               </div>
             </div>
-            <a href="card.html?customer=${encodeURIComponent(rawName)}" class="text-xs bg-blue-600 text-white font-bold px-2.5 py-1 rounded-lg">Open ➔</a>
+            <a href="card.html?id=${encodeURIComponent(rawId)}&title=${encodeURIComponent(displayName)}&phone=${encodeURIComponent(phoneVal)}&address=${encodeURIComponent(addressVal)}" class="text-xs bg-blue-600 hover:bg-blue-500 text-white font-bold px-2.5 py-1 rounded-lg transition">Open ➔</a>
           </div>
         `;
       } catch(e) {}
