@@ -3,724 +3,320 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aerus Home Wellness Hub | TappyThing</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Aerus Home Wellness | TappyThing Hub</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
-            -webkit-tap-highlight-color: transparent;
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #10b981;
+            --accent-hover: #059669;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --border: #334155;
+            --danger: #ef4444;
         }
-        .glass-card {
-            background: rgba(30, 41, 59, 0.9);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .mic-recording {
-            animation: pulse-red 1.2s infinite;
-        }
-        @keyframes pulse-red {
-            0% { transform: scale(0.98); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 18px rgba(239, 68, 68, 0); }
-            100% { transform: scale(0.98); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: var(--bg); color: var(--text); padding: 16px; max-width: 650px; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+        .logo { font-weight: 800; font-size: 1.2rem; color: var(--accent); }
+        .btn { background: var(--accent); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; text-align: center; display: inline-block; text-decoration: none; font-size: 0.95rem; }
+        .btn:hover { background: var(--accent-hover); }
+        .btn-secondary { background: var(--border); color: var(--text); }
+        .mic-box { background: var(--card); border: 2px dashed var(--accent); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 16px; }
+        .mic-btn { width: 70px; height: 70px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 1.8rem; cursor: pointer; margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+        .mic-btn.listening { animation: pulse 1.2s infinite; background: var(--danger); }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+        .card-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 700; }
+        .search-input { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 1rem; margin-bottom: 12px; }
+        .line-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+        .totals { margin-top: 16px; font-size: 1.1rem; }
+        .totals-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .grand-total { font-size: 1.4rem; font-weight: 800; color: var(--accent); border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px; }
+        .photo-preview { width: 100%; height: 180px; background: var(--bg); border: 1px dashed var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; overflow: hidden; }
+        .photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .nav-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+        .tab-btn { flex: 1; padding: 10px; background: var(--card); border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center; }
+        .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .hidden { display: none; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between pb-10">
+<body>
 
-    <header class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md px-4 py-3 border-b border-slate-800">
-        <div class="max-w-2xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('hub')">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center font-extrabold text-xl text-white shadow-lg shadow-emerald-950/50">
-                    T⚡
-                </div>
-                <div>
-                    <h1 class="text-base font-bold text-white flex items-center gap-2">
-                        TappyThing <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30 font-semibold">Aerus #001</span>
-                    </h1>
-                    <p class="text-xs text-slate-400">Voice Dispatch & Forever Card™ Engine</p>
-                </div>
-            </div>
-
-            <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
-                <button id="tabHub" onclick="switchView('hub')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-emerald-600 text-white shadow-md">
-                    <i class="fa-solid fa-calendar-days mr-1"></i> Hub Agenda
-                </button>
-                <button id="tabCard" onclick="switchView('card')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-address-card mr-1"></i> Forever Card™
-                </button>
-            </div>
-        </div>
+    <header>
+        <div class="logo">TappyThing ⚡ Aerus #001</div>
+        <div style="font-size: 0.85rem; color: var(--muted);">Timonium, MD</div>
     </header>
 
-    <main class="max-w-2xl mx-auto px-4 py-6 w-full flex-grow">
+    <div class="nav-tabs">
+        <div class="tab-btn active" id="tab-hub" onclick="switchView('hub')">📅 Hub Agenda</div>
+        <div class="tab-btn" id="tab-card" onclick="switchView('card')"> Forever Card™</div>
+    </div>
 
-        <section id="screenHub" class="space-y-6">
-            
-            <!-- Voice Intake Module -->
-            <div class="glass-card rounded-2xl p-6 text-center relative overflow-hidden">
-                <span class="inline-block px-3 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded-full mb-3 border border-emerald-500/20">
-                    REAL-TIME VOICE DISPATCH
-                </span>
-                
-                <h2 class="text-xl font-black text-white mb-1">Tap & Speak Appointment Intake</h2>
-                <p class="text-xs text-slate-400 mb-5">Example: <em>"Appointment for Ruth Tucker at 9:30 AM"</em> or <em>"Paul Schwab 10:00 AM"</em></p>
+    <!-- HUB VIEW -->
+    <div id="view-hub">
+        <div class="mic-box">
+            <button class="mic-btn" id="main-mic" onclick="toggleVoiceIntake()">🎙️</button>
+            <div id="mic-status" style="font-weight: 700; margin-bottom: 4px;">TAP TO TALK</div>
+            <div style="font-size: 0.85rem; color: var(--muted);">Say: "Appointment for Ruth Tucker at 9:30 AM"</div>
+        </div>
 
-                <div class="flex justify-center items-center py-2">
-                    <button id="hubVoiceBtn" onclick="toggleVoiceIntake()" class="relative w-32 h-32 rounded-full bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 flex flex-col items-center justify-center text-white shadow-xl shadow-emerald-950/50 hover:scale-105 active:scale-95 transition-all">
-                        <i id="micIcon" class="fa-solid fa-microphone text-3xl mb-1 text-white"></i>
-                        <span id="micText" class="text-[10px] font-black tracking-wider text-emerald-100 uppercase">TAP TO TALK</span>
-                    </button>
-                </div>
+        <input type="text" class="search-input" id="vault-search" placeholder="🔍 Search Customer Vault..." oninput="handleVaultSearch()">
+        <div id="vault-results"></div>
 
-                <div id="voiceStatusBox" class="mt-4 p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 min-h-[46px] flex items-center justify-center text-center">
-                    <span class="text-slate-400"><i class="fa-solid fa-circle-dot mr-1 text-emerald-500"></i> Microphone ready. Tap button to dictate intake...</span>
-                </div>
+        <h3 style="margin-bottom: 12px;">Today's Schedule Agenda</h3>
+        <div id="schedule-list">
+            <div style="color: var(--muted); text-align: center; padding: 24px; background: var(--card); border-radius: 8px;">
+                0 Appointments — Ready for intake.
+            </div>
+        </div>
+    </div>
+
+    <!-- CARD VIEW -->
+    <div id="view-card" class="hidden">
+        <div class="card">
+            <div class="card-header">
+                <span id="card-cust-name">Customer Name</span>
+                <span style="color: var(--accent);" id="card-cust-id">CLIENT #</span>
+            </div>
+            <div id="card-cust-address" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 4px;">Address</div>
+            <div id="card-cust-phone" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 16px;">Phone</div>
+
+            <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                <button class="btn btn-secondary" onclick="sendCustomerSMS()">📱 SMS Customer</button>
+                <button class="btn btn-secondary" onclick="syncToGoogleCalendar()">📅 Sync Google Cal</button>
             </div>
 
-            <!-- Dynamic Schedule Container -->
-            <div class="glass-card rounded-2xl p-5">
-                <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-calendar-day text-emerald-400 text-base"></i>
-                        <h3 class="text-sm font-bold text-white uppercase tracking-wider">Today's Schedule Agenda</h3>
-                    </div>
-                    <span class="text-xs text-emerald-400 font-semibold bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20" id="scheduleCountTag">
-                        0 Appointments
-                    </span>
-                </div>
+            <!-- CAMERA MODULE -->
+            <h4>Machine Diagnostic Photo</h4>
+            <div class="photo-preview" id="photo-container">
+                <span style="color: var(--muted);" id="photo-label">No Photo — Tap below to snap</span>
+                <img id="photo-img" class="hidden" src="" alt="Machine Diagnostic Photo">
+            </div>
+            <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotoUpload(event)">
+            <button class="btn btn-secondary" style="margin-bottom: 16px;" onclick="document.getElementById('camera-input').click()">📷 Snap Machine Photo</button>
 
-                <div id="scheduleContainer" class="space-y-3">
-                    <!-- Populated dynamically -->
-                </div>
+            <!-- ESTIMATE MODULE -->
+            <h4>Voice Estimate Builder</h4>
+            <div style="font-size: 0.85rem; color: var(--muted); margin-bottom: 8px;">Tap mic and dictate: "Full service 149 dollars and new HEPA filter 39.95"</div>
+            <button class="btn btn-secondary" style="margin-bottom: 12px;" onclick="toggleCardVoice()">🎙️ Dictate Line Items</button>
+
+            <div id="line-items-container" style="margin-bottom: 12px;">
+                <div style="color: var(--muted); font-size: 0.85rem; padding: 8px 0;">No line items added yet.</div>
             </div>
 
-            <!-- Dynamic Vault Search -->
-            <div class="glass-card rounded-2xl p-5">
-                <div class="flex items-center gap-2 mb-3">
-                    <i class="fa-solid fa-users-viewfinder text-emerald-400"></i>
-                    <h3 class="text-sm font-bold text-white uppercase tracking-wider">Customer Vault Search (22,283 Records)</h3>
-                </div>
-                <input type="text" id="vaultSearchInput" onkeyup="filterVaultSearch()" placeholder="Search vault by name, address, or phone..." 
-                       class="w-full bg-slate-950 text-white font-medium text-xs p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-emerald-500 transition-all mb-3">
-                
-                <div id="vaultSearchResults" class="space-y-2">
-                    <!-- Dynamic search results render here -->
-                </div>
+            <div class="totals">
+                <div class="totals-row"><span>Subtotal:</span><span id="val-subtotal">$0.00</span></div>
+                <div class="totals-row"><span>MD Tax (6%):</span><span id="val-tax">$0.00</span></div>
+                <div class="totals-row grand-total"><span>Total Balance:</span><span id="val-total">$0.00</span></div>
             </div>
 
-        </section>
-
-        <section id="screenCard" class="space-y-6 hidden">
-
-            <!-- Card Mode Switcher -->
-            <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
-                <button id="modeTech" onclick="setCardMode('tech')" class="flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-emerald-600 text-white shadow-md">
-                    <i class="fa-solid fa-wrench mr-1"></i> Tech/Shop Side
-                </button>
-                <button id="modeCust" onclick="setCardMode('cust')" class="flex-1 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-mobile-screen mr-1"></i> Customer Mirror
-                </button>
-            </div>
-
-            <!-- Customer Detail Header Bar -->
-            <div class="glass-card rounded-2xl p-5 border-l-4 border-emerald-500">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 text-[10px] font-black rounded border border-emerald-500/30" id="cardClientIdTag">CLIENT #--</span>
-                            <button onclick="toggleDocType()" class="px-2 py-0.5 bg-teal-500/20 text-teal-300 hover:bg-teal-500/30 text-[10px] font-black rounded border border-teal-500/30 transition-all cursor-pointer" id="cardDocTypeTag">
-                                TYPE: ESTIMATE (TAP TO SWITCH)
-                            </button>
-                        </div>
-                        <h2 class="text-2xl font-black text-white" id="cardCustName">No Customer Selected</h2>
-                        <p class="text-xs text-slate-300 mt-1 flex items-center gap-1">
-                            <i class="fa-solid fa-location-dot text-emerald-400"></i> <span id="cardCustAddr">Select or schedule a customer first</span>
-                        </p>
-                        <p class="text-xs text-slate-300 mt-0.5 flex items-center gap-1">
-                            <i class="fa-solid fa-phone text-teal-400"></i> <span id="cardCustPhone">--</span>
-                        </p>
-                    </div>
-
-                    <!-- Clean Actions -->
-                    <div class="flex flex-col gap-2">
-                        <button onclick="sendCustomerSMS()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg border border-emerald-400/30 active:scale-95 transition-all">
-                            <i class="fa-solid fa-paper-plane text-xs"></i>
-                            <span>📱 SMS Customer</span>
-                        </button>
-                        <button onclick="syncToGoogleCalendar()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-slate-700 transition-all">
-                            <i class="fa-solid fa-calendar-plus text-emerald-400"></i>
-                            <span>📅 Sync Google Cal</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Dynamic Camera Capture Module -->
-            <div id="techPhotoModule" class="glass-card rounded-2xl p-5">
-                <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-camera text-emerald-400"></i> Diagnostic Camera Snap
-                </h3>
-
-                <div id="photoPreviewContainer" class="bg-slate-950 rounded-xl border border-dashed border-slate-800 min-h-[140px] flex flex-col items-center justify-center p-3 text-center overflow-hidden">
-                    <img id="cardImageDisplay" src="" alt="Diagnostic Snap" class="hidden w-full h-52 object-cover rounded-lg shadow-md mb-2">
-                    <div id="photoEmptyPrompt">
-                        <i class="fa-solid fa-camera-retro text-3xl text-slate-700 mb-2"></i>
-                        <p class="text-xs text-slate-400 font-medium">📷 No photo taken yet — tap button below to snap machine picture</p>
-                    </div>
-                </div>
-
-                <label class="mt-3 cursor-pointer bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold text-xs py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 border border-slate-700 transition-all">
-                    <i class="fa-solid fa-circle-plus"></i>
-                    <span>SNAP MACHINE PHOTO</span>
-                    <input type="file" accept="image/*" capture="environment" onchange="handleRealPhotoUpload(event)" class="hidden">
-                </label>
-            </div>
-
-            <!-- Dynamic Speech-to-Estimate Parser Module -->
-            <div class="glass-card rounded-2xl p-5 border border-emerald-500/20">
-                <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-3">
-                    <div>
-                        <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                            <i class="fa-solid fa-calculator text-emerald-400"></i> Dynamic Voice Estimate Engine
-                        </h3>
-                        <p class="text-[11px] text-slate-400">MD 6% Tax Engine Auto-Calculated</p>
-                    </div>
-
-                    <button id="estimateMicBtn" onclick="toggleEstimateVoice()" class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-md hover:from-emerald-500 hover:to-teal-500 transition-all">
-                        <i class="fa-solid fa-microphone"></i>
-                        <span id="estimateMicText">🎙️ Dictate Estimate</span>
-                    </button>
-                </div>
-
-                <div id="estimateVoiceStatus" class="mb-3 p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-[11px] text-slate-400">
-                    Tap <strong>"🎙️ Dictate Estimate"</strong> and speak: <em>"Full machine service 149 dollars and replacement HEPA filter 39 dollars 95 cents"</em>
-                </div>
-
-                <!-- Dynamic Line Items List -->
-                <div id="cardLinesContainer" class="space-y-2 mb-3">
-                    <!-- Populated dynamically from voice parser -->
-                </div>
-
-                <div class="grid grid-cols-2 gap-2 mb-4">
-                    <button onclick="addNewBlankLineItem()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-plus text-emerald-400"></i> + Add Manual Line
-                    </button>
-                    <button onclick="clearCardDraftLines()" class="bg-rose-950/40 hover:bg-rose-900/40 text-rose-300 border border-rose-800/50 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-trash-can"></i> Clear Items
-                    </button>
-                </div>
-
-                <!-- MD 6% Tax Totals Engine -->
-                <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5 text-xs">
-                    <div class="flex justify-between text-slate-400">
-                        <span>Subtotal:</span>
-                        <span class="font-bold text-slate-200" id="lblSubtotalVal">$0.00</span>
-                    </div>
-                    <div class="flex justify-between text-slate-400">
-                        <span>MD State Tax (6%):</span>
-                        <span class="font-bold text-slate-200" id="lblTaxVal">$0.00</span>
-                    </div>
-                    <div class="flex justify-between text-sm font-black text-white pt-2 border-t border-slate-800">
-                        <span class="text-emerald-400">Total Balance Due:</span>
-                        <span class="text-emerald-400" id="lblTotalVal">$0.00</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Navigation Back -->
-            <button onclick="switchView('hub')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-slate-700 transition-all">
-                <i class="fa-solid fa-arrow-left"></i>
-                <span>⬅️ Back to Schedule Agenda</span>
-            </button>
-
-        </section>
-
-    </main>
+            <button class="btn" style="margin-top: 16px;" onclick="switchView('hub')">⬅️ Back to Schedule</button>
+        </div>
+    </div>
 
     <script>
-        // 1. CUSTOMER VAULT DATABASE
-        const CUSTOMER_VAULT = [
-            { id: "22086", name: "Ruth Tucker", phone: "410-256-6949", address: "6 Lagan Ct, Nottingham, MD 21236" },
-            { id: "19203", name: "Paul Schwab", phone: "410-294-6383", address: "8515 Huntspring Dr, Lutherville, MD 21093" },
-            { id: "10492", name: "Claire Hartman", phone: "443-336-6380", address: "1902 Corbridge Ln, Monkton, MD 21111" },
-            { id: "18301", name: "Sandy Stelljes", phone: "443-555-9201", address: "802 York Rd, Towson, MD 21204" },
-            { id: "12044", name: "Maryanna Regester", phone: "410-555-0192", address: "112 Timonium Rd, Timonium, MD 21093" },
-            { id: "15930", name: "John Miller", phone: "443-555-8821", address: "405 York Rd, Towson, MD 21204" }
+        const vault = [
+            { id: 22086, name: "Ruth Tucker", address: "6 Lagan Ct, Nottingham, MD 21236", phone: "4102566949" },
+            { id: 19203, name: "Paul Schwab", address: "8515 Huntspring Dr, Lutherville, MD 21093", phone: "4102946383" }
         ];
 
-        // Number Word Map for Parsing Natural Speech Prices
-        const NUMBER_WORDS = {
-            "zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9,
-            "ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15, "sixteen": 16,
-            "seventeen": 17, "eighteen": 18, "nineteen": 19, "twenty": 20, "thirty": 30, "forty": 40, "fifty": 50,
-            "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90, "hundred": 100
-        };
-
-        // 2. SYSTEM STATE
-        let appointments = []; // Starts 100% clean
-        let currentActiveIndex = -1;
-        let isIntakeRecognizing = false;
-        let isEstimateRecognizing = false;
-        let docType = "ESTIMATE";
-        let cardMode = "tech";
-
-        window.onload = function() {
-            renderScheduleAgenda();
-            filterVaultSearch();
-        };
+        let appointments = [];
+        let lineItems = [];
+        let currentCardCustomer = vault[0];
+        let speechTimer = null;
+        let activeRecognition = null;
 
         function switchView(viewName) {
-            const hub = document.getElementById('screenHub');
-            const card = document.getElementById('screenCard');
-            const tabHub = document.getElementById('tabHub');
-            const tabCard = document.getElementById('tabCard');
+            document.getElementById('view-hub').classList.add('hidden');
+            document.getElementById('view-card').classList.add('hidden');
+            document.getElementById('tab-hub').classList.remove('active');
+            document.getElementById('tab-card').classList.remove('active');
 
             if (viewName === 'hub') {
-                hub.classList.remove('hidden');
-                card.classList.add('hidden');
-                tabHub.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-emerald-600 text-white shadow-md";
-                tabCard.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white";
-                renderScheduleAgenda();
+                document.getElementById('view-hub').classList.remove('hidden');
+                document.getElementById('tab-hub').classList.add('active');
             } else {
-                if (currentActiveIndex === -1 && appointments.length > 0) {
-                    currentActiveIndex = 0;
-                }
-                hub.classList.add('hidden');
-                card.classList.remove('hidden');
-                tabCard.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-emerald-600 text-white shadow-md";
-                tabHub.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white";
-                renderActiveForeverCard();
+                document.getElementById('view-card').classList.remove('hidden');
+                document.getElementById('tab-card').classList.add('active');
             }
         }
 
-        function setCardMode(mode) {
-            cardMode = mode;
-            const btnTech = document.getElementById('modeTech');
-            const btnCust = document.getElementById('modeCust');
-            const photoMod = document.getElementById('techPhotoModule');
-
-            if (mode === 'tech') {
-                btnTech.className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-emerald-600 text-white shadow-md";
-                btnCust.className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white";
-                photoMod.classList.remove('hidden');
-            } else {
-                btnCust.className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-emerald-600 text-white shadow-md";
-                btnTech.className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white";
-                photoMod.classList.add('hidden');
-            }
-        }
-
-        function toggleDocType() {
-            docType = docType === "ESTIMATE" ? "FINAL INVOICE" : "ESTIMATE";
-            document.getElementById('cardDocTypeTag').innerText = `TYPE: ${docType} (TAP TO SWITCH)`;
-        }
-
-        function toggleVoiceIntake() {
-            const statusBox = document.getElementById('voiceStatusBox');
-            const micBtn = document.getElementById('hubVoiceBtn');
-            const micText = document.getElementById('micText');
-            const micIcon = document.getElementById('micIcon');
-
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                statusBox.innerHTML = `<span class="text-amber-400">⚠️ Speech recognition not supported on this browser. Use search below.</span>`;
-                return;
-            }
-
-            if (isIntakeRecognizing) return;
-
-            const recognition = new SpeechRecognition();
-            recognition.continuous = false; // SINGLE SHOT LOCK
-            recognition.interimResults = false;
-            recognition.lang = 'en-US';
-
-            recognition.onstart = function() {
-                isIntakeRecognizing = true;
-                micBtn.classList.add('mic-recording');
-                micText.innerText = "LISTENING...";
-                micIcon.className = "fa-solid fa-spinner fa-spin text-3xl mb-1 text-red-300";
-                statusBox.innerHTML = `<span class="text-red-400 font-bold flex items-center justify-center gap-2"><i class="fa-solid fa-circle text-red-500 animate-pulse"></i> Listening... Speak customer name and time!</span>`;
-            };
-
-            recognition.onresult = function(event) {
-                const transcript = event.results[0][0].transcript;
-                statusBox.innerHTML = `<span class="text-white font-semibold">Heard: "${transcript}"</span>`;
-                processDynamicVoiceIntake(transcript);
-                recognition.stop();
-            };
-
-            recognition.onerror = function(event) {
-                statusBox.innerHTML = `<span class="text-amber-400">Speech recognition error: ${event.error}</span>`;
-                resetIntakeMicUI();
-            };
-
-            recognition.onend = function() {
-                resetIntakeMicUI();
-            };
-
-            recognition.start();
-        }
-
-        function resetIntakeMicUI() {
-            isIntakeRecognizing = false;
-            const micBtn = document.getElementById('hubVoiceBtn');
-            const micText = document.getElementById('micText');
-            const micIcon = document.getElementById('micIcon');
-            micBtn.classList.remove('mic-recording');
-            micText.innerText = "TAP TO TALK";
-            micIcon.className = "fa-solid fa-microphone text-3xl mb-1 text-white";
-        }
-
-        function processDynamicVoiceIntake(transcript) {
-            const statusBox = document.getElementById('voiceStatusBox');
-            const lower = transcript.toLowerCase();
-
-            // Dynamic Vault Lookup by checking spoken tokens
-            let matchedCustomer = CUSTOMER_VAULT.find(c => {
-                const nameParts = c.name.toLowerCase().split(' ');
-                return nameParts.some(part => part.length > 2 && lower.includes(part));
-            });
-
-            // Dynamic Time Extraction
-            const timeMatch = transcript.match(/\d{1,2}(:\d{2})?\s*(am|pm|a\.m\.|p\.m\.)/i) || 
-                              transcript.match(/\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s*(o'clock|am|pm)?\b/i);
-            
-            const extractedTime = timeMatch ? timeMatch[0].toUpperCase() : "9:30 AM";
-
-            if (!matchedCustomer) {
-                const cleanedName = transcript.replace(/\b(schedule|appointment|for|book|at|today|tomorrow|\d{1,2}(:\d{2})?\s*(am|pm))\b/gi, '').trim();
-                matchedCustomer = {
-                    id: Math.floor(10000 + Math.random() * 90000).toString(),
-                    name: cleanedName.length > 2 ? capitalizePhrase(cleanedName) : "Walk-In Customer",
-                    phone: "N/A",
-                    address: "Timonium, MD"
-                };
-            }
-
-            // Strict Duplicate Check
-            const existingIdx = appointments.findIndex(a => a.customer.name.toLowerCase() === matchedCustomer.name.toLowerCase());
-            if (existingIdx >= 0) {
-                appointments[existingIdx].time = extractedTime;
-                statusBox.innerHTML = `<span class="text-emerald-400 font-bold">🔄 Updated ${matchedCustomer.name} to ${extractedTime}!</span>`;
-            } else {
-                appointments.push({
-                    customer: matchedCustomer,
-                    time: extractedTime,
-                    lines: [],
-                    photoUrl: ""
-                });
-                statusBox.innerHTML = `<span class="text-emerald-400 font-bold">✅ Scheduled ${matchedCustomer.name} for ${extractedTime}!</span>`;
-            }
-
-            renderScheduleAgenda();
-        }
-
-        function renderScheduleAgenda() {
-            const container = document.getElementById('scheduleContainer');
-            const countTag = document.getElementById('scheduleCountTag');
+        function handleVaultSearch() {
+            const q = document.getElementById('vault-search').value.toLowerCase().trim();
+            const container = document.getElementById('vault-results');
             container.innerHTML = '';
+            if (q.length < 2) return;
 
-            countTag.innerText = `${appointments.length} Appointment${appointments.length === 1 ? '' : 's'}`;
-
-            if (appointments.length === 0) {
-                container.innerHTML = `<div class="text-center py-6 text-slate-500 text-xs font-semibold">0 Appointments — Ready for intake.</div>`;
-                return;
-            }
-
-            appointments.forEach((app, idx) => {
-                const card = document.createElement('div');
-                card.className = "flex items-center justify-between p-3.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-slate-700 transition-all";
-                card.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <div class="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-xs font-black">
-                            ${app.time}
-                        </div>
-                        <div>
-                            <div class="font-extrabold text-sm text-white">${app.customer.name}</div>
-                            <div class="text-xs text-slate-400">${app.customer.address}</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="syncGoogleCalDirect('${app.customer.name}', '${app.customer.address}', '${app.time}')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-2.5 py-1.5 rounded-lg border border-slate-700 transition-all">
-                            📅 Cal
-                        </button>
-                        <button onclick="openAppointmentForeverCard(${idx})" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all shadow-md">
-                            Open Card ➔
-                        </button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function filterVaultSearch() {
-            const query = document.getElementById('vaultSearchInput').value.toLowerCase().trim();
-            const resultsContainer = document.getElementById('vaultSearchResults');
-            resultsContainer.innerHTML = '';
-
-            if (query.length < 2) return;
-
-            const filtered = CUSTOMER_VAULT.filter(c => 
-                c.name.toLowerCase().includes(query) || 
-                c.phone.includes(query) || 
-                c.address.toLowerCase().includes(query)
-            );
-
-            if (filtered.length === 0) {
-                resultsContainer.innerHTML = `<div class="text-xs text-slate-500 py-2 text-center">No customer records matching "${query}"</div>`;
-                return;
-            }
-
-            filtered.forEach(cust => {
-                const item = document.createElement('div');
-                item.className = "flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs";
-                item.innerHTML = `
-                    <div>
-                        <div class="font-bold text-white">${cust.name} <span class="text-[10px] text-slate-500">CLIENT #${cust.id}</span></div>
-                        <div class="text-slate-400 text-[11px]">${cust.address} | ${cust.phone}</div>
-                    </div>
-                    <button onclick="manualScheduleFromVault('${cust.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1.5 rounded-lg text-[11px]">
-                        + Schedule
-                    </button>
-                `;
-                resultsContainer.appendChild(item);
-            });
-        }
-
-        function manualScheduleFromVault(custId) {
-            const cust = CUSTOMER_VAULT.find(c => c.id === custId);
-            if (cust) {
-                const existingIdx = appointments.findIndex(a => a.customer.id === cust.id);
-                if (existingIdx >= 0) {
-                    openAppointmentForeverCard(existingIdx);
-                } else {
-                    appointments.push({
-                        customer: cust,
-                        time: "9:30 AM",
-                        lines: [],
-                        photoUrl: ""
-                    });
-                    renderScheduleAgenda();
-                    openAppointmentForeverCard(appointments.length - 1);
-                }
-            }
-        }
-
-        function openAppointmentForeverCard(index) {
-            currentActiveIndex = index;
-            switchView('card');
-        }
-
-        function renderActiveForeverCard() {
-            if (currentActiveIndex < 0 || currentActiveIndex >= appointments.length) return;
-
-            const app = appointments[currentActiveIndex];
-            document.getElementById('cardCustName').innerText = app.customer.name;
-            document.getElementById('cardCustAddr').innerText = app.customer.address;
-            document.getElementById('cardCustPhone').innerText = app.customer.phone;
-            document.getElementById('cardClientIdTag').innerText = `CLIENT #${app.customer.id}`;
-
-            const img = document.getElementById('cardImageDisplay');
-            const emptyPrompt = document.getElementById('photoEmptyPrompt');
-            if (app.photoUrl) {
-                img.src = app.photoUrl;
-                img.classList.remove('hidden');
-                emptyPrompt.classList.add('hidden');
-            } else {
-                img.classList.add('hidden');
-                emptyPrompt.classList.remove('hidden');
-            }
-
-            renderCardLineItems();
-            calculateCardTotals();
-        }
-
-        function toggleEstimateVoice() {
-            const statusLabel = document.getElementById('estimateVoiceStatus');
-            const btnText = document.getElementById('estimateMicText');
-
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                statusLabel.innerText = "⚠️ Web Speech API not supported on this browser.";
-                return;
-            }
-
-            if (isEstimateRecognizing) return;
-
-            const recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.lang = 'en-US';
-
-            recognition.onstart = function() {
-                isEstimateRecognizing = true;
-                btnText.innerText = "Listening...";
-                statusLabel.innerHTML = `<span class="text-red-400 font-bold"><i class="fa-solid fa-microphone animate-pulse mr-1"></i> Dictate items & prices now...</span>`;
-            };
-
-            recognition.onresult = function(event) {
-                const transcript = event.results[0][0].transcript;
-                statusLabel.innerHTML = `<span class="text-white">Parsed: "${transcript}"</span>`;
-                parseSpeechToEstimateLines(transcript);
-            };
-
-            recognition.onerror = function(event) {
-                statusLabel.innerText = `Error: ${event.error}`;
-                btnText.innerText = "🎙️ Dictate Estimate";
-                isEstimateRecognizing = false;
-            };
-
-            recognition.onend = function() {
-                btnText.innerText = "🎙️ Dictate Estimate";
-                isEstimateRecognizing = false;
-            };
-
-            recognition.start();
-        }
-
-        function parseSpeechToEstimateLines(transcript) {
-            if (currentActiveIndex < 0) return;
-
-            const segments = transcript.split(/\b(?:and|then|plus|also)\b/i);
-            let parsedAny = false;
-
-            segments.forEach(seg => {
-                let text = seg.trim();
-                if (!text) return;
-
-                let price = 0;
-                let desc = text;
-
-                // Match explicit prices ($149, 149 dollars, 39.95)
-                const numericMatch = text.match(/(\$?(\d+(?:\.\d{1,2})?))\s*(dollars|cents)?/i);
-                
-                if (numericMatch) {
-                    price = parseFloat(numericMatch[2]);
-                    desc = text.replace(numericMatch[0], '').replace(/\b(for|a|an|dollars|cents)\b/gi, '').trim();
-                } else {
-                    let words = text.toLowerCase().split(' ');
-                    let calculatedPrice = 0;
-
-                    words.forEach(w => {
-                        if (NUMBER_WORDS[w] !== undefined) {
-                            calculatedPrice += NUMBER_WORDS[w];
-                        }
-                    });
-
-                    if (calculatedPrice > 0) {
-                        price = calculatedPrice;
-                        desc = words.filter(w => NUMBER_WORDS[w] === undefined && !['dollars', 'cents', 'for'].includes(w)).join(' ');
-                    }
-                }
-
-                if (price > 0 || desc.length > 2) {
-                    appointments[currentActiveIndex].lines.push({
-                        desc: capitalizePhrase(desc.length > 0 ? desc : "Service Line Item"),
-                        price: price > 0 ? price : 0.00
-                    });
-                    parsedAny = true;
-                }
-            });
-
-            if (!parsedAny) {
-                appointments[currentActiveIndex].lines.push({
-                    desc: capitalizePhrase(transcript),
-                    price: 0.00
-                });
-            }
-
-            renderCardLineItems();
-            calculateCardTotals();
-        }
-
-        function capitalizePhrase(str) {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        }
-
-        function renderCardLineItems() {
-            if (currentActiveIndex < 0) return;
-            const app = appointments[currentActiveIndex];
-            const container = document.getElementById('cardLinesContainer');
-            container.innerHTML = '';
-
-            if (!app.lines || app.lines.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-2 italic">Clean slate — $0.00 balance. Dictate or add line items above.</p>`;
-                return;
-            }
-
-            app.lines.forEach((line, idx) => {
+            const matches = vault.filter(c => c.name.toLowerCase().includes(q) || c.phone.includes(q));
+            matches.forEach(c => {
                 const div = document.createElement('div');
-                div.className = "flex items-center gap-2 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs";
+                div.className = 'card';
                 div.innerHTML = `
-                    <input type="text" value="${line.desc}" placeholder="Description" oninput="updateLineItemData(${idx}, 'desc', this.value)"
-                           class="flex-grow bg-slate-900 text-white px-2.5 py-1.5 rounded-lg border border-slate-700 focus:outline-none">
-                    <span class="text-slate-500">$</span>
-                    <input type="number" step="0.01" value="${line.price}" placeholder="Price" oninput="updateLineItemData(${idx}, 'price', parseFloat(this.value) || 0)"
-                           class="w-20 bg-slate-900 text-emerald-400 font-bold px-2 py-1.5 rounded-lg border border-slate-700 focus:outline-none">
-                    <button onclick="removeLineItemData(${idx})" class="text-rose-400 px-1.5 py-1 hover:text-rose-300">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
+                    <div class="card-header"><span>${c.name}</span><span>#${c.id}</span></div>
+                    <div style="font-size:0.85rem; color:var(--muted);">${c.address}</div>
+                    <button class="btn" style="margin-top:8px;" onclick="addOrUpdateAppointment('${c.name}', '9:30 AM')">+ Schedule 9:30 AM</button>
                 `;
                 container.appendChild(div);
             });
         }
 
-        function addNewBlankLineItem() {
-            if (currentActiveIndex < 0) return;
-            appointments[currentActiveIndex].lines.push({ desc: "Service Line Item", price: 0.00 });
-            renderCardLineItems();
-            calculateCardTotals();
-        }
+        function addOrUpdateAppointment(name, time) {
+            const cleanName = name.replace(/schedule|appointment|for|book|at|today/gi, '').trim();
+            if (!cleanName || cleanName.length < 2) return;
 
-        function updateLineItemData(idx, key, val) {
-            if (currentActiveIndex < 0) return;
-            appointments[currentActiveIndex].lines[idx][key] = val;
-            calculateCardTotals();
-        }
-
-        function removeLineItemData(idx) {
-            if (currentActiveIndex < 0) return;
-            appointments[currentActiveIndex].lines.splice(idx, 1);
-            renderCardLineItems();
-            calculateCardTotals();
-        }
-
-        function clearCardDraftLines() {
-            if (currentActiveIndex < 0) return;
-            appointments[currentActiveIndex].lines = [];
-            renderCardLineItems();
-            calculateCardTotals();
-        }
-
-        function calculateCardTotals() {
-            if (currentActiveIndex < 0) return;
-            const app = appointments[currentActiveIndex];
-            let sub = 0;
-            if (app.lines) {
-                app.lines.forEach(l => sub += (parseFloat(l.price) || 0));
+            const cust = vault.find(c => c.name.toLowerCase().includes(cleanName.toLowerCase())) || { name: cleanName, address: "Timonium, MD", phone: "N/A" };
+            
+            const existingIdx = appointments.findIndex(a => a.cust.name.toLowerCase() === cust.name.toLowerCase());
+            if (existingIdx >= 0) {
+                appointments[existingIdx].time = time;
+            } else {
+                appointments.push({ cust, time });
             }
-            const tax = sub * 0.06; // MD 6% Tax
-            const total = sub + tax;
 
-            document.getElementById('lblSubtotalVal').innerText = `$${sub.toFixed(2)}`;
-            document.getElementById('lblTaxVal').innerText = `$${tax.toFixed(2)}`;
-            document.getElementById('lblTotalVal').innerText = `$${total.toFixed(2)}`;
+            renderSchedule();
+            document.getElementById('vault-search').value = '';
+            document.getElementById('vault-results').innerHTML = '';
         }
 
-        function handleRealPhotoUpload(event) {
-            const file = event.target.files[0];
-            if (!file || currentActiveIndex < 0) return;
+        function renderSchedule() {
+            const container = document.getElementById('schedule-list');
+            if (appointments.length === 0) {
+                container.innerHTML = `<div style="color: var(--muted); text-align: center; padding: 24px; background: var(--card); border-radius: 8px;">0 Appointments — Ready for intake.</div>`;
+                return;
+            }
+            container.innerHTML = '';
+            appointments.forEach((app, idx) => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `
+                    <div class="card-header"><span>${app.time} — ${app.cust.name}</span></div>
+                    <div style="font-size:0.85rem; color:var(--muted); margin-bottom:12px;">${app.cust.address}</div>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn" onclick="openCustomerCard(${idx})">Open Card ➔</button>
+                        <button class="btn btn-secondary" style="width:auto;" onclick="syncGoogleCalDirect('${app.cust.name}', '${app.cust.address}', '${app.time}')">📅 Cal</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                appointments[currentActiveIndex].photoUrl = e.target.result;
-                renderActiveForeverCard();
+        function openCustomerCard(idx) {
+            currentCardCustomer = appointments[idx].cust;
+            document.getElementById('card-cust-name').innerText = currentCardCustomer.name;
+            document.getElementById('card-cust-id').innerText = `CLIENT #${currentCardCustomer.id || 'NEW'}`;
+            document.getElementById('card-cust-address').innerText = currentCardCustomer.address;
+            document.getElementById('card-cust-phone').innerText = currentCardCustomer.phone;
+            switchView('card');
+        }
+
+        function toggleVoiceIntake() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) return;
+            const rec = new SpeechRecognition();
+            
+            // SILENCE / PAUSE GUARD
+            rec.continuous = true;
+            rec.interimResults = true;
+
+            const btn = document.getElementById('main-mic');
+            const status = document.getElementById('mic-status');
+
+            rec.onstart = () => {
+                btn.classList.add('listening');
+                status.innerText = "LISTENING NOW...";
             };
-            reader.readAsDataURL(file);
+
+            rec.onresult = (e) => {
+                let fullTranscript = '';
+                for (let i = 0; i < e.results.length; i++) {
+                    fullTranscript += e.results[i][0].transcript + ' ';
+                }
+
+                status.innerText = `Heard: "${fullTranscript.trim()}"`;
+
+                // Wait 1.5s of silence before processing
+                clearTimeout(speechTimer);
+                speechTimer = setTimeout(() => {
+                    rec.stop();
+                    processDynamicVoiceIntake(fullTranscript.trim());
+                }, 1500);
+            };
+
+            rec.onend = () => { btn.classList.remove('listening'); };
+            rec.start();
+        }
+
+        function processDynamicVoiceIntake(text) {
+            const timeMatch = text.match(/\d{1,2}(:\d{2})?\s*(am|pm)/i);
+            const timeStr = timeMatch ? timeMatch[0].toUpperCase() : "9:30 AM";
+
+            // Dynamic Vault Lookup
+            const matchedCust = vault.find(c => text.toLowerCase().includes(c.name.toLowerCase().split(' ')[0]));
+            if (matchedCust) {
+                addOrUpdateAppointment(matchedCust.name, timeStr);
+            } else {
+                addOrUpdateAppointment(text, timeStr);
+            }
+        }
+
+        function toggleCardVoice() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) return;
+            const rec = new SpeechRecognition();
+            rec.continuous = true;
+            rec.interimResults = true;
+
+            rec.onresult = (e) => {
+                let fullTranscript = '';
+                for (let i = 0; i < e.results.length; i++) {
+                    fullTranscript += e.results[i][0].transcript + ' ';
+                }
+
+                clearTimeout(speechTimer);
+                speechTimer = setTimeout(() => {
+                    rec.stop();
+                    parseLineItemsFromSpeech(fullTranscript.trim());
+                }, 1500);
+            };
+            rec.start();
+        }
+
+        function parseLineItemsFromSpeech(text) {
+            const priceMatch = text.match(/(\d+(\.\d{2})?)/g);
+            if (priceMatch) {
+                const price = parseFloat(priceMatch[0]);
+                const desc = text.replace(priceMatch[0], '').replace('dollars', '').replace('dollar', '').trim();
+                lineItems.push({ desc: desc || "Service Item", price });
+            } else {
+                lineItems.push({ desc: text, price: 0.00 });
+            }
+            renderLineItems();
+        }
+
+        function renderLineItems() {
+            const container = document.getElementById('line-items-container');
+            container.innerHTML = '';
+            let subtotal = 0;
+
+            if (lineItems.length === 0) {
+                container.innerHTML = `<div style="color: var(--muted); font-size: 0.85rem; padding: 8px 0;">No line items added yet.</div>`;
+            } else {
+                lineItems.forEach(item => {
+                    subtotal += item.price;
+                    const div = document.createElement('div');
+                    div.className = 'line-item';
+                    div.innerHTML = `<span>${item.desc}</span><span>$${item.price.toFixed(2)}</span>`;
+                    container.appendChild(div);
+                });
+            }
+
+            const tax = subtotal * 0.06;
+            const total = subtotal + tax;
+
+            document.getElementById('val-subtotal').innerText = `$${subtotal.toFixed(2)}`;
+            document.getElementById('val-tax').innerText = `$${tax.toFixed(2)}`;
+            document.getElementById('val-total').innerText = `$${total.toFixed(2)}`;
         }
 
         function syncGoogleCalDirect(name, address, time) {
@@ -728,20 +324,32 @@
             const details = encodeURIComponent(`Customer Service Intake for ${name}`);
             const loc = encodeURIComponent(address);
             const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${loc}`;
-            window.open(url, '_blank');
+            
+            // DIRECT BROWSER REDIRECT TO BYPASS MOBILE POPUP BLOCKERS
+            window.location.href = url;
         }
 
         function syncToGoogleCalendar() {
-            if (currentActiveIndex < 0) return;
-            const app = appointments[currentActiveIndex];
-            syncGoogleCalDirect(app.customer.name, app.customer.address, app.time);
+            syncGoogleCalDirect(currentCardCustomer.name, currentCardCustomer.address, "9:30 AM");
         }
 
         function sendCustomerSMS() {
-            if (currentActiveIndex < 0) return;
-            const app = appointments[currentActiveIndex];
-            const body = encodeURIComponent(`Hi ${app.customer.name}, here is your live Aerus service card: ${window.location.href}`);
-            window.location.href = `sms:${app.customer.phone}?body=${body}`;
+            const body = encodeURIComponent(`Hi ${currentCardCustomer.name}, here is your live Aerus card: https://aerus.app/card?id=${currentCardCustomer.id || 22086}`);
+            window.location.href = `sms:${currentCardCustomer.phone}?body=${body}`;
+        }
+
+        function handlePhotoUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    document.getElementById('photo-label').classList.add('hidden');
+                    const img = document.getElementById('photo-img');
+                    img.src = evt.target.result;
+                    img.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
         }
     </script>
 </body>
