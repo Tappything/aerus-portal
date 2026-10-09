@@ -66,10 +66,10 @@
 
       <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-800">
         <button id="tabHub" onclick="switchView('hub')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white shadow-md">
-          <i class="fa-solid fa-calendar-days mr-1"></i> Calendar
+          <i class="fa-solid fa-calendar-days mr-1"></i> Schedule Hub
         </button>
         <button id="tabCard" onclick="switchView('card')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-gray-400 hover:text-white">
-          <i class="fa-solid fa-address-card mr-1"></i> Card
+          <i class="fa-solid fa-address-card mr-1"></i> Card View
         </button>
       </div>
     </div>
@@ -77,19 +77,17 @@
 
   <main class="max-w-2xl mx-auto px-4 py-6 w-full flex-grow">
 
-    <!-- ========================================== -->
-    <!-- SCREEN 1: CALENDAR & VOICE DISPATCH HUB    -->
-    <!-- ========================================== -->
+    <!-- SCREEN 1: CALENDAR & VOICE DISPATCH HUB -->
     <section id="screenHub" class="space-y-6">
 
-      <!-- Real Speech Recognition Mic Module -->
+      <!-- Speech Recognition Mic Module -->
       <div class="glass-card rounded-2xl p-6 text-center relative overflow-hidden">
         <span class="inline-block px-3 py-1 bg-blue-500/10 text-blue-400 text-xs font-bold rounded-full mb-3 border border-blue-500/20">
           REAL-TIME VOICE COORDINATOR
         </span>
         
         <h2 class="text-xl font-black text-white mb-1">Tap & Speak Appointment Intake</h2>
-        <p class="text-xs text-gray-400 mb-5">Example: <em>"Schedule appointment for Ruth Tucker at 10:00 AM"</em></p>
+        <p class="text-xs text-gray-400 mb-5">Example: <em>"Appointment for Ruth Tucker at 10:00 AM"</em></p>
 
         <!-- Dynamic Speech Mic Button -->
         <div class="flex justify-center items-center py-2">
@@ -104,7 +102,7 @@
         </div>
       </div>
 
-      <!-- Real Dynamic Schedule List -->
+      <!-- Schedule List (0 Appointments on Startup) -->
       <div class="glass-card rounded-2xl p-5">
         <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
           <div class="flex items-center gap-2">
@@ -121,7 +119,7 @@
         </div>
       </div>
 
-      <!-- Real Vault Search Module -->
+      <!-- Vault Search Module (Clean on Startup) -->
       <div class="glass-card rounded-2xl p-5">
         <div class="flex items-center gap-2 mb-3">
           <i class="fa-solid fa-users-viewfinder text-blue-400"></i>
@@ -131,15 +129,13 @@
                class="w-full bg-slate-900 text-white font-medium text-xs p-3 rounded-xl border border-slate-700 focus:outline-none focus:border-blue-500 transition-all mb-3">
         
         <div id="vaultSearchResults" class="space-y-2">
-          <!-- Live search matches populate here -->
+          <!-- Completely empty on startup; displays matches only when query >= 2 chars -->
         </div>
       </div>
 
     </section>
 
-    <!-- ========================================== -->
-    <!-- SCREEN 2: CLEAN DYNAMIC FOREVER CARD™      -->
-    <!-- ========================================== -->
+    <!-- SCREEN 2: CLEAN DYNAMIC FOREVER CARD™ -->
     <section id="screenCard" class="space-y-6 hidden">
 
       <!-- Customer Detail Header Bar -->
@@ -159,18 +155,18 @@
             </p>
           </div>
 
-          <!-- 1-Tap Live SMS Trigger -->
-          <button onclick="sendLiveCardSMS()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-4 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg border border-emerald-400/30 active:scale-95 transition-all">
-            <i class="fa-solid fa-paper-plane text-sm"></i>
+          <!-- 1-Tap Voice Dictated Live SMS Trigger -->
+          <button onclick="dictateOnMyWaySMS()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-4 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg border border-emerald-400/30 active:scale-95 transition-all">
+            <i class="fa-solid fa-microphone text-sm"></i>
             <div class="text-left">
-              <div>TEXT LIVE CARD LINK</div>
-              <div class="text-[9px] text-emerald-100 font-normal">Opens Native SMS</div>
+              <div>DICTATE "ON MY WAY" SMS</div>
+              <div class="text-[9px] text-emerald-100 font-normal">Appends Live Card Link Automatically</div>
             </div>
           </button>
         </div>
       </div>
 
-      <!-- Real Camera File FileReader Diagnostic Snap -->
+      <!-- Camera Diagnostic Snap Module (Empty on Startup) -->
       <div class="glass-card rounded-2xl p-5">
         <h3 class="text-xs font-bold text-gray-300 uppercase tracking-wider mb-3 flex items-center gap-2">
           <i class="fa-solid fa-camera text-blue-400"></i> Camera Diagnostic Snap
@@ -180,7 +176,7 @@
           <img id="cardImageDisplay" src="" alt="Diagnostic Snap" class="hidden w-full h-52 object-cover rounded-lg shadow-md mb-2">
           <div id="photoEmptyPrompt">
             <i class="fa-solid fa-camera-retro text-3xl text-gray-600 mb-2"></i>
-            <p class="text-xs text-gray-400 font-medium">📷 No photo captured — tap button below to take camera snap</p>
+            <p class="text-xs text-gray-400 font-medium">📷 No photo taken yet — tap button below to snap machine picture</p>
           </div>
         </div>
 
@@ -191,7 +187,7 @@
         </label>
       </div>
 
-      <!-- Universal 7-Stage Pipeline Selector -->
+      <!-- Pipeline Stage Selector -->
       <div class="glass-card rounded-2xl p-5">
         <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">
           Pipeline Stage Selector
@@ -199,9 +195,20 @@
         <select id="cardStageSelector" onchange="updateActiveCardStage(this.value)" class="w-full bg-slate-900 text-emerald-400 font-bold text-xs p-3 rounded-xl border border-slate-700 focus:outline-none">
           <!-- Populated dynamically from TENANT_CONFIG -->
         </select>
+
+        <!-- Category & Supplier Chips -->
+        <div class="mt-4 pt-3 border-t border-slate-800">
+          <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Service Category</label>
+          <div id="categoryChipsContainer" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <div class="mt-3">
+          <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Supplier / Vendor</label>
+          <div id="supplierChipsContainer" class="flex flex-wrap gap-2"></div>
+        </div>
       </div>
 
-      <!-- Universal Interactive Estimate & Invoice Calculator Engine -->
+      <!-- Estimate & Invoice Calculator Engine -->
       <div class="glass-card rounded-2xl p-5 border border-blue-500/20">
         <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
           <div>
@@ -218,7 +225,7 @@
 
         <!-- Dynamic Line Items Container -->
         <div id="cardLinesContainer" class="space-y-2 mb-3">
-          <!-- Blank by default -->
+          <!-- Blank by default ($0.00) -->
         </div>
 
         <div class="grid grid-cols-2 gap-2 mb-4">
@@ -230,7 +237,7 @@
           </button>
         </div>
 
-        <!-- Dynamic Tax Engine Totals Box -->
+        <!-- Tax Engine Totals Box -->
         <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1.5 text-xs">
           <div class="flex justify-between text-gray-400">
             <span>Subtotal:</span>
@@ -262,6 +269,8 @@
       techName: "William",
       taxRate: 0.06, // MD 6%
       currency: "USD",
+      categories: ["Vacuum", "Water Treatment", "Air Purification", "Supplies / Bags"],
+      suppliers: ["FOAS", "Desco", "Amazon Direct", "Aerus OEM"],
       stages: [
         "1. 🚗 Field Pickups / Vehicle",
         "2. 📥 Counter Intake / Showroom",
@@ -273,7 +282,7 @@
       ]
     };
 
-    // 2. REAL EMBEDDED CUSTOMER VAULT (Subset of 22,283 records for instant local lookup)
+    // 2. CUSTOMER VAULT DATABASE
     const CUSTOMER_VAULT = [
       { id: "22086", name: "Ruth Tucker", phone: "410-256-6949", address: "6 Lagan Ct, Nottingham, MD 21236" },
       { id: "10492", name: "Claire Hartman", phone: "410-555-0182", address: "14 E Padonia Rd, Timonium, MD 21093" },
@@ -283,7 +292,7 @@
       { id: "20194", name: "Robert Davis", phone: "410-555-3341", address: "221 Ridgetop Rd, Lutherville, MD 21093" }
     ];
 
-    // LIVE SCHEDULE STATE ARRAY
+    // 3. CLEAN INITIAL STATE (0 Appointments on Startup)
     let appointments = [];
     let currentActiveIndex = -1;
     let isRecognizing = false;
@@ -300,21 +309,31 @@
         selector.appendChild(opt);
       });
 
-      // Default seed: Add Ruth Tucker to live appointment schedule if schedule is empty
-      if (appointments.length === 0) {
-        appointments.push({
-          customer: CUSTOMER_VAULT[0], // Ruth Tucker
-          time: "8:00 AM",
-          stage: TENANT_CONFIG.stages[2], // Tech Workbench
-          docMode: "Proposal / Estimate",
-          lines: [],
-          photoUrl: ""
-        });
-      }
+      // Render Chips
+      renderChips('categoryChipsContainer', TENANT_CONFIG.categories);
+      renderChips('supplierChipsContainer', TENANT_CONFIG.suppliers);
 
+      // Startup Clean State Rendering
       renderScheduleAgenda();
-      filterVaultSearch();
+      filterVaultSearch(); // Clears search box container on startup
     };
+
+    function renderChips(containerId, items) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+      items.forEach((item, idx) => {
+        const chip = document.createElement('span');
+        chip.className = `px-2.5 py-1 rounded-full text-[10px] font-bold cursor-pointer transition-all border ${idx === 0 ? 'bg-blue-600/30 text-blue-300 border-blue-500/40' : 'bg-slate-900 text-gray-400 border-slate-800 hover:text-white'}`;
+        chip.innerText = item;
+        chip.onclick = function() {
+          container.querySelectorAll('span').forEach(c => {
+            c.className = 'px-2.5 py-1 rounded-full text-[10px] font-bold cursor-pointer transition-all border bg-slate-900 text-gray-400 border-slate-800 hover:text-white';
+          });
+          chip.className = 'px-2.5 py-1 rounded-full text-[10px] font-bold cursor-pointer transition-all border bg-blue-600/30 text-blue-300 border-blue-500/40';
+        };
+        container.appendChild(chip);
+      });
+    }
 
     function switchView(viewName) {
       const hub = document.getElementById('screenHub');
@@ -403,7 +422,7 @@
       const statusBox = document.getElementById('voiceStatusBox');
       const lower = transcript.toLowerCase();
 
-      // 1. Match Customer from Vault
+      // 1. Query Vault
       let matchedCustomer = null;
       for (let cust of CUSTOMER_VAULT) {
         if (lower.includes(cust.name.toLowerCase()) || lower.includes(cust.name.split(' ')[0].toLowerCase())) {
@@ -412,16 +431,15 @@
         }
       }
 
-      // 2. Extract Time Pattern (e.g., 10:00 AM, 8 AM, 2:30 PM)
+      // 2. Extract Time
       const timeMatch = transcript.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm|a\.m\.|p\.m\.))/i);
       const extractedTime = timeMatch ? timeMatch[0].toUpperCase() : "10:00 AM";
 
       if (matchedCustomer) {
-        // Dynamic push to schedule
         appointments.push({
           customer: matchedCustomer,
           time: extractedTime,
-          stage: TENANT_CONFIG.stages[2], // Tech Workbench
+          stage: TENANT_CONFIG.stages[2],
           docMode: "Proposal / Estimate",
           lines: [],
           photoUrl: ""
@@ -430,7 +448,7 @@
         renderScheduleAgenda();
         statusBox.innerHTML = `<span class="text-emerald-400 font-bold">✅ Scheduled ${matchedCustomer.name} for ${extractedTime}!</span>`;
       } else {
-        statusBox.innerHTML = `<span class="text-amber-400">Could not find customer match in vault for: "${transcript}". Search vault below to add manually!</span>`;
+        statusBox.innerHTML = `<span class="text-amber-400">No match found in vault for: "${transcript}". Type name in search box below!</span>`;
       }
     }
 
@@ -442,7 +460,7 @@
       countTag.innerText = `${appointments.length} Appointment${appointments.length === 1 ? '' : 's'}`;
 
       if (appointments.length === 0) {
-        container.innerHTML = `<div class="text-center py-6 text-gray-500 text-xs">No active appointments scheduled. Use mic above or vault search below!</div>`;
+        container.innerHTML = `<div class="text-center py-6 text-gray-500 text-xs font-semibold">0 Appointments — Ready for intake.</div>`;
         return;
       }
 
@@ -467,16 +485,26 @@
       });
     }
 
+    // REQUIREMENT 2: Vault Search results container completely EMPTY if query length < 2
     function filterVaultSearch() {
       const query = document.getElementById('vaultSearchInput').value.toLowerCase().trim();
       const resultsContainer = document.getElementById('vaultSearchResults');
       resultsContainer.innerHTML = '';
+
+      if (query.length < 2) {
+        return; // Empty container on load and short inputs
+      }
 
       const filtered = CUSTOMER_VAULT.filter(c => 
         c.name.toLowerCase().includes(query) || 
         c.phone.includes(query) || 
         c.address.toLowerCase().includes(query)
       );
+
+      if (filtered.length === 0) {
+        resultsContainer.innerHTML = `<div class="text-xs text-gray-500 py-2 text-center">No customer records matching "${query}"</div>`;
+        return;
+      }
 
       filtered.forEach(cust => {
         const item = document.createElement('div');
@@ -499,7 +527,7 @@
       if (cust) {
         appointments.push({
           customer: cust,
-          time: "11:00 AM",
+          time: "10:00 AM",
           stage: TENANT_CONFIG.stages[2],
           docMode: "Proposal / Estimate",
           lines: [],
@@ -516,7 +544,13 @@
     }
 
     function renderActiveForeverCard() {
-      if (currentActiveIndex < 0 || currentActiveIndex >= appointments.length) return;
+      if (currentActiveIndex < 0 || currentActiveIndex >= appointments.length) {
+        document.getElementById('cardCustName').innerText = "No Customer Selected";
+        document.getElementById('cardCustAddr').innerText = "Select or schedule a customer first";
+        document.getElementById('cardCustPhone').innerText = "--";
+        document.getElementById('cardClientIdTag').innerText = "CLIENT #--";
+        return;
+      }
 
       const app = appointments[currentActiveIndex];
       document.getElementById('cardCustName').innerText = app.customer.name;
@@ -527,7 +561,7 @@
       document.getElementById('docModeToggleLabel').innerText = app.docMode;
       document.getElementById('cardStageSelector').value = app.stage;
 
-      // Render Photo
+      // Render Photo State
       const img = document.getElementById('cardImageDisplay');
       const emptyPrompt = document.getElementById('photoEmptyPrompt');
       if (app.photoUrl) {
@@ -544,6 +578,7 @@
     }
 
     function renderCardLineItems() {
+      if (currentActiveIndex < 0) return;
       const app = appointments[currentActiveIndex];
       const container = document.getElementById('cardLinesContainer');
       container.innerHTML = '';
@@ -578,11 +613,13 @@
     }
 
     function updateLineItemData(idx, key, val) {
+      if (currentActiveIndex < 0) return;
       appointments[currentActiveIndex].lines[idx][key] = val;
       calculateCardTotals();
     }
 
     function removeLineItemData(idx) {
+      if (currentActiveIndex < 0) return;
       appointments[currentActiveIndex].lines.splice(idx, 1);
       renderCardLineItems();
       calculateCardTotals();
@@ -603,7 +640,12 @@
     }
 
     function calculateCardTotals() {
-      if (currentActiveIndex < 0) return;
+      if (currentActiveIndex < 0) {
+        document.getElementById('lblSubtotalVal').innerText = "$0.00";
+        document.getElementById('lblTaxVal').innerText = "$0.00";
+        document.getElementById('lblTotalVal').innerText = "$0.00";
+        return;
+      }
       const app = appointments[currentActiveIndex];
       let sub = 0;
       if (app.lines) {
@@ -635,18 +677,35 @@
       reader.readAsDataURL(file);
     }
 
-    function sendLiveCardSMS() {
+    function dictateOnMyWaySMS() {
       if (currentActiveIndex < 0) return;
       const app = appointments[currentActiveIndex];
-      const smsBody = encodeURIComponent(`Hi ${app.customer.name}, this is ${TENANT_CONFIG.techName} from ${TENANT_CONFIG.shopName}! Track your machine photos and service card live here: ${window.location.href}`);
-      window.location.href = `sms:${app.customer.phone}?body=${smsBody}`;
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        const smsBody = encodeURIComponent(`Hi ${app.customer.name}, this is ${TENANT_CONFIG.techName} from ${TENANT_CONFIG.shopName}! On my way now. Track your card live: ${window.location.href}`);
+        window.location.href = `sms:${app.customer.phone}?body=${smsBody}`;
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.onstart = function() {
+        alert("Speak your custom message now! (e.g., 'Hi Mrs. Tucker, heading your way now!')");
+      };
+      recognition.onresult = function(event) {
+        const spokenMsg = event.results[0][0].transcript;
+        const smsBody = encodeURIComponent(`${spokenMsg} Track your service card live here: ${window.location.href}`);
+        window.location.href = `sms:${app.customer.phone}?body=${smsBody}`;
+      };
+      recognition.start();
     }
 
     function generateStripePaymentLink() {
       if (currentActiveIndex < 0) return;
       const app = appointments[currentActiveIndex];
       let totalStr = document.getElementById('lblTotalVal').innerText;
-      alert(`Stripe Checkout Link Generated for ${app.customer.name} (${totalStr})!\n\nLink ready to text or attach to invoice.`);
+      alert(`Stripe Payment Link Generated for ${app.customer.name} (${totalStr})!\n\nLink ready to send via SMS.`);
     }
   </script>
 </body>
