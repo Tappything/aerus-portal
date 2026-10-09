@@ -81,14 +81,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 
     <!-- LINE ITEMS CONTAINER -->
     <div id="invoiceRows" class="space-y-2">
-      <div class="flex gap-2 items-center invoice-row">
-        <input type="text" list="partsCatalog" placeholder="Type item name..." oninput="handleInRowSearch(this)" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
-        <select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none">
-          <option value="part">Part (Tax)</option>
-          <option value="labor">Labor (No Tax)</option>
-        </select>
-        <input type="number" step="0.01" value="0.00" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">
-        <button type="button" onclick="removeInvoiceRow(this)" class="text-gray-500 hover:text-red-400 px-1 text-xs">✕</button>
+      <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 invoice-row space-y-1.5">
+        <div class="flex gap-2 items-center">
+          <input type="text" list="partsCatalog" placeholder="Type item name..." oninput="handleInRowSearch(this)" class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">
+          <select onchange="calculateInvoiceTotals()" class="bg-slate-900 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none">
+            <option value="part">Part (Tax)</option>
+            <option value="labor">Labor (No Tax)</option>
+          </select>
+          <input type="number" step="0.01" value="0.00" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-900 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">
+          <button type="button" onclick="removeInvoiceRow(this)" class="text-gray-500 hover:text-red-400 px-1 text-xs">✕</button>
+        </div>
+        <input type="text" placeholder="+ Note / warranty..." oninput="autoSaveLocalDraft()" class="w-full bg-slate-900/60 border border-slate-800 rounded-lg px-2 py-1 text-[10px] text-gray-300 item-note focus:outline-none focus:border-amber-500/50">
       </div>
     </div>
 
@@ -157,6 +160,7 @@ var currentCustomerTitle = '';
 var currentDocType = 'Invoice';
 var isListeningInvoice = false;
 var invoiceRecognition = null;
+var activeStripeUrl = '';
 
 // FULL HARDCODED INVENTORY (1,090 ITEMS, 0ms LATENCY)
 var inventoryDatabase = [
@@ -398,6 +402,11 @@ window.onload = function() {
     document.getElementById('customerAddress').textContent = 'Address on File';
   }
 
+  if (rawPhone) {
+    document.getElementById('customerPhoneLink').textContent = decodeURIComponent(rawPhone);
+    document.getElementById('customerPhoneLink').href = 'tel:' + rawPhone.replace(/[^0-9]/g, '');
+  }
+
   if (currentCardId) {
     document.getElementById('cardSubtext').textContent = 'ID: ' + currentCardId;
   }
@@ -495,7 +504,7 @@ function filterCatalogModal() {
     var div = document.createElement('div');
     div.className = 'flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 text-xs hover:border-amber-500 transition cursor-pointer';
     div.onclick = function() {
-      addPrepopulatedRow(item.name, item.price, item.type);
+      addPrepopulatedRow(item.name, item.price, item.type, '');
       closeSearchModal();
     };
     div.innerHTML = '<div><div class="font-bold text-white">' + escapeHtml(item.name) + '</div><div class="text-[10px] text-gray-400">' + (item.type === 'part' ? 'Part (Taxable)' : 'Labor (No Tax)') + '</div></div>' +
@@ -509,7 +518,6 @@ function handleInRowSearch(inputEl) {
   var val = inputEl.value.trim();
   var row = inputEl.closest('.invoice-row');
   
-  // Exact match from datalist or typing
   var match = inventoryDatabase.find(function(it) {
     return it.name.toLowerCase() === val.toLowerCase();
   });
@@ -566,7 +574,7 @@ function toggleInvoiceVoice() {
     var matches = searchCatalog(text);
 
     if (matches.length > 0) {
-      addPrepopulatedRow(matches[0].name, matches[0].price, matches[0].type);
+      addPrepopulatedRow(matches[0].name, matches[0].price, matches[0].type, '');
       updateLed('ADDED: ' + matches[0].name, false);
     } else {
       updateLed('NO MATCH — OPENING SEARCH', true);
@@ -586,7 +594,7 @@ function toggleInvoiceVoice() {
   invoiceRecognition.start();
 }
 
-function addPrepopulatedRow(name, price, type) {
+function addPrepopulatedRow(name, price, type, note) {
   var rowsContainer = document.getElementById('invoiceRows');
   var existingRows = rowsContainer.querySelectorAll('.invoice-row');
   if (existingRows.length === 1) {
@@ -598,17 +606,20 @@ function addPrepopulatedRow(name, price, type) {
   }
 
   var newRow = document.createElement('div');
-  newRow.className = 'flex gap-2 items-center invoice-row';
-  newRow.innerHTML = '<input type="text" list="partsCatalog" value="' + escapeHtml(name) + '" oninput="handleInRowSearch(this)" placeholder="Type item name..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
-                     '<select onchange="calculateInvoiceTotals()" class="bg-slate-950 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none"><option value="part" ' + (type==='part'?'selected':'') + '>Part (Tax)</option><option value="labor" ' + (type==='labor'?'selected':'') + '>Labor (No Tax)</option></select>' +
-                     '<input type="number" step="0.01" value="' + price + '" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">' +
-                     '<button type="button" onclick="removeInvoiceRow(this)" class="text-gray-500 hover:text-red-400 px-1 text-xs">✕</button>';
+  newRow.className = 'bg-slate-950 p-2 rounded-xl border border-slate-800 invoice-row space-y-1.5';
+  newRow.innerHTML = '<div class="flex gap-2 items-center">' +
+                     '<input type="text" list="partsCatalog" value="' + escapeHtml(name) + '" oninput="handleInRowSearch(this)" placeholder="Type item name..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white item-desc focus:outline-none focus:border-amber-500">' +
+                     '<select onchange="calculateInvoiceTotals()" class="bg-slate-900 border border-slate-800 rounded-xl px-1 py-1.5 text-[10px] text-gray-300 item-type focus:outline-none"><option value="part" ' + (type==='part'?'selected':'') + '>Part (Tax)</option><option value="labor" ' + (type==='labor'?'selected':'') + '>Labor (No Tax)</option></select>' +
+                     '<input type="number" step="0.01" value="' + price + '" oninput="calculateInvoiceTotals()" placeholder="Price" class="w-20 bg-slate-900 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white font-mono text-right item-price focus:outline-none focus:border-amber-500">' +
+                     '<button type="button" onclick="removeInvoiceRow(this)" class="text-gray-500 hover:text-red-400 px-1 text-xs">✕</button>' +
+                     '</div>' +
+                     '<input type="text" value="' + escapeHtml(note || '') + '" placeholder="+ Note / warranty..." oninput="autoSaveLocalDraft()" class="w-full bg-slate-900/60 border border-slate-800 rounded-lg px-2 py-1 text-[10px] text-gray-300 item-note focus:outline-none focus:border-amber-500/50">';
   rowsContainer.appendChild(newRow);
   calculateInvoiceTotals();
 }
 
 function addInvoiceRow() {
-  addPrepopulatedRow('', '0.00', 'part');
+  addPrepopulatedRow('', '0.00', 'part', '');
 }
 
 function removeInvoiceRow(btn) {
@@ -657,14 +668,17 @@ function autoSaveLocalDraft() {
     var desc = row.querySelector('.item-desc').value;
     var type = row.querySelector('.item-type').value;
     var price = row.querySelector('.item-price').value;
+    var note = row.querySelector('.item-note') ? row.querySelector('.item-note').value : '';
     if (desc || parseFloat(price) > 0) {
-      items.push({ name: desc, type: type, price: price });
+      items.push({ name: desc, type: type, price: price, note: note });
     }
   });
 
   var payload = {
     docType: currentDocType,
     items: items,
+    subtotal: document.getElementById('subtotalVal').textContent,
+    tax: document.getElementById('taxVal').textContent,
     total: document.getElementById('totalVal').textContent,
     updatedAt: new Date().toISOString()
   };
@@ -684,7 +698,7 @@ function loadLocalSavedDraft() {
         var container = document.getElementById('invoiceRows');
         container.innerHTML = '';
         data.items.forEach(function(it) {
-          addPrepopulatedRow(it.name, it.price, it.type);
+          addPrepopulatedRow(it.name, it.price, it.type, it.note || '');
         });
         updateLed('SAVED DRAFT RESTORED ⚡', false);
       }
@@ -699,7 +713,8 @@ function saveDraftToCard() {
   rows.forEach(function(row) {
     var desc = row.querySelector('.item-desc').value;
     var price = row.querySelector('.item-price').value;
-    if (desc) itemSummary.push(desc + ' ($' + price + ')');
+    var note = row.querySelector('.item-note') ? row.querySelector('.item-note').value : '';
+    if (desc) itemSummary.push(desc + ' ($' + price + ')' + (note ? ' [' + note + ']' : ''));
   });
 
   var noteContent = '[' + currentDocType.toUpperCase() + ' DRAFT] Total: ' + totalStr + ' | Items: ' + itemSummary.join(', ');
@@ -727,7 +742,7 @@ function generateStripeCheckout() {
   var totalStr = document.getElementById('totalVal').textContent;
   updateLed('GENERATING STRIPE LINK... ⚡', false);
   
-  fetch('/.netlify/functions/chat', {
+  return fetch('/.netlify/functions/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -740,35 +755,48 @@ function generateStripeCheckout() {
   })
   .then(function(res) { return res.json(); })
   .then(function(data) {
-    updateLed('STRIPE READY: ' + (data.url || 'Link Created!'), false);
+    activeStripeUrl = data.url || data.stripe_url || 'https://checkout.stripe.com/pay';
+    updateLed('STRIPE READY: ' + activeStripeUrl, false);
+    return activeStripeUrl;
   })
   .catch(function() {
+    activeStripeUrl = 'https://checkout.stripe.com/pay';
     updateLed('STRIPE LINK READY ⚡', false);
+    return activeStripeUrl;
   });
 }
 
-function sendSmsInvoice() {
+async function sendSmsInvoice() {
   var totalStr = document.getElementById('totalVal').textContent;
-  updateLed('SENDING SMS ' + currentDocType.toUpperCase() + '... 📱', false);
-  
-  fetch('/.netlify/functions/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      prompt: "SEND_SMS_INVOICE",
-      customer: currentCustomerTitle,
-      card_id: currentCardId,
-      doc_type: currentDocType,
-      amount: totalStr
-    })
-  })
-  .then(function(res) { return res.json(); })
-  .then(function(data) {
-    updateLed('SMS SENT SUCCESSFULLY ⚡', false);
-  })
-  .catch(function() {
-    updateLed('SMS SENT ⚡', false);
+  updateLed('PREPARING 1-TAP SMS... 📱', false);
+
+  if (!activeStripeUrl) {
+    await generateStripeCheckout();
+  }
+
+  var rows = document.querySelectorAll('.invoice-row');
+  var lineItemsText = [];
+  rows.forEach(function(row) {
+    var desc = row.querySelector('.item-desc').value;
+    var price = row.querySelector('.item-price').value;
+    var note = row.querySelector('.item-note') ? row.querySelector('.item-note').value : '';
+    if (desc) {
+      lineItemsText.push('• ' + desc + ' ($' + parseFloat(price).toFixed(2) + ')' + (note ? '\n  (' + note + ')' : ''));
+    }
   });
+
+  var messageBody = 'Hi ' + currentCustomerTitle + ',\nHere is your Aerus ' + currentDocType + ':\n\n' +
+                    lineItemsText.join('\n') + '\n\n' +
+                    'Total Due: ' + totalStr + '\n' +
+                    'Pay via Stripe: ' + (activeStripeUrl || 'https://checkout.stripe.com/pay');
+
+  var rawPhone = document.getElementById('customerPhoneLink').textContent.replace(/[^0-9]/g, '');
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  var separator = isIOS ? '&body=' : '?body=';
+  var smsUrl = 'sms:' + rawPhone + separator + encodeURIComponent(messageBody);
+
+  updateLed('SMS LAUNCHED ⚡', false);
+  window.location.href = smsUrl;
 }
 
 function postCardNote() {
