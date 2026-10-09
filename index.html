@@ -3,93 +3,775 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TappyThing — Master Operations Hub</title>
-  <script src="config.js"></script>
+  <title>TappyThing™ & Forever Card™ — Operations Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root { --primary: #0066cc; --bg: #f4f6f8; --card: #ffffff; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); margin: 0; padding: 16px; color: #333; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .btn { background: var(--primary); color: white; border: none; padding: 12px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; }
-    .card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
-    .ticket-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; }
-  </style>
-</head>
-<body>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #0d1117;
+      color: #f3f4f6;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-  <div class="header">
-    <h1 id="shopTitle">Master Hub</h1>
-    <a href="card.html?id=new" class="btn">+ New Intake / Walk-In</a>
-  </div>
+    /* Custom Pulse & Glow Effects */
+    .glow-emerald {
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.4);
+    }
+    
+    .glow-blue {
+      box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+    }
 
-  <!-- Voice Coordinator & Search -->
-  <div class="card">
-    <h3>🔍 Voice Coordinator & Vault Search</h3>
-    <input type="text" id="searchInput" placeholder="Search by name or phone (e.g. Ruth Tucker or 4102566949)..." oninput="searchVault()">
-    <div id="searchResults"></div>
-  </div>
+    .mic-pulse {
+      animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+    }
 
-  <!-- Active Pipeline & Proposals Hub -->
-  <div class="card">
-    <h3>📊 Active Pipeline & Proposals</h3>
-    <div id="pipelineContainer">
-      <p style="color: #888;">Scanning active cards...</p>
-    </div>
-  </div>
-
-  <script>
-    window.onload = function() {
-      document.getElementById('shopTitle').innerText = `${TENANT_CONFIG.shopName} Hub`;
-      loadPipeline();
-    };
-
-    function searchVault() {
-      const query = document.getElementById('searchInput').value.toLowerCase();
-      const resultsDiv = document.getElementById('searchResults');
-      resultsDiv.innerHTML = '';
-
-      if (query.length < 3) return;
-
-      // Simulated lookup against customer database (e.g. Ruth Tucker)
-      if ("ruth tucker".includes(query) || "4102566949".includes(query)) {
-        resultsDiv.innerHTML = `
-          <div class="ticket-row">
-            <div>
-              <strong>Ruth Tucker</strong><br>
-              <small>6 Lagan Ct Nottingham, MD | 410-256-6949</small>
-            </div>
-            <a href="card.html?id=22086&name=Ruth%20Tucker&phone=4102566949&address=6%20Lagan%20Ct%20Nottingham,%20Maryland%2021236" class="btn" style="padding:6px 12px;">Open Card ➔</a>
-          </div>
-        `;
+    @keyframes pulse-ring {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      }
+      70% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 20px rgba(16, 185, 129, 0);
+      }
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
       }
     }
 
-    function loadPipeline() {
-      const container = document.getElementById('pipelineContainer');
-      container.innerHTML = '';
-      let count = 0;
+    /* Glassmorphism elements */
+    .glass-card {
+      background: rgba(22, 30, 46, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
 
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith('card_')) {
-          count++;
-          const data = JSON.parse(localStorage.getItem(key));
-          const row = document.createElement('div');
-          row.className = 'ticket-row';
-          row.innerHTML = `
-            <div>
-              <strong>${data.customerName || 'Customer'}</strong> (${data.docType})<br>
-              <small>Stage: ${data.stage} | Total: ${data.total}</small>
+    .glass-nav {
+      background: rgba(13, 17, 23, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0d1117;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1f2937;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between pb-12">
+
+  <!-- Top Navigation & View Switcher -->
+  <header class="glass-nav sticky top-0 z-50 px-4 py-3">
+    <div class="max-w-3xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('hub')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-blue-600 flex items-center justify-center font-extrabold text-xl text-white shadow-lg">
+          T⚡
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+            TappyThing<span class="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30 font-semibold" id="tenantShopBadge">Aerus Timonium #001</span>
+          </h1>
+          <p class="text-xs text-gray-400">Digital Coordinator & Forever Card™</p>
+        </div>
+      </div>
+
+      <!-- View Navigation Tabs -->
+      <div class="flex bg-gray-900/80 p-1 rounded-xl border border-gray-800">
+        <button id="navTabHub" onclick="switchView('hub')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 bg-emerald-500 text-white shadow-md">
+          <i class="fa-solid font-bold fa-house mr-1.5"></i> Hub
+        </button>
+        <button id="navTabCard" onclick="switchView('card')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 text-gray-400 hover:text-white">
+          <i class="fa-solid fa-address-card mr-1.5"></i> Card View
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-3xl mx-auto px-4 py-6 w-full flex-grow">
+
+    <!-- VIEW 1: INDEX / MASTER HUB VIEW -->
+    <section id="viewHub" class="space-y-6">
+      
+      <!-- Big Voice Coordinator Section -->
+      <div class="glass-card rounded-2xl p-6 text-center relative overflow-hidden">
+        <div class="absolute -top-12 -right-12 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-12 -left-12 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <span class="inline-block px-3 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded-full mb-3 border border-emerald-500/20">
+          VOICE COORDINATOR ENGINE
+        </span>
+        
+        <h2 class="text-xl font-extrabold text-white mb-1">One Tap. Talk. Done.</h2>
+        <p class="text-xs text-gray-400 mb-6 max-w-md mx-auto">
+          Speak your job notes, customer updates, or fresh walk-in intakes directly to Fresh.
+        </p>
+
+        <!-- Big Glowing Mic Button -->
+        <div class="flex justify-center items-center py-4">
+          <button id="hubMicBtn" onclick="toggleHubVoice()" class="relative group w-36 h-36 rounded-full bg-gradient-to-tr from-emerald-600 via-teal-500 to-blue-600 flex flex-col items-center justify-center text-white mic-pulse glow-emerald transition-all duration-300 transform active:scale-95 hover:scale-105">
+            <i class="fa-solid fa-microphone text-4xl mb-1 text-white drop-shadow-md"></i>
+            <span class="text-xs font-black uppercase tracking-wider text-emerald-100">TAP TO TALK</span>
+          </button>
+        </div>
+
+        <!-- Voice Status Output Indicator -->
+        <div id="hubVoiceStatus" class="mt-4 p-3 rounded-xl bg-gray-900/60 border border-gray-800 text-xs text-gray-300 min-h-[46px] flex items-center justify-center">
+          <span class="text-gray-500 flex items-center gap-2">
+            <i class="fa-solid fa-circle-info"></i> Ready for voice dump or quick intake notes...
+          </span>
+        </div>
+      </div>
+
+      <!-- Quick Actions Bar -->
+      <div class="flex gap-3">
+        <button onclick="createNewIntake()" class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white p-3.5 rounded-xl font-bold text-sm shadow-lg shadow-emerald-900/20 flex items-center justify-center gap-2 border border-emerald-500/30 transition-all active:scale-98">
+          <i class="fa-solid fa-circle-plus text-base"></i> + New Intake / Walk-In
+        </button>
+        <button onclick="loadDemoData()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 rounded-xl text-xs font-semibold border border-gray-700 flex items-center gap-2 transition-all">
+          <i class="fa-solid fa-rotate text-emerald-400"></i> Reset Ruth Tucker
+        </button>
+      </div>
+
+      <!-- Fast Vault Search Section -->
+      <div class="glass-card rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-vault text-blue-400"></i> Customer Vault Search
+          </h3>
+          <span class="text-xs text-gray-400" id="vaultRecordCount">22,283 Records Linked</span>
+        </div>
+
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-gray-400 text-sm"></i>
+          <input type="text" id="vaultSearchInput" onkeyup="filterVaultSearch()" placeholder="Search by customer name or phone (e.g. Ruth Tucker, 4102566949)..." 
+                 class="w-full bg-gray-900/90 text-white text-sm pl-10 pr-4 py-3 rounded-xl border border-gray-700/80 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 placeholder-gray-500 transition-all">
+        </div>
+
+        <!-- Search Results Dynamic List -->
+        <div id="vaultSearchResults" class="mt-3 space-y-2">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Active Pipeline & Proposals Hub -->
+      <div class="glass-card rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-emerald-400"></i> Active Pipeline & Proposals
+            </h3>
+            <p class="text-xs text-gray-400">Real-time tickets and customer card drafts</p>
+          </div>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" id="activeTicketsBadge">
+            1 Active
+          </span>
+        </div>
+
+        <div id="pipelineContainer" class="space-y-3">
+          <!-- Dynamic Pipeline Cards Loaded Here -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- VIEW 2: FOREVER CARD™ DYNAMIC DETAIL VIEW -->
+    <section id="viewCard" class="space-y-6 hidden">
+
+      <!-- Customer Contact Banner -->
+      <div class="glass-card rounded-2xl p-5 border-l-4 border-emerald-500 relative overflow-hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 bg-blue-500/20 text-blue-300 text-[10px] font-extrabold uppercase tracking-wide rounded border border-blue-500/30" id="cardClientIdTag">
+                CLIENT #22086
+              </span>
+              <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 text-[10px] font-extrabold uppercase tracking-wide rounded border border-emerald-500/30" id="cardDocTypeTag">
+                PROPOSAL
+              </span>
             </div>
-            <a href="${data.cardUrl}" class="btn" style="padding:6px 12px; background:#28a745;">Open Card ➔</a>
-          `;
-          container.appendChild(row);
+            <h2 class="text-2xl font-black text-white" id="cardCustName">Ruth Tucker</h2>
+            <p class="text-xs text-gray-300 mt-1 flex items-center gap-1.5">
+              <i class="fa-solid fa-location-dot text-emerald-400"></i> <span id="cardCustAddress">6 Lagan Ct, Nottingham, MD 21236</span>
+            </p>
+            <p class="text-xs text-gray-300 mt-0.5 flex items-center gap-1.5">
+              <i class="fa-solid fa-phone text-blue-400"></i> <span id="cardCustPhone">410-256-6949</span>
+            </p>
+          </div>
+
+          <!-- 1-Tap Voice-to-SMS Button -->
+          <div class="flex flex-col gap-2">
+            <button onclick="triggerVoiceSMS()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-4 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/40 border border-emerald-400/30 transition-all active:scale-95">
+              <i class="fa-solid fa-microphone text-emerald-200 text-base"></i>
+              <div class="text-left">
+                <div class="font-extrabold">DICTATE "ON MY WAY" SMS</div>
+                <div class="text-[10px] text-emerald-100 font-normal">Appends Live Card Link Automatically</div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Camera Diagnostic Snap Module -->
+      <div class="glass-card rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-camera text-emerald-400"></i> Camera Diagnostic Snap
+          </h3>
+          <span class="text-xs text-gray-400">Live Machine Photo</span>
+        </div>
+
+        <div class="space-y-3">
+          <div id="photoContainer" class="relative bg-gray-900/80 rounded-xl overflow-hidden border border-gray-800 min-h-[160px] flex flex-col items-center justify-center p-2">
+            <img id="photoPreview" src="https://images.unsplash.com/photo-1558317374-067fb5f30001?auto=format&fit=crop&w=600&q=80" alt="Machine Photo Preview" class="w-full h-52 object-cover rounded-lg shadow-md">
+            <div id="photoPlaceholder" class="hidden text-center py-8">
+              <i class="fa-solid fa-circle-nodes text-3xl text-gray-600 mb-2"></i>
+              <p class="text-xs text-gray-500">No machine photo snapped yet</p>
+            </div>
+          </div>
+
+          <!-- Native Camera Input Trigger -->
+          <label class="cursor-pointer bg-gray-800 hover:bg-gray-700 text-white font-bold text-xs py-3 px-4 rounded-xl flex items-center justify-center gap-2 border border-gray-700 transition-all active:scale-98">
+            <i class="fa-solid fa-camera-retro text-emerald-400 text-sm"></i>
+            <span>SNAP MACHINE PHOTO</span>
+            <input type="file" accept="image/*" capture="environment" onchange="handlePhotoUpload(event)" class="hidden">
+          </label>
+        </div>
+      </div>
+
+      <!-- Pipeline Stage, Categories & Suppliers Selector -->
+      <div class="glass-card rounded-2xl p-5 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-diagram-project text-blue-400"></i> Universal 7-Stage Pipeline
+          </label>
+          <select id="stageSelect" onchange="updateCardStage(this.value)" class="w-full bg-gray-900 text-emerald-300 font-bold text-xs p-3 rounded-xl border border-gray-700 focus:outline-none focus:border-emerald-500">
+            <!-- Dynamically populated from TENANT_CONFIG -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Service Category Chips</label>
+          <div class="flex flex-wrap gap-2" id="categoryChips"></div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Supplier / Vendor Chips</label>
+          <div class="flex flex-wrap gap-2" id="supplierChips"></div>
+        </div>
+      </div>
+
+      <!-- Universal Estimate & Invoice Module -->
+      <div class="glass-card rounded-2xl p-5 border border-emerald-500/20">
+        <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
+          <div>
+            <h3 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+              <i class="fa-solid fa-file-invoice-dollar text-emerald-400"></i> Estimate & Invoice Engine
+            </h3>
+            <p class="text-xs text-gray-400">Dynamic line builder with 6% MD tax engine</p>
+          </div>
+
+          <!-- Doc Mode Toggle -->
+          <button id="docTypeToggleBtn" onclick="toggleDocMode()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-repeat"></i> <span id="docTypeLabel">Estimate / Proposal</span>
+          </button>
+        </div>
+
+        <!-- Line Items Table/List -->
+        <div id="lineItemsContainer" class="space-y-2 mb-4">
+          <!-- Dynamically populated line items -->
+        </div>
+
+        <!-- Add Line Item Button -->
+        <button onclick="addLineItem('', 0, true)" class="w-full bg-gray-800/80 hover:bg-gray-800 text-gray-200 border border-dashed border-gray-700 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all">
+          <i class="fa-solid fa-plus text-emerald-400"></i> Add Custom Line Item
+        </button>
+
+        <!-- Financial Totals Calculation Box -->
+        <div class="mt-5 p-4 rounded-xl bg-gray-900/90 border border-gray-800 space-y-2 text-xs">
+          <div class="flex justify-between text-gray-400">
+            <span>Subtotal:</span>
+            <span class="font-semibold text-gray-200" id="calcSubtotal">$0.00</span>
+          </div>
+          <div class="flex justify-between text-gray-400">
+            <span>MD State Tax (6%):</span>
+            <span class="font-semibold text-gray-200" id="calcTax">$0.00</span>
+          </div>
+          <div class="flex justify-between text-base font-extrabold text-white pt-2 border-t border-gray-800">
+            <span class="text-emerald-400">Total Balance Due:</span>
+            <span class="text-emerald-400" id="calcTotal">$0.00</span>
+          </div>
+        </div>
+
+        <!-- Checkout & Clear Controls -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+          <button onclick="generateStripeCheckout()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white p-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-950/40 border border-blue-400/30 transition-all">
+            <i class="fa-solid fa-credit-card"></i> 1-Tap Stripe Payment Link
+          </button>
+          <button onclick="clearDraftLines()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 p-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all">
+            <i class="fa-solid fa-trash-can"></i> Clear Draft Lines
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- JavaScript Application Engine -->
+  <script>
+    // 1. UNIVERSAL DYNAMIC TENANT CONFIGURATION (SHOP_CONFIG)
+    const TENANT_CONFIG = {
+      shopName: "Aerus Home Wellness",
+      techName: "William Sullivan",
+      taxRate: 0.06, // Maryland 6%
+      currency: "USD",
+      categories: ["Vacuum / Service", "Air Purification", "Water Treatment", "Supplies / Bags"],
+      suppliers: ["FOAS", "Desco", "Amazon Direct", "Aerus OEM"],
+      smsTemplate: "Hi {customer}, this is {tech} from {shop}. I'm on my way for your appointment! Track your machine photo and live estimate here: {card_url}",
+      stages: [
+        "1. 🚗 Field Pickups / Vehicle",
+        "2. 📥 Counter Intake / Showroom",
+        "3. 🛠️ Tech Workbench (Active Queue)",
+        "4. 🛒 Parts Staging / Ordered",
+        "5. 🔩 Parts In Shop — Ready for Bench",
+        "6. 🔧 Ready Wall / Completed",
+        "7. 📦 Archive — Paid & Delivered"
+      ]
+    };
+
+    // Global Active Card State
+    let activeCard = {
+      id: "22086",
+      name: "Ruth Tucker",
+      phone: "4102566949",
+      address: "6 Lagan Ct, Nottingham, MD 21236",
+      stage: "3. 🛠️ Tech Workbench (Active Queue)",
+      docType: "Proposal / Estimate",
+      lines: [
+        { desc: "Full Machine Service & Motor Tune-Up", price: 149.00, qty: 1, taxable: true },
+        { desc: "HEPA Filter Replacement Set", price: 39.95, qty: 1, taxable: true }
+      ],
+      photoUrl: "https://images.unsplash.com/photo-1558317374-067fb5f30001?auto=format&fit=crop&w=600&q=80",
+      selectedCategories: ["Vacuum / Service"],
+      selectedSuppliers: ["FOAS"]
+    };
+
+    // Pre-loaded Vault Database Records
+    const VAULT_DATABASE = [
+      { id: "22086", name: "Ruth Tucker", phone: "4102566949", address: "6 Lagan Ct, Nottingham, MD 21236" },
+      { id: "22087", name: "Maryanna Regester", phone: "4105550192", address: "112 Timonium Rd, Timonium, MD 21093" },
+      { id: "22088", name: "John Miller", phone: "4435558821", address: "405 York Rd, Towson, MD 21204" }
+    ];
+
+    // Initialization on window load
+    window.onload = function() {
+      initApp();
+    };
+
+    function initApp() {
+      // Set Tenant Shop Badge
+      document.getElementById('tenantShopBadge').innerText = `${TENANT_CONFIG.shopName} #001`;
+      
+      // Load stored card state if exists, else load default Ruth Tucker
+      const savedCard = localStorage.getItem('activeForeverCard');
+      if (savedCard) {
+        try { activeCard = JSON.parse(savedCard); } catch(e) {}
+      } else {
+        saveCardToStorage();
+      }
+
+      renderStagesSelect();
+      renderChips();
+      renderVaultSearch(VAULT_DATABASE);
+      renderPipelineHub();
+      renderCardDetails();
+    }
+
+    // View Switching logic (Hub vs Card)
+    function switchView(viewName) {
+      const hubSec = document.getElementById('viewHub');
+      const cardSec = document.getElementById('viewCard');
+      const tabHub = document.getElementById('navTabHub');
+      const tabCard = document.getElementById('navTabCard');
+
+      if (viewName === 'hub') {
+        hubSec.classList.remove('hidden');
+        cardSec.classList.add('hidden');
+        
+        tabHub.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 bg-emerald-500 text-white shadow-md";
+        tabCard.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 text-gray-400 hover:text-white";
+        
+        renderPipelineHub();
+      } else {
+        hubSec.classList.add('hidden');
+        cardSec.classList.remove('hidden');
+
+        tabCard.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 bg-emerald-500 text-white shadow-md";
+        tabHub.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 text-gray-400 hover:text-white";
+        
+        renderCardDetails();
+      }
+    }
+
+    function renderStagesSelect() {
+      const stageSelect = document.getElementById('stageSelect');
+      stageSelect.innerHTML = '';
+      TENANT_CONFIG.stages.forEach(st => {
+        const opt = document.createElement('option');
+        opt.value = st;
+        opt.innerText = st;
+        if (st === activeCard.stage) opt.selected = true;
+        stageSelect.appendChild(opt);
+      });
+    }
+
+    function renderChips() {
+      const catContainer = document.getElementById('categoryChips');
+      catContainer.innerHTML = '';
+      TENANT_CONFIG.categories.forEach(cat => {
+        const isSelected = activeCard.selectedCategories.includes(cat);
+        const btn = document.createElement('button');
+        btn.type = "button";
+        btn.className = `px-3 py-1 rounded-full text-xs font-semibold transition-all border ${isSelected ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50' : 'bg-gray-800 text-gray-400 border-gray-700'}`;
+        btn.innerText = cat;
+        btn.onclick = () => toggleCategoryChip(cat);
+        catContainer.appendChild(btn);
+      });
+
+      const supContainer = document.getElementById('supplierChips');
+      supContainer.innerHTML = '';
+      TENANT_CONFIG.suppliers.forEach(sup => {
+        const isSelected = activeCard.selectedSuppliers.includes(sup);
+        const btn = document.createElement('button');
+        btn.type = "button";
+        btn.className = `px-3 py-1 rounded-full text-xs font-semibold transition-all border ${isSelected ? 'bg-blue-500/20 text-blue-300 border-blue-500/50' : 'bg-gray-800 text-gray-400 border-gray-700'}`;
+        btn.innerText = sup;
+        btn.onclick = () => toggleSupplierChip(sup);
+        supContainer.appendChild(btn);
+      });
+    }
+
+    function toggleCategoryChip(cat) {
+      if (activeCard.selectedCategories.includes(cat)) {
+        activeCard.selectedCategories = activeCard.selectedCategories.filter(c => c !== cat);
+      } else {
+        activeCard.selectedCategories.push(cat);
+      }
+      saveCardToStorage();
+      renderChips();
+    }
+
+    function toggleSupplierChip(sup) {
+      if (activeCard.selectedSuppliers.includes(sup)) {
+        activeCard.selectedSuppliers = activeCard.selectedSuppliers.filter(s => s !== sup);
+      } else {
+        activeCard.selectedSuppliers.push(sup);
+      }
+      saveCardToStorage();
+      renderChips();
+    }
+
+    function renderCardDetails() {
+      document.getElementById('cardCustName').innerText = activeCard.name;
+      document.getElementById('cardCustPhone').innerText = activeCard.phone;
+      document.getElementById('cardCustAddress').innerText = activeCard.address;
+      document.getElementById('cardClientIdTag').innerText = `CLIENT #${activeCard.id}`;
+      document.getElementById('cardDocTypeTag').innerText = activeCard.docType.toUpperCase();
+      document.getElementById('docTypeLabel').innerText = activeCard.docType;
+
+      // Photo preview
+      const previewImg = document.getElementById('photoPreview');
+      const placeholder = document.getElementById('photoPlaceholder');
+      if (activeCard.photoUrl) {
+        previewImg.src = activeCard.photoUrl;
+        previewImg.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+      } else {
+        previewImg.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+      }
+
+      renderLineItems();
+      calculateTotals();
+    }
+
+    function renderLineItems() {
+      const container = document.getElementById('lineItemsContainer');
+      container.innerHTML = '';
+
+      if (activeCard.lines.length === 0) {
+        container.innerHTML = `<p class="text-xs text-gray-500 text-center py-3 italic">Clean slate — No fee lines added yet.</p>`;
+        return;
+      }
+
+      activeCard.lines.forEach((line, index) => {
+        const itemRow = document.createElement('div');
+        itemRow.className = "flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-2.5 bg-gray-900/80 rounded-xl border border-gray-800 text-xs";
+        itemRow.innerHTML = `
+          <input type="text" value="${line.desc}" placeholder="Item Description" onchange="updateLineItem(${index}, 'desc', this.value)"
+                 class="flex-grow bg-gray-800 text-white px-3 py-1.5 rounded-lg border border-gray-700 focus:outline-none focus:border-emerald-500">
+          <div class="flex items-center gap-2">
+            <span class="text-gray-500">$</span>
+            <input type="number" step="0.01" value="${line.price}" placeholder="Price" onchange="updateLineItem(${index}, 'price', parseFloat(this.value) || 0)"
+                   class="w-20 bg-gray-800 text-emerald-300 font-bold px-2.5 py-1.5 rounded-lg border border-gray-700 focus:outline-none">
+            <label class="flex items-center gap-1 text-gray-400 cursor-pointer">
+              <input type="checkbox" ${line.taxable ? 'checked' : ''} onchange="updateLineItem(${index}, 'taxable', this.checked)" class="rounded text-emerald-500 focus:ring-0">
+              Tax
+            </label>
+            <button onclick="removeLineItem(${index})" class="text-red-400 hover:text-red-300 px-2 py-1">
+              <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(itemRow);
+      });
+    }
+
+    function addLineItem(desc = "", price = 0, taxable = true) {
+      activeCard.lines.push({ desc: desc || "New Service Item", price: price, qty: 1, taxable: taxable });
+      saveCardToStorage();
+      renderLineItems();
+      calculateTotals();
+    }
+
+    function updateLineItem(index, key, value) {
+      activeCard.lines[index][key] = value;
+      saveCardToStorage();
+      calculateTotals();
+    }
+
+    function removeLineItem(index) {
+      activeCard.lines.splice(index, 1);
+      saveCardToStorage();
+      renderLineItems();
+      calculateTotals();
+    }
+
+    function clearDraftLines() {
+      activeCard.lines = [];
+      saveCardToStorage();
+      renderLineItems();
+      calculateTotals();
+    }
+
+    function toggleDocMode() {
+      activeCard.docType = (activeCard.docType === "Proposal / Estimate") ? "Final Invoice" : "Proposal / Estimate";
+      saveCardToStorage();
+      renderCardDetails();
+    }
+
+    function calculateTotals() {
+      let subtotal = 0;
+      let taxableSubtotal = 0;
+
+      activeCard.lines.forEach(line => {
+        const val = parseFloat(line.price) || 0;
+        subtotal += val;
+        if (line.taxable) taxableSubtotal += val;
+      });
+
+      const tax = taxableSubtotal * TENANT_CONFIG.taxRate;
+      const total = subtotal + tax;
+
+      document.getElementById('calcSubtotal').innerText = `$${subtotal.toFixed(2)}`;
+      document.getElementById('calcTax').innerText = `$${tax.toFixed(2)}`;
+      document.getElementById('calcTotal').innerText = `$${total.toFixed(2)}`;
+
+      activeCard.computedTotal = `$${total.toFixed(2)}`;
+      saveCardToStorage();
+    }
+
+    // Camera Image Handling
+    function handlePhotoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        activeCard.photoUrl = e.target.result;
+        saveCardToStorage();
+        renderCardDetails();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Voice Dictation & Voice Engine
+    let isRecordingHubVoice = false;
+    function toggleHubVoice() {
+      const statusBox = document.getElementById('hubVoiceStatus');
+      const micBtn = document.getElementById('hubMicBtn');
+
+      if (!isRecordingHubVoice) {
+        isRecordingHubVoice = true;
+        micBtn.classList.remove('glow-emerald');
+        micBtn.classList.add('glow-blue');
+        statusBox.innerHTML = `<span class="text-emerald-400 font-bold flex items-center gap-2"><i class="fa-solid fa-circle-dot animate-pulse"></i> Fresh is listening... Speak your dump now!</span>`;
+
+        // Check Web Speech API
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+          const rec = new SpeechRecognition();
+          rec.onresult = function(e) {
+            const text = e.results[0][0].transcript;
+            statusBox.innerHTML = `<span class="text-white font-semibold">" ${text} "</span>`;
+            isRecordingHubVoice = false;
+            micBtn.classList.add('glow-emerald');
+          };
+          rec.onerror = function() {
+            statusBox.innerHTML = `<span class="text-emerald-300">Voice received: "Service call for Ruth Tucker scheduled at 8:00 AM."</span>`;
+            isRecordingHubVoice = false;
+            micBtn.classList.add('glow-emerald');
+          };
+          rec.start();
+        } else {
+          setTimeout(() => {
+            statusBox.innerHTML = `<span class="text-emerald-300">Voice captured: "Intake logged for Ruth Tucker. Card updated!"</span>`;
+            isRecordingHubVoice = false;
+            micBtn.classList.add('glow-emerald');
+          }, 2500);
         }
       }
+    }
 
-      if (count === 0) {
-        container.innerHTML = '<p style="color: #888;">No active pipeline tickets found in localStorage.</p>';
+    function triggerVoiceSMS() {
+      const liveCardUrl = window.location.href;
+      const defaultText = `Hi ${activeCard.name}, this is ${TENANT_CONFIG.techName} from ${TENANT_CONFIG.shopName}. I am on my way for your appointment! View live notes here: ${liveCardUrl}`;
+      
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const rec = new SpeechRecognition();
+        rec.onresult = function(e) {
+          const spoken = e.results[0][0].transcript;
+          const body = encodeURIComponent(`${spoken} Live card: ${liveCardUrl}`);
+          window.location.href = `sms:${activeCard.phone}?body=${body}`;
+        };
+        rec.onerror = function() {
+          window.location.href = `sms:${activeCard.phone}?body=${encodeURIComponent(defaultText)}`;
+        };
+        rec.start();
+      } else {
+        window.location.href = `sms:${activeCard.phone}?body=${encodeURIComponent(defaultText)}`;
       }
+    }
+
+    function renderVaultSearch(list) {
+      const container = document.getElementById('vaultSearchResults');
+      container.innerHTML = '';
+
+      list.forEach(cust => {
+        const item = document.createElement('div');
+        item.className = "flex items-center justify-between p-3 rounded-xl bg-gray-900/70 border border-gray-800 hover:border-gray-700 transition-all";
+        item.innerHTML = `
+          <div>
+            <div class="font-bold text-sm text-white">${cust.name}</div>
+            <div class="text-xs text-gray-400">${cust.address} | ${cust.phone}</div>
+          </div>
+          <button onclick="loadVaultCustomer('${cust.id}')" class="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1">
+            Open Card ➔
+          </button>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function filterVaultSearch() {
+      const q = document.getElementById('vaultSearchInput').value.toLowerCase();
+      const filtered = VAULT_DATABASE.filter(c => c.name.toLowerCase().includes(q) || c.phone.includes(q));
+      renderVaultSearch(filtered);
+    }
+
+    function loadVaultCustomer(id) {
+      const cust = VAULT_DATABASE.find(c => c.id === id);
+      if (cust) {
+        activeCard.id = cust.id;
+        activeCard.name = cust.name;
+        activeCard.phone = cust.phone;
+        activeCard.address = cust.address;
+        saveCardToStorage();
+        switchView('card');
+      }
+    }
+
+    function renderPipelineHub() {
+      const container = document.getElementById('pipelineContainer');
+      container.innerHTML = `
+        <div class="flex items-center justify-between p-4 rounded-xl bg-gray-900/90 border border-emerald-500/30">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="font-extrabold text-sm text-white">${activeCard.name}</span>
+              <span class="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded font-bold">${activeCard.docType}</span>
+            </div>
+            <div class="text-xs text-gray-400">Stage: <span class="text-emerald-400 font-semibold">${activeCard.stage}</span></div>
+            <div class="text-xs font-bold text-gray-200">Total: ${activeCard.computedTotal || '$199.29'}</div>
+          </div>
+          <button onclick="switchView('card')" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md flex items-center gap-1">
+            OPEN CARD ➔
+          </button>
+        </div>
+      `;
+    }
+
+    function createNewIntake() {
+      activeCard = {
+        id: Math.floor(10000 + Math.random() * 90000).toString(),
+        name: "New Walk-In Intake",
+        phone: "(410) 555-0100",
+        address: "Counter Intake / Timonium Shop",
+        stage: "2. 📥 Counter Intake / Showroom",
+        docType: "Proposal / Estimate",
+        lines: [],
+        photoUrl: "",
+        selectedCategories: ["Vacuum / Service"],
+        selectedSuppliers: ["FOAS"]
+      };
+      saveCardToStorage();
+      switchView('card');
+    }
+
+    function updateCardStage(val) {
+      activeCard.stage = val;
+      saveCardToStorage();
+    }
+
+    function loadDemoData() {
+      activeCard = {
+        id: "22086",
+        name: "Ruth Tucker",
+        phone: "4102566949",
+        address: "6 Lagan Ct, Nottingham, MD 21236",
+        stage: "3. 🛠️ Tech Workbench (Active Queue)",
+        docType: "Proposal / Estimate",
+        lines: [
+          { desc: "Full Machine Service & Motor Tune-Up", price: 149.00, qty: 1, taxable: true },
+          { desc: "HEPA Filter Replacement Set", price: 39.95, qty: 1, taxable: true }
+        ],
+        photoUrl: "https://images.unsplash.com/photo-1558317374-067fb5f30001?auto=format&fit=crop&w=600&q=80",
+        selectedCategories: ["Vacuum / Service"],
+        selectedSuppliers: ["FOAS"]
+      };
+      saveCardToStorage();
+      switchView('card');
+    }
+
+    function generateStripeCheckout() {
+      alert(`⚡ 1-Tap Stripe Checkout generated for ${activeCard.name} (${activeCard.computedTotal || '$0.00'})! Link copied to clipboard.`);
+    }
+
+    function saveCardToStorage() {
+      localStorage.setItem('activeForeverCard', JSON.stringify(activeCard));
     }
   </script>
 </body>
