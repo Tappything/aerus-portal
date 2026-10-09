@@ -3,71 +3,151 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>TappyThing — Master Command Hub</title>
+  <title>TappyThing — Digital Coordinator Hub</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #05070e; color: #f3f4f6; }
     .card-face { background: linear-gradient(180deg, #0f172a 0%, #090d16 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); }
+    .led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
+    @keyframes pulse-red {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+    .mic-pulsing { animation: pulse-red 1.5s infinite; background-color: #dc2626 !important; color: #ffffff !important; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-start p-4 pb-20">
+<body class="min-h-screen flex flex-col items-center justify-start p-3 pb-20 relative">
 
-  <div class="max-w-md w-full card-face rounded-3xl p-6 relative space-y-6 shadow-2xl my-auto text-center">
+  <div class="max-w-md w-full card-face rounded-3xl p-5 relative space-y-4 shadow-2xl my-auto text-center">
     
     <!-- HEADER -->
-    <div class="space-y-1">
-      <h1 class="text-2xl font-black text-blue-400 tracking-tight flex items-center justify-center gap-2">
-        <i class="fa-solid fa-bolt"></i> TappyThing Hub
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <h1 class="text-xl font-black text-blue-400 tracking-tight flex items-center gap-2">
+        <i class="fa-solid fa-bolt text-amber-400"></i> TappyThing Engine
       </h1>
-      <p class="text-xs text-gray-400">Search 23,000+ Vault Records or Open Working Cards</p>
+      <span class="text-[10px] bg-blue-950 text-blue-400 font-bold px-2.5 py-1 rounded-xl border border-blue-800/60">Digital Coordinator</span>
+    </div>
+
+    <!-- LED STATUS DISPLAY -->
+    <div class="led-display rounded-2xl p-2.5 text-center border border-blue-900/50 min-h-[44px] flex items-center justify-center">
+      <div id="statusLed" class="text-xs font-bold text-emerald-400 tracking-wide">TAPPYTHING READY ⚡ TAP & SPEAK</div>
+    </div>
+
+    <!-- MAIN TAPPYTHING VOICE COORDINATOR BUTTON -->
+    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
+      <button 
+        type="button" 
+        id="mainMicBtn" 
+        onclick="toggleTappyVoice()" 
+        class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black py-4 px-4 rounded-2xl text-base flex items-center justify-center gap-2 shadow-lg transition active:scale-95"
+      >
+        <i class="fa-solid fa-microphone text-xl"></i> TAP & SPEAK TO TAPPYTHING
+      </button>
+      <p class="text-[10px] text-gray-400 italic">Dictate intakes, notes, or card updates in one tap</p>
     </div>
 
     <!-- HERO SEARCH BOX -->
-    <div class="space-y-2 text-left">
-      <label class="text-xs font-bold text-gray-300 uppercase tracking-wider block">Customer Vault Search</label>
+    <div class="space-y-1.5 text-left bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5">
+      <label class="text-[11px] font-black text-gray-300 uppercase tracking-wider block">Customer Vault Search (23,000+)</label>
       <div class="relative">
         <input 
           type="text" 
           id="vaultSearch" 
           oninput="handleVaultSearch(this.value)" 
-          placeholder="Type or speak customer name or phone..." 
-          class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 shadow-inner"
+          placeholder="Type customer name or phone..." 
+          class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
         />
-        <i class="fa-solid fa-magnifying-glass absolute right-4 top-3.5 text-gray-500"></i>
       </div>
-      <ul id="searchResults" class="space-y-1.5 max-h-48 overflow-y-auto pt-1"></ul>
+      <ul id="searchResults" class="space-y-1.5 max-h-36 overflow-y-auto pt-1"></ul>
     </div>
 
     <!-- ACTIVE CARDS & WORKING PROPOSALS SECTION -->
-    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 text-left space-y-3">
+    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 text-left space-y-2.5">
       <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-        <h3 class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
+        <h3 class="text-[11px] font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
           <i class="fa-solid fa-folder-open"></i> Active Cards & Proposals
         </h3>
-        <span id="activeCountBadge" class="text-[10px] bg-amber-950/80 text-amber-300 border border-amber-800/60 px-2 py-0.5 rounded-full font-bold">0 Open</span>
+        <span id="activeCountBadge" class="text-[10px] bg-amber-950 text-amber-300 border border-amber-800/60 px-2 py-0.5 rounded-full font-bold">0 Open</span>
       </div>
       
-      <div id="activeCardsList" class="space-y-2 text-xs">
-        <!-- Auto-populated from local saved drafts -->
+      <div id="activeCardsList" class="space-y-1.5 text-xs">
+        <!-- Auto-populated from drafts -->
       </div>
-    </div>
-
-    <!-- FOOTER STATUS -->
-    <div class="text-[11px] text-gray-500 flex items-center justify-center gap-2">
-      <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-      <span>0ms Vault Engine Active — TappyThing 2026</span>
     </div>
 
   </div>
 
 <script>
-  let searchDebounce;
+  let isListening = false;
+  let recognition = null;
+  let searchDebounce = null;
+
+  function updateLed(msg, isErr) {
+    const led = document.getElementById('statusLed');
+    if (led) {
+      led.textContent = msg;
+      led.className = isErr ? 'text-xs font-bold text-red-400 tracking-wide' : 'text-xs font-bold text-emerald-400 tracking-wide';
+    }
+  }
+
+  function toggleTappyVoice() {
+    const btn = document.getElementById('mainMicBtn');
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { alert('Voice recognition not supported on this browser.'); return; }
+
+    if (isListening && recognition) {
+      recognition.stop();
+      isListening = false;
+      btn.classList.remove('mic-pulsing');
+      updateLed('TAPPYTHING READY ⚡ TAP & SPEAK', false);
+      return;
+    }
+
+    recognition = new SR();
+    recognition.lang = 'en-US';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    btn.classList.add('mic-pulsing');
+    updateLed('LISTENING... SPEAK YOUR COMMAND', false);
+    isListening = true;
+
+    recognition.onresult = function(e) {
+      const text = e.results[0][0].transcript;
+      updateLed('PROCESSING: "' + text + '"', false);
+      
+      // Post direct command to netlify chat backend
+      fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: text })
+      })
+      .then(res => res.json())
+      .then(data => {
+        updateLed('COMMAND PROCESSED ⚡', false);
+        renderActiveWorkingHub();
+      })
+      .catch(() => {
+        // Fallback: put voice text straight into search box
+        document.getElementById('vaultSearch').value = text;
+        handleVaultSearch(text);
+        updateLed('SEARCHED VAULT FOR: ' + text, false);
+      });
+    };
+
+    recognition.onend = function() {
+      isListening = false;
+      btn.classList.remove('mic-pulsing');
+    };
+
+    recognition.start();
+  }
 
   function handleVaultSearch(query) {
     clearTimeout(searchDebounce);
     const resultsContainer = document.getElementById('searchResults');
-    
     if (!query || query.trim().length < 2) {
       resultsContainer.innerHTML = '';
       return;
@@ -79,7 +159,6 @@
         const data = await res.json();
         renderSearchResults(data.customers || data.results || []);
       } catch (err) {
-        // Direct local fallback testing
         renderSearchResults([
           { id: "13238553775", name: "Richard Smothers", phone: "410-376-9061", address: "1415 Kingsway Rd, Baltimore, MD" },
           { id: "20525", name: "Aranza Rodriguez", phone: "410-960-9980", address: "1408 Charmuth Rd, Timonium, MD" },
@@ -100,7 +179,7 @@
 
     customers.forEach(cust => {
       const li = document.createElement('li');
-      li.className = 'flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800 hover:border-blue-500 transition cursor-pointer';
+      li.className = 'flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 hover:border-blue-500 transition cursor-pointer';
       li.onclick = () => openCard(cust.id, cust.name, cust.phone, cust.address);
       li.innerHTML = `
         <div>
@@ -120,11 +199,10 @@
   function renderActiveWorkingHub() {
     const container = document.getElementById('activeCardsList');
     const badge = document.getElementById('activeCountBadge');
-    
     let keys = Object.keys(localStorage).filter(k => k.startsWith('tappy_draft_'));
     
     if (keys.length === 0) {
-      container.innerHTML = '<div class="text-gray-500 italic text-[11px] py-2 text-center">No open working proposals. Search a customer above to start one!</div>';
+      container.innerHTML = '<div class="text-gray-500 italic text-[11px] py-1 text-center">No open working proposals.</div>';
       badge.textContent = '0 Open';
       return;
     }
@@ -137,16 +215,16 @@
         let data = JSON.parse(localStorage.getItem(k));
         let rawName = k.replace('tappy_draft_', '').replace(/_/g, ' ');
         container.innerHTML += `
-          <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800 hover:border-amber-500/50 transition">
+          <div class="flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800">
             <div>
               <div class="font-bold text-white capitalize text-xs">${rawName}</div>
-              <div class="text-[10px] text-gray-400 flex gap-2 mt-0.5">
+              <div class="text-[10px] text-gray-400 flex gap-2">
                 <span class="text-amber-400 font-bold">${data.docType || 'Draft'}</span>
                 <span>•</span>
                 <span class="text-emerald-400 font-mono font-bold">${data.total || '$0.00'}</span>
               </div>
             </div>
-            <a href="card.html?customer=${encodeURIComponent(rawName)}" class="text-xs bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1 rounded-lg transition">Open Card ➔</a>
+            <a href="card.html?customer=${encodeURIComponent(rawName)}" class="text-xs bg-blue-600 text-white font-bold px-2.5 py-1 rounded-lg">Open ➔</a>
           </div>
         `;
       } catch(e) {}
