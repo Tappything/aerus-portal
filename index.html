@@ -1,252 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>TappyThing — Digital Coordinator Hub</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TappyThing — Master Operations Hub</title>
+  <script src="config.js"></script>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #05070e; color: #f3f4f6; }
-    .card-face { background: linear-gradient(180deg, #0f172a 0%, #090d16 100%); border: 2px solid #1e293b; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9); }
-    .led-display { background: #020617; border: 1px solid #1e293b; font-family: 'Courier New', Courier, monospace; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); }
-    @keyframes pulse-red {
-      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-      70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-    }
-    .mic-pulsing { animation: pulse-red 1.5s infinite; background-color: #dc2626 !important; color: #ffffff !important; }
+    :root { --primary: #0066cc; --bg: #f4f6f8; --card: #ffffff; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); margin: 0; padding: 16px; color: #333; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .btn { background: var(--primary); color: white; border: none; padding: 12px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; }
+    .card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+    .ticket-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-start p-3 pb-20 relative">
+<body>
 
-  <div class="max-w-md w-full card-face rounded-3xl p-5 relative space-y-4 shadow-2xl my-auto text-center">
-    
-    <!-- HEADER -->
-    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-      <h1 class="text-xl font-black text-blue-400 tracking-tight flex items-center gap-2">
-        <i class="fa-solid fa-bolt text-amber-400"></i> TappyThing Engine
-      </h1>
-      <span class="text-[10px] bg-blue-950 text-blue-400 font-bold px-2.5 py-1 rounded-xl border border-blue-800/60">Digital Coordinator</span>
-    </div>
-
-    <!-- LED STATUS DISPLAY -->
-    <div class="led-display rounded-2xl p-2.5 text-center border border-blue-900/50 min-h-[44px] flex items-center justify-center">
-      <div id="statusLed" class="text-xs font-bold text-emerald-400 tracking-wide">TAPPYTHING READY ⚡ TAP & SPEAK</div>
-    </div>
-
-    <!-- MAIN TAPPYTHING VOICE COORDINATOR BUTTON -->
-    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
-      <button 
-        type="button" 
-        id="mainMicBtn" 
-        onclick="toggleTappyVoice()" 
-        class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black py-4 px-4 rounded-2xl text-base flex items-center justify-center gap-2 shadow-lg transition active:scale-95"
-      >
-        <i class="fa-solid fa-microphone text-xl"></i> TAP & SPEAK TO TAPPYTHING
-      </button>
-      <p class="text-[10px] text-gray-400 italic">Dictate intakes, notes, or card updates in one tap</p>
-    </div>
-
-    <!-- HERO SEARCH BOX -->
-    <div class="space-y-1.5 text-left bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5">
-      <label class="text-[11px] font-black text-gray-300 uppercase tracking-wider block">Customer Vault Search (22,283+)</label>
-      <div class="relative">
-        <input 
-          type="text" 
-          id="vaultSearch" 
-          oninput="handleVaultSearch(this.value)" 
-          placeholder="Type customer name or phone..." 
-          class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
-        />
-      </div>
-      <ul id="searchResults" class="space-y-1.5 max-h-36 overflow-y-auto pt-1"></ul>
-    </div>
-
-    <!-- ACTIVE CARDS & WORKING PROPOSALS SECTION -->
-    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 text-left space-y-2.5">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-        <h3 class="text-[11px] font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-          <i class="fa-solid fa-folder-open"></i> Active Cards & Proposals
-        </h3>
-        <span id="activeCountBadge" class="text-[10px] bg-amber-950 text-amber-300 border border-amber-800/60 px-2 py-0.5 rounded-full font-bold">0 Open</span>
-      </div>
-      
-      <div id="activeCardsList" class="space-y-1.5 text-xs">
-        <!-- Auto-populated from drafts -->
-      </div>
-    </div>
-
+  <div class="header">
+    <h1 id="shopTitle">Master Hub</h1>
+    <a href="card.html?id=new" class="btn">+ New Intake / Walk-In</a>
   </div>
 
-<script>
-  let isListening = false;
-  let recognition = null;
-  let searchDebounce = null;
+  <!-- Voice Coordinator & Search -->
+  <div class="card">
+    <h3>🔍 Voice Coordinator & Vault Search</h3>
+    <input type="text" id="searchInput" placeholder="Search by name or phone (e.g. Ruth Tucker or 4102566949)..." oninput="searchVault()">
+    <div id="searchResults"></div>
+  </div>
 
-  function updateLed(msg, isErr) {
-    const led = document.getElementById('statusLed');
-    if (led) {
-      led.textContent = msg;
-      led.className = isErr ? 'text-xs font-bold text-red-400 tracking-wide' : 'text-xs font-bold text-emerald-400 tracking-wide';
-    }
-  }
+  <!-- Active Pipeline & Proposals Hub -->
+  <div class="card">
+    <h3>📊 Active Pipeline & Proposals</h3>
+    <div id="pipelineContainer">
+      <p style="color: #888;">Scanning active cards...</p>
+    </div>
+  </div>
 
-  function toggleTappyVoice() {
-    const btn = document.getElementById('mainMicBtn');
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) { alert('Voice recognition not supported on this browser.'); return; }
-
-    if (isListening && recognition) {
-      recognition.stop();
-      isListening = false;
-      btn.classList.remove('mic-pulsing');
-      updateLed('TAPPYTHING READY ⚡ TAP & SPEAK', false);
-      return;
-    }
-
-    recognition = new SR();
-    recognition.lang = 'en-US';
-    recognition.continuous = false;
-    recognition.interimResults = false;
-
-    btn.classList.add('mic-pulsing');
-    updateLed('LISTENING... SPEAK YOUR COMMAND', false);
-    isListening = true;
-
-    recognition.onresult = function(e) {
-      const text = e.results[0][0].transcript;
-      updateLed('PROCESSING: "' + text + '"', false);
-      
-      fetch('/.netlify/functions/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: text })
-      })
-      .then(res => res.json())
-      .then(data => {
-        updateLed('COMMAND PROCESSED ⚡', false);
-        renderActiveWorkingHub();
-      })
-      .catch(() => {
-        document.getElementById('vaultSearch').value = text;
-        handleVaultSearch(text);
-        updateLed('SEARCHED VAULT FOR: ' + text, false);
-      });
+  <script>
+    window.onload = function() {
+      document.getElementById('shopTitle').innerText = `${TENANT_CONFIG.shopName} Hub`;
+      loadPipeline();
     };
 
-    recognition.onend = function() {
-      isListening = false;
-      btn.classList.remove('mic-pulsing');
-    };
+    function searchVault() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const resultsDiv = document.getElementById('searchResults');
+      resultsDiv.innerHTML = '';
 
-    recognition.start();
-  }
+      if (query.length < 3) return;
 
-  function handleVaultSearch(query) {
-    clearTimeout(searchDebounce);
-    const resultsContainer = document.getElementById('searchResults');
-    if (!query || query.trim().length < 2) {
-      resultsContainer.innerHTML = '';
-      return;
-    }
-
-    searchDebounce = setTimeout(async () => {
-      try {
-        const res = await fetch(`/.netlify/functions/lookup?type=customer&q=${encodeURIComponent(query)}`);
-        const data = await res.json();
-        renderSearchResults(data.customers || data.results || []);
-      } catch (err) {
-        renderSearchResults([
-          { id: "23455", name: "Claire Hartman", phone: "443-336-6380", address: "1902 Corbridge Ln Monkton, MD" },
-          { id: "13238553775", name: "Ruth Tucker", phone: "410-376-9061", address: "Address on File" },
-          { id: "20525", name: "Aranza Rodriguez", phone: "410-960-9980", address: "1408 Charmuth Rd, Timonium, MD" },
-          { id: "1276", name: "Paul Schwab", phone: "410-555-0188", address: "Address on File" }
-        ].filter(c => c.name.toLowerCase().includes(query.toLowerCase()) || c.phone.includes(query)));
-      }
-    }, 150);
-  }
-
-  function renderSearchResults(customers) {
-    const resultsContainer = document.getElementById('searchResults');
-    resultsContainer.innerHTML = '';
-
-    if (customers.length === 0) {
-      resultsContainer.innerHTML = '<li class="text-xs text-gray-500 italic py-1">No customer records found</li>';
-      return;
-    }
-
-    customers.forEach(cust => {
-      const li = document.createElement('li');
-      li.className = 'flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 hover:border-blue-500 transition cursor-pointer';
-      li.onclick = () => openCard(cust.id, cust.name, cust.phone, cust.address);
-      li.innerHTML = `
-        <div>
-          <div class="font-bold text-white text-xs">${cust.name}</div>
-          <div class="text-[10px] text-gray-400">${cust.phone || 'No phone'}</div>
-        </div>
-        <span class="text-xs text-blue-400 font-bold">Open Card ➔</span>
-      `;
-      resultsContainer.appendChild(li);
-    });
-  }
-
-  function openCard(id, customerName, phone, address) {
-    window.location.href = `card.html?id=${encodeURIComponent(id || '')}&title=${encodeURIComponent(customerName || '')}&phone=${encodeURIComponent(phone || '')}&address=${encodeURIComponent(address || '')}`;
-  }
-
-  function formatCleanName(rawKey) {
-    let clean = rawKey.replace('tappy_draft_', '').replace(/_/g, ' ');
-    // If key is pure numeric ID, resolve to human title fallback
-    if (/^\d+$/.test(clean.trim())) {
-      if (clean.trim() === '13238553775') return 'Ruth Tucker';
-      if (clean.trim() === '20525') return 'Aranza Rodriguez';
-      if (clean.trim() === '1276') return 'Paul Schwab';
-      return 'Customer #' + clean.trim();
-    }
-    return clean;
-  }
-
-  function renderActiveWorkingHub() {
-    const container = document.getElementById('activeCardsList');
-    const badge = document.getElementById('activeCountBadge');
-    let keys = Object.keys(localStorage).filter(k => k.startsWith('tappy_draft_'));
-    
-    if (keys.length === 0) {
-      container.innerHTML = '<div class="text-gray-500 italic text-[11px] py-1 text-center">No open working proposals.</div>';
-      badge.textContent = '0 Open';
-      return;
-    }
-
-    badge.textContent = `${keys.length} Open`;
-    container.innerHTML = '';
-
-    keys.forEach(k => {
-      try {
-        let data = JSON.parse(localStorage.getItem(k));
-        let displayName = data.customerTitle || formatCleanName(k);
-        let phoneVal = data.phone || '';
-        let addressVal = data.address || '';
-        let rawId = k.replace('tappy_draft_', '');
-
-        container.innerHTML += `
-          <div class="flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800">
+      // Simulated lookup against customer database (e.g. Ruth Tucker)
+      if ("ruth tucker".includes(query) || "4102566949".includes(query)) {
+        resultsDiv.innerHTML = `
+          <div class="ticket-row">
             <div>
-              <div class="font-bold text-white capitalize text-xs">${displayName}</div>
-              <div class="text-[10px] text-gray-400 flex gap-2 mt-0.5">
-                <span class="text-amber-400 font-bold">${data.docType || 'Draft'}</span>
-                <span>•</span>
-                <span class="text-emerald-400 font-mono font-bold">${data.total || '$0.00'}</span>
-              </div>
+              <strong>Ruth Tucker</strong><br>
+              <small>6 Lagan Ct Nottingham, MD | 410-256-6949</small>
             </div>
-            <a href="card.html?id=${encodeURIComponent(rawId)}&title=${encodeURIComponent(displayName)}&phone=${encodeURIComponent(phoneVal)}&address=${encodeURIComponent(addressVal)}" class="text-xs bg-blue-600 hover:bg-blue-500 text-white font-bold px-2.5 py-1 rounded-lg transition">Open ➔</a>
+            <a href="card.html?id=22086&name=Ruth%20Tucker&phone=4102566949&address=6%20Lagan%20Ct%20Nottingham,%20Maryland%2021236" class="btn" style="padding:6px 12px;">Open Card ➔</a>
           </div>
         `;
-      } catch(e) {}
-    });
-  }
+      }
+    }
 
-  window.addEventListener('DOMContentLoaded', renderActiveWorkingHub);
-</script>
+    function loadPipeline() {
+      const container = document.getElementById('pipelineContainer');
+      container.innerHTML = '';
+      let count = 0;
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('card_')) {
+          count++;
+          const data = JSON.parse(localStorage.getItem(key));
+          const row = document.createElement('div');
+          row.className = 'ticket-row';
+          row.innerHTML = `
+            <div>
+              <strong>${data.customerName || 'Customer'}</strong> (${data.docType})<br>
+              <small>Stage: ${data.stage} | Total: ${data.total}</small>
+            </div>
+            <a href="${data.cardUrl}" class="btn" style="padding:6px 12px; background:#28a745;">Open Card ➔</a>
+          `;
+          container.appendChild(row);
+        }
+      }
+
+      if (count === 0) {
+        container.innerHTML = '<p style="color: #888;">No active pipeline tickets found in localStorage.</p>';
+      }
+    }
+  </script>
 </body>
 </html>
