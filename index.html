@@ -13,30 +13,22 @@
         .glass-card { background: rgba(30, 41, 59, 0.9); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .deck-card { transition: transform 0.2s ease, box-shadow 0.2s ease; cursor: pointer; }
         .deck-card:active { transform: scale(0.98); }
-        .logo-medallion { width: 52px; height: 52px; border-radius: 16px; background: #020617; border: 2px solid rgba(16, 185, 129, 0.5); padding: 2px; box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+        .logo-medallion { width: 54px; height: 54px; border-radius: 20px; background: radial-gradient(circle, #0f172a 0%, #020617 100%); border: 2px solid #10b981; padding: 2px; box-shadow: 0 0 18px rgba(16, 185, 129, 0.35); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between pb-10">
-
-    <!-- Pre-Loaded Aerus Product Catalog Datalist -->
-    <datalist id="aerusPartsCatalog">
-        <option value="Replacement Fan Assembly" data-price="15.00" data-type="PART">
-        <option value="Standard Vacuum Bags (4-Pack)" data-price="24.95" data-type="PART">
-        <option value="HEPA Filter Replacement" data-price="49.95" data-type="PART">
-        <option value="Pure & Gentle Soap Program" data-price="325.00" data-type="PART">
-        <option value="Water Cooler w/ 6 Stage Reverse Osmosis" data-price="2500.00" data-type="PART">
-        <option value="Professional RO Installation" data-price="450.00" data-type="LABOR">
-        <option value="Standard RO Installation" data-price="300.00" data-type="LABOR">
-        <option value="Bench Repair Labor & Tune-Up" data-price="60.00" data-type="LABOR">
-        <option value="Motor Housing - Platinum" data-price="25.00" data-type="PART">
-        <option value="Front Motor Cover - Legacy/Classic" data-price="10.00" data-type="PART">
-    </datalist>
 
     <header class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md px-4 py-3 border-b border-slate-800">
         <div class="max-w-md mx-auto flex items-center justify-between gap-2">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('hub')">
                 <div class="logo-medallion flex items-center justify-center overflow-hidden">
-                    <img id="tappyLogoImg" src="tappything-logo.png" onerror="this.onerror=null; this.src='https://via.placeholder.com/120?text=TAPPY';" alt="Fresh Logo" class="w-full h-full object-cover rounded-xl">
+                    <svg viewBox="0 0 100 100" class="w-full h-full text-emerald-400">
+                        <rect width="100" height="100" rx="25" fill="#020617"/>
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="#10b981" stroke-width="3" stroke-dasharray="6,3"/>
+                        <path d="M25 45 C25 25, 75 25, 75 45 L75 60 C75 75, 25 75, 25 60 Z" fill="#10b981" opacity="0.2"/>
+                        <path d="M30 50 L50 30 L70 50 L50 70 Z" fill="none" stroke="#34d399" stroke-width="4"/>
+                        <circle cx="50" cy="50" r="10" fill="#34d399"/>
+                    </svg>
                 </div>
                 <div>
                     <h1 class="text-sm font-black text-white flex items-center gap-1 tracking-tight">
@@ -168,7 +160,7 @@
                     </div>
                     <label class="mt-2 cursor-pointer bg-slate-800 text-emerald-400 font-bold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 border border-slate-700 active:scale-95">
                         <i class="fa-solid fa-camera text-sm"></i> <span>SNAP PROOF PHOTO</span>
-                        <input type="file" accept="image/*" capture="environment" onchange="handleRealPhotoUpload(event)" class="hidden">
+                        <input type="file" accept="image/*,video/*" capture="environment" onchange="handleRealPhotoUpload(event)" class="hidden">
                     </label>
                 </div>
 
@@ -183,8 +175,8 @@
                     <div id="cardLinesContainer" class="space-y-2 mb-3"></div>
 
                     <div class="grid grid-cols-2 gap-2 mb-3">
-                        <button onclick="addNewLineItem('PART')" class="bg-slate-800 text-slate-200 py-1.5 rounded-xl text-xs font-bold border border-slate-700">+ Add Part</button>
-                        <button onclick="addNewLineItem('LABOR')" class="bg-slate-800 text-slate-200 py-1.5 rounded-xl text-xs font-bold border border-slate-700">+ Add Labor</button>
+                        <button onclick="addNewLineItem('PART')" class="bg-slate-800 text-slate-200 py-1.5 rounded-xl text-xs font-bold border border-slate-700 active:bg-emerald-600">+ Add Part</button>
+                        <button onclick="addNewLineItem('LABOR')" class="bg-slate-800 text-slate-200 py-1.5 rounded-xl text-xs font-bold border border-slate-700 active:bg-emerald-600">+ Add Labor</button>
                     </div>
 
                     <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-1">
@@ -248,8 +240,8 @@
                     <div id="custInvoiceMathBox" class="my-3 p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1.5">
                         <div class="font-bold text-white border-b border-slate-800 pb-1">Itemized Breakdown</div>
                         <div id="custItemizedLinesDisplay" class="space-y-1 text-slate-300 py-1">
-                            <div class="flex justify-between"><span>• Fan Assembly Part:</span><span>$15.00</span></div>
-                            <div class="flex justify-between"><span>• Service & Labor:</span><span>$60.00</span></div>
+                            <div class="flex justify-between"><span>• Replacement Fan Assembly:</span><span>$15.00</span></div>
+                            <div class="flex justify-between"><span>• Bench Repair Labor & Tune-Up:</span><span>$60.00</span></div>
                         </div>
                         <div class="flex justify-between text-slate-400 pt-1 border-t border-slate-800"><span>Parts Subtotal:</span><span id="custPartsLbl">$15.00</span></div>
                         <div class="flex justify-between text-slate-400"><span>Labor (Tax Exempt):</span><span id="custLaborLbl">$60.00</span></div>
@@ -293,7 +285,7 @@
 
         let appointments = JSON.parse(localStorage.getItem('tappy_appointments') || '[]');
         let vaultInvoices = JSON.parse(localStorage.getItem('tappy_vault_invoices') || '[]');
-        let currentActiveIndex = -1;
+        let currentActiveIndex = 0;
         let isEstimateRecognizing = false;
 
         if (appointments.length === 0) {
@@ -362,7 +354,7 @@
                 hub.classList.remove('hidden');
                 card.classList.add('hidden');
             } else {
-                if (currentActiveIndex === -1 && appointments.length > 0) currentActiveIndex = 0;
+                if (currentActiveIndex < 0 && appointments.length > 0) currentActiveIndex = 0;
                 hub.classList.add('hidden');
                 card.classList.remove('hidden');
                 renderActiveForeverCard();
@@ -482,7 +474,14 @@
         }
 
         function parseSpeechToEstimateLines(transcript) {
-            if (currentActiveIndex < 0) return;
+            if (currentActiveIndex < 0) {
+                if (appointments.length > 0) currentActiveIndex = 0;
+                else return;
+            }
+
+            if (!appointments[currentActiveIndex].lines) {
+                appointments[currentActiveIndex].lines = [];
+            }
 
             const segments = transcript.split(/\b(?:and|then|plus|also)\b/i);
             segments.forEach(seg => {
@@ -498,14 +497,13 @@
                     desc = text.replace(numericMatch[0], '').replace(/\b(for|a|an|dollars|cents)\b/gi, '').trim();
                 }
 
-                if (price > 0 || desc.length > 2) {
-                    const isLabor = desc.toLowerCase().includes('labor') || desc.toLowerCase().includes('service') || desc.toLowerCase().includes('tune up');
-                    appointments[currentActiveIndex].lines.push({
-                        desc: desc.length > 0 ? desc : (isLabor ? "Bench Repair Labor & Tune-Up" : "Replacement Part"),
-                        price: price > 0 ? price : (isLabor ? 60.00 : 15.00),
-                        isTaxable: !isLabor
-                    });
-                }
+                const isLabor = desc.toLowerCase().includes('labor') || desc.toLowerCase().includes('service') || desc.toLowerCase().includes('tune up');
+
+                appointments[currentActiveIndex].lines.push({
+                    desc: desc.length > 0 ? desc : (isLabor ? "Bench Repair Labor & Tune-Up" : "Replacement Fan Assembly"),
+                    price: price > 0 ? price : (isLabor ? 60.00 : 15.00),
+                    isTaxable: !isLabor
+                });
             });
 
             saveState();
@@ -624,36 +622,42 @@
         }
 
         function addNewLineItem(type = 'PART') {
-            if (currentActiveIndex < 0) return;
+            if (currentActiveIndex < 0) {
+                if (appointments.length > 0) currentActiveIndex = 0;
+                else return;
+            }
+
+            if (!appointments[currentActiveIndex].lines) {
+                appointments[currentActiveIndex].lines = [];
+            }
+
             appointments[currentActiveIndex].lines.push({
                 desc: type === 'LABOR' ? 'Bench Repair Labor & Tune-Up' : 'Replacement Fan Assembly',
                 price: type === 'LABOR' ? 60.00 : 15.00,
-                isTaxable: type === 'PART'
+                isTaxable: (type === 'PART')
             });
+
             saveState();
             renderCardLineItems();
             calculateCardTotals();
         }
 
-        function handleCatalogSelect(idx, inputElem) {
+        function handleCatalogDropdownSelect(idx, selectElem) {
             if (currentActiveIndex < 0) return;
-            const val = inputElem.value;
-            const datalist = document.getElementById('aerusPartsCatalog');
-            const options = Array.from(datalist.options);
-            const matched = options.find(o => o.value.toLowerCase() === val.toLowerCase());
+            const selectedOpt = selectElem.options[selectElem.selectedIndex];
+            const val = selectedOpt.value;
+            if (!val) return;
 
-            if (matched) {
-                const price = parseFloat(matched.getAttribute('data-price')) || 0;
-                const type = matched.getAttribute('data-type');
-                appointments[currentActiveIndex].lines[idx].desc = matched.value;
-                appointments[currentActiveIndex].lines[idx].price = price;
-                appointments[currentActiveIndex].lines[idx].isTaxable = (type === 'PART');
-                saveState();
-                renderCardLineItems();
-                calculateCardTotals();
-            } else {
-                updateLineData(idx, 'desc', val);
-            }
+            const price = parseFloat(selectedOpt.getAttribute('data-price')) || 0;
+            const type = selectedOpt.getAttribute('data-type');
+
+            appointments[currentActiveIndex].lines[idx].desc = val;
+            appointments[currentActiveIndex].lines[idx].price = price;
+            appointments[currentActiveIndex].lines[idx].isTaxable = (type === 'PART');
+
+            saveState();
+            renderCardLineItems();
+            calculateCardTotals();
         }
 
         function renderCardLineItems() {
@@ -662,11 +666,23 @@
             const container = document.getElementById('cardLinesContainer');
             container.innerHTML = '';
 
+            if (!app.lines) app.lines = [];
+
             app.lines.forEach((line, idx) => {
                 const div = document.createElement('div');
                 div.className = "flex items-center gap-2 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs";
                 div.innerHTML = `
-                    <input type="text" list="aerusPartsCatalog" value="${line.desc}" onchange="handleCatalogSelect(${idx}, this)" oninput="updateLineData(${idx}, 'desc', this.value)" placeholder="Search catalog or type..." class="flex-grow bg-slate-900 text-white px-2 py-1.5 rounded border border-slate-700">
+                    <select onchange="handleCatalogDropdownSelect(${idx}, this)" class="flex-grow bg-slate-900 text-white px-2 py-1.5 rounded border border-slate-700 focus:outline-none">
+                        <option value="" ${!line.desc ? 'selected' : ''}>-- Choose Catalog Item --</option>
+                        <option value="Replacement Fan Assembly" data-price="15.00" data-type="PART" ${line.desc === 'Replacement Fan Assembly' ? 'selected' : ''}>Replacement Fan Assembly ($15.00)</option>
+                        <option value="Standard Vacuum Bags (4-Pack)" data-price="24.95" data-type="PART" ${line.desc.includes('Bags') ? 'selected' : ''}>Standard Vacuum Bags 4-Pack ($24.95)</option>
+                        <option value="C-Bags 12-Pack" data-price="24.00" data-type="PART" ${line.desc.includes('C-Bags') ? 'selected' : ''}>C-Bags 12-Pack ($24.00)</option>
+                        <option value="HEPA Filter Replacement" data-price="49.95" data-type="PART" ${line.desc.includes('HEPA') ? 'selected' : ''}>HEPA Filter Replacement ($49.95)</option>
+                        <option value="Pure & Gentle Soap Program" data-price="325.00" data-type="PART" ${line.desc.includes('Soap') ? 'selected' : ''}>Pure & Gentle Soap Program ($325.00)</option>
+                        <option value="Water Cooler w/ 6 Stage RO" data-price="2500.00" data-type="PART" ${line.desc.includes('RO') ? 'selected' : ''}>Water Cooler w/ 6 Stage RO ($2500.00)</option>
+                        <option value="Bench Repair Labor & Tune-Up" data-price="60.00" data-type="LABOR" ${line.desc.includes('Labor') || line.desc.includes('Tune-Up') ? 'selected' : ''}>Bench Repair Labor & Tune-Up ($60.00)</option>
+                        <option value="Professional RO Installation" data-price="450.00" data-type="LABOR" ${line.desc.includes('RO Installation') ? 'selected' : ''}>Professional RO Installation ($450.00)</option>
+                    </select>
                     <span class="text-slate-500">$</span>
                     <input type="number" step="0.01" value="${line.price}" oninput="updateLineData(${idx}, 'price', parseFloat(this.value) || 0)" class="w-16 bg-slate-900 text-emerald-400 font-bold px-1.5 py-1.5 rounded border border-slate-700">
                     <button onclick="removeLineItem(${idx})" class="text-rose-400 px-1 font-bold">✕</button>
@@ -698,6 +714,8 @@
 
             const itemizedDisplay = document.getElementById('custItemizedLinesDisplay');
             itemizedDisplay.innerHTML = '';
+
+            if (!app.lines) app.lines = [];
 
             app.lines.forEach(l => {
                 const amt = parseFloat(l.price) || 0;
