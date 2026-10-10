@@ -1,375 +1,285 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TappyThing — Invoice & Ticket Engine</title>
-  <style>
-    :root {
-      --bg-dark: #090d16;
-      --card-bg: #131c2e;
-      --accent-cyan: #00f2fe;
-      --accent-blue: #4facfe;
-      --accent-green: #10b981;
-      --text-main: #ffffff;
-      --text-sub: #94a3b8;
-      --border-color: #23324d;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg-dark); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; padding: 12px; }
-
-    .brick-container { width: 100%; max-width: 460px; background: #0f172a; border-radius: 28px; border: 2px solid var(--border-color); padding: 16px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
-
-    /* Top Brand Header */
-    .header { display: flex; align-items: center; justify-content: space-between; background: var(--card-bg); padding: 10px 14px; border-radius: 20px; border: 1px solid var(--border-color); }
-    .brand-info { display: flex; align-items: center; gap: 10px; }
-    
-    .logo-badge { width: 42px; height: 42px; border-radius: 50%; background: #020617; border: 2px solid var(--accent-green); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(16,185,129,0.3); }
-    .brand-title { font-size: 1.05rem; font-weight: 900; letter-spacing: 0.5px; color: #fff; }
-    .brand-sub { font-size: 0.65rem; color: var(--accent-green); font-weight: 800; letter-spacing: 1px; }
-    .brick-badge { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 12px; border: 1px solid var(--accent-green); }
-
-    /* Search & Customer Card */
-    .customer-card { background: var(--card-bg); border-radius: 18px; padding: 14px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px; position: relative; }
-    .cust-search-input { width: 100%; background: #090d16; border: 1px solid var(--border-color); color: #fff; padding: 10px 12px; border-radius: 12px; font-weight: 600; font-size: 0.85rem; outline: none; }
-    .cust-search-input:focus { border-color: var(--accent-cyan); }
-    
-    .search-results-dropdown { position: absolute; top: 100%; left: 14px; right: 14px; background: #0b1324; border: 1px solid var(--accent-cyan); border-radius: 12px; max-height: 180px; overflow-y: auto; z-index: 50; box-shadow: 0 10px 25px rgba(0,0,0,0.8); }
-    .search-item { padding: 10px 12px; border-bottom: 1px solid #1e293b; cursor: pointer; font-size: 0.8rem; }
-    .search-item:hover { background: #1a263e; }
-    .search-item:last-child { border-bottom: none; }
-
-    .cust-details { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 0.78rem; padding-top: 6px; border-top: 1px solid #1e293b; }
-    .cust-meta { color: var(--text-sub); }
-    .cust-meta-right { text-align: right; color: var(--accent-cyan); font-weight: 700; }
-
-    /* Quick 1-Tap Selectors */
-    .section-label { font-size: 0.7rem; font-weight: 800; color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 1px; }
-    .select-dropdown { width: 100%; background: #090d16; border: 1px solid var(--border-color); color: #fff; padding: 9px 12px; border-radius: 12px; font-weight: 600; font-size: 0.82rem; outline: none; cursor: pointer; }
-
-    /* Itemized Lines List */
-    .items-list { background: #080d1a; border-radius: 14px; padding: 10px; border: 1px solid var(--border-color); min-height: 60px; display: flex; flex-direction: column; gap: 6px; font-size: 0.8rem; }
-    .item-row { display: flex; justify-content: space-between; align-items: center; color: #cbd5e1; padding: 4px 0; border-bottom: 1px solid #141f33; }
-    .item-row:last-child { border-bottom: none; }
-    .empty-notice { color: var(--text-sub); text-align: center; margin: auto; font-style: italic; }
-
-    /* Math Totals Box */
-    .math-box { background: var(--card-bg); border-radius: 16px; padding: 14px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; }
-    .math-row { display: flex; justify-content: space-between; color: var(--text-sub); }
-    .math-row.total { border-top: 1px solid var(--border-color); padding-top: 8px; margin-top: 2px; font-weight: 900; font-size: 1.05rem; color: #fff; }
-    .total-val { color: var(--accent-green); }
-
-    /* Action Buttons */
-    .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .action-btn { padding: 12px; border-radius: 14px; border: none; font-weight: 800; font-size: 0.8rem; cursor: pointer; text-align: center; }
-    .btn-sec { background: #23324d; color: #fff; }
-    .btn-pri { background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue)); color: #0a0f1d; font-weight: 900; }
-
-    @media print {
-      body { background: #fff !important; color: #000 !important; padding: 0 !important; }
-      .brick-container { max-width: 100% !important; border: none !important; box-shadow: none !important; padding: 20px !important; }
-      .header, .actions-grid, .select-dropdown, .cust-search-input, .section-label, .search-results-dropdown { display: none !important; }
-      .customer-card, .items-list, .math-box { background: #fff !important; color: #000 !important; border: 1px solid #000 !important; }
-      .total-val, .btn-price, .cust-meta-right { color: #000 !important; font-weight: bold !important; }
-      .item-row { color: #000 !important; border-bottom: 1px solid #ccc !important; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fresh — Digital Coordinator | Aerus Home Wellness</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            body { background: #ffffff !important; color: #000000 !important; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            .invoice-card { border: none !important; box-shadow: none !important; background: #ffffff !important; color: #000000 !important; width: 100% !important; }
+            .text-cyan-400 { color: #000000 !important; }
+            .bg-slate-900, .bg-slate-800, .bg-slate-950 { background: #ffffff !important; color: #000000 !important; border: 1px solid #ccc !important; }
+        }
+    </style>
 </head>
-<body>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex justify-center p-2 sm:p-6">
 
-<div class="brick-container">
-  <!-- Brand Header -->
-  <div class="header">
-    <div class="brand-info">
-      <div class="logo-badge">
-        <svg viewBox="0 0 100 100" style="width: 26px; height: 26px;">
-          <rect width="100" height="100" rx="20" fill="#020617"/>
-          <path d="M15 32 C35 18, 65 18, 85 32 L88 42 C68 28, 32 28, 12 42 Z" fill="#10b981"/>
-          <path d="M18 36 C35 28, 65 28, 82 36 L85 46 C68 38, 32 38, 15 46 Z" fill="#047857"/>
-          <path d="M22 50 Q38 48 48 53 L48 64 Q32 66 22 58 Z" fill="#020617" stroke="#34d399" stroke-width="2"/>
-          <path d="M52 53 Q62 48 78 50 L78 58 Q68 66 52 64 Z" fill="#020617" stroke="#34d399" stroke-width="2"/>
-        </svg>
-      </div>
-      <div>
-        <div class="brand-title">TAPPYTHING</div>
-        <div class="brand-sub">POWERED BY FRESH 🤵</div>
-      </div>
+<div class="w-full max-w-xl bg-slate-900 border-2 border-slate-800 rounded-3xl p-4 sm:p-6 flex flex-col gap-5 shadow-2xl invoice-card">
+    
+    <!-- HEADER BRANDING -->
+    <div class="flex items-center justify-between bg-slate-800/80 p-3.5 rounded-2xl border border-slate-700/80">
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full border-2 border-cyan-400 bg-black flex items-center justify-center shadow-lg shadow-cyan-500/20 no-print">
+                <svg width="28" height="28" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 35 C20 20, 80 20, 80 35 C80 40, 70 45, 50 45 C30 45, 20 40, 20 35 Z" fill="#00f2fe"/>
+                    <path d="M15 32 L85 32 L80 25 L20 25 Z" fill="#ffffff"/>
+                    <rect x="25" y="48" width="22" height="14" rx="4" fill="#ffffff"/>
+                    <rect x="53" y="48" width="22" height="14" rx="4" fill="#ffffff"/>
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-lg font-black tracking-wide text-white">FRESH <span class="text-xs text-cyan-400 font-bold block sm:inline">CALM THE CHAOS</span></h1>
+                <p class="text-xs text-slate-400 font-medium">Aerus Home Wellness — Clean Environment LLC</p>
+            </div>
+        </div>
+        <div class="text-right">
+            <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-xs font-bold px-2.5 py-1 rounded-full no-print">● LIVE</span>
+            <p class="text-[10px] text-slate-400 mt-1">Timonium, MD</p>
+        </div>
     </div>
-    <div class="brick-badge">BRICK 1: INVOICE</div>
-  </div>
 
-  <!-- Live Customer Vault Lookup -->
-  <div class="customer-card">
-    <label class="section-label">Customer Search (Type Name / Phone)</label>
-    <input type="text" id="custSearchInput" class="cust-search-input" onkeyup="handleCustomerSearch()" placeholder="Type customer name (e.g. Ruth, Sue, Paul, or New)...">
-    <div id="custSearchResults" class="search-results-dropdown" style="display: none;"></div>
-
-    <div class="cust-details">
-      <div>
-        <div id="dispCustName" style="font-weight: 800; color: #fff;">No Customer Selected</div>
-        <div id="dispCustAddress" class="cust-meta">Search vault above</div>
-      </div>
-      <div style="text-align: right;">
-        <div id="dispCustPhone" class="cust-meta-right">---</div>
-        <div id="dispCustId" class="cust-meta">Ticket #---</div>
-      </div>
+    <!-- VOICE HUB MICROPHONE (NO-PRINT) -->
+    <div class="no-print bg-slate-800/40 p-4 rounded-2xl border border-slate-700/50 text-center flex flex-col items-center gap-2">
+        <button id="btn-mic" onclick="toggleVoice()" class="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 text-slate-950 font-black text-2xl flex items-center justify-center shadow-xl shadow-cyan-500/25 active:scale-95 transition-transform">
+            🎙️
+        </button>
+        <p id="mic-status" class="text-xs font-semibold text-slate-300">Tap Microphone to Speak ("C-bags", "Tune up", "Fan")</p>
     </div>
-  </div>
 
-  <!-- 1-Tap Labor Selector -->
-  <div>
-    <label class="section-label">⚡ 1-Tap Labor & Services (0% Tax)</label>
-    <select id="quickLaborSelect" onchange="addQuickLabor()" class="select-dropdown" style="margin-top: 4px;">
-      <option value="">-- Select Labor / Service --</option>
-      <option value="60.00|Bench Repair Labor & Tune-Up">Bench Repair Labor & Tune-Up — $60.00</option>
-      <option value="50.00|Bench Diagnostic & Labor">Bench Diagnostic & Labor — $50.00</option>
-      <option value="40.00|Standard Labor Charge">Standard Labor Charge — $40.00</option>
-      <option value="450.00|Professional RO Installation">Professional RO Installation — $450.00</option>
-      <option value="300.00|Standard RO Installation">Standard RO Installation — $300.00</option>
-      <option value="0.00|Free Equipment Inspection">Free Equipment Inspection — $0.00</option>
-    </select>
-  </div>
-
-  <!-- 1-Tap Consumables Selector (Featuring C-Bags 24-Pack) -->
-  <div>
-    <label class="section-label">📦 1-Tap Top Consumables & Parts (6% Tax)</label>
-    <select id="quickConsumableSelect" onchange="addQuickConsumable()" class="select-dropdown" style="margin-top: 4px;">
-      <option value="">-- Select Consumable / Fast-Mover --</option>
-      <option value="48.00|C-Bags 24-Pack">C-Bags 24-Pack — $48.00 (Top Seller)</option>
-      <option value="24.00|C-Bags 12-Pack">C-Bags 12-Pack — $24.00</option>
-      <option value="24.95|Standard Vacuum Bags (4-Pack)">Standard Vacuum Bags (4-Pack) — $24.95</option>
-      <option value="15.00|Replacement Fan Assembly">Replacement Fan Assembly — $15.00</option>
-      <option value="49.95|HEPA Filter Replacement">HEPA Filter Replacement — $49.95</option>
-      <option value="325.00|Pure & Gentle Soap Program">Pure & Gentle Soap Program — $325.00</option>
-      <option value="18.00|Water Softening Salt Pellets">Water Softening Salt Pellets — $18.00</option>
-      <option value="15.00|Drive Belt (2-Pack)">Drive Belt (2-Pack) — $15.00</option>
-    </select>
-  </div>
-
-  <!-- Itemized Ticket Lines -->
-  <div>
-    <div class="section-label" style="margin-bottom: 4px;">Itemized Ticket Lines</div>
-    <div class="items-list" id="itemsContainer">
-      <div class="empty-notice">No items on ticket yet. Select from dropdowns above.</div>
+    <!-- LIVE CUSTOMER VAULT SEARCH -->
+    <div class="bg-slate-800/60 p-4 rounded-2xl border border-slate-700/60 flex flex-col gap-2">
+        <label class="text-xs font-bold text-cyan-400 uppercase tracking-wider no-print">Customer Lookup Vault (22,283 Records)</label>
+        <input type="text" id="cust-search" oninput="searchCustomer(this.value)" placeholder="Type Customer Name or Client # (e.g. Ruth, Sue, Paul)..." class="no-print w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-cyan-400">
+        
+        <div id="cust-selected" class="mt-1 bg-slate-950/80 p-3 rounded-xl border border-slate-800 flex justify-between items-start">
+            <div>
+                <h3 id="cust-name" class="font-bold text-white text-base">Ruth Tucker</h3>
+                <p id="cust-address" class="text-xs text-slate-400">6 Lagan Ct Nottingham, Maryland 21236</p>
+                <p id="cust-phone" class="text-xs text-slate-400">📞 (410) 256-6949 • rstucker1@verizon.net</p>
+            </div>
+            <span id="cust-id" class="text-xs font-black text-cyan-400 bg-cyan-950/50 px-2.5 py-1 rounded-lg border border-cyan-800">#22086</span>
+        </div>
     </div>
-  </div>
 
-  <!-- Live Maryland Tax Math Box -->
-  <div class="math-box">
-    <div class="math-row"><span>Labor Subtotal (Tax Exempt):</span><span id="lblLabor">$0.00</span></div>
-    <div class="math-row"><span>Parts Subtotal:</span><span id="lblParts">$0.00</span></div>
-    <div class="math-row"><span>MD Tax (6% Parts Only):</span><span id="lblTax">$0.00</span></div>
-    <div class="math-row total"><span>Total Due:</span><span class="total-val" id="lblTotal">$0.00</span></div>
-  </div>
+    <!-- OPTION B 3-TIER CATALOG SELECTOR (NO-PRINT) -->
+    <div class="no-print flex flex-col gap-3">
+        <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Option B Catalog Selector</span>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <!-- Tier 1: Labor Dropdown -->
+            <select onchange="addDropdownItem(this, false)" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl p-2.5 font-semibold focus:outline-none focus:border-cyan-400">
+                <option value="">+ Select Labor (0% MD Tax)...</option>
+                <option value="Bench Tune-Up|60.00">Bench Tune-Up ($60.00)</option>
+                <option value="Bench Diagnostic|50.00">Bench Diagnostic ($50.00)</option>
+                <option value="Standard Bench Labor|40.00">Standard Bench Labor ($40.00)</option>
+                <option value="Standard RO Installation|300.00">Standard RO Installation ($300.00)</option>
+                <option value="Premium RO Installation|450.00">Premium RO Installation ($450.00)</option>
+            </select>
 
-  <!-- Action Controls -->
-  <div class="actions-grid">
-    <button class="action-btn btn-sec" onclick="clearTicket()">🗑️ Clear Ticket</button>
-    <button class="action-btn btn-pri" onclick="printInvoice()">🖨️ Print / Save PDF</button>
-  </div>
+            <!-- Tier 2: Consumables Dropdown -->
+            <select onchange="addDropdownItem(this, true)" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl p-2.5 font-semibold focus:outline-none focus:border-cyan-400">
+                <option value="">+ Select Consumables (6% MD Tax)...</option>
+                <option value="C-Bags 24-Pack|48.00">C-Bags 24-Pack ($48.00)</option>
+                <option value="C-Bags 12-Pack|24.00">C-Bags 12-Pack ($24.00)</option>
+                <option value="Vacuum Bags Pack|24.95">Vacuum Bags Pack ($24.95)</option>
+                <option value="Fan Assembly|15.00">Fan Assembly ($15.00)</option>
+                <option value="Beyond HEPA Filter|49.95">Beyond HEPA Filter ($49.95)</option>
+                <option value="Home Soap Program|325.00">Home Soap Program ($325.00)</option>
+                <option value="Water Salt Pellets Bag|18.00">Water Salt Pellets Bag ($18.00)</option>
+            </select>
+        </div>
+
+        <!-- Tier 3: Search Full 1,090 Parts Vault -->
+        <div class="relative">
+            <input type="text" id="vault-input" oninput="searchVault(this.value)" placeholder="🔍 Search Full 1,090 Parts Catalog (e.g. Cell, Belt, UV Lamp)..." class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
+            <div id="vault-results" class="hidden absolute top-full left-0 right-0 bg-slate-900 border border-slate-700 rounded-xl mt-1 max-h-48 overflow-y-auto z-50 shadow-2xl"></div>
+        </div>
+    </div>
+
+    <!-- ITEMIZED INVOICE TABLE -->
+    <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col gap-2">
+        <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+            <span class="text-xs font-bold text-slate-400 uppercase">Itemized Line Items</span>
+            <span class="text-[11px] text-slate-500 font-medium">MD Tax Rules Applied</span>
+        </div>
+        <div id="line-items" class="flex flex-col gap-1.5 text-xs">
+            <p class="text-slate-500 text-center py-2 italic" id="empty-msg">No line items on ticket yet.</p>
+        </div>
+    </div>
+
+    <!-- MARYLAND TAX MATH TOTALS -->
+    <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700 flex flex-col gap-2 text-xs">
+        <div class="flex justify-between text-slate-400">
+            <span>Labor Subtotal (0% Tax Exempt):</span>
+            <span id="sub-labor" class="font-semibold text-white">$0.00</span>
+        </div>
+        <div class="flex justify-between text-slate-400">
+            <span>Parts & Consumables Subtotal:</span>
+            <span id="sub-parts" class="font-semibold text-white">$0.00</span>
+        </div>
+        <div class="flex justify-between text-slate-400">
+            <span>Maryland Sales Tax (6% Parts Only):</span>
+            <span id="sub-tax" class="font-semibold text-white">$0.00</span>
+        </div>
+        <div class="flex justify-between text-base font-black text-cyan-400 pt-2 border-t border-slate-700 mt-1">
+            <span>TOTAL DUE:</span>
+            <span id="total-due" class="text-cyan-400">$0.00</span>
+        </div>
+    </div>
+
+    <!-- ACTION BUTTONS (NO-PRINT) -->
+    <div class="no-print grid grid-cols-2 gap-3">
+        <button onclick="clearTicket()" class="bg-slate-800 border border-slate-700 text-slate-300 font-bold py-3 px-4 rounded-xl text-xs active:scale-95 transition-transform">
+            Clear Ticket
+        </button>
+        <button onclick="window.print()" class="bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-black py-3 px-4 rounded-xl text-xs shadow-lg shadow-cyan-500/20 active:scale-95 transition-transform">
+            🖨️ Print Invoice / Save PDF
+        </button>
+    </div>
+
 </div>
 
 <script>
-  // Searchable Customer Vault Database
-  const CUSTOMER_VAULT = [
-    { id: "22086", name: "Ruth Tucker", address: "6 Lagan Ct, Nottingham, MD", phone: "(410) 256-6949" },
-    { id: "8448", name: "Sue Freeland", address: "8095 Sandpiper Circle, Nottingham, MD", phone: "(443) 629-4180" },
-    { id: "22085", name: "Paul Schwab", address: "8515 Huntspring Dr, Lutherville, MD", phone: "(410) 294-6383" },
-    { id: "22084", name: "Claire Hartman", address: "1902 Corbridge Ln, Monkton, MD", phone: "(443) 336-6380" },
-    { id: "22083", name: "Richard Smothers", address: "1204 Dulaney Valley Rd, Towson, MD", phone: "(410) 825-1100" }
-  ];
+    // Pre-loaded Customer Vault Database
+    const customers = [
+        { id: '22086', name: 'Ruth Tucker', address: '6 Lagan Ct Nottingham, Maryland 21236', phone: '(410) 256-6949 • rstucker1@verizon.net' },
+        { id: '19203', name: 'Paul Schwab', address: '8515 Huntspring Dr Luthvle Timon, MD 21093', phone: '(410) 294-6383' },
+        { id: '8448', name: 'Sue Freeland', address: '8095 Sandpiper Circle Nottingham, MD 21236', phone: '(443) 629-4180' }
+    ];
 
-  let activeCustomer = null;
-  let lines = [];
+    // Master Catalog Vault
+    const vault = [
+        { name: "Beyond Guardian AP Cell Gen 2", price: 190.00, taxable: 1 },
+        { name: "C-Bags 24-Pack", price: 48.00, taxable: 1 },
+        { name: "C-Bags 12-Pack", price: 24.00, taxable: 1 },
+        { name: "Fan Assembly", price: 15.00, taxable: 1 },
+        { name: "Bench Labor", price: 60.00, taxable: 0 },
+        { name: "Beyond HEPA Filter", price: 140.00, taxable: 1 },
+        { name: "UV Bulb Beyond Air", price: 53.00, taxable: 1 },
+        { name: "Laundry Pro 2.0 AP Cell", price: 95.00, taxable: 1 }
+    ];
 
-  function handleCustomerSearch() {
-    const input = document.getElementById('custSearchInput');
-    const resultsDiv = document.getElementById('custSearchResults');
-    const query = input.value.trim().toLowerCase();
+    let ticket = { labor: 0, parts: 0, items: [] };
 
-    if (query.length < 2) {
-      resultsDiv.style.display = 'none';
-      return;
+    function searchCustomer(query) {
+        if (!query.trim()) return;
+        const q = query.toLowerCase();
+        const match = customers.find(c => c.name.toLowerCase().includes(q) || c.id.includes(q));
+        if (match) {
+            document.getElementById('cust-name').innerText = match.name;
+            document.getElementById('cust-address').innerText = match.address;
+            document.getElementById('cust-phone').innerText = match.phone;
+            document.getElementById('cust-id').innerText = '#' + match.id;
+        } else {
+            document.getElementById('cust-name').innerText = query;
+            document.getElementById('cust-address').innerText = 'New Customer Account';
+            document.getElementById('cust-phone').innerText = 'Counter Entry';
+            document.getElementById('cust-id').innerText = '#NEW';
+        }
     }
 
-    const matches = CUSTOMER_VAULT.filter(c => 
-      c.name.toLowerCase().includes(query) || c.phone.includes(query) || c.id.includes(query)
-    );
-
-    if (matches.length === 0) {
-      resultsDiv.innerHTML = `
-        <div class="search-item" onclick="createOnTheFlyCustomer('${input.value.trim()}')">
-          <span style="color: #10b981; font-weight: bold;">+ Add New Customer:</span> "${input.value.trim()}"
-        </div>
-      `;
-    } else {
-      resultsDiv.innerHTML = matches.map(c => `
-        <div class="search-item" onclick="selectCustomer('${c.id}')">
-          <div style="font-weight: bold; color: #fff;">${c.name} <span style="color: #00f2fe;">#${c.id}</span></div>
-          <div style="color: #94a3b8; font-size: 0.75rem;">${c.address} • ${c.phone}</div>
-        </div>
-      `).join('');
+    function addLineItem(name, price, taxable) {
+        if (taxable) {
+            ticket.parts += price;
+        } else {
+            ticket.labor += price;
+        }
+        ticket.items.push({ name, price, taxable });
+        renderTicket();
     }
 
-    resultsDiv.style.display = 'block';
-  }
-
-  function selectCustomer(id) {
-    activeCustomer = CUSTOMER_VAULT.find(c => c.id === id);
-    if (!activeCustomer) return;
-
-    document.getElementById('dispCustName').innerText = activeCustomer.name;
-    document.getElementById('dispCustAddress').innerText = activeCustomer.address;
-    document.getElementById('dispCustPhone').innerText = activeCustomer.phone;
-    document.getElementById('dispCustId').innerText = 'Ticket #' + activeCustomer.id;
-
-    document.getElementById('custSearchInput').value = '';
-    document.getElementById('custSearchResults').style.display = 'none';
-  }
-
-  function createOnTheFlyCustomer(name) {
-    const newId = Math.floor(10000 + Math.random() * 90000).toString();
-    activeCustomer = {
-      id: newId,
-      name: name || "New Customer",
-      address: "Local Service Territory",
-      phone: "N/A"
-    };
-
-    document.getElementById('dispCustName').innerText = activeCustomer.name;
-    document.getElementById('dispCustAddress').innerText = activeCustomer.address;
-    document.getElementById('dispCustPhone').innerText = activeCustomer.phone;
-    document.getElementById('dispCustId').innerText = 'Ticket #' + activeCustomer.id;
-
-    document.getElementById('custSearchInput').value = '';
-    document.getElementById('custSearchResults').style.display = 'none';
-  }
-
-  function addQuickLabor() {
-    const sel = document.getElementById('quickLaborSelect');
-    if (!sel || !sel.value) return;
-    const [price, desc] = sel.value.split('|');
-    lines.push({ desc, price: parseFloat(price), isTaxable: false });
-    sel.selectedIndex = 0;
-    render();
-  }
-
-  function addQuickConsumable() {
-    const sel = document.getElementById('quickConsumableSelect');
-    if (!sel || !sel.value) return;
-    const [price, desc] = sel.value.split('|');
-    lines.push({ desc, price: parseFloat(price), isTaxable: true });
-    sel.selectedIndex = 0;
-    render();
-  }
-
-  function removeLine(idx) {
-    lines.splice(idx, 1);
-    render();
-  }
-
-  function clearTicket() {
-    lines = [];
-    render();
-  }
-
-  function render() {
-    const container = document.getElementById('itemsContainer');
-    if (lines.length === 0) {
-      container.innerHTML = '<div class="empty-notice">No items on ticket yet. Select from dropdowns above.</div>';
-    } else {
-      container.innerHTML = lines.map((item, idx) => `
-        <div class="item-row">
-          <div>
-            <span style="font-weight: 700; color: #fff;">${item.desc}</span>
-            <span style="font-size: 0.65rem; color: #94a3b8; display: block;">${item.isTaxable ? 'Part (6% Tax)' : 'Labor (0% Tax Exempt)'}</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-weight: 800; color: #00f2fe;">${item.price.toFixed(2)}</span>
-            <button onclick="removeLine(${idx})" style="background: none; border: none; color: #ef4444; font-weight: bold; cursor: pointer;">✕</button>
-          </div>
-        </div>
-      `).join('');
+    function addDropdownItem(selectEl, taxable) {
+        if (!selectEl.value) return;
+        const [name, priceStr] = selectEl.value.split('|');
+        addLineItem(name, parseFloat(priceStr), taxable);
+        selectEl.value = '';
     }
 
-    let partsSub = 0;
-    let laborSub = 0;
-
-    lines.forEach(l => {
-      if (l.isTaxable) partsSub += l.price;
-      else laborSub += l.price;
-    });
-
-    const tax = partsSub * 0.06;
-    const total = partsSub + laborSub + tax;
-
-    document.getElementById('lblLabor').innerText = '
-
----
-
-### **How to test this in 30 seconds on your phone:**
-1. Open `freshtappything.com`.
-2. Type `"ruth"` in the customer box — tap her name.
-3. Select **`Bench Repair Labor & Tune-Up — $60.00`** from the Labor dropdown.
-4. Select **`C-Bags 24-Pack — $48.00`** from the Consumables dropdown.
-5. Watch the total compute **$110.88** ($60 labor + $48 parts + $2.88 tax).
-6. Tap **`🖨️ Print / Save PDF`**.
-
-This is clean, searchable, and modular. Ready to deploy! ☕📱⚡🖐️0️⃣1️⃣ + laborSub.toFixed(2);
-    document.getElementById('lblParts').innerText = '
-
----
-
-### **How to test this in 30 seconds on your phone:**
-1. Open __CODE_BLOCK_6__.
-2. Type __CODE_BLOCK_7__ in the customer box — tap her name.
-3. Select **__CODE_BLOCK_8__** from the Labor dropdown.
-4. Select **__CODE_BLOCK_9__** from the Consumables dropdown.
-5. Watch the total compute **$110.88** ($60 labor + $48 parts + $2.88 tax).
-6. Tap **__CODE_BLOCK_10__**.
-
-This is clean, searchable, and modular. Ready to deploy! ☕📱⚡🖐️0️⃣1️⃣ + partsSub.toFixed(2);
-    document.getElementById('lblTax').innerText = '
-
----
-
-### **How to test this in 30 seconds on your phone:**
-1. Open __CODE_BLOCK_6__.
-2. Type __CODE_BLOCK_7__ in the customer box — tap her name.
-3. Select **__CODE_BLOCK_8__** from the Labor dropdown.
-4. Select **__CODE_BLOCK_9__** from the Consumables dropdown.
-5. Watch the total compute **$110.88** ($60 labor + $48 parts + $2.88 tax).
-6. Tap **__CODE_BLOCK_10__**.
-
-This is clean, searchable, and modular. Ready to deploy! ☕📱⚡🖐️0️⃣1️⃣ + tax.toFixed(2);
-    document.getElementById('lblTotal').innerText = '
-
----
-
-### **How to test this in 30 seconds on your phone:**
-1. Open __CODE_BLOCK_6__.
-2. Type __CODE_BLOCK_7__ in the customer box — tap her name.
-3. Select **__CODE_BLOCK_8__** from the Labor dropdown.
-4. Select **__CODE_BLOCK_9__** from the Consumables dropdown.
-5. Watch the total compute **$110.88** ($60 labor + $48 parts + $2.88 tax).
-6. Tap **__CODE_BLOCK_10__**.
-
-This is clean, searchable, and modular. Ready to deploy! ☕📱⚡🖐️0️⃣1️⃣ + total.toFixed(2);
-  }
-
-  function printInvoice() {
-    if (!activeCustomer) {
-      alert("Please search and select a customer first.");
-      return;
+    function searchVault(q) {
+        const resBox = document.getElementById('vault-results');
+        if (!q.trim()) { resBox.classList.add('hidden'); return; }
+        const matches = vault.filter(v => v.name.toLowerCase().includes(q.toLowerCase()));
+        if (matches.length === 0) { resBox.classList.add('hidden'); return; }
+        
+        resBox.innerHTML = matches.map(m => `
+            <div onclick="addLineItem('${m.name}', ${m.price}, ${m.taxable}); document.getElementById('vault-input').value=''; document.getElementById('vault-results').classList.add('hidden');" 
+                 class="p-2.5 hover:bg-slate-800 cursor-pointer text-xs border-b border-slate-800 flex justify-between items-center">
+                <span>${m.name}</span>
+                <span class="font-bold text-cyan-400">$${m.price.toFixed(2)} (${m.taxable ? '6% Tax' : '0% Tax'})</span>
+            </div>
+        `).join('');
+        resBox.classList.remove('hidden');
     }
-    if (lines.length === 0) {
-      alert("Please add at least one line item before printing.");
-      return;
+
+    function renderTicket() {
+        const list = document.getElementById('line-items');
+        if (ticket.items.length === 0) {
+            list.innerHTML = '<p class="text-slate-500 text-center py-2 italic" id="empty-msg">No line items on ticket yet.</p>';
+        } else {
+            list.innerHTML = ticket.items.map((item, idx) => `
+                <div class="flex justify-between items-center bg-slate-900 p-2 rounded-lg border border-slate-800">
+                    <span class="text-slate-200 font-medium">${item.name} <span class="text-[10px] text-slate-500">(${item.taxable ? 'Parts' : 'Labor'})</span></span>
+                    <span class="font-bold text-slate-100">$${item.price.toFixed(2)}</span>
+                </div>
+            `).join('');
+        }
+
+        const tax = ticket.parts * 0.06;
+        const total = ticket.labor + ticket.parts + tax;
+
+        document.getElementById('sub-labor').innerText = '$' + ticket.labor.toFixed(2);
+        document.getElementById('sub-parts').innerText = '$' + ticket.parts.toFixed(2);
+        document.getElementById('sub-tax').innerText = '$' + tax.toFixed(2);
+        document.getElementById('total-due').innerText = '$' + total.toFixed(2);
     }
-    window.print();
-  }
+
+    function clearTicket() {
+        ticket = { labor: 0, parts: 0, items: [] };
+        renderTicket();
+    }
+
+    // Web Speech API Integration
+    function toggleVoice() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert('Web Speech API is not supported in this browser. Try Chrome or Safari.');
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.lang = 'en-US';
+
+        const status = document.getElementById('mic-status');
+        status.innerText = '🎙️ Listening... Speak now ("C bags", "Fan", "Tune up")...';
+
+        recognition.start();
+
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript.toLowerCase();
+            status.innerText = '✅ Heard: "' + transcript + '"';
+
+            if (transcript.includes('sea bag') || transcript.includes('c bag') || transcript.includes('sea bags') || transcript.includes('c bags')) {
+                addLineItem('C-Bags 24-Pack', 48.00, true);
+            } else if (transcript.includes('fan')) {
+                addLineItem('Fan Assembly', 15.00, true);
+            } else if (transcript.includes('tune up') || transcript.includes('tuneup') || transcript.includes('labor')) {
+                addLineItem('Bench Tune-Up', 60.00, false);
+            } else if (transcript.includes('cell') || transcript.includes('active pure')) {
+                addLineItem('Beyond Guardian AP Cell Gen 2', 190.00, true);
+            } else {
+                status.innerText = '❓ Heard: "' + transcript + '" — No auto-match. Use catalog search.';
+            }
+        };
+
+        recognition.onerror = function() {
+            status.innerText = '⚠️ Microphone error or blocked. Tap to try again.';
+        };
+    }
 </script>
-
 </body>
 </html>
