@@ -23,13 +23,14 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between pb-10">
 
-    <!-- MASTER HEADER WITH BRAND SLOT & VOICE PILL -->
+    <!-- MASTER HEADER WITH BANDANA LOGO & FOREVER CARD BRANDING -->
     <header class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md px-4 py-3 border-b border-slate-800">
         <div class="max-w-md mx-auto flex items-center justify-between gap-2">
             
+            <!-- Bandana Logo & Brand Slot -->
             <div class="flex items-center space-x-2.5 cursor-pointer" onclick="switchView('hub')">
                 <div class="w-10 h-10 rounded-xl bg-slate-950 p-1 border border-emerald-500/40 flex items-center justify-center overflow-hidden shadow-lg">
-                    <img id="tappyLogoImg" src="tappything-logo.png" onerror="this.onerror=null; this.src='https://via.placeholder.com/100?text=TAPPY';" alt="TappyThing Logo" class="w-full h-full object-contain">
+                    <img id="tappyLogoImg" src="tappything-logo.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/sullivanwilliam/tappything/main/tappything-logo.png';" alt="TappyThing Bandana Logo" class="w-full h-full object-contain">
                 </div>
                 <div>
                     <h1 class="text-xs font-black text-white flex items-center gap-1 tracking-tight">
@@ -45,6 +46,7 @@
                 <span id="pillMicText">TAP TO TALK</span>
             </button>
 
+            <!-- Mode Switch Tabs -->
             <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
                 <button id="tabHub" onclick="switchView('hub')" class="px-2 py-1 rounded-lg text-xs font-bold bg-emerald-600 text-white">
                     <i class="fa-solid fa-layer-group"></i>
@@ -58,6 +60,7 @@
 
     <main class="max-w-md mx-auto px-4 py-4 w-full flex-grow">
 
+        <!-- SCREEN 1: TECH DECK STACK HUB -->
         <section id="screenHub" class="space-y-4">
             
             <div id="voiceStatusBox" class="p-3 rounded-2xl bg-slate-900 border border-slate-800 text-xs text-slate-300 flex items-center justify-between">
@@ -67,7 +70,9 @@
                 </span>
             </div>
 
+            <!-- FULL 5-CARD TECH DECK STACK -->
             <div class="space-y-2.5">
+                <!-- Card 1: World -->
                 <div class="deck-card glass-card rounded-2xl p-4 border-l-4 border-cyan-500 relative" onclick="toggleDrawer('drawerWorld')">
                     <div class="flex justify-between items-center">
                         <div>
@@ -81,6 +86,21 @@
                     </div>
                 </div>
 
+                <!-- Card 2: Operations Desk -->
+                <div class="deck-card glass-card rounded-2xl p-4 border-l-4 border-blue-500 relative" onclick="toggleDrawer('drawerOps')">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Card 2 / Ops</span>
+                            <h4 class="text-sm font-bold text-white">Empire Operations Desk</h4>
+                        </div>
+                        <i class="fa-solid fa-chart-line text-blue-400"></i>
+                    </div>
+                    <div id="drawerOps" class="hidden mt-3 pt-2 border-t border-slate-800 text-xs text-slate-300">
+                        Bench repair metrics and active store workflow online.
+                    </div>
+                </div>
+
+                <!-- Card 3: Schedule Agenda -->
                 <div class="deck-card glass-card rounded-2xl p-4 border-l-4 border-emerald-500 relative">
                     <div class="flex justify-between items-center mb-2" onclick="toggleDrawer('drawerSchedule')">
                         <div>
@@ -93,8 +113,37 @@
                         <div id="scheduleContainer" class="space-y-2"></div>
                     </div>
                 </div>
+
+                <!-- Card 4: Pinball Sprint -->
+                <div class="deck-card glass-card rounded-2xl p-4 border-l-4 border-amber-500 relative" onclick="toggleDrawer('drawerPinball')">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="text-[9px] font-black text-amber-400 uppercase tracking-widest">Card 4 / Action Engine</span>
+                            <h4 class="text-sm font-bold text-white">Pinball Sprint Deck</h4>
+                        </div>
+                        <span class="text-[10px] font-bold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded">0 / 6 Tasks</span>
+                    </div>
+                    <div id="drawerPinball" class="hidden mt-3 pt-2 border-t border-slate-800 text-xs text-slate-300">
+                        Action sprint queue ready.
+                    </div>
+                </div>
+
+                <!-- Card 5: Brain Deposit -->
+                <div class="deck-card glass-card rounded-2xl p-4 border-l-4 border-purple-500 relative" onclick="toggleDrawer('drawerBrain')">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="text-[9px] font-black text-purple-400 uppercase tracking-widest">Card 5 / Thought Dump</span>
+                            <h4 class="text-sm font-bold text-white">Brain Deposit</h4>
+                        </div>
+                        <i class="fa-solid fa-brain text-purple-400"></i>
+                    </div>
+                    <div id="drawerBrain" class="hidden mt-3 pt-2 border-t border-slate-800 text-xs text-slate-300">
+                        Tap top voice pill to log instant brain deposit notes.
+                    </div>
+                </div>
             </div>
 
+            <!-- Vault Search -->
             <div class="glass-card rounded-2xl p-4">
                 <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-2 flex items-center gap-1.5">
                     <i class="fa-solid fa-users-viewfinder text-emerald-400"></i> Customer Vault Search
@@ -105,6 +154,7 @@
             </div>
         </section>
 
+        <!-- SCREEN 2: UNIFIED CUSTOMER CARD WORKSPACE -->
         <section id="screenCard" class="space-y-4 hidden">
             <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
                 <button id="modeTech" onclick="setCardMode('tech')" class="flex-1 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white">
@@ -115,6 +165,7 @@
                 </button>
             </div>
 
+            <!-- TECH BENCH WORKSPACE -->
             <div id="techWorkspaceView" class="space-y-4">
                 <div class="glass-card rounded-2xl p-4 border-l-4 border-emerald-500">
                     <div class="flex justify-between items-start mb-1">
@@ -130,6 +181,7 @@
                     </div>
                 </div>
 
+                <!-- Media Snap -->
                 <div class="glass-card rounded-2xl p-4">
                     <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Diagnostic Proof Photo/Video</h3>
                     <div id="photoPreviewContainer" class="bg-slate-950 rounded-xl border border-dashed border-slate-800 min-h-[100px] flex items-center justify-center p-2 text-center">
@@ -142,6 +194,7 @@
                     </label>
                 </div>
 
+                <!-- Line Item & MD Tax Builder -->
                 <div class="glass-card rounded-2xl p-4">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="text-xs font-bold text-white uppercase">MD Tax Engine (Parts 6% / Labor 0%)</h3>
@@ -166,7 +219,10 @@
                 </div>
             </div>
 
+            <!-- THE 4-CARD CUSTOMER MIRROR DECK -->
             <div id="customerMirrorView" class="space-y-3 hidden">
+                
+                <!-- Card Navigator Tabs -->
                 <div class="flex justify-between bg-slate-950 p-1 rounded-xl border border-slate-800 text-[10px] font-bold">
                     <button id="cTab1" onclick="showCustCard(1)" class="flex-1 py-1.5 rounded-lg bg-emerald-600 text-white">1. Health</button>
                     <button id="cTab2" onclick="showCustCard(2)" class="flex-1 py-1.5 rounded-lg text-slate-400">2. Assistant</button>
@@ -174,6 +230,7 @@
                     <button id="cTab4" onclick="showCustCard(4)" class="flex-1 py-1.5 rounded-lg text-slate-400">4. Vault</button>
                 </div>
 
+                <!-- CARD 1: Machine Health & Status -->
                 <div id="custFace1" class="glass-card rounded-2xl p-5 border-l-4 border-cyan-400">
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-[9px] font-black text-cyan-400 uppercase tracking-widest">Card 1 / Health Status</span>
@@ -188,6 +245,7 @@
                     </p>
                 </div>
 
+                <!-- CARD 2: 2-Way Interactive Messenger -->
                 <div id="custFace2" class="glass-card rounded-2xl p-5 border-l-4 border-teal-400 hidden">
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-[9px] font-black text-teal-400 uppercase tracking-widest">Card 2 / 2-Way Assistant</span>
@@ -200,6 +258,7 @@
                     </button>
                 </div>
 
+                <!-- CARD 3: Generic Solution & Stripe Checkout -->
                 <div id="custFace3" class="glass-card rounded-2xl p-5 border-l-4 border-emerald-400 hidden">
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Card 3 / Home Wellness Solution</span>
@@ -221,6 +280,7 @@
                     </button>
                 </div>
 
+                <!-- CARD 4: Lifetime Service History Vault -->
                 <div id="custFace4" class="glass-card rounded-2xl p-5 border-l-4 border-purple-400 hidden">
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-[9px] font-black text-purple-400 uppercase tracking-widest">Card 4 / Service Vault</span>
@@ -258,7 +318,7 @@
         window.onload = function() {
             fetchCloudState();
             filterVaultSearch();
-            setInterval(fetchCloudState, 5000); // 5-second live polling across laptop and phone
+            setInterval(fetchCloudState, 4000);
         };
 
         async function fetchCloudState() {
@@ -273,7 +333,6 @@
                     }
                 }
             } catch (e) {
-                // Fallback to local storage if offline
                 appointments = JSON.parse(localStorage.getItem('tappy_appointments') || '[]');
                 renderScheduleAgenda();
             }
@@ -288,7 +347,7 @@
                     body: JSON.stringify({ appointments, boardId: "18424728273" })
                 });
             } catch (e) {
-                console.log('Local state cached; cloud sync retrying...');
+                console.log('Local state cached; retrying cloud sync...');
             }
         }
 
