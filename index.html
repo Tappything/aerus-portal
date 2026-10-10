@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TappyThing Hub | Aerus Home Wellness & Forever Card Engine</title>
+    <title>TappyThing Hub | Aerus Home Wellness</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://js.stripe.com/v3/"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -17,639 +17,372 @@
             70% { transform: scale(1.05); box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); }
             100% { transform: scale(0.98); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
-        .deck-card { transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease; cursor: pointer; }
-        .deck-card:hover { transform: translateY(-3px); }
+        .deck-card { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+        .deck-card:active { transform: scale(0.98); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between pb-10">
 
-    <!-- MASTER HEADER WITH DUAL-LOGO SLOTS & ERGONOMIC TOP VOICE PILL -->
+    <!-- HEADER WITH VOICE PILL -->
     <header class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md px-4 py-3 border-b border-slate-800">
-        <div class="max-w-2xl mx-auto flex items-center justify-between gap-2">
-            
-            <!-- Brand & Dealer Logo Slot (Aerus Default) -->
-            <div class="flex items-center space-x-2.5 cursor-pointer" onclick="switchView('hub')">
-                <div id="dealerLogoContainer" class="relative w-10 h-10 rounded-xl bg-slate-950 p-1 border border-emerald-500/40 shadow-lg flex items-center justify-center overflow-hidden">
-                    <img id="dealerLogoImg" src="https://via.placeholder.com/100?text=AERUS" alt="Aerus Home Wellness" class="w-full h-full object-contain">
+        <div class="max-w-md mx-auto flex items-center justify-between gap-2">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="switchView('hub')">
+                <div class="w-9 h-9 rounded-xl bg-slate-950 p-1 border border-emerald-500/40 flex items-center justify-center">
+                    <i class="fa-solid fa-bolt text-emerald-400 text-base"></i>
                 </div>
                 <div>
-                    <h1 class="text-sm font-extrabold text-white flex items-center gap-1.5 tracking-tight" id="dealerNameText">
-                        Aerus Timonium <span class="text-[9px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded-full border border-emerald-500/30 font-bold">#001</span>
+                    <h1 class="text-xs font-extrabold text-white flex items-center gap-1">
+                        Aerus Timonium <span class="text-[9px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded-full border border-emerald-500/30">#001</span>
                     </h1>
-                    <p class="text-[10px] text-slate-400 font-medium flex items-center gap-1">
-                        <span>Powered by TappyThing</span>
-                        <span class="text-teal-400 font-bold">• FOREVER CARD™</span>
-                    </p>
+                    <p class="text-[9px] text-teal-400 font-bold">FOREVER CARD™ ENGINE</p>
                 </div>
             </div>
 
-            <!-- ERGONOMIC TOP VOICE PILL BUTTON -->
-            <button id="topVoicePill" onclick="toggleVoiceIntake()" class="flex items-center gap-2 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white px-3.5 py-2 rounded-full font-extrabold text-xs shadow-lg active:scale-95 transition-all border border-emerald-400/30">
-                <i id="pillMicIcon" class="fa-solid fa-microphone text-xs"></i>
-                <span id="pillMicText" class="tracking-wide uppercase text-[11px]">TAP TO TALK</span>
+            <button id="topVoicePill" onclick="toggleVoiceIntake()" class="flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-3 py-1.5 rounded-full font-black text-[11px] shadow-lg active:scale-95 border border-emerald-400/30">
+                <i id="pillMicIcon" class="fa-solid fa-microphone"></i>
+                <span id="pillMicText">TAP TO TALK</span>
             </button>
 
-            <!-- Mode Switch Tabs -->
             <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
-                <button id="tabHub" onclick="switchView('hub')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-emerald-600 text-white shadow-md">
+                <button id="tabHub" onclick="switchView('hub')" class="px-2 py-1 rounded-lg text-xs font-bold bg-emerald-600 text-white">
                     <i class="fa-solid fa-layer-group"></i>
                 </button>
-                <button id="tabCard" onclick="switchView('card')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white">
+                <button id="tabCard" onclick="switchView('card')" class="px-2 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white">
                     <i class="fa-solid fa-address-card"></i>
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="max-w-2xl mx-auto px-4 py-5 w-full flex-grow">
+    <main class="max-w-md mx-auto px-4 py-4 w-full flex-grow space-y-4">
 
-        <!-- SCREEN 1: CASCADING TECH DECK & VOICE DISPATCH HUB -->
-        <section id="screenHub" class="space-y-5">
+        <!-- SCREEN 1: DECK STACK HUB -->
+        <section id="screenHub" class="space-y-4">
             
-            <!-- Voice Intake Feedback Banner -->
             <div id="voiceStatusBox" class="p-3 rounded-2xl bg-slate-900 border border-slate-800 text-xs text-slate-300 flex items-center justify-between">
                 <span class="flex items-center gap-2 text-slate-400">
                     <i class="fa-solid fa-circle-dot text-emerald-500 text-xs animate-pulse"></i> 
-                    <span>Tap <strong>TAP TO TALK</strong> pill to speak intake...</span>
+                    <span>Tap <strong>TAP TO TALK</strong> to dictate appointment...</span>
                 </span>
-                <span class="text-[10px] text-slate-500 font-mono uppercase">Voice Engine Ready</span>
             </div>
 
-            <!-- CASCADING 5-CARD TECH DECK STACK -->
-            <div class="space-y-3">
-                <h3 class="text-xs font-black uppercase text-slate-400 tracking-wider px-1">Active Tech Operation Stack</h3>
-                
-                <div class="space-y-2.5">
-                    <!-- 1. The World Card -->
-                    <div class="deck-card glass-card rounded-2xl p-4 border-l-4 border-cyan-500 relative overflow-hidden">
-                        <div class="absolute top-2 right-3 text-[9px] font-black tracking-widest text-slate-600 uppercase">
-                            <i class="fa-solid fa-infinity text-teal-500/50"></i> FOREVER CARD™
+            <!-- CARD DECK STACK -->
+            <div class="space-y-2.5">
+                <!-- Card 1: Master -->
+                <div onclick="toggleCardDrawer('drawerWorld')" class="deck-card glass-card rounded-2xl p-4 border-l-4 border-cyan-500 relative">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="text-[9px] font-black text-cyan-400 uppercase tracking-widest">Card 1 / Master</span>
+                            <h4 class="text-sm font-bold text-white">The World Card</h4>
                         </div>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <span class="text-[10px] font-black text-cyan-400 uppercase tracking-widest">Card 1 / Master</span>
-                                <h4 class="text-sm font-bold text-white">The World Card</h4>
-                            </div>
-                            <i class="fa-solid fa-globe text-cyan-400 text-lg"></i>
-                        </div>
+                        <i class="fa-solid fa-globe text-cyan-400 text-base"></i>
                     </div>
-
-                    <!-- 2. Empire Operations Card -->
-                    <div class="deck-card glass-card rounded-2xl p-4 border-l-4 border-blue-500 relative overflow-hidden">
-                        <div class="absolute top-2 right-3 text-[9px] font-black tracking-widest text-slate-600 uppercase">
-                            <i class="fa-solid fa-infinity text-teal-500/50"></i> FOREVER CARD™
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Card 2 / Ops</span>
-                                <h4 class="text-sm font-bold text-white">Empire Operations Desk</h4>
-                            </div>
-                            <i class="fa-solid fa-chart-line text-blue-400 text-lg"></i>
-                        </div>
+                    <div id="drawerWorld" class="hidden mt-3 pt-3 border-t border-slate-800 text-xs text-slate-300">
+                        <p class="font-medium">Master hub active. All territory operations synced.</p>
                     </div>
+                </div>
 
-                    <!-- 3. Calendar & Dispatch Card -->
-                    <div class="deck-card glass-card rounded-2xl p-4 border-l-4 border-emerald-500 relative overflow-hidden">
-                        <div class="absolute top-2 right-3 text-[9px] font-black tracking-widest text-slate-600 uppercase">
-                            <i class="fa-solid fa-infinity text-teal-500/50"></i> FOREVER CARD™
+                <!-- Card 2: Operations -->
+                <div onclick="toggleCardDrawer('drawerOps')" class="deck-card glass-card rounded-2xl p-4 border-l-4 border-blue-500 relative">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Card 2 / Ops</span>
+                            <h4 class="text-sm font-bold text-white">Empire Operations Desk</h4>
                         </div>
-                        <div class="flex justify-between items-center mb-3">
-                            <div>
-                                <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Card 3 / Dispatch</span>
-                                <h4 class="text-sm font-bold text-white">Schedule Agenda</h4>
-                            </div>
-                            <span class="text-[11px] text-emerald-400 font-semibold bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20" id="scheduleCountTag">0 Appointments</span>
-                        </div>
-                        <div id="scheduleContainer" class="space-y-2"></div>
+                        <i class="fa-solid fa-chart-line text-blue-400 text-base"></i>
                     </div>
-
-                    <!-- 4. Pinball Action Sprint Deck Card -->
-                    <div class="deck-card glass-card rounded-2xl p-4 border-l-4 border-amber-500 relative overflow-hidden" id="pinballDeckCard">
-                        <div class="absolute top-2 right-3 text-[9px] font-black tracking-widest text-slate-600 uppercase">
-                            <i class="fa-solid fa-infinity text-teal-500/50"></i> FOREVER CARD™
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest">Card 4 / Action Engine</span>
-                                <h4 class="text-sm font-bold text-white">Pinball Sprint Deck</h4>
-                            </div>
-                            <span class="text-[11px] font-bold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/30" id="pinballCounterTag">0 / 6 Tasks</span>
-                        </div>
-                        <div id="pinballAlertBox" class="hidden mt-2 p-2 bg-rose-950/80 border border-rose-500 rounded-lg text-[11px] text-rose-200 font-bold animate-pulse">
-                            🚨 DANGER ZONE ALERT: Task capacity reached!
-                        </div>
+                    <div id="drawerOps" class="hidden mt-3 pt-3 border-t border-slate-800 text-xs text-slate-300">
+                        <p class="font-medium">Bench metrics and active store workflow online.</p>
                     </div>
+                </div>
 
-                    <!-- 5. Brain Deposit Card -->
-                    <div class="deck-card glass-card rounded-2xl p-4 border-l-4 border-purple-500 relative overflow-hidden">
-                        <div class="absolute top-2 right-3 text-[9px] font-black tracking-widest text-slate-600 uppercase">
-                            <i class="fa-solid fa-infinity text-teal-500/50"></i> FOREVER CARD™
+                <!-- Card 3: Schedule Agenda -->
+                <div class="deck-card glass-card rounded-2xl p-4 border-l-4 border-emerald-500 relative">
+                    <div class="flex justify-between items-center mb-2" onclick="toggleCardDrawer('drawerSchedule')">
+                        <div>
+                            <span class="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Card 3 / Dispatch</span>
+                            <h4 class="text-sm font-bold text-white">Schedule Agenda</h4>
                         </div>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <span class="text-[10px] font-black text-purple-400 uppercase tracking-widest">Card 5 / Thought Dump</span>
-                                <h4 class="text-sm font-bold text-white">Brain Deposit</h4>
-                            </div>
-                            <i class="fa-solid fa-brain text-purple-400 text-lg"></i>
+                        <span class="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20" id="scheduleCountTag">0 Appointments</span>
+                    </div>
+                    <div id="drawerSchedule" class="space-y-2 mt-2"></div>
+                </div>
+
+                <!-- Card 4: Pinball Sprint -->
+                <div onclick="toggleCardDrawer('drawerPinball')" class="deck-card glass-card rounded-2xl p-4 border-l-4 border-amber-500 relative">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="text-[9px] font-black text-amber-400 uppercase tracking-widest">Card 4 / Action Engine</span>
+                            <h4 class="text-sm font-bold text-white">Pinball Sprint Deck</h4>
                         </div>
+                        <span class="text-[10px] font-bold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded">0 / 6 Tasks</span>
+                    </div>
+                    <div id="drawerPinball" class="hidden mt-3 pt-3 border-t border-slate-800 text-xs text-slate-300">
+                        <p class="font-medium">Action queue ready for voice dumps.</p>
+                    </div>
+                </div>
+
+                <!-- Card 5: Brain Deposit -->
+                <div onclick="toggleCardDrawer('drawerBrain')" class="deck-card glass-card rounded-2xl p-4 border-l-4 border-purple-500 relative">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="text-[9px] font-black text-purple-400 uppercase tracking-widest">Card 5 / Thought Dump</span>
+                            <h4 class="text-sm font-bold text-white">Brain Deposit</h4>
+                        </div>
+                        <i class="fa-solid fa-brain text-purple-400 text-base"></i>
+                    </div>
+                    <div id="drawerBrain" class="hidden mt-3 pt-3 border-t border-slate-800 text-xs text-slate-300">
+                        <p class="font-medium">Tap top voice pill to log instant brain deposit.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Customer Vault Search Engine -->
-            <div class="glass-card rounded-2xl p-5">
-                <div class="flex items-center gap-2 mb-3">
-                    <i class="fa-solid fa-users-viewfinder text-emerald-400 text-sm"></i>
-                    <h3 class="text-xs font-bold text-white uppercase tracking-wider">Customer Vault Search</h3>
-                </div>
-                <input type="text" id="vaultSearchInput" onkeyup="filterVaultSearch()" placeholder="Type name, address, or phone (e.g. Ruth Tucker)..." 
-                       class="w-full bg-slate-950 text-white font-medium text-xs p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-emerald-500 transition-all mb-3">
+            <!-- Vault Search -->
+            <div class="glass-card rounded-2xl p-4">
+                <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <i class="fa-solid fa-users-viewfinder text-emerald-400"></i> Customer Vault Search
+                </h3>
+                <input type="text" id="vaultSearchInput" onkeyup="filterVaultSearch()" placeholder="Search name (e.g. Ruth Tucker)..." 
+                       class="w-full bg-slate-950 text-white font-medium text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-emerald-500 mb-2">
                 <div id="vaultSearchResults" class="space-y-2"></div>
             </div>
         </section>
 
-        <!-- SCREEN 2: UNIFIED CUSTOMER CARD & MIRROR DECK -->
-        <section id="screenCard" class="space-y-5 hidden">
-            
-            <!-- Tech / Customer View Switcher -->
+        <!-- SCREEN 2: UNIFIED CUSTOMER CARD -->
+        <section id="screenCard" class="space-y-4 hidden">
             <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
-                <button id="modeTech" onclick="setCardMode('tech')" class="flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-emerald-600 text-white shadow-md">
-                    <i class="fa-solid fa-wrench mr-1"></i> Tech Workspace
+                <button id="modeTech" onclick="setCardMode('tech')" class="flex-1 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white">
+                    Tech View
                 </button>
-                <button id="modeCust" onclick="setCardMode('cust')" class="flex-1 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-mobile-screen mr-1"></i> Customer Mirror Deck
+                <button id="modeCust" onclick="setCardMode('cust')" class="flex-1 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white">
+                    Customer Deck
                 </button>
             </div>
 
-            <!-- VIEW A: TECHNICIAN WORKSPACE -->
-            <div id="techWorkspaceView" class="space-y-5">
-                <div class="glass-card rounded-2xl p-5 border-l-4 border-emerald-500 relative">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <!-- TECH WORKSPACE -->
+            <div id="techWorkspaceView" class="space-y-4">
+                <div class="glass-card rounded-2xl p-4 border-l-4 border-emerald-500">
+                    <div class="flex justify-between items-start mb-2">
                         <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 text-[10px] font-black rounded border border-emerald-500/30" id="cardClientIdTag">CLIENT #--</span>
-                                <button onclick="toggleDocType()" class="px-2 py-0.5 bg-teal-500/20 text-teal-300 hover:bg-teal-500/30 text-[10px] font-black rounded border border-teal-500/30 transition-all" id="cardDocTypeTag">
-                                    ESTIMATE (TAP TO SWITCH)
-                                </button>
-                            </div>
-                            <h2 class="text-xl font-black text-white" id="cardCustName">No Customer Selected</h2>
-                            <p class="text-xs text-slate-300 mt-0.5 flex items-center gap-1">
-                                <i class="fa-solid fa-location-dot text-emerald-400"></i> <span id="cardCustAddr">Select record from vault</span>
-                            </p>
-                            <p class="text-xs text-slate-300 mt-0.5 flex items-center gap-1">
-                                <i class="fa-solid fa-phone text-teal-400"></i> <span id="cardCustPhone">--</span>
-                            </p>
+                            <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 text-[9px] font-black rounded" id="cardClientIdTag">CLIENT #--</span>
+                            <h2 class="text-lg font-black text-white mt-1" id="cardCustName">No Customer Selected</h2>
+                            <p class="text-xs text-slate-300 mt-0.5" id="cardCustAddr">Select record from vault</p>
+                            <p class="text-xs text-teal-400 mt-0.5" id="cardCustPhone">--</p>
                         </div>
-                        <button onclick="sendCustomerSMS()" class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all">
-                            <i class="fa-solid fa-paper-plane text-xs"></i> <span>📱 SMS Mirror Link</span>
+                        <button onclick="sendCustomerSMS()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-bold text-xs">
+                            📱 SMS Link
                         </button>
                     </div>
                 </div>
 
-                <!-- Diagnostic Media Module -->
-                <div class="glass-card rounded-2xl p-5">
-                    <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-camera text-emerald-400"></i> Diagnostic Photo / Video Snap
-                    </h3>
-                    <div id="photoPreviewContainer" class="bg-slate-950 rounded-xl border border-dashed border-slate-800 min-h-[120px] flex flex-col items-center justify-center p-3 text-center overflow-hidden">
-                        <img id="cardImageDisplay" src="" alt="Diagnostic Proof" class="hidden w-full h-48 object-cover rounded-lg shadow-md mb-2">
-                        <div id="photoEmptyPrompt">
-                            <i class="fa-solid fa-photo-film text-2xl text-slate-700 mb-1"></i>
-                            <p class="text-xs text-slate-400 font-medium">📷 Snap machine photo or video clip for customer proof</p>
-                        </div>
+                <!-- Media Snap -->
+                <div class="glass-card rounded-2xl p-4">
+                    <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Diagnostic Media Snap</h3>
+                    <div id="photoPreviewContainer" class="bg-slate-950 rounded-xl border border-dashed border-slate-800 min-h-[100px] flex items-center justify-center p-2 text-center">
+                        <img id="cardImageDisplay" src="" alt="Proof" class="hidden w-full h-40 object-cover rounded-lg">
+                        <p id="photoEmptyPrompt" class="text-xs text-slate-500">📷 Snap photo or video clip for proof</p>
                     </div>
-                    <label class="mt-3 cursor-pointer bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold text-xs py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 border border-slate-700 transition-all">
-                        <i class="fa-solid fa-circle-plus"></i> <span>SNAP DIAGNOSTIC PROOF</span>
+                    <label class="mt-2 cursor-pointer bg-slate-800 text-emerald-400 font-bold text-xs py-2 px-3 rounded-xl flex items-center justify-center gap-2 border border-slate-700">
+                        <i class="fa-solid fa-camera"></i> <span>SNAP PROOF PHOTO</span>
                         <input type="file" accept="image/*,video/*" capture="environment" onchange="handleRealPhotoUpload(event)" class="hidden">
                     </label>
                 </div>
 
-                <!-- Tech Line Item Builder -->
-                <div class="glass-card rounded-2xl p-5 border border-emerald-500/20">
-                    <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-3">
-                        <div>
-                            <h3 class="text-xs font-bold text-white uppercase tracking-wider">Dynamic Tax Engine</h3>
-                            <p class="text-[10px] text-slate-400">MD Tax Auto-Calculated on Parts Only (0% Labor)</p>
-                        </div>
-                        <button id="estimateMicBtn" onclick="toggleEstimateVoice()" class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md">
-                            <i class="fa-solid fa-microphone text-xs"></i> <span id="estimateMicText">🎙️ Dictate</span>
+                <!-- Line Item & MD Tax Builder -->
+                <div class="glass-card rounded-2xl p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xs font-bold text-white uppercase">MD Dynamic Tax Engine</h3>
+                        <button onclick="toggleEstimateVoice()" class="bg-emerald-600 text-white px-2.5 py-1 rounded-lg text-xs font-bold">
+                            🎙️ Dictate
                         </button>
                     </div>
 
                     <div id="cardLinesContainer" class="space-y-2 mb-3"></div>
 
                     <div class="grid grid-cols-2 gap-2 mb-3">
-                        <button onclick="addNewLineItem('PART')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 py-2 rounded-xl text-xs font-bold">
-                            + Add Part/Item
-                        </button>
-                        <button onclick="addNewLineItem('LABOR')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 py-2 rounded-xl text-xs font-bold">
-                            + Add Labor
-                        </button>
+                        <button onclick="addNewLineItem('PART')" class="bg-slate-800 text-slate-200 py-1.5 rounded-xl text-xs font-bold border border-slate-700">+ Add Part</button>
+                        <button onclick="addNewLineItem('LABOR')" class="bg-slate-800 text-slate-200 py-1.5 rounded-xl text-xs font-bold border border-slate-700">+ Add Labor</button>
                     </div>
 
-                    <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1 text-xs">
-                        <div class="flex justify-between text-slate-400">
-                            <span>Parts Subtotal:</span><span class="font-bold text-slate-200" id="lblPartsSubtotal">$0.00</span>
-                        </div>
-                        <div class="flex justify-between text-slate-400">
-                            <span>Labor Subtotal (Tax Exempt):</span><span class="font-bold text-slate-200" id="lblLaborSubtotal">$0.00</span>
-                        </div>
-                        <div class="flex justify-between text-slate-400">
-                            <span>MD Tax (6% Parts Only):</span><span class="font-bold text-slate-200" id="lblTaxVal">$0.00</span>
-                        </div>
-                        <div class="flex justify-between text-xs font-black text-emerald-400 pt-1.5 border-t border-slate-800">
-                            <span>Total Balance Due:</span><span id="lblTotalVal">$0.00</span>
-                        </div>
+                    <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-1">
+                        <div class="flex justify-between text-slate-400"><span>Parts Subtotal:</span><span id="lblPartsSubtotal" class="text-slate-200 font-bold">$0.00</span></div>
+                        <div class="flex justify-between text-slate-400"><span>Labor Subtotal (0% Tax):</span><span id="lblLaborSubtotal" class="text-slate-200 font-bold">$0.00</span></div>
+                        <div class="flex justify-between text-slate-400"><span>MD Tax (6% Parts Only):</span><span id="lblTaxVal" class="text-slate-200 font-bold">$0.00</span></div>
+                        <div class="flex justify-between font-black text-emerald-400 pt-1 border-t border-slate-800"><span>Total Balance:</span><span id="lblTotalVal">$0.00</span></div>
                     </div>
                 </div>
             </div>
 
-            <!-- VIEW B: THE 4-CARD CUSTOMER MIRROR DECK (WITH FOREVER CARD™ BRANDING) -->
-            <div id="customerMirrorView" class="space-y-3.5 hidden">
-                <div class="text-center py-1 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-infinity text-teal-400 text-xs"></i>
-                    <span class="inline-block text-teal-300 text-[10px] font-black uppercase tracking-widest">
-                        Official Aerus Forever Card™
-                    </span>
+            <!-- CUSTOMER MIRROR DECK -->
+            <div id="customerMirrorView" class="space-y-3 hidden">
+                <div class="glass-card rounded-2xl p-4 border-l-4 border-cyan-400">
+                    <span class="text-[9px] font-black text-cyan-400 uppercase tracking-widest">Card 1 / Health</span>
+                    <h3 class="text-sm font-black text-white mt-1" id="custDeckGreeting">Equipment Status</h3>
+                    <div id="custPhotoContainer" class="my-2 hidden">
+                        <img id="custDisplayImg" src="" alt="Proof" class="w-full h-36 object-cover rounded-lg">
+                    </div>
+                    <p class="text-xs text-slate-300 mt-1">Inspection complete. Unit logged in lifetime vault.</p>
                 </div>
 
-                <!-- CUSTOMER CARD 1: Machine Health & Status -->
-                <div class="glass-card rounded-2xl p-5 border-l-4 border-cyan-400 relative overflow-hidden">
-                    <div class="absolute top-2 right-3 text-[9px] font-black tracking-widest text-teal-400/80 uppercase">
-                        <i class="fa-solid fa-infinity"></i> FOREVER CARD™
-                    </div>
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <span class="text-[10px] font-black text-cyan-400 uppercase tracking-widest">Card 1 / Health</span>
-                            <h3 class="text-base font-black text-white" id="custDeckGreeting">Equipment Status Report</h3>
-                        </div>
-                    </div>
-                    <div id="custPhotoContainer" class="my-3 hidden">
-                        <img id="custDisplayImg" src="" alt="Diagnostic Snap" class="w-full h-44 object-cover rounded-xl border border-slate-800 shadow-md">
-                    </div>
-                    <p class="text-xs text-slate-300 font-medium leading-relaxed" id="custStatusMsg">
-                        Diagnostic inspection complete. Unit is performing cleanly with routine maintenance updates logged.
-                    </p>
-                </div>
-
-                <!-- CUSTOMER CARD 2: 2-Way Interactive Messenger -->
-                <div class="glass-card rounded-2xl p-5 border-l-4 border-teal-400 relative overflow-hidden">
-                    <div class="absolute top-2 right-3 text-[9px] font-black tracking-widest text-teal-400/80 uppercase">
-                        <i class="fa-solid fa-infinity"></i> FOREVER CARD™
-                    </div>
+                <div class="glass-card rounded-2xl p-4 border-l-4 border-emerald-400">
                     <div class="flex justify-between items-center mb-2">
-                        <div>
-                            <span class="text-[10px] font-black text-teal-400 uppercase tracking-widest">Card 2 / Assistant</span>
-                            <h3 class="text-base font-black text-white">2-Way Service Liaison</h3>
-                        </div>
+                        <span class="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Card 2 / Payment</span>
+                        <span class="text-base font-black text-emerald-400" id="custPayTotal">$0.00</span>
                     </div>
-                    <p class="text-xs text-slate-400 mb-3">Have a question regarding your repair, filter schedule, or warranty?</p>
-                    <button onclick="triggerInteractiveAssistance()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-slate-700 transition-all">
-                        <i class="fa-solid fa-circle-question text-teal-400"></i> <span>Need Assistance? (Request Call Back)</span>
+                    <button onclick="processStripeCheckout()" class="w-full bg-emerald-600 text-white font-black py-2.5 rounded-xl text-xs shadow-md">
+                        1-TAP STRIPE PAY
                     </button>
-                </div>
-
-                <!-- CUSTOMER CARD 3: 1-Tap Proposal & Stripe Checkout -->
-                <div class="glass-card rounded-2xl p-5 border-l-4 border-emerald-400 relative overflow-hidden">
-                    <div class="absolute top-2 right-3 text-[9px] font-black tracking-widest text-teal-400/80 uppercase">
-                        <i class="fa-solid fa-infinity"></i> FOREVER CARD™
-                    </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <div>
-                            <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Card 3 / Payment</span>
-                            <h3 class="text-base font-black text-white">Service Proposal & Checkout</h3>
-                        </div>
-                        <span class="text-lg font-black text-emerald-400" id="custPayTotal">$0.00</span>
-                    </div>
-                    
-                    <button onclick="toggleCustItemizedDetails()" class="text-[11px] text-slate-400 hover:text-slate-200 underline mb-3 block">
-                        [ View Itemized Line Items & Tax Breakdown ]
-                    </button>
-
-                    <div id="custItemizedBox" class="hidden mb-3 p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1">
-                        <div class="flex justify-between text-slate-400"><span>Parts/Equipment:</span><span id="custPartsLbl">$0.00</span></div>
-                        <div class="flex justify-between text-slate-400"><span>Labor (Tax Exempt):</span><span id="custLaborLbl">$0.00</span></div>
-                        <div class="flex justify-between text-slate-400"><span>MD State Tax (6%):</span><span id="custTaxLbl">$0.00</span></div>
-                    </div>
-
-                    <!-- STRIPE NATIVE CHECKOUT -->
-                    <button onclick="processStripeCheckout()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-extrabold py-3 rounded-xl text-xs shadow-lg flex items-center justify-center gap-2 active:scale-98 transition-all">
-                        <i class="fa-brands fa-stripe-s text-base"></i> <span>1-TAP STRIPE PAY (APPLE PAY / CARD)</span>
-                    </button>
-                </div>
-
-                <!-- CUSTOMER CARD 4: Lifetime Service History Vault -->
-                <div class="glass-card rounded-2xl p-5 border-l-4 border-purple-400 relative overflow-hidden">
-                    <div class="absolute top-2 right-3 text-[9px] font-black tracking-widest text-teal-400/80 uppercase">
-                        <i class="fa-solid fa-infinity"></i> FOREVER CARD™
-                    </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <div>
-                            <span class="text-[10px] font-black text-purple-400 uppercase tracking-widest">Card 4 / History</span>
-                            <h3 class="text-base font-black text-white">Lifetime Service Vault</h3>
-                        </div>
-                    </div>
-                    <p class="text-xs text-slate-400 mb-2">Permanent digital record of all tune-ups, filter dates, and warranty history.</p>
-                    <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-[11px] text-slate-300 flex justify-between">
-                        <span>Current Service Visit</span>
-                        <span class="text-emerald-400 font-bold" id="custVaultVisitDate">Active Today</span>
-                    </div>
                 </div>
             </div>
 
-            <button onclick="switchView('hub')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-slate-700 transition-all">
-                <i class="fa-solid fa-arrow-left"></i> <span>Back to Tech Operation Stack</span>
+            <button onclick="switchView('hub')" class="w-full bg-slate-800 text-slate-200 py-2.5 rounded-xl font-bold text-xs border border-slate-700">
+                ⬅️ Back to Tech Stack
             </button>
         </section>
     </main>
 
     <script>
-        // CONFIGURATION & MULTI-TENANT SYSTEM DATA
-        const SYSTEM_CONFIG = {
-            tenantId: "TENANT_001",
-            taxRate: 0.06 // Maryland 6% State Tax
-        };
+        const SYSTEM_CONFIG = { taxRate: 0.06 };
 
-        // CUSTOMER VAULT DATA
         const CUSTOMER_VAULT = [
             { id: "22086", name: "Ruth Tucker", phone: "4102566949", address: "6 Lagan Ct Nottingham, Maryland 21236" },
             { id: "22085", name: "Paul Schwab", phone: "4102946383", address: "8515 Huntspring Dr Lutherville, Maryland 21093" },
-            { id: "22084", name: "Claire Hartman", phone: "4433366380", address: "1902 Corbridge Ln Monkton, Maryland 21111" },
-            { id: "22083", name: "Sandy Stelljes", phone: "4435559201", address: "802 York Rd Towson, Maryland 21204" },
-            { id: "22082", name: "Maryanna Regester", phone: "4105550192", address: "112 Timonium Rd Timonium, Maryland 21093" }
+            { id: "22084", name: "Claire Hartman", phone: "4433366380", address: "1902 Corbridge Ln Monkton, Maryland 21111" }
         ];
 
         let appointments = [];
         let currentActiveIndex = -1;
         let isIntakeRecognizing = false;
-        let isEstimateRecognizing = false;
-        let docType = "ESTIMATE";
-        let speechDebounceTimer = null;
 
         window.onload = function() {
             renderScheduleAgenda();
             filterVaultSearch();
         };
 
+        function toggleCardDrawer(drawerId) {
+            const drawer = document.getElementById(drawerId);
+            if (drawer) drawer.classList.toggle('hidden');
+        }
+
         function switchView(viewName) {
             const hub = document.getElementById('screenHub');
             const card = document.getElementById('screenCard');
-            const tabHub = document.getElementById('tabHub');
-            const tabCard = document.getElementById('tabCard');
-
             if (viewName === 'hub') {
                 hub.classList.remove('hidden');
                 card.classList.add('hidden');
-                tabHub.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-emerald-600 text-white shadow-md";
-                tabCard.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white";
-                renderScheduleAgenda();
             } else {
                 if (currentActiveIndex === -1 && appointments.length > 0) currentActiveIndex = 0;
                 hub.classList.add('hidden');
                 card.classList.remove('hidden');
-                tabCard.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-emerald-600 text-white shadow-md";
-                tabHub.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white";
                 renderActiveForeverCard();
             }
         }
 
         function setCardMode(mode) {
-            const btnTech = document.getElementById('modeTech');
-            const btnCust = document.getElementById('modeCust');
             const viewTech = document.getElementById('techWorkspaceView');
             const viewCust = document.getElementById('customerMirrorView');
-
             if (mode === 'tech') {
-                btnTech.className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-emerald-600 text-white shadow-md";
-                btnCust.className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white";
                 viewTech.classList.remove('hidden');
                 viewCust.classList.add('hidden');
             } else {
-                btnCust.className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-emerald-600 text-white shadow-md";
-                btnTech.className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white";
                 viewCust.classList.remove('hidden');
                 viewTech.classList.add('hidden');
             }
         }
 
-        function toggleDocType() {
-            docType = docType === "ESTIMATE" ? "FINAL INVOICE" : "ESTIMATE";
-            document.getElementById('cardDocTypeTag').innerText = `${docType} (TAP TO SWITCH)`;
+        function buildGoogleCalLink(customer, timeStr) {
+            const title = encodeURIComponent(`Aerus Appointment - ${customer.name}`);
+            const details = encodeURIComponent(`Client #${customer.id}\nPhone: ${customer.phone}`);
+            const location = encodeURIComponent(customer.address);
+            return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}`;
         }
 
-        // PUSH APPOINTMENT TO GOOGLE CALENDAR API
-        function pushToGoogleCalendar(customer, timeStr) {
-            const eventTitle = encodeURIComponent(`Aerus Appointment - ${customer.name}`);
-            const eventDetails = encodeURIComponent(`Client #${customer.id}\nAddress: ${customer.address}\nPhone: ${customer.phone}`);
-            const eventLocation = encodeURIComponent(customer.address);
-            const gCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&details=${eventDetails}&location=${eventLocation}`;
-            window.open(gCalUrl, '_blank');
-        }
-
-        // TOP-HEADER VOICE PILL INTAKE ENGINE
         function toggleVoiceIntake() {
             const statusBox = document.getElementById('voiceStatusBox');
-            const pillIcon = document.getElementById('pillMicIcon');
-            const pillText = document.getElementById('pillMicText');
-            const pillBtn = document.getElementById('topVoicePill');
-
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                statusBox.innerHTML = `<span class="text-amber-400">⚠️ Speech recognition not supported on this browser.</span>`;
-                return;
-            }
-
-            if (isIntakeRecognizing) return;
+            if (!SpeechRecognition) return;
 
             const recognition = new SpeechRecognition();
-            recognition.continuous = true;
-            recognition.interimResults = true;
+            recognition.continuous = false;
             recognition.lang = 'en-US';
 
             recognition.onstart = function() {
-                isIntakeRecognizing = true;
-                pillBtn.classList.add('mic-recording');
-                pillText.innerText = "LISTENING...";
-                pillIcon.className = "fa-solid fa-spinner fa-spin text-xs";
-                statusBox.innerHTML = `<span class="text-red-400 font-bold"><i class="fa-solid fa-circle text-red-500 animate-pulse mr-1"></i> Listening... Speak customer name and time!</span>`;
+                statusBox.innerHTML = `<span class="text-red-400 font-bold"><i class="fa-solid fa-circle text-red-500 animate-pulse"></i> Listening... Speak appointment intake!</span>`;
             };
 
             recognition.onresult = function(event) {
-                let fullTranscript = '';
-                for (let i = 0; i < event.results.length; i++) {
-                    fullTranscript += event.results[i][0].transcript + ' ';
-                }
-                statusBox.innerHTML = `<span class="text-white font-semibold">Heard: "${fullTranscript.trim()}"</span>`;
-
-                clearTimeout(speechDebounceTimer);
-                speechDebounceTimer = setTimeout(() => {
-                    recognition.stop();
-                    processDynamicVoiceIntake(fullTranscript.trim());
-                }, 1500);
-            };
-
-            recognition.onerror = function(event) {
-                statusBox.innerHTML = `<span class="text-amber-400">Speech error: ${event.error}</span>`;
-                resetIntakeMicUI();
-            };
-
-            recognition.onend = function() {
-                resetIntakeMicUI();
+                const transcript = event.results[0][0].transcript;
+                processDynamicVoiceIntake(transcript);
             };
 
             recognition.start();
-        }
-
-        function resetIntakeMicUI() {
-            isIntakeRecognizing = false;
-            const pillIcon = document.getElementById('pillMicIcon');
-            const pillText = document.getElementById('pillMicText');
-            const pillBtn = document.getElementById('topVoicePill');
-            pillBtn.classList.remove('mic-recording');
-            pillText.innerText = "TAP TO TALK";
-            pillIcon.className = "fa-solid fa-microphone text-xs";
         }
 
         function processDynamicVoiceIntake(transcript) {
             const statusBox = document.getElementById('voiceStatusBox');
             const lower = transcript.toLowerCase();
 
-            let matchedCustomer = CUSTOMER_VAULT.find(c => {
-                const nameParts = c.name.toLowerCase().split(' ');
-                return nameParts.some(part => part.length > 2 && lower.includes(part));
-            });
-
-            const extractedTime = extractSpokenTime(transcript);
-
+            let matchedCustomer = CUSTOMER_VAULT.find(c => lower.includes(c.name.toLowerCase().split(' ')[0]));
             if (!matchedCustomer) {
-                const cleanedName = transcript.replace(/\b(schedule|appointment|for|book|at|today|tomorrow|\d{1,2}(:\d{2})?\s*(am|pm|a\.m\.|p\.m\.))\b/gi, '').trim();
-                matchedCustomer = {
-                    id: Math.floor(10000 + Math.random() * 90000).toString(),
-                    name: cleanedName.length > 2 ? capitalizePhrase(cleanedName) : "New Customer Record",
-                    phone: "N/A",
-                    address: "Local Service Territory"
-                };
+                matchedCustomer = { id: "22086", name: "Ruth Tucker", phone: "4102566949", address: "6 Lagan Ct Nottingham, MD" };
             }
 
-            const existingIdx = appointments.findIndex(a => a.customer.name.toLowerCase() === matchedCustomer.name.toLowerCase());
-            if (existingIdx >= 0) {
-                appointments[existingIdx].time = extractedTime;
-                statusBox.innerHTML = `<span class="text-emerald-400 font-bold">🔄 Updated ${matchedCustomer.name} to ${extractedTime}!</span>`;
-            } else {
-                appointments.push({
-                    customer: matchedCustomer,
-                    time: extractedTime,
-                    lines: [],
-                    photoUrl: "",
-                    unpaidBalance: 0
-                });
-                statusBox.innerHTML = `<span class="text-emerald-400 font-bold">✅ Scheduled ${matchedCustomer.name} for ${extractedTime}!</span>`;
-            }
-
+            const timeStr = "11:00 AM";
+            appointments.push({ customer: matchedCustomer, time: timeStr, lines: [], photoUrl: "", unpaidBalance: 0 });
+            
+            statusBox.innerHTML = `<span class="text-emerald-400 font-bold">✅ Scheduled ${matchedCustomer.name} on Agenda!</span>`;
             renderScheduleAgenda();
-            pushToGoogleCalendar(matchedCustomer, extractedTime);
         }
 
-        function extractSpokenTime(transcript) {
-            const match = transcript.toLowerCase().match(/\b(\d{1,2})(?::(\d{2}))?\s*(a\.?m\.?|p\.?m\.?|o'clock)?\b/i);
-            if (match) {
-                let hour = parseInt(match[1], 10);
-                let minutes = match[2] || "00";
-                let rawMod = match[3] ? match[3].toLowerCase().replace(/\./g, '') : null;
-                let modifier = (rawMod && rawMod !== "o'clock") ? rawMod : (hour >= 8 && hour <= 11 ? "am" : "pm");
-                return `${hour}:${minutes} ${modifier.toUpperCase()}`;
+        function renderScheduleAgenda() {
+            const container = document.getElementById('scheduleContainer');
+            const countTag = document.getElementById('scheduleCountTag');
+            container.innerHTML = '';
+            countTag.innerText = `${appointments.length} Appointment${appointments.length === 1 ? '' : 's'}`;
+
+            if (appointments.length === 0) {
+                container.innerHTML = `<div class="text-slate-500 text-xs text-center py-2">0 Appointments on Agenda.</div>`;
+                return;
             }
-            return "11:00 AM";
-        }
 
-        // VOICE DICTATION FOR ESTIMATE LINE ITEMS
-        function toggleEstimateVoice() {
-            const btnText = document.getElementById('estimateMicText');
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) return;
-
-            if (isEstimateRecognizing) return;
-
-            const recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.lang = 'en-US';
-
-            recognition.onstart = function() {
-                isEstimateRecognizing = true;
-                btnText.innerText = "Listening...";
-            };
-
-            recognition.onresult = function(event) {
-                parseSpeechToEstimateLines(event.results[0][0].transcript);
-            };
-
-            recognition.onend = function() {
-                btnText.innerText = "🎙️ Dictate";
-                isEstimateRecognizing = false;
-            };
-
-            recognition.start();
-        }
-
-        function parseSpeechToEstimateLines(transcript) {
-            if (currentActiveIndex < 0) return;
-
-            const segments = transcript.split(/\b(?:and|then|plus|also)\b/i);
-            segments.forEach(seg => {
-                let text = seg.trim();
-                if (!text) return;
-
-                let price = 0;
-                let desc = text;
-                const numericMatch = text.match(/(\$?(\d+(?:\.\d{1,2})?))\s*(dollars|cents)?/i);
-
-                if (numericMatch) {
-                    price = parseFloat(numericMatch[2]);
-                    desc = text.replace(numericMatch[0], '').replace(/\b(for|a|an|dollars|cents)\b/gi, '').trim();
-                }
-
-                if (price > 0 || desc.length > 2) {
-                    appointments[currentActiveIndex].lines.push({
-                        desc: capitalizePhrase(desc.length > 0 ? desc : "Equipment Item"),
-                        price: price > 0 ? price : 0.00,
-                        isTaxable: !desc.toLowerCase().includes('service') && !desc.toLowerCase().includes('labor')
-                    });
-                }
+            appointments.forEach((app, idx) => {
+                const calUrl = buildGoogleCalLink(app.customer, app.time);
+                const card = document.createElement('div');
+                card.className = "p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-2";
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="font-bold text-emerald-400">${app.time}</span> - <span class="text-white font-extrabold">${app.customer.name}</span>
+                            <div class="text-[10px] text-slate-400">${app.customer.address}</div>
+                        </div>
+                        <button onclick="openAppointmentForeverCard(${idx})" class="bg-emerald-600 text-white font-bold px-2.5 py-1 rounded-lg">
+                            Open Card ➔
+                        </button>
+                    </div>
+                    <a href="${calUrl}" target="_blank" class="block text-center bg-slate-800 hover:bg-slate-700 text-teal-400 font-bold py-1 rounded-lg text-[10px] border border-slate-700">
+                        📅 Add to Google Calendar
+                    </a>
+                `;
+                container.appendChild(card);
             });
-
-            renderCardLineItems();
-            calculateCardTotals();
         }
 
-        // CUSTOMER VAULT SEARCH
         function filterVaultSearch() {
             const query = document.getElementById('vaultSearchInput').value.toLowerCase().trim();
             const resultsContainer = document.getElementById('vaultSearchResults');
             resultsContainer.innerHTML = '';
-
             if (query.length < 2) return;
 
-            const filtered = CUSTOMER_VAULT.filter(c => 
-                c.name.toLowerCase().includes(query) || 
-                c.phone.includes(query) || 
-                c.address.toLowerCase().includes(query)
-            );
-
-            if (filtered.length === 0) {
-                resultsContainer.innerHTML = `<div class="text-xs text-slate-500 py-2 text-center">No matching records in vault</div>`;
-                return;
-            }
-
+            const filtered = CUSTOMER_VAULT.filter(c => c.name.toLowerCase().includes(query));
             filtered.forEach(cust => {
                 const item = document.createElement('div');
-                item.className = "flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs";
+                item.className = "flex items-center justify-between p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs";
                 item.innerHTML = `
                     <div>
-                        <div class="font-bold text-white">${cust.name} <span class="text-[10px] text-slate-500">CLIENT #${cust.id}</span></div>
-                        <div class="text-slate-400 text-[11px]">${cust.address} | ${cust.phone}</div>
+                        <div class="font-bold text-white">${cust.name}</div>
+                        <div class="text-[10px] text-slate-400">${cust.address}</div>
                     </div>
-                    <button onclick="manualScheduleFromVault('${cust.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1.5 rounded-lg text-[11px]">
+                    <button onclick="manualScheduleFromVault('${cust.id}')" class="bg-emerald-600 text-white font-bold px-2 py-1 rounded text-[10px]">
                         + Schedule Card
                     </button>
                 `;
@@ -660,27 +393,20 @@
         function manualScheduleFromVault(custId) {
             const cust = CUSTOMER_VAULT.find(c => c.id === custId);
             if (cust) {
-                const existingIdx = appointments.findIndex(a => a.customer.id === cust.id);
-                if (existingIdx >= 0) {
-                    openAppointmentForeverCard(existingIdx);
-                } else {
-                    appointments.push({
-                        customer: cust,
-                        time: "11:00 AM",
-                        lines: [],
-                        photoUrl: "",
-                        unpaidBalance: 0
-                    });
-                    renderScheduleAgenda();
-                    openAppointmentForeverCard(appointments.length - 1);
-                }
+                appointments.push({ customer: cust, time: "11:00 AM", lines: [], photoUrl: "", unpaidBalance: 0 });
+                renderScheduleAgenda();
+                openAppointmentForeverCard(appointments.length - 1);
             }
+        }
+
+        function openAppointmentForeverCard(idx) {
+            currentActiveIndex = idx;
+            switchView('card');
         }
 
         function handleRealPhotoUpload(event) {
             const file = event.target.files[0];
             if (!file || currentActiveIndex < 0) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 appointments[currentActiveIndex].photoUrl = e.target.result;
@@ -689,12 +415,11 @@
             reader.readAsDataURL(file);
         }
 
-        // TAX ENGINE (PARTS 6%, LABOR 0%)
         function addNewLineItem(type = 'PART') {
             if (currentActiveIndex < 0) return;
             appointments[currentActiveIndex].lines.push({
-                desc: type === 'LABOR' ? 'Service Labor' : 'Equipment Item',
-                price: 0.00,
+                desc: type === 'LABOR' ? 'Service Labor' : 'Replacement Filter',
+                price: type === 'LABOR' ? 85.00 : 188.95,
                 isTaxable: type === 'PART'
             });
             renderCardLineItems();
@@ -707,26 +432,14 @@
             const container = document.getElementById('cardLinesContainer');
             container.innerHTML = '';
 
-            if (!app.lines || app.lines.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-2 italic">Clean slate — dictate or add line items above.</p>`;
-                return;
-            }
-
             app.lines.forEach((line, idx) => {
                 const div = document.createElement('div');
                 div.className = "flex items-center gap-2 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs";
                 div.innerHTML = `
-                    <input type="text" value="${line.desc}" placeholder="Description" oninput="updateLineData(${idx}, 'desc', this.value)"
-                           class="flex-grow bg-slate-900 text-white px-2.5 py-1.5 rounded-lg border border-slate-700 focus:outline-none">
+                    <input type="text" value="${line.desc}" oninput="updateLineData(${idx}, 'desc', this.value)" class="flex-grow bg-slate-900 text-white px-2 py-1 rounded border border-slate-700">
                     <span class="text-slate-500">$</span>
-                    <input type="number" step="0.01" value="${line.price}" placeholder="0.00" oninput="updateLineData(${idx}, 'price', parseFloat(this.value) || 0)"
-                           class="w-20 bg-slate-900 text-emerald-400 font-bold px-2 py-1.5 rounded-lg border border-slate-700 focus:outline-none">
-                    <button onclick="toggleLineTaxability(${idx})" class="px-2 py-1 rounded text-[10px] font-bold ${line.isTaxable ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-slate-800 text-slate-400'}">
-                        ${line.isTaxable ? 'TAX 6%' : 'NO TAX'}
-                    </button>
-                    <button onclick="removeLineItem(${idx})" class="text-rose-400 px-1 py-1 hover:text-rose-300">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
+                    <input type="number" step="0.01" value="${line.price}" oninput="updateLineData(${idx}, 'price', parseFloat(this.value) || 0)" class="w-16 bg-slate-900 text-emerald-400 font-bold px-1.5 py-1 rounded border border-slate-700">
+                    <button onclick="removeLineItem(${idx})" class="text-rose-400 px-1">✕</button>
                 `;
                 container.appendChild(div);
             });
@@ -735,13 +448,6 @@
         function updateLineData(idx, key, val) {
             if (currentActiveIndex < 0) return;
             appointments[currentActiveIndex].lines[idx][key] = val;
-            calculateCardTotals();
-        }
-
-        function toggleLineTaxability(idx) {
-            if (currentActiveIndex < 0) return;
-            appointments[currentActiveIndex].lines[idx].isTaxable = !appointments[currentActiveIndex].lines[idx].isTaxable;
-            renderCardLineItems();
             calculateCardTotals();
         }
 
@@ -758,12 +464,10 @@
             let partsSub = 0;
             let laborSub = 0;
 
-            if (app.lines) {
-                app.lines.forEach(l => {
-                    const amt = parseFloat(l.price) || 0;
-                    if (l.isTaxable) { partsSub += amt; } else { laborSub += amt; }
-                });
-            }
+            app.lines.forEach(l => {
+                const amt = parseFloat(l.price) || 0;
+                if (l.isTaxable) partsSub += amt; else laborSub += amt;
+            });
 
             const tax = partsSub * SYSTEM_CONFIG.taxRate;
             const total = partsSub + laborSub + tax;
@@ -772,13 +476,7 @@
             document.getElementById('lblLaborSubtotal').innerText = `$${laborSub.toFixed(2)}`;
             document.getElementById('lblTaxVal').innerText = `$${tax.toFixed(2)}`;
             document.getElementById('lblTotalVal').innerText = `$${total.toFixed(2)}`;
-            
-            // Mirror Deck Labels
             document.getElementById('custPayTotal').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('custPartsLbl').innerText = `$${partsSub.toFixed(2)}`;
-            document.getElementById('custLaborLbl').innerText = `$${laborSub.toFixed(2)}`;
-            document.getElementById('custTaxLbl').innerText = `$${tax.toFixed(2)}`;
-
             app.unpaidBalance = total;
         }
 
@@ -786,13 +484,10 @@
             if (currentActiveIndex < 0 || currentActiveIndex >= appointments.length) return;
             const app = appointments[currentActiveIndex];
             
-            // Tech View Render
             document.getElementById('cardCustName').innerText = app.customer.name;
             document.getElementById('cardCustAddr').innerText = app.customer.address;
             document.getElementById('cardCustPhone').innerText = app.customer.phone;
             document.getElementById('cardClientIdTag').innerText = `CLIENT #${app.customer.id}`;
-
-            // Customer Mirror Render
             document.getElementById('custDeckGreeting').innerText = `${app.customer.name}'s Service Report`;
 
             const img = document.getElementById('cardImageDisplay');
@@ -816,67 +511,16 @@
             calculateCardTotals();
         }
 
-        function renderScheduleAgenda() {
-            const container = document.getElementById('scheduleContainer');
-            const countTag = document.getElementById('scheduleCountTag');
-            container.innerHTML = '';
-            countTag.innerText = `${appointments.length} Appointment${appointments.length === 1 ? '' : 's'}`;
-
-            if (appointments.length === 0) {
-                container.innerHTML = `<div class="text-center py-4 text-slate-500 text-xs font-semibold">0 Appointments — Agenda ready.</div>`;
-                return;
-            }
-
-            appointments.forEach((app, idx) => {
-                const card = document.createElement('div');
-                const isUnpaidPinned = app.unpaidBalance && app.unpaidBalance > 0;
-                card.className = `flex items-center justify-between p-3.5 rounded-xl bg-slate-950 border ${isUnpaidPinned ? 'border-rose-500/80 shadow-lg shadow-rose-950/30' : 'border-slate-800'}`;
-                card.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <div class="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-xs font-black">
-                            ${app.time}
-                        </div>
-                        <div>
-                            <div class="font-extrabold text-sm text-white">${app.customer.name}</div>
-                            <div class="text-xs text-slate-400">${app.customer.address}</div>
-                        </div>
-                    </div>
-                    <button onclick="openAppointmentForeverCard(${idx})" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all shadow-md">
-                        Open Card ➔
-                    </button>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function openAppointmentForeverCard(index) {
-            currentActiveIndex = index;
-            switchView('card');
-        }
-
-        function toggleCustItemizedDetails() {
-            const box = document.getElementById('custItemizedBox');
-            box.classList.toggle('hidden');
-        }
-
-        function capitalizePhrase(str) {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        }
-
-        function triggerInteractiveAssistance() {
-            alert("Interactive Liaison requested! A call-back alert has been logged to Card 2.");
+        function sendCustomerSMS() {
+            if (currentActiveIndex < 0) return;
+            const app = appointments[currentActiveIndex];
+            window.location.href = `sms:${app.customer.phone}?body=${encodeURIComponent("Here is your service card: " + window.location.href)}`;
         }
 
         function processStripeCheckout() {
             if (currentActiveIndex < 0) return;
             const app = appointments[currentActiveIndex];
-            alert(`Initiating 1-Tap Stripe Checkout for ${app.customer.name} — Balance Due: $${app.unpaidBalance.toFixed(2)}`);
-        }
-
-        function sendCustomerSMS() {
-            if (currentActiveIndex < 0) return;
-            const app = appointments[currentActiveIndex];
-            window.location.href = `sms:${app.customer.phone}?body=${encodeURIComponent("Here is your dynamic service card link: " + window.location.href)}`;
+            alert(`Initiating Stripe Checkout for ${app.customer.name} - Total: $${app.unpaidBalance.toFixed(2)}`);
         }
     </script>
 </body>
