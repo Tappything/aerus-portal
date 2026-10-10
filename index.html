@@ -1,76 +1,114 @@
 <script>
 function openPrintInvoiceModal() {
-  if (typeof currentActiveIndex === 'undefined' || currentActiveIndex < 0 || !appointments[currentActiveIndex]) {
+  if (typeof currentActiveIndex === 'undefined' || currentActiveIndex < 0 || !appointments || !appointments[currentActiveIndex]) {
     alert("Please select an active ticket first.");
     return;
   }
   
   const app = appointments[currentActiveIndex];
+  const cust = app.customer || {};
 
-  // 1. Pull dynamic active customer data
-  document.getElementById('invDate').innerText = new Date().toLocaleDateString();
-  document.getElementById('invTicketNum').innerText = '#' + (app.customer.id || '22086');
-  document.getElementById('invCustomerName').innerText = app.customer.name || 'Customer';
-  document.getElementById('invCustomerAddress').innerText = app.customer.address || '';
-  document.getElementById('invCustomerPhone').innerText = app.customer.phone || '';
-  document.getElementById('invCustomerEmail').innerText = app.customer.email || '';
+  // Safe helper: Never crashes if an HTML element ID is missing
+  const setEl = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.innerText = val || '';
+  };
 
-  // 2. Populate dynamic line items from active card
+  setEl('invDate', new Date().toLocaleDateString());
+  setEl('invTicketNum', '#' + (cust.id || '22086'));
+  setEl('invCustomerName', cust.name || 'Valued Customer');
+  setEl('invCustomerAddress', cust.address || 'Local Customer');
+  setEl('invCustomerPhone', cust.phone || '');
+  setEl('invCustomerEmail', cust.email || '');
+
+  // Populate dynamic line items from active card
   const tbody = document.getElementById('invTableBody');
-  tbody.innerHTML = '';
+  if (tbody) {
+    tbody.innerHTML = '';
+    let partsSub = 0;
+    let laborSub = 0;
 
-  let partsSub = 0;
-  let laborSub = 0;
+    if (app.lines && app.lines.length > 0) {
+      app.lines.forEach(item => {
+        const linePrice = parseFloat(item.price) || 0;
+        if (item.isTaxable) {
+          partsSub += linePrice;
+        } else {
+          laborSub += linePrice;
+        }
 
-  if (app.lines && app.lines.length > 0) {
-    app.lines.forEach(item => {
-      const linePrice = parseFloat(item.price) || 0;
-      if (item.isTaxable) {
-        partsSub += linePrice;
-      } else {
-        laborSub += linePrice;
-      }
+        tbody.innerHTML += `
+          <tr class="border-b border-slate-200 text-xs">
+            <td class="p-2 font-medium text-slate-800">
+              ${item.desc || 'Aerus Item'}
+              <span class="text-[10px] text-slate-500 block">${item.isTaxable ? 'Aerus Part (Taxable)' : 'Labor & Diagnostic Service (Tax Exempt)'}</span>
+            </td>
+            <td class="p-2 text-center">1</td>
+            <td class="p-2 text-right">$${linePrice.toFixed(2)}</td>
+            <td class="p-2 text-right font-bold text-slate-900">$${linePrice.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+    } else {
+      tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 italic">No line items added to this ticket yet.</td></tr>`;
+    }
 
-      tbody.innerHTML += `
-        <tr class="border-b border-slate-100">
-          <td class="p-2 font-medium text-slate-800">
-            ${item.desc}
-            <span class="text-[10px] text-slate-400 block">${item.isTaxable ? 'Part' : 'Labor / Service (Tax Exempt)'}</span>
-          </td>
-          <td class="p-2 text-center">1</td>
-          <td class="p-2 text-right">$${linePrice.toFixed(2)}</td>
-          <td class="p-2 text-right font-bold text-slate-900">$${linePrice.toFixed(2)}</td>
-        </tr>
-      `;
-    });
-  } else {
-    tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400 italic">No line items added to this ticket yet.</td></tr>`;
+    // Maryland 6% Sales Tax Calculation (Parts only)
+    const taxRate = (typeof SYSTEM_CONFIG !== 'undefined' && SYSTEM_CONFIG.taxRate) ? SYSTEM_CONFIG.taxRate : 0.06;
+    const tax = partsSub * taxRate;
+    const grandTotal = partsSub + laborSub + tax;
+
+    // Safe Totals Rendering
+    setEl('invPartsSubtotal', '$' + partsSub.toFixed(2));
+    setEl('invLaborSubtotal', '$' + laborSub.toFixed(2));
+    setEl('invTaxTotal', '$' + tax.toFixed(2));
+    setEl('invGrandTotal', '$' + grandTotal.toFixed(2));
   }
 
-  // 3. Maryland 6% Sales Tax Calculation (Parts only)
-  const taxRate = (typeof SYSTEM_CONFIG !== 'undefined' && SYSTEM_CONFIG.taxRate) ? SYSTEM_CONFIG.taxRate : 0.06;
-  const tax = partsSub * taxRate;
-  const grandTotal = partsSub + laborSub + tax;
-
-  // 4. Render Totals
-  document.getElementById('invPartsSubtotal').innerText = '$' + partsSub.toFixed(2);
-  document.getElementById('invLaborSubtotal').innerText = '$' + laborSub.toFixed(2);
-  document.getElementById('invTaxTotal').innerText = '$' + tax.toFixed(2);
-  document.getElementById('invGrandTotal').innerText = '$' + grandTotal.toFixed(2);
-
-  // 5. Open Modal
+  // Open Modal Safely
   const modal = document.getElementById('printInvoiceModal');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
 }
 
 function closePrintInvoiceModal() {
   const modal = document.getElementById('printInvoiceModal');
-  modal.classList.remove('flex');
-  modal.classList.add('hidden');
+  if (modal) {
+    modal.classList.remove('flex');
+    modal.classList.add('hidden');
+  }
 }
 
 function triggerInvoicePrint() {
-  window.print();
+  const printContent = document.getElementById('printableDocument');
+  if (!printContent) {
+    window.print();
+    return;
+  }
+  
+  // Dedicated print window for crisp formatting
+  const win = window.open('', '', 'height=700,width=850');
+  win.document.write(`
+    <html>
+      <head>
+        <title>Invoice - Aerus Home Wellness</title>
+        <script src="https://cdn.tailwindcss.com"><\/script>
+        <style>
+          body { font-family: sans-serif; background: #fff; color: #000; padding: 20px; }
+        </style>
+      </head>
+      <body>
+        ${printContent.innerHTML}
+      </body>
+    </html>
+  `);
+  win.document.close();
+  win.focus();
+  setTimeout(() => {
+    win.print();
+    win.close();
+  }, 500);
 }
 </script>
