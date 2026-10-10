@@ -3,571 +3,1079 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TappyThing — Aerus Home Wellness</title>
-  <!-- Tailwind CSS CDN -->
+  <title>TappyThing — Aerus Home Wellness | Forever Card™</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
-    body { font-family: 'Inter', sans-serif; }
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: #f8fafc; -webkit-tap-highlight-color: transparent; }
+    .glass-card { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    @media print {
+      body { background: #fff !important; color: #000 !important; }
+      header, nav, button, input, select, .no-print { display: none !important; }
+      #printableInvoiceDoc { display: block !important; border: 2px solid #000 !important; }
+    }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-12">
+<body class="min-h-screen flex flex-col justify-between pb-12">
 
-  <!-- TOP BRANDING HEADER WITH GREEN BANDANA MEDALLION -->
-  <header class="bg-slate-900 border-b border-slate-800 p-4 sticky top-0 z-40 shadow-xl">
-    <div class="max-w-3xl mx-auto flex items-center justify-between">
-      
-      <!-- AERUS LOGO & STORE INFO -->
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center font-black text-white text-xl shadow-lg">
+  <!-- TOP HEADER -->
+  <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 p-3.5 sticky top-0 z-40 shadow-xl">
+    <div class="max-w-2xl mx-auto flex items-center justify-between gap-2">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('hub')">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 flex items-center justify-center font-black text-white text-lg shadow-lg border border-emerald-400/40">
           A
         </div>
         <div>
-          <h1 class="text-base font-black tracking-wide text-white flex items-center gap-2">
+          <h1 class="text-sm font-black text-white flex items-center gap-1.5 tracking-tight">
             AERUS HOME WELLNESS
-            <span class="bg-blue-500/20 text-blue-400 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border border-blue-500/30">Timonium</span>
+            <span class="bg-emerald-500/20 text-emerald-400 text-[9px] uppercase font-bold px-1.5 py-0.5 rounded border border-emerald-500/30">Timonium</span>
           </h1>
-          <p class="text-xs text-slate-400">Clean Environment LLC | (410) 252-6571</p>
+          <p class="text-[10px] text-slate-400 font-medium">Clean Environment LLC | Forever Card™</p>
         </div>
       </div>
 
-      <!-- OFFICIAL GREEN BANDANA MEDALLION LOGO -->
-      <div class="flex items-center gap-2 bg-slate-800/90 border-2 border-emerald-500/60 px-3 py-1.5 rounded-full shadow-lg">
-        <div class="w-7 h-7 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold text-xs shadow-md border border-emerald-300 relative overflow-hidden">
-          <svg class="w-4 h-4 text-emerald-100" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582a1 1 0 01.586.928v4.334a1 1 0 01-.586.928L11 13.677V17a1 1 0 11-2 0v-3.323L5.046 12.095A1 1 0 014.46 11.167V6.833a1 1 0 01.586-.928L9 4.323V3a1 1 0 011-1z" clip-rule="evenodd"></path>
-          </svg>
-        </div>
-        <div class="text-left hidden sm:block">
-          <div class="text-[11px] font-black text-emerald-400 leading-tight">FRESH 🤵</div>
-          <div class="text-[9px] text-slate-300 leading-tight">Digital Coordinator</div>
-        </div>
-      </div>
+      <!-- VOICE PILL -->
+      <button id="topVoicePill" onclick="toggleVoiceIntake()" class="flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white px-3 py-2 rounded-full font-black text-[11px] shadow-lg active:scale-95 border border-emerald-400/30">
+        <span id="pillMicIcon">🎙️</span>
+        <span id="pillMicText">TAP TO TALK</span>
+      </button>
 
+      <!-- VIEW SWITCHER -->
+      <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
+        <button id="tabHub" onclick="switchView('hub')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white">
+          Stack
+        </button>
+        <button id="tabCard" onclick="switchView('card')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white">
+          Card
+        </button>
+      </div>
     </div>
   </header>
 
-  <!-- MAIN APP CONTAINER -->
-  <main class="max-w-3xl mx-auto p-4 space-y-6">
+  <!-- MAIN WRAPPER -->
+  <main class="max-w-2xl mx-auto px-4 py-4 w-full flex-grow space-y-4">
 
-    <!-- CARD 1: VOICE INTAKE (PHONETIC SPEECH MATCHING) -->
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center shadow-xl relative overflow-hidden">
-      <div class="absolute -right-8 -top-8 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl"></div>
-      
-      <p class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2">TappyThing Voice Command</p>
-      <h2 class="text-xl font-bold text-white mb-4">Tap & Speak Into Your Hub</h2>
-      
-      <!-- Primary Voice Button -->
-      <button 
-        onclick="simulateVoiceIntake()"
-        class="w-24 h-24 mx-auto rounded-full bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 p-1 shadow-2xl hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center group cursor-pointer">
-        <div class="w-full h-full bg-slate-950 rounded-full flex items-center justify-center group-hover:bg-transparent transition-all">
-          <svg class="w-10 h-10 text-cyan-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
-          </svg>
+    <!-- STATUS BANNER -->
+    <div id="voiceStatusBox" class="p-3 rounded-2xl bg-slate-900 border border-slate-800 text-xs text-slate-300 flex items-center justify-between">
+      <span class="flex items-center gap-2 text-slate-400">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="statusText">Voice Ready. Speak "sea bags", "fan", "tune up", or schedule intake...</span>
+      </span>
+      <button onclick="resetAllAppMemory()" class="text-[10px] text-slate-500 hover:text-red-400 font-bold underline">Clear Cache</button>
+    </div>
+
+    <!-- VIEW 1: HUB / ACCORDION STACK -->
+    <section id="screenHub" class="space-y-3">
+      <!-- Card 1: Master -->
+      <div class="glass-card rounded-2xl p-4 border-l-4 border-cyan-500">
+        <div class="flex justify-between items-center cursor-pointer" onclick="toggleDrawer('drawerWorld')">
+          <div>
+            <span class="text-[9px] font-black text-cyan-400 uppercase tracking-widest">Card 1 / Master</span>
+            <h4 class="text-sm font-bold text-white">The World Card</h4>
+          </div>
+          <span class="text-xs text-cyan-400">🌐 Active</span>
         </div>
+        <div id="drawerWorld" class="hidden mt-3 pt-2 border-t border-slate-800 text-xs text-slate-300">
+          Master command hub active. Aerus Timonium #001 instance connected.
+        </div>
+      </div>
+
+      <!-- Card 2: Ops -->
+      <div class="glass-card rounded-2xl p-4 border-l-4 border-blue-500">
+        <div class="flex justify-between items-center cursor-pointer" onclick="toggleDrawer('drawerOps')">
+          <div>
+            <span class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Card 2 / Ops</span>
+            <h4 class="text-sm font-bold text-white">Empire Operations Desk</h4>
+          </div>
+          <span class="text-xs text-blue-400">📊 Queue</span>
+        </div>
+        <div id="drawerOps" class="hidden mt-3 pt-2 border-t border-slate-800 text-xs text-slate-300">
+          Bench repair metrics and active intake queues online.
+        </div>
+      </div>
+
+      <!-- Card 3: Dispatch & Schedule -->
+      <div class="glass-card rounded-2xl p-4 border-l-4 border-emerald-500">
+        <div class="flex justify-between items-center cursor-pointer mb-2" onclick="toggleDrawer('drawerSchedule')">
+          <div>
+            <span class="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Card 3 / Dispatch</span>
+            <h4 class="text-sm font-bold text-white">Schedule Agenda</h4>
+          </div>
+          <span id="scheduleCountTag" class="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">1 Appointment</span>
+        </div>
+        <div id="drawerSchedule" class="space-y-2 mt-2">
+          <div id="scheduleContainer" class="space-y-2"></div>
+        </div>
+      </div>
+
+      <!-- Card 4: Invoice Vault -->
+      <div class="glass-card rounded-2xl p-4 border-l-4 border-amber-500">
+        <div class="flex justify-between items-center cursor-pointer" onclick="toggleDrawer('drawerVaultInvoices')">
+          <div>
+            <span class="text-[9px] font-black text-amber-400 uppercase tracking-widest">Card 4 / Money Safe</span>
+            <h4 class="text-sm font-bold text-white">Invoice Vault</h4>
+          </div>
+          <span id="vaultBadgeCount" class="text-[10px] font-bold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/30">0 Locked Tickets</span>
+        </div>
+        <div id="drawerVaultInvoices" class="hidden mt-3 pt-2 border-t border-slate-800 text-xs space-y-2">
+          <div id="vaultListContainer" class="space-y-2"></div>
+        </div>
+      </div>
+
+      <!-- Customer Vault Lookup -->
+      <div class="glass-card rounded-2xl p-4">
+        <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          👥 Customer Vault Search (22,000+ Records)
+        </h3>
+        <input type="text" id="vaultSearchInput" onkeyup="filterVaultSearch()" placeholder="Search name (e.g. Ruth Tucker, Sue Freeland)..." 
+               class="w-full bg-slate-950 text-white font-medium text-xs p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-emerald-500 mb-2">
+        <div id="vaultSearchResults" class="space-y-2"></div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: FOREVER CARD™ EXPERIENCE -->
+    <section id="screenCard" class="space-y-4 hidden">
+      <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
+        <button id="modeTech" onclick="setCardMode('tech')" class="flex-1 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white">
+          🔧 Bench Workspace
+        </button>
+        <button id="modeCust" onclick="setCardMode('cust')" class="flex-1 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white">
+          📱 Customer 4-Card Deck
+        </button>
+      </div>
+
+      <!-- TECH BENCH WORKSPACE -->
+      <div id="techWorkspaceView" class="space-y-4">
+        <!-- Customer Banner -->
+        <div class="glass-card rounded-2xl p-4 border-l-4 border-emerald-500">
+          <div class="flex justify-between items-start mb-1">
+            <div>
+              <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 text-[9px] font-black rounded" id="cardClientIdTag">CLIENT #22086</span>
+              <h2 class="text-lg font-black text-white mt-1" id="cardCustName">Ruth Tucker</h2>
+              <p class="text-xs text-slate-300 mt-0.5" id="cardCustAddr">6 Lagan Ct, Nottingham, Maryland 21236</p>
+              <p class="text-xs text-teal-400 mt-0.5" id="cardCustPhone">(410) 256-6949</p>
+            </div>
+            <button onclick="sendCustomerSMS()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-bold text-xs shadow-md">
+              📱 SMS Link
+            </button>
+          </div>
+        </div>
+
+        <!-- Media Proof Snap -->
+        <div class="glass-card rounded-2xl p-4">
+          <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Diagnostic Proof Photo / Video</h3>
+          <div id="photoPreviewContainer" class="bg-slate-950 rounded-xl border border-dashed border-slate-800 min-h-[110px] flex items-center justify-center p-2 text-center">
+            <img id="cardImageDisplay" src="" alt="Proof" class="hidden w-full h-44 object-cover rounded-lg">
+            <video id="cardVideoDisplay" controls class="hidden w-full h-44 rounded-lg bg-black"></video>
+            <p id="photoEmptyPrompt" class="text-xs text-slate-500">📷 Direct Camera / Video Capture Ready</p>
+          </div>
+          <label class="mt-2 cursor-pointer bg-slate-800 text-emerald-400 font-bold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 border border-slate-700 active:scale-95">
+            <span>📷 SNAP PROOF PHOTO / VIDEO</span>
+            <input type="file" accept="image/*,video/*" capture="environment" onchange="handleRealMediaUpload(event)" class="hidden">
+          </label>
+        </div>
+
+        <!-- OPTION B 3-TIER INVOICE BUILDER -->
+        <div class="glass-card rounded-2xl p-4 space-y-3.5">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+            <div>
+              <h3 class="text-xs font-black text-white uppercase tracking-wider">Maryland Tax Engine</h3>
+              <p class="text-[10px] text-slate-400">Parts 6% Tax | Labor 0% Tax Exempt</p>
+            </div>
+            <div class="flex gap-1.5">
+              <button onclick="clearActiveTicketLines()" class="bg-red-950/40 text-red-300 border border-red-800/60 font-bold px-2.5 py-1 rounded-lg text-xs hover:bg-red-900/60">
+                🗑️ Clear
+              </button>
+              <button onclick="openPrintInvoiceModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1 rounded-lg text-xs shadow-md">
+                🖨️ Print
+              </button>
+            </div>
+          </div>
+
+          <!-- Tier 1: 1-Tap Labor -->
+          <div>
+            <label class="block text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-1">⚡ 1-Tap Labor & Service (0% Tax)</label>
+            <select id="quickLaborSelect" onchange="addQuickLabor()" class="w-full bg-slate-950 border border-slate-800 text-white rounded-xl p-2.5 text-xs font-semibold focus:outline-none focus:border-emerald-500">
+              <option value="">-- Select Labor / Service --</option>
+              <option value="60.00|Bench Repair Labor & Tune-Up">Bench Repair Labor & Tune-Up — $60.00</option>
+              <option value="50.00|Bench Diagnostic & Labor">Bench Diagnostic & Labor — $50.00</option>
+              <option value="40.00|Standard Labor Charge">Standard Labor Charge — $40.00</option>
+              <option value="450.00|Professional RO Installation">Professional RO Installation — $450.00</option>
+              <option value="300.00|Standard RO Installation">Standard RO Installation — $300.00</option>
+              <option value="0.00|Free Equipment Inspection">Free Equipment Inspection — $0.00</option>
+            </select>
+          </div>
+
+          <!-- Tier 2: 1-Tap Consumables -->
+          <div>
+            <label class="block text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-1">📦 1-Tap Fast-Movers (6% Tax)</label>
+            <select id="quickConsumableSelect" onchange="addQuickConsumable()" class="w-full bg-slate-950 border border-slate-800 text-white rounded-xl p-2.5 text-xs font-semibold focus:outline-none focus:border-blue-500">
+              <option value="">-- Select Consumable / Part --</option>
+              <option value="24.00|C-Bags 12-Pack">C-Bags 12-Pack — $24.00</option>
+              <option value="15.00|Replacement Fan Assembly">Replacement Fan Assembly — $15.00</option>
+              <option value="24.95|Standard Vacuum Bags (4-Pack)">Standard Vacuum Bags (4-Pack) — $24.95</option>
+              <option value="49.95|HEPA Filter Replacement">HEPA Filter Replacement — $49.95</option>
+              <option value="325.00|Pure & Gentle Soap Program">Pure & Gentle Soap Program — $325.00</option>
+              <option value="18.00|Water Softening Salt Pellets">Water Softening Salt Pellets — $18.00</option>
+            </select>
+          </div>
+
+          <!-- Tier 3: Master 970+ Search -->
+          <div class="relative">
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">🔍 Search Full Catalog (970+ Vault)</label>
+            <input type="text" id="catalogSearchInput" onkeyup="searchVaultCatalog()" placeholder="Search part or alias (e.g. Belt, Sea Bags, Gasket)..." class="w-full bg-slate-950 border border-slate-800 text-white rounded-xl p-2.5 text-xs focus:outline-none focus:border-amber-500">
+            <div id="vaultSearchResults" class="hidden absolute left-0 right-0 top-full mt-1 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl max-h-48 overflow-y-auto z-50"></div>
+          </div>
+
+          <!-- Active Line Items Table -->
+          <div class="space-y-2 pt-2 border-t border-slate-800">
+            <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Itemized Ticket Lines</h4>
+            <div id="cardLinesContainer" class="space-y-1.5"></div>
+          </div>
+
+          <!-- Live Math Totals -->
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-1">
+            <div class="flex justify-between text-slate-400"><span>Parts Subtotal:</span><span id="lblPartsSubtotal" class="text-slate-200 font-bold">$0.00</span></div>
+            <div class="flex justify-between text-slate-400"><span>Labor Subtotal (Tax Exempt):</span><span id="lblLaborSubtotal" class="text-slate-200 font-bold">$0.00</span></div>
+            <div class="flex justify-between text-slate-400"><span>MD Tax (6% Parts Only):</span><span id="lblTaxVal" class="text-slate-200 font-bold">$0.00</span></div>
+            <div class="flex justify-between font-black text-emerald-400 pt-1 border-t border-slate-800 text-sm"><span>Total Due:</span><span id="lblTotalVal">$0.00</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CUSTOMER 4-CARD DECK -->
+      <div id="customerMirrorView" class="space-y-3 hidden">
+        <div class="flex justify-between bg-slate-950 p-1 rounded-xl border border-slate-800 text-[10px] font-bold">
+          <button id="cTab1" onclick="showCustCard(1)" class="flex-1 py-1.5 rounded-lg bg-emerald-600 text-white">1. Health</button>
+          <button id="cTab2" onclick="showCustCard(2)" class="flex-1 py-1.5 rounded-lg text-slate-400">2. Assistant</button>
+          <button id="cTab3" onclick="showCustCard(3)" class="flex-1 py-1.5 rounded-lg text-slate-400">3. Solution</button>
+          <button id="cTab4" onclick="showCustCard(4)" class="flex-1 py-1.5 rounded-lg text-slate-400">4. Vault</button>
+        </div>
+
+        <!-- Face 1: Health -->
+        <div id="custFace1" class="glass-card rounded-2xl p-5 border-l-4 border-cyan-400">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-[9px] font-black text-cyan-400 uppercase tracking-widest">Card 1 / Health Status</span>
+            <span class="text-[9px] font-bold text-teal-400">FOREVER CARD™</span>
+          </div>
+          <h3 class="text-base font-black text-white" id="custDeckGreeting">Ruth Tucker's Aerus Report</h3>
+          <div id="custPhotoContainer" class="my-3">
+            <img id="custDisplayImg" src="" alt="Proof" class="w-full h-44 object-cover rounded-xl border border-slate-800">
+            <video id="custDisplayVideo" controls class="hidden w-full h-44 rounded-xl border border-slate-800 bg-black"></video>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed mt-2" id="custHealthNotesText">
+            Bench diagnostic complete. Multi-point airflow inspection and performance tuning finalized.
+          </p>
+        </div>
+
+        <!-- Face 2: Assistant -->
+        <div id="custFace2" class="glass-card rounded-2xl p-5 border-l-4 border-teal-400 hidden">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-[9px] font-black text-teal-400 uppercase tracking-widest">Card 2 / 2-Way Assistant</span>
+            <span class="text-[9px] font-bold text-teal-400">FOREVER CARD™</span>
+          </div>
+          <h3 class="text-base font-black text-white">Direct Message Shop</h3>
+          <div class="bg-slate-950 rounded-xl p-3 border border-slate-800 space-y-2 my-3">
+            <div id="chatHistory" class="space-y-1.5 text-xs">
+              <div class="bg-slate-900 p-2 rounded-lg text-slate-300">
+                <span class="font-bold text-emerald-400">Shop Desk:</span> Hello! How can we assist you with your equipment today?
+              </div>
+            </div>
+            <div class="flex gap-2 pt-2">
+              <input type="text" id="custChatMessageInput" placeholder="Type message..." class="flex-grow bg-slate-900 text-white text-xs p-2 rounded-lg border border-slate-700">
+              <button onclick="sendCustomerChatMessage()" class="bg-emerald-600 text-white font-bold px-3 py-2 rounded-lg text-xs">Send</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Face 3: Solution & Pay -->
+        <div id="custFace3" class="glass-card rounded-2xl p-5 border-l-4 border-emerald-400 hidden">
+          <div class="flex justify-between items-center mb-2">
+            <div>
+              <span class="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Card 3 / Solution & Invoice</span>
+              <div class="text-[10px] text-slate-400">AERUS HOME WELLNESS — Clean Environment LLC</div>
+            </div>
+            <span class="text-xl font-black text-emerald-400" id="custPayTotal">$75.90</span>
+          </div>
+
+          <div id="custInvoiceMathBox" class="my-3 p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1.5">
+            <div class="font-bold text-white border-b border-slate-800 pb-1 flex justify-between">
+              <span>Itemized Breakdown</span>
+              <span id="invTicketTag" class="text-emerald-400">Ticket #22086</span>
+            </div>
+            <div id="custItemizedLinesDisplay" class="space-y-1 text-slate-300 py-1"></div>
+            <div class="flex justify-between text-slate-400 pt-1 border-t border-slate-800"><span>Parts Subtotal:</span><span id="custPartsLbl">$15.00</span></div>
+            <div class="flex justify-between text-slate-400"><span>Labor (Tax Exempt):</span><span id="custLaborLbl">$60.00</span></div>
+            <div class="flex justify-between text-slate-400"><span>MD Tax (6% Parts Only):</span><span id="custTaxLbl">$0.90</span></div>
+            <div class="flex justify-between font-bold text-emerald-400 pt-1 border-t border-slate-800"><span>Total Due:</span><span id="custTotalLbl">$75.90</span></div>
+          </div>
+
+          <button onclick="openPrintInvoiceModal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md mb-2 flex items-center justify-center gap-2">
+            🖨️ Print Invoice / Save PDF
+          </button>
+
+          <button onclick="processStripeCheckout()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-extrabold py-3 rounded-xl text-xs shadow-lg active:scale-95">
+            1-TAP STRIPE PAY (APPLE PAY / CARD)
+          </button>
+        </div>
+
+        <!-- Face 4: Vault -->
+        <div id="custFace4" class="glass-card rounded-2xl p-5 border-l-4 border-purple-400 hidden">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-[9px] font-black text-purple-400 uppercase tracking-widest">Card 4 / Service Vault</span>
+            <span class="text-[9px] font-bold text-teal-400">FOREVER CARD™</span>
+          </div>
+          <h3 class="text-base font-black text-white">Lifetime Service Archive</h3>
+          <div id="vaultHistoryContainer" class="my-3 p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-2">
+            <div class="text-slate-300">
+              <span class="font-bold text-emerald-400">Oct 10, 2026:</span> Fan Assembly Replacement & Bench Airflow Tune-Up ($75.90)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="switchView('hub')" class="w-full bg-slate-800 text-slate-200 py-2.5 rounded-xl font-bold text-xs border border-slate-700">
+        ⬅️ Back to Tech Stack
       </button>
-      <p class="text-xs text-slate-400 mt-3">Try speaking "C-bags", "sea bags", "fan", or "tune up"</p>
-    </div>
-
-    <!-- CARD 2: ACTIVE TICKET SELECTOR & CUSTOMER BANNER -->
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Customer Ticket</span>
-        <select id="appointmentSelect" onchange="switchCustomerCard()" class="bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-1.5 text-xs font-bold outline-none focus:ring-2 focus:ring-blue-500">
-          <option value="0">Ruth Tucker (#22086)</option>
-          <option value="1">Sue Freeland (#8448)</option>
-        </select>
-      </div>
-
-      <div class="grid grid-cols-2 gap-4 text-xs pt-1">
-        <div>
-          <div id="cardCustName" class="text-sm font-black text-white">Ruth Tucker</div>
-          <div id="cardCustAddress" class="text-slate-400">6 Lagan Ct, Nottingham, MD 21236</div>
-        </div>
-        <div class="text-right">
-          <div id="cardCustPhone" class="font-bold text-blue-400">(410) 256-6949</div>
-          <div id="cardCustEmail" class="text-slate-400">rstucker1@verizon.net</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- CARD 3: SOLUTION & INVOICE BUILDER -->
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-5">
-      
-      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-        <div>
-          <h3 class="text-base font-bold text-white">Ticket Solution & Line Builder</h3>
-          <p class="text-xs text-slate-400">Option B Fast Counter Selection Engine</p>
-        </div>
-        
-        <div class="flex gap-2">
-          <!-- 1-TAP CLEAR / RESET TICKET BUTTON -->
-          <button 
-            onclick="clearActiveTicketLines()" 
-            class="bg-red-900/40 hover:bg-red-800/60 border border-red-700/60 text-red-200 font-bold px-3 py-2 rounded-xl text-xs transition-all active:scale-95 flex items-center gap-1">
-            🗑️ Reset Ticket
-          </button>
-
-          <!-- 1-TAP PRINT MODAL TRIGGER BUTTON -->
-          <button 
-            onclick="openPrintInvoiceModal()" 
-            class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-md transition-all active:scale-95 flex items-center gap-2">
-            🖨️ Print Invoice
-          </button>
-        </div>
-      </div>
-
-      <!-- OPTION B: 3-TIER SELECTION LAYOUT -->
-      <div class="space-y-4 bg-slate-950 p-4 rounded-xl border border-slate-800 text-left">
-        
-        <!-- CATEGORY 1: QUICK LABOR & SERVICE (TAX EXEMPT) -->
-        <div>
-          <label class="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">
-            ⚡ 1-Tap Labor & Services (0% Tax)
-          </label>
-          <select id="quickLaborSelect" onchange="addQuickLabor()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg p-2.5 text-xs font-medium focus:ring-2 focus:ring-emerald-500 outline-none">
-            <option value="">-- Select Labor / Service --</option>
-            <option value="60.00|Bench Repair Labor & Tune-Up">Bench Repair Labor & Tune-Up — $60.00</option>
-            <option value="50.00|Bench Diagnostic & Labor">Bench Diagnostic & Labor — $50.00</option>
-            <option value="40.00|Standard Labor Charge">Standard Labor Charge — $40.00</option>
-            <option value="450.00|Professional RO Installation">Professional RO Installation — $450.00</option>
-            <option value="300.00|Standard RO Installation">Standard RO Installation — $300.00</option>
-            <option value="0.00|Free Equipment Inspection">Free Equipment Inspection — $0.00</option>
-          </select>
-        </div>
-
-        <!-- CATEGORY 2: TOP CONSUMABLES & FAST-MOVERS (6% TAX) -->
-        <div>
-          <label class="block text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">
-            📦 1-Tap Top Consumables (6% Tax)
-          </label>
-          <select id="quickConsumableSelect" onchange="addQuickConsumable()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg p-2.5 text-xs font-medium focus:ring-2 focus:ring-blue-500 outline-none">
-            <option value="">-- Select Fast-Mover --</option>
-            <option value="15.00|Replacement Fan Assembly">Replacement Fan Assembly — $15.00</option>
-            <option value="24.95|Standard Vacuum Bags (4-Pack)">Standard Vacuum Bags (4-Pack) — $24.95</option>
-            <option value="24.00|C-Bags 12-Pack">C-Bags 12-Pack — $24.00</option>
-            <option value="49.95|HEPA Filter Replacement">HEPA Filter Replacement — $49.95</option>
-            <option value="325.00|Pure & Gentle Soap Program">Pure & Gentle Soap Program — $325.00</option>
-            <option value="18.00|Water Softening Salt Pellets">Water Softening Salt Pellets — $18.00</option>
-          </select>
-        </div>
-
-        <!-- CATEGORY 3: FULL 970+ CATALOG SEARCH VAULT -->
-        <div class="relative">
-          <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
-            🔍 Search Full Catalog (970+ Vault)
-          </label>
-          <input 
-            type="text" 
-            id="catalogSearchInput" 
-            onkeyup="searchVaultCatalog()" 
-            placeholder="Type 2+ chars (e.g. Belt, Sea Bags, Fan)..." 
-            class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-amber-500 outline-none"
-          />
-          <div id="vaultSearchResults" class="hidden absolute left-0 right-0 top-full mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl max-h-48 overflow-y-auto z-50"></div>
-        </div>
-
-      </div>
-
-      <!-- ACTIVE TICKET LINES LIST -->
-      <div>
-        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Active Ticket Items</h4>
-        <div id="activeLinesContainer" class="space-y-2">
-          <!-- Populated dynamically -->
-        </div>
-      </div>
-
-    </div>
-
+    </section>
   </main>
 
   <!-- PRINTABLE INVOICE MODAL -->
   <div id="printInvoiceModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-    <div class="bg-white text-slate-900 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl p-6 border border-slate-200">
-      
-      <!-- Modal Header Bar (Hidden when printed) -->
-      <div class="flex justify-between items-center mb-6 border-b border-slate-200 pb-4">
-        <button 
-          onclick="triggerInvoicePrint()" 
-          class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-md transition-all active:scale-95">
-          🖨️ Print / Save PDF
+    <div class="bg-white text-slate-900 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl p-6 border border-slate-200">
+      <div class="flex justify-between items-center mb-4 border-b border-slate-200 pb-3">
+        <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-md">
+          🖨️ Send to Printer / Save PDF
         </button>
-        <button 
-          onclick="closePrintInvoiceModal()" 
-          class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-4 py-2 rounded-xl text-sm transition-all">
+        <button onclick="closePrintInvoiceModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-3 py-1.5 rounded-xl text-xs">
           ✕ Close
         </button>
       </div>
 
-      <!-- Printable Invoice Sheet -->
-      <div id="printableDocument" class="p-6 border-2 border-slate-900 rounded-xl bg-white text-slate-900">
-        
-        <!-- Header -->
-        <div class="flex justify-between items-start border-b-2 border-slate-900 pb-4 mb-4">
+      <div id="printableInvoiceDoc" class="p-5 border-2 border-slate-900 rounded-xl bg-white text-slate-900">
+        <div class="flex justify-between items-start border-b-2 border-slate-900 pb-3 mb-3">
           <div>
-            <h1 class="text-xl font-black text-slate-900 tracking-wide uppercase">AERUS HOME WELLNESS</h1>
+            <h1 class="text-lg font-black text-slate-900 uppercase">AERUS HOME WELLNESS</h1>
             <p class="text-xs font-semibold text-slate-600">Clean Environment LLC — Timonium</p>
-            <p class="text-[11px] text-slate-500">1810 York Rd, Timonium, MD 21093 | (410) 252-6571</p>
+            <p class="text-[10px] text-slate-500">1810 York Rd, Timonium, MD 21093 | (410) 252-6571</p>
           </div>
           <div class="text-right">
-            <span class="text-lg font-black text-blue-600 tracking-wider">OFFICIAL INVOICE</span>
-            <p class="text-xs text-slate-500 mt-1">Date: <span id="invDate">10/10/2026</span></p>
+            <span class="text-base font-black text-blue-600">OFFICIAL INVOICE</span>
+            <p class="text-[10px] text-slate-500">Date: <span id="invDate">10/10/2026</span></p>
             <p class="text-xs font-bold text-slate-800">Ticket #: <span id="invTicketNum">#22086</span></p>
           </div>
         </div>
 
-        <!-- Customer Details -->
-        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 grid grid-cols-2 gap-4 mb-4 text-xs">
+        <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 grid grid-cols-2 gap-2 mb-3 text-xs">
           <div>
-            <p class="font-bold text-slate-400 uppercase text-[10px]">Billed To</p>
-            <p id="invCustomerName" class="font-bold text-slate-900 text-sm">Ruth Tucker</p>
-            <p id="invCustomerAddress" class="text-slate-600">6 Lagan Ct, Nottingham, MD 21236</p>
+            <p class="font-bold text-slate-400 uppercase text-[9px]">Billed To</p>
+            <p id="invCustomerName" class="font-bold text-slate-900">Ruth Tucker</p>
+            <p id="invCustomerAddress" class="text-slate-600 text-[11px]">6 Lagan Ct, Nottingham, MD 21236</p>
           </div>
           <div class="text-right">
-            <p class="font-bold text-slate-400 uppercase text-[10px]">Contact Info</p>
+            <p class="font-bold text-slate-400 uppercase text-[9px]">Contact Info</p>
             <p id="invCustomerPhone" class="text-slate-700">(410) 256-6949</p>
             <p id="invCustomerEmail" class="text-slate-700">rstucker1@verizon.net</p>
           </div>
         </div>
 
-        <!-- Line Table -->
-        <table class="w-full text-left text-xs mb-4 border-collapse">
+        <table class="w-full text-left text-xs mb-3 border-collapse">
           <thead>
-            <tr class="bg-slate-900 text-white uppercase text-[10px] tracking-wider">
-              <th class="p-2 rounded-l">Description</th>
+            <tr class="bg-slate-900 text-white uppercase text-[9px]">
+              <th class="p-2">Description</th>
               <th class="p-2 text-center">Qty</th>
-              <th class="p-2 text-right">Unit Price</th>
-              <th class="p-2 text-right rounded-r">Amount</th>
+              <th class="p-2 text-right">Price</th>
+              <th class="p-2 text-right">Amount</th>
             </tr>
           </thead>
-          <tbody id="invTableBody">
-            <!-- Dynamically populated -->
-          </tbody>
+          <tbody id="invTableBody"></tbody>
         </table>
 
-        <!-- Totals -->
-        <div class="flex justify-end pt-2 border-t border-slate-200">
-          <div class="w-56 text-xs space-y-1">
-            <div class="flex justify-between text-slate-600">
-              <span>Parts Subtotal:</span>
-              <span id="invPartsSubtotal">$0.00</span>
-            </div>
-            <div class="flex justify-between text-slate-600">
-              <span>Labor Subtotal:</span>
-              <span id="invLaborSubtotal">$50.00</span>
-            </div>
-            <div class="flex justify-between text-slate-500 pb-1 border-b border-slate-200">
-              <span>MD Tax (6% Parts Only):</span>
-              <span id="invTaxTotal">$0.00</span>
-            </div>
-            <div class="flex justify-between text-sm font-black text-slate-900 pt-1">
-              <span>TOTAL DUE:</span>
-              <span id="invGrandTotal" class="text-emerald-700">$50.00</span>
-            </div>
+        <div class="flex justify-end pt-2 border-t border-slate-200 text-xs">
+          <div class="w-48 space-y-1">
+            <div class="flex justify-between text-slate-600"><span>Parts:</span><span id="invPartsSubtotal">$0.00</span></div>
+            <div class="flex justify-between text-slate-600"><span>Labor (Tax Exempt):</span><span id="invLaborSubtotal">$0.00</span></div>
+            <div class="flex justify-between text-slate-500 pb-1 border-b border-slate-200"><span>MD Tax (6%):</span><span id="invTaxTotal">$0.00</span></div>
+            <div class="flex justify-between font-black text-slate-900 pt-1 text-sm"><span>TOTAL DUE:</span><span id="invGrandTotal">$0.00</span></div>
           </div>
         </div>
-
-        <!-- Footer -->
-        <div class="mt-6 pt-3 border-t border-slate-200 text-center text-[10px] text-slate-400">
-          Thank you for trusting Aerus Home Wellness! | Clean Environment LLC
-        </div>
-
       </div>
     </div>
   </div>
 
-  <!-- APPLICATION CONTROLLER SCRIPT -->
+  <!-- COMPLETE RUNTIME ENGINE -->
   <script>
-    window.SYSTEM_CONFIG = { taxRate: 0.06 };
-    window.currentActiveIndex = 0;
+    const SYSTEM_CONFIG = { taxRate: 0.06 };
 
-    window.appointments = [
-      {
-        customer: { id: '22086', name: 'Ruth Tucker', address: '6 Lagan Ct, Nottingham, MD 21236', phone: '(410) 256-6949', email: 'rstucker1@verizon.net' },
-        lines: [
-          { desc: 'Bench Repair Labor & Tune-Up', price: 50.00, isTaxable: false },
-          { desc: 'Replacement Fan Assembly', price: 15.00, isTaxable: true }
-        ]
-      },
-      {
-        customer: { id: '8448', name: 'Sue Freeland', address: '8095 Sandpiper Circle, Nottingham, MD 21236', phone: '(443) 629-4180', email: 'suefreeland@gmail.com' },
-        lines: [
-          { desc: 'Bench Repair Labor & Tune-Up', price: 60.00, isTaxable: false }
-        ]
+    const CUSTOMER_VAULT = [
+      { id: "22086", name: "Ruth Tucker", phone: "(410) 256-6949", email: "rstucker1@verizon.net", address: "6 Lagan Ct, Nottingham, Maryland 21236" },
+      { id: "8448", name: "Sue Freeland", phone: "(443) 629-4180", email: "suefreeland@gmail.com", address: "8095 Sandpiper Circle, Nottingham, Maryland 21236" },
+      { id: "22085", name: "Paul Schwab", phone: "(410) 294-6383", email: "paulschwab@msn.com", address: "8515 Huntspring Dr, Lutherville, Maryland 21093" }
+    ];
+
+    const MASTER_CATALOG = [
+      { n: "C-Bags 12-Pack", p: 24.00, t: "PART", aliases: ["sea", "see", "c bag", "c-bag", "sea bag", "see bag", "cbags"] },
+      { n: "Replacement Fan Assembly", p: 15.00, t: "PART", aliases: ["fan", "fan assembly", "motor fan"] },
+      { n: "Standard Vacuum Bags (4-Pack)", p: 24.95, t: "PART", aliases: ["vacuum bags", "bags", "bag"] },
+      { n: "HEPA Filter Replacement", p: 49.95, t: "PART", aliases: ["hepa", "filter", "hepa filter"] },
+      { n: "Pure & Gentle Soap Program", p: 325.00, t: "PART", aliases: ["soap", "pure gentle", "soap program"] },
+      { n: "Water Softening Salt Pellets", p: 18.00, t: "PART", aliases: ["salt", "pellets", "water salt"] },
+      { n: "Drive Belt (2-Pack)", p: 15.00, t: "PART", aliases: ["belt", "drive belt", "belts"] },
+      { n: "Motor Chamber Gasket", p: 12.50, t: "PART", aliases: ["gasket", "seal"] },
+      { n: "Bench Repair Labor & Tune-Up", p: 60.00, t: "LABOR", aliases: ["bench", "tune up", "tune-up", "labor", "repair", "service"] },
+      { n: "Bench Diagnostic & Labor", p: 50.00, t: "LABOR", aliases: ["diagnostic", "bench diagnostic"] },
+      { n: "Standard Labor Charge", p: 40.00, t: "LABOR", aliases: ["standard labor"] },
+      { n: "Professional RO Installation", p: 450.00, t: "LABOR", aliases: ["ro install", "reverse osmosis"] },
+      { n: "Standard RO Installation", p: 300.00, t: "LABOR", aliases: ["ro installation"] },
+      { n: "Free Equipment Inspection", p: 0.00, t: "LABOR", aliases: ["inspection", "free inspection"] }
+    ];
+
+    let appointments = [];
+    let vaultInvoices = [];
+    let currentActiveIndex = 0;
+    let isEstimateRecognizing = false;
+
+    // INITIALIZE & CLEAN INVALID CACHE
+    window.onload = function() {
+      try {
+        const cached = localStorage.getItem('tappy_appointments');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].customer && parsed[0].customer.name) {
+            appointments = parsed;
+          }
+        }
+      } catch (e) {
+        console.warn("Storage reset");
       }
-    ];
 
-    window.MASTER_CATALOG = [
-      { sku: 'AER-101', description: 'C-Bags 12-Pack', price: 24.00, aliases: ['sea', 'see', 'c-bag', 'sea bag', 'see bag'] },
-      { sku: 'AER-102', description: 'Standard Vacuum Bags (4-Pack)', price: 24.95, aliases: ['vacuum bag', 'bags'] },
-      { sku: 'AER-103', description: 'Replacement Fan Assembly', price: 15.00, aliases: ['fan', 'fan assembly'] },
-      { sku: 'AER-104', description: 'HEPA Filter Replacement', price: 49.95, aliases: ['hepa', 'filter'] },
-      { sku: 'AER-105', description: 'Motor Chamber Gasket', price: 12.50, aliases: ['gasket', 'seal'] },
-      { sku: 'AER-106', description: 'Drive Belt 2-Pack', price: 15.00, aliases: ['belt', 'drive belt'] },
-      { sku: 'AER-107', description: 'Beyond Cell Air Purification Core', price: 120.00, aliases: ['beyond', 'cell'] }
-    ];
+      // Default baseline to Ruth Tucker
+      if (appointments.length === 0) {
+        appointments = [{
+          customer: CUSTOMER_VAULT[0],
+          time: "11:00 AM",
+          lines: [
+            { desc: "Replacement Fan Assembly", price: 15.00, isTaxable: true, type: "PART" },
+            { desc: "Bench Repair Labor & Tune-Up", price: 60.00, isTaxable: false, type: "LABOR" }
+          ],
+          photoUrl: "",
+          mediaType: "image",
+          unpaidBalance: 75.90,
+          isPaid: false
+        }];
+      }
 
-    document.addEventListener('DOMContentLoaded', function() {
-      switchCustomerCard();
-    });
+      renderScheduleAgenda();
+      renderInvoiceVault();
+      renderActiveForeverCard();
+      calculateCardTotals();
+    };
 
-    function switchCustomerCard() {
-      var sel = document.getElementById('appointmentSelect');
-      if (sel) window.currentActiveIndex = parseInt(sel.value) || 0;
-      
-      var app = window.appointments[window.currentActiveIndex];
-      if (!app) return;
-
-      document.getElementById('cardCustName').innerText = app.customer.name;
-      document.getElementById('cardCustAddress').innerText = app.customer.address;
-      document.getElementById('cardCustPhone').innerText = app.customer.phone;
-      document.getElementById('cardCustEmail').innerText = app.customer.email;
-
-      renderActiveCardLines();
+    function resetAllAppMemory() {
+      localStorage.clear();
+      location.reload();
     }
 
-    // PURGES BLANK PHANTOM ROWS AND RENDERS CLEAN LINES
-    function renderActiveCardLines() {
-      var container = document.getElementById('activeLinesContainer');
-      if (!container) return;
-      container.innerHTML = '';
+    function saveState() {
+      try {
+        localStorage.setItem('tappy_appointments', JSON.stringify(appointments));
+        localStorage.setItem('tappy_vault_invoices', JSON.stringify(vaultInvoices));
+      } catch (e) {
+        // fallback
+      }
+    }
 
-      var app = window.appointments[window.currentActiveIndex];
-      if (!app || !app.lines) return;
+    function toggleDrawer(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('hidden');
+    }
 
-      // AUTO-PURGE BLANK ROWS
-      app.lines = app.lines.filter(function(line) {
-        return line && line.desc && line.desc.trim() !== '' && typeof line.price === 'number';
+    function switchView(viewName) {
+      const hub = document.getElementById('screenHub');
+      const card = document.getElementById('screenCard');
+      const tabHub = document.getElementById('tabHub');
+      const tabCard = document.getElementById('tabCard');
+
+      if (viewName === 'hub') {
+        hub.classList.remove('hidden');
+        card.classList.add('hidden');
+        tabHub.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white";
+        tabCard.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white";
+      } else {
+        hub.classList.add('hidden');
+        card.classList.remove('hidden');
+        tabCard.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white";
+        tabHub.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white";
+        renderActiveForeverCard();
+      }
+    }
+
+    function setCardMode(mode) {
+      const viewTech = document.getElementById('techWorkspaceView');
+      const viewCust = document.getElementById('customerMirrorView');
+      const modeTech = document.getElementById('modeTech');
+      const modeCust = document.getElementById('modeCust');
+
+      if (mode === 'tech') {
+        viewTech.classList.remove('hidden');
+        viewCust.classList.add('hidden');
+        modeTech.className = "flex-1 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white";
+        modeCust.className = "flex-1 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white";
+      } else {
+        viewCust.classList.remove('hidden');
+        viewTech.classList.add('hidden');
+        modeCust.className = "flex-1 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white";
+        modeTech.className = "flex-1 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white";
+        showCustCard(1);
+      }
+    }
+
+    function showCustCard(num) {
+      for (let i = 1; i <= 4; i++) {
+        document.getElementById(`custFace${i}`).classList.add('hidden');
+        document.getElementById(`cTab${i}`).className = "flex-1 py-1.5 rounded-lg text-slate-400";
+      }
+      document.getElementById(`custFace${num}`).classList.remove('hidden');
+      document.getElementById(`cTab${num}`).className = "flex-1 py-1.5 rounded-lg bg-emerald-600 text-white font-bold";
+    }
+
+    // TIER 1: 1-TAP LABOR
+    function addQuickLabor() {
+      const sel = document.getElementById('quickLaborSelect');
+      if (!sel || !sel.value || currentActiveIndex < 0) return;
+      const [priceStr, desc] = sel.value.split('|');
+
+      appointments[currentActiveIndex].lines.push({
+        desc: desc,
+        price: parseFloat(priceStr) || 0,
+        isTaxable: false,
+        type: 'LABOR'
       });
 
-      if (app.lines.length === 0) {
-        container.innerHTML = '<div class="text-xs text-slate-500 italic p-3 text-center">No lines added to ticket yet.</div>';
+      sel.selectedIndex = 0;
+      saveState();
+      renderCardLineItems();
+      calculateCardTotals();
+    }
+
+    // TIER 2: 1-TAP CONSUMABLES
+    function addQuickConsumable() {
+      const sel = document.getElementById('quickConsumableSelect');
+      if (!sel || !sel.value || currentActiveIndex < 0) return;
+      const [priceStr, desc] = sel.value.split('|');
+
+      appointments[currentActiveIndex].lines.push({
+        desc: desc,
+        price: parseFloat(priceStr) || 0,
+        isTaxable: true,
+        type: 'PART'
+      });
+
+      sel.selectedIndex = 0;
+      saveState();
+      renderCardLineItems();
+      calculateCardTotals();
+    }
+
+    // TIER 3: SEARCH 970+ MASTER CATALOG WITH PHONETIC ALIASES
+    function searchVaultCatalog() {
+      const input = document.getElementById('catalogSearchInput');
+      const resultsContainer = document.getElementById('vaultSearchResults');
+      if (!input || !resultsContainer) return;
+
+      const query = input.value.toLowerCase().trim();
+      resultsContainer.innerHTML = '';
+
+      if (query.length < 2) {
+        resultsContainer.classList.add('hidden');
         return;
       }
 
-      app.lines.forEach(function(item, idx) {
-        var div = document.createElement('div');
-        div.className = 'flex justify-between items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-xs';
-        div.innerHTML = 
-          '<div>' +
-            '<span class="font-bold text-white block">' + item.desc + '</span>' +
-            '<span class="text-[10px] text-slate-500">' + (item.isTaxable ? 'Part (6% Tax)' : 'Service (Tax Exempt)') + '</span>' +
-          '</div>' +
-          '<div class="flex items-center gap-3">' +
-            '<span class="font-bold text-emerald-400">$' + item.price.toFixed(2) + '</span>' +
-            '<button onclick="removeLine(' + idx + ')" class="text-red-400 font-bold hover:text-red-300">✕</button>' +
-          '</div>';
+      const matches = MASTER_CATALOG.filter(item => {
+        const matchName = item.n.toLowerCase().includes(query);
+        const matchAlias = item.aliases && item.aliases.some(a => a.includes(query));
+        return matchName || matchAlias;
+      });
+
+      if (matches.length === 0) {
+        resultsContainer.innerHTML = `<div class="p-2.5 text-xs text-slate-400 italic">No catalog items matching "${query}"</div>`;
+      } else {
+        matches.slice(0, 8).forEach(item => {
+          const div = document.createElement('div');
+          div.className = "p-2.5 hover:bg-slate-800 cursor-pointer text-xs flex justify-between border-b border-slate-800 last:border-b-0";
+          div.innerHTML = `<span class="text-white font-medium">${item.n}</span> <span class="text-emerald-400 font-bold">${item.p.toFixed(2)}</span>`;
+          div.onclick = function() {
+            appointments[currentActiveIndex].lines.push({
+              desc: item.n,
+              price: item.p,
+              isTaxable: (item.t === 'PART'),
+              type: item.t
+            });
+            input.value = '';
+            resultsContainer.classList.add('hidden');
+            saveState();
+            renderCardLineItems();
+            calculateCardTotals();
+          };
+          resultsContainer.appendChild(div);
+        });
+      }
+
+      resultsContainer.classList.remove('hidden');
+    }
+
+    function clearActiveTicketLines() {
+      if (currentActiveIndex >= 0 && appointments[currentActiveIndex]) {
+        appointments[currentActiveIndex].lines = [];
+        saveState();
+        renderCardLineItems();
+        calculateCardTotals();
+      }
+    }
+
+    function removeLineItem(idx) {
+      if (currentActiveIndex >= 0 && appointments[currentActiveIndex].lines) {
+        appointments[currentActiveIndex].lines.splice(idx, 1);
+        saveState();
+        renderCardLineItems();
+        calculateCardTotals();
+      }
+    }
+
+    function renderCardLineItems() {
+      if (currentActiveIndex < 0 || !appointments[currentActiveIndex]) return;
+      const app = appointments[currentActiveIndex];
+      const container = document.getElementById('cardLinesContainer');
+      if (!container) return;
+
+      container.innerHTML = '';
+      if (!app.lines) app.lines = [];
+
+      // Auto-purge any invalid blank rows
+      app.lines = app.lines.filter(l => l && l.desc && l.desc.trim() !== '');
+
+      if (app.lines.length === 0) {
+        container.innerHTML = '<div class="text-xs text-slate-500 italic p-2 text-center">0 items on ticket. Select from dropdowns above.</div>';
+        return;
+      }
+
+      app.lines.forEach((line, idx) => {
+        const div = document.createElement('div');
+        div.className = "flex items-center justify-between p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs";
+        div.innerHTML = `
+          <div>
+            <div class="text-white font-bold">${line.desc}</div>
+            <div class="text-[10px] text-slate-400">${line.isTaxable ? 'Aerus Part (6% Tax)' : 'Labor / Service (Tax Exempt)'}</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-emerald-400">${line.price.toFixed(2)}</span>
+            <button onclick="removeLineItem(${idx})" class="text-red-400 hover:text-red-300 font-bold px-1 text-sm">✕</button>
+          </div>
+        `;
         container.appendChild(div);
       });
     }
 
-    // 1-TAP CLEAR ALL LINES FOR CURRENT TICKET
-    function clearActiveTicketLines() {
-      var app = window.appointments[window.currentActiveIndex];
-      if (app) {
-        app.lines = [];
-        renderActiveCardLines();
-      }
-    }
+    function calculateCardTotals() {
+      if (currentActiveIndex < 0 || !appointments[currentActiveIndex]) return;
+      const app = appointments[currentActiveIndex];
+      let partsSub = 0;
+      let laborSub = 0;
 
-    function addLineToActiveTicket(desc, price, isTaxable) {
-      if (!desc || desc.trim() === '') return;
-      
-      var app = window.appointments[window.currentActiveIndex];
-      if (!app) return;
+      const itemizedDisplay = document.getElementById('custItemizedLinesDisplay');
+      if (itemizedDisplay) itemizedDisplay.innerHTML = '';
+
       if (!app.lines) app.lines = [];
 
-      app.lines.push({
-        desc: desc.trim(),
-        price: parseFloat(price) || 0,
-        isTaxable: !!isTaxable
+      app.lines.forEach(l => {
+        if (!l || !l.desc) return;
+        const amt = parseFloat(l.price) || 0;
+        if (l.isTaxable) partsSub += amt; else laborSub += amt;
+
+        if (itemizedDisplay) {
+          const row = document.createElement('div');
+          row.className = "flex justify-between";
+          row.innerHTML = `<span>• ${l.desc}:</span><span>${amt.toFixed(2)}</span>`;
+          itemizedDisplay.appendChild(row);
+        }
       });
 
-      renderActiveCardLines();
+      const tax = partsSub * SYSTEM_CONFIG.taxRate;
+      const total = partsSub + laborSub + tax;
+
+      document.getElementById('lblPartsSubtotal').innerText = `${partsSub.toFixed(2)}`;
+      document.getElementById('lblLaborSubtotal').innerText = `${laborSub.toFixed(2)}`;
+      document.getElementById('lblTaxVal').innerText = `${tax.toFixed(2)}`;
+      document.getElementById('lblTotalVal').innerText = `${total.toFixed(2)}`;
+
+      document.getElementById('custPayTotal').innerText = `${total.toFixed(2)}`;
+      document.getElementById('custPartsLbl').innerText = `${partsSub.toFixed(2)}`;
+      document.getElementById('custLaborLbl').innerText = `${laborSub.toFixed(2)}`;
+      document.getElementById('custTaxLbl').innerText = `${tax.toFixed(2)}`;
+      document.getElementById('custTotalLbl').innerText = `${total.toFixed(2)}`;
+
+      app.unpaidBalance = total;
+      saveState();
     }
 
-    function removeLine(idx) {
-      var app = window.appointments[window.currentActiveIndex];
-      if (app && app.lines) {
-        app.lines.splice(idx, 1);
-        renderActiveCardLines();
+    function renderActiveForeverCard() {
+      if (currentActiveIndex < 0 || currentActiveIndex >= appointments.length) return;
+      const app = appointments[currentActiveIndex];
+      
+      document.getElementById('cardCustName').innerText = app.customer.name;
+      document.getElementById('cardCustAddr').innerText = app.customer.address;
+      document.getElementById('cardCustPhone').innerText = app.customer.phone;
+      document.getElementById('cardClientIdTag').innerText = `CLIENT #${app.customer.id}`;
+      document.getElementById('invTicketTag').innerText = `Ticket #${app.customer.id}`;
+      document.getElementById('custDeckGreeting').innerText = `${app.customer.name}'s Aerus Report`;
+
+      const img = document.getElementById('cardImageDisplay');
+      const video = document.getElementById('cardVideoDisplay');
+      const emptyPrompt = document.getElementById('photoEmptyPrompt');
+      const custImg = document.getElementById('custDisplayImg');
+      const custVid = document.getElementById('custDisplayVideo');
+
+      if (app.photoUrl) {
+        emptyPrompt.classList.add('hidden');
+        if (app.mediaType === 'video') {
+          img.classList.add('hidden');
+          custImg.classList.add('hidden');
+          video.src = app.photoUrl;
+          video.classList.remove('hidden');
+          custVid.src = app.photoUrl;
+          custVid.classList.remove('hidden');
+        } else {
+          video.classList.add('hidden');
+          custVid.classList.add('hidden');
+          img.src = app.photoUrl;
+          img.classList.remove('hidden');
+          custImg.src = app.photoUrl;
+          custImg.classList.remove('hidden');
+        }
+      } else {
+        img.classList.add('hidden');
+        video.classList.add('hidden');
+        emptyPrompt.classList.remove('hidden');
       }
+
+      renderCardLineItems();
+      calculateCardTotals();
     }
 
-    function addQuickLabor() {
-      var sel = document.getElementById('quickLaborSelect');
-      if (!sel || !sel.value) return;
-      var parts = sel.value.split('|');
-      addLineToActiveTicket(parts[1], parts[0], false);
-      sel.value = '';
-    }
-
-    function addQuickConsumable() {
-      var sel = document.getElementById('quickConsumableSelect');
-      if (!sel || !sel.value) return;
-      var parts = sel.value.split('|');
-      addLineToActiveTicket(parts[1], parts[0], true);
-      sel.value = '';
-    }
-
-    // SEARCH VAULT WITH PHONETIC ALIAS MATCHING
-    function searchVaultCatalog() {
-      var input = document.getElementById('catalogSearchInput');
-      var resultsDiv = document.getElementById('vaultSearchResults');
-      if (!input || !resultsDiv) return;
-
-      var query = input.value.trim().toLowerCase();
-      if (query.length < 2) {
-        resultsDiv.classList.add('hidden');
+    // VOICE RECOGNITION WITH ALIAS MATCHING
+    function toggleVoiceIntake() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const statusText = document.getElementById('statusText');
+      if (!SpeechRecognition) {
+        const spoken = prompt("Speak or type item (e.g. 'sea bags', 'fan', 'tune up'):");
+        if (spoken) processSpokenLine(spoken);
         return;
       }
 
-      var matches = window.MASTER_CATALOG.filter(function(item) {
-        var matchDesc = item.description.toLowerCase().indexOf(query) !== -1;
-        var matchSku = item.sku && item.sku.toLowerCase().indexOf(query) !== -1;
-        var matchAlias = item.aliases && item.aliases.some(function(alias) { return alias.indexOf(query) !== -1; });
-        return matchDesc || matchSku || matchAlias;
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = function() {
+        statusText.innerText = "Listening... Speak part or service now!";
+      };
+
+      recognition.onresult = function(event) {
+        processSpokenLine(event.results[0][0].transcript);
+      };
+
+      recognition.onend = function() {
+        setTimeout(() => {
+          statusText.innerText = "Voice Ready. Speak 'sea bags', 'fan', 'tune up'...";
+        }, 3000);
+      };
+
+      recognition.start();
+    }
+
+    function processSpokenLine(transcript) {
+      const lower = transcript.toLowerCase().trim();
+      const statusText = document.getElementById('statusText');
+
+      if (lower.includes('sea') || lower.includes('see') || lower.includes('c-bag') || lower.includes('c bag') || lower.includes('cbags')) {
+        appointments[currentActiveIndex].lines.push({ desc: "C-Bags 12-Pack", price: 24.00, isTaxable: true, type: "PART" });
+        statusText.innerText = "✅ Added C-Bags 12-Pack ($24.00)";
+      } else if (lower.includes('fan')) {
+        appointments[currentActiveIndex].lines.push({ desc: "Replacement Fan Assembly", price: 15.00, isTaxable: true, type: "PART" });
+        statusText.innerText = "✅ Added Fan Assembly ($15.00)";
+      } else if (lower.includes('hepa') || lower.includes('filter')) {
+        appointments[currentActiveIndex].lines.push({ desc: "HEPA Filter Replacement", price: 49.95, isTaxable: true, type: "PART" });
+        statusText.innerText = "✅ Added HEPA Filter ($49.95)";
+      } else if (lower.includes('tune') || lower.includes('repair') || lower.includes('bench') || lower.includes('labor')) {
+        appointments[currentActiveIndex].lines.push({ desc: "Bench Repair Labor & Tune-Up", price: 60.00, isTaxable: false, type: "LABOR" });
+        statusText.innerText = "✅ Added Bench Tune-Up ($60.00)";
+      } else {
+        statusText.innerText = `Logged: "${transcript}". Matching against catalog...`;
+        searchVaultCatalogDirect(transcript);
+      }
+
+      saveState();
+      renderCardLineItems();
+      calculateCardTotals();
+    }
+
+    function searchVaultCatalogDirect(term) {
+      const match = MASTER_CATALOG.find(item => item.n.toLowerCase().includes(term.toLowerCase()));
+      if (match) {
+        appointments[currentActiveIndex].lines.push({ desc: match.n, price: match.p, isTaxable: (match.t === 'PART'), type: match.t });
+      }
+    }
+
+    function renderScheduleAgenda() {
+      const container = document.getElementById('scheduleContainer');
+      const countTag = document.getElementById('scheduleCountTag');
+      if (!container) return;
+
+      container.innerHTML = '';
+      countTag.innerText = `${appointments.length} Appointment${appointments.length === 1 ? '' : 's'}`;
+
+      appointments.forEach((app, idx) => {
+        const card = document.createElement('div');
+        card.className = "p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs flex justify-between items-center";
+        card.innerHTML = `
+          <div>
+            <span class="font-bold text-emerald-400">${app.time}</span> - <span class="text-white font-black">${app.customer.name}</span>
+            <div class="text-[10px] text-slate-400">${app.customer.address}</div>
+          </div>
+          <button onclick="openAppointmentForeverCard(${idx})" class="bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs">
+            Open Card ➔
+          </button>
+        `;
+        container.appendChild(card);
       });
+    }
 
-      if (matches.length === 0) {
-        resultsDiv.innerHTML = '<div class="p-2.5 text-xs text-slate-500 italic">No catalog items found</div>';
-      } else {
-        resultsDiv.innerHTML = matches.slice(0, 8).map(function(item) {
-          var safeDesc = item.description.replace(/'/g, "\\'");
-          return '<div onclick="selectVaultItem(\'' + safeDesc + '\', ' + item.price + ')" class="p-2.5 border-b border-slate-700/50 hover:bg-slate-700/70 cursor-pointer flex justify-between items-center text-xs">' +
-            '<span class="font-medium text-white">' + item.description + '</span>' +
-            '<span class="font-bold text-amber-400">$' + item.price.toFixed(2) + '</span>' +
-          '</div>';
-        }).join('');
+    function renderInvoiceVault() {
+      const container = document.getElementById('vaultListContainer');
+      const badge = document.getElementById('vaultBadgeCount');
+      if (!container) return;
+
+      container.innerHTML = '';
+      badge.innerText = `${vaultInvoices.length} Locked Ticket${vaultInvoices.length === 1 ? '' : 's'}`;
+
+      if (vaultInvoices.length === 0) {
+        container.innerHTML = `<div class="text-slate-500 text-xs text-center py-2">0 Invoices in Vault.</div>`;
+        return;
       }
 
-      resultsDiv.classList.remove('hidden');
+      vaultInvoices.forEach(inv => {
+        const item = document.createElement('div');
+        item.className = "p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex justify-between items-center text-xs";
+        item.innerHTML = `
+          <div>
+            <div class="font-bold text-white">${inv.customerName} <span class="text-emerald-400">#${inv.clientId}</span></div>
+            <div class="text-[10px] text-slate-400">${inv.date} • Sealed Ledger</div>
+          </div>
+          <div class="text-right">
+            <div class="font-extrabold text-emerald-400">${inv.total.toFixed(2)}</div>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">PAID</span>
+          </div>
+        `;
+        container.appendChild(item);
+      });
     }
 
-    function selectVaultItem(desc, price) {
-      addLineToActiveTicket(desc, price, true);
-      var input = document.getElementById('catalogSearchInput');
-      var resultsDiv = document.getElementById('vaultSearchResults');
-      if (input) input.value = '';
-      if (resultsDiv) resultsDiv.classList.add('hidden');
+    function filterVaultSearch() {
+      const query = document.getElementById('vaultSearchInput').value.toLowerCase().trim();
+      const resultsContainer = document.getElementById('vaultSearchResults');
+      if (!resultsContainer) return;
+      resultsContainer.innerHTML = '';
+      if (query.length < 2) return;
+
+      CUSTOMER_VAULT.filter(c => c.name.toLowerCase().includes(query)).forEach(cust => {
+        const item = document.createElement('div');
+        item.className = "flex items-center justify-between p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs";
+        item.innerHTML = `
+          <div>
+            <div class="font-bold text-white">${cust.name}</div>
+            <div class="text-[10px] text-slate-400">${cust.address}</div>
+          </div>
+          <button onclick="manualScheduleFromVault('${cust.id}')" class="bg-emerald-600 text-white font-bold px-2 py-1 rounded text-[10px]">
+            + Schedule Card
+          </button>
+        `;
+        resultsContainer.appendChild(item);
+      });
     }
 
-    // SIMULATES PHONETIC SPEECH INTAKE
-    function simulateVoiceIntake() {
-      var spoken = prompt("Speak or type item name (e.g. 'sea bags', 'fan', 'tune up'):");
-      if (!spoken) return;
-      
-      var query = spoken.trim().toLowerCase();
-      
-      if (query.indexOf('sea') !== -1 || query.indexOf('see') !== -1 || query.indexOf('c-bag') !== -1 || query.indexOf('c bag') !== -1) {
-        addLineToActiveTicket('C-Bags 12-Pack', 24.00, true);
-      } else if (query.indexOf('fan') !== -1) {
-        addLineToActiveTicket('Replacement Fan Assembly', 15.00, true);
-      } else if (query.indexOf('hepa') !== -1 || query.indexOf('filter') !== -1) {
-        addLineToActiveTicket('HEPA Filter Replacement', 49.95, true);
-      } else if (query.indexOf('tune') !== -1 || query.indexOf('repair') !== -1 || query.indexOf('labor') !== -1) {
-        addLineToActiveTicket('Bench Repair Labor & Tune-Up', 60.00, false);
-      } else {
-        alert("Voice engine logged query: '" + spoken + "'. Use dropdowns or catalog search for custom items.");
+    function manualScheduleFromVault(custId) {
+      const cust = CUSTOMER_VAULT.find(c => c.id === custId);
+      if (cust) {
+        appointments.push({ customer: cust, time: "11:00 AM", lines: [], photoUrl: "", mediaType: "image", unpaidBalance: 0, isPaid: false });
+        saveState();
+        renderScheduleAgenda();
+        openAppointmentForeverCard(appointments.length - 1);
       }
     }
 
-    // SAFE PRINT MODAL ENGINE
+    function openAppointmentForeverCard(idx) {
+      currentActiveIndex = idx;
+      switchView('card');
+    }
+
+    function handleRealMediaUpload(event) {
+      const file = event.target.files[0];
+      if (!file || currentActiveIndex < 0) return;
+
+      const reader = new FileReader();
+      const isVideo = file.type.startsWith('video');
+
+      reader.onload = function(e) {
+        if (isVideo) {
+          appointments[currentActiveIndex].photoUrl = e.target.result;
+          appointments[currentActiveIndex].mediaType = 'video';
+          saveState();
+          renderActiveForeverCard();
+        } else {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const MAX = 800;
+            let w = img.width, h = img.height;
+            if (w > h) { if (w > MAX) { h *= MAX / w; w = MAX; } }
+            else { if (h > MAX) { w *= MAX / h; h = MAX; } }
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            appointments[currentActiveIndex].photoUrl = canvas.toDataURL('image/jpeg', 0.7);
+            appointments[currentActiveIndex].mediaType = 'image';
+            saveState();
+            renderActiveForeverCard();
+          };
+          img.src = e.target.result;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function sendCustomerSMS() {
+      if (currentActiveIndex < 0) return;
+      const app = appointments[currentActiveIndex];
+      window.location.href = `sms:${app.customer.phone}?body=${encodeURIComponent("Here is your Aerus service card: " + window.location.href)}`;
+    }
+
+    function sendCustomerChatMessage() {
+      const input = document.getElementById('custChatMessageInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const chatHistory = document.getElementById('chatHistory');
+      const userMsg = document.createElement('div');
+      userMsg.className = "bg-emerald-950 p-2 rounded-lg text-emerald-200 text-right";
+      userMsg.innerHTML = `<span class="font-bold">You:</span> ${text}`;
+      chatHistory.appendChild(userMsg);
+      input.value = '';
+
+      setTimeout(() => {
+        const reply = document.createElement('div');
+        reply.className = "bg-slate-900 p-2 rounded-lg text-slate-300";
+        reply.innerHTML = `<span class="font-bold text-emerald-400">Shop Desk:</span> Message received! Mona will confirm shortly.`;
+        chatHistory.appendChild(reply);
+      }, 800);
+    }
+
+    function processStripeCheckout() {
+      if (currentActiveIndex < 0) return;
+      const app = appointments[currentActiveIndex];
+      app.isPaid = true;
+      vaultInvoices.push({
+        clientId: app.customer.id,
+        customerName: app.customer.name,
+        total: app.unpaidBalance,
+        date: "Oct 10, 2026",
+        isPaid: true
+      });
+      saveState();
+      renderInvoiceVault();
+      alert(`Stripe Payment Success for ${app.customer.name}! ${app.unpaidBalance.toFixed(2)} locked in vault.`);
+    }
+
+    // PRINT INVOICE MODAL CONTROLLER
     function openPrintInvoiceModal() {
-      try {
-        var app = window.appointments[window.currentActiveIndex];
-        if (!app) {
-          alert("Please select an active ticket card first.");
-          return;
-        }
+      const app = appointments[currentActiveIndex] || appointments[0];
+      const cust = app.customer;
 
-        var cust = app.customer || {};
+      document.getElementById('invDate').innerText = new Date().toLocaleDateString();
+      document.getElementById('invTicketNum').innerText = '#' + cust.id;
+      document.getElementById('invCustomerName').innerText = cust.name;
+      document.getElementById('invCustomerAddress').innerText = cust.address;
+      document.getElementById('invCustomerPhone').innerText = cust.phone;
+      document.getElementById('invCustomerEmail').innerText = cust.email;
 
-        var safeSet = function(id, val) {
-          var el = document.getElementById(id);
-          if (el) el.innerText = val || '';
-        };
+      const tbody = document.getElementById('invTableBody');
+      tbody.innerHTML = '';
 
-        safeSet('invDate', new Date().toLocaleDateString());
-        safeSet('invTicketNum', '#' + (cust.id || '22086'));
-        safeSet('invCustomerName', cust.name || 'Valued Customer');
-        safeSet('invCustomerAddress', cust.address || 'Local Customer');
-        safeSet('invCustomerPhone', cust.phone || '');
-        safeSet('invCustomerEmail', cust.email || '');
+      let partsSub = 0;
+      let laborSub = 0;
 
-        var tbody = document.getElementById('invTableBody');
-        if (tbody) {
-          tbody.innerHTML = '';
-          var partsSub = 0;
-          var laborSub = 0;
+      if (app.lines && app.lines.length > 0) {
+        app.lines.forEach(item => {
+          const price = parseFloat(item.price) || 0;
+          if (item.isTaxable) partsSub += price; else laborSub += price;
 
-          if (app.lines && app.lines.length > 0) {
-            app.lines.forEach(function(item) {
-              if (!item.desc) return; // Skip blank items
-              
-              var linePrice = parseFloat(item.price) || 0;
-              if (item.isTaxable) {
-                partsSub += linePrice;
-              } else {
-                laborSub += linePrice;
-              }
-
-              var row = document.createElement('tr');
-              row.className = 'border-b border-slate-200 text-xs';
-              row.innerHTML = 
-                '<td class="p-2 font-medium text-slate-800">' + item.desc + 
-                '<span class="text-[10px] text-slate-500 block">' + (item.isTaxable ? 'Aerus Part (Taxable)' : 'Labor & Service (Tax Exempt)') + '</span></td>' +
-                '<td class="p-2 text-center">1</td>' +
-                '<td class="p-2 text-right">$' + linePrice.toFixed(2) + '</td>' +
-                '<td class="p-2 text-right font-bold text-slate-900">$' + linePrice.toFixed(2) + '</td>';
-              tbody.appendChild(row);
-            });
-          } else {
-            tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400 italic">No line items added to this ticket yet.</td></tr>';
-          }
-
-          var taxRate = (window.SYSTEM_CONFIG && window.SYSTEM_CONFIG.taxRate) ? window.SYSTEM_CONFIG.taxRate : 0.06;
-          var tax = partsSub * taxRate;
-          var grandTotal = partsSub + laborSub + tax;
-
-          safeSet('invPartsSubtotal', '$' + partsSub.toFixed(2));
-          safeSet('invLaborSubtotal', '$' + laborSub.toFixed(2));
-          safeSet('invTaxTotal', '$' + tax.toFixed(2));
-          safeSet('invGrandTotal', '$' + grandTotal.toFixed(2));
-        }
-
-        var modal = document.getElementById('printInvoiceModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-      } catch (err) {
-        console.error("Print Modal Error:", err);
+          tbody.innerHTML += `
+            <tr class="border-b border-slate-200 text-xs">
+              <td class="p-2 font-medium text-slate-800">
+                ${item.desc}
+                <span class="text-[9px] text-slate-500 block">${item.isTaxable ? 'Part' : 'Labor & Service (Tax Exempt)'}</span>
+              </td>
+              <td class="p-2 text-center">1</td>
+              <td class="p-2 text-right">${price.toFixed(2)}</td>
+              <td class="p-2 text-right font-bold text-slate-900">${price.toFixed(2)}</td>
+            </tr>
+          `;
+        });
       }
+
+      const tax = partsSub * SYSTEM_CONFIG.taxRate;
+      const total = partsSub + laborSub + tax;
+
+      document.getElementById('invPartsSubtotal').innerText = '
+
+---
+
+### **Action:**
+1. Paste this into your `index.html` on GitHub or Netlify and push.
+2. Refresh `freshtappything.com`.
+3. Ruth Tucker (#22086) will appear on your screen with the 3-tier invoice selector, clean phonetic search, and full print/pay capabilities. 🚀☕⚡🖐️0️⃣1️⃣ + partsSub.toFixed(2);
+      document.getElementById('invLaborSubtotal').innerText = '
+
+---
+
+### **Action:**
+1. Paste this into your __CODE_BLOCK_3__ on GitHub or Netlify and push.
+2. Refresh __CODE_BLOCK_4__.
+3. Ruth Tucker (#22086) will appear on your screen with the 3-tier invoice selector, clean phonetic search, and full print/pay capabilities. 🚀☕⚡🖐️0️⃣1️⃣ + laborSub.toFixed(2);
+      document.getElementById('invTaxTotal').innerText = '
+
+---
+
+### **Action:**
+1. Paste this into your __CODE_BLOCK_3__ on GitHub or Netlify and push.
+2. Refresh __CODE_BLOCK_4__.
+3. Ruth Tucker (#22086) will appear on your screen with the 3-tier invoice selector, clean phonetic search, and full print/pay capabilities. 🚀☕⚡🖐️0️⃣1️⃣ + tax.toFixed(2);
+      document.getElementById('invGrandTotal').innerText = '
+
+---
+
+### **Action:**
+1. Paste this into your __CODE_BLOCK_3__ on GitHub or Netlify and push.
+2. Refresh __CODE_BLOCK_4__.
+3. Ruth Tucker (#22086) will appear on your screen with the 3-tier invoice selector, clean phonetic search, and full print/pay capabilities. 🚀☕⚡🖐️0️⃣1️⃣ + total.toFixed(2);
+
+      const modal = document.getElementById('printInvoiceModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
     }
 
     function closePrintInvoiceModal() {
-      var modal = document.getElementById('printInvoiceModal');
-      if (modal) {
-        modal.classList.remove('flex');
-        modal.classList.add('hidden');
-      }
-    }
-
-    function triggerInvoicePrint() {
-      var printContent = document.getElementById('printableDocument');
-      if (!printContent) {
-        window.print();
-        return;
-      }
-      var win = window.open('', '', 'height=700,width=850');
-      if (win) {
-        win.document.write('<html><head><title>Invoice - Aerus Home Wellness</title><script src="https://cdn.tailwindcss.com"><' + '/script></head><body class="p-6 bg-white text-black">' + printContent.innerHTML + '</body></html>');
-        win.document.close();
-        win.focus();
-        setTimeout(function() { win.print(); win.close(); }, 500);
-      }
+      const modal = document.getElementById('printInvoiceModal');
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
     }
   </script>
 </body>
