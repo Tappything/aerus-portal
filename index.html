@@ -310,7 +310,8 @@
             { id: "22084", name: "Claire Hartman", phone: "4433366380", address: "1902 Corbridge Ln Monkton, Maryland 21111" }
         ];
 
-        let appointments = [];
+        // LOCAL STORAGE PERSISTENCE ENGINE
+        let appointments = JSON.parse(localStorage.getItem('tappy_appointments') || '[]');
         let currentActiveIndex = -1;
         let isIntakeRecognizing = false;
         let isEstimateRecognizing = false;
@@ -318,7 +319,15 @@
         window.onload = function() {
             renderScheduleAgenda();
             filterVaultSearch();
+            if (appointments.length > 0) {
+                const drawer = document.getElementById('drawerSchedule');
+                if (drawer) drawer.classList.remove('hidden');
+            }
         };
+
+        function saveState() {
+            localStorage.setItem('tappy_appointments', JSON.stringify(appointments));
+        }
 
         function toggleDrawer(id) {
             const el = document.getElementById(id);
@@ -409,7 +418,6 @@
             const statusBox = document.getElementById('voiceStatusBox');
             const lower = transcript.toLowerCase();
 
-            // FUZZY MATCH: Checks full name or first/last substring
             let matchedCustomer = CUSTOMER_VAULT.find(c => {
                 const parts = c.name.toLowerCase().split(' ');
                 return parts.some(p => p.length >= 3 && (lower.includes(p) || lower.includes(p.substring(0, 3))));
@@ -428,9 +436,10 @@
             const timeStr = extractSpokenTime(transcript);
             appointments.push({ customer: matchedCustomer, time: timeStr, lines: [], photoUrl: "", unpaidBalance: 0 });
             
+            saveState(); // LOCK TO LOCAL STORAGE
+
             statusBox.innerHTML = `<span class="text-emerald-400 font-bold">✅ Scheduled ${matchedCustomer.name} for ${timeStr}!</span>`;
             
-            // RENDERS CARDS & EXPANSER DRAWER INSTANTLY
             renderScheduleAgenda();
             const drawer = document.getElementById('drawerSchedule');
             if (drawer) drawer.classList.remove('hidden');
@@ -490,6 +499,7 @@
                 }
             });
 
+            saveState();
             renderCardLineItems();
             calculateCardTotals();
         }
@@ -517,9 +527,12 @@
                             <span class="font-bold text-emerald-400">${app.time}</span> - <span class="text-white font-extrabold">${app.customer.name}</span>
                             <div class="text-[10px] text-slate-400">${app.customer.address}</div>
                         </div>
-                        <button onclick="openAppointmentForeverCard(${idx})" class="bg-emerald-600 text-white font-bold px-2.5 py-1 rounded-lg">
-                            Open Card ➔
-                        </button>
+                        <div class="flex items-center gap-1">
+                            <button onclick="openAppointmentForeverCard(${idx})" class="bg-emerald-600 text-white font-bold px-2.5 py-1 rounded-lg">
+                                Open Card ➔
+                            </button>
+                            <button onclick="clearAppointment(${idx})" class="text-rose-400 px-1 font-bold text-xs">✕</button>
+                        </div>
                     </div>
                     <a href="${calUrl}" target="_blank" class="block text-center bg-slate-800 hover:bg-slate-700 text-teal-400 font-bold py-1 rounded-lg text-[10px] border border-slate-700">
                         📅 Add to Google Calendar
@@ -527,6 +540,12 @@
                 `;
                 container.appendChild(card);
             });
+        }
+
+        function clearAppointment(idx) {
+            appointments.splice(idx, 1);
+            saveState();
+            renderScheduleAgenda();
         }
 
         function filterVaultSearch() {
@@ -556,6 +575,7 @@
             const cust = CUSTOMER_VAULT.find(c => c.id === custId);
             if (cust) {
                 appointments.push({ customer: cust, time: "11:00 AM", lines: [], photoUrl: "", unpaidBalance: 0 });
+                saveState();
                 renderScheduleAgenda();
                 openAppointmentForeverCard(appointments.length - 1);
             }
@@ -572,6 +592,7 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 appointments[currentActiveIndex].photoUrl = e.target.result;
+                saveState();
                 renderActiveForeverCard();
             };
             reader.readAsDataURL(file);
@@ -584,6 +605,7 @@
                 price: type === 'LABOR' ? 85.00 : 188.95,
                 isTaxable: type === 'PART'
             });
+            saveState();
             renderCardLineItems();
             calculateCardTotals();
         }
@@ -610,12 +632,14 @@
         function updateLineData(idx, key, val) {
             if (currentActiveIndex < 0) return;
             appointments[currentActiveIndex].lines[idx][key] = val;
+            saveState();
             calculateCardTotals();
         }
 
         function removeLineItem(idx) {
             if (currentActiveIndex < 0) return;
             appointments[currentActiveIndex].lines.splice(idx, 1);
+            saveState();
             renderCardLineItems();
             calculateCardTotals();
         }
@@ -645,6 +669,7 @@
             document.getElementById('custTaxLbl').innerText = `$${tax.toFixed(2)}`;
 
             app.unpaidBalance = total;
+            saveState();
         }
 
         function renderActiveForeverCard() {
