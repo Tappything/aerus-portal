@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TappyThing | Calm the Chaos</title>
+    <title>TappyThing Hub | Forever Card™ Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://js.stripe.com/v3/"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -23,20 +23,20 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between pb-10">
 
-    <!-- MASTER HEADER WITH TAPPYTHING LOGO & ERGONOMIC VOICE PILL -->
+    <!-- MASTER HEADER WITH TAPPYTHING BANDANA LOGO & FOREVER CARD BRANDING -->
     <header class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md px-4 py-3 border-b border-slate-800">
         <div class="max-w-md mx-auto flex items-center justify-between gap-2">
             
-            <!-- Logo Area -->
-            <div class="flex items-center space-x-2 cursor-pointer" onclick="switchView('hub')">
-                <div class="w-10 h-10 rounded-xl bg-slate-950 p-1 border border-emerald-500/40 flex items-center justify-center overflow-hidden">
-                    <img id="tappyLogoImg" src="tappything-logo.png" onerror="this.onerror=null; this.src='https://via.placeholder.com/100?text=TAPPY';" alt="TappyThing" class="w-full h-full object-contain">
+            <!-- Bandana Logo & Brand Slot -->
+            <div class="flex items-center space-x-2.5 cursor-pointer" onclick="switchView('hub')">
+                <div class="w-10 h-10 rounded-xl bg-slate-950 p-1 border border-emerald-500/40 flex items-center justify-center overflow-hidden shadow-lg">
+                    <img id="tappyLogoImg" src="tappything-logo.png" onerror="this.onerror=null; this.src='https://via.placeholder.com/100?text=TAPPY';" alt="TappyThing Bandana Logo" class="w-full h-full object-contain">
                 </div>
                 <div>
                     <h1 class="text-xs font-black text-white flex items-center gap-1 tracking-tight">
-                        TappyThing <span class="text-[9px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded-full border border-emerald-500/30">Aerus #001</span>
+                        FOREVER CARD™ <span class="text-[9px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded-full border border-emerald-500/30">Aerus #001</span>
                     </h1>
-                    <p class="text-[9px] text-teal-400 font-bold uppercase tracking-wide">Calm the Chaos™</p>
+                    <p class="text-[9px] text-teal-400 font-bold uppercase tracking-wide">TappyThing • Calm the Chaos™</p>
                 </div>
             </div>
 
@@ -60,7 +60,7 @@
 
     <main class="max-w-md mx-auto px-4 py-4 w-full flex-grow">
 
-        <!-- SCREEN 1: DECK STACK HUB -->
+        <!-- SCREEN 1: TECH DECK STACK HUB -->
         <section id="screenHub" class="space-y-4">
             
             <div id="voiceStatusBox" class="p-3 rounded-2xl bg-slate-900 border border-slate-800 text-xs text-slate-300 flex items-center justify-between">
@@ -156,14 +156,14 @@
         <section id="screenCard" class="space-y-4 hidden">
             <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
                 <button id="modeTech" onclick="setCardMode('tech')" class="flex-1 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white">
-                    <i class="fa-solid fa-wrench mr-1"></i> Tech View
+                    <i class="fa-solid fa-wrench mr-1"></i> Bench Control
                 </button>
                 <button id="modeCust" onclick="setCardMode('cust')" class="flex-1 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white">
                     <i class="fa-solid fa-mobile-screen mr-1"></i> Customer 4-Card Deck
                 </button>
             </div>
 
-            <!-- TECH WORKSPACE -->
+            <!-- TECH BENCH WORKSPACE -->
             <div id="techWorkspaceView" class="space-y-4">
                 <div class="glass-card rounded-2xl p-4 border-l-4 border-emerald-500">
                     <div class="flex justify-between items-start mb-1">
@@ -217,14 +217,14 @@
                 </div>
             </div>
 
-            <!-- THE 4-CARD CUSTOMER MIRROR DECK (NOT AN INVOICE) -->
+            <!-- THE 4-CARD CUSTOMER MIRROR DECK -->
             <div id="customerMirrorView" class="space-y-3 hidden">
                 
                 <!-- Card Navigator Tabs -->
                 <div class="flex justify-between bg-slate-950 p-1 rounded-xl border border-slate-800 text-[10px] font-bold">
                     <button id="cTab1" onclick="showCustCard(1)" class="flex-1 py-1.5 rounded-lg bg-emerald-600 text-white">1. Health</button>
                     <button id="cTab2" onclick="showCustCard(2)" class="flex-1 py-1.5 rounded-lg text-slate-400">2. Assistant</button>
-                    <button id="cTab3" onclick="showCustCard(3)" class="flex-1 py-1.5 rounded-lg text-slate-400">3. Proposal</button>
+                    <button id="cTab3" onclick="showCustCard(3)" class="flex-1 py-1.5 rounded-lg text-slate-400">3. Solution</button>
                     <button id="cTab4" onclick="showCustCard(4)" class="flex-1 py-1.5 rounded-lg text-slate-400">4. Vault</button>
                 </div>
 
@@ -256,10 +256,10 @@
                     </button>
                 </div>
 
-                <!-- CARD 3: 1-Tap Proposal & Stripe Checkout -->
+                <!-- CARD 3: Generic Solution & Stripe Checkout -->
                 <div id="custFace3" class="glass-card rounded-2xl p-5 border-l-4 border-emerald-400 hidden">
                     <div class="flex justify-between items-center mb-2">
-                        <span class="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Card 3 / Service Proposal</span>
+                        <span class="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Card 3 / Home Wellness Solution</span>
                         <span class="text-lg font-black text-emerald-400" id="custPayTotal">$0.00</span>
                     </div>
 
@@ -391,7 +391,6 @@
             recognition.start();
         }
 
-        // DYNAMIC TIME EXTRACTOR RESTORED
         function extractSpokenTime(transcript) {
             const match = transcript.toLowerCase().match(/\b(\d{1,2})(?::(\d{2}))?\s*(a\.?m\.?|p\.?m\.?|o'clock)?\b/i);
             if (match) {
@@ -408,19 +407,31 @@
             const statusBox = document.getElementById('voiceStatusBox');
             const lower = transcript.toLowerCase();
 
-            let matchedCustomer = CUSTOMER_VAULT.find(c => lower.includes(c.name.toLowerCase().split(' ')[0]));
+            let matchedCustomer = CUSTOMER_VAULT.find(c => {
+                const parts = c.name.toLowerCase().split(' ');
+                return parts.some(p => p.length > 2 && lower.includes(p));
+            });
+
             if (!matchedCustomer) {
-                matchedCustomer = { id: "22086", name: "Ruth Tucker", phone: "4102566949", address: "6 Lagan Ct Nottingham, MD" };
+                const cleanName = transcript.replace(/\b(schedule|appointment|for|at|today|tomorrow)\b/gi, '').trim();
+                matchedCustomer = {
+                    id: Math.floor(10000 + Math.random() * 90000).toString(),
+                    name: cleanName.length > 2 ? cleanName : "New Customer Record",
+                    phone: "N/A",
+                    address: "Local Service Territory"
+                };
             }
 
             const timeStr = extractSpokenTime(transcript);
             appointments.push({ customer: matchedCustomer, time: timeStr, lines: [], photoUrl: "", unpaidBalance: 0 });
             
-            statusBox.innerHTML = `<span class="text-emerald-400 font-bold">✅ Scheduled ${matchedCustomer.name} for ${timeStr} on Agenda!</span>`;
+            statusBox.innerHTML = `<span class="text-emerald-400 font-bold">✅ Scheduled ${matchedCustomer.name} for ${timeStr}!</span>`;
             renderScheduleAgenda();
+            
+            const drawer = document.getElementById('drawerSchedule');
+            if (drawer) drawer.classList.remove('hidden');
         }
 
-        // ESTIMATE VOICE DICTATION FUNCTION RESTORED
         function toggleEstimateVoice() {
             const btnText = document.getElementById('estimateMicText');
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -638,7 +649,7 @@
             document.getElementById('cardCustAddr').innerText = app.customer.address;
             document.getElementById('cardCustPhone').innerText = app.customer.phone;
             document.getElementById('cardClientIdTag').innerText = `CLIENT #${app.customer.id}`;
-            document.getElementById('custDeckGreeting').innerText = `${app.customer.name}'s Aerus Guardian Report`;
+            document.getElementById('custDeckGreeting').innerText = `${app.customer.name}'s Aerus Report`;
 
             const img = document.getElementById('cardImageDisplay');
             const emptyPrompt = document.getElementById('photoEmptyPrompt');
