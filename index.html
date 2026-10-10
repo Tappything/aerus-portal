@@ -22,16 +22,12 @@
         <div class="max-w-md mx-auto flex items-center justify-between gap-2">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('hub')">
                 <div class="logo-medallion flex items-center justify-center overflow-hidden">
-                    <!-- Fresh Bandana Medallion Vector -->
                     <svg viewBox="0 0 100 100" class="w-full h-full">
                         <rect width="100" height="100" rx="22" fill="#020617"/>
-                        <!-- Oval Badge Contour -->
                         <ellipse cx="50" cy="50" rx="44" ry="38" fill="none" stroke="#10b981" stroke-width="3" stroke-dasharray="6,3"/>
-                        <!-- Fresh Bandana Silhouette -->
                         <path d="M25 35 C25 20, 75 20, 75 35 C75 55, 65 75, 50 85 C35 75, 25 55, 25 35 Z" fill="#059669" opacity="0.25"/>
                         <path d="M30 40 L50 25 L70 40 L50 78 Z" fill="none" stroke="#34d399" stroke-width="4" stroke-linejoin="round"/>
                         <circle cx="50" cy="45" r="8" fill="#34d399"/>
-                        <!-- Tappy Medallion Accent -->
                         <path d="M42 58 L50 50 L58 58" fill="none" stroke="#6ee7b7" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
@@ -279,37 +275,60 @@
     <script>
         const SYSTEM_CONFIG = { taxRate: 0.06 };
 
-        const AERUS_CATALOG = [
-            { n: "Replacement Fan Assembly", p: 15.00, t: "PART" },
-            { n: "Standard Vacuum Bags (4-Pack)", p: 24.95, t: "PART" },
-            { n: "C-Bags 12-Pack", p: 24.00, t: "PART" },
-            { n: "Potassium Chloride 40 lb Bag", p: 100.00, t: "PART" },
-            { n: "Water Softening Salt Pellets (40lb bag)", p: 18.00, t: "PART" },
-            { n: "HEPA Filter Replacement", p: 49.95, t: "PART" },
-            { n: "White Filter Housing - Legacy", p: 21.00, t: "PART" },
-            { n: "Pure & Gentle Soap Program", p: 325.00, t: "PART" },
-            { n: "Water Cooler w/ 6 Stage RO", p: 2500.00, t: "PART" },
-            { n: "Motor Cover Support - Platinum", p: 5.00, t: "PART" },
-            { n: "Motor Housing - Platinum", p: 25.00, t: "PART" },
-            { n: "Front Motor Cover - Legacy/Classic", p: 10.00, t: "PART" },
-            { n: "Lower Motor Mount - Guard. Upr.", p: 10.00, t: "PART" },
-            { n: "Hose Assembly - Epic 8000", p: 265.00, t: "PART" },
-            { n: "Stainless Steel Hose - Laundry Pro", p: 35.00, t: "PART" },
-            { n: "Dust Mite & Flea Control - 1 lb", p: 43.99, t: "PART" },
-            { n: "Pet Refresh Air System", p: 143.00, t: "PART" },
-            { n: "Standard Cord Wrap Assembly", p: 18.50, t: "PART" },
-            { n: "Bench Repair Labor & Tune-Up", p: 60.00, t: "LABOR" },
-            { n: "Standard Labor Charge", p: 40.00, t: "LABOR" },
-            { n: "Professional RO Installation", p: 450.00, t: "LABOR" },
-            { n: "Standard RO Installation", p: 300.00, t: "LABOR" },
-            { n: "Plumbing Labor & Parts", p: 900.00, t: "LABOR" }
-        ];
-
         const CUSTOMER_VAULT = [
             { id: "22086", name: "Ruth Tucker", phone: "4102566949", address: "6 Lagan Ct Nottingham, Maryland 21236" },
             { id: "22085", name: "Paul Schwab", phone: "4102946383", address: "8515 Huntspring Dr Lutherville, Maryland 21093" },
             { id: "22084", name: "Claire Hartman", phone: "4433366380", address: "1902 Corbridge Ln Monkton, Maryland 21111" }
         ];
+
+        let AERUS_CATALOG = [];
+
+        // Load full 1,000+ parts catalog dynamically from backend CSV
+        async function loadFullAerusCatalog() {
+            try {
+                const response = await fetch('/export_export (35).csv');
+                if (response.ok) {
+                    const text = await response.text();
+                    const lines = text.split('\n');
+                    const parsed = [];
+                    for (let i = 1; i < lines.length; i++) {
+                        const cols = lines[i].split(',');
+                        if (cols.length >= 4) {
+                            const name = cols[1] ? cols[1].replace(/"/g, '').trim() : '';
+                            const price = parseFloat(cols[3]) || 0;
+                            const type = (cols[5] && cols[5].toLowerCase().includes('service')) || name.toLowerCase().includes('labor') ? 'LABOR' : 'PART';
+                            if (name && name !== 'Name') {
+                                parsed.push({ n: name, p: price, t: type });
+                            }
+                        }
+                    }
+                    if (parsed.length > 50) {
+                        AERUS_CATALOG = parsed;
+                        return;
+                    }
+                }
+            } catch (e) { console.log("CSV fetch fallback"); }
+
+            // Default curated catalog fallback
+            AERUS_CATALOG = [
+                { n: "Replacement Fan Assembly", p: 15.00, t: "PART" },
+                { n: "Standard Vacuum Bags (4-Pack)", p: 24.95, t: "PART" },
+                { n: "C-Bags 12-Pack", p: 24.00, t: "PART" },
+                { n: "Potassium Chloride 40 lb Bag", p: 100.00, t: "PART" },
+                { n: "Water Softening Salt Pellets (40lb bag)", p: 18.00, t: "PART" },
+                { n: "HEPA Filter Replacement", p: 49.95, t: "PART" },
+                { n: "White Filter Housing - Legacy", p: 21.00, t: "PART" },
+                { n: "Pure & Gentle Soap Program", p: 325.00, t: "PART" },
+                { n: "Water Cooler w/ 6 Stage RO", p: 2500.00, t: "PART" },
+                { n: "Motor Cover Support - Platinum", p: 5.00, t: "PART" },
+                { n: "Motor Housing - Platinum", p: 25.00, t: "PART" },
+                { n: "Front Motor Cover - Legacy/Classic", p: 10.00, t: "PART" },
+                { n: "Bench Repair Labor & Tune-Up", p: 60.00, t: "LABOR" },
+                { n: "Standard Labor Charge", p: 40.00, t: "LABOR" },
+                { n: "Professional RO Installation", p: 450.00, t: "LABOR" },
+                { n: "Standard RO Installation", p: 300.00, t: "LABOR" }
+            ];
+        }
 
         let appointments = JSON.parse(localStorage.getItem('tappy_appointments') || '[]');
         let vaultInvoices = JSON.parse(localStorage.getItem('tappy_vault_invoices') || '[]');
@@ -327,7 +346,8 @@
             }];
         }
 
-        window.onload = function() {
+        window.onload = async function() {
+            await loadFullAerusCatalog();
             syncWithNetlifyCloud();
             renderScheduleAgenda();
             renderInvoiceVault();
@@ -697,7 +717,7 @@
                 const div = document.createElement('div');
                 div.className = "flex items-center gap-2 p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs";
                 
-                let catalogOptionsHtml = `<option value="" ${!line.desc ? 'selected' : ''}>-- Choose Aerus Catalog Item --</option>`;
+                let catalogOptionsHtml = `<option value="" ${!line.desc ? 'selected' : ''}>-- Choose Aerus Catalog Item (${AERUS_CATALOG.length}+ Items) --</option>`;
                 AERUS_CATALOG.forEach(item => {
                     const isSelected = (line.desc === item.n) ? 'selected' : '';
                     catalogOptionsHtml += `<option value="${item.n}" data-price="${item.p.toFixed(2)}" data-type="${item.t}" ${isSelected}>${item.n} ($${item.p.toFixed(2)})</option>`;
