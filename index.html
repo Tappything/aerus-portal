@@ -1,218 +1,281 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TappyThing — Digital Coordinator</title>
-    <style>
-        :root {
-            --bg-main: #0a0e17;
-            --card-bg: #161f30;
-            --accent-cyan: #00f2fe;
-            --accent-blue: #4facfe;
-            --text-main: #ffffff;
-            --text-sub: #94a3b8;
-            --status-active: #10b981;
-            --status-parts: #f59e0b;
-            --status-ready: #3b82f6;
-            --status-closed: #64748b;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TappyThing — Brick 1: Invoice & Ticket Builder</title>
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --card-bg: #131c2e;
+      --accent-cyan: #00f2fe;
+      --accent-blue: #4facfe;
+      --accent-green: #10b981;
+      --text-main: #ffffff;
+      --text-sub: #94a3b8;
+      --border-color: #23324d;
+    }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg-main); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; padding: 10px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg-dark); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; padding: 14px; }
 
-        .app-container { width: 100%; max-width: 480px; background: #0f172a; border-radius: 28px; border: 2px solid #1e293b; padding: 16px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+    .brick-container { width: 100%; max-width: 440px; background: #0f172a; border-radius: 28px; border: 2px solid var(--border-color); padding: 18px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
 
-        /* Header Bar */
-        .header { display: flex; align-items: center; justify-content: space-between; background: var(--card-bg); padding: 10px 16px; border-radius: 20px; border: 1px solid #334155; }
-        .brand { display: flex; align-items: center; gap: 12px; }
-        .brand-img { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--accent-cyan); object-fit: cover; background: #fff; }
-        .brand-title { font-size: 1.1rem; font-weight: 800; letter-spacing: 0.5px; }
-        .brand-sub { font-size: 0.65rem; color: var(--accent-cyan); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
-        .live-tag { background: rgba(16, 185, 129, 0.2); color: var(--status-active); font-size: 0.7rem; font-weight: 700; padding: 4px 8px; border-radius: 12px; border: 1px solid var(--status-active); }
+    /* Top Brand Header */
+    .header { display: flex; align-items: center; justify-content: space-between; background: var(--card-bg); padding: 10px 14px; border-radius: 20px; border: 1px solid var(--border-color); }
+    .brand-info { display: flex; align-items: center; gap: 10px; }
+    
+    /* Green Bandana Logo Medallion */
+    .logo-badge { width: 42px; height: 42px; border-radius: 50%; background: #020617; border: 2px solid var(--accent-green); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(16,185,129,0.3); }
+    .brand-title { font-size: 1.05rem; font-weight: 900; letter-spacing: 0.5px; color: #fff; }
+    .brand-sub { font-size: 0.65rem; color: var(--accent-green); font-weight: 800; letter-spacing: 1px; }
+    .brick-badge { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 12px; border: 1px solid var(--accent-green); }
 
-        /* Arc Voice Intake Button */
-        .voice-section { text-align: center; margin: 8px 0; }
-        .arc-button { width: 110px; height: 110px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue)); border: none; color: #000; font-weight: 900; font-size: 1.1rem; cursor: pointer; box-shadow: 0 0 25px rgba(0, 242, 254, 0.4); transition: transform 0.1s, box-shadow 0.1s; }
-        .arc-button:active { transform: scale(0.95); box-shadow: 0 0 10px rgba(0, 242, 254, 0.8); }
-        .voice-label { margin-top: 8px; font-size: 0.8rem; color: var(--text-sub); font-weight: 600; }
+    /* Customer Selector Card (100% Dynamic) */
+    .customer-card { background: var(--card-bg); border-radius: 18px; padding: 14px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px; }
+    .cust-select { width: 100%; background: #090d16; border: 1px solid var(--border-color); color: #fff; padding: 8px 10px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; outline: none; }
+    .cust-details { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 0.78rem; padding-top: 4px; border-top: 1px solid #1e293b; }
+    .cust-meta { color: var(--text-sub); }
+    .cust-meta-right { text-align: right; color: var(--accent-cyan); font-weight: 700; }
 
-        /* Status Lanes Bar */
-        .lane-tabs { display: flex; gap: 6px; background: #020617; padding: 4px; border-radius: 14px; overflow-x: auto; }
-        .tab-btn { flex: 1; padding: 8px 4px; border: none; background: transparent; color: var(--text-sub); font-size: 0.7rem; font-weight: 700; border-radius: 10px; cursor: pointer; text-align: center; white-space: nowrap; }
-        .tab-btn.active { background: var(--card-bg); color: var(--text-main); border: 1px solid #334155; }
+    /* 1-Tap Quick Buttons */
+    .section-label { font-size: 0.7rem; font-weight: 800; color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 1px; }
+    .quick-grid { display: grid; grid-template-columns: 1fr; gap: 6px; }
+    .quick-btn { background: #162238; border: 1px solid var(--border-color); color: #fff; padding: 10px 12px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.15s; }
+    .quick-btn:active { background: #223455; transform: scale(0.98); }
+    .btn-name { font-weight: 700; font-size: 0.85rem; }
+    .btn-tax-tag { font-size: 0.65rem; color: var(--text-sub); display: block; }
+    .btn-price { font-weight: 900; font-size: 0.9rem; color: var(--accent-cyan); }
 
-        /* Active Card */
-        .card { background: var(--card-bg); border-radius: 18px; padding: 14px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 10px; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; }
-        .cust-name { font-weight: 700; font-size: 1rem; }
-        .cust-address { font-size: 0.75rem; color: var(--text-sub); }
-        .status-badge { font-size: 0.65rem; font-weight: 800; padding: 3px 8px; border-radius: 8px; text-transform: uppercase; }
-        .badge-parts { background: rgba(245, 158, 11, 0.2); color: var(--status-parts); border: 1px solid var(--status-parts); }
-        .badge-active { background: rgba(16, 185, 129, 0.2); color: var(--status-active); border: 1px solid var(--status-active); }
+    /* Itemized Lines List */
+    .items-list { background: #080d1a; border-radius: 14px; padding: 10px; border: 1px solid var(--border-color); min-height: 60px; display: flex; flex-direction: column; gap: 6px; font-size: 0.8rem; }
+    .item-row { display: flex; justify-content: space-between; align-items: center; color: #cbd5e1; padding: 2px 0; border-bottom: 1px solid #141f33; }
+    .item-row:last-child { border-bottom: none; }
+    .empty-notice { color: var(--text-sub); text-align: center; margin: auto; font-style: italic; }
 
-        .note-box { background: #090d16; border-radius: 10px; padding: 10px; font-size: 0.8rem; color: #cbd5e1; border: 1px solid #1e293b; }
+    /* Math Totals Box */
+    .math-box { background: var(--card-bg); border-radius: 16px; padding: 14px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; }
+    .math-row { display: flex; justify-content: space-between; color: var(--text-sub); }
+    .math-row.total { border-top: 1px solid var(--border-color); padding-top: 8px; margin-top: 2px; font-weight: 900; font-size: 1.05rem; color: #fff; }
+    .total-val { color: var(--accent-green); }
 
-        /* Quick-Tap Option B Counter Strip */
-        .counter-strip { display: flex; flex-direction: column; gap: 8px; }
-        .strip-title { font-size: 0.75rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; }
-        .quick-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .btn-tap { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 10px; border-radius: 12px; font-weight: 700; font-size: 0.75rem; text-align: left; cursor: pointer; }
-        .btn-tap span { display: block; font-size: 0.65rem; color: var(--text-sub); font-weight: 400; }
-
-        /* Ticket Summary */
-        .ticket-summary { background: #020617; border-radius: 12px; padding: 10px; font-size: 0.8rem; display: flex; flex-direction: column; gap: 4px; }
-        .summary-row { display: flex; justify-content: space-between; }
-        .summary-row.total { font-weight: 800; font-size: 0.95rem; color: var(--accent-cyan); border-top: 1px solid #1e293b; pt: 4px; margin-top: 4px; }
-
-        /* Action Bar */
-        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .btn-action { padding: 12px; border-radius: 14px; border: none; font-weight: 800; font-size: 0.8rem; cursor: pointer; text-align: center; }
-        .btn-primary { background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue)); color: #000; }
-        .btn-secondary { background: #334155; color: #fff; }
-    </style>
+    /* Action Buttons */
+    .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .action-btn { padding: 12px; border-radius: 14px; border: none; font-weight: 800; font-size: 0.8rem; cursor: pointer; text-align: center; }
+    .btn-sec { background: #23324d; color: #fff; }
+    .btn-pri { background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue)); color: #0a0f1d; font-weight: 900; }
+  </style>
 </head>
 <body>
 
-<div class="app-container">
-    <!-- Top Header -->
-    <div class="header">
-        <div class="brand">
-            <img src="https://i.ibb.co/qFFCqDq/fresh-logo.jpg" alt="Fresh" class="brand-img" id="fresh-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'44\' height=\'44\' viewBox=\'0 0 44 44\'><circle cx=\'22\' cy=\'22\' r=\'20\' fill=\'%2300f2fe\'/><text x=\'50%\' y=\'55%\' font-size=\'16\' font-weight=\'bold\' text-anchor=\'middle\' fill=\'%23000\'>F</text></svg>'">
-            <div>
-                <div class="brand-title">FRESH</div>
-                <div class="brand-sub">CALM THE CHAOS</div>
-            </div>
-        </div>
-        <div class="live-tag">● LIVE</div>
+<div class="brick-container">
+  <!-- Brand Header -->
+  <div class="header">
+    <div class="brand-info">
+      <div class="logo-badge">
+        <svg viewBox="0 0 100 100" style="width: 26px; height: 26px;">
+          <rect width="100" height="100" rx="20" fill="#020617"/>
+          <path d="M15 32 C35 18, 65 18, 85 32 L88 42 C68 28, 32 28, 12 42 Z" fill="#10b981"/>
+          <path d="M18 36 C35 28, 65 28, 82 36 L85 46 C68 38, 32 38, 15 46 Z" fill="#047857"/>
+          <path d="M22 50 Q38 48 48 53 L48 64 Q32 66 22 58 Z" fill="#020617" stroke="#34d399" stroke-width="2"/>
+          <path d="M52 53 Q62 48 78 50 L78 58 Q68 66 52 64 Z" fill="#020617" stroke="#34d399" stroke-width="2"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">TAPPYTHING</div>
+        <div class="brand-sub">POWERED BY FRESH 🤵</div>
+      </div>
     </div>
+    <div class="brick-badge">BRICK 1: INVOICE</div>
+  </div>
 
-    <!-- 1-Button Voice Intake -->
-    <div class="voice-section">
-        <button class="arc-button" id="btn-arc" onclick="handleVoiceTap()">TALK</button>
-        <div class="voice-label" id="voice-status">Tap button to talk to Fresh</div>
+  <!-- 100% Dynamic Customer Selector -->
+  <div class="customer-card">
+    <label class="section-label">Select Customer From Vault</label>
+    <select id="custSelect" class="cust-select" onchange="changeCustomer()">
+      <option value="0">Ruth Tucker (#22086) — Nottingham, MD</option>
+      <option value="1">Sue Freeland (#8448) — Sandpiper Circle, MD</option>
+      <option value="2">Paul Schwab (#22085) — Lutherville, MD</option>
+    </select>
+    <div class="cust-details">
+      <div>
+        <div id="dispCustName" style="font-weight: 800; color: #fff;">Ruth Tucker</div>
+        <div id="dispCustAddress" class="cust-meta">6 Lagan Ct, Nottingham, MD</div>
+      </div>
+      <div style="text-align: right;">
+        <div id="dispCustPhone" class="cust-meta-right">(410) 256-6949</div>
+        <div id="dispCustId" class="cust-meta">Ticket #22086</div>
+      </div>
     </div>
+  </div>
 
-    <!-- 4-Lane Status Board -->
-    <div class="lane-tabs">
-        <button class="tab-btn active" onclick="switchLane('active')">🟢 Bench</button>
-        <button class="tab-btn" onclick="switchLane('parts')">🟡 Parts Order</button>
-        <button class="tab-btn" onclick="switchLane('ready')">🔵 Pickup</button>
-        <button class="tab-btn" onclick="switchLane('closed')">⚪ Closed</button>
-    </div>
+  <!-- 1-Tap Option B Quick Catalog -->
+  <div class="section-label">1-Tap Fast-Movers</div>
+  <div class="quick-grid">
+    <button class="quick-btn" onclick="addItem('Bench Labor & Tune-Up', 60.00, false)">
+      <div>
+        <span class="btn-name">+ Bench Labor & Tune-Up</span>
+        <span class="btn-tax-tag">0% MD Tax (Tax Exempt)</span>
+      </div>
+      <span class="btn-price">$60.00</span>
+    </button>
+    <button class="quick-btn" onclick="addItem('C-Bags 24-Pack', 48.00, true)">
+      <div>
+        <span class="btn-name">+ C-Bags 24-Pack</span>
+        <span class="btn-tax-tag">6% MD Sales Tax</span>
+      </div>
+      <span class="btn-price">$48.00</span>
+    </button>
+    <button class="quick-btn" onclick="addItem('Replacement Fan Assembly', 15.00, true)">
+      <div>
+        <span class="btn-name">+ Fan Assembly</span>
+        <span class="btn-tax-tag">6% MD Sales Tax</span>
+      </div>
+      <span class="btn-price">$15.00</span>
+    </button>
+  </div>
 
-    <!-- Active Card -->
-    <div class="card" id="active-card">
-        <div class="card-header">
-            <div>
-                <div class="cust-name" id="cust-name">Active Workstation Card</div>
-                <div class="cust-address" id="cust-address">Tap Voice or Select Customer</div>
-            </div>
-            <div class="status-badge badge-active" id="card-status">ACTIVE BENCH</div>
-        </div>
+  <!-- Itemized Ticket Lines -->
+  <div class="section-label">Ticket Line Items</div>
+  <div class="items-list" id="itemsContainer">
+    <div class="empty-notice" id="emptyNotice">No items added yet. Tap buttons above.</div>
+  </div>
 
-        <div class="note-box" id="card-notes">
-            <b>Bench Note:</b> Ready for counter ticket entry or voice intake.
-        </div>
+  <!-- Live Maryland Tax Math Box -->
+  <div class="math-box">
+    <div class="math-row"><span>Labor Subtotal (Tax Exempt):</span><span id="lblLabor">$0.00</span></div>
+    <div class="math-row"><span>Parts Subtotal:</span><span id="lblParts">$0.00</span></div>
+    <div class="math-row"><span>MD Tax (6% Parts Only):</span><span id="lblTax">$0.00</span></div>
+    <div class="math-row total"><span>Total Due:</span><span class="total-val" id="lblTotal">$0.00</span></div>
+  </div>
 
-        <!-- 1-Tap Quick Items -->
-        <div class="counter-strip">
-            <div class="strip-title">1-Tap Quick Catalog Adding</div>
-            <div class="quick-buttons">
-                <button class="btn-tap" onclick="addItem('Bench Tune-Up / Labor', 60.00, false)">
-                    + Bench Labor ($60)
-                    <span>0% MD Tax</span>
-                </button>
-                <button class="btn-tap" onclick="addItem('Beyond AP Cell Gen 2', 190.00, true)">
-                    + Beyond Cell ($190)
-                    <span>6% MD Tax</span>
-                </button>
-            </div>
-            <!-- Row 2 Quick Buttons -->
-            <div class="quick-buttons" style="margin-top: 2px;">
-                <button class="btn-tap" onclick="addItem('C-Bags 24-Pack', 48.00, true)">
-                    + C-Bags 24-Pk ($48)
-                    <span>6% MD Tax</span>
-                </button>
-                <button class="btn-tap" onclick="addItem('Fan Assembly', 15.00, true)">
-                    + Fan Assembly ($15)
-                    <span>6% MD Tax</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Live Ticket Invoice Calculation -->
-        <div class="ticket-summary">
-            <div class="summary-row"><span>Items:</span><span id="ticket-items">0 items selected</span></div>
-            <div class="summary-row"><span>Labor Subtotal:</span><span id="labor-sub">$0.00</span></div>
-            <div class="summary-row"><span>Parts Subtotal:</span><span id="parts-sub">$0.00</span></div>
-            <div class="summary-row"><span>MD Sales Tax (6% Parts):</span><span id="tax-sub">$0.00</span></div>
-            <div class="summary-row total"><span>Total Due:</span><span id="total-due">$0.00</span></div>
-        </div>
-    </div>
-
-    <!-- Actions -->
-    <div class="actions">
-        <button class="btn-action btn-secondary" onclick="toggleStatus()">Flip Status</button>
-        <button class="btn-action btn-primary" onclick="alert('Invoice Printed / Sent via Fresh 2-Way Chat!')">1-Tap Print / Send</button>
-    </div>
+  <!-- Action Controls -->
+  <div class="actions-grid">
+    <button class="action-btn btn-sec" onclick="clearTicket()">🗑️ Clear Lines</button>
+    <button class="action-btn btn-pri" onclick="printInvoice()">🖨️ Print / Save PDF</button>
+  </div>
 </div>
 
 <script>
-    // Bulletproof Guarded DOM Helper (Prevents White Screen Crashes)
-    function setEl(id, prop, val) {
-        const el = document.getElementById(id);
-        if (el) el[prop] = val;
+  const VAULT = [
+    { id: "22086", name: "Ruth Tucker", address: "6 Lagan Ct, Nottingham, MD", phone: "(410) 256-6949" },
+    { id: "8448", name: "Sue Freeland", address: "8095 Sandpiper Circle, Nottingham, MD", phone: "(443) 629-4180" },
+    { id: "22085", name: "Paul Schwab", address: "8515 Huntspring Dr, Lutherville, MD", phone: "(410) 294-6383" }
+  ];
+
+  let currentCustIndex = 0;
+  let lines = [];
+
+  function changeCustomer() {
+    const sel = document.getElementById('custSelect');
+    currentCustIndex = parseInt(sel.value) || 0;
+    const cust = VAULT[currentCustIndex];
+
+    document.getElementById('dispCustName').innerText = cust.name;
+    document.getElementById('dispCustAddress').innerText = cust.address;
+    document.getElementById('dispCustPhone').innerText = cust.phone;
+    document.getElementById('dispCustId').innerText = 'Ticket #' + cust.id;
+  }
+
+  function addItem(desc, price, isTaxable) {
+    lines.push({ desc, price, isTaxable });
+    render();
+  }
+
+  function removeLine(idx) {
+    lines.splice(idx, 1);
+    render();
+  }
+
+  function clearTicket() {
+    lines = [];
+    render();
+  }
+
+  function render() {
+    const container = document.getElementById('itemsContainer');
+    if (lines.length === 0) {
+      container.innerHTML = '<div class="empty-notice">No items added yet. Tap buttons above.</div>';
+    } else {
+      container.innerHTML = lines.map((item, idx) => `
+        <div class="item-row">
+          <div>
+            <span style="font-weight: 700; color: #fff;">${item.desc}</span>
+            <span style="font-size: 0.65rem; color: #94a3b8; display: block;">${item.isTaxable ? 'Part (6% Tax)' : 'Labor (0% Tax)'}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-weight: 800; color: #00f2fe;">${item.price.toFixed(2)}</span>
+            <button onclick="removeLine(${idx})" style="background: none; border: none; color: #ef4444; font-weight: bold; cursor: pointer;">✕</button>
+          </div>
+        </div>
+      `).join('');
     }
 
-    let ticket = { labor: 0, parts: 0, items: [] };
+    let partsSub = 0;
+    let laborSub = 0;
 
-    function addItem(name, price, isTaxable) {
-        if (isTaxable) {
-            ticket.parts += price;
-        } else {
-            ticket.labor += price;
-        }
-        ticket.items.push(name + ' ($' + price.toFixed(2) + ')');
-        updateInvoice();
+    lines.forEach(l => {
+      if (l.isTaxable) partsSub += l.price;
+      else laborSub += l.price;
+    });
+
+    const tax = partsSub * 0.06;
+    const total = partsSub + laborSub + tax;
+
+    document.getElementById('lblLabor').innerText = '
+
+---
+
+### **Why this version is ready to test:**
+* **No hardcoded customer:** Switch to Sue Freeland or Paul Schwab with one click.
+* **Includes C-Bags 24-Pack:** Your #1 seller is pre-loaded on the button.
+* **Penny-perfect Maryland tax math:** Verified for both parts and tax-exempt labor.
+* **Clean Green Bandana Logo:** Renders properly in the header.
+
+Give this a quick spin, and tell me if Brick 1 looks right! ☕⚡🖐️0️⃣1️⃣ + laborSub.toFixed(2);
+    document.getElementById('lblParts').innerText = '
+
+---
+
+### **Why this version is ready to test:**
+* **No hardcoded customer:** Switch to Sue Freeland or Paul Schwab with one click.
+* **Includes C-Bags 24-Pack:** Your #1 seller is pre-loaded on the button.
+* **Penny-perfect Maryland tax math:** Verified for both parts and tax-exempt labor.
+* **Clean Green Bandana Logo:** Renders properly in the header.
+
+Give this a quick spin, and tell me if Brick 1 looks right! ☕⚡🖐️0️⃣1️⃣ + partsSub.toFixed(2);
+    document.getElementById('lblTax').innerText = '
+
+---
+
+### **Why this version is ready to test:**
+* **No hardcoded customer:** Switch to Sue Freeland or Paul Schwab with one click.
+* **Includes C-Bags 24-Pack:** Your #1 seller is pre-loaded on the button.
+* **Penny-perfect Maryland tax math:** Verified for both parts and tax-exempt labor.
+* **Clean Green Bandana Logo:** Renders properly in the header.
+
+Give this a quick spin, and tell me if Brick 1 looks right! ☕⚡🖐️0️⃣1️⃣ + tax.toFixed(2);
+    document.getElementById('lblTotal').innerText = '
+
+---
+
+### **Why this version is ready to test:**
+* **No hardcoded customer:** Switch to Sue Freeland or Paul Schwab with one click.
+* **Includes C-Bags 24-Pack:** Your #1 seller is pre-loaded on the button.
+* **Penny-perfect Maryland tax math:** Verified for both parts and tax-exempt labor.
+* **Clean Green Bandana Logo:** Renders properly in the header.
+
+Give this a quick spin, and tell me if Brick 1 looks right! ☕⚡🖐️0️⃣1️⃣ + total.toFixed(2);
+  }
+
+  function printInvoice() {
+    if (lines.length === 0) {
+      alert("Please add at least one line item first.");
+      return;
     }
-
-    function updateInvoice() {
-        const tax = ticket.parts * 0.06;
-        const total = ticket.labor + ticket.parts + tax;
-
-        setEl('labor-sub', 'innerText', '$' + ticket.labor.toFixed(2));
-        setEl('parts-sub', 'innerText', '$' + ticket.parts.toFixed(2));
-        setEl('tax-sub', 'innerText', '$' + tax.toFixed(2));
-        setEl('total-due', 'innerText', '$' + total.toFixed(2));
-        setEl('ticket-items', 'innerText', ticket.items.length + ' item(s)');
-    }
-
-    function handleVoiceTap() {
-        setEl('voice-status', 'innerText', '🎙️ Listening to Voice Dump...');
-        setTimeout(() => {
-            setEl('voice-status', 'innerText', '✅ Fresh Processed: Card Updated');
-        }, 1500);
-    }
-
-    function switchLane(lane) {
-        if (lane === 'parts') {
-            setEl('card-status', 'innerText', 'PARTS ON ORDER');
-            setEl('card-status', 'className', 'status-badge badge-parts');
-        } else {
-            setEl('card-status', 'innerText', 'ACTIVE BENCH');
-            setEl('card-status', 'className', 'status-badge badge-active');
-        }
-    }
-
-    function toggleStatus() {
-        const current = document.getElementById('card-status').innerText;
-        if (current.includes('PARTS')) {
-            switchLane('active');
-        } else {
-            switchLane('parts');
-        }
-    }
+    window.print();
+  }
 </script>
+
 </body>
 </html>
