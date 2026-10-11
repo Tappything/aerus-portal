@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FOREVER CARD™ — TappyThing Digital Coordinator</title>
-    <!-- Tailwind CSS (Zero dependency, instant render) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PapaParse for high-speed client-side CSV parsing of 22,283 vault records -->
+    <!-- PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
         @media print {
@@ -38,7 +38,7 @@
                 <button id="voiceBtn" onclick="toggleVoiceIntake()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-black text-base rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
                     <span class="text-2xl">🎙️</span> TAP TO TALK TO FRESH
                 </button>
-                <p id="voiceStatus" class="text-[11px] font-bold text-slate-400 mt-2">Tap to dictate appointment e.g. "Ruth Tucker appointment 11am"</p>
+                <p id="voiceStatus" class="text-[11px] font-bold text-slate-400 mt-2">Tap to dictate e.g. "Put Vivian Fulton for 8:15 today"</p>
             </section>
 
             <!-- Today's Dispatch Calendar Schedule -->
@@ -170,7 +170,7 @@
                     skipEmptyLines: true,
                     complete: function(results) {
                         customerVault = results.data;
-                        document.getElementById('vaultRecordCount').textContent = `${customerVault.length.toLocaleString()} Vault Records`;
+                        document.getElementById('vaultRecordCount').textContent = `${customerVault.length.toLocaleString()} Vault Records Ready`;
                     }
                 });
 
@@ -184,7 +184,7 @@
                     }
                 });
             } catch (err) {
-                console.error('Database fetch fallback active:', err);
+                console.error('Database fetch error:', err);
             }
         }
 
@@ -273,7 +273,7 @@
 
             if (customerVault.length === 0) {
                 res.classList.remove('hidden');
-                res.innerHTML = `<p class="p-2 text-xs text-slate-500">Searching vault...</p>`;
+                res.innerHTML = `<p class="p-2 text-xs text-slate-500">Loading 22,283 vault records...</p>`;
                 return;
             }
 
@@ -302,7 +302,7 @@
 
                 return `
                     <div onclick="scheduleVaultCust('${safeName}', '${ticket}', '${safeAddr}', '${phone}')" class="p-2.5 hover:bg-slate-800 rounded-lg cursor-pointer text-xs flex justify-between items-center border-b border-slate-800/50">
-                        <div><strong>${name}</strong> <span class="text-slate-400">${ticket} • ${addr.substring(0, 24)}...</span></div>
+                        <div><strong>${name}</strong> <span class="text-slate-400">${ticket} • ${addr.substring(0, 22)}...</span></div>
                         <span class="text-emerald-400 font-bold bg-emerald-950 px-2 py-0.5 rounded text-[10px]">+ Schedule</span>
                     </div>
                 `;
@@ -325,30 +325,40 @@
             if (!recognition) {
                 recognition = new SpeechRecognition();
                 recognition.onstart = () => {
-                    document.getElementById('voiceStatus').textContent = '🎙️ Listening... Speak customer name or appointment now!';
+                    document.getElementById('voiceStatus').textContent = '🎙️ Listening... Speak customer appointment now!';
                 };
                 recognition.onend = () => {
-                    document.getElementById('voiceStatus').textContent = 'Tap to dictate appointment e.g. "Ruth Tucker appointment 11am"';
+                    document.getElementById('voiceStatus').textContent = 'Tap to dictate e.g. "Put Vivian Fulton for 8:15 today"';
                 };
                 recognition.onresult = (event) => {
                     const text = event.results[0][0].transcript.trim();
                     const query = text.toLowerCase();
 
-                    // CRITICAL FIX: Check if the spoken text CONTAINS any vault customer's name
-                    const matches = customerVault.filter(c => {
-                        const vaultName = (c.Name || '').toLowerCase();
-                        return vaultName && query.includes(vaultName);
-                    });
+                    // SMART VOICE PARSER: Extract time and match customer name from tokenized words
+                    let matchedCustomer = null;
 
-                    if (matches.length > 0) {
-                        const target = matches[0];
-                        addScheduleSlot("Today 11:00 AM", target.Name, `#${target['Client #'] || 'Vault'}`, target.Address, target.Phone);
-                        document.getElementById('voiceStatus').textContent = `✅ Scheduled: ${target.Name} on Calendar!`;
+                    if (customerVault.length > 0) {
+                        matchedCustomer = customerVault.find(c => {
+                            const vName = (c.Name || '').toLowerCase();
+                            if (!vName) return false;
+                            const parts = vName.split(' ');
+                            // Check if speech contains both first and last name or full name
+                            return query.includes(vName) || parts.every(p => p.length > 2 && query.includes(p));
+                        });
+                    }
+
+                    // Extract spoken time or default to Today
+                    let timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:am|pm)?|\d{1,2}\s*(?:am|pm))/i);
+                    let timeStr = timeMatch ? timeMatch[0].toUpperCase() : "Today 11:00 AM";
+
+                    if (matchedCustomer) {
+                        addScheduleSlot(timeStr, matchedCustomer.Name, `#${matchedCustomer['Client #'] || 'Vault'}`, matchedCustomer.Address, matchedCustomer.Phone);
+                        document.getElementById('voiceStatus').textContent = `✅ Scheduled: ${matchedCustomer.Name} for ${timeStr}!`;
                     } else {
-                        document.getElementById('newTaskInput').value = text;
-                        document.getElementById('pinballExpanded').classList.remove('hidden');
-                        addPinballTask();
-                        document.getElementById('voiceStatus').textContent = `✅ Task Added: "${text}"`;
+                        // Fallback: If customer is not in memory yet, drop appointment directly onto schedule from spoken text
+                        const nameExtract = text.replace(/put|for|today|at|appointment|schedule/gi, '').trim();
+                        addScheduleSlot(timeStr, nameExtract || "Spoken Intake", "#Vault", "Pending Address Lookup", "");
+                        document.getElementById('voiceStatus').textContent = `✅ Appointment Added: "${text}"`;
                     }
                 };
             }
@@ -396,7 +406,7 @@
                     }
                 }
             } else {
-                resultBox.textContent = 'Searching 1,090 catalog items...';
+                resultBox.textContent = 'Searching catalog...';
             }
         }
 
