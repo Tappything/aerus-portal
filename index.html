@@ -38,7 +38,7 @@
                 <button id="voiceBtn" onclick="toggleVoiceIntake()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-black text-base rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
                     <span class="text-2xl">🎙️</span> TAP TO TALK TO FRESH
                 </button>
-                <p id="voiceStatus" class="text-[11px] font-bold text-slate-400 mt-2">Tap to dictate appointment e.g. "Schedule customer at 11am"</p>
+                <p id="voiceStatus" class="text-[11px] font-bold text-slate-400 mt-2">Tap to dictate appointment e.g. "Ruth Tucker appointment 11am"</p>
             </section>
 
             <!-- Today's Dispatch Calendar Schedule -->
@@ -155,19 +155,15 @@
     </div>
 
     <script>
-        // Dynamic In-Memory Databases Loaded From Repository CSVs
         let customerVault = [];
         let catalogBook = [];
 
-        // Application State
         let schedule = [];
         let tasks = [];
         let activeCust = { name: "", ticket: "", addr: "", phone: "" };
 
-        // Async Loader for customers.csv & catalog.csv
         async function loadRepositoryData() {
             try {
-                // Fetch Customers Vault (22,283 records)
                 Papa.parse('customers.csv', {
                     download: true,
                     header: true,
@@ -178,7 +174,6 @@
                     }
                 });
 
-                // Fetch Catalog Price Book (1,090 items)
                 Papa.parse('catalog.csv', {
                     download: true,
                     header: true,
@@ -267,7 +262,6 @@
             document.getElementById('scheduleCount').textContent = `${schedule.length} Appointment${schedule.length === 1 ? '' : 's'}`;
         }
 
-        // 100% Dynamic Vault Query Execution
         function searchVault() {
             const q = document.getElementById('vaultSearch').value.toLowerCase().trim();
             const res = document.getElementById('searchResults');
@@ -289,7 +283,7 @@
                 const clientNum = (c['Client #'] || '').toLowerCase();
                 const addr = (c.Address || '').toLowerCase();
                 return name.includes(q) || phone.includes(q) || clientNum.includes(q) || addr.includes(q);
-            }).slice(0, 8); // Top 8 dynamic matches
+            }).slice(0, 8);
 
             res.classList.remove('hidden');
             if (matches.length === 0) {
@@ -331,21 +325,25 @@
             if (!recognition) {
                 recognition = new SpeechRecognition();
                 recognition.onstart = () => {
-                    document.getElementById('voiceStatus').textContent = '🎙️ Listening... Speak customer name or task now!';
+                    document.getElementById('voiceStatus').textContent = '🎙️ Listening... Speak customer name or appointment now!';
                 };
                 recognition.onend = () => {
-                    document.getElementById('voiceStatus').textContent = 'Tap to dictate appointment e.g. "Schedule customer at 11am"';
+                    document.getElementById('voiceStatus').textContent = 'Tap to dictate appointment e.g. "Ruth Tucker appointment 11am"';
                 };
                 recognition.onresult = (event) => {
                     const text = event.results[0][0].transcript.trim();
                     const query = text.toLowerCase();
 
-                    // Dynamic Speech Match against Loaded Vault
-                    const matches = customerVault.filter(c => (c.Name || '').toLowerCase().includes(query));
+                    // CRITICAL FIX: Check if the spoken text CONTAINS any vault customer's name
+                    const matches = customerVault.filter(c => {
+                        const vaultName = (c.Name || '').toLowerCase();
+                        return vaultName && query.includes(vaultName);
+                    });
+
                     if (matches.length > 0) {
                         const target = matches[0];
                         addScheduleSlot("Today 11:00 AM", target.Name, `#${target['Client #'] || 'Vault'}`, target.Address, target.Phone);
-                        document.getElementById('voiceStatus').textContent = `✅ Scheduled: ${target.Name} from Vault!`;
+                        document.getElementById('voiceStatus').textContent = `✅ Scheduled: ${target.Name} on Calendar!`;
                     } else {
                         document.getElementById('newTaskInput').value = text;
                         document.getElementById('pinballExpanded').classList.remove('hidden');
@@ -389,7 +387,6 @@
                 const price = parseFloat(match.Price || 0);
                 resultBox.textContent = `🎯 Match: ${match.Name} ($${price.toFixed(2)})`;
                 
-                // Dynamically select in dropdown if available
                 const select = document.getElementById('consumableSelect');
                 for (let opt of select.options) {
                     if (parseFloat(opt.value) === price) {
