@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FOREVER CARD™ — Powered by TappyThing</title>
+    <title>FOREVER CARD™ — TappyThing Digital Coordinator</title>
     <!-- Tailwind CSS (Zero dependency, instant render) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PapaParse for high-speed client-side CSV parsing of 22,283 vault records -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
         @media print {
             body * { visibility: hidden; }
@@ -18,8 +20,8 @@
 
     <div class="w-full max-w-md bg-slate-900 rounded-3xl shadow-2xl border border-slate-800 overflow-hidden flex flex-col my-auto transition-all duration-300">
 
-        <!-- 1. EXECUTIVE BRAND HEADER (Authentic Tyler Medallion Anchor) -->
-        <header class="bg-gradient-to-b from-slate-950 to-slate-900 text-white p-6 text-center relative border-b border-slate-800/80">
+        <!-- BRAND HEADER -->
+        <header class="bg-gradient-to-b from-slate-950 to-slate-900 text-white p-6 text-center relative border-b border-slate-800">
             <div class="mx-auto w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center shadow-xl border-2 border-emerald-500 mb-3 overflow-hidden">
                 <img src="https://i.ibb.co/qFFCqDq/fresh-logo.jpg" alt="Fresh Logo" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null; this.src='https://via.placeholder.com/80/0f172a/10b981?text=FRESH';">
             </div>
@@ -28,197 +30,187 @@
             <p class="text-[10px] text-slate-500 mt-1 font-semibold">Powered by TappyThing • Client #001</p>
         </header>
 
-        <!-- 2. LEVEL 1: MASTER COMMAND COVER (Serene, Soothed, High-End) -->
+        <!-- LEVEL 1: MASTER COVER -->
         <main id="level1Cover" class="p-5 space-y-4 block">
             
-            <!-- Card 1: Voice & Brain Intake -->
-            <section class="bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 rounded-2xl p-4 text-center transition cursor-pointer shadow-lg">
-                <button id="voiceBtn" onclick="toggleVoiceIntake()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-black text-base rounded-xl shadow-lg transition transform active:scale-98 flex items-center justify-center gap-2">
+            <!-- Voice Hub -->
+            <section class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-4 text-center shadow-lg">
+                <button id="voiceBtn" onclick="toggleVoiceIntake()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-black text-base rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
                     <span class="text-2xl">🎙️</span> TAP TO TALK TO FRESH
                 </button>
-                <p id="voiceStatus" class="text-[11px] font-bold text-slate-400 mt-2">Voice Assistant Ready — Tap to speak dictations or scheduling</p>
+                <p id="voiceStatus" class="text-[11px] font-bold text-slate-400 mt-2">Tap to dictate appointment e.g. "Schedule customer at 11am"</p>
             </section>
 
-            <!-- Card 2: Pinball Sprint Deck (Task Knockout) -->
-            <section class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 transition shadow-md">
+            <!-- Today's Dispatch Calendar Schedule -->
+            <section class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">📅</span>
+                        <h2 class="text-xs font-black text-slate-300 tracking-wider uppercase">Today's Dispatch Calendar</h2>
+                    </div>
+                    <span id="scheduleCount" class="text-[10px] text-emerald-400 font-bold">0 Appointments</span>
+                </div>
+
+                <div id="agendaList" class="space-y-2">
+                    <div class="p-4 text-center border border-dashed border-slate-800 rounded-xl text-slate-500 text-xs">
+                        Calendar Clean & Clear.<br>Use Vault Search below or Voice Mic above to drop appointment target.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Customer Vault Search -->
+            <section class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 space-y-2">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xs font-black text-slate-400 tracking-wider uppercase">Customer Vault Search</h2>
+                    <span id="vaultRecordCount" class="text-[10px] text-slate-500 font-bold">Loading Vault...</span>
+                </div>
+                <div>
+                    <input type="text" id="vaultSearch" oninput="searchVault()" placeholder="Search 22,283 records by name, phone, or address..." class="w-full text-xs p-3 bg-slate-950 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-emerald-500">
+                    <div id="searchResults" class="hidden mt-2 bg-slate-950 border border-slate-800 rounded-xl max-h-48 overflow-y-auto space-y-1 p-1"></div>
+                </div>
+            </section>
+
+            <!-- Pinball Tasks -->
+            <section class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4">
                 <div onclick="togglePinballDeck()" class="flex justify-between items-center cursor-pointer">
                     <div class="flex items-center gap-2">
                         <span class="text-lg">🎯</span>
                         <h2 class="text-xs font-black text-slate-300 tracking-wider uppercase">Pinball Task Deck</h2>
                     </div>
-                    <span id="taskCounter" class="text-[11px] font-extrabold bg-blue-950 text-blue-400 border border-blue-800/50 px-2.5 py-1 rounded-full">0 Sprint Active</span>
+                    <span id="taskCounter" class="text-[11px] font-extrabold bg-blue-950 text-blue-400 border border-blue-800/50 px-2.5 py-1 rounded-full">0 Active</span>
                 </div>
-
-                <!-- Expanded View -->
-                <div id="pinballExpanded" class="hidden mt-4 pt-3 border-t border-slate-700/50 space-y-3">
-                    <div id="dangerZoneAlert" class="hidden bg-rose-950/80 border border-rose-600 text-rose-200 p-3 rounded-xl font-black text-xs text-center">
-                        🚨 DANGER ZONE KNOCKOUT ALERT! 12 Tasks Pending. Complete tasks before adding new entries!
-                    </div>
-
+                <div id="pinballExpanded" class="hidden mt-3 pt-3 border-t border-slate-700/50 space-y-2">
                     <div class="flex gap-2">
-                        <input type="text" id="newTaskInput" placeholder="Quick dump task..." class="flex-1 text-xs p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-blue-500">
-                        <button onclick="addPinballTask()" class="bg-blue-600 text-white px-3 text-xs font-bold rounded-lg hover:bg-blue-500">+ Add</button>
+                        <input type="text" id="newTaskInput" placeholder="Task description..." class="flex-1 text-xs p-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-200">
+                        <button onclick="addPinballTask()" class="bg-blue-600 text-white px-3 text-xs font-bold rounded-lg">+ Add</button>
                     </div>
-
-                    <ul id="taskList" class="space-y-2">
-                        <!-- Dynamic 6-slot tasks render here -->
-                    </ul>
-                </div>
-            </section>
-
-            <!-- Card 3: DEDICATED CALENDAR SCHEDULE (Starts Clean & Blank) -->
-            <section class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 transition shadow-md space-y-3">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="text-lg">📅</span>
-                        <h2 class="text-xs font-black text-slate-300 tracking-wider uppercase">Today's Dispatch Schedule</h2>
-                    </div>
-                    <span id="scheduleCount" class="text-[10px] text-slate-500 font-bold">0 Slots Active</span>
-                </div>
-
-                <!-- Dynamic Agenda Target List -->
-                <div id="agendaList" class="space-y-2">
-                    <div class="p-3 text-center border border-dashed border-slate-800 rounded-xl text-slate-500 text-xs">
-                        No appointments scheduled today.<br>Speak intake or search vault below to add target.
-                    </div>
-                </div>
-            </section>
-
-            <!-- Card 4: Customer Vault Search (Below Schedule) -->
-            <section class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 transition shadow-md space-y-2">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-xs font-black text-slate-400 tracking-wider uppercase">Customer Vault Search</h2>
-                    <span class="text-[10px] text-slate-500 font-bold">22,283 Records</span>
-                </div>
-                <div>
-                    <input type="text" id="vaultSearch" oninput="searchVault()" placeholder="Search vault by name or phone..." class="w-full text-xs p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-emerald-500">
-                    <div id="searchResults" class="hidden mt-2 bg-slate-950 border border-slate-800 rounded-xl max-h-36 overflow-y-auto space-y-1 p-1"></div>
+                    <ul id="taskList" class="space-y-1"></ul>
                 </div>
             </section>
 
         </main>
 
-        <!-- 3. LEVEL 2: THE CUSTOMER FOREVER CARD™ (Explodes into Action) -->
+        <!-- LEVEL 2: CUSTOMER FOREVER CARD WORKSPACE -->
         <main id="level2Card" class="p-5 space-y-4 hidden bg-slate-900">
-            
-            <!-- Back Button -->
-            <button onclick="showLevel1Cover()" class="text-xs font-extrabold text-slate-300 bg-slate-800 border border-slate-700 px-3.5 py-2 rounded-xl hover:bg-slate-700 transition flex items-center gap-1">
-                ⬅️ Back to Master Command
+            <button onclick="showLevel1Cover()" class="text-xs font-extrabold text-slate-300 bg-slate-800 border border-slate-700 px-3.5 py-2 rounded-xl hover:bg-slate-700 transition">
+                ⬅️ Back to Master Calendar
             </button>
 
-            <!-- Gem Card Header -->
-            <section class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
-                <div>
-                    <h2 id="cardCustName" class="text-xl font-black text-white">No Customer Selected</h2>
-                    <p id="cardCustTicket" class="text-xs text-emerald-400 font-bold mt-0.5">Ticket #---</p>
-                    <p id="cardCustAddr" class="text-xs text-slate-400 mt-1">Select a customer from vault</p>
-                </div>
-                <div class="flex gap-2 pt-1">
-                    <a id="callBtn" href="#" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 text-center py-2 text-xs font-extrabold rounded-xl transition">
-                        📞 Call
-                    </a>
-                    <button onclick="sendFreshSMS()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2 text-xs font-extrabold rounded-xl transition">
-                        💬 Send Fresh SMS
-                    </button>
+            <!-- Action Bar Header -->
+            <section class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
+                <h2 id="cardCustName" class="text-xl font-black text-white">No Customer Selected</h2>
+                <p id="cardCustTicket" class="text-xs text-emerald-400 font-bold">Ticket #---</p>
+                <p id="cardCustAddr" class="text-xs text-slate-400">Select customer from calendar</p>
+                <div class="flex gap-2 pt-2">
+                    <a id="callBtn" href="#" class="flex-1 bg-slate-800 text-slate-100 text-center py-2 text-xs font-extrabold rounded-xl border border-slate-700">📞 Call</a>
+                    <button onclick="sendFreshSMS()" class="flex-1 bg-blue-600 text-white py-2 text-xs font-extrabold rounded-xl">💬 Send SMS</button>
                 </div>
             </section>
 
-            <!-- 3-Way Mode Tabs -->
-            <div class="grid grid-cols-3 gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px] font-bold">
-                <button onclick="setTab('shop')" id="tabShop" class="py-2 text-center rounded-lg bg-emerald-600 text-white">🏪 Shop Desk</button>
-                <button onclick="setTab('tech')" id="tabTech" class="py-2 text-center rounded-lg text-slate-400 hover:text-white">🔧 Tech Bench</button>
-                <button onclick="setTab('mirror')" id="tabMirror" class="py-2 text-center rounded-lg text-slate-400 hover:text-white">📱 Mirror Card</button>
-            </div>
-
-            <!-- Tab 1: Shop Desk / Invoicing -->
-            <div id="viewShop" class="space-y-4">
-                <section id="printableInvoice" class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
-                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-wider">Option B Line Builder & Invoicing</h3>
-                    
-                    <!-- Tier 1: Labor (0% MD Tax) -->
-                    <div>
-                        <label class="text-[11px] font-extrabold text-slate-300">Tier 1: Labor (Tax Exempt)</label>
-                        <select id="laborSelect" onchange="calculateTotals()" class="w-full text-xs p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 mt-1 focus:outline-none">
-                            <option value="0">-- No Labor Selected --</option>
-                            <option value="60">Bench Tune-Up — $60.00</option>
-                            <option value="50">Diagnostic Assessment — $50.00</option>
-                            <option value="150">RO System Installation — $150.00</option>
-                        </select>
-                    </div>
-
-                    <!-- Tier 2: Consumables (6% MD Tax) - Default $0.00 -->
-                    <div>
-                        <label class="text-[11px] font-extrabold text-slate-300">Tier 2: Consumables (6% MD Tax)</label>
-                        <select id="consumableSelect" onchange="calculateTotals()" class="w-full text-xs p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 mt-1 focus:outline-none">
-                            <option value="0" data-taxable="0" selected>-- No Consumable Selected --</option>
-                            <option value="48" data-taxable="1">C-Bags 24-Pack (Top Seller) — $48.00</option>
-                            <option value="24" data-taxable="1">C-Bags 12-Pack — $24.00</option>
-                            <option value="15" data-taxable="1">Motor Fan Blade — $15.00</option>
-                            <option value="49.95" data-taxable="1">HEPA Filter — $49.95</option>
-                            <option value="325" data-taxable="1">Gentle Soap Package — $325.00</option>
-                        </select>
-                    </div>
-
-                    <!-- Tier 3: Search Catalog Alias -->
-                    <div>
-                        <label class="text-[11px] font-extrabold text-slate-300">Tier 3: Phonetic Catalog Search</label>
-                        <input type="text" id="aliasInput" oninput="searchCatalogAlias()" placeholder="Type e.g. 'sea bags'..." class="w-full text-xs p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 mt-1 focus:outline-none">
-                        <p id="aliasMatchResult" class="text-[11px] text-emerald-400 font-bold mt-1 h-4"></p>
-                    </div>
-
-                    <!-- Totals Summary -->
-                    <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-1 text-xs font-semibold">
-                        <div class="flex justify-between text-slate-400"><span>Labor Subtotal (Exempt):</span><span id="lblLabor">$0.00</span></div>
-                        <div class="flex justify-between text-slate-400"><span>Parts Subtotal:</span><span id="lblParts">$0.00</span></div>
-                        <div class="flex justify-between text-blue-400 font-bold"><span>MD Sales Tax (6% Parts):</span><span id="lblTax">$0.00</span></div>
-                        <div class="flex justify-between text-base font-black text-white border-t border-slate-800 pt-2 mt-2"><span>Total Due:</span><span id="lblTotal" class="text-emerald-400">$0.00</span></div>
-                    </div>
-
-                    <!-- Actions -->
-                    <div class="grid grid-cols-2 gap-2 pt-1">
-                        <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-700 text-white py-2.5 text-xs font-black rounded-xl border border-slate-700">
-                            🖨️ Print / PDF
-                        </button>
-                        <button onclick="markStripePaid()" class="bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 text-xs font-black rounded-xl shadow">
-                            💳 1-Tap Pay
-                        </button>
-                    </div>
-                </section>
-            </div>
-
-            <!-- Tab 2: Tech Bench -->
-            <div id="viewTech" class="hidden space-y-3 bg-slate-950 p-4 rounded-2xl border border-slate-800">
-                <h3 class="text-xs font-black text-slate-400 uppercase tracking-wider">Diagnostic Camera Intake</h3>
-                <input type="file" id="mediaCapture" accept="image/*,video/*" capture="environment" onchange="previewProofMedia(event)" class="text-xs w-full text-slate-400 file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-800 file:text-slate-200">
-                <div id="mediaPreview" class="hidden mt-2 text-xs text-emerald-400 font-bold">✅ Photo / Proof Compressed & Sealed</div>
-            </div>
-
-            <!-- Tab 3: Mirror Card View -->
-            <div id="viewMirror" class="hidden space-y-3 bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center">
-                <h3 class="text-xs font-black text-emerald-400 uppercase tracking-wider">Shared Customer Mirror Card</h3>
-                <p class="text-xs text-slate-300">Clean view shared with customer mobile view.</p>
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 text-left space-y-2">
-                    <p class="text-xs font-bold text-white">Service Report Summary</p>
-                    <p class="text-[11px] text-slate-400">Status: Diagnostic Completed • Sealed Vault Active</p>
+            <!-- Invoicing Engine -->
+            <section id="printableInvoice" class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-wider">Option B Line Builder & MD Tax</h3>
+                
+                <div>
+                    <label class="text-[11px] font-extrabold text-slate-300">Tier 1: Labor (0% MD Tax Exempt)</label>
+                    <select id="laborSelect" onchange="calculateTotals()" class="w-full text-xs p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 mt-1">
+                        <option value="0">-- No Labor Selected --</option>
+                        <option value="60">Bench Tune-Up — $60.00</option>
+                        <option value="50">Diagnostic Assessment — $50.00</option>
+                        <option value="150">RO System Installation — $150.00</option>
+                    </select>
                 </div>
-            </div>
 
+                <div>
+                    <label class="text-[11px] font-extrabold text-slate-300">Tier 2: Consumables (6% MD Tax Parts)</label>
+                    <select id="consumableSelect" onchange="calculateTotals()" class="w-full text-xs p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 mt-1">
+                        <option value="0" data-taxable="0" selected>-- Dynamic Catalog Loading... --</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-extrabold text-slate-300">Tier 3: Phonetic Catalog Search (1,090 Items)</label>
+                    <input type="text" id="aliasInput" oninput="searchCatalogAlias()" placeholder="Type e.g. 'sea bags' or part name..." class="w-full text-xs p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 mt-1">
+                    <p id="aliasMatchResult" class="text-[11px] text-emerald-400 font-bold mt-1 h-4"></p>
+                </div>
+
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-1 text-xs font-semibold">
+                    <div class="flex justify-between text-slate-400"><span>Labor Subtotal:</span><span id="lblLabor">$0.00</span></div>
+                    <div class="flex justify-between text-slate-400"><span>Parts Subtotal:</span><span id="lblParts">$0.00</span></div>
+                    <div class="flex justify-between text-blue-400 font-bold"><span>MD Sales Tax (6% Parts):</span><span id="lblTax">$0.00</span></div>
+                    <div class="flex justify-between text-base font-black text-white border-t border-slate-800 pt-2 mt-2"><span>Total Due:</span><span id="lblTotal" class="text-emerald-400">$0.00</span></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button onclick="window.print()" class="bg-slate-800 text-white py-2.5 text-xs font-black rounded-xl border border-slate-700">🖨️ Print / PDF</button>
+                    <button onclick="alert('💳 1-Tap Stripe Checkout Paid & Sealed!')" class="bg-emerald-600 text-white py-2.5 text-xs font-black rounded-xl">💳 1-Tap Pay</button>
+                </div>
+            </section>
         </main>
 
-        <!-- Footer -->
-        <footer class="bg-slate-950 p-3 text-center border-t border-slate-800/80">
-            <p class="text-[10px] font-bold text-slate-500">TappyThing Platform v1.0 • Clean Environment LLC</p>
+        <footer class="bg-slate-950 p-3 text-center border-t border-slate-800">
+            <p class="text-[10px] font-bold text-slate-500">TappyThing Executive Platform v1.0 • Clean Environment LLC</p>
         </footer>
 
     </div>
 
-    <!-- JS Logic Engine -->
     <script>
+        // Dynamic In-Memory Databases Loaded From Repository CSVs
+        let customerVault = [];
+        let catalogBook = [];
+
+        // Application State
+        let schedule = [];
         let tasks = [];
         let activeCust = { name: "", ticket: "", addr: "", phone: "" };
-        
-        // LINE 128: INITIALIZED CLEAN & BLANK
-        let schedule = [];
+
+        // Async Loader for customers.csv & catalog.csv
+        async function loadRepositoryData() {
+            try {
+                // Fetch Customers Vault (22,283 records)
+                Papa.parse('customers.csv', {
+                    download: true,
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        customerVault = results.data;
+                        document.getElementById('vaultRecordCount').textContent = `${customerVault.length.toLocaleString()} Vault Records`;
+                    }
+                });
+
+                // Fetch Catalog Price Book (1,090 items)
+                Papa.parse('catalog.csv', {
+                    download: true,
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        catalogBook = results.data;
+                        populateConsumablesDropdown();
+                    }
+                });
+            } catch (err) {
+                console.error('Database fetch fallback active:', err);
+            }
+        }
+
+        function populateConsumablesDropdown() {
+            const select = document.getElementById('consumableSelect');
+            select.innerHTML = '<option value="0" data-taxable="0" selected>-- No Consumable Selected --</option>';
+            
+            catalogBook.forEach(item => {
+                const name = item.Name || item.name || '';
+                const price = parseFloat(item.Price || item.price || 0);
+                const isTaxable = (item.Taxable == '1' || item.taxable == '1') ? '1' : '0';
+
+                if (name && price > 0) {
+                    const opt = document.createElement('option');
+                    opt.value = price;
+                    opt.setAttribute('data-taxable', isTaxable);
+                    opt.textContent = `${name} — $${price.toFixed(2)}`;
+                    select.appendChild(opt);
+                }
+            });
+        }
 
         function showLevel1Cover() {
             document.getElementById('level1Cover').classList.remove('hidden');
@@ -227,74 +219,18 @@
 
         function openCustomerCard(name, ticket, addr, phone) {
             activeCust = { name, ticket, addr, phone };
-            document.getElementById('cardCustName').textContent = name;
-            document.getElementById('cardCustTicket').textContent = `Ticket ${ticket}`;
-            document.getElementById('cardCustAddr').textContent = addr;
-            document.getElementById('callBtn').href = `tel:${phone}`;
+            document.getElementById('cardCustName').textContent = name || "No Name";
+            document.getElementById('cardCustTicket').textContent = `Ticket #${ticket || '---'}`;
+            document.getElementById('cardCustAddr').textContent = addr || "No Address Recorded";
+            document.getElementById('callBtn').href = phone ? `tel:${phone}` : '#';
             
             document.getElementById('level1Cover').classList.add('hidden');
             document.getElementById('level2Card').classList.remove('hidden');
             calculateTotals();
         }
 
-        function togglePinballDeck() {
-            document.getElementById('pinballExpanded').classList.toggle('hidden');
-        }
-
-        function setTab(tab) {
-            ['Shop', 'Tech', 'Mirror'].forEach(t => {
-                document.getElementById(`view${t}`).classList.add('hidden');
-                document.getElementById(`tab${t}`).className = "py-2 text-center rounded-lg text-slate-400 hover:text-white";
-            });
-
-            if (tab === 'shop') {
-                document.getElementById('viewShop').classList.remove('hidden');
-                document.getElementById('tabShop').className = "py-2 text-center rounded-lg bg-emerald-600 text-white";
-            } else if (tab === 'tech') {
-                document.getElementById('viewTech').classList.remove('hidden');
-                document.getElementById('tabTech').className = "py-2 text-center rounded-lg bg-emerald-600 text-white";
-            } else if (tab === 'mirror') {
-                document.getElementById('viewMirror').classList.remove('hidden');
-                document.getElementById('tabMirror').className = "py-2 text-center rounded-lg bg-emerald-600 text-white";
-            }
-        }
-
-        let recognition;
-        function toggleVoiceIntake() {
-            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                alert('Speech recognition unavailable. You can type into the Pinball task box.');
-                return;
-            }
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!recognition) {
-                recognition = new SpeechRecognition();
-                recognition.onstart = () => {
-                    document.getElementById('voiceStatus').textContent = '🎙️ Listening... Speak scheduling or task now!';
-                };
-                recognition.onend = () => {
-                    document.getElementById('voiceStatus').textContent = 'Voice Assistant Ready — Tap to speak dictations or scheduling';
-                };
-                recognition.onresult = (event) => {
-                    const text = event.results[0][0].transcript;
-                    
-                    if (text.toLowerCase().includes('ruth') || text.toLowerCase().includes('tucker')) {
-                        addScheduleSlot("11:00 AM", "Ruth Tucker", "#22086", "6 Lagan Ct, Nottingham MD", "4102566949");
-                        document.getElementById('voiceStatus').textContent = '✅ Scheduled 11:00 AM — Ruth Tucker on Agenda!';
-                    } else if (text.toLowerCase().includes('claire') || text.toLowerCase().includes('hartman')) {
-                        addScheduleSlot("2:00 PM", "Claire Hartman", "#23455", "1902 Corbridge Ln, Monkton MD", "4433366380");
-                        document.getElementById('voiceStatus').textContent = '✅ Scheduled 2:00 PM — Claire Hartman on Agenda!';
-                    } else {
-                        document.getElementById('newTaskInput').value = text;
-                        document.getElementById('pinballExpanded').classList.remove('hidden');
-                        addPinballTask();
-                    }
-                };
-            }
-            recognition.start();
-        }
-
         function addScheduleSlot(time, name, ticket, addr, phone) {
-            if (!schedule.some(s => s.ticket === ticket)) {
+            if (!schedule.some(s => s.ticket === ticket && s.name === name)) {
                 schedule.push({ time, name, ticket, addr, phone });
             }
             renderSchedule();
@@ -306,67 +242,119 @@
             
             if (schedule.length === 0) {
                 list.innerHTML = `
-                    <div class="p-3 text-center border border-dashed border-slate-800 rounded-xl text-slate-500 text-xs">
-                        No appointments scheduled today.<br>Speak intake or search vault below to add target.
+                    <div class="p-4 text-center border border-dashed border-slate-800 rounded-xl text-slate-500 text-xs">
+                        Calendar Clean & Clear.<br>Use Vault Search below or Voice Mic above to drop appointment target.
                     </div>
                 `;
-                document.getElementById('scheduleCount').textContent = '0 Slots Active';
+                document.getElementById('scheduleCount').textContent = '0 Appointments';
                 return;
             }
 
             schedule.forEach(s => {
                 const div = document.createElement('div');
-                div.className = "bg-slate-950/80 p-3 rounded-xl border border-slate-800 flex justify-between items-center shadow";
+                div.className = "bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex justify-between items-center shadow";
                 div.innerHTML = `
                     <div>
                         <p class="text-xs font-black text-slate-100">📅 ${s.time} — ${s.name} (${s.ticket})</p>
                         <p class="text-[11px] font-semibold text-slate-400">${s.addr}</p>
                     </div>
-                    <button onclick="openCustomerCard('${s.name}', '${s.ticket}', '${s.addr}', '${s.phone}')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs px-3 py-2 rounded-lg transition shadow">
+                    <button onclick="openCustomerCard('${s.name.replace(/'/g, "\\'")}', '${s.ticket}', '${s.addr.replace(/'/g, "\\'")}', '${s.phone}')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs px-3 py-2 rounded-lg transition">
                         Open Forever Card ➔
                     </button>
                 `;
                 list.appendChild(div);
             });
-            document.getElementById('scheduleCount').textContent = `${schedule.length} Slot${schedule.length === 1 ? '' : 's'} Active`;
+            document.getElementById('scheduleCount').textContent = `${schedule.length} Appointment${schedule.length === 1 ? '' : 's'}`;
         }
 
-        function addPinballTask() {
-            const input = document.getElementById('newTaskInput');
-            const val = input.value.trim();
-            if (!val) return;
-
-            if (tasks.length >= 12) {
-                document.getElementById('dangerZoneAlert').classList.remove('hidden');
+        // 100% Dynamic Vault Query Execution
+        function searchVault() {
+            const q = document.getElementById('vaultSearch').value.toLowerCase().trim();
+            const res = document.getElementById('searchResults');
+            
+            if (!q) {
+                res.classList.add('hidden');
                 return;
             }
 
-            tasks.push(val);
-            input.value = '';
-            renderTasks();
-        }
-
-        function completeTask(idx) {
-            tasks.splice(idx, 1);
-            if (tasks.length < 12) {
-                document.getElementById('dangerZoneAlert').classList.add('hidden');
+            if (customerVault.length === 0) {
+                res.classList.remove('hidden');
+                res.innerHTML = `<p class="p-2 text-xs text-slate-500">Searching vault...</p>`;
+                return;
             }
-            renderTasks();
+
+            const matches = customerVault.filter(c => {
+                const name = (c.Name || '').toLowerCase();
+                const phone = (c.Phone || '').toLowerCase();
+                const clientNum = (c['Client #'] || '').toLowerCase();
+                const addr = (c.Address || '').toLowerCase();
+                return name.includes(q) || phone.includes(q) || clientNum.includes(q) || addr.includes(q);
+            }).slice(0, 8); // Top 8 dynamic matches
+
+            res.classList.remove('hidden');
+            if (matches.length === 0) {
+                res.innerHTML = `<p class="p-2.5 text-xs text-slate-500">No vault matches found for "${q}"</p>`;
+                return;
+            }
+
+            res.innerHTML = matches.map(c => {
+                const name = c.Name || 'Unknown Customer';
+                const ticket = c['Client #'] ? `#${c['Client #']}` : '#Vault';
+                const addr = c.Address || '';
+                const phone = c.Phone || '';
+
+                const safeName = name.replace(/'/g, "\\'");
+                const safeAddr = addr.replace(/'/g, "\\'");
+
+                return `
+                    <div onclick="scheduleVaultCust('${safeName}', '${ticket}', '${safeAddr}', '${phone}')" class="p-2.5 hover:bg-slate-800 rounded-lg cursor-pointer text-xs flex justify-between items-center border-b border-slate-800/50">
+                        <div><strong>${name}</strong> <span class="text-slate-400">${ticket} • ${addr.substring(0, 24)}...</span></div>
+                        <span class="text-emerald-400 font-bold bg-emerald-950 px-2 py-0.5 rounded text-[10px]">+ Schedule</span>
+                    </div>
+                `;
+            }).join('');
         }
 
-        function renderTasks() {
-            const list = document.getElementById('taskList');
-            list.innerHTML = '';
-            
-            const visible = tasks.slice(0, 6);
-            visible.forEach((t, i) => {
-                const li = document.createElement('li');
-                li.className = "bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center text-xs font-semibold";
-                li.innerHTML = `<span>${t}</span><button onclick="completeTask(${i})" class="text-[11px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded-lg font-bold">✓ Done</button>`;
-                list.appendChild(li);
-            });
+        function scheduleVaultCust(name, ticket, addr, phone) {
+            addScheduleSlot("Today 11:00 AM", name, ticket, addr, phone);
+            document.getElementById('searchResults').classList.add('hidden');
+            document.getElementById('vaultSearch').value = '';
+        }
 
-            document.getElementById('taskCounter').textContent = `${tasks.length} Active`;
+        let recognition;
+        function toggleVoiceIntake() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('Speech API not supported in this browser. Please use Vault Search below.');
+                return;
+            }
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!recognition) {
+                recognition = new SpeechRecognition();
+                recognition.onstart = () => {
+                    document.getElementById('voiceStatus').textContent = '🎙️ Listening... Speak customer name or task now!';
+                };
+                recognition.onend = () => {
+                    document.getElementById('voiceStatus').textContent = 'Tap to dictate appointment e.g. "Schedule customer at 11am"';
+                };
+                recognition.onresult = (event) => {
+                    const text = event.results[0][0].transcript.trim();
+                    const query = text.toLowerCase();
+
+                    // Dynamic Speech Match against Loaded Vault
+                    const matches = customerVault.filter(c => (c.Name || '').toLowerCase().includes(query));
+                    if (matches.length > 0) {
+                        const target = matches[0];
+                        addScheduleSlot("Today 11:00 AM", target.Name, `#${target['Client #'] || 'Vault'}`, target.Address, target.Phone);
+                        document.getElementById('voiceStatus').textContent = `✅ Scheduled: ${target.Name} from Vault!`;
+                    } else {
+                        document.getElementById('newTaskInput').value = text;
+                        document.getElementById('pinballExpanded').classList.remove('hidden');
+                        addPinballTask();
+                        document.getElementById('voiceStatus').textContent = `✅ Task Added: "${text}"`;
+                    }
+                };
+            }
+            recognition.start();
         }
 
         function calculateTotals() {
@@ -374,7 +362,7 @@
             const consumableSelect = document.getElementById('consumableSelect');
             const selectedConsumable = consumableSelect.options[consumableSelect.selectedIndex];
             const consumablePrice = parseFloat(selectedConsumable.value) || 0;
-            const isTaxable = selectedConsumable.getAttribute('data-taxable') === '1';
+            const isTaxable = selectedConsumable ? selectedConsumable.getAttribute('data-taxable') === '1' : false;
 
             const partsSubtotal = consumablePrice;
             const mdSalesTax = isTaxable ? partsSubtotal * 0.06 : 0;
@@ -395,63 +383,57 @@
                 return;
             }
 
-            if (query.includes('sea bag') || query.includes('sea bags') || query.includes('c-bag') || query.includes('c bag')) {
-                resultBox.textContent = '🎯 Phonetic Match: C-Bags 24-Pack ($48.00)';
-                document.getElementById('consumableSelect').value = '48';
-                calculateTotals();
-            } else if (query.includes('tune') || query.includes('bench')) {
-                resultBox.textContent = '🎯 Phonetic Match: Bench Tune-Up ($60.00)';
-                document.getElementById('laborSelect').value = '60';
-                calculateTotals();
+            const matches = catalogBook.filter(item => (item.Name || '').toLowerCase().includes(query));
+            if (matches.length > 0) {
+                const match = matches[0];
+                const price = parseFloat(match.Price || 0);
+                resultBox.textContent = `🎯 Match: ${match.Name} ($${price.toFixed(2)})`;
+                
+                // Dynamically select in dropdown if available
+                const select = document.getElementById('consumableSelect');
+                for (let opt of select.options) {
+                    if (parseFloat(opt.value) === price) {
+                        select.value = opt.value;
+                        calculateTotals();
+                        break;
+                    }
+                }
             } else {
-                resultBox.textContent = 'Searching 1,090 Catalog Records...';
+                resultBox.textContent = 'Searching 1,090 catalog items...';
             }
         }
 
-        function searchVault() {
-            const q = document.getElementById('vaultSearch').value.toLowerCase().trim();
-            const res = document.getElementById('searchResults');
-            if (!q) {
-                res.classList.add('hidden');
-                return;
-            }
-            res.classList.remove('hidden');
-            res.innerHTML = `
-                <div onclick="scheduleVaultCust('Ruth Tucker', '#22086', '6 Lagan Ct Nottingham, MD 21236', '4102566949')" class="p-2 hover:bg-slate-800 rounded-lg cursor-pointer text-xs">
-                    <strong>Ruth Tucker</strong> <span class="text-slate-400">#22086 • Nottingham MD</span>
-                </div>
-                <div onclick="scheduleVaultCust('Claire Hartman', '#23455', '1902 Corbridge Ln Monkton MD', '4433366380')" class="p-2 hover:bg-slate-800 rounded-lg cursor-pointer text-xs">
-                    <strong>Claire Hartman</strong> <span class="text-slate-400">#23455 • Monkton MD</span>
-                </div>
-            `;
+        function togglePinballDeck() {
+            document.getElementById('pinballExpanded').classList.toggle('hidden');
         }
 
-        function scheduleVaultCust(name, ticket, addr, phone) {
-            addScheduleSlot("11:00 AM", name, ticket, addr, phone);
-            document.getElementById('searchResults').classList.add('hidden');
-            document.getElementById('vaultSearch').value = '';
+        function addPinballTask() {
+            const input = document.getElementById('newTaskInput');
+            if (!input.value.trim()) return;
+            tasks.push(input.value.trim());
+            input.value = '';
+            renderTasks();
+        }
+
+        function renderTasks() {
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+            tasks.forEach((t, i) => {
+                const li = document.createElement('li');
+                li.className = "bg-slate-950 p-2 rounded-lg text-xs flex justify-between items-center";
+                li.innerHTML = `<span>${t}</span><button onclick="tasks.splice(${i},1);renderTasks();" class="text-emerald-400 font-bold">✓</button>`;
+                list.appendChild(li);
+            });
+            document.getElementById('taskCounter').textContent = `${tasks.length} Active`;
         }
 
         function sendFreshSMS() {
-            if (!activeCust.phone) {
-                alert('Please select a customer first!');
-                return;
-            }
-            const msg = encodeURIComponent(`Hi ${activeCust.name}, this is Fresh from Aerus Home Wellness. Your service diagnostic is complete! View your Forever Card & invoice here.`);
-            window.location.href = `sms:${activeCust.phone}?body=${msg}`;
-        }
-
-        function markStripePaid() {
-            alert('💳 1-Tap Stripe Checkout Completed! Invoice marked PAID and sealed to Lifetime Vault.');
-        }
-
-        function previewProofMedia(e) {
-            if (e.target.files.length > 0) {
-                document.getElementById('mediaPreview').classList.remove('hidden');
-            }
+            if (!activeCust.phone) return alert('Select customer from vault first');
+            window.location.href = `sms:${activeCust.phone}?body=${encodeURIComponent("Hi " + activeCust.name + ", your service diagnostic is complete! View your Forever Card here.")}`;
         }
 
         window.onload = () => {
+            loadRepositoryData();
             renderSchedule();
             calculateTotals();
         };
