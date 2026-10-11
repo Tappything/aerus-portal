@@ -66,31 +66,33 @@
                 </div>
             </section>
 
-            <!-- Card 3: Dispatch & Customer Vault -->
+            <!-- Card 3: DEDICATED CALENDAR SCHEDULE (Starts Clean & Blank) -->
             <section class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 transition shadow-md space-y-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <span class="text-lg">📅</span>
-                        <h2 class="text-xs font-black text-slate-300 tracking-wider uppercase">Dispatch & Customer Vault</h2>
+                        <h2 class="text-xs font-black text-slate-300 tracking-wider uppercase">Today's Dispatch Schedule</h2>
                     </div>
-                    <span class="text-[10px] text-slate-400 font-bold">22,283 Vault Records</span>
+                    <span id="scheduleCount" class="text-[10px] text-slate-500 font-bold">0 Slots Active</span>
                 </div>
 
-                <!-- Live Customer Search -->
+                <!-- Dynamic Agenda Target List -->
+                <div id="agendaList" class="space-y-2">
+                    <div class="p-3 text-center border border-dashed border-slate-800 rounded-xl text-slate-500 text-xs">
+                        No appointments scheduled today.<br>Speak intake or search vault below to add target.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Card 4: Customer Vault Search (Below Schedule) -->
+            <section class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 transition shadow-md space-y-2">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xs font-black text-slate-400 tracking-wider uppercase">Customer Vault Search</h2>
+                    <span class="text-[10px] text-slate-500 font-bold">22,283 Records</span>
+                </div>
                 <div>
                     <input type="text" id="vaultSearch" oninput="searchVault()" placeholder="Search vault by name or phone..." class="w-full text-xs p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-emerald-500">
                     <div id="searchResults" class="hidden mt-2 bg-slate-950 border border-slate-800 rounded-xl max-h-36 overflow-y-auto space-y-1 p-1"></div>
-                </div>
-
-                <!-- 1. BLANK DISPATCH SLOT (Dynamic) -->
-                <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 flex justify-between items-center">
-                    <div>
-                        <p class="text-xs font-black text-slate-100" id="agendaCustName">No Customer Selected</p>
-                        <p class="text-[11px] font-semibold text-slate-400" id="agendaCustMeta">Search vault or speak intake to assign</p>
-                    </div>
-                    <button id="agendaLaunchBtn" onclick="launchActiveCard()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs px-3 py-2 rounded-lg transition shadow">
-                        Open Card ➔
-                    </button>
                 </div>
             </section>
 
@@ -104,7 +106,7 @@
                 ⬅️ Back to Master Command
             </button>
 
-            <!-- 2. BLANK GEM CARD HEADER (Dynamic) -->
+            <!-- Gem Card Header -->
             <section class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
                 <div>
                     <h2 id="cardCustName" class="text-xl font-black text-white">No Customer Selected</h2>
@@ -213,8 +215,10 @@
     <!-- JS Logic Engine -->
     <script>
         let tasks = [];
-        // 3. BLANK STATE INITIALIZATION (Dynamic)
         let activeCust = { name: "", ticket: "", addr: "", phone: "" };
+        
+        // LINE 128: INITIALIZED CLEAN & BLANK
+        let schedule = [];
 
         function showLevel1Cover() {
             document.getElementById('level1Cover').classList.remove('hidden');
@@ -231,14 +235,6 @@
             document.getElementById('level1Cover').classList.add('hidden');
             document.getElementById('level2Card').classList.remove('hidden');
             calculateTotals();
-        }
-
-        function launchActiveCard() {
-            if (!activeCust.name) {
-                alert('Please search and select a customer from the vault first!');
-                return;
-            }
-            openCustomerCard(activeCust.name, activeCust.ticket, activeCust.addr, activeCust.phone);
         }
 
         function togglePinballDeck() {
@@ -273,7 +269,7 @@
             if (!recognition) {
                 recognition = new SpeechRecognition();
                 recognition.onstart = () => {
-                    document.getElementById('voiceStatus').textContent = '🎙️ Listening... Speak task or customer name now!';
+                    document.getElementById('voiceStatus').textContent = '🎙️ Listening... Speak scheduling or task now!';
                 };
                 recognition.onend = () => {
                     document.getElementById('voiceStatus').textContent = 'Voice Assistant Ready — Tap to speak dictations or scheduling';
@@ -281,10 +277,12 @@
                 recognition.onresult = (event) => {
                     const text = event.results[0][0].transcript;
                     
-                    // Dynamic Speech Match against Vault Database
                     if (text.toLowerCase().includes('ruth') || text.toLowerCase().includes('tucker')) {
-                        selectVaultCust('Ruth Tucker', '#22086', '6 Lagan Ct Nottingham, MD 21236', '4102566949');
-                        document.getElementById('voiceStatus').textContent = '✅ Dynamically Loaded Ruth Tucker from Database!';
+                        addScheduleSlot("11:00 AM", "Ruth Tucker", "#22086", "6 Lagan Ct, Nottingham MD", "4102566949");
+                        document.getElementById('voiceStatus').textContent = '✅ Scheduled 11:00 AM — Ruth Tucker on Agenda!';
+                    } else if (text.toLowerCase().includes('claire') || text.toLowerCase().includes('hartman')) {
+                        addScheduleSlot("2:00 PM", "Claire Hartman", "#23455", "1902 Corbridge Ln, Monkton MD", "4433366380");
+                        document.getElementById('voiceStatus').textContent = '✅ Scheduled 2:00 PM — Claire Hartman on Agenda!';
                     } else {
                         document.getElementById('newTaskInput').value = text;
                         document.getElementById('pinballExpanded').classList.remove('hidden');
@@ -293,6 +291,44 @@
                 };
             }
             recognition.start();
+        }
+
+        function addScheduleSlot(time, name, ticket, addr, phone) {
+            if (!schedule.some(s => s.ticket === ticket)) {
+                schedule.push({ time, name, ticket, addr, phone });
+            }
+            renderSchedule();
+        }
+
+        function renderSchedule() {
+            const list = document.getElementById('agendaList');
+            list.innerHTML = '';
+            
+            if (schedule.length === 0) {
+                list.innerHTML = `
+                    <div class="p-3 text-center border border-dashed border-slate-800 rounded-xl text-slate-500 text-xs">
+                        No appointments scheduled today.<br>Speak intake or search vault below to add target.
+                    </div>
+                `;
+                document.getElementById('scheduleCount').textContent = '0 Slots Active';
+                return;
+            }
+
+            schedule.forEach(s => {
+                const div = document.createElement('div');
+                div.className = "bg-slate-950/80 p-3 rounded-xl border border-slate-800 flex justify-between items-center shadow";
+                div.innerHTML = `
+                    <div>
+                        <p class="text-xs font-black text-slate-100">📅 ${s.time} — ${s.name} (${s.ticket})</p>
+                        <p class="text-[11px] font-semibold text-slate-400">${s.addr}</p>
+                    </div>
+                    <button onclick="openCustomerCard('${s.name}', '${s.ticket}', '${s.addr}', '${s.phone}')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs px-3 py-2 rounded-lg transition shadow">
+                        Open Forever Card ➔
+                    </button>
+                `;
+                list.appendChild(div);
+            });
+            document.getElementById('scheduleCount').textContent = `${schedule.length} Slot${schedule.length === 1 ? '' : 's'} Active`;
         }
 
         function addPinballTask() {
@@ -381,21 +417,19 @@
             }
             res.classList.remove('hidden');
             res.innerHTML = `
-                <div onclick="selectVaultCust('Ruth Tucker', '#22086', '6 Lagan Ct Nottingham, MD 21236', '4102566949')" class="p-2 hover:bg-slate-800 rounded-lg cursor-pointer text-xs">
+                <div onclick="scheduleVaultCust('Ruth Tucker', '#22086', '6 Lagan Ct Nottingham, MD 21236', '4102566949')" class="p-2 hover:bg-slate-800 rounded-lg cursor-pointer text-xs">
                     <strong>Ruth Tucker</strong> <span class="text-slate-400">#22086 • Nottingham MD</span>
                 </div>
-                <div onclick="selectVaultCust('Claire Hartman', '#23455', '1902 Corbridge Ln Monkton MD', '4433366380')" class="p-2 hover:bg-slate-800 rounded-lg cursor-pointer text-xs">
+                <div onclick="scheduleVaultCust('Claire Hartman', '#23455', '1902 Corbridge Ln Monkton MD', '4433366380')" class="p-2 hover:bg-slate-800 rounded-lg cursor-pointer text-xs">
                     <strong>Claire Hartman</strong> <span class="text-slate-400">#23455 • Monkton MD</span>
                 </div>
             `;
         }
 
-        function selectVaultCust(name, ticket, addr, phone) {
-            document.getElementById('agendaCustName').textContent = name;
-            document.getElementById('agendaCustMeta').textContent = `${ticket} • ${addr}`;
+        function scheduleVaultCust(name, ticket, addr, phone) {
+            addScheduleSlot("11:00 AM", name, ticket, addr, phone);
             document.getElementById('searchResults').classList.add('hidden');
             document.getElementById('vaultSearch').value = '';
-            activeCust = { name, ticket, addr, phone };
         }
 
         function sendFreshSMS() {
@@ -418,6 +452,7 @@
         }
 
         window.onload = () => {
+            renderSchedule();
             calculateTotals();
         };
     </script>
