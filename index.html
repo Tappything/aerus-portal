@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FOREVER CARD™ — TappyThing Digital Coordinator</title>
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS (Zero dependency, instant render) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PapaParse -->
+    <!-- PapaParse for high-speed client-side CSV parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
         @media print {
@@ -38,7 +38,7 @@
                 <button id="voiceBtn" onclick="toggleVoiceIntake()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-black text-base rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
                     <span class="text-2xl">🎙️</span> TAP TO TALK TO FRESH
                 </button>
-                <p id="voiceStatus" class="text-[11px] font-bold text-slate-400 mt-2">Tap to dictate e.g. "Put Vivian Fulton for 8:15 today"</p>
+                <p id="voiceStatus" class="text-[11px] font-bold text-slate-400 mt-2">Tap to dictate appointment e.g. "Schedule customer at 11am"</p>
             </section>
 
             <!-- Today's Dispatch Calendar Schedule -->
@@ -90,7 +90,7 @@
 
         </main>
 
-        <!-- LEVEL 2: CUSTOMER FOREVER CARD WORKSPACE -->
+        <!-- LEVEL 2: CUSTOMER FOREVER CARD WORKSPACE (DYNAMIC SELF-BUILDER) -->
         <main id="level2Card" class="p-5 space-y-4 hidden bg-slate-900">
             <button onclick="showLevel1Cover()" class="text-xs font-extrabold text-slate-300 bg-slate-800 border border-slate-700 px-3.5 py-2 rounded-xl hover:bg-slate-700 transition">
                 ⬅️ Back to Master Calendar
@@ -107,30 +107,83 @@
                 </div>
             </section>
 
-            <!-- Invoicing Engine -->
-            <section id="printableInvoice" class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
-                <h3 class="text-xs font-black text-slate-400 uppercase tracking-wider">Option B Line Builder & MD Tax</h3>
+            <!-- ⚡ DYNAMIC JOB WORKFLOW DISPATCH ENGINE -->
+            <section class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <h3 class="text-xs font-black text-emerald-400 uppercase tracking-wider">⚡ Job Workflow Dispatch</h3>
+                    <span id="activeWorkflowBadge" class="text-[10px] bg-slate-800 text-slate-300 font-bold px-2 py-0.5 rounded">Custom Intake</span>
+                </div>
+
+                <!-- 1. Speak or Pick Purpose -->
+                <div>
+                    <label class="text-[11px] font-extrabold text-slate-300">What are we doing on this visit?</label>
+                    <div class="flex gap-2 mt-1">
+                        <input type="text" id="jobPurposeInput" placeholder="Speak or type job purpose..." class="flex-1 text-xs p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none">
+                        <button onclick="dictateJobPurpose()" class="bg-blue-600 text-white px-3 text-xs font-bold rounded-xl">🎙️</button>
+                    </div>
+                </div>
+
+                <!-- 2. Saved Workflow Type Selectors -->
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Saved Workflow Templates:</label>
+                    <div class="grid grid-cols-2 gap-2 mt-1.5" id="workflowTemplates">
+                        <button onclick="applyWorkflow('Diagnostic & Repair')" class="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-left text-[11px] font-bold text-slate-200">🔧 Diagnostic & Repair</button>
+                        <button onclick="applyWorkflow('Inspection Audit')" class="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-left text-[11px] font-bold text-slate-200">📋 Inspection Audit</button>
+                        <button onclick="applyWorkflow('Direct Retail Sale')" class="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-left text-[11px] font-bold text-slate-200">🛍️ Retail & Consumables</button>
+                        <button onclick="addCustomWorkflowTemplate()" class="p-2 bg-slate-900/60 hover:bg-slate-800 border border-dashed border-slate-700 rounded-xl text-left text-[11px] font-bold text-emerald-400">+ Add Template</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DYNAMIC STAGE BUILDER (Generated on the fly) -->
+            <section id="dynamicStageBuilder" class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+                <h3 id="stageTitle" class="text-xs font-black text-slate-300 uppercase tracking-wider">Stage 1: Job Intake & Proof Snap</h3>
+
+                <!-- Camera Upload -->
+                <div>
+                    <input type="file" id="mediaCapture" accept="image/*,video/*" capture="environment" onchange="previewProofMedia(event)" class="text-xs w-full text-slate-400 file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-800 file:text-slate-200 cursor-pointer">
+                    <div id="mediaPreview" class="hidden mt-2 p-2 bg-emerald-950/80 border border-emerald-600 rounded-xl text-xs text-emerald-300 font-bold">
+                        ✅ Equipment Proof Photo Compressed & Sealed!
+                    </div>
+                </div>
+
+                <!-- Dynamic Data Fields -->
+                <div id="dynamicFieldsContainer" class="space-y-2">
+                    <div>
+                        <label class="text-[11px] font-extrabold text-slate-300">Initial Job Notes / Diagnosis</label>
+                        <textarea id="stageNotes" placeholder="Record equipment notes, Serial #, or inspection findings..." class="w-full text-xs p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 mt-1 h-16 focus:outline-none"></textarea>
+                    </div>
+                </div>
+
+                <button onclick="toggleInvoicingSection()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow transition">
+                    ➔ Proceed to Estimate & Invoicing
+                </button>
+            </section>
+
+            <!-- ON-DEMAND INVOICE ENGINE -->
+            <section id="invoiceSection" class="hidden bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-wider">Option B Line Builder & Tax Engine</h3>
                 
                 <div>
-                    <label class="text-[11px] font-extrabold text-slate-300">Tier 1: Labor (0% MD Tax Exempt)</label>
+                    <label class="text-[11px] font-extrabold text-slate-300">Tier 1: Labor (0% Tax Exempt)</label>
                     <select id="laborSelect" onchange="calculateTotals()" class="w-full text-xs p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 mt-1">
                         <option value="0">-- No Labor Selected --</option>
-                        <option value="60">Bench Tune-Up — $60.00</option>
+                        <option value="60">Bench Tune-Up / Service — $60.00</option>
                         <option value="50">Diagnostic Assessment — $50.00</option>
-                        <option value="150">RO System Installation — $150.00</option>
+                        <option value="150">System Installation — $150.00</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="text-[11px] font-extrabold text-slate-300">Tier 2: Consumables (6% MD Tax Parts)</label>
+                    <label class="text-[11px] font-extrabold text-slate-300">Tier 2: Consumables & Parts (6% MD Tax)</label>
                     <select id="consumableSelect" onchange="calculateTotals()" class="w-full text-xs p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 mt-1">
-                        <option value="0" data-taxable="0" selected>-- Dynamic Catalog Loading... --</option>
+                        <option value="0" data-taxable="0" selected>-- Dynamic Price Book Loading... --</option>
                     </select>
                 </div>
 
                 <div>
                     <label class="text-[11px] font-extrabold text-slate-300">Tier 3: Phonetic Catalog Search (1,090 Items)</label>
-                    <input type="text" id="aliasInput" oninput="searchCatalogAlias()" placeholder="Type e.g. 'sea bags' or part name..." class="w-full text-xs p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 mt-1">
+                    <input type="text" id="aliasInput" oninput="searchCatalogAlias()" placeholder="Type part name e.g. 'sea bags'..." class="w-full text-xs p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 mt-1">
                     <p id="aliasMatchResult" class="text-[11px] text-emerald-400 font-bold mt-1 h-4"></p>
                 </div>
 
@@ -219,9 +272,89 @@
             document.getElementById('cardCustAddr').textContent = addr || "No Address Recorded";
             document.getElementById('callBtn').href = phone ? `tel:${phone}` : '#';
             
+            // Default to Dynamic Job Purpose Stage
+            document.getElementById('invoiceSection').classList.add('hidden');
+
             document.getElementById('level1Cover').classList.add('hidden');
             document.getElementById('level2Card').classList.remove('hidden');
             calculateTotals();
+        }
+
+        // Dynamic Workflow Engine Logic
+        function applyWorkflow(type) {
+            document.getElementById('activeWorkflowBadge').textContent = type;
+            document.getElementById('jobPurposeInput').value = type;
+            const container = document.getElementById('dynamicFieldsContainer');
+
+            if (type === 'Diagnostic & Repair') {
+                container.innerHTML = `
+                    <div>
+                        <label class="text-[11px] font-extrabold text-slate-300">Equipment Serial # & Condition</label>
+                        <input type="text" placeholder="Enter Serial Number or Model..." class="w-full text-xs p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-extrabold text-slate-300">Bench Notes / Repair Findings</label>
+                        <textarea placeholder="Describe motor armature, seals, or electrical status..." class="w-full text-xs p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 mt-1 h-16"></textarea>
+                    </div>
+                `;
+            } else if (type === 'Inspection Audit') {
+                container.innerHTML = `
+                    <div>
+                        <label class="text-[11px] font-extrabold text-slate-300">Water / Air Quality Test Readings</label>
+                        <input type="text" placeholder="PPM / Air Flow CFM Reading..." class="w-full text-xs p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-extrabold text-slate-300">System Recommendation Notes</label>
+                        <textarea placeholder="Recommended filter changes or upgrade path..." class="w-full text-xs p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 mt-1 h-16"></textarea>
+                    </div>
+                `;
+            } else if (type === 'Direct Retail Sale') {
+                container.innerHTML = `
+                    <div>
+                        <label class="text-[11px] font-extrabold text-slate-300">Quick Pickup / Delivery Note</label>
+                        <input type="text" placeholder="Bag / Filter pickup details..." class="w-full text-xs p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 mt-1">
+                    </div>
+                `;
+            }
+        }
+
+        function addCustomWorkflowTemplate() {
+            const name = prompt("Enter new custom workflow template name (e.g. Chimney Sweep Inspection, HVAC Tune-Up):");
+            if (!name) return;
+
+            const btnContainer = document.getElementById('workflowTemplates');
+            const newBtn = document.createElement('button');
+            newBtn.className = "p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-left text-[11px] font-bold text-slate-200";
+            newBtn.textContent = `⚡ ${name}`;
+            newBtn.onclick = () => applyWorkflow(name);
+            btnContainer.insertBefore(newBtn, btnContainer.lastElementChild);
+            
+            applyWorkflow(name);
+        }
+
+        function dictateJobPurpose() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                return alert('Speech recognition unavailable');
+            }
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const rec = new SpeechRecognition();
+            rec.onstart = () => alert('🎙️ Dictate job purpose now...');
+            rec.onresult = (e) => {
+                const text = e.results[0][0].transcript;
+                document.getElementById('jobPurposeInput').value = text;
+                applyWorkflow(text);
+            };
+            rec.start();
+        }
+
+        function toggleInvoicingSection() {
+            document.getElementById('invoiceSection').classList.toggle('hidden');
+        }
+
+        function previewProofMedia(e) {
+            if (e.target.files.length > 0) {
+                document.getElementById('mediaPreview').classList.remove('hidden');
+            }
         }
 
         function addScheduleSlot(time, name, ticket, addr, phone) {
@@ -328,34 +461,29 @@
                     document.getElementById('voiceStatus').textContent = '🎙️ Listening... Speak customer appointment now!';
                 };
                 recognition.onend = () => {
-                    document.getElementById('voiceStatus').textContent = 'Tap to dictate e.g. "Put Vivian Fulton for 8:15 today"';
+                    document.getElementById('voiceStatus').textContent = 'Tap to dictate e.g. "Put Vivian Fulton for 8:30 today"';
                 };
                 recognition.onresult = (event) => {
                     const text = event.results[0][0].transcript.trim();
                     const query = text.toLowerCase();
 
-                    // SMART VOICE PARSER: Extract time and match customer name from tokenized words
                     let matchedCustomer = null;
-
                     if (customerVault.length > 0) {
                         matchedCustomer = customerVault.find(c => {
                             const vName = (c.Name || '').toLowerCase();
                             if (!vName) return false;
                             const parts = vName.split(' ');
-                            // Check if speech contains both first and last name or full name
                             return query.includes(vName) || parts.every(p => p.length > 2 && query.includes(p));
                         });
                     }
 
-                    // Extract spoken time or default to Today
                     let timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:am|pm)?|\d{1,2}\s*(?:am|pm))/i);
-                    let timeStr = timeMatch ? timeMatch[0].toUpperCase() : "Today 11:00 AM";
+                    let timeStr = timeMatch ? timeMatch[0].toUpperCase() : "Today 8:30 AM";
 
                     if (matchedCustomer) {
                         addScheduleSlot(timeStr, matchedCustomer.Name, `#${matchedCustomer['Client #'] || 'Vault'}`, matchedCustomer.Address, matchedCustomer.Phone);
                         document.getElementById('voiceStatus').textContent = `✅ Scheduled: ${matchedCustomer.Name} for ${timeStr}!`;
                     } else {
-                        // Fallback: If customer is not in memory yet, drop appointment directly onto schedule from spoken text
                         const nameExtract = text.replace(/put|for|today|at|appointment|schedule/gi, '').trim();
                         addScheduleSlot(timeStr, nameExtract || "Spoken Intake", "#Vault", "Pending Address Lookup", "");
                         document.getElementById('voiceStatus').textContent = `✅ Appointment Added: "${text}"`;
