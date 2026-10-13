@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-900 text-slate-100">
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,10 +8,10 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- PapaParse CDN for Client-Side $0 API CSV Engine -->
+    <!-- PapaParse CDN for $0 Client-Side Engine -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     
-    <!-- Google Fonts for Laverne & Shirley Monogram Script and Inter -->
+    <!-- Google Fonts for Laverne & Shirley Monogram & Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@1,800&display=swap" rel="stylesheet">
@@ -27,14 +27,14 @@
         .font-monogram {
             font-family: 'Great Vibes', 'Playfair Display', cursive, serif;
         }
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .card-flip-container {
-            perspective: 1000px;
+        .card-perspective {
+            perspective: 1200px;
         }
         .card-flipper {
             transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
@@ -43,92 +43,92 @@
         .card-flipper.flipped {
             transform: rotateY(180deg);
         }
-        .card-front, .card-back {
+        .card-face-front, .card-face-back {
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
         }
-        .card-back {
+        .card-face-back {
             transform: rotateY(180deg);
         }
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
         }
         ::-webkit-scrollbar-track {
             background: rgba(15, 23, 42, 0.6);
         }
         ::-webkit-scrollbar-thumb {
-            background: rgba(100, 116, 139, 0.5);
+            background: rgba(100, 116, 139, 0.4);
             border-radius: 4px;
         }
     </style>
 </head>
 <body class="h-full flex flex-col bg-slate-950 text-slate-100 overflow-x-hidden select-none">
 
-    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
-        <div class="max-w-5xl mx-auto flex items-center justify-between">
-            <!-- Left: Laverne & Shirley Monogram & Forever Card SaaS Branding -->
-            <div class="flex items-center space-x-3">
-                <div class="flex flex-col items-center justify-center bg-gradient-to-br from-amber-500 to-amber-700 text-white w-12 h-12 rounded-2xl shadow-lg border border-amber-400/30">
-                    <span class="font-monogram text-3xl font-extrabold leading-none drop-shadow-md">F</span>
+    <!-- TOP HEADER BRANDING (Sleek & Compact) -->
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80 px-3.5 py-2.5">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            
+            <!-- Left: Laverne & Shirley Monogram 'F' -->
+            <div class="flex items-center space-x-2.5">
+                <div class="flex flex-col items-center justify-center bg-gradient-to-br from-amber-500 to-amber-700 text-white w-10 h-10 rounded-xl shadow-md border border-amber-400/30">
+                    <span class="font-monogram text-2xl font-extrabold leading-none">F</span>
                 </div>
                 <div>
                     <div class="flex items-center space-x-1.5">
-                        <span class="text-xs font-bold uppercase tracking-widest text-amber-400">Forever Card</span>
-                        <span class="text-[10px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/30 font-medium">SaaS</span>
+                        <span class="text-xs font-bold text-amber-400 tracking-wide">Forever Card</span>
+                        <span class="text-[9px] bg-amber-500/20 text-amber-300 px-1 py-0.2 rounded border border-amber-500/30 font-medium">SaaS</span>
                     </div>
-                    <p class="text-[11px] text-slate-400 font-medium">Powered by <span class="text-emerald-400 font-semibold">TappyThing</span></p>
+                    <p class="text-[10px] text-slate-400">Powered by <span class="text-emerald-400 font-semibold">TappyThing</span></p>
                 </div>
             </div>
 
-            <!-- Right: Clean Environment Card & 1-Tap Toggle View Button -->
+            <!-- Right: Clean Environment Card & 1-Tap Toggle View -->
             <div class="flex items-center space-x-2">
-                <div class="hidden sm:block text-right mr-2">
+                <div class="hidden sm:block text-right mr-1">
                     <span class="text-xs font-semibold text-slate-300 block">Clean Environment Card</span>
-                    <span class="text-[10px] text-slate-500 block">Digital Coordinator Hub</span>
+                    <span class="text-[10px] text-slate-500 block">Clean Environment LLC</span>
                 </div>
                 
-                <button id="toggle-view-btn" onclick="toggleCardSide()" class="flex items-center space-x-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-lg shadow-emerald-900/30 transition-all duration-200 active:scale-95 border border-emerald-400/30">
-                    <i class="fa-solid fa-arrows-rotate text-sm" id="toggle-icon"></i>
-                    <span id="toggle-text">Switch to Client View</span>
+                <button id="header-flip-btn" onclick="toggleCardSide()" class="flex items-center space-x-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-md shadow-emerald-950/40 transition active:scale-95 border border-emerald-400/30">
+                    <i class="fa-solid fa-arrows-rotate text-xs"></i>
+                    <span id="header-flip-text">FLIP VIEW</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="flex-1 max-w-5xl w-full mx-auto p-3 sm:p-5 flex flex-col space-y-4">
+    <main class="flex-1 max-w-4xl w-full mx-auto p-3 sm:p-4 flex flex-col space-y-3">
 
-        <!-- COMMAND CENTER SEARCH, VOICE & CSV HOOK BAR -->
-        <section class="glass-panel p-3.5 rounded-2xl shadow-xl space-y-3">
-            <div class="flex flex-col sm:flex-row items-center gap-2">
-                <!-- Vault Search Box -->
-                <div class="relative w-full flex-1">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                        <i class="fa-solid fa-magnifying-glass"></i>
+        <!-- COMPACT COMMAND CENTER ACTION TOOLBAR -->
+        <section class="glass-card p-2.5 rounded-2xl shadow-lg space-y-2">
+            <div class="flex items-center gap-2">
+                <!-- Search Box -->
+                <div class="relative flex-1">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
                     </div>
-                    <input type="text" id="vault-search" onkeyup="handleSearchInput(event)" placeholder="Search Customer Vault (Name, Address, Phone, Client #)..." class="w-full pl-10 pr-10 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-                    <button id="clear-search" onclick="clearSearch()" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-200">
-                        <i class="fa-solid fa-circle-xmark"></i>
+                    <input type="text" id="vault-search" onkeyup="handleSearchInput(event)" placeholder="Search Vault (Name, Address, Phone, Client #)..." class="w-full pl-8 pr-8 py-2 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500">
+                    <button id="clear-search" onclick="clearSearch()" class="hidden absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-400 hover:text-slate-200">
+                        <i class="fa-solid fa-circle-xmark text-xs"></i>
                     </button>
                 </div>
 
-                <!-- REAL Web Speech Recognition Audio Tap Button -->
-                <button id="voice-tap-btn" onclick="triggerVoiceIntake()" class="w-full sm:w-auto flex items-center justify-center space-x-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-sm shadow-lg shadow-orange-950/40 transition-all duration-200 active:scale-95 whitespace-nowrap">
-                    <i class="fa-solid fa-microphone text-base" id="mic-icon"></i>
-                    <span id="mic-text">TAP TO TALK TO FRESH</span>
+                <!-- Compact Voice Tap Button (In Toolbar - NOT giant banner!) -->
+                <button id="voice-tap-btn" onclick="triggerVoiceIntake()" class="flex items-center space-x-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold px-3.5 py-2 rounded-xl text-xs shadow-md transition active:scale-95 whitespace-nowrap">
+                    <i class="fa-solid fa-microphone text-xs" id="mic-icon"></i>
+                    <span id="mic-text">TAP TO TALK</span>
                 </button>
             </div>
 
-            <!-- CSV File Loaders (PapaParse Hooks) & Memory Count Status -->
-            <div class="flex flex-col sm:flex-row items-center justify-between text-xs px-1 text-slate-400 border-t border-slate-800/80 pt-2 gap-2">
-                <div class="flex items-center space-x-2">
-                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span class="font-medium text-slate-300">Command Center Engine</span>
-                    <span id="speech-status-tag" class="text-[10px] bg-slate-800 text-sky-300 px-1.5 py-0.5 rounded border border-slate-700">WebSpeech Ready</span>
+            <!-- CSV Loaders & Status Bar -->
+            <div class="flex items-center justify-between text-[11px] text-slate-400 px-1 border-t border-slate-800/80 pt-1.5">
+                <div class="flex items-center space-x-1.5">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span id="quick-vault-count" class="font-mono text-emerald-400">0 Vault Records</span>
                 </div>
 
-                <!-- PapaParse CSV Upload Hooks ($0 Client API) -->
-                <div class="flex items-center space-x-3 text-[11px]">
+                <div class="flex items-center space-x-2">
                     <label class="cursor-pointer text-slate-400 hover:text-amber-400 transition flex items-center space-x-1">
                         <i class="fa-solid fa-file-csv"></i>
                         <span>Load Vault CSV</span>
@@ -140,135 +140,117 @@
                         <span>Load Catalog CSV</span>
                         <input type="file" accept=".csv" onchange="loadCatalogCSV(event)" class="hidden">
                     </label>
-                    <span class="text-slate-700">|</span>
-                    <span id="quick-vault-count" class="font-mono text-emerald-400 font-semibold">0 Vault Records</span>
                 </div>
             </div>
         </section>
 
-        <!-- DOUBLE-SIDED GEM CARD WORKSPACE -->
-        <section class="card-flip-container flex-1 min-h-[620px] w-full">
-            <div id="card-flipper" class="card-flipper relative w-full h-full min-h-[620px]">
+        <!-- DOUBLE-SIDED MIRROR CARD CANVAS -->
+        <section class="card-perspective flex-1 min-h-[580px] w-full">
+            <div id="card-flipper" class="card-flipper relative w-full h-full min-h-[580px]">
 
                 <!-- ================================================================= -->
-                <!-- SIDE A: SHOP VIEW (INTERNAL OPS - Chris, Mona, Mike)              -->
+                <!-- SIDE A: SHOP VIEW (INTERNAL WORKSPACE)                            -->
                 <!-- ================================================================= -->
-                <div class="card-front absolute inset-0 w-full h-full glass-panel rounded-3xl p-4 sm:p-6 flex flex-col justify-between space-y-4 border border-amber-500/20 shadow-2xl overflow-y-auto">
+                <div class="card-face-front absolute inset-0 w-full h-full glass-card rounded-2xl p-4 flex flex-col justify-between space-y-3 border border-amber-500/20 shadow-xl overflow-y-auto">
                     
-                    <!-- Top Status & Customer Header -->
+                    <!-- Header Bar -->
                     <div>
-                        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                        <div class="flex items-center justify-between pb-2 border-b border-slate-800">
                             <div class="flex items-center space-x-2">
-                                <span class="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5">
-                                    <i class="fa-solid fa-wrench"></i>
-                                    <span>SHOP VIEW (OPS)</span>
+                                <span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[11px] font-bold uppercase">
+                                    <i class="fa-solid fa-wrench mr-1"></i>SHOP VIEW (OPS)
                                 </span>
-                                <span id="client-id-badge" class="text-xs font-mono bg-slate-800 text-slate-300 px-2 py-1 rounded-md border border-slate-700">Client #----</span>
+                                <span id="client-id-badge" class="text-xs font-mono bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded">Client #----</span>
                             </div>
-                            <span class="text-xs text-slate-400 flex items-center space-x-1">
-                                <i class="fa-solid fa-clock text-amber-400"></i>
-                                <span id="card-date-badge">New Intake</span>
+                            <span class="text-[11px] text-slate-400">
+                                <i class="fa-solid fa-calendar-day text-amber-400 mr-1"></i>Dispatch Card
                             </span>
                         </div>
 
-                        <!-- Active Customer Details Card -->
-                        <div class="mt-3 bg-slate-900/80 rounded-2xl p-3.5 border border-slate-800 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
-                            <div class="space-y-1">
-                                <h2 id="card-client-name" class="text-xl font-bold text-white flex items-center space-x-2">
+                        <!-- Active Customer Card Box -->
+                        <div class="mt-2.5 bg-slate-900/90 rounded-xl p-3 border border-slate-800 flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                            <div class="space-y-0.5">
+                                <h2 id="card-client-name" class="text-base font-bold text-white flex items-center space-x-2">
                                     <span>Select or Search Customer</span>
-                                    <i id="client-verified-icon" class="fa-solid fa-circle-question text-slate-500 text-sm" title="Search Vault or Speak to Fresh"></i>
                                 </h2>
-                                <p id="card-client-address" class="text-xs text-slate-300 flex items-center space-x-1.5">
-                                    <i class="fa-solid fa-location-dot text-amber-400 w-3"></i>
+                                <p id="card-client-address" class="text-xs text-slate-300 flex items-center space-x-1">
+                                    <i class="fa-solid fa-location-dot text-amber-400"></i>
                                     <span>No Address Bound</span>
                                 </p>
                             </div>
                             
-                            <!-- Direct Call & SMS Mobile Links -->
-                            <div class="flex items-center space-x-2">
-                                <a id="client-phone-call" href="tel:" class="flex-1 sm:flex-none flex items-center justify-center space-x-1.5 bg-slate-800 text-slate-500 border border-slate-700 px-3 py-2 rounded-xl text-xs font-semibold transition-all pointer-events-none">
+                            <!-- Direct Mobile Call / SMS Buttons -->
+                            <div class="flex items-center space-x-1.5">
+                                <a id="client-phone-call" href="tel:" class="flex-1 sm:flex-none flex items-center justify-center space-x-1 bg-slate-800 text-slate-500 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition pointer-events-none">
                                     <i class="fa-solid fa-phone"></i>
                                     <span id="phone-display-text">No Phone</span>
                                 </a>
-                                <a id="client-phone-sms" href="sms:" class="flex items-center justify-center bg-slate-800 text-slate-500 border border-slate-700 p-2 rounded-xl text-xs font-semibold transition-all pointer-events-none" title="Send SMS">
+                                <a id="client-phone-sms" href="sms:" class="flex items-center justify-center bg-slate-800 text-slate-500 p-1.5 rounded-lg text-xs transition pointer-events-none">
                                     <i class="fa-solid fa-comment-sms"></i>
                                 </a>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Operational Actions & Diagnostics -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
+                    <!-- Ops Actions Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         
-                        <!-- Left Column: Camera Photo Intake & Real Voice Diagnostic -->
-                        <div class="space-y-3">
-                            <!-- 1-Tap Camera Photo Intake -->
+                        <!-- Left: Camera Intake & Audio Diagnostic -->
+                        <div class="space-y-2.5">
                             <div>
-                                <label class="text-xs font-semibold text-slate-300 mb-1.5 block flex items-center justify-between">
-                                    <span><i class="fa-solid fa-camera text-amber-400 mr-1.5"></i>Proof of Site / Equipment Photo</span>
-                                    <span class="text-[10px] text-slate-500">1-Tap Camera</span>
+                                <label class="text-xs font-semibold text-slate-300 mb-1 block flex items-center justify-between">
+                                    <span><i class="fa-solid fa-camera text-amber-400 mr-1"></i>Proof Photo / Equipment</span>
                                 </label>
-                                <div class="flex items-center space-x-2">
-                                    <input type="file" id="camera-file-input" accept="image/*" capture="environment" onchange="handlePhotoUpload(event)" class="hidden">
-                                    <button onclick="document.getElementById('camera-file-input').click()" class="flex-1 flex items-center justify-center space-x-2 bg-slate-900 border border-dashed border-amber-500/40 hover:border-amber-400 py-3 rounded-xl text-xs font-semibold text-amber-300 transition-all hover:bg-slate-800">
-                                        <i class="fa-solid fa-camera text-base"></i>
-                                        <span>TAKE / UPLOAD PHOTO</span>
-                                    </button>
-                                </div>
-                                <div id="photo-preview-box" class="hidden mt-2 relative rounded-xl overflow-hidden border border-slate-700 bg-slate-900 h-24">
-                                    <img id="photo-preview-img" class="w-full h-full object-cover" src="" alt="Proof Preview">
-                                    <button onclick="removePhoto()" class="absolute top-1 right-1 bg-slate-950/80 text-rose-400 p-1 rounded-full text-xs hover:text-rose-200">
-                                        <i class="fa-solid fa-xmark w-4 h-4 flex items-center justify-center"></i>
+                                <input type="file" id="camera-file-input" accept="image/*" capture="environment" onchange="handlePhotoUpload(event)" class="hidden">
+                                <button onclick="document.getElementById('camera-file-input').click()" class="w-full flex items-center justify-center space-x-2 bg-slate-900 border border-dashed border-amber-500/40 hover:border-amber-400 py-2 rounded-xl text-xs font-semibold text-amber-300 transition hover:bg-slate-800">
+                                    <i class="fa-solid fa-camera"></i>
+                                    <span>📷 TAKE / UPLOAD PHOTO</span>
+                                </button>
+                                <div id="photo-preview-box" class="hidden mt-1.5 relative rounded-lg overflow-hidden border border-slate-700 bg-slate-900 h-20">
+                                    <img id="photo-preview-img" class="w-full h-full object-cover" src="" alt="Preview">
+                                    <button onclick="removePhoto()" class="absolute top-1 right-1 bg-slate-950/80 text-rose-400 p-1 rounded-full text-xs">
+                                        <i class="fa-solid fa-xmark"></i>
                                     </button>
                                 </div>
                             </div>
 
-                            <!-- Expanding Real Audio & Text Diagnostic Intake -->
                             <div>
-                                <label class="text-xs font-semibold text-slate-300 mb-1.5 block flex items-center justify-between">
-                                    <span><i class="fa-solid fa-microphone-lines text-amber-400 mr-1.5"></i>Bench Notes & Diagnostics</span>
-                                    <span class="text-[10px] text-emerald-400">Expanding Speech Canvas</span>
+                                <label class="text-xs font-semibold text-slate-300 mb-1 block">
+                                    <i class="fa-solid fa-microphone-lines text-amber-400 mr-1"></i>Bench Notes & Voice Diagnostics
                                 </label>
-                                <textarea id="diagnostic-notes" oninput="autoExpandTextarea(this)" rows="3" placeholder="Dictate or type diagnosis notes... (e.g. Service inspection requested, replacement parts, work order details)" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 resize-none transition-all"></textarea>
+                                <textarea id="diagnostic-notes" oninput="autoExpandTextarea(this)" rows="3" placeholder="Dictate or type diagnostic findings..." class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500 resize-none transition-all"></textarea>
                             </div>
                         </div>
 
-                        <!-- Right Column: Parts Catalog Selector & Option B MD Tax Math -->
-                        <div class="space-y-3 flex flex-col justify-between">
+                        <!-- Right: Parts Catalog & Option B Math -->
+                        <div class="space-y-2.5 flex flex-col justify-between">
                             <div>
-                                <label class="text-xs font-semibold text-slate-300 mb-1.5 block flex items-center justify-between">
-                                    <span><i class="fa-solid fa-boxes-stacked text-amber-400 mr-1.5"></i>Parts & Service Catalog</span>
-                                    <span id="catalog-count-badge" class="text-[10px] text-slate-400">Default Catalog</span>
+                                <label class="text-xs font-semibold text-slate-300 mb-1 block flex items-center justify-between">
+                                    <span><i class="fa-solid fa-boxes-stacked text-amber-400 mr-1"></i>Parts & Service Catalog</span>
+                                    <span id="catalog-count-badge" class="text-[10px] text-slate-500">Default Catalog</span>
                                 </label>
                                 
-                                <div class="space-y-2">
-                                    <div class="relative">
-                                        <input type="text" id="part-search" onkeyup="filterPartsCatalog(event)" placeholder="Search catalog items or bags..." class="w-full pl-8 pr-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500">
-                                        <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-xs text-slate-500"></i>
-                                    </div>
-
-                                    <!-- Quick Add Buttons -->
-                                    <div class="flex flex-wrap gap-1.5 pt-1">
-                                        <button onclick="addPartToTicket('Standard Bench Diagnostic Labor', 89.00, 'labor')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg text-[11px] border border-slate-700 transition">
-                                            + Labor ($89.00 - Tax Exempt)
+                                <div class="space-y-1.5">
+                                    <div class="flex gap-1">
+                                        <button onclick="addPartToTicket('Diagnostic Labor', 89.00, 'labor')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded text-[10px] border border-slate-700 transition">
+                                            + Labor ($89)
                                         </button>
-                                        <button onclick="addPartToTicket('High-Efficiency Filter Pack', 29.95, 'parts')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg text-[11px] border border-slate-700 transition">
+                                        <button onclick="addPartToTicket('Filter Pack', 29.95, 'parts')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded text-[10px] border border-slate-700 transition">
                                             + Filters ($29.95)
                                         </button>
-                                        <button onclick="addPartToTicket('Drive Belt Unit', 12.50, 'parts')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg text-[11px] border border-slate-700 transition">
+                                        <button onclick="addPartToTicket('Drive Belt', 12.50, 'parts')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded text-[10px] border border-slate-700 transition">
                                             + Belt ($12.50)
                                         </button>
                                     </div>
 
-                                    <!-- Selected Items List -->
-                                    <div class="mt-2 bg-slate-900/90 rounded-xl p-2.5 border border-slate-800 min-h-[85px] max-h-[105px] overflow-y-auto space-y-1.5" id="selected-parts-list">
-                                        <p class="text-[11px] text-slate-500 italic text-center py-3" id="empty-parts-msg">No parts or services added yet.</p>
+                                    <div class="bg-slate-900/90 rounded-xl p-2 border border-slate-800 min-h-[70px] max-h-[90px] overflow-y-auto space-y-1" id="selected-parts-list">
+                                        <p class="text-[10px] text-slate-500 italic text-center py-2" id="empty-parts-msg">No parts added yet.</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Option B Tax Math Breakdown (MD 0% Labor / 6% Parts) -->
-                            <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 space-y-1 text-xs font-mono">
+                            <!-- Option B Math (MD 0% Labor / 6% Parts) -->
+                            <div class="bg-slate-900 p-2 rounded-xl border border-slate-800 space-y-0.5 text-[11px] font-mono">
                                 <div class="flex justify-between text-slate-400">
                                     <span>Labor Total (0% Tax):</span>
                                     <span id="math-labor-total">$0.00</span>
@@ -278,10 +260,10 @@
                                     <span id="math-parts-total">$0.00</span>
                                 </div>
                                 <div class="flex justify-between text-slate-400">
-                                    <span>MD State Tax (6% Parts Only):</span>
+                                    <span>MD Tax (6% Parts):</span>
                                     <span id="math-tax-total">$0.00</span>
                                 </div>
-                                <div class="flex justify-between text-emerald-400 font-bold border-t border-slate-800 pt-1 text-sm">
+                                <div class="flex justify-between text-emerald-400 font-bold border-t border-slate-800 pt-0.5 text-xs">
                                     <span>Option B Total:</span>
                                     <span id="math-grand-total">$0.00</span>
                                 </div>
@@ -289,86 +271,73 @@
                         </div>
                     </div>
 
-                    <!-- Bottom Navigation & Flip Buttons -->
-                    <div class="pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-                        <button onclick="resetCommandCenter()" class="w-full sm:w-auto text-slate-400 hover:text-slate-200 text-xs font-semibold py-2 px-3 rounded-xl flex items-center justify-center space-x-1.5 hover:bg-slate-800 transition">
-                            <i class="fa-solid fa-house"></i>
-                            <span>Back to Command Center</span>
+                    <!-- Bottom Nav -->
+                    <div class="pt-2 border-t border-slate-800 flex items-center justify-between gap-2">
+                        <button onclick="resetCommandCenter()" class="text-slate-400 hover:text-slate-200 text-xs font-semibold py-1.5 px-2.5 rounded-lg">
+                            <i class="fa-solid fa-house mr-1"></i>Command Center
                         </button>
 
-                        <button onclick="toggleCardSide()" class="w-full sm:w-auto flex-1 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold py-3 px-6 rounded-2xl text-xs sm:text-sm shadow-xl shadow-emerald-950/40 flex items-center justify-center space-x-2 transition-all active:scale-95 border border-emerald-400/30">
+                        <button onclick="toggleCardSide()" class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-md flex items-center justify-center space-x-1.5 transition active:scale-95 border border-emerald-400/30">
                             <span>PROCEED TO CLIENT PRESENTATION CARD</span>
-                            <i class="fa-solid fa-arrow-right"></i>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
                         </button>
                     </div>
                 </div>
 
                 <!-- ================================================================= -->
-                <!-- SIDE B: CLIENT VIEW (PRESENTATION - Clean Environment Card)       -->
+                <!-- SIDE B: CLIENT VIEW (PRESENTATION)                                -->
                 <!-- ================================================================= -->
-                <div class="card-back absolute inset-0 w-full h-full glass-panel rounded-3xl p-4 sm:p-6 flex flex-col justify-between space-y-4 border border-emerald-500/30 shadow-2xl overflow-y-auto">
+                <div class="card-face-back absolute inset-0 w-full h-full glass-card rounded-2xl p-4 flex flex-col justify-between space-y-3 border border-emerald-500/30 shadow-xl overflow-y-auto">
                     
-                    <!-- Top Status & Customer Header -->
+                    <!-- Header -->
                     <div>
-                        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                        <div class="flex items-center justify-between pb-2 border-b border-slate-800">
                             <div class="flex items-center space-x-2">
-                                <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5">
-                                    <i class="fa-solid fa-shield-halved"></i>
-                                    <span>CLEAN ENVIRONMENT CARD</span>
+                                <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded text-[11px] font-bold uppercase">
+                                    <i class="fa-solid fa-shield-halved mr-1"></i>CLEAN ENVIRONMENT CARD
                                 </span>
-                                <span class="text-xs font-mono bg-slate-800 text-slate-300 px-2 py-1 rounded-md border border-slate-700">Client Presentation</span>
                             </div>
-                            <span class="text-xs text-emerald-400 font-semibold flex items-center space-x-1">
-                                <i class="fa-solid fa-check-circle"></i>
-                                <span>Verified Member</span>
+                            <span class="text-xs text-emerald-400 font-semibold">
+                                <i class="fa-solid fa-check-circle mr-1"></i>Verified Member
                             </span>
                         </div>
 
-                        <!-- Client Hero Presentation Box -->
-                        <div class="mt-3 bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/30 rounded-2xl p-4 border border-emerald-500/20 shadow-inner space-y-2">
+                        <div class="mt-2 bg-gradient-to-br from-slate-900 to-emerald-950/40 rounded-xl p-3 border border-emerald-500/20">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <h2 id="client-view-name" class="text-2xl font-black text-white tracking-tight">Select Customer</h2>
-                                    <p id="client-view-address" class="text-xs text-slate-300 mt-1 flex items-center space-x-1">
-                                        <i class="fa-solid fa-location-dot text-emerald-400"></i>
-                                        <span>No Address Bound</span>
+                                    <h2 id="client-view-name" class="text-lg font-bold text-white">Select Customer</h2>
+                                    <p id="client-view-address" class="text-xs text-slate-300 mt-0.5">
+                                        <i class="fa-solid fa-location-dot text-emerald-400 mr-1"></i>No Address Bound
                                     </p>
                                 </div>
-                                <div class="text-right">
-                                    <span class="text-[10px] text-slate-400 block uppercase font-mono">Service Order</span>
-                                    <span id="client-view-ticket-id" class="text-xs font-bold text-amber-400 font-mono">#TT-00000</span>
-                                </div>
+                                <span id="client-view-ticket-id" class="text-xs font-bold text-amber-400 font-mono">#TT-00000</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Service Summary & Option B Proposal -->
-                    <div class="space-y-4 my-2">
-                        <!-- Inspection Summary -->
-                        <div class="bg-slate-900/80 rounded-2xl p-3.5 border border-slate-800 space-y-2">
-                            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-1.5">
-                                <i class="fa-solid fa-clipboard-check text-amber-400"></i>
-                                <span>Service & Equipment Findings</span>
+                    <!-- Client Proposal Details -->
+                    <div class="space-y-2">
+                        <div class="bg-slate-900/80 rounded-xl p-3 border border-slate-800 space-y-1">
+                            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                                <i class="fa-solid fa-clipboard-check text-amber-400 mr-1"></i>Service Findings
                             </h3>
-                            <p id="client-view-notes" class="text-xs text-slate-300 leading-relaxed italic bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80">
-                                "Service diagnostics requested. Equipment evaluated for optimal operation and maintenance."
+                            <p id="client-view-notes" class="text-xs text-slate-300 italic bg-slate-950/60 p-2 rounded-lg">
+                                "Equipment evaluated for optimal operation."
                             </p>
                         </div>
 
-                        <!-- Itemized Summary & MD Tax Calculation -->
-                        <div class="bg-slate-900/80 rounded-2xl p-3.5 border border-slate-800 space-y-2">
-                            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-1.5">
-                                <i class="fa-solid fa-list-check text-emerald-400"></i>
-                                <span>Recommended Service & Care Items</span>
+                        <div class="bg-slate-900/80 rounded-xl p-3 border border-slate-800 space-y-1.5">
+                            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                                <i class="fa-solid fa-list-check text-emerald-400 mr-1"></i>Recommended Care & Service
                             </h3>
                             
-                            <div id="client-view-items-list" class="space-y-1.5 min-h-[60px]">
-                                <p class="text-xs text-slate-500 italic py-2">No items added to presentation yet.</p>
+                            <div id="client-view-items-list" class="space-y-1 min-h-[45px]">
+                                <p class="text-xs text-slate-500 italic">No items added yet.</p>
                             </div>
 
-                            <div class="pt-2 border-t border-slate-800 space-y-1 text-xs font-mono">
+                            <div class="pt-1.5 border-t border-slate-800 space-y-0.5 text-[11px] font-mono">
                                 <div class="flex justify-between text-slate-400">
-                                    <span>Labor Subtotal (0% Tax):</span>
+                                    <span>Labor (0% Tax):</span>
                                     <span id="client-view-labor">$0.00</span>
                                 </div>
                                 <div class="flex justify-between text-slate-400">
@@ -376,39 +345,33 @@
                                     <span id="client-view-parts">$0.00</span>
                                 </div>
                                 <div class="flex justify-between text-slate-400">
-                                    <span>MD State Sales Tax (6% Parts):</span>
+                                    <span>MD Tax (6% Parts):</span>
                                     <span id="client-view-tax">$0.00</span>
                                 </div>
-                                <div class="flex justify-between items-center text-sm font-bold border-t border-slate-700 pt-1.5">
-                                    <span class="text-slate-200">Total Investment:</span>
-                                    <span id="client-view-grand-total" class="text-lg text-emerald-400 font-mono font-black">$0.00</span>
+                                <div class="flex justify-between text-xs font-bold text-emerald-400 border-t border-slate-700 pt-1">
+                                    <span>Total Investment:</span>
+                                    <span id="client-view-grand-total" class="font-mono text-sm">$0.00</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 1-Tap Option B Approval Box -->
-                        <div class="bg-gradient-to-r from-emerald-950/40 via-teal-950/30 to-slate-900 rounded-2xl p-3.5 border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-3">
-                            <div class="space-y-0.5 text-center sm:text-left">
-                                <span class="text-xs font-extrabold text-emerald-300 block uppercase tracking-wider">Option B Instant Approval</span>
-                                <p class="text-[11px] text-slate-400">Tap below to authorize service & generate Workiz receipt.</p>
-                            </div>
-                            <button onclick="approveClientEstimate()" class="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-emerald-950/50 transition active:scale-95 whitespace-nowrap">
-                                <i class="fa-solid fa-signature mr-1.5"></i>
-                                <span>AUTHORIZE & APPROVE</span>
+                        <!-- Approve Button -->
+                        <div class="bg-gradient-to-r from-emerald-950/40 to-slate-900 rounded-xl p-2.5 border border-emerald-500/30 flex items-center justify-between">
+                            <span class="text-xs font-bold text-emerald-300 uppercase">Option B Approval</span>
+                            <button onclick="approveClientEstimate()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs uppercase tracking-wider shadow transition active:scale-95">
+                                AUTHORIZE & APPROVE
                             </button>
                         </div>
                     </div>
 
-                    <!-- Bottom Action Buttons -->
-                    <div class="pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-                        <button onclick="toggleCardSide()" class="w-full sm:w-auto text-slate-400 hover:text-slate-200 text-xs font-semibold py-2 px-3 rounded-xl flex items-center justify-center space-x-1.5 hover:bg-slate-800 transition">
-                            <i class="fa-solid fa-arrow-left"></i>
-                            <span>Return to Shop Ops View</span>
+                    <!-- Bottom Nav -->
+                    <div class="pt-2 border-t border-slate-800 flex items-center justify-between gap-2">
+                        <button onclick="toggleCardSide()" class="text-slate-400 hover:text-slate-200 text-xs font-semibold py-1.5 px-2.5 rounded-lg">
+                            <i class="fa-solid fa-arrow-left mr-1"></i>Return to Shop View
                         </button>
 
-                        <button onclick="resetCommandCenter()" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 px-5 rounded-xl text-xs flex items-center justify-center space-x-2 border border-slate-700 transition">
-                            <i class="fa-solid fa-check"></i>
-                            <span>Finish & Back to Command Center</span>
+                        <button onclick="resetCommandCenter()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2 px-4 rounded-xl text-xs border border-slate-700 transition">
+                            Finish & Exit
                         </button>
                     </div>
                 </div>
@@ -419,68 +382,42 @@
     </main>
 
     <!-- DISAMBIGUATION POP-UP MODAL -->
-    <div id="disambiguation-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-lg rounded-3xl p-5 border border-amber-500/30 shadow-2xl space-y-4">
-            
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div class="flex items-center space-x-2">
-                    <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
-                        <i class="fa-solid fa-users-viewfinder"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-bold text-white">Multiple Vault Matches Found</h3>
-                        <p class="text-[11px] text-slate-400">Select the correct client record below</p>
-                    </div>
-                </div>
-                <button onclick="closeDisambiguationModal()" class="text-slate-400 hover:text-white p-1">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+    <div id="disambiguation-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-3">
+        <div class="glass-card w-full max-w-md rounded-2xl p-4 border border-amber-500/30 shadow-2xl space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                <h3 class="text-xs font-bold text-white uppercase">Multiple Matches Found</h3>
+                <button onclick="closeDisambiguationModal()" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-sm"></i>
                 </button>
             </div>
-
-            <!-- Matching Records List -->
-            <div id="disambiguation-list" class="space-y-2 max-h-[280px] overflow-y-auto pr-1">
-                <!-- Dynamically populated rows -->
-            </div>
-
-            <div class="pt-2 text-center">
-                <p class="text-[11px] text-slate-500">1 tap on any record binds full details instantly.</p>
-            </div>
+            <div id="disambiguation-list" class="space-y-1.5 max-h-[240px] overflow-y-auto"></div>
         </div>
     </div>
 
     <!-- JAVASCRIPT ENGINE -->
     <script>
-        
-        // --- DATASET STATE (Dynamic Memory Array - $0 API Overhead) ---
+        // Default Mock State ($0 API Overhead)
         let vaultDatabase = [
-            { id: "10001", name: "Sample Client A", address: "100 Main St", city: "Timonium", state: "MD", zip: "21093", phone: "410-555-0101", rawPhone: "4105550101", note: "Primary Account" },
-            { id: "10002", name: "Sample Client B", address: "250 York Rd", city: "Towson", state: "MD", zip: "21204", phone: "410-555-0102", rawPhone: "4105550102", note: "Residential Account" },
-            { id: "10003", name: "Sample Client C", address: "50 Park Ave", city: "Baltimore", state: "MD", zip: "21201", phone: "410-555-0103", rawPhone: "4105550103", note: "Commercial Account" }
+            { id: "10001", name: "Sample Client A", address: "100 Main St", city: "Timonium", state: "MD", zip: "21093", phone: "410-555-0101", rawPhone: "4105550101" },
+            { id: "10002", name: "Sample Client B", address: "250 York Rd", city: "Towson", state: "MD", zip: "21204", phone: "410-555-0102", rawPhone: "4105550102" }
         ];
-
         let catalogDatabase = [];
-
-        // --- APP STATE ---
         let currentClient = null;
         let isCardFlipped = false;
         let selectedParts = [];
         let speechRecognition = null;
         let isListening = false;
 
-        // Initialize Web Speech Recognition Engine on Load
         window.addEventListener('DOMContentLoaded', () => {
             initWebSpeechEngine();
             updateVaultCountDisplay();
             calculateOptionBTaxMath();
         });
 
-        // -----------------------------------------------------------------
-        // 1. PAPAPARSE CSV HOOKS (RESTORED ENGINE)
-        // -----------------------------------------------------------------
+        // 1. PapaParse CSV Loaders
         function loadVaultCSV(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             Papa.parse(file, {
                 header: true,
                 skipEmptyLines: true,
@@ -488,21 +425,17 @@
                     if (results.data && results.data.length > 0) {
                         vaultDatabase = results.data.map((row, idx) => ({
                             id: row.ClientNo || row.ID || row.id || (10000 + idx).toString(),
-                            name: row.Name || row.Customer || row.name || "Unknown Customer",
+                            name: row.Name || row.Customer || row.name || "Unknown",
                             address: row.Address || row.address || "Address Pending",
                             city: row.City || row.city || "Local",
                             state: row.State || row.state || "MD",
                             zip: row.Zip || row.zip || "00000",
                             phone: row.Phone || row.phone || "No Phone",
-                            rawPhone: (row.Phone || row.phone || "").replace(/\D/g, ''),
-                            note: row.Note || row.note || ""
+                            rawPhone: (row.Phone || row.phone || "").replace(/\D/g, '')
                         }));
                         updateVaultCountDisplay();
-                        showToast(`Successfully loaded ${vaultDatabase.length} records into Vault!`);
+                        showToast(`Loaded ${vaultDatabase.length} Vault records!`);
                     }
-                },
-                error: function(err) {
-                    showToast("Error parsing Vault CSV file.");
                 }
             });
         }
@@ -510,7 +443,6 @@
         function loadCatalogCSV(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             Papa.parse(file, {
                 header: true,
                 skipEmptyLines: true,
@@ -521,7 +453,7 @@
                             price: parseFloat(row.Price || row.price || 0),
                             type: (row.Type || row.type || "").toLowerCase().includes("labor") ? "labor" : "parts"
                         }));
-                        document.getElementById('catalog-count-badge').innerText = `${catalogDatabase.length} CSV Items Loaded`;
+                        document.getElementById('catalog-count-badge').innerText = `${catalogDatabase.length} Catalog Items`;
                         showToast(`Loaded ${catalogDatabase.length} catalog items!`);
                     }
                 }
@@ -529,141 +461,65 @@
         }
 
         function updateVaultCountDisplay() {
-            document.getElementById('quick-vault-count').innerText = `${vaultDatabase.length.toLocaleString()} Vault Records Sync`;
+            document.getElementById('quick-vault-count').innerText = `${vaultDatabase.length.toLocaleString()} Vault Records`;
         }
 
-        // -----------------------------------------------------------------
-        // 2. REAL WEB SPEECH RECOGNITION ENGINE (RESTORED)
-        // -----------------------------------------------------------------
+        // 2. Real Web Speech API
         function initWebSpeechEngine() {
             const SpeechEngine = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const statusTag = document.getElementById('speech-status-tag');
-
             if (SpeechEngine) {
                 speechRecognition = new SpeechEngine();
                 speechRecognition.continuous = false;
                 speechRecognition.interimResults = true;
                 speechRecognition.lang = 'en-US';
 
-                speechRecognition.onstart = function() {
-                    isListening = true;
-                    updateMicUI(true);
-                };
-
-                speechRecognition.onresult = function(event) {
+                speechRecognition.onstart = () => updateMicUI(true);
+                speechRecognition.onresult = (event) => {
                     let transcript = '';
                     for (let i = event.resultIndex; i < event.results.length; i++) {
                         transcript += event.results[i][0].transcript;
                     }
-
                     const notesArea = document.getElementById('diagnostic-notes');
                     notesArea.value = transcript;
                     autoExpandTextarea(notesArea);
-
-                    // Auto search if speech matches name
                     if (event.results[0].isFinal && transcript.trim().length > 2) {
                         executeVaultSearch(transcript.trim().toLowerCase());
                     }
                 };
-
-                speechRecognition.onerror = function(event) {
-                    isListening = false;
-                    updateMicUI(false);
-                    showToast("Voice capture paused or not heard. Try tapping again.");
-                };
-
-                speechRecognition.onend = function() {
-                    isListening = false;
-                    updateMicUI(false);
-                };
-
-                statusTag.innerText = "WebSpeech Ready";
-            } else {
-                statusTag.innerText = "Speech API Unsupported";
-                statusTag.classList.remove('text-sky-300');
-                statusTag.classList.add('text-amber-400');
+                speechRecognition.onerror = () => updateMicUI(false);
+                speechRecognition.onend = () => updateMicUI(false);
             }
         }
 
         function triggerVoiceIntake() {
             if (!speechRecognition) {
-                showToast("Web Speech API is not supported in this browser. Please type or use keyboard dictation.");
+                showToast("Web Speech API not supported. Please type notes.");
                 return;
             }
-
-            if (isListening) {
-                speechRecognition.stop();
-            } else {
-                speechRecognition.start();
-            }
+            if (isListening) speechRecognition.stop();
+            else speechRecognition.start();
         }
 
         function updateMicUI(listening) {
+            isListening = listening;
             const micBtn = document.getElementById('voice-tap-btn');
-            const micIcon = document.getElementById('mic-icon');
             const micText = document.getElementById('mic-text');
-
             if (listening) {
-                micBtn.classList.remove('from-amber-500', 'to-amber-600');
-                micBtn.classList.add('from-rose-600', 'to-rose-700', 'animate-pulse');
-                micIcon.className = "fa-solid fa-waveform text-base";
-                micText.innerText = "LISTENING TO FRESH...";
+                micBtn.classList.replace('from-amber-500', 'from-rose-600');
+                micBtn.classList.replace('to-orange-500', 'to-rose-700');
+                micText.innerText = "LISTENING...";
             } else {
-                micBtn.classList.remove('from-rose-600', 'to-rose-700', 'animate-pulse');
-                micBtn.classList.add('from-amber-500', 'to-amber-600');
-                micIcon.className = "fa-solid fa-microphone text-base";
-                micText.innerText = "TAP TO TALK TO FRESH";
+                micBtn.classList.replace('from-rose-600', 'from-amber-500');
+                micBtn.classList.replace('to-rose-700', 'to-orange-500');
+                micText.innerText = "TAP TO TALK";
             }
         }
 
-        // -----------------------------------------------------------------
-        // 3. OPTION B MARYLAND TAX MATH (0% LABOR / 6% PARTS)
-        // -----------------------------------------------------------------
-        function calculateOptionBTaxMath() {
-            let laborSubtotal = 0;
-            let partsSubtotal = 0;
-
-            selectedParts.forEach(item => {
-                if (item.type === 'labor') {
-                    laborSubtotal += item.price;
-                } else {
-                    partsSubtotal += item.price;
-                }
-            });
-
-            const mdStateTax = partsSubtotal * 0.06; // MD 6% Tax on Parts Only
-            const grandTotal = laborSubtotal + partsSubtotal + mdStateTax;
-
-            // Side A (Shop View)
-            document.getElementById('math-labor-total').innerText = `$${laborSubtotal.toFixed(2)}`;
-            document.getElementById('math-parts-total').innerText = `$${partsSubtotal.toFixed(2)}`;
-            document.getElementById('math-tax-total').innerText = `$${mdStateTax.toFixed(2)}`;
-            document.getElementById('math-grand-total').innerText = `$${grandTotal.toFixed(2)}`;
-
-            // Side B (Client View)
-            document.getElementById('client-view-labor').innerText = `$${laborSubtotal.toFixed(2)}`;
-            document.getElementById('client-view-parts').innerText = `$${partsSubtotal.toFixed(2)}`;
-            document.getElementById('client-view-tax').innerText = `$${mdStateTax.toFixed(2)}`;
-            document.getElementById('client-view-grand-total').innerText = `$${grandTotal.toFixed(2)}`;
-        }
-
-        // -----------------------------------------------------------------
-        // 4. VAULT SEARCH & CARD NAVIGATION ENGINE
-        // -----------------------------------------------------------------
+        // 3. Vault & Card Binding
         function handleSearchInput(event) {
             const query = event.target.value.trim().toLowerCase();
-            const clearBtn = document.getElementById('clear-search');
-
-            if (query.length > 0) {
-                clearBtn.classList.remove('hidden');
-            } else {
-                clearBtn.classList.add('hidden');
-                return;
-            }
-
-            if (event.key === 'Enter' || query.length >= 2) {
-                executeVaultSearch(query);
-            }
+            document.getElementById('clear-search').classList.toggle('hidden', query.length === 0);
+            if (event.key === 'Enter' || query.length >= 2) executeVaultSearch(query);
         }
 
         function clearSearch() {
@@ -672,88 +528,52 @@
         }
 
         function executeVaultSearch(query) {
-            const matches = vaultDatabase.filter(client => 
-                client.name.toLowerCase().includes(query) ||
-                client.address.toLowerCase().includes(query) ||
-                client.city.toLowerCase().includes(query) ||
-                client.id.includes(query) ||
-                (client.rawPhone && client.rawPhone.includes(query))
+            const matches = vaultDatabase.filter(c => 
+                c.name.toLowerCase().includes(query) ||
+                c.address.toLowerCase().includes(query) ||
+                c.id.includes(query) ||
+                (c.rawPhone && c.rawPhone.includes(query))
             );
 
-            if (matches.length === 1) {
-                bindClientToCard(matches[0]);
-            } else if (matches.length > 1) {
-                openDisambiguationModal(matches);
-            } else {
-                bindClientToCard({
-                    id: Math.floor(10000 + Math.random() * 90000).toString(),
-                    name: query.charAt(0).toUpperCase() + query.slice(1),
-                    address: "Address Pending Input",
-                    city: "Local Area",
-                    state: "MD",
-                    zip: "00000",
-                    phone: "Pending Phone",
-                    rawPhone: ""
-                });
-            }
+            if (matches.length === 1) bindClientToCard(matches[0]);
+            else if (matches.length > 1) openDisambiguationModal(matches);
+            else bindClientToCard({ id: "NEW", name: query, address: "Address Pending Input", city: "Local", state: "MD", zip: "00000", phone: "No Phone", rawPhone: "" });
         }
 
         function bindClientToCard(client) {
             currentClient = client;
-
-            // Side A
             document.getElementById('client-id-badge').innerText = `Client #${client.id}`;
-            document.getElementById('card-client-name').innerHTML = `<span>${client.name}</span> <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>`;
-            document.getElementById('card-client-address').innerHTML = `<i class="fa-solid fa-location-dot text-amber-400 w-3"></i> <span>${client.address}, ${client.city}, ${client.state} ${client.zip}</span>`;
+            document.getElementById('card-client-name').innerHTML = `<span>${client.name}</span>`;
+            document.getElementById('card-client-address').innerHTML = `<i class="fa-solid fa-location-dot text-amber-400 mr-1"></i><span>${client.address}, ${client.city}, ${client.state}</span>`;
             
             const phoneCall = document.getElementById('client-phone-call');
             const phoneSms = document.getElementById('client-phone-sms');
-            
             if (client.rawPhone) {
                 phoneCall.href = `tel:${client.rawPhone}`;
                 phoneSms.href = `sms:${client.rawPhone}`;
-                phoneCall.classList.remove('pointer-events-none', 'bg-slate-800', 'text-slate-500');
-                phoneCall.classList.add('bg-emerald-600/20', 'text-emerald-300');
-                phoneSms.classList.remove('pointer-events-none', 'bg-slate-800', 'text-slate-500');
-                phoneSms.classList.add('bg-sky-600/20', 'text-sky-300');
+                phoneCall.classList.remove('pointer-events-none', 'text-slate-500');
+                phoneCall.classList.add('text-emerald-300');
+                phoneSms.classList.remove('pointer-events-none', 'text-slate-500');
+                phoneSms.classList.add('text-sky-300');
                 document.getElementById('phone-display-text').innerText = client.phone;
             }
 
-            // Side B
             document.getElementById('client-view-name').innerText = client.name;
-            document.getElementById('client-view-address').innerHTML = `<i class="fa-solid fa-location-dot text-emerald-400"></i> <span>${client.address}, ${client.city}, ${client.state} ${client.zip}</span>`;
+            document.getElementById('client-view-address').innerHTML = `<i class="fa-solid fa-location-dot text-emerald-400 mr-1"></i><span>${client.address}, ${client.city}</span>`;
             document.getElementById('client-view-ticket-id').innerText = `#TT-${client.id}`;
-
             closeDisambiguationModal();
-            showToast(`Bound client: ${client.name}`);
         }
 
         function openDisambiguationModal(matches) {
-            const listContainer = document.getElementById('disambiguation-list');
-            listContainer.innerHTML = "";
-
-            matches.forEach(client => {
+            const list = document.getElementById('disambiguation-list');
+            list.innerHTML = "";
+            matches.forEach(c => {
                 const row = document.createElement('div');
-                row.className = "bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 p-3 rounded-2xl cursor-pointer transition flex items-center justify-between";
-                row.onclick = () => bindClientToCard(client);
-
-                row.innerHTML = `
-                    <div class="space-y-0.5">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-xs font-bold text-white">${client.name}</span>
-                            <span class="text-[10px] bg-slate-800 text-amber-400 px-1.5 py-0.5 rounded font-mono">#${client.id}</span>
-                            ${client.note ? `<span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded">${client.note}</span>` : ''}
-                        </div>
-                        <p class="text-[11px] text-slate-400"><i class="fa-solid fa-location-dot text-amber-400 mr-1"></i>${client.address}, ${client.city}</p>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-xs font-mono text-emerald-400 font-semibold block">${client.phone}</span>
-                        <span class="text-[10px] text-slate-500">Tap to Select <i class="fa-solid fa-chevron-right ml-1"></i></span>
-                    </div>
-                `;
-                listContainer.appendChild(row);
+                row.className = "bg-slate-900 border border-slate-800 p-2 rounded-xl text-xs cursor-pointer flex justify-between hover:border-amber-500";
+                row.onclick = () => bindClientToCard(c);
+                row.innerHTML = `<div><span class="font-bold text-white">${c.name}</span> <span class="text-[10px] text-amber-400">#${c.id}</span><p class="text-[10px] text-slate-400">${c.address}</p></div><span class="text-emerald-400 font-mono">${c.phone}</span>`;
+                list.appendChild(row);
             });
-
             document.getElementById('disambiguation-modal').classList.remove('hidden');
         }
 
@@ -761,30 +581,17 @@
             document.getElementById('disambiguation-modal').classList.add('hidden');
         }
 
-        // Toggle Card View State
+        // 4. Card Toggle & Math
         function toggleCardSide() {
-            const flipper = document.getElementById('card-flipper');
-            const toggleText = document.getElementById('toggle-text');
-            
             isCardFlipped = !isCardFlipped;
-            
-            if (isCardFlipped) {
-                flipper.classList.add('flipped');
-                toggleText.innerText = "Switch to Shop View";
-                updateClientViewPresentation();
-            } else {
-                flipper.classList.remove('flipped');
-                toggleText.innerText = "Switch to Client View";
-            }
+            document.getElementById('card-flipper').classList.toggle('flipped', isCardFlipped);
+            document.getElementById('header-flip-text').innerText = isCardFlipped ? "SHOP VIEW" : "CLIENT VIEW";
+            if (isCardFlipped) updateClientViewPresentation();
         }
 
         function resetCommandCenter() {
-            if (isCardFlipped) {
-                toggleCardSide();
-            }
-            document.getElementById('vault-search').value = "";
-            document.getElementById('clear-search').classList.add('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (isCardFlipped) toggleCardSide();
+            clearSearch();
         }
 
         function autoExpandTextarea(textarea) {
@@ -792,12 +599,12 @@
             textarea.style.height = (textarea.scrollHeight) + 'px';
         }
 
-        function handlePhotoUpload(event) {
-            const file = event.target.files[0];
+        function handlePhotoUpload(e) {
+            const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('photo-preview-img').src = e.target.result;
+                reader.onload = function(evt) {
+                    document.getElementById('photo-preview-img').src = evt.target.result;
                     document.getElementById('photo-preview-box').classList.remove('hidden');
                 };
                 reader.readAsDataURL(file);
@@ -805,20 +612,7 @@
         }
 
         function removePhoto() {
-            document.getElementById('camera-file-input').value = "";
-            document.getElementById('photo-preview-img').src = "";
             document.getElementById('photo-preview-box').classList.add('hidden');
-        }
-
-        // Catalog & Item Actions
-        function filterPartsCatalog(event) {
-            const query = event.target.value.trim().toLowerCase();
-            if (query.length > 1 && catalogDatabase.length > 0) {
-                const matchedParts = catalogDatabase.filter(item => item.name.toLowerCase().includes(query));
-                if (matchedParts.length > 0) {
-                    addPartToTicket(matchedParts[0].name, matchedParts[0].price, matchedParts[0].type);
-                }
-            }
         }
 
         function addPartToTicket(name, price, type = 'parts') {
@@ -827,81 +621,60 @@
             calculateOptionBTaxMath();
         }
 
-        function removePartFromTicket(index) {
-            selectedParts.splice(index, 1);
+        function removePartFromTicket(idx) {
+            selectedParts.splice(idx, 1);
             renderPartsList();
             calculateOptionBTaxMath();
         }
 
         function renderPartsList() {
             const container = document.getElementById('selected-parts-list');
-            
             if (selectedParts.length === 0) {
-                container.innerHTML = `<p class="text-[11px] text-slate-500 italic text-center py-3" id="empty-parts-msg">No parts or services added yet.</p>`;
+                container.innerHTML = `<p class="text-[10px] text-slate-500 italic text-center py-2">No parts added yet.</p>`;
                 return;
             }
-
             container.innerHTML = "";
-
-            selectedParts.forEach((part, index) => {
+            selectedParts.forEach((p, i) => {
                 const row = document.createElement('div');
-                row.className = "flex items-center justify-between text-xs text-slate-300 bg-slate-950/80 px-2.5 py-1.5 rounded-lg border border-slate-800";
-                row.innerHTML = `
-                    <div class="flex items-center space-x-1.5">
-                        <span class="text-[9px] px-1 py-0.5 rounded font-mono uppercase ${part.type === 'labor' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-slate-800 text-slate-400'}">${part.type}</span>
-                        <span>${part.name}</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <span class="font-mono text-emerald-400 font-semibold">$${part.price.toFixed(2)}</span>
-                        <button onclick="removePartFromTicket(${index})" class="text-rose-400 hover:text-rose-200">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
-                    </div>
-                `;
+                row.className = "flex justify-between items-center text-[11px] bg-slate-950 p-1 rounded";
+                row.innerHTML = `<span>${p.name}</span><div class="space-x-1"><span class="text-emerald-400">$${p.price.toFixed(2)}</span><button onclick="removePartFromTicket(${i})" class="text-rose-400">×</button></div>`;
                 container.appendChild(row);
             });
         }
 
+        function calculateOptionBTaxMath() {
+            let labor = 0, parts = 0;
+            selectedParts.forEach(p => p.type === 'labor' ? labor += p.price : parts += p.price);
+            const tax = parts * 0.06;
+            const grand = labor + parts + tax;
+
+            document.getElementById('math-labor-total').innerText = `$${labor.toFixed(2)}`;
+            document.getElementById('math-parts-total').innerText = `$${parts.toFixed(2)}`;
+            document.getElementById('math-tax-total').innerText = `$${tax.toFixed(2)}`;
+            document.getElementById('math-grand-total').innerText = `$${grand.toFixed(2)}`;
+
+            document.getElementById('client-view-labor').innerText = `$${labor.toFixed(2)}`;
+            document.getElementById('client-view-parts').innerText = `$${parts.toFixed(2)}`;
+            document.getElementById('client-view-tax').innerText = `$${tax.toFixed(2)}`;
+            document.getElementById('client-view-grand-total').innerText = `$${grand.toFixed(2)}`;
+        }
+
         function updateClientViewPresentation() {
             const notes = document.getElementById('diagnostic-notes').value.trim();
-            if (notes) {
-                document.getElementById('client-view-notes').innerText = `"${notes}"`;
-            }
-
-            const clientItemsList = document.getElementById('client-view-items-list');
-            clientItemsList.innerHTML = "";
-
-            if (selectedParts.length === 0) {
-                clientItemsList.innerHTML = `<p class="text-xs text-slate-500 italic py-2">No items added to presentation yet.</p>`;
-            } else {
-                selectedParts.forEach(part => {
-                    const row = document.createElement('div');
-                    row.className = "text-xs text-slate-300 flex justify-between py-1 border-b border-slate-800/60";
-                    row.innerHTML = `
-                        <span>${part.name} <span class="text-[10px] text-slate-500 font-mono">(${part.type})</span></span>
-                        <span class="font-mono text-slate-200">$${part.price.toFixed(2)}</span>
-                    `;
-                    clientItemsList.appendChild(row);
-                });
-            }
-
+            if (notes) document.getElementById('client-view-notes').innerText = `"${notes}"`;
             calculateOptionBTaxMath();
         }
 
         function approveClientEstimate() {
-            showToast("Option B Authorized! Workiz invoice queued.");
+            showToast("Option B Authorized!");
         }
 
-        function showToast(message) {
-            const toast = document.createElement('div');
-            toast.className = "fixed bottom-5 right-5 z-50 bg-emerald-600 text-white px-4 py-2.5 rounded-2xl text-xs font-bold shadow-2xl transition-all duration-300 flex items-center space-x-2 border border-emerald-400/40";
-            toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>${message}</span>`;
-            document.body.appendChild(toast);
-
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }, 2500);
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.className = "fixed bottom-4 right-4 bg-emerald-600 text-white px-3 py-2 rounded-xl text-xs font-bold shadow-xl border border-emerald-400/30";
+            t.innerText = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 2500);
         }
     </script>
 </body>
