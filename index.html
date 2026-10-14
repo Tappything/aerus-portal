@@ -1,226 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TappyThing — Universal Forever Card Engine</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background: #0b0f19; color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
-        .card-perspective { perspective: 1000px; width: 100%; max-width: 420px; }
-        .card-inner { position: relative; width: 100%; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
-        .card-inner.flipped { transform: rotateY(180deg); }
-        .card-face { backface-visibility: hidden; width: 100%; border-radius: 28px; }
-        .card-back { transform: rotateY(180deg); position: absolute; top: 0; left: 0; }
-        .voice-box { max-height: 0; opacity: 0; overflow: hidden; transition: all 0.4s ease; }
-        .voice-box.active { max-height: 140px; opacity: 1; padding: 12px 16px; margin-top: 12px; }
-        canvas#sig-canvas { width: 100%; height: 90px; background: rgba(0,0,0,0.4); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.2); cursor: crosshair; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TappyThing — Digital Coordinator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="min-h-screen flex items-center justify-center p-3">
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8 font-sans">
+  <div class="max-w-3xl mx-auto space-y-6">
+    
+    <!-- HEADER -->
+    <header class="flex items-center justify-between border-b border-slate-800 pb-4">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight text-white">TappyThing</h1>
+        <p class="text-xs text-slate-400">Appointment &bull; Dispatch &bull; Live Stripe Invoice Engine</p>
+      </div>
+      <span class="text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full">System Ready</span>
+    </header>
 
-    <div class="card-perspective my-auto">
-        <div class="card-inner" id="main-card-inner">
-
-            <!-- FACE 1: PHONE FOREVER CARD -->
-            <div class="card-face bg-slate-900/95 backdrop-blur-md border border-cyan-500/30 p-5 shadow-2xl rounded-3xl">
-                
-                <!-- HEADER: PRISTINE FOREVER CARD (LEFT) & CLIENT DATA (RIGHT) -->
-                <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-3 text-xs">
-                    <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-xl flex items-center justify-center font-black text-slate-950 text-base shadow-md shadow-cyan-500/20">F</div>
-                        <div class="flex flex-col">
-                            <span class="font-black tracking-wider text-white text-xs">FOREVER CARD</span>
-                            <span class="text-[9px] text-cyan-400 font-bold tracking-tight">powered by TappyThing</span>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="font-bold text-amber-400" id="active-client-name">Subscriber Name</div>
-                        <div class="text-[10px] text-slate-400" id="active-client-phone">(555) 000-0000</div>
-                    </div>
-                </div>
-
-                <!-- UNIVERSAL VENDOR SWITCHER PILL -->
-                <div class="mb-3 bg-slate-950/80 border border-slate-800 rounded-xl p-1.5 flex items-center justify-between text-xs">
-                    <span class="text-[10px] text-slate-400 font-bold px-2 uppercase tracking-wider">Vendor:</span>
-                    <select id="vendor-switch" onchange="switchVendor(this.value)" class="bg-slate-900 border border-cyan-500/40 text-cyan-300 font-bold text-xs rounded-lg px-2 py-1 outline-none">
-                        <option value="vendor1">Primary Service Hub</option>
-                        <option value="vendor2">Secondary Service</option>
-                    </select>
-                </div>
-
-                <!-- FRESH HERO LOGO + DEDICATED MIC BUTTON -->
-                <div class="text-center mb-4 flex flex-col items-center">
-                    <div class="bg-white p-2 rounded-2xl border-2 border-cyan-400/50 shadow-lg shadow-cyan-500/20 mb-2 w-36">
-                        <img src="Screenshot_20260903_095027_Messages.jpg" alt="Fresh Digital Coordinator" class="w-full h-auto rounded-xl">
-                    </div>
-
-                    <button onclick="toggleSpeechEngine()" id="mic-btn" class="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full shadow-lg shadow-cyan-500/30 active:scale-90 transition-all my-1">
-                        <svg class="w-6 h-6 fill-slate-950" viewBox="0 0 24 24">
-                            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
-                            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-                        </svg>
-                    </button>
-
-                    <div id="voice-box" class="voice-box w-full bg-slate-950/90 border border-cyan-500/40 rounded-2xl text-cyan-300 text-sm text-left mt-2">
-                        <span id="voice-text">Tap mic to speak...</span>
-                    </div>
-                </div>
-
-                <!-- DRAWERS CONTAINER -->
-                <div class="space-y-3">
-                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-3">
-                        <div class="flex justify-between items-center mb-1.5">
-                            <span class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Drawer 1: Vault & Dispatch</span>
-                            <span class="text-[10px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-md font-bold">22,283 Records</span>
-                        </div>
-                        <input type="text" id="vault-search" placeholder="Type or speak client name..." oninput="searchVault(this.value)" class="w-full bg-slate-950/60 border border-slate-700 text-white text-sm rounded-xl px-3 py-1.5 outline-none focus:border-cyan-400 mb-2">
-                        <div id="dispatch-queue" class="space-y-1 text-xs">
-                            <div class="flex justify-between items-center bg-slate-900/80 p-2 rounded-lg border border-cyan-500/30">
-                                <div>
-                                    <div class="font-bold text-white">Active Dispatch</div>
-                                    <div class="text-[10px] text-slate-400">Ready for Voice Intake</div>
-                                </div>
-                                <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-bold">Ready</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-3">
-                        <div class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-1.5">Drawer 2: Option B Repair Quote</div>
-                        <div class="flex justify-between text-xs py-1 border-b border-slate-800">
-                            <span class="text-slate-300">Bench Labor Rate</span>
-                            <span class="font-bold">$85.00 <span class="text-[10px] text-slate-500">(0% Tax)</span></span>
-                        </div>
-                        <div class="flex justify-between text-xs py-1 border-b border-slate-800">
-                            <span class="text-slate-300">Service Parts Pack</span>
-                            <span class="font-bold">$29.95 <span class="text-[10px] text-amber-400">(+6% Tax)</span></span>
-                        </div>
-                        <div class="text-right text-sm font-extrabold text-cyan-400 mt-1.5">Total: $116.75</div>
-                    </div>
-
-                    <button onclick="flipCard()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black rounded-xl text-sm shadow-lg active:scale-98 transition-all">
-                        📱 Hand Phone to Customer (3D Flip)
-                    </button>
-                </div>
-            </div>
-
-            <!-- FACE 2: PRISTINE CLIENT PRESENTATION -->
-            <div class="card-face card-back bg-slate-900/95 backdrop-blur-md border border-cyan-500/40 p-5 shadow-2xl rounded-3xl">
-                <div class="text-center mb-4">
-                    <div class="text-xs uppercase tracking-widest text-cyan-400 font-extrabold">PRISTINE CUSTOMER CHECKOUT</div>
-                    <div class="text-lg font-black text-white mt-1">Proposal & Checkout</div>
-                </div>
-
-                <div class="bg-slate-800/50 border border-amber-500/30 rounded-2xl p-4 mb-4">
-                    <div class="text-xs font-bold text-amber-400 uppercase">Approved Service Option</div>
-                    <div class="text-sm font-extrabold text-white mt-1">Full Service + Parts Pack</div>
-                    <div class="text-2xl font-black text-cyan-400 mt-2">$116.75</div>
-                </div>
-
-                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-3 mb-4">
-                    <div class="flex justify-between text-xs font-extrabold text-slate-400 mb-2">
-                        <span>Authorization Signature</span>
-                        <span class="text-cyan-400 cursor-pointer" onclick="clearCanvas()">Clear</span>
-                    </div>
-                    <canvas id="sig-canvas"></canvas>
-                </div>
-
-                <button onclick="alert('Invoice Authorized!')" class="w-full py-3.5 bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-black rounded-xl text-base shadow-lg active:scale-98 transition-all mb-2">
-                    Authorize & Complete Payment
-                </button>
-                <button onclick="flipCard()" class="w-full py-2 text-xs text-slate-400 hover:text-white transition-all">← Back to Workstation</button>
-            </div>
-
+    <!-- MODULE 1: APPOINTMENT / DISPATCH INTAKE -->
+    <section class="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5 shadow-lg space-y-4">
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400">1. Appointment / Dispatch Intake</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Time</label>
+          <input type="time" id="appTime" value="08:30" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
         </div>
-    </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Client Name</label>
+          <input type="text" id="clientName" value="Sample Client" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Address</label>
+          <input type="text" id="clientAddress" placeholder="123 Main St, Anytown" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+        </div>
+      </div>
+      <button onclick="addStop()" class="w-full md:w-auto bg-slate-700 hover:bg-slate-600 text-white font-medium px-4 py-2 rounded-lg text-sm transition">+ Add Stop</button>
+      
+      <div id="scheduleQueue" class="space-y-2 pt-2"></div>
+    </section>
 
-<script>
-    function flipCard() { document.getElementById('main-card-inner').classList.toggle('flipped'); }
+    <!-- MODULE 2: QUICK LINE-ITEM PICKER -->
+    <section class="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5 shadow-lg space-y-4">
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400">2. Quick Line-Item Picker</h2>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="addItem('Bench Labor', 85.00)" class="bg-indigo-600/20 border border-indigo-500/30 hover:bg-indigo-600/30 text-indigo-300 px-3 py-2 rounded-lg text-sm transition">+ Bench Labor ($85.00)</button>
+        <button onclick="addItem('Filter Pack', 29.95)" class="bg-indigo-600/20 border border-indigo-500/30 hover:bg-indigo-600/30 text-indigo-300 px-3 py-2 rounded-lg text-sm transition">+ Filter Pack ($29.95)</button>
+        <button onclick="addItem('Motor Replacement', 45.00)" class="bg-indigo-600/20 border border-indigo-500/30 hover:bg-indigo-600/30 text-indigo-300 px-3 py-2 rounded-lg text-sm transition">+ Motor Replacement ($45.00)</button>
+      </div>
 
-    function switchVendor(val) {
-        if(val === 'vendor2') {
-            document.getElementById('active-client-name').innerText = "Secondary Client";
-            document.getElementById('active-client-phone').innerText = "(555) 000-0002";
-        } else {
-            document.getElementById('active-client-name').innerText = "Subscriber Name";
-            document.getElementById('active-client-phone').innerText = "(555) 000-0001";
-        }
+      <div class="border border-slate-700/50 rounded-lg overflow-hidden">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-900/50 text-xs text-slate-400 uppercase">
+            <tr>
+              <th class="p-3">Item</th>
+              <th class="p-3 text-right">Price</th>
+            </tr>
+          </thead>
+          <tbody id="invoiceTable" class="divide-y divide-slate-700/50">
+            <tr><td colspan="2" class="p-3 text-center text-slate-500 text-xs">No items selected yet</td></tr>
+          </tbody>
+        </table>
+        <div class="bg-slate-900/80 p-3 flex justify-between items-center font-bold text-white border-t border-slate-700/50">
+          <span>Subtotal:</span>
+          <span id="subtotalAmount">$0.00</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 3: LIVE STRIPE HAND-OFF ENGINE -->
+    <section class="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5 shadow-lg space-y-4">
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400">3. Live Stripe Hand-Off Engine</h2>
+      <div>
+        <label class="block text-xs font-medium text-slate-300 mb-1">Stripe Payment Link URL</label>
+        <input type="text" id="stripeUrl" placeholder="https://buy.stripe.com/..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+      </div>
+
+      <div class="flex items-center justify-between pt-2">
+        <span id="statusBadge" class="text-xs bg-slate-700 text-slate-300 px-3 py-1 rounded-full">STATUS: READY</span>
+        <button onclick="generateStripeInvoice()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-lg text-sm shadow-lg transition flex items-center gap-2">
+          🚀 GENERATE STRIPE INVOICE &amp; PAY
+        </button>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    let items = [];
+    let stops = [];
+
+    function addStop() {
+      const time = document.getElementById('appTime').value;
+      const client = document.getElementById('clientName').value;
+      const address = document.getElementById('clientAddress').value;
+      if (!client) return;
+
+      stops.unshift({ time, client, address });
+      renderStops();
     }
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition;
-    let isListening = false;
-
-    if (SpeechRecognition) {
-        recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = true;
-
-        recognition.onstart = function() {
-            isListening = true;
-            document.getElementById('mic-btn').classList.add('animate-pulse', 'ring-4', 'ring-cyan-300');
-            document.getElementById('voice-box').classList.add('active');
-            document.getElementById('voice-text').innerText = "🎙️ Listening... Speak appointment or client name...";
-        };
-
-        recognition.onresult = function(event) {
-            let transcript = '';
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                transcript += event.results[i][0].transcript;
-            }
-            document.getElementById('voice-text').innerText = transcript;
-        };
-
-        recognition.onend = function() { stopSpeechEngine(); };
+    function renderStops() {
+      const q = document.getElementById('scheduleQueue');
+      q.innerHTML = stops.map(s => `
+        <div class="bg-slate-900/60 border border-slate-700/40 p-3 rounded-lg flex justify-between items-center text-xs text-slate-300">
+          <span class="font-bold text-indigo-400">${s.time}</span>
+          <span class="font-medium text-white">${s.client}</span>
+          <span class="text-slate-400">${s.address || 'No address provided'}</span>
+        </div>
+      `).join('');
     }
 
-    function toggleSpeechEngine() {
-        if (!SpeechRecognition) { alert("Speech API not supported in this browser."); return; }
-        if (isListening) { recognition.stop(); } else { recognition.start(); }
+    function addItem(name, price) {
+      items.push({ name, price });
+      renderInvoice();
     }
 
-    function stopSpeechEngine() {
-        isListening = false;
-        document.getElementById('mic-btn').classList.remove('animate-pulse', 'ring-4', 'ring-cyan-300');
+    function renderInvoice() {
+      const tb = document.getElementById('invoiceTable');
+      if (items.length === 0) {
+        tb.innerHTML = '<tr><td colspan="2" class="p-3 text-center text-slate-500 text-xs">No items selected yet</td></tr>';
+        document.getElementById('subtotalAmount').innerText = '$0.00';
+        return;
+      }
+      tb.innerHTML = items.map(i => `
+        <tr>
+          <td class="p-3 text-white">${i.name}</td>
+          <td class="p-3 text-right text-emerald-400 font-mono">$${i.price.toFixed(2)}</td>
+        </tr>
+      `).join('');
+      const subtotal = items.reduce((acc, i) => acc + i.price, 0);
+      document.getElementById('subtotalAmount').innerText = `$${subtotal.toFixed(2)}`;
     }
 
-    function searchVault(val) {
-        if (val.length > 2) {
-            document.getElementById('dispatch-queue').innerHTML = `
-                <div class="flex justify-between items-center bg-cyan-950/60 p-2 rounded-lg border border-cyan-500/40">
-                    <div>
-                        <div class="font-bold text-white">Searching Vault...</div>
-                        <div class="text-[10px] text-slate-300">Matching 22k database</div>
-                    </div>
-                    <span class="text-[10px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded font-bold">Active</span>
-                </div>`;
-        }
+    function generateStripeInvoice() {
+      const url = document.getElementById('stripeUrl').value;
+      const badge = document.getElementById('statusBadge');
+
+      badge.innerText = "STATUS: INVOICE CREATED";
+      badge.className = "text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-full font-bold";
+
+      if (url) {
+        window.open(url, '_blank');
+      } else {
+        alert("Invoice generated! Please paste a valid Stripe Payment Link URL to launch checkout directly.");
+      }
     }
-
-    const canvas = document.getElementById('sig-canvas');
-    const ctx = canvas.getContext('2d');
-    let isDrawing = false;
-
-    canvas.addEventListener('mousedown', startDrawing);
-    canvas.addEventListener('mousemove', draw);
-    canvas.addEventListener('mouseup', stopDrawing);
-    canvas.addEventListener('touchstart', startDrawing);
-    canvas.addEventListener('touchmove', draw);
-    canvas.addEventListener('touchend', stopDrawing);
-
-    function startDrawing(e) { isDrawing = true; draw(e); }
-    function draw(e) {
-        if (!isDrawing) return;
-        ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.strokeStyle = '#00f2fe';
-        const rect = canvas.getBoundingClientRect();
-        const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-        const y = (e.touches ? e.touches[0].clientY : e.clientX) - rect.top;
-        ctx.lineTo(x, y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, y);
-    }
-    function stopDrawing() { isDrawing = false; ctx.beginPath(); }
-    function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
-</script>
-
+  </script>
 </body>
 </html>
