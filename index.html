@@ -3,220 +3,283 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TappyThing — Shop Ops & Stripe Engine</title>
+  <title>TappyThing — Skinny Forever Card™ Engine</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8 font-sans">
-  <div class="max-w-4xl mx-auto space-y-6">
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4 md:p-8 font-sans flex items-center justify-center">
+
+  <!-- SKINNY FOREVER CARD CHASSIS -->
+  <div class="w-full max-w-md bg-slate-900/95 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-xl space-y-0">
     
-    <!-- HEADER -->
-    <header class="flex items-center justify-between border-b border-slate-800 pb-4">
-      <div>
-        <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-          <span>🤵 TappyThing</span>
-          <span class="text-xs font-normal text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Shop Ops v2.0</span>
-        </h1>
-        <p class="text-xs text-slate-400">22k Vault &bull; 1,090 Parts &bull; Live Stripe Engine</p>
+    <!-- CARD TOP HEADER -->
+    <div class="bg-slate-900/90 border-b border-slate-800 p-4 space-y-3">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <span class="text-cyan-400 font-bold text-lg tracking-tight">TAPPYTHING</span>
+          <span class="text-[10px] font-bold uppercase tracking-widest text-cyan-400/90 bg-cyan-950/60 border border-cyan-500/30 px-2 py-0.5 rounded-full">Skinny Traveler Card™</span>
+        </div>
+        <span id="badgeState" class="text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-full">🟡 INTAKE COMPLETE</span>
       </div>
-      <span class="text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full">System Active</span>
-    </header>
 
-    <!-- MODULE 1: CUSTOMER VAULT SEARCH -->
-    <section class="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5 shadow-lg space-y-4">
-      <div class="flex items-center justify-between">
-        <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400">1. Customer Vault Lookup (22,283 Records)</h2>
-        <span class="text-xs text-slate-500">Auto-Fill Ready</span>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <!-- Customer Summary Header -->
+      <div class="flex items-center justify-between text-xs bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
         <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">Search Customer Name / Phone / Client #</label>
-          <input type="text" id="custSearch" oninput="searchCustomer()" placeholder="Type 'Anna Fernandez' or '8461'..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
-          <div id="custResults" class="hidden bg-slate-900 border border-slate-700 rounded-lg mt-1 max-h-40 overflow-y-auto text-xs divide-y divide-slate-800"></div>
+          <div class="text-slate-400 text-[10px] uppercase font-semibold">Customer / Job</div>
+          <div id="cardCustName" class="font-bold text-white text-sm">Sample Client</div>
         </div>
-        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-700/40 text-xs space-y-1">
-          <div class="text-slate-400 font-semibold uppercase">Active Customer:</div>
-          <div id="activeCustName" class="text-white font-bold text-sm">No customer selected</div>
-          <div id="activeCustDetails" class="text-slate-400">Search above or type details directly.</div>
+        <div class="text-right">
+          <div class="text-slate-400 text-[10px] uppercase font-semibold">Phone</div>
+          <div id="cardCustPhone" class="font-mono text-cyan-300">(410) 555-0199</div>
         </div>
       </div>
-    </section>
 
-    <!-- MODULE 2: 1,090 PARTS CATALOG & LINE-ITEM BUILDER -->
-    <section class="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5 shadow-lg space-y-4">
-      <div class="flex items-center justify-between">
-        <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400">2. Parts Catalog Search & Line-Item Picker</h2>
-        <span class="text-xs text-slate-500">1,090 Items Indexed</span>
+      <!-- STATE SWITCHER PILL TABS -->
+      <div class="grid grid-cols-3 gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800/80 text-[11px] font-semibold text-center">
+        <button id="tab1" onclick="switchState(1)" class="py-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 transition">1. Intake</button>
+        <button id="tab2" onclick="switchState(2)" class="py-1.5 rounded-lg text-slate-400 hover:text-white transition">2. Workbench</button>
+        <button id="tab3" onclick="switchState(3)" class="py-1.5 rounded-lg text-slate-400 hover:text-white transition">3. Customer</button>
       </div>
-      
-      <!-- Quick Buttons -->
-      <div class="flex flex-wrap gap-2 text-xs">
-        <button onclick="addItem('Bench Labor', 85.00)" class="bg-indigo-600/20 border border-indigo-500/30 hover:bg-indigo-600/30 text-indigo-300 px-3 py-1.5 rounded-lg transition">+ Bench Labor ($85)</button>
-        <button onclick="addItem('100-Pack C Bags (Brown)', 90.00)" class="bg-indigo-600/20 border border-indigo-500/30 hover:bg-indigo-600/30 text-indigo-300 px-3 py-1.5 rounded-lg transition">+ C-Bags ($90)</button>
-        <button onclick="addItem('Floor Brush', 30.00)" class="bg-indigo-600/20 border border-indigo-500/30 hover:bg-indigo-600/30 text-indigo-300 px-3 py-1.5 rounded-lg transition">+ Floor Brush ($30)</button>
-        <button onclick="addItem('Aerus Pure & Clean', 113.00)" class="bg-indigo-600/20 border border-indigo-500/30 hover:bg-indigo-600/30 text-indigo-300 px-3 py-1.5 rounded-lg transition">+ Pure & Clean ($113)</button>
-      </div>
+    </div>
 
-      <!-- Parts Catalog Search -->
-      <div class="relative">
-        <input type="text" id="partSearch" oninput="searchParts()" placeholder="Search 1,090 parts by name or model #..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
-        <div id="partResults" class="hidden bg-slate-900 border border-slate-700 rounded-lg mt-1 max-h-48 overflow-y-auto text-xs divide-y divide-slate-800"></div>
-      </div>
-
-      <!-- Active Invoice Table -->
-      <div class="border border-slate-700/50 rounded-lg overflow-hidden">
-        <table class="w-full text-left text-sm text-slate-300">
-          <thead class="bg-slate-900/60 text-xs text-slate-400 uppercase">
-            <tr>
-              <th class="p-3">Item Description</th>
-              <th class="p-3 text-center">Qty</th>
-              <th class="p-3 text-right">Price</th>
-              <th class="p-3 text-right">Total</th>
-            </tr>
-          </thead>
-          <tbody id="invoiceTable" class="divide-y divide-slate-700/50">
-            <tr><td colspan="4" class="p-3 text-center text-slate-500 text-xs">No line items added yet</td></tr>
-          </tbody>
-        </table>
-        <div class="bg-slate-900/90 p-4 flex justify-between items-center font-bold text-white border-t border-slate-700/50">
-          <span class="text-slate-400 font-normal text-xs uppercase tracking-wider">Estimated Total:</span>
-          <span id="subtotalAmount" class="text-xl text-emerald-400 font-mono">$0.00</span>
+    <!-- CENTERPIECE: MACHINE PHOTO PREVIEW BOX -->
+    <div class="p-4 bg-slate-950/50 border-b border-slate-800">
+      <div class="relative w-full h-48 bg-slate-900 border-2 border-dashed border-slate-700/80 rounded-xl overflow-hidden flex flex-col items-center justify-center text-center p-3 group">
+        <img id="photoPreview" src="" class="hidden absolute inset-0 w-full h-full object-cover">
+        <div id="photoPlaceholder" class="space-y-2">
+          <div class="w-12 h-12 rounded-full bg-slate-800 text-cyan-400 flex items-center justify-center mx-auto text-xl shadow-inner">📷</div>
+          <div class="text-xs font-semibold text-slate-300">Machine Photo Preview</div>
+          <div class="text-[10px] text-slate-500">Tap below to capture or attach photo</div>
         </div>
+        <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handlePhotoUpload(event)" class="absolute inset-0 opacity-0 cursor-pointer">
       </div>
-    </section>
+    </div>
 
-    <!-- MODULE 3: LIVE STRIPE HAND-OFF ENGINE -->
-    <section class="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5 shadow-lg space-y-4">
-      <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400">3. Live Stripe Estimate & Payment Launcher</h2>
-      
-      <div>
-        <label class="block text-xs font-medium text-slate-300 mb-1">Stripe Payment Link or Quote URL</label>
-        <input type="text" id="stripeUrl" placeholder="https://buy.stripe.com/..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
-      </div>
+    <!-- CARD BODY: DYNAMIC STATE VIEWS -->
+    <div class="p-5">
 
-      <div class="flex items-center justify-between pt-2">
-        <span id="statusBadge" class="text-xs bg-slate-700 text-slate-300 px-3 py-1.5 rounded-full font-semibold">STATUS: READY</span>
-        <button onclick="generateStripeInvoice()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-lg text-sm shadow-lg transition flex items-center gap-2">
-          🚀 GENERATE STRIPE ESTIMATE &amp; PAY
+      <!-- STATE 1: INTAKE -->
+      <div id="state1" class="space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Customer Vault Lookup</label>
+          <input type="text" id="custSearch" oninput="searchCustomer()" placeholder="Type client name or phone..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+          <div id="custResults" class="hidden bg-slate-950 border border-slate-700 rounded-xl mt-1 max-h-32 overflow-y-auto text-xs divide-y divide-slate-800"></div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">🎙️ Symptom / Diagnostic Voice Note</label>
+          <textarea id="symptomNote" rows="3" placeholder="Loud burning smell on Guardian unit..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">Guardian unit showing loud motor strain and burning odor during operation.</textarea>
+        </div>
+
+        <button onclick="switchState(2)" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-3 px-4 rounded-xl text-xs shadow-lg shadow-cyan-950/50 flex items-center justify-center gap-2 transition">
+          Send Machine to Bench ➔
         </button>
       </div>
-    </section>
+
+      <!-- STATE 2: WORKBENCH -->
+      <div id="state2" class="hidden space-y-4">
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <span>Parts &amp; Labor Picker</span>
+          <span class="text-cyan-400 font-mono font-bold">1,090 Items</span>
+        </div>
+
+        <!-- Quick Pick Buttons -->
+        <div class="flex flex-wrap gap-1.5 text-[11px]">
+          <button onclick="addItem('Bench Labor', 85.00)" class="bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 text-cyan-300 px-2.5 py-1 rounded-lg">+ Bench Labor ($85)</button>
+          <button onclick="addItem('Motor Replacement', 45.00)" class="bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 text-cyan-300 px-2.5 py-1 rounded-lg">+ Motor ($45)</button>
+          <button onclick="addItem('Filter Pack', 29.95)" class="bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 text-cyan-300 px-2.5 py-1 rounded-lg">+ Filter Pack ($29.95)</button>
+        </div>
+
+        <!-- Parts Search -->
+        <input type="text" id="partSearch" oninput="searchParts()" placeholder="Search 1,090 catalog items..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+        <div id="partResults" class="hidden bg-slate-950 border border-slate-700 rounded-xl max-h-32 overflow-y-auto text-xs divide-y divide-slate-800"></div>
+
+        <!-- Itemized Table -->
+        <div class="bg-slate-950/80 border border-slate-800 rounded-xl overflow-hidden">
+          <table class="w-full text-left text-xs text-slate-300">
+            <tbody id="invoiceTable" class="divide-y divide-slate-800">
+              <tr><td colspan="2" class="p-2.5 text-center text-slate-500">No parts selected</td></tr>
+            </tbody>
+          </table>
+          <div class="p-3 bg-slate-900 flex justify-between items-center border-t border-slate-800 font-bold">
+            <span class="text-slate-400 text-xs">Total:</span>
+            <span id="benchTotal" class="text-amber-400 text-sm font-mono">$0.00</span>
+          </div>
+        </div>
+
+        <button onclick="switchState(3)" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold py-3 px-4 rounded-xl text-xs shadow-lg shadow-amber-950/50 flex items-center justify-center gap-2 transition">
+          Finalize Estimate for Client ➔
+        </button>
+      </div>
+
+      <!-- STATE 3: CUSTOMER VIEW -->
+      <div id="state3" class="hidden space-y-4">
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2 text-xs">
+          <div class="text-slate-400 font-semibold uppercase text-[10px]">Diagnosed Symptom</div>
+          <div id="finalSymptom" class="text-slate-200 bg-slate-900/60 p-2 rounded-lg italic border border-slate-800">Guardian unit showing loud motor strain.</div>
+          
+          <div class="text-slate-400 font-semibold uppercase text-[10px] pt-1">Service Breakdown</div>
+          <div id="finalItems" class="space-y-1 divide-y divide-slate-800/60 text-slate-300">
+            <div class="flex justify-between py-1"><span>Bench Labor</span><span class="font-mono text-cyan-300">$85.00</span></div>
+          </div>
+
+          <div class="flex justify-between items-center pt-2 border-t border-slate-800 font-bold text-sm">
+            <span class="text-white">Total Amount Due:</span>
+            <span id="finalTotal" class="text-emerald-400 font-mono text-base">$85.00</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Stripe Checkout Link</label>
+          <input type="text" id="stripeUrl" placeholder="https://buy.stripe.com/..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+        </div>
+
+        <button onclick="payStripe()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold py-3.5 px-4 rounded-xl text-xs shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 transition">
+          🚀 Authorize &amp; Pay via Stripe
+        </button>
+      </div>
+
+    </div>
 
   </div>
 
   <script>
-    // Sample Vault & Catalog Data Pre-loaded for High Speed
-    const sampleVault = [
-      { id: "8461", name: "Anna Fernandez", phone: "410-413-7664", email: "info@superiorcleaning.com", address: "300 Harding Ave, Middle River MD" },
-      { id: "10189", name: "Anna Smith", phone: "410-444-5558", email: "", address: "8118 Rose Haven Rd, Rosedale MD" },
-      { id: "2401", name: "John Finklestein", phone: "410-555-0199", email: "", address: "5308 Sunnyfield Ct, Ellicott City MD" }
+    let currentState = 1;
+    let lineItems = [];
+    
+    const vault = [
+      { name: "Sample Client", phone: "(410) 555-0199" },
+      { name: "Anna Fernandez", phone: "(410) 413-7664" },
+      { name: "John Finklestein", phone: "(410) 555-0123" }
     ];
 
-    const sampleCatalog = [
-      { name: "Labor", price: 40.00, model: "81000" },
-      { name: "Bench Labor Rate", price: 85.00, model: "81001" },
-      { name: "100-Pack C Bags (Brown)", price: 90.00, model: "DES-C100" },
-      { name: "Floor Brush (Desco)", price: 30.00, model: "DES-FB30" },
-      { name: "Aerus Pure & Clean", price: 113.00, model: "50111" },
-      { name: "Standard RO Installation", price: 300.00, model: "RO-300" }
+    const catalog = [
+      { name: "Bench Labor", price: 85.00 },
+      { name: "Motor Replacement", price: 45.00 },
+      { name: "Filter Pack", price: 29.95 },
+      { name: "100-Pack C Bags", price: 90.00 },
+      { name: "Floor Brush", price: 30.00 }
     ];
 
-    let activeCustomer = null;
-    let items = [];
+    function handlePhotoUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        document.getElementById('photoPreview').src = url;
+        document.getElementById('photoPreview').classList.remove('hidden');
+        document.getElementById('photoPlaceholder').classList.add('hidden');
+      }
+    }
 
-    function searchCustomer() {
-      const q = document.getElementById('custSearch').value.toLowerCase().trim();
-      const resBox = document.getElementById('custResults');
-      if (!q) { resBox.classList.add('hidden'); return; }
+    function switchState(state) {
+      currentState = state;
+      ['state1', 'state2', 'state3'].forEach((s, idx) => {
+        document.getElementById(s).classList.toggle('hidden', idx + 1 !== state);
+      });
 
-      const matches = sampleVault.filter(c => c.name.toLowerCase().includes(q) || c.id.includes(q) || c.phone.includes(q));
-      if (matches.length === 0) {
-        resBox.innerHTML = '<div class="p-2 text-slate-500">No matching customer found</div>';
+      ['tab1', 'tab2', 'tab3'].forEach((t, idx) => {
+        const btn = document.getElementById(t);
+        if (idx + 1 === state) {
+          btn.className = "py-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 transition font-bold";
+        } else {
+          btn.className = "py-1.5 rounded-lg text-slate-400 hover:text-white transition font-normal";
+        }
+      });
+
+      const badge = document.getElementById('badgeState');
+      if (state === 1) {
+        badge.innerText = "🟡 INTAKE COMPLETE";
+        badge.className = "text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-full";
+      } else if (state === 2) {
+        badge.innerText = "🟠 WORKBENCH DIAGNOSIS";
+        badge.className = "text-[10px] font-bold uppercase tracking-wider bg-orange-500/10 text-orange-400 border border-orange-500/30 px-2.5 py-1 rounded-full";
       } else {
-        resBox.innerHTML = matches.map(c => `
-          <div onclick="selectCustomer('${c.id}')" class="p-2 hover:bg-slate-800 cursor-pointer flex justify-between items-center">
-            <span class="font-bold text-white">${c.name} <span class="text-slate-400 font-normal">(#${c.id})</span></span>
-            <span class="text-slate-400">${c.phone}</span>
+        badge.innerText = "🟢 ESTIMATE READY";
+        badge.className = "text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-full";
+        renderFinalCustomerView();
+      }
+    }
+
+    function addItem(name, price) {
+      const existing = lineItems.find(i => i.name === name);
+      if (existing) { existing.qty++; } else { lineItems.push({ name, price, qty: 1 }); }
+      renderBenchTable();
+    }
+
+    function renderBenchTable() {
+      const tb = document.getElementById('invoiceTable');
+      if (lineItems.length === 0) {
+        tb.innerHTML = '<tr><td colspan="2" class="p-2.5 text-center text-slate-500">No parts selected</td></tr>';
+        document.getElementById('benchTotal').innerText = "$0.00";
+        return;
+      }
+      tb.innerHTML = lineItems.map(i => `
+        <tr>
+          <td class="p-2 text-white">${i.name} <span class="text-slate-500">x${i.qty}</span></td>
+          <td class="p-2 text-right text-emerald-400 font-mono font-bold">$${(i.price * i.qty).toFixed(2)}</td>
+        </tr>
+      `).join('');
+      const tot = lineItems.reduce((a, b) => a + (b.price * b.qty), 0);
+      document.getElementById('benchTotal').innerText = `$${tot.toFixed(2)}`;
+    }
+
+    function renderFinalCustomerView() {
+      document.getElementById('finalSymptom').innerText = document.getElementById('symptomNote').value || "Machine repair and maintenance.";
+      const container = document.getElementById('finalItems');
+      if (lineItems.length === 0) {
+        container.innerHTML = '<div class="py-1 text-slate-500">No items specified</div>';
+      } else {
+        container.innerHTML = lineItems.map(i => `
+          <div class="flex justify-between py-1">
+            <span>${i.name} (x${i.qty})</span>
+            <span class="font-mono text-cyan-300">$${(i.price * i.qty).toFixed(2)}</span>
           </div>
         `).join('');
       }
-      resBox.classList.remove('hidden');
+      const tot = lineItems.reduce((a, b) => a + (b.price * b.qty), 0);
+      document.getElementById('finalTotal').innerText = `$${tot.toFixed(2)}`;
     }
 
-    function selectCustomer(id) {
-      activeCustomer = sampleVault.find(c => c.id === id);
-      document.getElementById('activeCustName').innerText = activeCustomer.name + ` (#${activeCustomer.id})`;
-      document.getElementById('activeCustDetails').innerText = `${activeCustomer.phone} | ${activeCustomer.address}`;
+    function searchCustomer() {
+      const q = document.getElementById('custSearch').value.toLowerCase();
+      const box = document.getElementById('custResults');
+      if (!q) { box.classList.add('hidden'); return; }
+      const matches = vault.filter(v => v.name.toLowerCase().includes(q) || v.phone.includes(q));
+      box.innerHTML = matches.map(m => `
+        <div onclick="selectCust('${m.name}', '${m.phone}')" class="p-2 hover:bg-slate-900 cursor-pointer flex justify-between">
+          <span class="text-white">${m.name}</span>
+          <span class="text-slate-500">${m.phone}</span>
+        </div>
+      `).join('');
+      box.classList.remove('hidden');
+    }
+
+    function selectCust(name, phone) {
+      document.getElementById('cardCustName').innerText = name;
+      document.getElementById('cardCustPhone').innerText = phone;
       document.getElementById('custResults').classList.add('hidden');
       document.getElementById('custSearch').value = '';
     }
 
     function searchParts() {
-      const q = document.getElementById('partSearch').value.toLowerCase().trim();
-      const resBox = document.getElementById('partResults');
-      if (!q) { resBox.classList.add('hidden'); return; }
-
-      const matches = sampleCatalog.filter(p => p.name.toLowerCase().includes(q) || (p.model && p.model.toLowerCase().includes(q)));
-      if (matches.length === 0) {
-        resBox.innerHTML = '<div class="p-2 text-slate-500">No matching part found</div>';
-      } else {
-        resBox.innerHTML = matches.map((p, idx) => `
-          <div onclick="addCatalogItem(${idx})" class="p-2 hover:bg-slate-800 cursor-pointer flex justify-between items-center">
-            <span class="font-medium text-white">${p.name} <span class="text-slate-500">(${p.model || 'N/A'})</span></span>
-            <span class="text-emerald-400 font-mono font-bold">$${p.price.toFixed(2)}</span>
-          </div>
-        `).join('');
-      }
-      resBox.classList.remove('hidden');
-    }
-
-    function addCatalogItem(idx) {
-      const p = sampleCatalog[idx];
-      addItem(p.name, p.price);
-      document.getElementById('partResults').classList.add('hidden');
-      document.getElementById('partSearch').value = '';
-    }
-
-    function addItem(name, price) {
-      const existing = items.find(i => i.name === name);
-      if (existing) {
-        existing.qty += 1;
-      } else {
-        items.push({ name, price, qty: 1 });
-      }
-      renderInvoice();
-    }
-
-    function renderInvoice() {
-      const tb = document.getElementById('invoiceTable');
-      if (items.length === 0) {
-        tb.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-slate-500 text-xs">No line items added yet</td></tr>';
-        document.getElementById('subtotalAmount').innerText = '$0.00';
-        return;
-      }
-      tb.innerHTML = items.map(i => `
-        <tr>
-          <td class="p-3 text-white font-medium">${i.name}</td>
-          <td class="p-3 text-center font-mono">${i.qty}</td>
-          <td class="p-3 text-right font-mono text-slate-400">$${i.price.toFixed(2)}</td>
-          <td class="p-3 text-right font-mono text-emerald-400 font-bold">$${(i.price * i.qty).toFixed(2)}</td>
-        </tr>
+      const q = document.getElementById('partSearch').value.toLowerCase();
+      const box = document.getElementById('partResults');
+      if (!q) { box.classList.add('hidden'); return; }
+      const matches = catalog.filter(c => c.name.toLowerCase().includes(q));
+      box.innerHTML = matches.map(m => `
+        <div onclick="addItem('${m.name}', ${m.price}); document.getElementById('partResults').classList.add('hidden');" class="p-2 hover:bg-slate-900 cursor-pointer flex justify-between">
+          <span class="text-white">${m.name}</span>
+          <span class="text-cyan-400 font-mono">$${m.price.toFixed(2)}</span>
+        </div>
       `).join('');
-
-      const subtotal = items.reduce((acc, i) => acc + (i.price * i.qty), 0);
-      document.getElementById('subtotalAmount').innerText = `$${subtotal.toFixed(2)}`;
+      box.classList.remove('hidden');
     }
 
-    function generateStripeInvoice() {
+    function payStripe() {
       const url = document.getElementById('stripeUrl').value;
-      const badge = document.getElementById('statusBadge');
-
-      badge.innerText = "STATUS: ESTIMATE/INVOICE CREATED";
-      badge.className = "text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-full font-bold";
-
       if (url) {
         window.open(url, '_blank');
       } else {
-        alert("Estimate generated in TappyThing! Paste your Stripe Payment URL to launch live checkout.");
+        alert("Estimate Authorized! Launching Stripe checkout page.");
       }
     }
   </script>
