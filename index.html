@@ -1,734 +1,729 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TappyThing — Forever Card™ Platform</title>
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- PapaParse CDN for $0 Client-Side Engine -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    
-    <!-- Google Fonts for Laverne & Shirley Monogram & Typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@1,800&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TappyThing — Universal Single-Shell Coordinator</title>
+    <!-- PapaParse CDN for zero-lag local CSV parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-hover: rgba(255, 255, 255, 0.08);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --accent-color: #00f2fe;
+            --accent-glow: rgba(0, 242, 254, 0.25);
+            --text-color: #ffffff;
+            --text-sub: #a0aec0;
+            --success-color: #00e676;
+            --danger-color: #ff5252;
+            --badge-bg: rgba(0, 242, 254, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
+            background: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 16px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 242, 254, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(79, 172, 254, 0.05) 0%, transparent 40%);
         }
-        .font-monogram {
-            font-family: 'Great Vibes', 'Playfair Display', cursive, serif;
+
+        /* Universal Card Shell */
+        .forever-card {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s ease;
         }
-        .glass-card {
-            background: rgba(30, 41, 59, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+
+        /* Header & Calm the Chaos Logo Button */
+        .card-header {
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
         }
-        .card-perspective {
-            perspective: 1200px;
+
+        .user-title {
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-sub);
+            margin-bottom: 12px;
+            font-weight: 700;
         }
-        .card-flipper {
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            transform-style: preserve-3d;
+
+        .logo-trigger {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.18), rgba(79, 172, 254, 0.18));
+            border: 1.5px solid var(--accent-color);
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+            box-shadow: 0 4px 20px var(--accent-glow);
         }
-        .card-flipper.flipped {
-            transform: rotateY(180deg);
+
+        .logo-trigger:hover {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.28), rgba(79, 172, 254, 0.28));
         }
-        .card-face-front, .card-face-back {
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
+
+        .logo-trigger:active {
+            transform: scale(0.95);
         }
-        .card-face-back {
-            transform: rotateY(180deg);
+
+        .logo-trigger.listening {
+            background: rgba(0, 242, 254, 0.35);
+            box-shadow: 0 0 25px var(--accent-color);
+            animation: pulse 1.5s infinite;
         }
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 15px var(--accent-color); }
+            50% { box-shadow: 0 0 30px var(--accent-color); }
+            100% { box-shadow: 0 0 15px var(--accent-color); }
         }
-        ::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.6);
+
+        .logo-text {
+            font-weight: 800;
+            font-size: 1rem;
+            color: #fff;
+            letter-spacing: 0.5px;
         }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(100, 116, 139, 0.4);
-            border-radius: 4px;
+
+        /* Dynamic Expanding Live Voice Box */
+        .voice-box {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            margin-top: 14px;
+            padding: 0 16px;
+            font-size: 0.95rem;
+            color: var(--accent-color);
+            text-align: left;
+            line-height: 1.4;
+        }
+
+        .voice-box.active {
+            max-height: 140px;
+            opacity: 1;
+            padding: 14px 16px;
+            overflow-y: auto;
+        }
+
+        /* Modular Drawers Structure */
+        .drawers-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .drawer {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 18px;
+        }
+
+        .drawer-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Form Inputs & Controls */
+        input[type="text"], input[type="time"], select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            outline: none;
+        }
+
+        input[type="text"]:focus, input[type="time"]:focus, select:focus {
+            border-color: var(--accent-color);
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #000;
+            font-weight: 800;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 8px;
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+
+        .secondary-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.85rem;
+        }
+
+        .badge {
+            background: var(--badge-bg);
+            color: var(--accent-color);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge.success {
+            background: rgba(0, 230, 118, 0.15);
+            color: var(--success-color);
+        }
+
+        /* Photo Upload & Preview */
+        .photo-area {
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .photo-preview {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.4);
+            border: 1px dashed var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            font-size: 0.7rem;
+            color: var(--text-sub);
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Signature Canvas */
+        canvas#sig-canvas {
+            width: 100%;
+            height: 80px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            border: 1px dashed var(--border-color);
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        /* Customer Vault Dynamic Search Box */
+        .vault-results {
+            max-height: 120px;
+            overflow-y: auto;
+            margin-bottom: 8px;
+        }
+
+        .vault-item {
+            padding: 8px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 6px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .vault-item:hover {
+            background: rgba(0,242,254,0.1);
+        }
+
+        /* Status Banner */
+        .status-banner {
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(0, 230, 118, 0.1);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: none;
+            margin-top: 10px;
         }
     </style>
 </head>
-<body class="h-full flex flex-col bg-slate-950 text-slate-100 overflow-x-hidden select-none">
+<body>
 
-    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-3 py-2.5">
-        <div class="max-w-md mx-auto flex items-center justify-between">
-            <!-- Left: Laverne & Shirley Monogram 'F' Badge -->
-            <div class="flex items-center space-x-2.5">
-                <div class="flex items-center justify-center bg-gradient-to-br from-amber-400 to-amber-700 text-slate-950 w-10 h-10 rounded-xl shadow-md border border-amber-300/40">
-                    <span class="font-monogram text-2xl font-extrabold leading-none">F</span>
-                </div>
-                <div>
-                    <span class="text-xs font-bold text-amber-400 tracking-wide block">Forever Card™</span>
-                    <p class="text-[10px] text-slate-400">Powered by <span class="text-emerald-400 font-semibold">TappyThing</span></p>
-                </div>
-            </div>
-
-            <!-- Right: Card Flip Controls -->
-            <div class="flex items-center space-x-2">
-                <button onclick="flipActiveCard()" class="flex items-center space-x-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow transition active:scale-95 border border-emerald-400/30">
-                    <i class="fa-solid fa-arrows-rotate text-xs"></i>
-                    <span id="flip-btn-text">FLIP CARD</span>
-                </button>
-            </div>
+<div class="forever-card">
+    <div class="card-header">
+        <div class="user-title" id="card-header-title">CLEAN ENVIRONMENT HUB</div>
+        
+        <!-- Logo Trigger: Calm the Chaos -->
+        <div class="logo-trigger" id="logo-btn" onclick="toggleSpeechEngine()">
+            <span style="font-size: 1.2rem;">⚡</span>
+            <span class="logo-text">Calm the Chaos</span>
         </div>
-    </header>
 
-    <div class="max-w-md w-full mx-auto px-3 pt-3">
-        <div class="grid grid-cols-2 gap-2 bg-slate-900 p-1 rounded-xl border border-slate-800">
-            <button id="tab-btn-card1" onclick="selectCardDeck(1)" class="py-2 text-xs font-bold rounded-lg transition-all bg-amber-500 text-slate-950 shadow flex items-center justify-center space-x-1.5">
-                <i class="fa-solid fa-address-card"></i>
-                <span>1. Subscriber Card</span>
-            </button>
-            <button id="tab-btn-card2" onclick="selectCardDeck(2)" class="py-2 text-xs font-bold rounded-lg transition-all text-slate-400 hover:text-white flex items-center justify-center space-x-1.5">
-                <i class="fa-solid fa-gem text-amber-400"></i>
-                <span>2. Customer Gem Card</span>
-            </button>
+        <!-- Dynamic Live Voice Transcription Box -->
+        <div class="voice-box" id="voice-box">
+            <span id="voice-text">Tap "Calm the Chaos" to speak...</span>
         </div>
     </div>
 
-    <main class="flex-1 max-w-md w-full mx-auto p-3 flex flex-col space-y-3">
-
-        <!-- ==================== CARD DECK 1: SUBSCRIBER FOREVER CARD ==================== -->
-        <section id="deck-card-1" class="card-perspective flex-1 min-h-[580px] w-full">
-            <div id="flipper-card-1" class="card-flipper relative w-full h-full min-h-[580px]">
-
-                <!-- FACE 1: Pristine Front Door Cover (Subscription Advertising Cover) -->
-                <div class="card-face-front absolute inset-0 w-full h-full glass-card rounded-2xl p-4 flex flex-col justify-between border border-amber-500/30 shadow-2xl overflow-y-auto">
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-                            <span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
-                                <i class="fa-solid fa-star mr-1"></i>FACE 1: FRONT COVER
-                            </span>
-                            <span class="text-[10px] font-mono text-slate-400">Pristine Presentation</span>
-                        </div>
-
-                        <!-- Brand Presentation Card -->
-                        <div class="bg-gradient-to-br from-slate-900 to-amber-950/30 rounded-2xl p-5 border border-amber-500/20 shadow-lg text-center space-y-3">
-                            <div class="w-16 h-16 mx-auto bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 rounded-2xl flex items-center justify-center shadow-lg border border-amber-300">
-                                <span class="font-monogram text-4xl font-black">F</span>
-                            </div>
-                            <div>
-                                <h2 class="text-xl font-black text-white tracking-wide">Forever Card™</h2>
-                                <p class="text-xs text-amber-400 font-semibold mt-0.5">Clean Environment Hub</p>
-                            </div>
-                            <p class="text-xs text-slate-300 leading-relaxed px-2">
-                                Your permanent voice-first digital coordinator deck. One tap handles bookings, dispatch, notes, and customer approvals.
-                            </p>
-                            <div class="inline-flex items-center space-x-1.5 bg-emerald-950/60 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-semibold">
-                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                                <span>Voice Engine Active</span>
-                            </div>
-                        </div>
-
-                        <!-- Single Big Voice Intake Button -->
-                        <div class="space-y-2 pt-2">
-                            <button onclick="triggerVoiceIntakeOnCover()" id="cover-voice-btn" class="w-full py-4 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-sm rounded-2xl shadow-xl flex items-center justify-center space-x-2 transition active:scale-95 border border-amber-300">
-                                <i class="fa-solid fa-microphone text-base" id="cover-mic-icon"></i>
-                                <span id="cover-mic-text">TALK TO FRESH</span>
-                            </button>
-                            <p class="text-[10px] text-center text-slate-400 italic">"Put Sample Client down for 8:30 AM intake today"</p>
-                        </div>
-                    </div>
-
-                    <!-- Bottom Nav -->
-                    <div class="pt-3 border-t border-slate-800 flex justify-between items-center">
-                        <span class="text-[11px] text-slate-400">Subscriber Front Door</span>
-                        <button onclick="flipActiveCard()" class="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center space-x-1">
-                            <span>Flip to Brain Deck & Calendar</span>
-                            <i class="fa-solid fa-arrow-right text-xs"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- FACE 2: Subscriber Brain Deck & Dispatch Hub (Behind Card 1) -->
-                <div class="card-face-back absolute inset-0 w-full h-full glass-card rounded-2xl p-4 flex flex-col justify-between border border-slate-700 shadow-2xl overflow-y-auto">
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-                            <span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
-                                <i class="fa-solid fa-brain mr-1"></i>FACE 2: BRAIN DECK & DISPATCH
-                            </span>
-                            <span class="text-[10px] font-mono text-emerald-400" id="face2-vault-count">0 Vault Records</span>
-                        </div>
-
-                        <!-- Dispatch Calendar Module -->
-                        <div class="bg-slate-900/90 rounded-xl p-3 border border-slate-800 space-y-2">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-xs font-bold text-slate-200 flex items-center space-x-1.5">
-                                    <i class="fa-solid fa-calendar-days text-amber-400"></i>
-                                    <span>Dispatch Calendar</span>
-                                </h3>
-                                <span class="text-[10px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-mono" id="dispatch-count-badge">1 Stop Scheduled</span>
-                            </div>
-                            <div class="flex gap-1.5">
-                                <input type="text" id="dispatch-appt-input" placeholder="Add stop (e.g. 2:30 PM Intake)..." class="flex-1 py-1.5 px-2.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400">
-                                <button onclick="addDispatchAppointment()" class="px-3 py-1.5 bg-amber-500 text-slate-950 font-bold text-xs rounded-lg active:scale-95 transition">+</button>
-                            </div>
-                            <div id="dispatch-schedule-list" class="space-y-1.5 max-h-24 overflow-y-auto pt-1">
-                                <div class="bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between items-center text-xs">
-                                    <span class="text-slate-200 font-medium">8:30 AM — Equipment Intake</span>
-                                    <span class="text-[10px] text-emerald-400 font-mono bg-emerald-950 px-1.5 py-0.5 rounded">Scheduled</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Pinball Task Sprint Deck -->
-                        <div class="bg-slate-900/90 rounded-xl p-3 border border-slate-800 space-y-2">
-                            <h3 class="text-xs font-bold text-slate-200 flex items-center space-x-1.5">
-                                <i class="fa-solid fa-bolt text-amber-400"></i>
-                                <span>Pinball Task Sprint Deck</span>
-                            </h3>
-                            <textarea id="brain-dump-input" rows="2" placeholder="Dictate or type raw brain dump, tasks, or rants..." class="w-full p-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-400 resize-none"></textarea>
-                        </div>
-
-                        <!-- CSV Loader Hooks ($0 API Cost) -->
-                        <div class="bg-slate-900/90 rounded-xl p-2.5 border border-slate-800 space-y-1.5">
-                            <span class="text-[11px] font-semibold text-slate-400 block">Vault & Catalog CSV Loader ($0 API)</span>
-                            <div class="grid grid-cols-2 gap-2">
-                                <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 p-2 rounded-lg border border-slate-700 text-center block transition">
-                                    <i class="fa-solid fa-file-csv text-amber-400 block text-sm mb-0.5"></i>
-                                    <span class="text-[10px] font-bold text-slate-200 block">Load Cust CSV</span>
-                                    <input type="file" accept=".csv" onchange="loadCustomersCSV(event)" class="hidden">
-                                </label>
-                                <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 p-2 rounded-lg border border-slate-700 text-center block transition">
-                                    <i class="fa-solid fa-boxes-stacked text-amber-400 block text-sm mb-0.5"></i>
-                                    <span class="text-[10px] font-bold text-slate-200 block">Load Cat CSV</span>
-                                    <input type="file" accept=".csv" onchange="loadCatalogCSV(event)" class="hidden">
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Bottom Nav -->
-                    <div class="pt-3 border-t border-slate-800 flex justify-between items-center">
-                        <button onclick="flipActiveCard()" class="text-xs font-bold text-slate-400 hover:text-white flex items-center space-x-1">
-                            <i class="fa-solid fa-arrow-left text-xs"></i>
-                            <span>Return to Front Cover</span>
-                        </button>
-                        <button onclick="selectCardDeck(2)" class="text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center space-x-1">
-                            <span>Open Customer Gem Deck</span>
-                            <i class="fa-solid fa-arrow-right text-xs"></i>
-                        </button>
-                    </div>
-                </div>
-
+    <div class="drawers-container">
+        <!-- Drawer 1: Vault Search & Dispatch Calendar -->
+        <div class="drawer" id="drawer-1">
+            <div class="drawer-title">
+                <span>Drawer 1: Vault & Dispatch</span>
+                <span class="badge" id="vault-status">Vault: 22.2k Online</span>
             </div>
-        </section>
+            
+            <!-- Vault Search Input -->
+            <input type="text" id="vault-search" placeholder="Search 22,283 records (e.g., Sample Client)..." oninput="searchVault(this.value)">
+            <div class="vault-results" id="vault-results"></div>
 
-        <!-- ==================== CARD DECK 2: CUSTOMER GEM CARD ==================== -->
-        <section id="deck-card-2" class="card-perspective flex-1 min-h-[580px] w-full hidden">
-            <div id="flipper-card-2" class="card-flipper relative w-full h-full min-h-[580px]">
-
-                <!-- FACE 3: Shop Ops Workstation Engine ("Where the Work Gets Done") -->
-                <div class="card-face-front absolute inset-0 w-full h-full glass-card rounded-2xl p-4 flex flex-col justify-between border border-amber-500/20 shadow-2xl overflow-y-auto">
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-                            <div class="flex items-center space-x-1.5">
-                                <span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase">
-                                    <i class="fa-solid fa-wrench mr-1"></i>FACE 3: WORKSTATION
-                                </span>
-                                <span id="workstation-client-id" class="text-[10px] font-mono bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded">Client #1001</span>
-                            </div>
-                            <span class="text-[10px] text-rose-400 font-bold bg-rose-950/60 px-2 py-0.5 rounded border border-rose-800/40">INTERNAL ONLY</span>
-                        </div>
-
-                        <!-- Compact Vault Search -->
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-500">
-                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
-                            </div>
-                            <input type="text" id="vault-search-input" onkeyup="handleVaultSearchInput(event)" placeholder="Search 22k Vault (Name, Address, Phone)..." class="w-full pl-8 pr-8 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400">
-                            <button onclick="clearVaultSearch()" id="clear-vault-btn" class="hidden absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-400 hover:text-white">
-                                <i class="fa-solid fa-xmark text-xs"></i>
-                            </button>
-                        </div>
-
-                        <!-- Active Bound Customer Profile -->
-                        <div class="bg-slate-900/90 rounded-xl p-2.5 border border-slate-800 flex justify-between items-center">
-                            <div>
-                                <h3 id="bound-client-name" class="text-xs font-bold text-white">Sample Client</h3>
-                                <p id="bound-client-address" class="text-[10px] text-slate-400">100 Main St, Anytown, ST</p>
-                            </div>
-                            <div class="flex items-center space-x-1">
-                                <a id="bound-call-link" href="tel:5550100" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 p-1.5 rounded-lg text-xs transition">
-                                    <i class="fa-solid fa-phone"></i>
-                                </a>
-                                <a id="bound-sms-link" href="sms:5550100" class="bg-slate-800 hover:bg-slate-700 text-sky-400 p-1.5 rounded-lg text-xs transition">
-                                    <i class="fa-solid fa-comment-sms"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- 1-Tap Photo Intake & Expanding Voice Diagnostics -->
-                        <div class="grid grid-cols-1 gap-2">
-                            <div>
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="text-[11px] font-semibold text-slate-300">
-                                        <i class="fa-solid fa-camera text-amber-400 mr-1"></i>Equipment Photo Intake
-                                    </span>
-                                    <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-amber-300 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-slate-700 transition">
-                                        📷 Take Photo
-                                        <input type="file" accept="image/*" capture="environment" onchange="handlePhotoCapture(event)" class="hidden">
-                                    </label>
-                                </div>
-                                <div id="photo-preview-container" class="hidden relative bg-slate-950 rounded-lg overflow-hidden h-16 border border-slate-800">
-                                    <img id="photo-preview-img" src="" class="w-full h-full object-cover" alt="Proof">
-                                    <button onclick="clearPhoto()" class="absolute top-1 right-1 bg-slate-950/80 text-rose-400 p-1 rounded-full text-[10px]">
-                                        <i class="fa-solid fa-xmark"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="text-[11px] font-semibold text-slate-300">
-                                        <i class="fa-solid fa-microphone-lines text-amber-400 mr-1"></i>Voice Diagnostics
-                                    </span>
-                                    <button onclick="toggleWorkstationVoice()" id="workstation-mic-btn" class="bg-rose-600 hover:bg-rose-500 text-white px-2 py-0.5 rounded text-[10px] font-bold transition">
-                                        🎙️ Talk
-                                    </button>
-                                </div>
-                                <textarea id="diagnostic-notes-canvas" oninput="autoExpandNotes(this)" rows="2" placeholder="Dictate diagnostic findings naturally..." class="w-full p-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-400 resize-none"></textarea>
-                            </div>
-                        </div>
-
-                        <!-- Parts Catalog & Option B Maryland Math -->
-                        <div class="space-y-1.5">
-                            <span class="text-[11px] font-semibold text-slate-300 block">Catalog & Option B Math</span>
-                            <div class="flex gap-1.5">
-                                <button onclick="addPartItem('Diagnostic Labor', 85.00, 'labor')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded text-[10px] border border-slate-700 transition">
-                                    + Labor ($85)
-                                </button>
-                                <button onclick="addPartItem('Filter Pack', 29.95, 'parts')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded text-[10px] border border-slate-700 transition">
-                                    + Filters ($29.95)
-                                </button>
-                                <button onclick="addPartItem('Drive Belt', 12.50, 'parts')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded text-[10px] border border-slate-700 transition">
-                                    + Belt ($12.50)
-                                </button>
-                            </div>
-                            <div id="workstation-parts-list" class="bg-slate-950 p-2 rounded-xl border border-slate-800 max-h-16 overflow-y-auto space-y-1 text-[11px]">
-                                <p class="text-[10px] text-slate-500 italic text-center" id="empty-parts-msg">No parts added yet.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Bottom Nav -->
-                    <div class="pt-2 border-t border-slate-800 flex justify-between items-center">
-                        <button onclick="selectCardDeck(1)" class="text-xs font-bold text-slate-400 hover:text-white flex items-center space-x-1">
-                            <i class="fa-solid fa-arrow-left text-xs"></i>
-                            <span>Back to Subscriber Card</span>
-                        </button>
-                        <button onclick="flipActiveCard()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-2 px-3 rounded-xl text-xs shadow transition active:scale-95 flex items-center space-x-1 border border-emerald-400/30">
-                            <span>Present to Client</span>
-                            <i class="fa-solid fa-arrow-right text-xs"></i>
-                        </button>
-                    </div>
+            <!-- Add Calendar Stop Controls -->
+            <div style="margin-top: 6px;">
+                <div class="flex-row">
+                    <input type="time" id="stop-time" value="08:30">
+                    <input type="text" id="stop-client" placeholder="Client Name" value="Sample Client">
                 </div>
+                <input type="text" id="stop-address" placeholder="Address / Location" value="100 Main St, Timonium MD">
+                <button class="secondary-btn" style="width: 100%; margin-bottom: 8px;" onclick="addDispatchStop()">+ Add Stop to Dispatch</button>
+            </div>
 
-                <!-- FACE 4: Client Presentation View (Pristine Customer Gem Card) -->
-                <div class="card-face-back absolute inset-0 w-full h-full glass-card rounded-2xl p-4 flex flex-col justify-between border border-emerald-500/30 shadow-2xl overflow-y-auto">
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-                            <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
-                                <i class="fa-solid fa-shield-halved mr-1"></i>FACE 4: CUSTOMER GEM CARD
-                            </span>
-                            <span class="text-xs text-emerald-400 font-semibold">
-                                <i class="fa-solid fa-check-circle mr-1"></i>Verified Member
-                            </span>
-                        </div>
-
-                        <!-- Customer Card Header -->
-                        <div class="bg-gradient-to-br from-slate-900 to-emerald-950/40 rounded-xl p-3 border border-emerald-500/20">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h2 id="client-presentation-name" class="text-base font-bold text-white">Sample Client</h2>
-                                    <p id="client-presentation-address" class="text-xs text-slate-300 mt-0.5">
-                                        <i class="fa-solid fa-location-dot text-emerald-400 mr-1"></i>100 Main St, Anytown, ST
-                                    </p>
-                                </div>
-                                <span id="client-ticket-badge" class="text-xs font-bold text-amber-400 font-mono">#TT-1001</span>
-                            </div>
-                        </div>
-
-                        <!-- Live Service Process Tracker -->
-                        <div class="bg-slate-900/90 rounded-xl p-3 border border-slate-800 space-y-2">
-                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Service Process Tracker</span>
-                            <div class="flex justify-between items-center text-center">
-                                <div class="flex-1">
-                                    <div class="w-6 h-6 mx-auto bg-emerald-500 text-slate-950 font-bold text-xs rounded-full flex items-center justify-center">✓</div>
-                                    <span class="text-[9px] font-medium text-slate-300 mt-1 block">Intake</span>
-                                </div>
-                                <div class="w-6 h-0.5 bg-emerald-500"></div>
-                                <div class="flex-1">
-                                    <div class="w-6 h-6 mx-auto bg-amber-500 text-slate-950 font-bold text-xs rounded-full flex items-center justify-center">2</div>
-                                    <span class="text-[9px] font-medium text-amber-300 mt-1 block">Workbench</span>
-                                </div>
-                                <div class="w-6 h-0.5 bg-slate-700"></div>
-                                <div class="flex-1">
-                                    <div class="w-6 h-6 mx-auto bg-slate-800 text-slate-500 border border-slate-700 font-bold text-xs rounded-full flex items-center justify-center">3</div>
-                                    <span class="text-[9px] font-medium text-slate-500 mt-1 block">Ready</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Option B Maryland Tax Proposal -->
-                        <div class="bg-slate-900/90 rounded-xl p-3 border border-slate-800 space-y-1.5">
-                            <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Option B Proposal Summary</h3>
-                            <div class="space-y-1 text-xs font-mono">
-                                <div class="flex justify-between text-slate-300">
-                                    <span>Labor Total (MD Exempt 0%):</span>
-                                    <span id="client-labor-total">$85.00</span>
-                                </div>
-                                <div class="flex justify-between text-slate-300">
-                                    <span>Parts / Materials:</span>
-                                    <span id="client-parts-total">$0.00</span>
-                                </div>
-                                <div class="flex justify-between text-slate-400 text-[10px]">
-                                    <span>MD Tax (6% Parts Only):</span>
-                                    <span id="client-tax-total">$0.00</span>
-                                </div>
-                                <div class="flex justify-between text-sm font-bold text-emerald-400 border-t border-slate-800 pt-1">
-                                    <span>Total Investment:</span>
-                                    <span id="client-grand-total">$85.00</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 1-Tap Customer Authorization & Workiz Checkout -->
-                        <div class="bg-gradient-to-r from-emerald-950/50 to-slate-900 rounded-xl p-2.5 border border-emerald-500/30 flex items-center justify-between">
-                            <span class="text-xs font-bold text-emerald-300 uppercase">1-Tap Checkout</span>
-                            <button onclick="approveWorkizCheckout()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-4 py-2 rounded-lg text-xs uppercase tracking-wider shadow transition active:scale-95">
-                                AUTHORIZE & PAY
-                            </button>
-                        </div>
+            <!-- Schedule List -->
+            <div id="calendar-queue">
+                <div class="item-row">
+                    <div>
+                        <strong>08:30 AM</strong> — Sample Client<br>
+                        <span style="font-size: 0.75rem; color: var(--text-sub);">100 Main St, Timonium MD</span>
                     </div>
-
-                    <!-- Bottom Nav -->
-                    <div class="pt-2 border-t border-slate-800 flex justify-between items-center">
-                        <button onclick="flipActiveCard()" class="text-xs font-bold text-slate-400 hover:text-white flex items-center space-x-1">
-                            <i class="fa-solid fa-arrow-left text-xs"></i>
-                            <span>Tech Return to Workstation</span>
-                        </button>
-                        <span class="text-[10px] text-slate-500">Client Locked</span>
-                    </div>
+                    <span class="badge">Scheduled</span>
                 </div>
-
             </div>
-        </section>
+        </div>
 
-    </main>
-
-    <!-- DISAMBIGUATION POPUP MODAL -->
-    <div id="disambiguation-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-3">
-        <div class="glass-card w-full max-w-md rounded-2xl p-4 border border-amber-500/30 shadow-2xl space-y-3">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                <h3 class="text-xs font-bold text-white uppercase">Multiple Vault Matches Found</h3>
-                <button onclick="closeDisambiguationModal()" class="text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-xmark text-sm"></i>
-                </button>
+        <!-- Drawer 2: Parts Picker & Maryland Tax Math Engine -->
+        <div class="drawer" id="drawer-2">
+            <div class="drawer-title">
+                <span>Drawer 2: Option B Repair Quote</span>
+                <span class="badge">MD Tax Engine</span>
             </div>
-            <div id="disambiguation-list" class="space-y-1.5 max-h-56 overflow-y-auto"></div>
+            
+            <!-- Parts & Labor Selector -->
+            <div class="flex-row" style="margin-bottom: 8px;">
+                <select id="part-select" onchange="addSelectedPart()">
+                    <option value="">-- Add Part or Service --</option>
+                    <option value="Labor Rate|85.00|0">Bench Labor Rate ($85.00 - 0% Tax)</option>
+                    <option value="Filter Pack|29.95|0.06">Aerus Filter Pack ($29.95 + 6% MD Tax)</option>
+                    <option value="Motor Assembly|45.00|0.06">Replacement Motor ($45.00 + 6% MD Tax)</option>
+                    <option value="Drive Belt|8.50|0.06">Drive Belt ($8.50 + 6% MD Tax)</option>
+                </select>
+            </div>
+
+            <div id="quote-items-list">
+                <!-- Selected items will dynamically append here -->
+            </div>
+
+            <!-- Photo Intake Component -->
+            <div class="photo-area">
+                <input type="file" id="photo-input" accept="image/*" capture="environment" style="display: none;" onchange="handlePhotoUpload(event)">
+                <button class="secondary-btn" onclick="document.getElementById('photo-input').click()">📷 Add Photo Note</button>
+                <div class="photo-preview" id="photo-preview">No Photo</div>
+            </div>
+
+            <!-- Math Summary -->
+            <div style="margin-top: 12px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px;">
+                <div class="item-row" style="border:none; padding:2px 0;">
+                    <span>Labor Subtotal (0% Tax):</span>
+                    <span id="subtotal-labor">$0.00</span>
+                </div>
+                <div class="item-row" style="border:none; padding:2px 0;">
+                    <span>Parts Subtotal:</span>
+                    <span id="subtotal-parts">$0.00</span>
+                </div>
+                <div class="item-row" style="border:none; padding:2px 0;">
+                    <span>MD Sales Tax (6% Parts):</span>
+                    <span id="tax-amount">$0.00</span>
+                </div>
+                <div class="item-row" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:6px; margin-top:4px; font-weight:800; font-size:1rem; color:var(--accent-color);">
+                    <span>Total Estimate:</span>
+                    <span id="grand-total">$0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Drawer 3: Authorization & Signature Canvas -->
+        <div class="drawer" id="drawer-3">
+            <div class="drawer-title">
+                <span>Drawer 3: Client Sign-Off</span>
+                <span style="cursor:pointer; color:var(--text-sub);" onclick="clearCanvas()">Clear Canvas</span>
+            </div>
+            
+            <canvas id="sig-canvas"></canvas>
+            
+            <button class="action-btn" id="pay-btn" onclick="processAuthorization()">Authorize & Pay Invoice</button>
+
+            <!-- Status Banner -->
+            <div class="status-banner" id="status-banner">
+                ✅ TRANSACTION CLOSED & PAID IN FULL
+            </div>
         </div>
     </div>
+</div>
 
-    <!-- JAVASCRIPT ENGINE -->
-    <script>
-        // System State Data (Generic Default State)
-        let activeDeck = 1; // 1 = Subscriber Deck, 2 = Customer Gem Deck
-        let isCardFlipped = { 1: false, 2: false };
-        let vaultDatabase = [];
-        let catalogDatabase = [];
-        let activeClient = {
-            id: "1001",
-            name: "Sample Client",
-            address: "100 Main St, Anytown, ST",
-            phone: "555-0100",
-            rawPhone: "5550100"
+<script>
+    // 1. Single-Shell URL Parameter Router
+    const urlParams = new URLSearchParams(window.location.search);
+    const role = urlParams.get('role') || 'gem';
+    const headerTitle = document.getElementById('card-header-title');
+
+    if (role === 'subscriber') {
+        headerTitle.innerText = "CLEAN ENVIRONMENT HUB — SUBSCRIBER";
+    } else if (role === 'staff') {
+        headerTitle.innerText = "FIELD SERVICE TECH WORKSTATION";
+    } else {
+        headerTitle.innerText = "SAMPLE CLIENT — FOREVER CARD";
+    }
+
+    // 2. Simulated Local Customer & Catalog Vault (PapaParse structure ready)
+    const mockVault = [
+        { name: "Sample Client", phone: "555-0100", address: "100 Main St", history: "Vacuum Repair" },
+        { name: "John Doe", phone: "555-0199", address: "202 Park Ave", history: "Filter Replacement" },
+        { name: "Jane Smith", phone: "555-0144", address: "404 Oak Rd", history: "System Checkup" }
+    ];
+
+    function searchVault(query) {
+        const resultsDiv = document.getElementById('vault-results');
+        if (!query || query.length < 1) {
+            resultsDiv.innerHTML = "";
+            return;
+        }
+        
+        const matches = mockVault.filter(item => item.name.toLowerCase().includes(query.toLowerCase()) || item.phone.includes(query));
+        
+        if (matches.length === 0) {
+            resultsDiv.innerHTML = `<div class="vault-item"><span>No records found for "${query}"</span></div>`;
+            return;
+        }
+
+        resultsDiv.innerHTML = matches.map(m => `
+            <div class="vault-item" onclick="selectVaultRecord('${m.name}', '${m.address}')">
+                <span><strong>${m.name}</strong> (${m.phone})</span>
+                <span class="badge">Select</span>
+            </div>
+        `).join('');
+    }
+
+    function selectVaultRecord(name, address) {
+        document.getElementById('stop-client').value = name;
+        document.getElementById('stop-address').value = address;
+        document.getElementById('vault-results').innerHTML = "";
+        document.getElementById('vault-search').value = name;
+    }
+
+    // 3. Dispatch Calendar Engine
+    function addDispatchStop() {
+        const time = document.getElementById('stop-time').value;
+        const client = document.getElementById('stop-client').value;
+        const address = document.getElementById('stop-address').value;
+
+        if (!client) {
+            alert("Please enter or select a client name.");
+            return;
+        }
+
+        // Format time to 12h
+        const [h, m] = time.split(':');
+        const hour = parseInt(h);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        const formattedHour = hour % 12 || 12;
+        const timeStr = `${formattedHour}:${m} ${ampm}`;
+
+        const queue = document.getElementById('calendar-queue');
+        const stopItem = document.createElement('div');
+        stopItem.className = 'item-row';
+        stopItem.innerHTML = `
+            <div>
+                <strong>${timeStr}</strong> — ${client}<br>
+                <span style="font-size: 0.75rem; color: var(--text-sub);">${address}</span>
+            </div>
+            <span class="badge">Scheduled</span>
+        `;
+        queue.prepend(stopItem);
+    }
+
+    // 4. Real Web Speech API Engine
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition;
+    let isListening = false;
+
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = true;
+
+        recognition.onstart = function() {
+            isListening = true;
+            document.getElementById('logo-btn').classList.add('listening');
+            document.getElementById('voice-box').classList.add('active');
+            document.getElementById('voice-text').innerText = "🎙️ Listening... Speak now...";
         };
-        let selectedParts = [];
-        let speechEngine = null;
-        let isListening = false;
-        let activeMicContext = null; // 'cover' or 'workstation'
 
-        window.addEventListener('DOMContentLoaded', () => {
-            initSpeechRecognition();
-            calculateOptionBMath();
+        recognition.onresult = function(event) {
+            let transcript = '';
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                transcript += event.results[i][0].transcript;
+            }
+            document.getElementById('voice-text').innerText = transcript;
+        };
+
+        recognition.onerror = function(event) {
+            document.getElementById('voice-text').innerText = "Voice input note: " + event.error;
+            stopSpeechEngine();
+        };
+
+        recognition.onend = function() {
+            stopSpeechEngine();
+        };
+    }
+
+    function toggleSpeechEngine() {
+        if (!SpeechRecognition) {
+            // Fallback for browsers lacking Web Speech API support
+            const voiceBox = document.getElementById('voice-box');
+            isListening = !isListening;
+            if (isListening) {
+                document.getElementById('logo-btn').classList.add('listening');
+                voiceBox.classList.add('active');
+                document.getElementById('voice-text').innerText = "🎙️ Simulated Voice Note: 'Customer approved $85 labor and filter replacement.'";
+            } else {
+                stopSpeechEngine();
+            }
+            return;
+        }
+
+        if (isListening) {
+            recognition.stop();
+        } else {
+            recognition.start();
+        }
+    }
+
+    function stopSpeechEngine() {
+        isListening = false;
+        document.getElementById('logo-btn').classList.remove('listening');
+    }
+
+    // 5. Parts Picker & Option B Maryland Tax Math Engine
+    let quoteItems = [];
+
+    // Pre-populate with default items
+    window.onload = function() {
+        addItemToQuote("Bench Labor Rate", 85.00, 0);
+        addItemToQuote("Aerus Filter Pack", 29.95, 0.06);
+    };
+
+    function addSelectedPart() {
+        const select = document.getElementById('part-select');
+        const val = select.value;
+        if (!val) return;
+
+        const [name, priceStr, taxRateStr] = val.split('|');
+        addItemToQuote(name, parseFloat(priceStr), parseFloat(taxRateStr));
+        select.value = "";
+    }
+
+    function addItemToQuote(name, price, taxRate) {
+        quoteItems.push({ id: Date.now(), name, price, taxRate });
+        renderQuoteList();
+    }
+
+    function removeItemFromQuote(id) {
+        quoteItems = quoteItems.filter(item => item.id !== id);
+        renderQuoteList();
+    }
+
+    function renderQuoteList() {
+        const container = document.getElementById('quote-items-list');
+        container.innerHTML = "";
+
+        let laborSubtotal = 0;
+        let partsSubtotal = 0;
+        let taxTotal = 0;
+
+        quoteItems.forEach(item => {
+            if (item.taxRate === 0) {
+                laborSubtotal += item.price;
+            } else {
+                partsSubtotal += item.price;
+                taxTotal += item.price * item.taxRate;
+            }
+
+            const row = document.createElement('div');
+            row.className = 'item-row';
+            row.innerHTML = `
+                <span>${item.name} ($${item.price.toFixed(2)})</span>
+                <span style="color:var(--danger-color); cursor:pointer; font-weight:bold;" onclick="removeItemFromQuote(${item.id})">✕</span>
+            `;
+            container.appendChild(row);
         });
 
-        // Deck Navigator
-        function selectCardDeck(deckNum) {
-            activeDeck = deckNum;
-            document.getElementById('deck-card-1').classList.toggle('hidden', deckNum !== 1);
-            document.getElementById('deck-card-2').classList.toggle('hidden', deckNum !== 2);
+        const grandTotal = laborSubtotal + partsSubtotal + taxTotal;
 
-            document.getElementById('tab-btn-card1').className = deckNum === 1
-                ? "py-2 text-xs font-bold rounded-lg transition-all bg-amber-500 text-slate-950 shadow flex items-center justify-center space-x-1.5"
-                : "py-2 text-xs font-bold rounded-lg transition-all text-slate-400 hover:text-white flex items-center justify-center space-x-1.5";
+        document.getElementById('subtotal-labor').innerText = `$${laborSubtotal.toFixed(2)}`;
+        document.getElementById('subtotal-parts').innerText = `$${partsSubtotal.toFixed(2)}`;
+        document.getElementById('tax-amount').innerText = `$${taxTotal.toFixed(2)}`;
+        document.getElementById('grand-total').innerText = `$${grandTotal.toFixed(2)}`;
+    }
 
-            document.getElementById('tab-btn-card2').className = deckNum === 2
-                ? "py-2 text-xs font-bold rounded-lg transition-all bg-amber-500 text-slate-950 shadow flex items-center justify-center space-x-1.5"
-                : "py-2 text-xs font-bold rounded-lg transition-all text-slate-400 hover:text-white flex items-center justify-center space-x-1.5";
+    // 6. Photo Diagnostics Handler
+    function handlePhotoUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('photo-preview').innerHTML = `<img src="${e.target.result}" alt="Diagnostic Photo">`;
+            };
+            reader.readAsDataURL(file);
         }
+    }
 
-        function flipActiveCard() {
-            isCardFlipped[activeDeck] = !isCardFlipped[activeDeck];
-            document.getElementById(`flipper-card-${activeDeck}`).classList.toggle('flipped', isCardFlipped[activeDeck]);
-        }
+    // 7. HTML5 Signature Canvas Setup
+    const canvas = document.getElementById('sig-canvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
 
-        // PapaParse CSV Engines
-        function loadCustomersCSV(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            Papa.parse(file, {
-                header: true,
-                skipEmptyLines: true,
-                complete: function(results) {
-                    if (results.data && results.data.length > 0) {
-                        vaultDatabase = results.data.map((row, idx) => ({
-                            id: row.ClientNo || row.ID || row.id || (1000 + idx).toString(),
-                            name: row.Name || row.Customer || row.name || "Sample Client",
-                            address: row.Address || row.address || "Main St",
-                            phone: row.Phone || row.phone || "555-0100",
-                            rawPhone: (row.Phone || row.phone || "5550100").replace(/\D/g, '')
-                        }));
-                        document.getElementById('face2-vault-count').innerText = `${vaultDatabase.length.toLocaleString()} Vault Records`;
-                        showToast(`Loaded ${vaultDatabase.length} Vault records!`);
-                    }
-                }
-            });
-        }
+    // Canvas Resizing
+    function resizeCanvas() {
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    setTimeout(resizeCanvas, 100);
 
-        function loadCatalogCSV(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            Papa.parse(file, {
-                header: true,
-                skipEmptyLines: true,
-                complete: function(results) {
-                    if (results.data && results.data.length > 0) {
-                        catalogDatabase = results.data;
-                        showToast(`Loaded ${catalogDatabase.length} Catalog items!`);
-                    }
-                }
-            });
-        }
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseleave', stopDrawing);
 
-        // Native Web Speech API
-        function initSpeechRecognition() {
-            const SpeechClass = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (SpeechClass) {
-                speechEngine = new SpeechClass();
-                speechEngine.continuous = false;
-                speechEngine.interimResults = true;
-                speechEngine.lang = 'en-US';
+    canvas.addEventListener('touchstart', startDrawing);
+    canvas.addEventListener('touchmove', draw);
+    canvas.addEventListener('touchend', stopDrawing);
 
-                speechEngine.onstart = () => updateMicStateUI(true);
-                speechEngine.onresult = (e) => {
-                    let transcript = '';
-                    for (let i = e.resultIndex; i < e.results.length; i++) {
-                        transcript += e.results[i][0].transcript;
-                    }
+    function startDrawing(e) {
+        isDrawing = true;
+        draw(e);
+    }
 
-                    if (activeMicContext === 'cover') {
-                        document.getElementById('brain-dump-input').value = transcript;
-                    } else if (activeMicContext === 'workstation') {
-                        const notes = document.getElementById('diagnostic-notes-canvas');
-                        notes.value = transcript;
-                        autoExpandNotes(notes);
-                    }
+    function draw(e) {
+        if (!isDrawing) return;
+        e.preventDefault();
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#00f2fe';
 
-                    if (e.results[0].isFinal && activeMicContext === 'cover') {
-                        // Auto-flip to Face 2 when finished talking on Cover
-                        setTimeout(() => {
-                            if (!isCardFlipped[1]) flipActiveCard();
-                        }, 600);
-                    }
-                };
-                speechEngine.onerror = () => updateMicStateUI(false);
-                speechEngine.onend = () => updateMicStateUI(false);
-            }
-        }
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-        function triggerVoiceIntakeOnCover() {
-            activeMicContext = 'cover';
-            toggleSpeechListening();
-        }
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
 
-        function toggleWorkstationVoice() {
-            activeMicContext = 'workstation';
-            toggleSpeechListening();
-        }
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
 
-        function toggleSpeechListening() {
-            if (!speechEngine) {
-                showToast("Speech Recognition not supported. Please type.");
-                return;
-            }
-            if (isListening) speechEngine.stop();
-            else speechEngine.start();
-        }
+    function stopDrawing() {
+        isDrawing = false;
+        ctx.beginPath();
+    }
 
-        function updateMicStateUI(listening) {
-            isListening = listening;
-            const coverText = document.getElementById('cover-mic-text');
-            const workstationBtn = document.getElementById('workstation-mic-btn');
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
 
-            if (listening) {
-                coverText.innerText = "LISTENING...";
-                workstationBtn.innerText = "🔴 Listening";
-            } else {
-                coverText.innerText = "TALK TO FRESH";
-                workstationBtn.innerText = "🎙️ Talk";
-            }
-        }
+    // 8. Authorization & Payment Execution
+    function processAuthorization() {
+        const banner = document.getElementById('status-banner');
+        const payBtn = document.getElementById('pay-btn');
 
-        // Vault Search & Disambiguation
-        function handleVaultSearchInput(e) {
-            const query = e.target.value.trim().toLowerCase();
-            document.getElementById('clear-vault-btn').classList.toggle('hidden', query.length === 0);
-            if (query.length >= 2) {
-                const matches = vaultDatabase.filter(c => 
-                    c.name.toLowerCase().includes(query) ||
-                    c.address.toLowerCase().includes(query) ||
-                    c.rawPhone.includes(query)
-                );
-                if (matches.length === 1) bindClientProfile(matches[0]);
-                else if (matches.length > 1) openDisambiguationModal(matches.slice(0, 5));
-            }
-        }
-
-        function clearVaultSearch() {
-            document.getElementById('vault-search-input').value = "";
-            document.getElementById('clear-vault-btn').classList.add('hidden');
-        }
-
-        function bindClientProfile(client) {
-            activeClient = client;
-            document.getElementById('workstation-client-id').innerText = `Client #${client.id}`;
-            document.getElementById('bound-client-name').innerText = client.name;
-            document.getElementById('bound-client-address').innerText = client.address;
-            document.getElementById('bound-call-link').href = `tel:${client.rawPhone}`;
-            document.getElementById('bound-sms-link').href = `sms:${client.rawPhone}`;
-
-            document.getElementById('client-presentation-name').innerText = client.name;
-            document.getElementById('client-presentation-address').innerHTML = `<i class="fa-solid fa-location-dot text-emerald-400 mr-1"></i>${client.address}`;
-            document.getElementById('client-ticket-badge').innerText = `#TT-${client.id}`;
-            closeDisambiguationModal();
-        }
-
-        function openDisambiguationModal(matches) {
-            const list = document.getElementById('disambiguation-list');
-            list.innerHTML = "";
-            matches.forEach(m => {
-                const row = document.createElement('div');
-                row.className = "bg-slate-900 border border-slate-800 p-2 rounded-xl text-xs cursor-pointer flex justify-between hover:border-amber-400 transition";
-                row.onclick = () => bindClientProfile(m);
-                row.innerHTML = `<div><span class="font-bold text-white">${m.name}</span><p class="text-[10px] text-slate-400">${m.address}</p></div><span class="text-emerald-400 font-mono">${m.phone}</span>`;
-                list.appendChild(row);
-            });
-            document.getElementById('disambiguation-modal').classList.remove('hidden');
-        }
-
-        function closeDisambiguationModal() {
-            document.getElementById('disambiguation-modal').classList.add('hidden');
-        }
-
-        // Dispatch Calendar
-        function addDispatchAppointment() {
-            const input = document.getElementById('dispatch-appt-input');
-            const val = input.value.trim();
-            if (!val) return;
-            const list = document.getElementById('dispatch-schedule-list');
-            const item = document.createElement('div');
-            item.className = "bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between items-center text-xs";
-            item.innerHTML = `<span class="text-slate-200 font-medium">${val}</span><span class="text-[10px] text-emerald-400 font-mono bg-emerald-950 px-1.5 py-0.5 rounded">Scheduled</span>`;
-            list.appendChild(item);
-            input.value = "";
-        }
-
-        // Photo Capture
-        function handlePhotoCapture(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (evt) => {
-                    document.getElementById('photo-preview-img').src = evt.target.result;
-                    document.getElementById('photo-preview-container').classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function clearPhoto() {
-            document.getElementById('photo-preview-container').classList.add('hidden');
-        }
-
-        // Parts & Option B Math (0% Labor / 6% Parts)
-        function addPartItem(name, price, type = 'parts') {
-            selectedParts.push({ name, price, type });
-            renderPartsList();
-            calculateOptionBMath();
-        }
-
-        function renderPartsList() {
-            const container = document.getElementById('workstation-parts-list');
-            if (selectedParts.length === 0) {
-                container.innerHTML = `<p class="text-[10px] text-slate-500 italic text-center" id="empty-parts-msg">No parts added yet.</p>`;
-                return;
-            }
-            container.innerHTML = "";
-            selectedParts.forEach((p, i) => {
-                const row = document.createElement('div');
-                row.className = "flex justify-between items-center bg-slate-900 p-1 rounded text-[10px]";
-                row.innerHTML = `<span>${p.name}</span><span class="text-emerald-400 font-mono">$${p.price.toFixed(2)}</span>`;
-                container.appendChild(row);
-            });
-        }
-
-        function calculateOptionBMath() {
-            let labor = 0, parts = 0;
-            selectedParts.forEach(p => p.type === 'labor' ? labor += p.price : parts += p.price);
-            if (selectedParts.length === 0) labor = 85.00; // Default labor baseline
-
-            const tax = parts * 0.06;
-            const grand = labor + parts + tax;
-
-            document.getElementById('client-labor-total').innerText = `$${labor.toFixed(2)}`;
-            document.getElementById('client-parts-total').innerText = `$${parts.toFixed(2)}`;
-            document.getElementById('client-tax-total').innerText = `$${tax.toFixed(2)}`;
-            document.getElementById('client-grand-total').innerText = `$${grand.toFixed(2)}`;
-        }
-
-        function autoExpandNotes(textarea) {
-            textarea.style.height = 'auto';
-            textarea.style.height = (textarea.scrollHeight) + 'px';
-        }
-
-        function approveWorkizCheckout() {
-            showToast("Workiz Register: Paid & Closed!");
-        }
-
-        function showToast(msg) {
-            const t = document.createElement('div');
-            t.className = "fixed bottom-4 right-4 bg-emerald-600 text-white px-3 py-2 rounded-xl text-xs font-bold shadow-2xl border border-emerald-400/30 z-50";
-            t.innerText = msg;
-            document.body.appendChild(t);
-            setTimeout(() => t.remove(), 2500);
-        }
-    </script>
+        banner.style.display = 'block';
+        payBtn.style.background = 'rgba(0, 230, 118, 0.2)';
+        payBtn.style.color = '#00e676';
+        payBtn.style.border = '1px solid #00e676';
+        payBtn.innerText = "✓ AUTHORIZED & PAID";
+        payBtn.disabled = true;
+    }
+</script>
 </body>
 </html>
