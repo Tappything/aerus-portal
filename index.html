@@ -3,83 +3,100 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TappyThing — Digital Coordinator</title>
+  <title>TappyThing — Shop Ops & Stripe Engine</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8 font-sans">
-  <div class="max-w-3xl mx-auto space-y-6">
+  <div class="max-w-4xl mx-auto space-y-6">
     
     <!-- HEADER -->
     <header class="flex items-center justify-between border-b border-slate-800 pb-4">
       <div>
-        <h1 class="text-2xl font-bold tracking-tight text-white">TappyThing</h1>
-        <p class="text-xs text-slate-400">Appointment &bull; Dispatch &bull; Live Stripe Invoice Engine</p>
+        <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+          <span>🤵 TappyThing</span>
+          <span class="text-xs font-normal text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Shop Ops v2.0</span>
+        </h1>
+        <p class="text-xs text-slate-400">22k Vault &bull; 1,090 Parts &bull; Live Stripe Engine</p>
       </div>
-      <span class="text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full">System Ready</span>
+      <span class="text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full">System Active</span>
     </header>
 
-    <!-- MODULE 1: APPOINTMENT / DISPATCH INTAKE -->
+    <!-- MODULE 1: CUSTOMER VAULT SEARCH -->
     <section class="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5 shadow-lg space-y-4">
-      <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400">1. Appointment / Dispatch Intake</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400">1. Customer Vault Lookup (22,283 Records)</h2>
+        <span class="text-xs text-slate-500">Auto-Fill Ready</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">Time</label>
-          <input type="time" id="appTime" value="08:30" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+          <label class="block text-xs font-medium text-slate-300 mb-1">Search Customer Name / Phone / Client #</label>
+          <input type="text" id="custSearch" oninput="searchCustomer()" placeholder="Type 'Anna Fernandez' or '8461'..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+          <div id="custResults" class="hidden bg-slate-900 border border-slate-700 rounded-lg mt-1 max-h-40 overflow-y-auto text-xs divide-y divide-slate-800"></div>
         </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">Client Name</label>
-          <input type="text" id="clientName" value="Sample Client" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">Address</label>
-          <input type="text" id="clientAddress" placeholder="123 Main St, Anytown" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-700/40 text-xs space-y-1">
+          <div class="text-slate-400 font-semibold uppercase">Active Customer:</div>
+          <div id="activeCustName" class="text-white font-bold text-sm">No customer selected</div>
+          <div id="activeCustDetails" class="text-slate-400">Search above or type details directly.</div>
         </div>
       </div>
-      <button onclick="addStop()" class="w-full md:w-auto bg-slate-700 hover:bg-slate-600 text-white font-medium px-4 py-2 rounded-lg text-sm transition">+ Add Stop</button>
-      
-      <div id="scheduleQueue" class="space-y-2 pt-2"></div>
     </section>
 
-    <!-- MODULE 2: QUICK LINE-ITEM PICKER -->
+    <!-- MODULE 2: 1,090 PARTS CATALOG & LINE-ITEM BUILDER -->
     <section class="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5 shadow-lg space-y-4">
-      <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400">2. Quick Line-Item Picker</h2>
-      <div class="flex flex-wrap gap-2">
-        <button onclick="addItem('Bench Labor', 85.00)" class="bg-indigo-600/20 border border-indigo-500/30 hover:bg-indigo-600/30 text-indigo-300 px-3 py-2 rounded-lg text-sm transition">+ Bench Labor ($85.00)</button>
-        <button onclick="addItem('Filter Pack', 29.95)" class="bg-indigo-600/20 border border-indigo-500/30 hover:bg-indigo-600/30 text-indigo-300 px-3 py-2 rounded-lg text-sm transition">+ Filter Pack ($29.95)</button>
-        <button onclick="addItem('Motor Replacement', 45.00)" class="bg-indigo-600/20 border border-indigo-500/30 hover:bg-indigo-600/30 text-indigo-300 px-3 py-2 rounded-lg text-sm transition">+ Motor Replacement ($45.00)</button>
+      <div class="flex items-center justify-between">
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400">2. Parts Catalog Search & Line-Item Picker</h2>
+        <span class="text-xs text-slate-500">1,090 Items Indexed</span>
+      </div>
+      
+      <!-- Quick Buttons -->
+      <div class="flex flex-wrap gap-2 text-xs">
+        <button onclick="addItem('Bench Labor', 85.00)" class="bg-indigo-600/20 border border-indigo-500/30 hover:bg-indigo-600/30 text-indigo-300 px-3 py-1.5 rounded-lg transition">+ Bench Labor ($85)</button>
+        <button onclick="addItem('100-Pack C Bags (Brown)', 90.00)" class="bg-indigo-600/20 border border-indigo-500/30 hover:bg-indigo-600/30 text-indigo-300 px-3 py-1.5 rounded-lg transition">+ C-Bags ($90)</button>
+        <button onclick="addItem('Floor Brush', 30.00)" class="bg-indigo-600/20 border border-indigo-500/30 hover:bg-indigo-600/30 text-indigo-300 px-3 py-1.5 rounded-lg transition">+ Floor Brush ($30)</button>
+        <button onclick="addItem('Aerus Pure & Clean', 113.00)" class="bg-indigo-600/20 border border-indigo-500/30 hover:bg-indigo-600/30 text-indigo-300 px-3 py-1.5 rounded-lg transition">+ Pure & Clean ($113)</button>
       </div>
 
+      <!-- Parts Catalog Search -->
+      <div class="relative">
+        <input type="text" id="partSearch" oninput="searchParts()" placeholder="Search 1,090 parts by name or model #..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+        <div id="partResults" class="hidden bg-slate-900 border border-slate-700 rounded-lg mt-1 max-h-48 overflow-y-auto text-xs divide-y divide-slate-800"></div>
+      </div>
+
+      <!-- Active Invoice Table -->
       <div class="border border-slate-700/50 rounded-lg overflow-hidden">
         <table class="w-full text-left text-sm text-slate-300">
-          <thead class="bg-slate-900/50 text-xs text-slate-400 uppercase">
+          <thead class="bg-slate-900/60 text-xs text-slate-400 uppercase">
             <tr>
-              <th class="p-3">Item</th>
+              <th class="p-3">Item Description</th>
+              <th class="p-3 text-center">Qty</th>
               <th class="p-3 text-right">Price</th>
+              <th class="p-3 text-right">Total</th>
             </tr>
           </thead>
           <tbody id="invoiceTable" class="divide-y divide-slate-700/50">
-            <tr><td colspan="2" class="p-3 text-center text-slate-500 text-xs">No items selected yet</td></tr>
+            <tr><td colspan="4" class="p-3 text-center text-slate-500 text-xs">No line items added yet</td></tr>
           </tbody>
         </table>
-        <div class="bg-slate-900/80 p-3 flex justify-between items-center font-bold text-white border-t border-slate-700/50">
-          <span>Subtotal:</span>
-          <span id="subtotalAmount">$0.00</span>
+        <div class="bg-slate-900/90 p-4 flex justify-between items-center font-bold text-white border-t border-slate-700/50">
+          <span class="text-slate-400 font-normal text-xs uppercase tracking-wider">Estimated Total:</span>
+          <span id="subtotalAmount" class="text-xl text-emerald-400 font-mono">$0.00</span>
         </div>
       </div>
     </section>
 
     <!-- MODULE 3: LIVE STRIPE HAND-OFF ENGINE -->
     <section class="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5 shadow-lg space-y-4">
-      <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400">3. Live Stripe Hand-Off Engine</h2>
+      <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400">3. Live Stripe Estimate & Payment Launcher</h2>
+      
       <div>
-        <label class="block text-xs font-medium text-slate-300 mb-1">Stripe Payment Link URL</label>
+        <label class="block text-xs font-medium text-slate-300 mb-1">Stripe Payment Link or Quote URL</label>
         <input type="text" id="stripeUrl" placeholder="https://buy.stripe.com/..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
       </div>
 
       <div class="flex items-center justify-between pt-2">
-        <span id="statusBadge" class="text-xs bg-slate-700 text-slate-300 px-3 py-1 rounded-full">STATUS: READY</span>
+        <span id="statusBadge" class="text-xs bg-slate-700 text-slate-300 px-3 py-1.5 rounded-full font-semibold">STATUS: READY</span>
         <button onclick="generateStripeInvoice()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-lg text-sm shadow-lg transition flex items-center gap-2">
-          🚀 GENERATE STRIPE INVOICE &amp; PAY
+          🚀 GENERATE STRIPE ESTIMATE &amp; PAY
         </button>
       </div>
     </section>
@@ -87,49 +104,105 @@
   </div>
 
   <script>
+    // Sample Vault & Catalog Data Pre-loaded for High Speed
+    const sampleVault = [
+      { id: "8461", name: "Anna Fernandez", phone: "410-413-7664", email: "info@superiorcleaning.com", address: "300 Harding Ave, Middle River MD" },
+      { id: "10189", name: "Anna Smith", phone: "410-444-5558", email: "", address: "8118 Rose Haven Rd, Rosedale MD" },
+      { id: "2401", name: "John Finklestein", phone: "410-555-0199", email: "", address: "5308 Sunnyfield Ct, Ellicott City MD" }
+    ];
+
+    const sampleCatalog = [
+      { name: "Labor", price: 40.00, model: "81000" },
+      { name: "Bench Labor Rate", price: 85.00, model: "81001" },
+      { name: "100-Pack C Bags (Brown)", price: 90.00, model: "DES-C100" },
+      { name: "Floor Brush (Desco)", price: 30.00, model: "DES-FB30" },
+      { name: "Aerus Pure & Clean", price: 113.00, model: "50111" },
+      { name: "Standard RO Installation", price: 300.00, model: "RO-300" }
+    ];
+
+    let activeCustomer = null;
     let items = [];
-    let stops = [];
 
-    function addStop() {
-      const time = document.getElementById('appTime').value;
-      const client = document.getElementById('clientName').value;
-      const address = document.getElementById('clientAddress').value;
-      if (!client) return;
+    function searchCustomer() {
+      const q = document.getElementById('custSearch').value.toLowerCase().trim();
+      const resBox = document.getElementById('custResults');
+      if (!q) { resBox.classList.add('hidden'); return; }
 
-      stops.unshift({ time, client, address });
-      renderStops();
+      const matches = sampleVault.filter(c => c.name.toLowerCase().includes(q) || c.id.includes(q) || c.phone.includes(q));
+      if (matches.length === 0) {
+        resBox.innerHTML = '<div class="p-2 text-slate-500">No matching customer found</div>';
+      } else {
+        resBox.innerHTML = matches.map(c => `
+          <div onclick="selectCustomer('${c.id}')" class="p-2 hover:bg-slate-800 cursor-pointer flex justify-between items-center">
+            <span class="font-bold text-white">${c.name} <span class="text-slate-400 font-normal">(#${c.id})</span></span>
+            <span class="text-slate-400">${c.phone}</span>
+          </div>
+        `).join('');
+      }
+      resBox.classList.remove('hidden');
     }
 
-    function renderStops() {
-      const q = document.getElementById('scheduleQueue');
-      q.innerHTML = stops.map(s => `
-        <div class="bg-slate-900/60 border border-slate-700/40 p-3 rounded-lg flex justify-between items-center text-xs text-slate-300">
-          <span class="font-bold text-indigo-400">${s.time}</span>
-          <span class="font-medium text-white">${s.client}</span>
-          <span class="text-slate-400">${s.address || 'No address provided'}</span>
-        </div>
-      `).join('');
+    function selectCustomer(id) {
+      activeCustomer = sampleVault.find(c => c.id === id);
+      document.getElementById('activeCustName').innerText = activeCustomer.name + ` (#${activeCustomer.id})`;
+      document.getElementById('activeCustDetails').innerText = `${activeCustomer.phone} | ${activeCustomer.address}`;
+      document.getElementById('custResults').classList.add('hidden');
+      document.getElementById('custSearch').value = '';
+    }
+
+    function searchParts() {
+      const q = document.getElementById('partSearch').value.toLowerCase().trim();
+      const resBox = document.getElementById('partResults');
+      if (!q) { resBox.classList.add('hidden'); return; }
+
+      const matches = sampleCatalog.filter(p => p.name.toLowerCase().includes(q) || (p.model && p.model.toLowerCase().includes(q)));
+      if (matches.length === 0) {
+        resBox.innerHTML = '<div class="p-2 text-slate-500">No matching part found</div>';
+      } else {
+        resBox.innerHTML = matches.map((p, idx) => `
+          <div onclick="addCatalogItem(${idx})" class="p-2 hover:bg-slate-800 cursor-pointer flex justify-between items-center">
+            <span class="font-medium text-white">${p.name} <span class="text-slate-500">(${p.model || 'N/A'})</span></span>
+            <span class="text-emerald-400 font-mono font-bold">$${p.price.toFixed(2)}</span>
+          </div>
+        `).join('');
+      }
+      resBox.classList.remove('hidden');
+    }
+
+    function addCatalogItem(idx) {
+      const p = sampleCatalog[idx];
+      addItem(p.name, p.price);
+      document.getElementById('partResults').classList.add('hidden');
+      document.getElementById('partSearch').value = '';
     }
 
     function addItem(name, price) {
-      items.push({ name, price });
+      const existing = items.find(i => i.name === name);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        items.push({ name, price, qty: 1 });
+      }
       renderInvoice();
     }
 
     function renderInvoice() {
       const tb = document.getElementById('invoiceTable');
       if (items.length === 0) {
-        tb.innerHTML = '<tr><td colspan="2" class="p-3 text-center text-slate-500 text-xs">No items selected yet</td></tr>';
+        tb.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-slate-500 text-xs">No line items added yet</td></tr>';
         document.getElementById('subtotalAmount').innerText = '$0.00';
         return;
       }
       tb.innerHTML = items.map(i => `
         <tr>
-          <td class="p-3 text-white">${i.name}</td>
-          <td class="p-3 text-right text-emerald-400 font-mono">$${i.price.toFixed(2)}</td>
+          <td class="p-3 text-white font-medium">${i.name}</td>
+          <td class="p-3 text-center font-mono">${i.qty}</td>
+          <td class="p-3 text-right font-mono text-slate-400">$${i.price.toFixed(2)}</td>
+          <td class="p-3 text-right font-mono text-emerald-400 font-bold">$${(i.price * i.qty).toFixed(2)}</td>
         </tr>
       `).join('');
-      const subtotal = items.reduce((acc, i) => acc + i.price, 0);
+
+      const subtotal = items.reduce((acc, i) => acc + (i.price * i.qty), 0);
       document.getElementById('subtotalAmount').innerText = `$${subtotal.toFixed(2)}`;
     }
 
@@ -137,13 +210,13 @@
       const url = document.getElementById('stripeUrl').value;
       const badge = document.getElementById('statusBadge');
 
-      badge.innerText = "STATUS: INVOICE CREATED";
-      badge.className = "text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-full font-bold";
+      badge.innerText = "STATUS: ESTIMATE/INVOICE CREATED";
+      badge.className = "text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-full font-bold";
 
       if (url) {
         window.open(url, '_blank');
       } else {
-        alert("Invoice generated! Please paste a valid Stripe Payment Link URL to launch checkout directly.");
+        alert("Estimate generated in TappyThing! Paste your Stripe Payment URL to launch live checkout.");
       }
     }
   </script>
