@@ -6,7 +6,7 @@
   <title>Forever Card™ — Powered by TappyThing</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <script>
@@ -18,7 +18,11 @@
             brand: { 400: '#34d399', 500: '#10b981', 600: '#059669' },
             darkbg: '#080B11'
           },
-          fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] }
+          fontFamily: { 
+            sans: ['Inter', 'sans-serif'], 
+            mono: ['JetBrains Mono', 'monospace'],
+            script: ['Great Vibes', 'cursive']
+          }
         }
       }
     }
@@ -43,12 +47,12 @@
 
   <div class="card-chassis max-w-4xl w-full rounded-3xl p-5 sm:p-8 space-y-6 relative overflow-hidden">
 
-    <!-- 1. HEADER (BIG F, FRESH EMBLEM, SMALL MIC, SUBSCRIBER) -->
+    <!-- 1. HEADER (LAVERNE & SHIRLEY SCRIPT F, REAL BOY LOGO, SMALL MIC, SUBSCRIBER) -->
     <header class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border-b border-gray-800 pb-5">
       
-      <!-- LEFT: BIG F BRANDING -->
+      <!-- LEFT: LAVERNE & SHIRLEY CURSIVE F BRANDING -->
       <div class="flex items-center space-x-3 justify-center md:justify-start">
-        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-black font-black text-2xl shadow-lg shadow-brand-500/20">
+        <div class="text-5xl font-script text-brand-400 font-bold select-none drop-shadow-[0_2px_10px_rgba(52,211,153,0.3)] pr-1">
           F
         </div>
         <div>
@@ -57,24 +61,13 @@
         </div>
       </div>
 
-      <!-- CENTER: FRESH LOGO BADGE + COMPACT MIC -->
+      <!-- CENTER: REAL FRESH LOGO EMBLEM + SMALL MIC -->
       <div class="flex flex-col items-center justify-center space-y-1.5">
-        <div class="w-16 h-16 rounded-full border-2 border-brand-400 bg-white p-1 shadow-xl flex items-center justify-center overflow-hidden">
-          <svg viewBox="0 0 200 200" class="w-full h-full">
-            <circle cx="100" cy="100" r="95" fill="white" stroke="#000" stroke-width="6"/>
-            <circle cx="115" cy="85" r="32" fill="#000"/>
-            <ellipse cx="103" cy="82" rx="10" ry="7" fill="white"/>
-            <ellipse cx="127" cy="82" rx="10" ry="7" fill="white"/>
-            <path d="M 100 102 Q 115 118 130 102" stroke="#000" stroke-width="4" fill="none"/>
-            <path d="M 75 140 L 155 140 L 145 190 L 85 190 Z" fill="#000"/>
-            <path d="M 60 120 Q 50 70 70 50 Q 80 40 75 80 Z" fill="#000"/>
-            <path d="M 50 45 Q 35 30 25 50 Q 30 75 55 60 Z" fill="#000"/>
-            <text x="100" y="165" font-family="sans-serif" font-weight="900" font-size="22" text-anchor="middle" fill="#000">FRESH</text>
-            <text x="100" y="180" font-family="sans-serif" font-weight="700" font-size="9" text-anchor="middle" fill="#000">DIGITAL COORDINATOR</text>
-          </svg>
+        <div class="w-20 h-20 rounded-full border-2 border-brand-400 bg-white p-0.5 shadow-xl flex items-center justify-center overflow-hidden">
+          <img src="/user-uploads/4126.jpg" alt="Fresh Digital Coordinator" class="w-full h-full object-contain rounded-full" onerror="this.onerror=null; this.src='input_file_4.png';">
         </div>
 
-        <!-- SMALL, ELEGANT MICROPHONE BUTTON -->
+        <!-- SMALL COMPACT MIC BUTTON -->
         <button id="masterMicBtn" onclick="toggleVoiceDictation()" class="w-9 h-9 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-red-600/30 border border-red-400/40 transition transform active:scale-95" title="Talk to Fresh">
           <i id="micIcon" class="fa-solid fa-microphone text-xs"></i>
         </button>
@@ -93,11 +86,11 @@
 
     </header>
 
-    <!-- 2. CONTROL BAR: CALENDAR & PINBALL -->
+    <!-- 2. CONTROL BAR: CALENDAR & PINBALL (SIDE-BY-SIDE) -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       
       <!-- 📅 CALENDAR (WHAT'S NEXT) -->
-      <div class="bg-gray-950/70 border border-blue-500/30 rounded-2xl p-4 space-y-3 min-h-[140px]">
+      <div class="bg-gray-950/70 border border-blue-500/30 rounded-2xl p-4 space-y-3 min-h-[150px]">
         <div class="flex items-center justify-between border-b border-gray-800 pb-2">
           <div class="flex items-center space-x-2">
             <i class="fa-solid fa-calendar-days text-blue-400 text-sm"></i>
@@ -105,13 +98,13 @@
           </div>
           <span class="text-[10px] text-gray-500 font-mono">Schedule</span>
         </div>
-        <div id="calendarEventsList" class="space-y-2 text-xs font-mono">
-          <div class="text-gray-500 text-center py-4 italic">No scheduled items. Speak to add an appointment!</div>
+        <div id="calendarEventsList" class="space-y-2 text-xs font-mono max-h-40 overflow-y-auto">
+          <div id="calEmptyState" class="text-gray-500 text-center py-6 italic">No scheduled items. Tap mic to add!</div>
         </div>
       </div>
 
-      <!-- 🎰 PINBALL (ACTION ZONE) -->
-      <div class="bg-gray-950/70 border border-amber-500/30 rounded-2xl p-4 space-y-3 min-h-[140px]">
+      <!-- 🎰 PINBALL (ACTION ZONE — BAM! BAM! BAM!) -->
+      <div class="bg-gray-950/70 border border-amber-500/30 rounded-2xl p-4 space-y-3 min-h-[150px]">
         <div class="flex items-center justify-between border-b border-gray-800 pb-2">
           <div class="flex items-center space-x-2">
             <span class="text-sm">🎰</span>
@@ -119,52 +112,56 @@
           </div>
           <span class="text-[10px] text-gray-500 font-mono">Live Bounces</span>
         </div>
-        <div id="pinballActionsList" class="space-y-2 text-xs font-mono">
-          <div class="text-gray-500 text-center py-4 italic">Queue empty. Bounces appear here live.</div>
+        <div id="pinballActionsList" class="space-y-2 text-xs font-mono max-h-40 overflow-y-auto">
+          <div id="pinEmptyState" class="text-gray-500 text-center py-6 italic">Queue empty. Bounces appear here.</div>
         </div>
       </div>
 
     </div>
 
-    <!-- 3. VOICE STREAM DISPLAY -->
+    <!-- 3. FRESH VOICE STREAM -->
     <div class="bg-gray-950 border border-gray-800 rounded-2xl p-3.5 space-y-1">
       <div class="flex justify-between items-center text-xs">
         <span class="font-bold text-gray-300 font-mono flex items-center space-x-2">
           <span class="w-2 h-2 rounded-full bg-brand-400 inline-block"></span>
-          <span>Fresh Voice Stream:</span>
+          <span>Fresh Live Voice Stream:</span>
         </span>
         <span id="listeningBadge" class="hidden text-[10px] text-red-400 font-bold animate-pulse font-mono">● RECORDING</span>
       </div>
       <p id="liveTranscriptText" class="text-xs text-gray-400 italic font-mono">"Tap the microphone above to speak..."</p>
     </div>
 
-    <!-- 4. CUSTOM EXPANDABLE FOREVER CARD DOORS (BLANK CANVASES) -->
+    <!-- 4. CLEAN 4-STAGE OPERATIONAL DOORS -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      <button onclick="openCardSlot(1)" class="bg-gray-900/90 hover:bg-gray-800 border border-gray-800 hover:border-brand-500 p-5 rounded-2xl text-center transition group space-y-1">
-        <div class="text-xl font-bold text-brand-400">+ Add Card 1</div>
-        <div id="card1Label" class="text-[10px] text-gray-400">Custom Utility Door</div>
+      <button onclick="openStageDoor(1)" class="bg-gray-900/90 hover:bg-gray-800 border border-blue-500/30 hover:border-blue-400 p-4 rounded-2xl text-center transition group space-y-1">
+        <div class="text-xl">📥</div>
+        <div class="text-xs font-bold text-blue-400">1. Intake & Vault</div>
+        <div class="text-[10px] text-gray-400">Customer Drop-off</div>
       </button>
 
-      <button onclick="openCardSlot(2)" class="bg-gray-900/90 hover:bg-gray-800 border border-gray-800 hover:border-amber-500 p-5 rounded-2xl text-center transition group space-y-1">
-        <div class="text-xl font-bold text-amber-400">+ Add Card 2</div>
-        <div id="card2Label" class="text-[10px] text-gray-400">Custom Utility Door</div>
+      <button onclick="openStageDoor(2)" class="bg-gray-900/90 hover:bg-gray-800 border border-amber-500/30 hover:border-amber-400 p-4 rounded-2xl text-center transition group space-y-1">
+        <div class="text-xl">🛠️</div>
+        <div class="text-xs font-bold text-amber-400">2. Shop Ops / Bench</div>
+        <div class="text-[10px] text-gray-400">Diagnostics & Repair</div>
       </button>
 
-      <button onclick="openCardSlot(3)" class="bg-gray-900/90 hover:bg-gray-800 border border-gray-800 hover:border-emerald-500 p-5 rounded-2xl text-center transition group space-y-1">
-        <div class="text-xl font-bold text-emerald-400">+ Add Card 3</div>
-        <div id="card3Label" class="text-[10px] text-gray-400">Custom Utility Door</div>
+      <button onclick="openStageDoor(3)" class="bg-gray-900/90 hover:bg-gray-800 border border-emerald-500/30 hover:border-emerald-400 p-4 rounded-2xl text-center transition group space-y-1">
+        <div class="text-xl">📄</div>
+        <div class="text-xs font-bold text-emerald-400">3. Proposal & Pay</div>
+        <div class="text-[10px] text-gray-400">Stripe Invoicing</div>
       </button>
 
-      <button onclick="openCardSlot(4)" class="bg-gray-900/90 hover:bg-gray-800 border border-gray-800 hover:border-purple-500 p-5 rounded-2xl text-center transition group space-y-1">
-        <div class="text-xl font-bold text-purple-400">+ Add Card 4</div>
-        <div id="card4Label" class="text-[10px] text-gray-400">Custom Utility Door</div>
+      <button onclick="openStageDoor(4)" class="bg-gray-900/90 hover:bg-gray-800 border border-purple-500/30 hover:border-purple-400 p-4 rounded-2xl text-center transition group space-y-1">
+        <div class="text-xl">🧱</div>
+        <div class="text-xs font-bold text-purple-400">4. Ready Wall</div>
+        <div class="text-[10px] text-gray-400">Staging & Pickup</div>
       </button>
     </div>
 
     <!-- EXPANDABLE DRAWER -->
     <div id="activeWorkspaceDrawer" class="hidden bg-gray-950 border border-gray-800 rounded-2xl p-5 space-y-3">
       <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-        <h3 id="drawerTitle" class="text-sm font-bold text-white">Forever Card Canvas</h3>
+        <h3 id="drawerTitle" class="text-sm font-bold text-white">Stage Workspace</h3>
         <button onclick="closeDrawer()" class="text-gray-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div id="drawerBody" class="text-xs text-gray-300"></div>
@@ -175,6 +172,7 @@
   <script>
     let isRecording = false;
     let recognition = null;
+    let lastProcessedText = "";
 
     window.onload = function() {
       setupSpeech();
@@ -184,66 +182,131 @@
       if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognition = new SpeechRec();
-        recognition.continuous = true;
-        recognition.interimResults = true;
+        recognition.continuous = false;
+        recognition.interimResults = false;
 
         recognition.onresult = function(event) {
-          let text = '';
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            text += event.results[i][0].transcript;
-          }
+          const text = event.results[0][0].transcript;
           document.getElementById('liveTranscriptText').innerText = `"${text}"`;
-          parseSpeechToBoard(text);
+          
+          if (text !== lastProcessedText) {
+            lastProcessedText = text;
+            parseSpeechToBoard(text);
+          }
+        };
+
+        recognition.onend = function() {
+          stopDictation();
         };
       }
     }
 
     function toggleVoiceDictation() {
       if (!recognition) return alert('Speech recognition supported in Chrome/Edge.');
-      if (!isRecording) {
-        isRecording = true;
-        recognition.start();
-        document.getElementById('masterMicBtn').classList.add('pulse-record');
-        document.getElementById('listeningBadge').classList.remove('hidden');
-      } else {
-        isRecording = false;
-        recognition.stop();
-        document.getElementById('masterMicBtn').classList.remove('pulse-record');
-        document.getElementById('listeningBadge').classList.add('hidden');
-      }
+      if (!isRecording) startDictation();
+      else stopDictation();
+    }
+
+    function startDictation() {
+      isRecording = true;
+      recognition.start();
+      document.getElementById('masterMicBtn').classList.add('pulse-record');
+      document.getElementById('listeningBadge').classList.remove('hidden');
+      document.getElementById('liveTranscriptText').innerText = "Listening...";
+    }
+
+    function stopDictation() {
+      isRecording = false;
+      document.getElementById('masterMicBtn').classList.remove('pulse-record');
+      document.getElementById('listeningBadge').classList.add('hidden');
     }
 
     function parseSpeechToBoard(text) {
       const lower = text.toLowerCase();
-      if (lower.includes('appointment') || lower.includes('tomorrow') || lower.includes('schedule')) {
+      
+      // Route to Calendar if speech mentions schedule, appointment, or time
+      if (lower.includes('schedule') || lower.includes('appointment') || lower.includes('tomorrow') || lower.includes('9:00') || lower.includes('9 am')) {
         const cal = document.getElementById('calendarEventsList');
-        if (cal.innerText.includes('No scheduled items')) cal.innerHTML = '';
-        cal.innerHTML = `
+        const emptyState = document.getElementById('calEmptyState');
+        if (emptyState) emptyState.remove();
+
+        const itemHTML = `
           <div class="bg-gray-900 p-2.5 rounded-xl border border-blue-800/50 flex justify-between items-center">
             <div>
-              <div class="text-blue-300 font-bold">New Spoken Appointment</div>
+              <div class="text-blue-300 font-bold">Scheduled Event</div>
               <div class="text-[11px] text-gray-400">${text}</div>
             </div>
             <span class="text-[10px] bg-blue-950 text-blue-400 px-2 py-0.5 rounded-full border border-blue-800">Voice Log</span>
           </div>
-        ` + cal.innerHTML;
+        `;
+        cal.insertAdjacentHTML('afterbegin', itemHTML);
+      } 
+      // Route to Pinball for all other incoming voice notes / tasks
+      else {
+        const pin = document.getElementById('pinballActionsList');
+        const emptyState = document.getElementById('pinEmptyState');
+        if (emptyState) emptyState.remove();
+
+        const itemHTML = `
+          <div class="bg-gray-900 p-2.5 rounded-xl border border-amber-800/50 flex justify-between items-center">
+            <div>
+              <div class="text-amber-300 font-bold">⚡ Bam! Action Item</div>
+              <div class="text-[11px] text-gray-400">${text}</div>
+            </div>
+            <button onclick="openStageDoor(2)" class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-1 rounded-lg border border-amber-500/40">View</button>
+          </div>
+        `;
+        pin.insertAdjacentHTML('afterbegin', itemHTML);
       }
     }
 
-    function openCardSlot(slotNum) {
+    function openStageDoor(stageNum) {
       const drawer = document.getElementById('activeWorkspaceDrawer');
       const title = document.getElementById('drawerTitle');
       const body = document.getElementById('drawerBody');
       drawer.classList.remove('hidden');
 
-      title.innerText = `Forever Card Slot #${slotNum}`;
-      body.innerHTML = `
-        <div class="space-y-3">
-          <p class="text-gray-400">Configure or drop content into Forever Card Door #${slotNum}:</p>
-          <input type="text" placeholder="Card Title (e.g. Intake, Delivery, Invoice)" class="w-full bg-gray-900 border border-gray-800 rounded-xl p-2 text-white">
-          <button onclick="closeDrawer()" class="bg-brand-500 text-black font-bold px-4 py-2 rounded-xl">Save Card Door</button>
-        </div>
-      `;
+      if (stageNum === 1) {
+        title.innerText = "Stage 1: Intake & Customer Vault";
+        body.innerHTML = `
+          <div class="space-y-3">
+            <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
+              <div class="font-bold text-brand-400">William Sullivan</div>
+              <div class="text-gray-400">(410) 555-0199 • 1965 Greenspring Dr, Timonium MD</div>
+            </div>
+            <div class="border-2 border-dashed border-gray-800 p-4 rounded-xl text-center">📷 Tap to capture equipment serial tag</div>
+          </div>
+        `;
+      } else if (stageNum === 2) {
+        title.innerText = "Stage 2: Shop Ops / Workbench";
+        body.innerHTML = `
+          <div class="space-y-3">
+            <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
+              <div class="font-bold text-amber-400">Lux Guardian Vacuum</div>
+              <div class="text-gray-400">Diagnosis: Motor seal check & roller tune-up ($45.00)</div>
+            </div>
+          </div>
+        `;
+      } else if (stageNum === 3) {
+        title.innerText = "Stage 3: Proposal & Stripe Pay";
+        body.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex justify-between items-center text-sm font-bold text-white">
+              <span>Total Investment:</span>
+              <span class="text-brand-400 font-mono">$47.70</span>
+            </div>
+            <button onclick="alert('Synced to Shop Workbench — Stripe Link Dispatched!')" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-black font-black py-3 rounded-xl text-xs uppercase">🚀 Authorize & Send Stripe Link</button>
+          </div>
+        `;
+      } else if (stageNum === 4) {
+        title.innerText = "Stage 4: Ready Wall Staging";
+        body.innerHTML = `
+          <div class="space-y-3">
+            <div class="p-3 bg-emerald-950/40 border border-emerald-800 rounded-xl text-emerald-400 font-bold">✅ Staged at Front Desk</div>
+            <button onclick="confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } })" class="w-full bg-purple-600 text-white font-bold py-2 rounded-xl text-xs">🏁 Complete Job & Fire Confetti</button>
+          </div>
+        `;
+      }
     }
 
     function closeDrawer() {
