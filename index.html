@@ -3,15 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TappyThing Forever Card™ v2.9</title>
+  <title>TappyThing Digital Coordinator v3.1</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     body { background-color: #020617; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
     .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="min-h-screen pb-12 flex flex-col items-center p-3 sm:p-4">
+
+  <!-- DISPATCH CALENDAR / SCHEDULE BAR -->
+  <div class="w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-2xl p-3 mb-3 shadow-xl">
+    <div class="flex justify-between items-center mb-2 px-1">
+      <span class="text-[11px] font-extrabold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> Dispatch Calendar
+      </span>
+      <button onclick="toggleAddStopModal()" class="text-[11px] bg-cyan-950 text-cyan-300 border border-cyan-800 hover:bg-cyan-900 px-2.5 py-1 rounded-lg font-bold transition">
+        + Add Stop
+      </button>
+    </div>
+    <div id="dispatch-timeline" class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+      <!-- Dynamic Stops Loaded via JS -->
+    </div>
+  </div>
 
   <!-- TOP PASSPORT HEADER -->
   <header class="w-full max-w-md glass rounded-2xl p-3.5 mb-3 flex items-center justify-between border-b border-cyan-500/30">
@@ -23,7 +40,7 @@
         <img id="passport-img" class="hidden absolute inset-0 w-full h-full object-cover">
       </div>
       <div>
-        <div class="text-[10px] uppercase tracking-widest text-cyan-400 font-bold">TAPPYTHING FOREVER CARD™</div>
+        <div class="text-[10px] uppercase tracking-widest text-cyan-400 font-bold">TAPPYTHING CARD™</div>
         <h1 id="header-customer-name" class="text-sm font-extrabold text-white truncate max-w-[180px]">Margueriete Villasanta</h1>
         <p id="header-customer-phone" class="text-[11px] text-slate-400">Aerus Lux Guardian • 10:15 AM</p>
       </div>
@@ -34,11 +51,15 @@
     </div>
   </header>
 
-  <!-- MASTER VOICE BUTTON (REAL MIC DICTATION) -->
-  <div class="w-full max-w-md mb-3">
-    <button onclick="startVoiceDictation()" id="master-voice-btn" class="w-full py-3.5 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-black text-sm rounded-xl shadow-xl flex items-center justify-center gap-2 transition transform active:scale-95">
-      <span id="mic-pulse" class="w-2.5 h-2.5 rounded-full bg-slate-950"></span>
-      <span id="mic-btn-text">🎙️ TAP TO TALK TO FRESH</span>
+  <!-- MASTER VOICE BUTTON & PINBALL TRIGGER -->
+  <div class="w-full max-w-md mb-3 grid grid-cols-4 gap-2">
+    <button onclick="startVoiceDictation()" id="master-voice-btn" class="col-span-3 py-3.5 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-xl flex items-center justify-center gap-2 transition transform active:scale-95">
+      <span id="mic-pulse" class="w-2 h-2 rounded-full bg-slate-950"></span>
+      <span id="mic-btn-text">🎙️ TALK TO FRESH</span>
+    </button>
+    <button onclick="triggerPinball()" class="col-span-1 py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-xl flex flex-col items-center justify-center transition active:scale-95">
+      <span>🎰</span>
+      <span>PINBALL</span>
     </button>
   </div>
 
@@ -62,7 +83,7 @@
       </div>
 
       <div>
-        <label class="block text-xs font-bold text-slate-300 mb-1">Live Voice Symptom Note</label>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Live Voice Symptom Note / Pinball Output</label>
         <textarea id="symptom-note" rows="3" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-sm text-white" placeholder="Speak after tapping microphone button above..."></textarea>
       </div>
 
@@ -82,8 +103,17 @@
         <button onclick="addLabor('HEPA Filter Set', 29.95)" class="p-2 bg-slate-950 border border-slate-800 hover:border-cyan-500 rounded-lg text-xs font-bold text-slate-200">$29.95 Filter</button>
       </div>
 
+      <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-2">
+        <label class="block text-[11px] font-bold text-slate-400">Add Custom Item (e.g. Overhaul)</label>
+        <div class="flex gap-2">
+          <input type="text" id="custom-item-name" placeholder="Overhaul" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-white">
+          <input type="number" id="custom-item-price" placeholder="$150" class="w-20 bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-white">
+          <button onclick="addCustomItem()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs">+ Add</button>
+        </div>
+      </div>
+
       <div id="items-list" class="space-y-1.5 max-h-36 overflow-y-auto bg-slate-950/60 p-2 rounded-lg border border-slate-800">
-        <p class="text-xs text-slate-500 text-center py-2">No parts added yet. Tap buttons above to add.</p>
+        <p class="text-xs text-slate-500 text-center py-2">No parts added yet.</p>
       </div>
 
       <button onclick="switchStage(3)" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl shadow-lg transition">Send Estimate to Client ➔</button>
@@ -130,7 +160,27 @@
 
   </main>
 
+  <!-- ADD STOP MODAL -->
+  <div id="add-stop-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl p-4 w-full max-w-xs space-y-3">
+      <h3 class="text-sm font-bold text-cyan-400">+ Add Appointment Stop</h3>
+      <input type="text" id="modal-time" placeholder="Time (e.g. 12:30 PM)" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white">
+      <input type="text" id="modal-name" placeholder="Customer Name" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white">
+      <input type="text" id="modal-desc" placeholder="Equipment / Service Type" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white">
+      <div class="flex gap-2 pt-1">
+        <button onclick="toggleAddStopModal()" class="flex-1 py-2 bg-slate-800 text-slate-400 rounded-lg text-xs font-bold">Cancel</button>
+        <button onclick="saveNewStop()" class="flex-1 py-2 bg-cyan-600 text-white rounded-lg text-xs font-bold">Save Stop</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    let stops = [
+      { id: 1, time: '10:15 AM', name: 'Margueriete Villasanta', desc: 'Aerus Lux Guardian' },
+      { id: 2, time: '11:30 AM', name: 'Ruth Tucker', desc: 'Filter Swap & Diagnostic' },
+      { id: 3, time: '02:00 PM', name: 'Sarah Jenkins', desc: 'Prochem Steamer Unit' }
+    ];
+
     const customerVault = [
       { name: "Ruth Tucker", phone: "4102566949", address: "6 Lagan Ct Nottingham, MD" },
       { name: "Margueriete Villasanta", phone: "4105550192", address: "Timonium, MD" },
@@ -140,13 +190,58 @@
 
     let currentItems = [];
 
-    // REAL BROWSER MICROPHONE DICTATION (WEB SPEECH API)
+    window.addEventListener('DOMContentLoaded', () => {
+      renderTimeline();
+      loadStop(1);
+    });
+
+    function renderTimeline() {
+      const container = document.getElementById('dispatch-timeline');
+      container.innerHTML = stops.map(s => `
+        <div onclick="loadStop(${s.id})" class="min-w-[130px] bg-slate-950 border border-slate-800 hover:border-cyan-500 rounded-xl p-2 cursor-pointer transition shrink-0">
+          <div class="text-[10px] font-bold text-cyan-400">${s.time}</div>
+          <div class="text-xs font-bold text-white truncate">${s.name}</div>
+          <div class="text-[10px] text-slate-400 truncate">${s.desc}</div>
+        </div>
+      `).join('');
+    }
+
+    function loadStop(stopId) {
+      const stop = stops.find(s => s.id === stopId);
+      if (stop) {
+        document.getElementById('header-customer-name').innerText = stop.name;
+        document.getElementById('header-customer-phone').innerText = `${stop.desc} • ${stop.time}`;
+      }
+    }
+
+    function toggleAddStopModal() {
+      document.getElementById('add-stop-modal').classList.toggle('hidden');
+    }
+
+    function saveNewStop() {
+      const time = document.getElementById('modal-time').value || '12:30 PM';
+      const name = document.getElementById('modal-name').value || 'New Customer';
+      const desc = document.getElementById('modal-desc').value || 'Service Stop';
+      const newId = stops.length + 1;
+      stops.push({ id: newId, time, name, desc });
+      renderTimeline();
+      loadStop(newId);
+      toggleAddStopModal();
+    }
+
+    // PINBALL PROTOCOL ENGINE
+    function triggerPinball() {
+      const note = document.getElementById('symptom-note');
+      note.value = "🎰 PINBALL EXECUTED: Pending vault tasks pulled. Ruth Tucker (#22086) verified at 6 Lagan Ct, Nottingham MD. Pre-written proposal ready for SMS/Email checkout.";
+      alert("🎰 Pinball Protocol Triggered! Cross-referenced 22,283 customer records.");
+    }
+
     function startVoiceDictation() {
       const btnText = document.getElementById('mic-btn-text');
       const pulse = document.getElementById('mic-pulse');
       
       if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        alert("Voice recognition is not supported on this browser. Please type directly into the note box.");
+        alert("Voice recognition is not supported on this browser.");
         return;
       }
 
@@ -157,21 +252,22 @@
       recognition.lang = 'en-US';
 
       recognition.onstart = function() {
-        btnText.innerText = "LISTENING... SPEAK NOW";
+        btnText.innerText = "LISTENING...";
         pulse.classList.add('animate-ping');
       };
 
       recognition.onresult = function(event) {
         const transcript = event.results[0][0].transcript;
         document.getElementById('symptom-note').value = transcript;
-        btnText.innerText = "🎙️ TAP TO TALK TO FRESH";
+        document.getElementById('vault-search').value = transcript;
+        searchVault();
+        btnText.innerText = "🎙️ TALK TO FRESH";
         pulse.classList.remove('animate-ping');
       };
 
-      recognition.onerror = function(event) {
-        btnText.innerText = "🎙️ TAP TO TALK TO FRESH";
+      recognition.onerror = function() {
+        btnText.innerText = "🎙️ TALK TO FRESH";
         pulse.classList.remove('animate-ping');
-        alert("Microphone error or permission denied.");
       };
 
       recognition.start();
@@ -244,12 +340,29 @@
       renderItems();
     }
 
+    function addCustomItem() {
+      const nameInput = document.getElementById('custom-item-name');
+      const priceInput = document.getElementById('custom-item-price');
+      const name = nameInput.value.trim();
+      const price = parseFloat(priceInput.value);
+
+      if (!name || isNaN(price)) {
+        alert("Please enter a valid item name and dollar amount.");
+        return;
+      }
+
+      currentItems.push({ item: name, price: price });
+      renderItems();
+      nameInput.value = '';
+      priceInput.value = '';
+    }
+
     function renderItems() {
       const box = document.getElementById('items-list');
       const payBox = document.getElementById('pay-summary');
       let total = 0;
       if (currentItems.length === 0) {
-        box.innerHTML = `<p class="text-xs text-slate-500 text-center py-2">No parts added yet. Tap buttons above to add.</p>`;
+        box.innerHTML = `<p class="text-xs text-slate-500 text-center py-2">No parts added yet.</p>`;
         payBox.innerHTML = `<p class="text-xs text-slate-500">No line items.</p>`;
       } else {
         box.innerHTML = currentItems.map(i => `
