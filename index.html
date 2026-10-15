@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TappyThing / Forever Card™ — Fresh Digital Coordinator</title>
+  <title>Forever Card™ — Powered by TappyThing</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Google Fonts: Inter & JetBrains Mono -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-  <!-- JS Canvas Confetti for Ready Wall -->
+  <!-- Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <!-- PapaParse for Client Vault CSV parsing -->
+  <!-- PapaParse for 22,283 CSV Vault -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
   <script>
@@ -22,17 +22,13 @@
         extend: {
           colors: {
             brand: {
-              50: '#ecfdf5',
-              100: '#d1fae5',
               400: '#34d399',
               500: '#10b981',
               600: '#059669',
-              700: '#047857',
-              900: '#064e3b',
             },
-            darkbg: '#0B0F17',
+            darkbg: '#080B11',
             cardbg: '#111827',
-            panelbg: '#1F2937'
+            panelbg: '#1A2234'
           },
           fontFamily: {
             sans: ['Inter', 'sans-serif'],
@@ -45,727 +41,283 @@
 
   <style>
     body {
-      background-color: #0B0F17;
+      background-color: #080B11;
       color: #F3F4F6;
       font-family: 'Inter', sans-serif;
     }
-    .watermark-bg {
-      background-image: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.04) 0%, transparent 70%);
+    .card-chassis {
+      background: linear-gradient(145deg, #131B2E, #0D1322);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 25px rgba(16, 185, 129, 0.08);
     }
     .pulse-record {
-      animation: pulse-red 1.2s infinite;
+      animation: pulse-mic 1.2s infinite;
     }
-    @keyframes pulse-red {
-      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-      70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+    @keyframes pulse-mic {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8); }
+      70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
       100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
     }
-    /* Custom Scrollbars */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #111827; }
-    ::-webkit-scrollbar-thumb { background: #374151; border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: #10b981; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between watermark-bg antialiased selection:bg-brand-500 selection:text-black">
+<body class="min-h-screen flex items-center justify-center p-3 sm:p-6 antialiased">
 
-  <!-- ========================================== -->
-  <!-- 1. HEADER LAYOUT (STRICT 3-COLUMN LAYOUT)  -->
-  <!-- ========================================== -->
-  <header class="bg-gray-900/90 backdrop-blur border-b border-gray-800 sticky top-0 z-40 px-4 py-3 shadow-2xl">
-    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+  <!-- ========================================================= -->
+  <!-- THE UNIFIED FOREVER CARD™ CHASSIS                         -->
+  <!-- ========================================================= -->
+  <div class="card-chassis max-w-4xl w-full rounded-3xl p-5 sm:p-8 space-y-6 relative overflow-hidden">
+
+    <!-- ----------------------------------------------------- -->
+    <!-- 1. THE 3-COLUMN MASTER HEADER                         -->
+    <!-- ----------------------------------------------------- -->
+    <header class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border-b border-gray-800 pb-5">
       
       <!-- LEFT: FOREVER CARD™ BRANDING -->
       <div class="flex items-center space-x-3 justify-center md:justify-start">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-black font-black text-xl shadow-lg shadow-brand-500/20">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-black font-black text-xl shadow-lg shadow-brand-500/20">
           FC
         </div>
         <div>
-          <div class="flex items-center space-x-2">
-            <h1 class="text-lg font-black tracking-wider text-white uppercase font-mono">FOREVER CARD<span class="text-brand-400">™</span></h1>
-            <span class="text-[10px] uppercase tracking-widest bg-brand-900/80 text-brand-400 border border-brand-500/30 px-2 py-0.5 rounded-full font-bold">v3.6</span>
+          <div class="flex items-center space-x-1.5">
+            <h1 class="text-base font-black tracking-wider text-white uppercase font-mono">FOREVER CARD<span class="text-brand-400">™</span></h1>
           </div>
           <p class="text-xs text-gray-400 font-medium">Powered by TappyThing</p>
         </div>
       </div>
 
-      <!-- CENTER: THE HOST (CIRCULAR FRESH BADGE & MASTER TALK BUTTON) -->
+      <!-- CENTER: THE HOST (FRESH LOGO EMBLEM + MASTER MICROPHONE) -->
       <div class="flex flex-col items-center justify-center space-y-2">
-        <div class="flex items-center space-x-3">
-          <!-- CIRCULAR FRESH LOGO SVG -->
-          <div class="relative group cursor-pointer" onclick="toggleHelpModal()">
-            <div class="w-14 h-14 rounded-full border-2 border-brand-400 bg-black p-0.5 shadow-xl shadow-brand-500/20 flex items-center justify-center overflow-hidden transition transform group-hover:scale-105">
-              <svg viewBox="0 0 200 200" class="w-full h-full">
-                <!-- Circular Outer Border -->
-                <circle cx="100" cy="100" r="95" fill="#000" stroke="#10b981" stroke-width="6"/>
-                <!-- Boy Figure with Sunglasses holding Bandana -->
-                <path d="M 60,140 Q 100,120 140,140 L 150,200 L 50,200 Z" fill="#1F2937"/>
-                <!-- Head -->
-                <circle cx="100" cy="85" r="32" fill="#F3F4F6"/>
-                <!-- Hair -->
-                <path d="M 68,80 Q 75,50 100,52 Q 125,50 132,80 Q 100,60 68,80 Z" fill="#111827"/>
-                <!-- Sunglasses -->
-                <path d="M 75,78 Q 88,72 100,78 Q 112,72 125,78 Q 120,95 100,92 Q 80,95 75,78 Z" fill="#000" stroke="#10b981" stroke-width="2"/>
-                <!-- Smile -->
-                <path d="M 85,103 Q 100,115 115,103" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
-                <!-- Raised Arm Holding Bandana -->
-                <path d="M 130,125 Q 160,100 150,70" fill="none" stroke="#F3F4F6" stroke-width="12" stroke-linecap="round"/>
-                <!-- Tapped Bandana in Hand -->
-                <path d="M 145,65 Q 165,45 175,75 Q 155,85 145,65 Z" fill="#10b981" stroke="#fff" stroke-width="2"/>
-                <!-- Tapping Motion Lines -->
-                <path d="M 175,50 Q 185,55 180,65" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"/>
-                <path d="M 168,40 Q 180,45 175,55" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <span class="absolute -bottom-1 -right-1 bg-brand-500 text-black text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-tighter">FRESH</span>
+        <div class="relative group cursor-pointer">
+          <!-- Circular Fresh Logo Emblem -->
+          <div class="w-20 h-20 rounded-full border-2 border-brand-400 bg-white p-1 shadow-xl shadow-brand-500/20 flex items-center justify-center overflow-hidden">
+            <img src="/user-uploads/4126.jpg" alt="Fresh Digital Coordinator" class="w-full h-full object-contain">
           </div>
-
-          <!-- MASTER TALK TO FRESH BUTTON -->
-          <button id="talkToFreshBtn" onclick="toggleVoiceDictation()" class="flex items-center space-x-2 bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 text-white font-black px-5 py-2.5 rounded-2xl shadow-lg shadow-red-600/30 transition transform hover:-translate-y-0.5 active:translate-y-0 border border-red-400/40">
-            <i id="micIcon" class="fa-solid fa-microphone text-lg"></i>
-            <span id="micText" class="tracking-wider uppercase text-sm font-mono">TALK TO FRESH</span>
-          </button>
-          
-          <button onclick="toggleHelpModal()" class="w-9 h-9 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-300 flex items-center justify-center border border-gray-700 transition" title="Voice Help & Instructions">
-            <i class="fa-solid fa-circle-question text-lg"></i>
-          </button>
         </div>
+
+        <!-- SLEEK MASTER MICROPHONE RIGHT UNDERNEATH -->
+        <button id="masterMicBtn" onclick="toggleVoiceDictation()" class="flex items-center space-x-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black px-4 py-1.5 rounded-full shadow-lg shadow-red-600/30 transition transform hover:scale-105 active:scale-95 border border-red-400/40">
+          <i id="micIcon" class="fa-solid fa-microphone text-xs"></i>
+          <span id="micText" class="text-[11px] font-mono tracking-wider uppercase">TALK TO FRESH</span>
+        </button>
       </div>
 
-      <!-- RIGHT: SUBSCRIBER / HOUSEHOLD NAME & SETTINGS -->
+      <!-- RIGHT: SUBSCRIBER / CUSTOMER IDENTITY -->
       <div class="flex items-center space-x-3 justify-center md:justify-end">
-        <div class="text-right">
-          <div id="displayOrgName" class="text-sm font-bold text-white tracking-wide">Aerus Timonium</div>
-          <div class="text-[11px] text-emerald-400 flex items-center justify-end space-x-1">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-ping"></span>
-            <span>Live Sync Engine</span>
+        <div class="text-center md:text-right">
+          <div id="displayOrgName" class="text-sm font-black text-white tracking-wide">Aerus Timonium</div>
+          <div class="text-[11px] text-brand-400 flex items-center justify-center md:justify-end space-x-1 font-mono">
+            <span class="w-1.5 h-1.5 rounded-full bg-brand-400 inline-block animate-ping"></span>
+            <span>Live Card Active</span>
           </div>
         </div>
-        <button onclick="openSettingsModal()" class="p-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 transition" title="Settings & Webhook Config">
-          <i class="fa-solid fa-gear text-lg"></i>
+        <button onclick="openSettingsModal()" class="w-8 h-8 rounded-xl bg-gray-800/80 hover:bg-gray-700 text-gray-300 border border-gray-700 flex items-center justify-center transition" title="Settings">
+          <i class="fa-solid fa-gear text-sm"></i>
         </button>
+      </div>
+
+    </header>
+
+    <!-- ----------------------------------------------------- -->
+    <!-- 2. HEARTBEAT OF THE CARD: CALENDAR & PINBALL (SIDE-BY-SIDE) -->
+    <!-- ----------------------------------------------------- -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      
+      <!-- 📅 CALENDAR (WHAT'S NEXT) -->
+      <div class="bg-gray-950/70 border border-blue-500/30 rounded-2xl p-4 space-y-3">
+        <div class="flex items-center justify-between border-b border-gray-800 pb-2">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-calendar-days text-blue-400 text-sm"></i>
+            <h2 class="text-xs font-bold text-blue-400 uppercase font-mono tracking-wider">Calendar • What's Next</h2>
+          </div>
+          <span class="text-[10px] text-gray-500 font-mono">Today's Schedule</span>
+        </div>
+        <div class="space-y-2 text-xs font-mono">
+          <div class="bg-gray-900/80 p-2.5 rounded-xl border border-gray-800 flex justify-between items-center">
+            <div>
+              <div class="text-blue-300 font-bold">09:00 AM • Towson District Court</div>
+              <div class="text-[11px] text-gray-400 font-sans">William Scheduled Appearance</div>
+            </div>
+            <span class="text-[10px] bg-blue-950 text-blue-400 px-2 py-0.5 rounded-full border border-blue-800">Legal</span>
+          </div>
+          <div class="bg-gray-900/80 p-2.5 rounded-xl border border-gray-800 flex justify-between items-center">
+            <div>
+              <div class="text-emerald-300 font-bold">11:30 AM • Lutherville Install</div>
+              <div class="text-[11px] text-gray-400 font-sans">Mike Field Delivery & Setup</div>
+            </div>
+            <span class="text-[10px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-800">Delivery</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🎰 PINBALL (THE ACTIVITY ZONE — BAM! BAM! BAM!) -->
+      <div class="bg-gray-950/70 border border-amber-500/30 rounded-2xl p-4 space-y-3">
+        <div class="flex items-center justify-between border-b border-gray-800 pb-2">
+          <div class="flex items-center space-x-2">
+            <span class="text-sm">🎰</span>
+            <h2 class="text-xs font-bold text-amber-400 uppercase font-mono tracking-wider">Pinball • The Action Zone</h2>
+          </div>
+          <span class="text-[10px] text-gray-500 font-mono">Live Bounces</span>
+        </div>
+        <div class="space-y-2 text-xs font-mono">
+          <div class="bg-gray-900/80 p-2.5 rounded-xl border border-gray-800 flex justify-between items-center">
+            <div>
+              <div class="text-amber-300 font-bold">⚡ Bam! Counter Drop-off</div>
+              <div class="text-[11px] text-gray-400 font-sans">William Sullivan • Lux Guardian</div>
+            </div>
+            <button onclick="openBox('intake')" class="text-[10px] bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded-lg border border-amber-500/40 hover:bg-amber-500/30">View</button>
+          </div>
+          <div class="bg-gray-900/80 p-2.5 rounded-xl border border-gray-800 flex justify-between items-center">
+            <div>
+              <div class="text-purple-300 font-bold">⚡ Bam! 1-Tap Drop-Ship SMS</div>
+              <div class="text-[11px] text-gray-400 font-sans">OEM HEPA Filter Pack to Client</div>
+            </div>
+            <button onclick="copyReadySms()" class="text-[10px] bg-purple-500/20 text-purple-300 px-2.5 py-1 rounded-lg border border-purple-500/40 hover:bg-purple-500/30">Copy Text</button>
+          </div>
+        </div>
       </div>
 
     </div>
-  </header>
 
-  <!-- ========================================== -->
-  <!-- MAIN WORKSPACE & LIFECYCLE CONTAINER       -->
-  <!-- ========================================== -->
-  <main class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow space-y-6">
-
-    <!-- TOP NAVIGATION TABS & NAVIGATION -->
-    <div class="flex flex-wrap items-center justify-between gap-3 bg-gray-900/80 p-2 rounded-2xl border border-gray-800 shadow-xl">
-      <!-- 4 STAGE LIFECYCLE STEPPER -->
-      <div class="flex items-center space-x-1 sm:space-x-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
-        <button onclick="switchStage(1)" id="stageBtn1" class="stage-tab-btn flex items-center space-x-2 px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition bg-brand-500 text-black shadow-lg shadow-brand-500/20">
-          <span>📥 Stage 1: Intake</span>
-        </button>
-        <button onclick="switchStage(2)" id="stageBtn2" class="stage-tab-btn flex items-center space-x-2 px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition text-gray-400 hover:text-white hover:bg-gray-800">
-          <span>🛠️ Stage 2: Workbench</span>
-        </button>
-        <button onclick="switchStage(3)" id="stageBtn3" class="stage-tab-btn flex items-center space-x-2 px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition text-gray-400 hover:text-white hover:bg-gray-800">
-          <span>📄 Stage 3: Proposal</span>
-        </button>
-        <button onclick="switchStage(4)" id="stageBtn4" class="stage-tab-btn flex items-center space-x-2 px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition text-gray-400 hover:text-white hover:bg-gray-800">
-          <span>🧱 Stage 4: Ready Wall</span>
-        </button>
+    <!-- ----------------------------------------------------- -->
+    <!-- 3. ACTIVE VOICE CAPTURE / TRANSCRIPT STREAM           -->
+    <!-- ----------------------------------------------------- -->
+    <div id="voiceStreamBox" class="bg-gray-950 border border-gray-800 rounded-2xl p-3.5 space-y-2">
+      <div class="flex justify-between items-center text-xs">
+        <span class="font-bold text-gray-300 font-mono flex items-center space-x-2">
+          <span class="w-2 h-2 rounded-full bg-brand-400 inline-block"></span>
+          <span>Fresh Voice Stream:</span>
+        </span>
+        <span id="listeningBadge" class="hidden text-[10px] text-red-400 font-bold animate-pulse font-mono">● LIVE RECORDING</span>
       </div>
-
-      <!-- AUXILIARY MODULE TOGGLES -->
-      <div class="flex items-center space-x-2 w-full md:w-auto justify-end">
-        <button onclick="togglePinballPanel()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/30 text-xs font-bold hover:bg-amber-500/20 transition">
-          <i class="fa-solid fa-bowling-ball"></i>
-          <span>Pinball Protocol 🎰</span>
-        </button>
-        <button onclick="toggleCalendarView()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/30 text-xs font-bold hover:bg-blue-500/20 transition">
-          <i class="fa-solid fa-calendar-days"></i>
-          <span>Dispatch & Calendar</span>
-        </button>
-      </div>
+      <p id="liveTranscriptText" class="text-xs text-gray-400 italic">"Tap TALK TO FRESH to speak notes, diagnostic updates, or client drop-offs..."</p>
     </div>
 
-    <!-- DYNAMIC LIVE CLIENT VAULT SEARCH & QUICK CREATION -->
-    <section class="bg-gray-900 border border-gray-800 rounded-2xl p-4 shadow-xl space-y-3">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-3">
-        <div class="flex items-center space-x-2 w-full md:w-1/2">
-          <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
-          <div class="relative w-full">
-            <input type="text" id="vaultSearchInput" oninput="handleVaultSearch()" placeholder="Search 22,283 Vault Records by Name, Phone, or Address..." class="w-full bg-gray-950 border border-gray-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-brand-500 font-mono">
-            <!-- Search Results Dropdown -->
-            <div id="vaultSearchResults" class="hidden absolute left-0 right-0 top-12 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl max-h-60 overflow-y-auto z-30 divide-y divide-gray-800"></div>
-          </div>
-        </div>
-
-        <!-- ACTIVE CLIENT CARD DISPLAY -->
-        <div class="flex items-center justify-between bg-gray-950 border border-gray-800 rounded-xl px-4 py-2 w-full md:w-1/2">
-          <div>
-            <div class="text-[10px] uppercase font-mono tracking-wider text-gray-400">Selected Client / Household</div>
-            <div id="activeClientName" class="text-sm font-black text-brand-400">William Sullivan</div>
-            <div id="activeClientMeta" class="text-xs text-gray-400">(410) 555-0199 • 1965 Greenspring Dr, Timonium MD</div>
-          </div>
-          <button onclick="resetClientToDefault()" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-2.5 py-1 rounded-lg border border-gray-700 transition">
-            Clear
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========================================== -->
-    <!-- STAGE 1: INTAKE CANVAS                     -->
-    <!-- ========================================== -->
-    <section id="stageView1" class="stage-view grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- ----------------------------------------------------- -->
+    <!-- 4. CLEAN EXPANDABLE OPERATIONAL DOORS (BOXES)         -->
+    <!-- ----------------------------------------------------- -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
       
-      <!-- LEFT 2 COLS: VOICE INTAKE & NOTES -->
-      <div class="md:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl space-y-4">
-        <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-          <h2 class="text-base font-bold text-white flex items-center space-x-2">
-            <span>📥 Voice Intake & Audio Prompting</span>
-          </h2>
-          <span class="text-xs text-gray-400 font-mono">Stage 1 of 4</span>
-        </div>
+      <!-- DOOR 1: INTAKE & PHOTO -->
+      <button onclick="openBox('intake')" class="bg-gray-900/90 hover:bg-gray-800 border border-gray-800 hover:border-brand-500 p-4 rounded-2xl text-center transition group space-y-1">
+        <div class="text-2xl group-hover:scale-110 transition">📥</div>
+        <div class="text-xs font-bold text-white">Intake & Camera</div>
+        <div class="text-[10px] text-gray-400">Vault & Unit Photo</div>
+      </button>
 
-        <!-- VOICE INPUT BOX WITH LIVE STREAMING -->
-        <div class="space-y-2">
-          <label class="text-xs font-semibold text-gray-300 uppercase tracking-wider">Raw Voice Dump & Equipment Notes</label>
-          <div class="relative">
-            <textarea id="intakeVoiceNotes" rows="5" class="w-full bg-gray-950 border border-gray-700 rounded-xl p-3.5 text-sm text-white focus:outline-none focus:border-brand-500 font-sans" placeholder="Tap TALK TO FRESH and dump everything here — machine issues, symptoms, drop-off requests, serial numbers..."></textarea>
-            <div id="recordingIndicator" class="hidden absolute top-3 right-3 flex items-center space-x-2 bg-red-950/80 border border-red-500 text-red-400 px-2.5 py-1 rounded-full text-xs font-bold animate-pulse">
-              <span class="w-2 h-2 rounded-full bg-red-500"></span>
-              <span>Listening Live...</span>
-            </div>
-          </div>
-        </div>
+      <!-- DOOR 2: WORKBENCH -->
+      <button onclick="openBox('workbench')" class="bg-gray-900/90 hover:bg-gray-800 border border-gray-800 hover:border-amber-500 p-4 rounded-2xl text-center transition group space-y-1">
+        <div class="text-2xl group-hover:scale-110 transition">🛠️</div>
+        <div class="text-xs font-bold text-white">Workbench</div>
+        <div class="text-[10px] text-gray-400">Parts & Diagnostics</div>
+      </button>
 
-        <!-- QUICK VOICE ACTIONS -->
-        <div class="flex flex-wrap items-center gap-2 pt-2">
-          <button onclick="appendNote('Unit brought in for annual tune-up.')" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-lg border border-gray-700 transition">+ Annual Tune-Up</button>
-          <button onclick="appendNote('Suction loss reported. Check belt and roller.')" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-lg border border-gray-700 transition">+ Suction Issue</button>
-          <button onclick="appendNote('Burning smell detected during operation.')" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-lg border border-gray-700 transition">+ Burning Smell</button>
-          <button onclick="clearIntakeNotes()" class="text-xs bg-red-900/30 hover:bg-red-900/50 text-red-400 px-3 py-1.5 rounded-lg border border-red-800/40 transition">Clear Notes</button>
-        </div>
-      </div>
+      <!-- DOOR 3: PROPOSAL / INVOICE -->
+      <button onclick="openBox('proposal')" class="bg-gray-900/90 hover:bg-gray-800 border border-gray-800 hover:border-emerald-500 p-4 rounded-2xl text-center transition group space-y-1">
+        <div class="text-2xl group-hover:scale-110 transition">📄</div>
+        <div class="text-xs font-bold text-white">Proposal & Pay</div>
+        <div class="text-[10px] text-gray-400">Stripe Invoicing</div>
+      </button>
 
-      <!-- RIGHT COL: EQUIPMENT PHOTO CAPTURE & DISPATCH BUTTON -->
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between space-y-4">
-        <div class="space-y-4">
-          <div class="border-b border-gray-800 pb-3">
-            <h3 class="text-sm font-bold text-white">📷 Equipment & Serial Tag</h3>
-            <p class="text-xs text-gray-400">Snap unit photo or serial plate</p>
-          </div>
+      <!-- DOOR 4: READY WALL -->
+      <button onclick="openBox('readywall')" class="bg-gray-900/90 hover:bg-gray-800 border border-gray-800 hover:border-purple-500 p-4 rounded-2xl text-center transition group space-y-1">
+        <div class="text-2xl group-hover:scale-110 transition">🧱</div>
+        <div class="text-xs font-bold text-white">Ready Wall</div>
+        <div class="text-[10px] text-gray-400">Staging & Pickup</div>
+      </button>
 
-          <div class="border-2 border-dashed border-gray-700 rounded-xl p-4 text-center hover:border-brand-500 transition cursor-pointer bg-gray-950/50" onclick="document.getElementById('photoInput').click()">
-            <input type="file" id="photoInput" class="hidden" accept="image/*" onchange="previewPhoto(event)">
-            <div id="photoPreviewContainer" class="space-y-2">
-              <i class="fa-solid fa-camera text-3xl text-gray-500"></i>
-              <div class="text-xs text-gray-400">Tap to Capture / Upload Photo</div>
-            </div>
-            <img id="photoPreview" class="hidden w-full h-36 object-cover rounded-lg shadow-lg">
-          </div>
-        </div>
+    </div>
 
-        <button onclick="advanceToWorkbench()" class="w-full bg-gradient-to-r from-brand-500 to-emerald-600 hover:from-brand-400 hover:to-emerald-500 text-black font-black py-3.5 px-4 rounded-xl shadow-lg shadow-brand-500/20 text-sm tracking-wide uppercase transition transform hover:-translate-y-0.5">
-          Send to Workbench ➔
-        </button>
-      </div>
-
-    </section>
-
-    <!-- ========================================== -->
-    <!-- STAGE 2: WORKBENCH CANVAS                  -->
-    <!-- ========================================== -->
-    <section id="stageView2" class="stage-view hidden grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- ----------------------------------------------------- -->
+    <!-- 5. EXPANDABLE WORKSPACE CANVAS (OPENS CLEANLY)        -->
+    <!-- ----------------------------------------------------- -->
+    <div id="activeWorkspaceDrawer" class="hidden bg-gray-950 border border-gray-800 rounded-2xl p-5 space-y-4">
       
-      <!-- LEFT 2 COLS: BENCH DIAGNOSTICS & LINE ITEM BUILDER -->
-      <div class="md:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl space-y-4">
-        <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-          <h2 class="text-base font-bold text-white flex items-center space-x-2">
-            <span>🛠️ Bench Repair Lead & Diagnostics</span>
-          </h2>
-          <span class="text-xs text-amber-400 font-mono">Stage 2 of 4</span>
-        </div>
-
-        <div class="space-y-2">
-          <label class="text-xs font-semibold text-gray-300 uppercase tracking-wider">Bench Diagnostic Notes (Chris Lead)</label>
-          <textarea id="benchDiagnosticNotes" rows="3" class="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500" placeholder="Motor brushes worn down to 20%. Belt snapped. Roller bearing tight..."></textarea>
-        </div>
-
-        <!-- LINE ITEMS & SERVICES BUILDER -->
-        <div class="space-y-3 pt-2">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-bold text-white uppercase tracking-wider font-mono">Dynamic Line Items & Parts</h3>
-            <span class="text-xs text-gray-400">Add Parts & Labor</span>
-          </div>
-
-          <!-- INPUT FORM -->
-          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
-            <input type="text" id="itemDescInput" placeholder="Item / Service description (e.g. Deluxe Tune-Up)" class="sm:col-span-7 bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
-            <input type="number" id="itemPriceInput" placeholder="$ Amount" class="sm:col-span-3 bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500 font-mono">
-            <button onclick="addLineItem()" class="sm:col-span-2 bg-brand-500 hover:bg-brand-400 text-black font-bold py-2 px-3 rounded-xl text-sm transition">
-              + Add
-            </button>
-          </div>
-
-          <!-- QUICK ITEM CATALOG PRESETS -->
-          <div class="flex flex-wrap gap-1.5 pt-1">
-            <button onclick="addPresetItem('Standard Tune-Up', 45)" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-2.5 py-1 rounded-lg border border-gray-700">+ Tune-Up ($45)</button>
-            <button onclick="addPresetItem('Drive Belt Replacement', 15)" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-2.5 py-1 rounded-lg border border-gray-700">+ Belt ($15)</button>
-            <button onclick="addPresetItem('HEPA Filter Pack', 29.95)" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-2.5 py-1 rounded-lg border border-gray-700">+ HEPA Filter ($29.95)</button>
-            <button onclick="addPresetItem('Main Motor Assembly', 89)" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-2.5 py-1 rounded-lg border border-gray-700">+ Motor ($89)</button>
-          </div>
-
-          <!-- ACTIVE LINE ITEMS LIST -->
-          <div id="lineItemsList" class="bg-gray-950 border border-gray-800 rounded-xl p-3 divide-y divide-gray-800 min-h-[100px] max-h-48 overflow-y-auto">
-            <div class="text-xs text-gray-500 text-center py-6">No line items added yet.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- RIGHT COL: TOTAL SUMMARY & ADVANCE BUTTON -->
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between space-y-4">
-        <div class="space-y-4">
-          <div class="border-b border-gray-800 pb-3">
-            <h3 class="text-sm font-bold text-white font-mono">BENCH ESTIMATE SUMMARY</h3>
-          </div>
-
-          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2 font-mono">
-            <div class="flex justify-between text-xs text-gray-400">
-              <span>Subtotal:</span>
-              <span id="summarySubtotal">$0.00</span>
-            </div>
-            <div class="flex justify-between text-xs text-gray-400">
-              <span>Tax (6%):</span>
-              <span id="summaryTax">$0.00</span>
-            </div>
-            <div class="border-t border-gray-800 pt-2 flex justify-between text-base font-black text-brand-400">
-              <span>TOTAL:</span>
-              <span id="summaryTotal">$0.00</span>
-            </div>
-          </div>
-        </div>
-
-        <button onclick="advanceToProposal()" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-black font-black py-3.5 px-4 rounded-xl shadow-lg shadow-amber-500/20 text-sm tracking-wide uppercase transition transform hover:-translate-y-0.5">
-          Generate Proposal ➔
-        </button>
-      </div>
-
-    </section>
-
-    <!-- ========================================== -->
-    <!-- STAGE 3: PROPOSAL & PAYMENT CANVAS         -->
-    <!-- ========================================== -->
-    <section id="stageView3" class="stage-view hidden grid grid-cols-1 md:grid-cols-3 gap-6">
-      
-      <!-- LEFT 2 COLS: INTERACTIVE PROPOSAL INVOICE -->
-      <div class="md:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-6">
-        <div class="flex items-center justify-between border-b border-gray-800 pb-4">
-          <div>
-            <div class="text-xs uppercase font-mono text-gray-400">Formal Proposal / Invoice</div>
-            <h2 class="text-lg font-black text-white">Aerus Home Wellness — Repair Authorization</h2>
-          </div>
-          <div class="text-right">
-            <span id="proposalDate" class="text-xs font-mono text-gray-400">Oct 15, 2026</span>
-            <div class="text-xs font-bold text-brand-400">Ticket #TT-8821</div>
-          </div>
-        </div>
-
-        <!-- CUSTOMER REVIEW BLOCK -->
-        <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 grid grid-cols-2 gap-4 text-xs">
-          <div>
-            <span class="text-gray-500 uppercase tracking-wider font-mono">Customer Information</span>
-            <div id="propClientName" class="font-bold text-white text-sm mt-1">William Sullivan</div>
-            <div id="propClientPhone" class="text-gray-300">(410) 555-0199</div>
-            <div id="propClientAddr" class="text-gray-400">1965 Greenspring Dr, Timonium MD</div>
-          </div>
-          <div>
-            <span class="text-gray-500 uppercase tracking-wider font-mono">Scope of Repair</span>
-            <div id="propDiagSummary" class="text-gray-300 mt-1 italic">Annual Tune-up and suction seal restoration.</div>
-          </div>
-        </div>
-
-        <!-- LINE ITEMS TABLE -->
-        <div class="space-y-2">
-          <div class="text-xs font-bold text-gray-400 uppercase font-mono tracking-wider">Approved Line Items</div>
-          <div id="proposalItemsTable" class="bg-gray-950 border border-gray-800 rounded-xl divide-y divide-gray-800 p-3">
-            <!-- Rendered JS line items -->
-          </div>
-        </div>
-      </div>
-
-      <!-- RIGHT COL: STRIPE PAYMENT AUTHORIZATION -->
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between space-y-6">
-        <div class="space-y-4">
-          <div class="border-b border-gray-800 pb-3">
-            <h3 class="text-sm font-bold text-white font-mono">STRIPE PAYMENT DISPATCH</h3>
-            <p class="text-xs text-gray-400">1-Tap Customer Payment Link</p>
-          </div>
-
-          <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-3 font-mono">
-            <div class="flex justify-between text-xs text-gray-400">
-              <span>Amount Due:</span>
-              <span id="proposalTotalDisplay" class="text-white font-bold">$0.00</span>
-            </div>
-            <div class="text-[11px] text-gray-500 leading-relaxed">
-              Clicking below dispatches an authorized text link directly to customer phone for approval & payment.
-            </div>
-          </div>
-        </div>
-
-        <div class="space-y-3">
-          <button onclick="authorizeStripeLink()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-black font-black py-4 px-4 rounded-xl shadow-lg shadow-emerald-500/20 text-sm tracking-wide uppercase transition transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
-            <i class="fa-solid fa-bolt"></i>
-            <span>Authorize & Send Stripe Link</span>
-          </button>
-
-          <button onclick="markAsPaidInPerson()" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-2.5 px-4 rounded-xl text-xs border border-gray-700 transition">
-            Collect Cash / In-Person Payment
-          </button>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- ========================================== -->
-    <!-- STAGE 4: READY WALL CANVAS                 -->
-    <!-- ========================================== -->
-    <section id="stageView4" class="stage-view hidden grid grid-cols-1 md:grid-cols-3 gap-6">
-      
-      <!-- LEFT 2 COLS: STAGING BAY SELECTION & READY CARD -->
-      <div class="md:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-6">
-        <div class="flex items-center justify-between border-b border-gray-800 pb-4">
-          <div>
-            <div class="text-xs uppercase font-mono text-emerald-400 font-bold">Stage 4: Ready Wall 🧱</div>
-            <h2 class="text-lg font-black text-white">Staging & Delivery Bay Routing</h2>
-          </div>
-          <span class="bg-emerald-950 text-emerald-400 border border-emerald-800 text-xs font-bold px-3 py-1 rounded-full">
-            PAID & AUTHORIZED
-          </span>
-        </div>
-
-        <!-- STAGING BAY SELECTOR -->
-        <div class="space-y-3">
-          <label class="text-xs font-bold text-gray-300 uppercase tracking-wider font-mono">Select Physical Staging Location</label>
-          <div class="grid grid-cols-3 gap-3">
-            <button onclick="selectStagingBay('Front Desk')" id="bayBtnFront" class="bay-btn bg-gray-950 border-2 border-brand-500 p-4 rounded-xl text-center hover:bg-gray-800 transition">
-              <div class="text-xl mb-1">🏬</div>
-              <div class="text-xs font-bold text-white">Front Desk</div>
-              <div class="text-[10px] text-gray-400">Customer Pickup</div>
-            </button>
-            <button onclick="selectStagingBay('Main Bench')" id="bayBtnBench" class="bay-btn bg-gray-950 border border-gray-800 p-4 rounded-xl text-center hover:bg-gray-800 transition">
-              <div class="text-xl mb-1">🛠️</div>
-              <div class="text-xs font-bold text-white">Main Bench</div>
-              <div class="text-[10px] text-gray-400">Final QC Check</div>
-            </button>
-            <button onclick="selectStagingBay('Van Queue')" id="bayBtnVan" class="bay-btn bg-gray-950 border border-gray-800 p-4 rounded-xl text-center hover:bg-gray-800 transition">
-              <div class="text-xl mb-1">🚚</div>
-              <div class="text-xs font-bold text-white">Van Queue</div>
-              <div class="text-[10px] text-gray-400">Mike Delivery</div>
-            </button>
-          </div>
-        </div>
-
-        <!-- FINAL SUMMARY CARD -->
-        <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2 text-xs">
-          <div class="flex justify-between text-gray-400">
-            <span>Customer:</span>
-            <span id="readyCustomerName" class="font-bold text-white">William Sullivan</span>
-          </div>
-          <div class="flex justify-between text-gray-400">
-            <span>Staging Bay:</span>
-            <span id="selectedBayName" class="font-bold text-brand-400">Front Desk</span>
-          </div>
-          <div class="flex justify-between text-gray-400">
-            <span>Total Collected:</span>
-            <span id="readyTotalPaid" class="font-bold text-emerald-400 font-mono">$0.00</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- RIGHT COL: FULFILLMENT CLOSING BUTTON -->
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between space-y-6">
-        <div class="space-y-4">
-          <div class="border-b border-gray-800 pb-3">
-            <h3 class="text-sm font-bold text-white font-mono">COMPLETE JOB</h3>
-            <p class="text-xs text-gray-400">Mark Completed & Trigger Confetti</p>
-          </div>
-
-          <div class="text-xs text-gray-400 leading-relaxed">
-            Completing this card logs the ticket into the permanent archive and resets the intake canvas for the next job.
-          </div>
-        </div>
-
-        <button onclick="markJobCompleteAndFulfilled()" class="w-full bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 hover:from-pink-400 hover:to-indigo-500 text-white font-black py-4 px-4 rounded-xl shadow-lg shadow-purple-600/30 text-sm tracking-wide uppercase transition transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
-          <span>🏁 Mark Complete & Fulfilled</span>
-        </button>
-      </div>
-
-    </section>
-
-    <!-- ========================================== -->
-    <!-- AUXILIARY MODULE 1: PINBALL PROTOCOL 🎰    -->
-    <!-- ========================================== -->
-    <section id="pinballPanel" class="hidden bg-gray-900 border border-amber-500/30 rounded-2xl p-5 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-        <div class="flex items-center space-x-2">
-          <span class="text-xl">🎰</span>
-          <h2 class="text-base font-bold text-amber-400 font-mono uppercase tracking-wider">Pinball Protocol — Fast-Action Queue</h2>
-        </div>
-        <button onclick="togglePinballPanel()" class="text-gray-400 hover:text-white text-sm">
+      <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+        <h3 id="drawerTitle" class="text-sm font-bold text-white flex items-center space-x-2">
+          <span>Operational Canvas</span>
+        </h3>
+        <button onclick="closeDrawer()" class="text-gray-400 hover:text-white text-sm">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <!-- ACTION CARD 1: DROP-SHIP PARTS -->
-        <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
-          <div class="text-xs font-bold text-amber-400 uppercase font-mono">1-Tap Drop-Ship Link</div>
-          <p class="text-xs text-gray-400">Order Aerus OEM filters directly to customer home address.</p>
-          <button onclick="copyPinballScript('Drop-Ship Aerus Filter Pack to client address', 'https://aerustimonium.com/order')" class="w-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold py-1.5 px-3 rounded-lg text-xs border border-amber-500/30 transition">
-            Copy Drop-Ship Order Link
-          </button>
-        </div>
-
-        <!-- ACTION CARD 2: PRE-WRITTEN PICKUP TEXT -->
-        <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
-          <div class="text-xs font-bold text-amber-400 uppercase font-mono">Pickup Ready SMS</div>
-          <p class="text-xs text-gray-400">Instant customer notification script for completed bench repair.</p>
-          <button onclick="copyTextToClipboard('Hi William, your Aerus system tune-up is complete and staged at our Timonium front desk! You can pick up anytime today until 5 PM.')" class="w-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold py-1.5 px-3 rounded-lg text-xs border border-amber-500/30 transition">
-            Copy Ready SMS Script
-          </button>
-        </div>
-
-        <!-- ACTION CARD 3: MISSING DATA AUTO-AUDIT -->
-        <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
-          <div class="text-xs font-bold text-amber-400 uppercase font-mono">Vault Missing Data Audit</div>
-          <p class="text-xs text-gray-400">Scans client record for missing address or telephone details.</p>
-          <button onclick="runVaultAudit()" class="w-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold py-1.5 px-3 rounded-lg text-xs border border-amber-500/30 transition">
-            Run Quick Audit
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========================================== -->
-    <!-- AUXILIARY MODULE 2: CALENDAR & DISPATCH    -->
-    <!-- ========================================== -->
-    <section id="calendarView" class="hidden bg-gray-900 border border-blue-500/30 rounded-2xl p-5 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-        <div class="flex items-center space-x-2">
-          <i class="fa-solid fa-calendar-days text-blue-400"></i>
-          <h2 class="text-base font-bold text-blue-400 font-mono uppercase tracking-wider">Dispatch & Field Schedule Timeline</h2>
-        </div>
-        <button onclick="toggleCalendarView()" class="text-gray-400 hover:text-white text-sm">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+      <!-- DRAWER CONTENT INJECTOR -->
+      <div id="drawerBody" class="text-xs text-gray-300">
+        <!-- Injected via JavaScript -->
       </div>
 
-      <!-- DAY TIMELINE GRID -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 font-mono text-xs">
-        <div class="bg-gray-950 p-3 rounded-xl border border-gray-800 space-y-1">
-          <div class="text-blue-400 font-bold">09:00 AM — Court / Legal</div>
-          <div class="text-gray-300 font-sans font-medium">William Scheduled Appearance</div>
-          <div class="text-[10px] text-gray-500">Towson District Court</div>
-        </div>
-        <div class="bg-gray-950 p-3 rounded-xl border border-gray-800 space-y-1">
-          <div class="text-emerald-400 font-bold">11:30 AM — Mike Field Delivery</div>
-          <div class="text-gray-300 font-sans font-medium">Equip General Services Install</div>
-          <div class="text-[10px] text-gray-500">Lutherville MD</div>
-        </div>
-        <div class="bg-gray-950 p-3 rounded-xl border border-gray-800 space-y-1">
-          <div class="text-amber-400 font-bold">02:00 PM — Bench QC</div>
-          <div class="text-gray-300 font-sans font-medium">Chris Parts Delivery & Inventory</div>
-          <div class="text-[10px] text-gray-500">Shop Counter</div>
-        </div>
-        <div class="bg-gray-950 p-3 rounded-xl border border-gray-800 space-y-1">
-          <div class="text-purple-400 font-bold">04:30 PM — Ready Wall Audit</div>
-          <div class="text-gray-300 font-sans font-medium">Mona Customer Outreach Call</div>
-          <div class="text-[10px] text-gray-500">Aerus Timonium Hub</div>
-        </div>
-      </div>
-    </section>
+    </div>
 
-  </main>
-
-  <!-- ========================================== -->
-  <!-- GLOBAL FOOTER & WATERMARK                  -->
-  <!-- ========================================== -->
-  <footer class="bg-gray-950 border-t border-gray-800 py-4 px-4 text-center text-xs text-gray-500">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+    <!-- ----------------------------------------------------- -->
+    <!-- 6. GLOBAL FOOTER                                      -->
+    <!-- ----------------------------------------------------- -->
+    <footer class="pt-2 flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-500 border-t border-gray-900 gap-2">
       <div class="flex items-center space-x-2">
-        <!-- Small Footer Fresh Emblem -->
-        <span class="w-2 h-2 rounded-full bg-brand-500 inline-block"></span>
-        <span class="font-bold text-gray-400">TappyThing Multi-Tenant SaaS Engine</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+        <span>Clean Environment LLC • Aerus Timonium</span>
       </div>
       <div>
-        Powered by <span class="text-gray-300 font-semibold">Clean Environment LLC</span> • Operating Case Study: <span class="text-brand-400 font-semibold">Aerus Timonium</span>
+        Permanent Identity • Universal Forever Card™ Rail
       </div>
-    </div>
-  </footer>
+    </footer>
 
-  <!-- ========================================== -->
-  <!-- MODAL 1: SETTINGS & WEBHOOK CONFIG         -->
-  <!-- ========================================== -->
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- SETTINGS MODAL                                            -->
+  <!-- ========================================================= -->
   <div id="settingsModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-5">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-md w-full p-6 space-y-4">
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-        <h3 class="text-base font-bold text-white flex items-center space-x-2">
-          <i class="fa-solid fa-gear text-brand-400"></i>
-          <span>⚙️ System Settings & Webhooks</span>
-        </h3>
-        <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-white">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+        <h3 class="text-sm font-bold text-white">⚙️ System Settings</h3>
+        <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
       </div>
-
-      <div class="space-y-4 text-xs">
+      <div class="space-y-3 text-xs">
         <div>
-          <label class="font-bold text-gray-300">Subscriber / Organization Name</label>
-          <input type="text" id="cfgOrgName" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-white mt-1 focus:outline-none focus:border-brand-500">
+          <label class="text-gray-400 block mb-1">Subscriber / Household Name</label>
+          <input type="text" id="cfgOrgName" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-white">
         </div>
-
         <div>
-          <label class="font-bold text-gray-300">Workbench Webhook Endpoint URL</label>
-          <input type="url" id="cfgWebhookUrl" placeholder="https://hook.make.com/your-endpoint" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-white mt-1 focus:outline-none focus:border-brand-500 font-mono">
-        </div>
-
-        <div>
-          <label class="font-bold text-gray-300">Stripe Payment Link Base URL</label>
-          <input type="url" id="cfgStripeUrl" placeholder="https://buy.stripe.com/your-link" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-white mt-1 focus:outline-none focus:border-brand-500 font-mono">
-        </div>
-
-        <!-- CSV VAULT FILE UPLOADER -->
-        <div class="pt-2">
-          <label class="font-bold text-gray-300 block mb-1">Load Customer CSV Vault (PapaParse Engine)</label>
-          <input type="file" id="csvFileInput" accept=".csv" class="w-full text-gray-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-gray-800 file:text-brand-400 hover:file:bg-gray-700">
+          <label class="text-gray-400 block mb-1">Monday/Make Webhook URL</label>
+          <input type="url" id="cfgWebhookUrl" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-white font-mono">
         </div>
       </div>
-
       <div class="flex justify-end space-x-2 pt-2 border-t border-gray-800">
-        <button onclick="closeSettingsModal()" class="px-4 py-2 rounded-xl bg-gray-800 text-gray-300 hover:bg-gray-700 font-bold text-xs">Cancel</button>
-        <button onclick="saveSettings()" class="px-4 py-2 rounded-xl bg-brand-500 text-black hover:bg-brand-400 font-bold text-xs">Save Configuration</button>
+        <button onclick="saveSettings()" class="bg-brand-500 text-black font-bold px-4 py-2 rounded-xl text-xs">Save</button>
       </div>
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- MODAL 2: FRESH HELP & VOICE GUIDANCE       -->
-  <!-- ========================================== -->
-  <div id="helpModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-gray-900 border border-brand-500/40 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-      <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-        <div class="flex items-center space-x-2">
-          <span class="text-xl">🤵</span>
-          <h3 class="text-base font-bold text-white">Fresh Coaching & Voice Guide</h3>
-        </div>
-        <button onclick="toggleHelpModal()" class="text-gray-400 hover:text-white">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <div class="space-y-3 text-xs text-gray-300 leading-relaxed">
-        <div class="p-3 bg-gray-950 rounded-xl border border-gray-800">
-          <span class="font-bold text-brand-400 block mb-1">🎙️ Voice First:</span>
-          Tap <strong class="text-white">TALK TO FRESH</strong> and speak naturally. Dictate client names, drop-off details, or repair notes in one single stream.
-        </div>
-        <div class="p-3 bg-gray-950 rounded-xl border border-gray-800">
-          <span class="font-bold text-amber-400 block mb-1">⚡ 1-Tap Workflow:</span>
-          Add line items, review calculations, and push directly to your workbench without touching technical settings.
-        </div>
-        <div class="p-3 bg-gray-950 rounded-xl border border-gray-800">
-          <span class="font-bold text-emerald-400 block mb-1">🏆 Closing the Win:</span>
-          Once paid, assign a Staging Bay and mark complete to fire the celebratory Ready Wall closing!
-        </div>
-      </div>
-
-      <button onclick="toggleHelpModal()" class="w-full py-2.5 bg-brand-500 text-black font-bold rounded-xl text-xs">
-        Got it, let's win!
-      </button>
-    </div>
-  </div>
-
-  <!-- ========================================== -->
-  <!-- FLOATING TOAST NOTIFICATION BANNER         -->
-  <!-- ========================================== -->
-  <div id="toastNotification" class="hidden fixed bottom-6 right-6 z-50 bg-gray-900 border border-brand-500/50 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 transition transform duration-300 translate-y-10">
-    <div id="toastIcon" class="w-8 h-8 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center font-bold">
-      ✓
-    </div>
-    <div>
-      <div id="toastMessage" class="text-xs font-bold font-mono">Job Sent to Workbench</div>
-      <div id="toastSubtext" class="text-[10px] text-gray-400">Synced to Shop Workbench</div>
-    </div>
-  </div>
-
-  <!-- ========================================== -->
-  <!-- JAVASCRIPT APPLICATION ENGINE              -->
-  <!-- ========================================== -->
+  <!-- ========================================================= -->
+  <!-- JAVASCRIPT ENGINE                                         -->
+  <!-- ========================================================= -->
   <script>
-    // --- GLOBAL APPLICATION STATE ---
-    let currentStage = 1;
     let isRecording = false;
     let recognition = null;
+    let activeClient = { name: "William Sullivan", phone: "(410) 555-0199", address: "1965 Greenspring Dr, Timonium MD" };
+    let lineItems = [{ id: 1, desc: "Standard Precision Tune-Up", price: 45.00 }];
 
-    let activeClient = {
-      name: "William Sullivan",
-      phone: "(410) 555-0199",
-      address: "1965 Greenspring Dr, Timonium MD"
-    };
-
-    let lineItems = [];
-    let selectedStagingBay = "Front Desk";
-    let customerVault = [
-      { name: "William Sullivan", phone: "(410) 555-0199", address: "1965 Greenspring Dr, Timonium MD" },
-      { name: "Equip General Services", phone: "(410) 555-0144", address: "Lutherville MD" },
-      { name: "Mona Aerus", phone: "(410) 252-3000", address: "York Rd, Timonium MD" }
-    ];
-
-    // --- CONFIGURATION DEFAULTS ---
-    let config = {
-      orgName: localStorage.getItem('tt_orgName') || 'Aerus Timonium',
-      webhookUrl: localStorage.getItem('tt_webhookUrl') || '',
-      stripeUrl: localStorage.getItem('tt_stripeUrl') || ''
-    };
-
-    // --- INITIALIZATION ON LOAD ---
     window.onload = function() {
-      document.getElementById('displayOrgName').innerText = config.orgName;
-      document.getElementById('cfgOrgName').value = config.orgName;
-      document.getElementById('cfgWebhookUrl').value = config.webhookUrl;
-      document.getElementById('cfgStripeUrl').value = config.stripeUrl;
-
-      setupWebSpeechAPI();
-      renderActiveClient();
-      renderLineItems();
-
-      // Setup CSV Vault Uploader via PapaParse
-      document.getElementById('csvFileInput').addEventListener('change', handleCsvUpload);
+      setupSpeechRecognition();
+      const savedOrg = localStorage.getItem('tt_orgName') || 'Aerus Timonium';
+      document.getElementById('displayOrgName').innerText = savedOrg;
+      document.getElementById('cfgOrgName').value = savedOrg;
+      document.getElementById('cfgWebhookUrl').value = localStorage.getItem('tt_webhookUrl') || '';
     };
 
-    // --- WEB SPEECH API INTEGRATION ---
-    function setupWebSpeechAPI() {
+    function setupSpeechRecognition() {
       if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SpeechRecognition();
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRec();
         recognition.continuous = true;
         recognition.interimResults = true;
 
         recognition.onresult = function(event) {
-          let transcript = '';
+          let text = '';
           for (let i = event.resultIndex; i < event.results.length; i++) {
-            transcript += event.results[i][0].transcript;
+            text += event.results[i][0].transcript;
           }
-          const notesArea = document.getElementById('intakeVoiceNotes');
-          notesArea.value = transcript;
-
-          // Check for voice keywords
-          if (transcript.toLowerCase().includes('fresh help')) {
-            toggleHelpModal();
-          }
-        };
-
-        recognition.onerror = function(err) {
-          console.warn('Speech Recognition error:', err);
-          stopDictation();
+          document.getElementById('liveTranscriptText').innerText = `"${text}"`;
         };
 
         recognition.onend = function() {
@@ -775,417 +327,110 @@
     }
 
     function toggleVoiceDictation() {
-      if (!recognition) {
-        showToast("Voice Recognition Not Supported", "Please use Chrome or Edge browser.");
-        return;
-      }
-      if (!isRecording) {
-        startDictation();
-      } else {
-        stopDictation();
-      }
+      if (!recognition) return alert('Voice speech recognition is supported in Chrome/Edge.');
+      if (!isRecording) startDictation();
+      else stopDictation();
     }
 
     function startDictation() {
       isRecording = true;
       recognition.start();
-      const btn = document.getElementById('talkToFreshBtn');
-      btn.classList.add('pulse-record');
-      document.getElementById('micText').innerText = "LISTENING...";
-      document.getElementById('recordingIndicator').classList.remove('hidden');
+      document.getElementById('masterMicBtn').classList.add('pulse-record');
+      document.getElementById('micText').innerText = 'LISTENING...';
+      document.getElementById('listeningBadge').classList.remove('hidden');
     }
 
     function stopDictation() {
       isRecording = false;
-      if (recognition) recognition.stop();
-      const btn = document.getElementById('talkToFreshBtn');
-      btn.classList.remove('pulse-record');
-      document.getElementById('micText').innerText = "TALK TO FRESH";
-      document.getElementById('recordingIndicator').classList.add('hidden');
+      recognition.stop();
+      document.getElementById('masterMicBtn').classList.remove('pulse-record');
+      document.getElementById('micText').innerText = 'TALK TO FRESH';
+      document.getElementById('listeningBadge').classList.add('hidden');
     }
 
-    function appendNote(text) {
-      const area = document.getElementById('intakeVoiceNotes');
-      area.value = area.value ? area.value + " " + text : text;
-    }
+    function openBox(boxName) {
+      const drawer = document.getElementById('activeWorkspaceDrawer');
+      const title = document.getElementById('drawerTitle');
+      const body = document.getElementById('drawerBody');
+      drawer.classList.remove('hidden');
 
-    function clearIntakeNotes() {
-      document.getElementById('intakeVoiceNotes').value = "";
-    }
-
-    // --- STAGE NAVIGATION LOGIC ---
-    function switchStage(stageNum) {
-      currentStage = stageNum;
-      document.querySelectorAll('.stage-view').forEach(el => el.classList.add('hidden'));
-      document.getElementById(`stageView${stageNum}`).classList.remove('hidden');
-
-      // Update Tab Styles
-      for (let i = 1; i <= 4; i++) {
-        const btn = document.getElementById(`stageBtn${i}`);
-        if (i === stageNum) {
-          btn.className = "stage-tab-btn flex items-center space-x-2 px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition bg-brand-500 text-black shadow-lg shadow-brand-500/20";
-        } else {
-          btn.className = "stage-tab-btn flex items-center space-x-2 px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition text-gray-400 hover:text-white hover:bg-gray-800";
-        }
-      }
-    }
-
-    function advanceToWorkbench() {
-      switchStage(2);
-      showToast("Job Sent to Workbench", "Synced to Shop Workbench");
-      triggerWebhookDispatch("Workbench_Intake");
-    }
-
-    function advanceToProposal() {
-      if (lineItems.length === 0) {
-        showToast("Add Line Items", "Please add at least one repair item.");
-        return;
-      }
-      switchStage(3);
-      renderProposalView();
-      showToast("Proposal Dispatched", "Synced to Proposal Canvas");
-      triggerWebhookDispatch("Proposal_Generated");
-    }
-
-    // --- LINE ITEMS & PRICING ENGINE ---
-    function addLineItem() {
-      const descInput = document.getElementById('itemDescInput');
-      const priceInput = document.getElementById('itemPriceInput');
-      const desc = descInput.value.trim();
-      const price = parseFloat(priceInput.value);
-
-      if (!desc || isNaN(price) || price <= 0) {
-        showToast("Invalid Line Item", "Please provide a description and price.");
-        return;
-      }
-
-      lineItems.push({ id: Date.now(), desc: desc, price: price });
-      descInput.value = "";
-      priceInput.value = "";
-      renderLineItems();
-    }
-
-    function addPresetItem(desc, price) {
-      lineItems.push({ id: Date.now(), desc: desc, price: price });
-      renderLineItems();
-    }
-
-    function removeLineItem(id) {
-      lineItems = lineItems.filter(item => item.id !== id);
-      renderLineItems();
-    }
-
-    function renderLineItems() {
-      const container = document.getElementById('lineItemsList');
-      if (lineItems.length === 0) {
-        container.innerHTML = `<div class="text-xs text-gray-500 text-center py-6">No line items added yet.</div>`;
-        updateCalculations(0);
-        return;
-      }
-
-      let html = "";
-      let subtotal = 0;
-      lineItems.forEach(item => {
-        subtotal += item.price;
-        html += `
-          <div class="flex items-center justify-between py-2 text-xs">
-            <span class="text-white font-medium">${item.desc}</span>
-            <div class="flex items-center space-x-3">
-              <span class="font-mono text-brand-400 font-bold">$${item.price.toFixed(2)}</span>
-              <button onclick="removeLineItem(${item.id})" class="text-gray-500 hover:text-red-400">
-                <i class="fa-solid fa-xmark"></i>
-              </button>
+      if (boxName === 'intake') {
+        title.innerHTML = `<span>📥 Intake & Customer Vault</span>`;
+        body.innerHTML = `
+          <div class="space-y-3">
+            <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
+              <div class="font-bold text-brand-400">${activeClient.name}</div>
+              <div class="text-gray-400">${activeClient.phone} • ${activeClient.address}</div>
+            </div>
+            <div class="border-2 border-dashed border-gray-800 p-4 rounded-xl text-center">
+              📷 Equipment / Serial Tag Photo Captured
             </div>
           </div>
         `;
-      });
-      container.innerHTML = html;
-      updateCalculations(subtotal);
-    }
-
-    function updateCalculations(subtotal) {
-      const tax = subtotal * 0.06;
-      const total = subtotal + tax;
-
-      document.getElementById('summarySubtotal').innerText = `$${subtotal.toFixed(2)}`;
-      document.getElementById('summaryTax').innerText = `$${tax.toFixed(2)}`;
-      document.getElementById('summaryTotal').innerText = `$${total.toFixed(2)}`;
-    }
-
-    // --- PROPOSAL & STRIPE ACTIONS ---
-    function renderProposalView() {
-      document.getElementById('propClientName').innerText = activeClient.name;
-      document.getElementById('propClientPhone').innerText = activeClient.phone;
-      document.getElementById('propClientAddr').innerText = activeClient.address;
-
-      const diagNotes = document.getElementById('benchDiagnosticNotes').value.trim();
-      document.getElementById('propDiagSummary').innerText = diagNotes || "Standard bench tune-up and inspection.";
-
-      let subtotal = lineItems.reduce((acc, i) => acc + i.price, 0);
-      let total = subtotal * 1.06;
-
-      document.getElementById('proposalTotalDisplay').innerText = `$${total.toFixed(2)}`;
-
-      let html = "";
-      lineItems.forEach(i => {
-        html += `
-          <div class="flex justify-between py-2 text-xs">
-            <span class="text-gray-300">${i.desc}</span>
-            <span class="font-mono font-bold text-white">$${i.price.toFixed(2)}</span>
+      } else if (boxName === 'workbench') {
+        title.innerHTML = `<span>🛠️ Workbench Diagnostics</span>`;
+        body.innerHTML = `
+          <div class="space-y-3">
+            <p class="text-gray-400">Diagnosis: Motor suction seal restored. Roller aligned.</p>
+            <div class="bg-gray-900 p-3 rounded-xl border border-gray-800 flex justify-between">
+              <span>Standard Precision Tune-Up</span>
+              <span class="font-mono text-brand-400 font-bold">$45.00</span>
+            </div>
           </div>
         `;
-      });
-      document.getElementById('proposalItemsTable').innerHTML = html;
-    }
-
-    function authorizeStripeLink() {
-      showToast("Estimate Dispatched via Stripe", "Payment Link Sent to Phone");
-      triggerWebhookDispatch("Stripe_Link_Sent");
-      setTimeout(() => switchStage(4), 1200);
-    }
-
-    function markAsPaidInPerson() {
-      showToast("Payment Confirmed (Cash)", "Synced to Shop Workbench");
-      triggerWebhookDispatch("Payment_Confirmed_InPerson");
-      switchStage(4);
-    }
-
-    // --- STAGING BAY & READY WALL CLOSING ---
-    function selectStagingBay(bayName) {
-      selectedStagingBay = bayName;
-      document.getElementById('selectedBayName').innerText = bayName;
-
-      document.querySelectorAll('.bay-btn').forEach(btn => {
-        btn.classList.remove('border-2', 'border-brand-500');
-        btn.classList.add('border', 'border-gray-800');
-      });
-
-      if (bayName === 'Front Desk') document.getElementById('bayBtnFront').className = "bay-btn bg-gray-950 border-2 border-brand-500 p-4 rounded-xl text-center hover:bg-gray-800 transition";
-      if (bayName === 'Main Bench') document.getElementById('bayBtnBench').className = "bay-btn bg-gray-950 border-2 border-brand-500 p-4 rounded-xl text-center hover:bg-gray-800 transition";
-      if (bayName === 'Van Queue') document.getElementById('bayBtnVan').className = "bay-btn bg-gray-950 border-2 border-brand-500 p-4 rounded-xl text-center hover:bg-gray-800 transition";
-      
-      showToast(`Staged at ${bayName}`, "Ready Wall Updated");
-    }
-
-    function markJobCompleteAndFulfilled() {
-      triggerWebhookDispatch("Job_Fulfilled");
-
-      // CELEBRATORY CONFETTI ANIMATION 🎉
-      if (typeof confetti === 'function') {
-        confetti({
-          particleCount: 120,
-          spread: 80,
-          origin: { y: 0.6 }
-        });
-      }
-
-      showToast("Job Completed & Fulfilled 🎉", "Staged on Ready Wall");
-
-      setTimeout(() => {
-        // Reset to Stage 1 for clean SaaS state
-        clearIntakeNotes();
-        lineItems = [];
-        renderLineItems();
-        switchStage(1);
-      }, 2500);
-    }
-
-    // --- DYNAMIC VAULT SEARCH ENGINE ---
-    function handleVaultSearch() {
-      const q = document.getElementById('vaultSearchInput').value.toLowerCase().trim();
-      const resultsDiv = document.getElementById('vaultSearchResults');
-
-      if (!q) {
-        resultsDiv.classList.add('hidden');
-        return;
-      }
-
-      const matches = customerVault.filter(c => 
-        c.name.toLowerCase().includes(q) || 
-        c.phone.includes(q) || 
-        c.address.toLowerCase().includes(q)
-      );
-
-      let html = "";
-      matches.forEach(c => {
-        html += `
-          <div onclick="selectClientFromVault('${c.name}', '${c.phone}', '${c.address}')" class="p-3 hover:bg-gray-800 cursor-pointer text-xs">
-            <div class="font-bold text-white">${c.name}</div>
-            <div class="text-gray-400">${c.phone} • ${c.address}</div>
+      } else if (boxName === 'proposal') {
+        title.innerHTML = `<span>📄 Proposal & Stripe Link</span>`;
+        body.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex justify-between items-center text-sm font-bold text-white">
+              <span>Total Investment:</span>
+              <span class="text-brand-400 font-mono">$47.70 (incl tax)</span>
+            </div>
+            <button onclick="fireStripePay()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-black font-black py-3 rounded-xl text-xs uppercase tracking-wider">
+              🚀 Authorize & Send Stripe Link
+            </button>
           </div>
         `;
-      });
-
-      // Universal 1-tap fallback
-      html += `
-        <div onclick="addNewClientFromQuery('${q}')" class="p-3 bg-brand-950/40 hover:bg-brand-900/60 text-brand-400 cursor-pointer text-xs font-bold border-t border-gray-800">
-          + Add "${q}" as New Client / Household
-        </div>
-      `;
-
-      resultsDiv.innerHTML = html;
-      resultsDiv.classList.remove('hidden');
-    }
-
-    function selectClientFromVault(name, phone, address) {
-      activeClient = { name, phone, address };
-      renderActiveClient();
-      document.getElementById('vaultSearchInput').value = "";
-      document.getElementById('vaultSearchResults').classList.add('hidden');
-      showToast("Client Loaded", `${name} selected.`);
-    }
-
-    function addNewClientFromQuery(query) {
-      activeClient = {
-        name: query || "New Client",
-        phone: "(000) 000-0000",
-        address: "Address Pending"
-      };
-      customerVault.push(activeClient);
-      renderActiveClient();
-      document.getElementById('vaultSearchInput').value = "";
-      document.getElementById('vaultSearchResults').classList.add('hidden');
-      showToast("New Client Created", `${activeClient.name} added to vault.`);
-    }
-
-    function resetClientToDefault() {
-      activeClient = {
-        name: "New Customer / Household",
-        phone: "(000) 000-0000",
-        address: "Address pending"
-      };
-      renderActiveClient();
-    }
-
-    function renderActiveClient() {
-      document.getElementById('activeClientName').innerText = activeClient.name;
-      document.getElementById('activeClientMeta').innerText = `${activeClient.phone} • ${activeClient.address}`;
-    }
-
-    // --- PAPAPARSE CSV UPLOAD ENGINE ---
-    function handleCsvUpload(evt) {
-      const file = evt.target.files[0];
-      if (!file) return;
-
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: function(results) {
-          if (results.data && results.data.length > 0) {
-            customerVault = results.data.map(row => ({
-              name: row.Name || row.name || row.Customer || "Unknown",
-              phone: row.Phone || row.phone || "(000) 000-0000",
-              address: row.Address || row.address || "Address pending"
-            }));
-            showToast("Vault Loaded Successfully", `${customerVault.length} client records imported.`);
-          }
-        }
-      });
-    }
-
-    // --- PHOTO PREVIEW HANDLER ---
-    function previewPhoto(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          document.getElementById('photoPreview').src = e.target.result;
-          document.getElementById('photoPreview').classList.remove('hidden');
-          document.getElementById('photoPreviewContainer').classList.add('hidden');
-        };
-        reader.readAsDataURL(file);
+      } else if (boxName === 'readywall') {
+        title.innerHTML = `<span>🧱 Ready Wall Staging</span>`;
+        body.innerHTML = `
+          <div class="space-y-3">
+            <div class="p-3 bg-emerald-950/40 border border-emerald-800 rounded-xl text-emerald-400 font-bold">
+              ✅ Staged at Front Desk (Ready for Customer Pickup)
+            </div>
+            <button onclick="triggerConfetti()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 rounded-xl text-xs">
+              🏁 Complete Job & Fire Confetti
+            </button>
+          </div>
+        `;
       }
     }
 
-    // --- AUXILIARY MODULE TOGGLES ---
-    function togglePinballPanel() {
-      document.getElementById('pinballPanel').classList.toggle('hidden');
+    function closeDrawer() {
+      document.getElementById('activeWorkspaceDrawer').classList.add('hidden');
     }
 
-    function toggleCalendarView() {
-      document.getElementById('calendarView').classList.toggle('hidden');
+    function fireStripePay() {
+      alert("Stripe Payment Link Dispatched to Client Phone!");
     }
 
-    function copyPinballScript(desc, link) {
-      copyTextToClipboard(`${desc}: ${link}`);
-      showToast("Link Copied", desc);
+    function triggerConfetti() {
+      if (typeof confetti === 'function') confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     }
 
-    function runVaultAudit() {
-      showToast("Vault Audit Complete", "22,283 records scanned. All fields valid.");
+    function copyReadySms() {
+      navigator.clipboard.writeText("Hi William, your Aerus tune-up is ready at our front desk!");
+      alert("SMS Text Copied to Clipboard!");
     }
 
-    function copyTextToClipboard(text) {
-      const dummy = document.createElement("textarea");
-      document.body.appendChild(dummy);
-      dummy.value = text;
-      dummy.select();
-      document.execCommand("copy");
-      document.body.removeChild(dummy);
-      showToast("Copied to Clipboard", "Ready to paste!");
-    }
-
-    // --- SETTINGS & LOCALSTORAGE PERSISTENCE ---
-    function openSettingsModal() {
-      document.getElementById('settingsModal').classList.remove('hidden');
-    }
-
-    function closeSettingsModal() {
-      document.getElementById('settingsModal').classList.add('hidden');
-    }
-
+    function openSettingsModal() { document.getElementById('settingsModal').classList.remove('hidden'); }
+    function closeSettingsModal() { document.getElementById('settingsModal').classList.add('hidden'); }
     function saveSettings() {
-      config.orgName = document.getElementById('cfgOrgName').value.trim() || 'Aerus Timonium';
-      config.webhookUrl = document.getElementById('cfgWebhookUrl').value.trim();
-      config.stripeUrl = document.getElementById('cfgStripeUrl').value.trim();
-
-      localStorage.setItem('tt_orgName', config.orgName);
-      localStorage.setItem('tt_webhookUrl', config.webhookUrl);
-      localStorage.setItem('tt_stripeUrl', config.stripeUrl);
-
-      document.getElementById('displayOrgName').innerText = config.orgName;
+      const org = document.getElementById('cfgOrgName').value;
+      localStorage.setItem('tt_orgName', org);
+      localStorage.setItem('tt_webhookUrl', document.getElementById('cfgWebhookUrl').value);
+      document.getElementById('displayOrgName').innerText = org;
       closeSettingsModal();
-      showToast("Settings Saved", "Configuration updated.");
-    }
-
-    function toggleHelpModal() {
-      document.getElementById('helpModal').classList.toggle('hidden');
-    }
-
-    // --- INVISIBLE BACKEND WEBHOOK DISPATCH ---
-    function triggerWebhookDispatch(actionType) {
-      if (!config.webhookUrl) return; // Silent if no webhook configured
-
-      const payload = {
-        action: actionType,
-        orgName: config.orgName,
-        client: activeClient,
-        intakeNotes: document.getElementById('intakeVoiceNotes').value,
-        diagnosticNotes: document.getElementById('benchDiagnosticNotes').value,
-        lineItems: lineItems,
-        totalAmount: lineItems.reduce((acc, i) => acc + i.price, 0) * 1.06,
-        stagingBay: selectedStagingBay,
-        timestamp: new Date().toISOString()
-      };
-
-      fetch(config.webhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      }).catch(err => console.warn('Silent webhook dispatch logged:', err));
-    }
-
-    // --- TOAST NOTIFICATION UTILITY ---
-    function showToast(message, subtext) {
-      const toast = document.getElementById('toastNotification');
-      document.getElementById('toastMessage').innerText = message;
-      document.getElementById('toastSubtext').innerText = subtext || "Synced to Shop Workbench";
-
-      toast.classList.remove('hidden', 'translate-y-10');
-      setTimeout(() => {
-        toast.classList.add('translate-y-10');
-        setTimeout(() => toast.classList.add('hidden'), 300);
-      }, 2500);
     }
   </script>
 </body>
