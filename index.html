@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TappyThing Forever Card™ - Sellable Skinny Traveler v2.5</title>
+    <title>TappyThing Forever Card™ - Sellable Skinny Traveler v2.6</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -27,12 +27,12 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         .glass-panel {
-            background: rgba(15, 23, 42, 0.75);
+            background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .glass-card {
-            background: rgba(30, 41, 59, 0.6);
+            background: rgba(30, 41, 59, 0.65);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
@@ -44,58 +44,81 @@
             70% { transform: scale(1.03); box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); }
             100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
         }
+        /* Hide scrollbars for clean mobile appearance */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="h-full antialiased font-sans flex flex-col justify-between max-w-md mx-auto min-h-screen bg-slate-950 text-slate-100 border-x border-slate-800 shadow-2xl relative">
 
+    <!-- DISPATCH / APPOINTMENT CALENDAR BAR (TOP LEVEL) -->
+    <section class="bg-slate-900 border-b border-slate-800 p-3 space-y-2">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-1.5">
+                <i class="fa-solid fa-calendar-days text-cyan-400 text-xs"></i>
+                <span class="text-[11px] font-extrabold text-slate-200 uppercase tracking-wider">Dispatch Schedule</span>
+                <span id="today-date-badge" class="text-[10px] bg-slate-800 text-cyan-300 font-mono px-2 py-0.5 rounded-full border border-slate-700">Today</span>
+            </div>
+            <button onclick="toggleAddAppointmentModal()" class="px-2.5 py-1 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all">
+                <i class="fa-solid fa-plus text-[9px]"></i>
+                <span>Add Stop</span>
+            </button>
+        </div>
+
+        <!-- Scrollable Appointment Stops Timeline -->
+        <div id="appointment-timeline" class="flex gap-2 overflow-x-auto no-scrollbar py-1">
+            <!-- Dynamically populated appointments -->
+        </div>
+    </section>
+
     <!-- FIXED TOP HEADER -->
-    <header class="sticky top-0 z-30 glass-panel border-b border-slate-800 p-4 shadow-lg">
-        <div class="flex items-center justify-between mb-2">
+    <header class="sticky top-0 z-30 glass-panel border-b border-slate-800 p-3 shadow-lg">
+        <div class="flex items-center justify-between mb-1.5">
             <div class="flex items-center space-x-2">
-                <span class="p-2 bg-cyan-500/10 text-cyan-400 rounded-lg border border-cyan-500/20 text-xs font-bold tracking-wider">
+                <span class="p-1.5 bg-cyan-500/10 text-cyan-400 rounded-lg border border-cyan-500/20 text-[10px] font-bold tracking-wider">
                     TAPPYTHING
                 </span>
-                <h1 class="text-xs font-extrabold text-slate-300 uppercase tracking-widest">FOREVER CARD™</h1>
+                <h1 class="text-[11px] font-extrabold text-slate-300 uppercase tracking-widest">FOREVER CARD™</h1>
             </div>
             <!-- Dynamic Status Badge -->
-            <span id="header-status-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+            <span id="header-status-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
                 <span>STAGE 1: INTAKE</span>
             </span>
         </div>
 
-        <div class="flex items-center justify-between text-sm pt-1 border-t border-slate-800/80 mt-1">
-            <div class="truncate">
-                <span id="header-customer-name" class="font-bold text-slate-100">Select Customer...</span>
-                <span id="header-customer-phone" class="text-xs text-slate-400 block truncate">---</span>
+        <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-800/80">
+            <div class="truncate flex-1 pr-2">
+                <span id="header-customer-name" class="font-bold text-slate-100 block truncate">Margueriete Villasanta</span>
+                <span id="header-customer-phone" class="text-[10px] text-slate-400 block truncate">(410) 555-0192 • Aerus Lux Guardian</span>
             </div>
-            <div class="text-right">
-                <span class="text-[10px] text-slate-500 uppercase tracking-wider block">Ticket ID</span>
-                <span id="ticket-id-display" class="font-mono text-xs text-cyan-400 font-semibold">#TT-88492</span>
+            <div class="text-right shrink-0">
+                <span class="text-[9px] text-slate-500 uppercase tracking-wider block">Ticket ID</span>
+                <span id="ticket-id-display" class="font-mono text-xs text-cyan-400 font-bold">#TT-88492</span>
             </div>
         </div>
     </header>
 
     <!-- MAIN SCROLLABLE CONTENT AREA -->
-    <main class="flex-1 p-4 space-y-4 overflow-y-auto">
+    <main class="flex-1 p-3 space-y-3 overflow-y-auto">
 
         <!-- ANCHORED CENTERPIECE: PERMANENT MACHINE PHOTO PREVIEW -->
-        <section class="glass-card rounded-2xl p-3 relative overflow-hidden border border-slate-800">
-            <div class="flex justify-between items-center mb-2">
-                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+        <section class="glass-card rounded-2xl p-2.5 relative overflow-hidden border border-slate-800">
+            <div class="flex justify-between items-center mb-1.5">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                     <i class="fa-solid fa-camera text-cyan-400"></i> Equipment Passport Photo
                 </span>
-                <span id="photo-status" class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full">Not Captured</span>
+                <span id="photo-status" class="text-[9px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full">Not Captured</span>
             </div>
 
-            <div id="photo-preview-container" class="relative w-full h-44 bg-slate-900/80 rounded-xl border-2 border-dashed border-slate-700 flex flex-col items-center justify-center text-center p-4 transition-all overflow-hidden group">
+            <div id="photo-preview-container" class="relative w-full h-36 bg-slate-900/80 rounded-xl border-2 border-dashed border-slate-700 flex flex-col items-center justify-center text-center p-3 transition-all overflow-hidden group">
                 <img id="equipment-img" src="" alt="Equipment Preview" class="hidden absolute inset-0 w-full h-full object-cover rounded-xl z-0">
-                <div id="photo-placeholder" class="z-10 flex flex-col items-center">
-                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-500 mb-2 group-hover:text-cyan-400 transition-colors"></i>
-                    <p class="text-xs text-slate-300 font-medium">Tap to Snap Equipment Photo</p>
-                    <p class="text-[10px] text-slate-500 mt-0.5">Captures visual condition instantly</p>
+                <div id="photo-placeholder" class="z-10 flex flex-col items-center" onclick="document.getElementById('camera-input').click()">
+                    <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-500 mb-1 group-hover:text-cyan-400 transition-colors"></i>
+                    <p class="text-xs text-slate-300 font-semibold">Tap to Snap Equipment Photo</p>
+                    <p class="text-[9px] text-slate-500 mt-0.5">Captures visual condition instantly</p>
                 </div>
-                <input type="file" id="camera-input" accept="image/*" capture="environment" class="absolute inset-0 opacity-0 cursor-pointer z-20" onchange="handlePhotoUpload(event)">
+                <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoUpload(event)">
             </div>
         </section>
 
@@ -107,74 +130,74 @@
             <button onclick="switchTab(4)" id="tab-btn-4" class="py-2 rounded-lg text-slate-400 hover:text-slate-200 transition-all">4. Ready 🧱</button>
         </nav>
 
-        <!-- STAGE 1: COUNTER INTAKE -->
-        <div id="stage-1" class="space-y-4">
-            <!-- Customer Vault Search -->
-            <div class="glass-card p-4 rounded-2xl space-y-3">
-                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                    <i class="fa-solid fa-address-book text-cyan-400 mr-1"></i> Customer Vault Lookup
+        <!-- STAGE 1: COUNTER INTAKE & UNIVERSAL SEARCH -->
+        <div id="stage-1" class="space-y-3">
+            <!-- Customer Vault Search (Universal - No Dead Ends) -->
+            <div class="glass-card p-3 rounded-2xl space-y-2">
+                <label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                    <i class="fa-solid fa-address-book text-cyan-400 mr-1"></i> Universal Customer Search
                 </label>
                 <div class="relative">
-                    <input type="text" id="vault-search-input" placeholder="Search by name, phone, or unit ID..." 
-                           class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                    <input type="text" id="vault-search-input" placeholder="Type name, phone, or unit ID..." 
+                           class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
                            oninput="filterVaultSearch(this.value)">
-                    <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-3 text-slate-500 text-xs"></i>
+                    <i class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-slate-500 text-xs"></i>
                 </div>
                 <!-- Search Results Dropdown -->
-                <div id="vault-results" class="space-y-1 max-h-36 overflow-y-auto hidden border-t border-slate-800 pt-2"></div>
+                <div id="vault-results" class="space-y-1 max-h-40 overflow-y-auto hidden border-t border-slate-800 pt-2"></div>
             </div>
 
             <!-- Voice & Text Symptom Note Canvas -->
-            <div class="glass-card p-4 rounded-2xl space-y-3">
+            <div class="glass-card p-3 rounded-2xl space-y-2">
                 <div class="flex justify-between items-center">
-                    <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <label class="text-[10px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                         <i class="fa-solid fa-microphone text-rose-400"></i> Diagnostic Symptom Canvas
                     </label>
-                    <span id="recording-status" class="text-[10px] text-slate-500">Ready for audio</span>
+                    <span id="recording-status" class="text-[9px] text-slate-500">Ready for audio</span>
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <button type="button" id="voice-rec-btn" onclick="toggleVoiceRecording()" class="flex-1 py-2.5 px-3 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all">
+                    <button type="button" id="voice-rec-btn" onclick="toggleVoiceRecording()" class="flex-1 py-2 px-3 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all">
                         <i id="rec-icon" class="fa-solid fa-microphone"></i>
                         <span id="rec-btn-text">Tap to Voice Record</span>
                     </button>
                 </div>
 
                 <textarea id="symptom-note" rows="3" placeholder="Symptom details / Customer rants / Audio transcription auto-fills here..." 
-                          class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"></textarea>
+                          class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"></textarea>
             </div>
 
-            <button onclick="switchTab(2)" class="w-full py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2 text-sm transition-all">
+            <button onclick="switchTab(2)" class="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2 text-xs transition-all">
                 <span>Send to Workbench</span>
                 <i class="fa-solid fa-arrow-right"></i>
             </button>
         </div>
 
         <!-- STAGE 2: WORKBENCH DIAGNOSTIC & ESTIMATE -->
-        <div id="stage-2" class="space-y-4 hidden">
-            <div class="glass-card p-4 rounded-2xl space-y-3">
-                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+        <div id="stage-2" class="space-y-3 hidden">
+            <div class="glass-card p-3 rounded-2xl space-y-2">
+                <label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider">
                     <i class="fa-solid fa-bolt text-amber-400 mr-1"></i> Quick Labor & Common Parts
                 </label>
-                <div class="grid grid-cols-3 gap-2">
-                    <button onclick="addCatalogItem('Standard Labor', 85.00)" class="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-xl text-left transition-all">
-                        <div class="text-[11px] font-bold text-slate-200">Std Labor</div>
+                <div class="grid grid-cols-3 gap-1.5">
+                    <button onclick="addCatalogItem('Standard Service Labor', 85.00)" class="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-xl text-left transition-all">
+                        <div class="text-[10px] font-bold text-slate-200">Std Labor</div>
                         <div class="text-[10px] text-amber-400 font-semibold">$85.00</div>
                     </button>
                     <button onclick="addCatalogItem('Motor Replacement', 45.00)" class="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-xl text-left transition-all">
-                        <div class="text-[11px] font-bold text-slate-200">Motor Swap</div>
+                        <div class="text-[10px] font-bold text-slate-200">Motor Swap</div>
                         <div class="text-[10px] text-amber-400 font-semibold">$45.00</div>
                     </button>
-                    <button onclick="addCatalogItem('HEPA Filter Kit', 29.95)" class="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-xl text-left transition-all">
-                        <div class="text-[11px] font-bold text-slate-200">HEPA Filter</div>
+                    <button onclick="addCatalogItem('HEPA Filter Set', 29.95)" class="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-xl text-left transition-all">
+                        <div class="text-[10px] font-bold text-slate-200">HEPA Filter</div>
                         <div class="text-[10px] text-amber-400 font-semibold">$29.95</div>
                     </button>
                 </div>
 
                 <!-- Catalog Search Selector -->
-                <div class="pt-2">
+                <div class="pt-1">
                     <div class="relative">
-                        <input type="text" id="catalog-search" placeholder="Search 1,090 catalog items..." 
+                        <input type="text" id="catalog-search" placeholder="Search catalog parts & labor..." 
                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500"
                                oninput="searchCatalog(this.value)">
                         <i class="fa-solid fa-boxes-stacked absolute right-3 top-2.5 text-slate-500 text-xs"></i>
@@ -184,114 +207,114 @@
             </div>
 
             <!-- Live Itemized Table -->
-            <div class="glass-card p-4 rounded-2xl space-y-3">
-                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                    <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Itemized Estimate</span>
-                    <span class="text-[10px] text-slate-500">Live Calculation</span>
+            <div class="glass-card p-3 rounded-2xl space-y-2">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
+                    <span class="text-[10px] font-bold text-slate-300 uppercase tracking-wider">Itemized Estimate</span>
+                    <span class="text-[9px] text-slate-500">Live Calculation</span>
                 </div>
 
-                <div id="estimate-items-list" class="space-y-2 text-xs divide-y divide-slate-800/50">
-                    <div class="text-slate-500 text-center py-3 italic">No items added to estimate yet</div>
+                <div id="estimate-items-list" class="space-y-1.5 text-xs divide-y divide-slate-800/50">
+                    <div class="text-slate-500 text-center py-2 italic text-xs">No items added to estimate yet</div>
                 </div>
 
                 <!-- Subtotal / Total Bar -->
-                <div class="pt-3 border-t border-slate-800 flex justify-between items-end">
+                <div class="pt-2 border-t border-slate-800 flex justify-between items-end">
                     <div>
-                        <div class="text-[10px] text-slate-400 uppercase tracking-wider">Estimated Total</div>
-                        <div class="text-[10px] text-emerald-400">Includes parts & bench service</div>
+                        <div class="text-[9px] text-slate-400 uppercase tracking-wider">Estimated Total</div>
+                        <div class="text-[9px] text-emerald-400">Includes parts & bench service</div>
                     </div>
-                    <div id="estimate-total-display" class="text-xl font-black text-emerald-400">$0.00</div>
+                    <div id="estimate-total-display" class="text-lg font-black text-emerald-400">$0.00</div>
                 </div>
             </div>
 
-            <button onclick="switchTab(3)" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 text-sm transition-all">
+            <button onclick="switchTab(3)" class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 text-xs transition-all">
                 <span>Send Estimate to Client</span>
                 <i class="fa-solid fa-arrow-right"></i>
             </button>
         </div>
 
         <!-- STAGE 3: CUSTOMER PRESENTATION & STRIPE PAY -->
-        <div id="stage-3" class="space-y-4 hidden">
+        <div id="stage-3" class="space-y-3 hidden">
             <!-- Diagnostic & Estimate Summary -->
-            <div class="glass-card p-4 rounded-2xl space-y-3 border-emerald-500/20">
-                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                    <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Customer Quote Summary</span>
-                    <span class="text-xs font-mono text-slate-300" id="summary-total">$0.00</span>
+            <div class="glass-card p-3 rounded-2xl space-y-2 border-emerald-500/20">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
+                    <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Customer Quote Summary</span>
+                    <span class="text-xs font-mono font-bold text-slate-200" id="summary-total">$0.00</span>
                 </div>
 
                 <div class="space-y-2 text-xs">
                     <div>
-                        <span class="text-[10px] text-slate-500 uppercase block">Diagnosed Symptom</span>
-                        <p id="summary-symptom" class="text-slate-200 bg-slate-900/60 p-2 rounded-lg italic">No notes captured.</p>
+                        <span class="text-[9px] text-slate-500 uppercase block">Diagnosed Symptom</span>
+                        <p id="summary-symptom" class="text-slate-200 bg-slate-900/60 p-2 rounded-lg italic text-[11px]">No notes captured.</p>
                     </div>
 
                     <div>
-                        <span class="text-[10px] text-slate-500 uppercase block">Approved Repair Items</span>
+                        <span class="text-[9px] text-slate-500 uppercase block">Approved Repair Items</span>
                         <div id="summary-items-list" class="space-y-1 mt-1 text-slate-300"></div>
                     </div>
                 </div>
             </div>
 
             <!-- Stripe Payment Simulator -->
-            <div class="glass-card p-4 rounded-2xl space-y-3">
-                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                    <i class="fa-brands fa-stripe text-indigo-400 text-base mr-1"></i> Stripe 1-Tap Authorization
+            <div class="glass-card p-3 rounded-2xl space-y-2">
+                <label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                    <i class="fa-brands fa-stripe text-indigo-400 text-sm mr-1"></i> Stripe 1-Tap Authorization
                 </label>
 
                 <div class="space-y-2">
                     <input type="text" readonly id="stripe-checkout-url" value="https://checkout.stripe.com/pay/cs_live_tappything_demo" 
-                           class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-[11px] font-mono text-slate-400 focus:outline-none">
+                           class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-[10px] font-mono text-slate-400 focus:outline-none">
 
-                    <button onclick="simulateStripePay()" id="stripe-pay-btn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 text-xs transition-all">
+                    <button onclick="simulateStripePay()" id="stripe-pay-btn" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 text-xs transition-all">
                         <i class="fa-solid fa-lock"></i>
                         <span>Authorize & Pay via Stripe</span>
                     </button>
                 </div>
             </div>
 
-            <button onclick="confirmPaymentAndMoveToReadyWall()" id="ready-wall-advance-btn" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 text-sm transition-all opacity-50 pointer-events-none">
+            <button onclick="confirmPaymentAndMoveToReadyWall()" id="ready-wall-advance-btn" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 text-xs transition-all opacity-50 pointer-events-none">
                 <span>Payment Confirmed ➔ Move to Ready Wall 🧱</span>
             </button>
         </div>
 
         <!-- STAGE 4: THE READY WALL 🧱 -->
-        <div id="stage-4" class="space-y-4 hidden">
-            <div class="glass-card p-4 rounded-2xl border-2 border-emerald-500/40 text-center space-y-3 bg-emerald-950/20">
-                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 text-xl mb-1">
+        <div id="stage-4" class="space-y-3 hidden">
+            <div class="glass-card p-3 rounded-2xl border-2 border-emerald-500/40 text-center space-y-2 bg-emerald-950/20">
+                <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 text-lg mb-0.5">
                     <i class="fa-solid fa-circle-check"></i>
                 </div>
-                <h2 class="text-sm font-black text-emerald-400 uppercase tracking-wider">🟢 PAID & STAGED ON READY WALL</h2>
-                <p class="text-xs text-slate-300">Unit is prepped, verified, and sitting in fulfillment staging.</p>
+                <h2 class="text-xs font-black text-emerald-400 uppercase tracking-wider">🟢 PAID & STAGED ON READY WALL</h2>
+                <p class="text-[11px] text-slate-300">Unit is prepped, verified, and sitting in fulfillment staging.</p>
             </div>
 
             <!-- Staging Location Selector -->
-            <div class="glass-card p-4 rounded-2xl space-y-3">
-                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+            <div class="glass-card p-3 rounded-2xl space-y-2">
+                <label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider">
                     <i class="fa-solid fa-cubes text-cyan-400 mr-1"></i> Select Staging Bay / Shelf Location
                 </label>
 
-                <div class="grid grid-cols-2 gap-2 text-xs">
-                    <button onclick="setStagingLocation('Shelf A')" class="staging-btn p-3 bg-slate-900 border border-slate-700 hover:border-cyan-500 rounded-xl text-center font-bold text-slate-200 transition-all">
-                        Shelf A
+                <div class="grid grid-cols-2 gap-1.5 text-xs">
+                    <button onclick="setStagingLocation('Shelf A')" class="staging-btn p-2.5 bg-slate-900 border border-slate-700 hover:border-cyan-500 rounded-xl text-center font-bold text-slate-200 transition-all">
+                        Shelf A - Front
                     </button>
-                    <button onclick="setStagingLocation('Shelf B')" class="staging-btn p-3 bg-slate-900 border border-slate-700 hover:border-cyan-500 rounded-xl text-center font-bold text-slate-200 transition-all">
-                        Shelf B
+                    <button onclick="setStagingLocation('Shelf B')" class="staging-btn p-2.5 bg-slate-900 border border-slate-700 hover:border-cyan-500 rounded-xl text-center font-bold text-slate-200 transition-all">
+                        Shelf B - Rack
                     </button>
-                    <button onclick="setStagingLocation('Bay 1')" class="staging-btn p-3 bg-slate-900 border border-slate-700 hover:border-cyan-500 rounded-xl text-center font-bold text-slate-200 transition-all">
-                        Bay 1
+                    <button onclick="setStagingLocation('Bay 1')" class="staging-btn p-2.5 bg-slate-900 border border-slate-700 hover:border-cyan-500 rounded-xl text-center font-bold text-slate-200 transition-all">
+                        Bay 1 - Heavy
                     </button>
-                    <button onclick="setStagingLocation('Van Delivery')" class="staging-btn p-3 bg-slate-900 border border-slate-700 hover:border-cyan-500 rounded-xl text-center font-bold text-slate-200 transition-all">
+                    <button onclick="setStagingLocation('Van Delivery')" class="staging-btn p-2.5 bg-slate-900 border border-slate-700 hover:border-cyan-500 rounded-xl text-center font-bold text-slate-200 transition-all">
                         <i class="fa-solid fa-truck-fast text-amber-400 mr-1"></i> Van Delivery
                     </button>
                 </div>
 
-                <div class="text-[11px] text-slate-400 text-center pt-1">
+                <div class="text-[10px] text-slate-400 text-center pt-1">
                     Current Location: <span id="current-location-display" class="font-bold text-cyan-400">Unassigned</span>
                 </div>
             </div>
 
-            <button onclick="completeOrderFulfillment()" class="w-full py-4 bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 hover:from-emerald-300 hover:to-cyan-400 text-slate-950 font-black rounded-xl shadow-xl shadow-emerald-500/25 flex items-center justify-center gap-2 text-base transition-all transform active:scale-95">
-                <i class="fa-solid fa-flag-checkered text-lg"></i>
+            <button onclick="completeOrderFulfillment()" class="w-full py-3.5 bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 hover:from-emerald-300 hover:to-cyan-400 text-slate-950 font-black rounded-xl shadow-xl shadow-emerald-500/25 flex items-center justify-center gap-2 text-sm transition-all transform active:scale-95">
+                <i class="fa-solid fa-flag-checkered text-base"></i>
                 <span>Complete Pickup / Delivery</span>
             </button>
         </div>
@@ -299,19 +322,57 @@
     </main>
 
     <!-- FOOTER BRANDING -->
-    <footer class="p-3 text-center border-t border-slate-900 text-[10px] text-slate-600 bg-slate-950">
-        TappyThing Multi-Tenant SaaS Engine v2.5 • Clean Environment LLC
+    <footer class="p-2 text-center border-t border-slate-900 text-[9px] text-slate-600 bg-slate-950">
+        TappyThing Multi-Tenant SaaS Engine v2.6 • Clean Environment LLC
     </footer>
+
+    <!-- ADD APPOINTMENT MODAL -->
+    <div id="add-appointment-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel p-5 rounded-3xl border border-cyan-500/30 space-y-3 max-w-xs w-full shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="text-xs font-black text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-calendar-plus"></i> Add Dispatch Stop
+                </h3>
+                <button onclick="toggleAddAppointmentModal()" class="text-slate-500 hover:text-slate-300 text-xs">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-2 text-xs">
+                <div>
+                    <label class="text-[10px] text-slate-400 uppercase block mb-1">Time Slot</label>
+                    <input type="text" id="new-app-time" placeholder="e.g. 10:15 AM" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-slate-100">
+                </div>
+                <div>
+                    <label class="text-[10px] text-slate-400 uppercase block mb-1">Client Name</label>
+                    <input type="text" id="new-app-client" placeholder="e.g. Margueriete Villasanta" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-slate-100">
+                </div>
+                <div>
+                    <label class="text-[10px] text-slate-400 uppercase block mb-1">Phone / Location</label>
+                    <input type="text" id="new-app-phone" placeholder="e.g. (410) 555-0192 • Timonium" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-slate-100">
+                </div>
+                <div>
+                    <label class="text-[10px] text-slate-400 uppercase block mb-1">Equipment / Service Type</label>
+                    <input type="text" id="new-app-unit" placeholder="e.g. Aerus Lux Guardian" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-slate-100">
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button onclick="toggleAddAppointmentModal()" class="flex-1 py-2 bg-slate-800 text-slate-400 rounded-xl text-xs font-bold">Cancel</button>
+                <button onclick="saveNewAppointment()" class="flex-1 py-2 bg-cyan-500 text-slate-950 rounded-xl text-xs font-extrabold shadow-lg shadow-cyan-500/20">Add to Schedule</button>
+            </div>
+        </div>
+    </div>
 
     <!-- CELEBRATION MODAL -->
     <div id="celebration-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="glass-panel p-6 rounded-3xl border border-emerald-500/40 text-center space-y-4 max-w-xs w-full shadow-2xl animate-bounce-short">
-            <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center text-3xl mx-auto border border-emerald-500/30">
+        <div class="glass-panel p-6 rounded-3xl border border-emerald-500/40 text-center space-y-4 max-w-xs w-full shadow-2xl">
+            <div class="w-14 h-14 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center text-2xl mx-auto border border-emerald-500/30">
                 <i class="fa-solid fa-trophy"></i>
             </div>
-            <h3 class="text-lg font-black text-slate-100">Job Complete & Closed!</h3>
+            <h3 class="text-base font-black text-slate-100">Job Complete & Closed!</h3>
             <p class="text-xs text-slate-300">Customer passport updated. Ready Wall cleared and recorded.</p>
-            <button onclick="resetApp()" class="w-full py-3 bg-emerald-500 text-slate-950 font-bold rounded-xl text-xs hover:bg-emerald-400 transition-all">
+            <button onclick="resetApp()" class="w-full py-2.5 bg-emerald-500 text-slate-950 font-bold rounded-xl text-xs hover:bg-emerald-400 transition-all">
                 Start Next Ticket
             </button>
         </div>
@@ -319,19 +380,27 @@
 
     <!-- JAVASCRIPT STATE ENGINE -->
     <script>
-        // Sample Generic Vault Data
-        const vaultCustomers = [
-            { id: "C-101", name: "Alex Morgan", phone: "(555) 234-5678", unit: "Aerus Lux Guardian" },
-            { id: "C-102", name: "Sarah Jenkins", phone: "(555) 876-5432", unit: "Prochem Steamer v2" },
+        // Sample Customer Vault Data (Representing 22,283 Records)
+        let vaultCustomers = [
+            { id: "C-100", name: "Margueriete Villasanta", phone: "(410) 555-0192", unit: "Aerus Lux Guardian" },
+            { id: "C-101", name: "Alex Morgan", phone: "(443) 336-6380", unit: "Aerus Lux Guardian" },
+            { id: "C-102", name: "Sarah Jenkins", phone: "(410) 960-2843", unit: "Prochem Steamer v2" },
             { id: "C-103", name: "Marcus Vance", phone: "(555) 345-6789", unit: "Puratrex Hydro System" },
             { id: "C-104", name: "Elena Rostova", phone: "(555) 987-6543", unit: "Sanitaire Commercial" }
         ];
 
-        // Sample Generic Catalog Data
+        // Sample Dispatch Schedule Stops
+        let dispatchStops = [
+            { id: "S-1", time: "10:15 AM", client: "Margueriete Villasanta", phone: "(410) 555-0192", unit: "Aerus Lux Guardian" },
+            { id: "S-2", time: "11:30 AM", client: "Shop Counter Intake", phone: "(410) 252-0000", unit: "Walk-in Service" },
+            { id: "S-3", time: "02:00 PM", client: "Sarah Jenkins", phone: "(410) 960-2843", unit: "Prochem Steamer v2" }
+        ];
+
+        // Sample Catalog Data (1,090 Items)
         const catalogData = [
-            { id: "P-01", name: "Standard Labor", price: 85.00 },
+            { id: "P-01", name: "Standard Service Labor", price: 85.00 },
             { id: "P-02", name: "Motor Replacement", price: 45.00 },
-            { id: "P-03", name: "HEPA Filter Kit", price: 29.95 },
+            { id: "P-03", name: "HEPA Filter Set", price: 29.95 },
             { id: "P-04", name: "Drive Belt (2-Pack)", price: 12.50 },
             { id: "P-05", name: "Gasket Seal Ring", price: 8.75 },
             { id: "P-06", name: "Power Cord 25ft", price: 24.00 }
@@ -339,50 +408,91 @@
 
         // App State
         let currentStage = 1;
-        let selectedCustomer = null;
+        let selectedCustomer = vaultCustomers[0];
         let estimateItems = [];
         let isRecording = false;
         let isPaid = false;
         let stagingLocation = "Unassigned";
 
+        // Initialize App on Load
+        window.onload = function() {
+            renderDispatchTimeline();
+            selectCustomer(vaultCustomers[0].id);
+        };
+
+        // Render Dispatch Schedule Timeline
+        function renderDispatchTimeline() {
+            const container = document.getElementById('appointment-timeline');
+            container.innerHTML = dispatchStops.map(stop => `
+                <button onclick="loadDispatchStop('${stop.id}')" class="shrink-0 p-2 bg-slate-950 border border-slate-800 hover:border-cyan-500 rounded-xl text-left transition-all group">
+                    <div class="flex items-center gap-1.5 mb-0.5">
+                        <span class="text-[9px] font-bold text-cyan-400 bg-cyan-950 px-1.5 py-0.5 rounded border border-cyan-800">${stop.time}</span>
+                        <span class="text-[10px] font-bold text-slate-200 group-hover:text-cyan-300 truncate max-w-[100px]">${stop.client}</span>
+                    </div>
+                    <div class="text-[9px] text-slate-500 truncate max-w-[140px]">${stop.unit}</div>
+                </button>
+            `).join('');
+        }
+
+        // Load Dispatch Stop into Card Header
+        function loadDispatchStop(stopId) {
+            const stop = dispatchStops.find(s => s.id === stopId);
+            if (stop) {
+                document.getElementById('header-customer-name').innerText = stop.client;
+                document.getElementById('header-customer-phone').innerText = `${stop.phone} • ${stop.unit}`;
+                document.getElementById('vault-search-input').value = stop.client;
+            }
+        }
+
+        // Toggle Add Appointment Modal
+        function toggleAddAppointmentModal() {
+            document.getElementById('add-appointment-modal').classList.toggle('hidden');
+        }
+
+        function saveNewAppointment() {
+            const time = document.getElementById('new-app-time').value || "12:00 PM";
+            const client = document.getElementById('new-app-client').value || "New Service Client";
+            const phone = document.getElementById('new-app-phone').value || "(555) 000-0000";
+            const unit = document.getElementById('new-app-unit').value || "General Equipment";
+
+            const newStop = {
+                id: `S-${Date.now()}`,
+                time, client, phone, unit
+            };
+
+            dispatchStops.push(newStop);
+            renderDispatchTimeline();
+            loadDispatchStop(newStop.id);
+            toggleAddAppointmentModal();
+
+            // Clear Modal Inputs
+            document.getElementById('new-app-time').value = '';
+            document.getElementById('new-app-client').value = '';
+            document.getElementById('new-app-phone').value = '';
+            document.getElementById('new-app-unit').value = '';
+        }
+
         // Tab Switching Engine
         function switchTab(stageNum) {
             currentStage = stageNum;
 
-            // Hide all stages
             for (let i = 1; i <= 4; i++) {
                 document.getElementById(`stage-${i}`).classList.add('hidden');
                 const btn = document.getElementById(`tab-btn-${i}`);
                 btn.className = "py-2 rounded-lg text-slate-400 hover:text-slate-200 transition-all";
             }
 
-            // Show current stage
             document.getElementById(`stage-${stageNum}`).classList.remove('hidden');
             const activeBtn = document.getElementById(`tab-btn-${stageNum}`);
             activeBtn.className = "py-2 rounded-lg bg-cyan-500 text-slate-950 font-bold shadow transition-all";
 
-            // Update Badge Status
             const badge = document.getElementById('header-status-badge');
-            const statusTexts = [
-                "",
-                "STAGE 1: INTAKE",
-                "STAGE 2: WORKBENCH",
-                "STAGE 3: CUSTOMER PAY",
-                "STAGE 4: READY WALL 🧱"
-            ];
-            
-            const badgeColors = [
-                "",
-                "bg-amber-500/20 text-amber-400 border-amber-500/30",
-                "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
-                "bg-indigo-500/20 text-indigo-400 border-indigo-500/30",
-                "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
-            ];
+            const statusTexts = ["", "STAGE 1: INTAKE", "STAGE 2: WORKBENCH", "STAGE 3: CUSTOMER PAY", "STAGE 4: READY WALL 🧱"];
+            const badgeColors = ["", "bg-amber-500/20 text-amber-400 border-amber-500/30", "bg-cyan-500/20 text-cyan-400 border-cyan-500/30", "bg-indigo-500/20 text-indigo-400 border-indigo-500/30", "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"];
 
-            badge.className = `px-2.5 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${badgeColors[stageNum]}`;
-            badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-current animate-pulse"></span><span>${statusTexts[stageNum]}</span>`;
+            badge.className = `px-2 py-0.5 rounded-full text-[10px] font-bold border flex items-center gap-1 ${badgeColors[stageNum]}`;
+            badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span><span>${statusTexts[stageNum]}</span>`;
 
-            // Auto Sync Summary if moving to stage 3
             if (stageNum === 3) syncSummary();
         }
 
@@ -397,13 +507,13 @@
                     img.classList.remove('hidden');
                     document.getElementById('photo-placeholder').classList.add('hidden');
                     document.getElementById('photo-status').innerText = "Captured";
-                    document.getElementById('photo-status').className = "text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30 font-bold";
+                    document.getElementById('photo-status').className = "text-[9px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30 font-bold";
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        // Vault Search Engine
+        // Universal Vault Search Engine (No Dead Ends)
         function filterVaultSearch(query) {
             const container = document.getElementById('vault-results');
             if (!query.trim()) {
@@ -417,19 +527,25 @@
                 c.unit.toLowerCase().includes(query.toLowerCase())
             );
 
-            if (matches.length === 0) {
-                container.innerHTML = `<div class="text-xs text-slate-500 p-2 italic">No customer matches found</div>`;
-            } else {
-                container.innerHTML = matches.map(c => `
-                    <div onclick="selectCustomer('${c.id}')" class="p-2 hover:bg-slate-800/80 rounded-lg cursor-pointer text-xs flex justify-between items-center transition-colors">
-                        <div>
-                            <div class="font-bold text-slate-200">${c.name}</div>
-                            <div class="text-[10px] text-slate-400">${c.unit} • ${c.phone}</div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-slate-600 text-[10px]"></i>
+            let html = matches.map(c => `
+                <div onclick="selectCustomer('${c.id}')" class="p-2 hover:bg-slate-800/80 rounded-lg cursor-pointer text-xs flex justify-between items-center transition-colors">
+                    <div>
+                        <div class="font-bold text-slate-200">${c.name}</div>
+                        <div class="text-[10px] text-slate-400">${c.unit} • ${c.phone}</div>
                     </div>
-                `).join('');
-            }
+                    <i class="fa-solid fa-chevron-right text-slate-600 text-[10px]"></i>
+                </div>
+            `).join('');
+
+            // Add Dynamic "+ Create New Customer" Option (Zero Dead Ends)
+            html += `
+                <div onclick="createNewCustomerFromQuery('${query.replace(/'/g, "\\'")}')" class="p-2.5 bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-800/60 rounded-lg cursor-pointer text-xs flex items-center justify-between text-cyan-300 font-bold transition-all mt-1">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-user-plus text-cyan-400"></i> + Add "${query}" as New Client</span>
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </div>
+            `;
+
+            container.innerHTML = html;
             container.classList.remove('hidden');
         }
 
@@ -443,7 +559,19 @@
             }
         }
 
-        // Simulated Voice Recording
+        function createNewCustomerFromQuery(typedText) {
+            const newId = `C-${Date.now()}`;
+            const newCust = {
+                id: newId,
+                name: typedText,
+                phone: "(Pending Phone)",
+                unit: "Standard Equipment"
+            };
+            vaultCustomers.unshift(newCust);
+            selectCustomer(newId);
+        }
+
+        // Voice Recording Simulation
         function toggleVoiceRecording() {
             const btn = document.getElementById('voice-rec-btn');
             const icon = document.getElementById('rec-icon');
@@ -457,16 +585,16 @@
                 icon.className = "fa-solid fa-square";
                 text.innerText = "Stop Recording...";
                 status.innerText = "🎙️ Listening...";
-                status.className = "text-[10px] text-rose-400 font-bold animate-pulse";
+                status.className = "text-[9px] text-rose-400 font-bold animate-pulse";
             } else {
                 isRecording = false;
                 btn.classList.remove('pulse-recording', 'bg-rose-600', 'text-white');
                 icon.className = "fa-solid fa-microphone";
                 text.innerText = "Tap to Voice Record";
                 status.innerText = "Transcribed";
-                status.className = "text-[10px] text-emerald-400 font-bold";
+                status.className = "text-[9px] text-emerald-400 font-bold";
                 
-                noteTextarea.value = (noteTextarea.value + " Customer notes unit losing suction intermittently after 10 mins of runtime. Slight burning odor from motor bay.").trim();
+                noteTextarea.value = (noteTextarea.value + " Customer notes unit losing suction intermittently after 10 mins. Slight motor burning smell.").trim();
             }
         }
 
@@ -492,7 +620,6 @@
             }
         }
 
-        // Add Estimate Items Engine
         function addCatalogItem(name, price) {
             const existing = estimateItems.find(i => i.name === name);
             if (existing) {
@@ -513,7 +640,7 @@
         function renderEstimate() {
             const container = document.getElementById('estimate-items-list');
             if (estimateItems.length === 0) {
-                container.innerHTML = `<div class="text-slate-500 text-center py-3 italic">No items added to estimate yet</div>`;
+                container.innerHTML = `<div class="text-slate-500 text-center py-2 italic text-xs">No items added to estimate yet</div>`;
                 document.getElementById('estimate-total-display').innerText = "$0.00";
                 return;
             }
@@ -523,15 +650,15 @@
                 const sub = item.price * item.qty;
                 total += sub;
                 return `
-                    <div class="flex items-center justify-between py-1.5">
+                    <div class="flex items-center justify-between py-1">
                         <div class="flex-1">
                             <span class="font-semibold text-slate-200">${item.name}</span>
-                            <span class="text-[10px] text-slate-500 block">$${item.price.toFixed(2)} x ${item.qty}</span>
+                            <span class="text-[9px] text-slate-500 block">$${item.price.toFixed(2)} x ${item.qty}</span>
                         </div>
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2">
                             <span class="font-bold text-amber-400">$${sub.toFixed(2)}</span>
                             <button onclick="removeEstimateItem(${idx})" class="text-slate-600 hover:text-rose-400 transition-colors">
-                                <i class="fa-solid fa-trash text-[10px]"></i>
+                                <i class="fa-solid fa-trash text-[9px]"></i>
                             </button>
                         </div>
                     </div>
@@ -541,7 +668,6 @@
             document.getElementById('estimate-total-display').innerText = `$${total.toFixed(2)}`;
         }
 
-        // Stage 3 Sync Engine
         function syncSummary() {
             const symptom = document.getElementById('symptom-note').value || "No diagnostic notes provided.";
             document.getElementById('summary-symptom').innerText = symptom;
@@ -555,7 +681,7 @@
                     const sub = item.price * item.qty;
                     total += sub;
                     return `
-                        <div class="flex justify-between text-[11px]">
+                        <div class="flex justify-between text-[10px]">
                             <span>${item.qty}x ${item.name}</span>
                             <span class="font-mono">$${sub.toFixed(2)}</span>
                         </div>
@@ -565,20 +691,19 @@
             document.getElementById('summary-total').innerText = `$${total.toFixed(2)}`;
         }
 
-        // Stripe Simulator
         function simulateStripePay() {
             const btn = document.getElementById('stripe-pay-btn');
             btn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> Processing Stripe Payment...`;
-            btn.className = "w-full py-3 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs";
+            btn.className = "w-full py-2.5 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs";
 
             setTimeout(() => {
                 isPaid = true;
                 btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Stripe Payment Authorized!`;
-                btn.className = "w-full py-3 bg-emerald-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-lg shadow-emerald-500/20";
+                btn.className = "w-full py-2.5 bg-emerald-500 text-slate-950 font-extrabold rounded-xl text-xs shadow-lg shadow-emerald-500/20";
                 
                 const advBtn = document.getElementById('ready-wall-advance-btn');
                 advBtn.classList.remove('opacity-50', 'pointer-events-none');
-            }, 1200);
+            }, 1000);
         }
 
         function confirmPaymentAndMoveToReadyWall() {
@@ -587,22 +712,19 @@
             }
         }
 
-        // Stage 4 Staging Selector
         function setStagingLocation(loc) {
             stagingLocation = loc;
             document.getElementById('current-location-display').innerText = loc;
             
-            // Highlight buttons
             document.querySelectorAll('.staging-btn').forEach(btn => {
                 if (btn.innerText.includes(loc)) {
-                    btn.className = "staging-btn p-3 bg-cyan-500/20 border-2 border-cyan-500 rounded-xl text-center font-bold text-cyan-300 transition-all shadow-md";
+                    btn.className = "staging-btn p-2.5 bg-cyan-500/20 border-2 border-cyan-500 rounded-xl text-center font-bold text-cyan-300 transition-all shadow-md";
                 } else {
-                    btn.className = "staging-btn p-3 bg-slate-900 border border-slate-700 rounded-xl text-center font-bold text-slate-200 transition-all";
+                    btn.className = "staging-btn p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-center font-bold text-slate-200 transition-all";
                 }
             });
         }
 
-        // Fulfillment Celebration Trigger
         function completeOrderFulfillment() {
             confetti({
                 particleCount: 120,
@@ -622,7 +744,7 @@
             document.getElementById('equipment-img').classList.add('hidden');
             document.getElementById('photo-placeholder').classList.remove('hidden');
             document.getElementById('photo-status').innerText = "Not Captured";
-            document.getElementById('photo-status').className = "text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full";
+            document.getElementById('photo-status').className = "text-[9px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full";
             renderEstimate();
             switchTab(1);
         }
