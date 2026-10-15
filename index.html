@@ -1,84 +1,75 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Forever Card™ — Powered by TappyThing</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: { 400: '#34d399', 500: '#10b981', 600: '#059669' },
-            darkbg: '#080B11'
-          },
-          fontFamily: { 
-            sans: ['Inter', 'sans-serif'], 
-            mono: ['JetBrains Mono', 'monospace'],
-            script: ['Great Vibes', 'cursive']
-          }
-        }
-      }
-    }
-  </script>
-
   <style>
-    body { background-color: #080B11; color: #F3F4F6; font-family: 'Inter', sans-serif; }
-    .card-chassis {
-      background: linear-gradient(145deg, #131B2E, #0D1322);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 25px rgba(16, 185, 129, 0.08);
+    body { background-color: #E2E8F0; color: #0F172A; font-family: 'Inter', sans-serif; }
+    .physical-card {
+      background: #FFFFFF;
+      border: 2px solid #CBD5E1;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15), 0 0 15px rgba(16, 185, 129, 0.1);
     }
     .pulse-record { animation: pulse-mic 1.2s infinite; }
     @keyframes pulse-mic {
-      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8); }
-      70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+      0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.8); }
+      70% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
     }
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-3 sm:p-6 antialiased">
 
-  <div class="card-chassis max-w-4xl w-full rounded-3xl p-5 sm:p-8 space-y-6 relative overflow-hidden">
+  <div class="physical-card max-w-4xl w-full rounded-3xl p-5 sm:p-8 space-y-6 relative overflow-hidden">
 
     <!-- 1. HEADER (LAVERNE & SHIRLEY SCRIPT F, REAL BOY LOGO, SMALL MIC, SUBSCRIBER) -->
-    <header class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border-b border-gray-800 pb-5">
+    <header class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border-b border-slate-200 pb-5">
       
-      <!-- LEFT: LAVERNE & SHIRLEY CURSIVE F BRANDING -->
+      <!-- LEFT: CURSIVE F BRANDING -->
       <div class="flex items-center space-x-3 justify-center md:justify-start">
-        <div class="text-5xl font-script text-brand-400 font-bold select-none drop-shadow-[0_2px_10px_rgba(52,211,153,0.3)] pr-1">
+        <div class="text-5xl font-['Great_Vibes'] text-emerald-600 font-bold select-none drop-shadow-sm pr-1">
           F
         </div>
         <div>
-          <h1 class="text-base font-black tracking-wider text-white uppercase font-mono">FOREVER CARD<span class="text-brand-400">™</span></h1>
-          <p class="text-[11px] text-gray-400 font-medium">Powered by TappyThing</p>
+          <h1 class="text-base font-black tracking-wider text-slate-900 uppercase font-mono">FOREVER CARD<span class="text-emerald-600">™</span></h1>
+          <p class="text-[11px] text-slate-500 font-medium">Powered by TappyThing</p>
         </div>
       </div>
 
-      <!-- CENTER: REAL FRESH LOGO EMBLEM + SMALL MIC -->
-      <div class="flex flex-col items-center justify-center space-y-1.5">
-        <div class="w-20 h-20 rounded-full border-2 border-brand-400 bg-white p-0.5 shadow-xl flex items-center justify-center overflow-hidden">
-          <img src="/user-uploads/4126.jpg" alt="Fresh Digital Coordinator" class="w-full h-full object-contain rounded-full" onerror="this.onerror=null; this.src='input_file_4.png';">
+      <!-- CENTER: EMBEDDED BOY LOGO BADGE + COMPACT MIC -->
+      <div class="flex flex-col items-center justify-center space-y-2">
+        <div class="w-20 h-20 rounded-full border-2 border-emerald-500 bg-white p-0.5 shadow-md flex items-center justify-center overflow-hidden">
+          <svg viewBox="0 0 200 200" class="w-full h-full">
+            <circle cx="100" cy="100" r="95" fill="white" stroke="#000" stroke-width="5"/>
+            <circle cx="115" cy="80" r="30" fill="#000"/>
+            <ellipse cx="103" cy="77" rx="9" ry="6" fill="white"/>
+            <ellipse cx="127" cy="77" rx="9" ry="6" fill="white"/>
+            <path d="M 100 96 Q 115 110 130 96" stroke="#000" stroke-width="4" fill="none"/>
+            <path d="M 75 130 L 155 130 L 145 185 L 85 185 Z" fill="#000"/>
+            <path d="M 55 110 Q 45 60 65 40 Q 75 30 70 70 Z" fill="#000"/>
+            <path d="M 45 35 Q 30 20 20 40 Q 25 65 50 50 Z" fill="#000"/>
+            <text x="100" y="155" font-family="sans-serif" font-weight="900" font-size="20" text-anchor="middle" fill="#000">FRESH</text>
+            <text x="100" y="172" font-family="sans-serif" font-weight="700" font-size="8" text-anchor="middle" fill="#000">DIGITAL COORDINATOR</text>
+          </svg>
         </div>
 
-        <!-- SMALL COMPACT MIC BUTTON -->
-        <button id="masterMicBtn" onclick="toggleVoiceDictation()" class="w-9 h-9 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-red-600/30 border border-red-400/40 transition transform active:scale-95" title="Talk to Fresh">
-          <i id="micIcon" class="fa-solid fa-microphone text-xs"></i>
+        <button id="masterMicBtn" onclick="toggleVoiceDictation()" class="w-10 h-10 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center shadow-md border border-red-400 transition transform active:scale-95" title="Talk to Fresh">
+          <i id="micIcon" class="fa-solid fa-microphone text-sm"></i>
         </button>
       </div>
 
       <!-- RIGHT: SUBSCRIBER IDENTITY -->
       <div class="flex items-center space-x-3 justify-center md:justify-end">
         <div class="text-center md:text-right">
-          <div id="displayOrgName" class="text-sm font-black text-white tracking-wide">Aerus Timonium</div>
-          <div class="text-[11px] text-brand-400 flex items-center justify-center md:justify-end space-x-1 font-mono">
-            <span class="w-1.5 h-1.5 rounded-full bg-brand-400 inline-block animate-ping"></span>
+          <div id="displayOrgName" class="text-sm font-black text-slate-900 tracking-wide">Aerus Timonium</div>
+          <div class="text-[11px] text-emerald-600 flex items-center justify-center md:justify-end space-x-1 font-mono font-bold">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-ping"></span>
             <span>Live Card Active</span>
           </div>
         </div>
@@ -86,85 +77,97 @@
 
     </header>
 
-    <!-- 2. CONTROL BAR: CALENDAR & PINBALL (SIDE-BY-SIDE) -->
+    <!-- 2. CONTROL BAR: REAL VISUAL CALENDAR & DYNAMIC PINBALL -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       
-      <!-- 📅 CALENDAR (WHAT'S NEXT) -->
-      <div class="bg-gray-950/70 border border-blue-500/30 rounded-2xl p-4 space-y-3 min-h-[150px]">
-        <div class="flex items-center justify-between border-b border-gray-800 pb-2">
+      <!-- 📅 VISUAL CALENDAR TIMELINE -->
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 min-h-[180px]">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
           <div class="flex items-center space-x-2">
-            <i class="fa-solid fa-calendar-days text-blue-400 text-sm"></i>
-            <h2 class="text-xs font-bold text-blue-400 uppercase font-mono tracking-wider">Calendar • What's Next</h2>
+            <i class="fa-solid fa-calendar-days text-blue-600 text-sm"></i>
+            <h2 class="text-xs font-bold text-blue-900 uppercase font-mono tracking-wider">Schedule Grid • Today & Tomorrow</h2>
           </div>
-          <span class="text-[10px] text-gray-500 font-mono">Schedule</span>
+          <span class="text-[10px] text-slate-500 font-mono font-bold">Live Grid</span>
         </div>
-        <div id="calendarEventsList" class="space-y-2 text-xs font-mono max-h-40 overflow-y-auto">
-          <div id="calEmptyState" class="text-gray-500 text-center py-6 italic">No scheduled items. Tap mic to add!</div>
+        
+        <!-- VISUAL SCHEDULE TIMELINE -->
+        <div id="calendarGrid" class="space-y-1.5 text-xs font-mono max-h-48 overflow-y-auto">
+          <div class="flex items-center space-x-2 p-1.5 rounded-lg bg-white border border-slate-200">
+            <span class="w-16 font-bold text-slate-500 text-[10px]">09:00 AM</span>
+            <span class="text-slate-400 text-[11px] italic">Open Slot</span>
+          </div>
+          <div class="flex items-center space-x-2 p-1.5 rounded-lg bg-white border border-slate-200">
+            <span class="w-16 font-bold text-slate-500 text-[10px]">01:00 PM</span>
+            <span class="text-slate-400 text-[11px] italic">Open Slot</span>
+          </div>
+          <div id="scheduledItemsSlot" class="space-y-1.5">
+            <!-- Voice items stream dynamically right here -->
+          </div>
         </div>
       </div>
 
-      <!-- 🎰 PINBALL (ACTION ZONE — BAM! BAM! BAM!) -->
-      <div class="bg-gray-950/70 border border-amber-500/30 rounded-2xl p-4 space-y-3 min-h-[150px]">
-        <div class="flex items-center justify-between border-b border-gray-800 pb-2">
+      <!-- 🎰 PINBALL ACTION ZONE -->
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 min-h-[180px]">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
           <div class="flex items-center space-x-2">
             <span class="text-sm">🎰</span>
-            <h2 class="text-xs font-bold text-amber-400 uppercase font-mono tracking-wider">Pinball • Action Zone</h2>
+            <h2 class="text-xs font-bold text-amber-900 uppercase font-mono tracking-wider">Pinball • Action Zone</h2>
           </div>
-          <span class="text-[10px] text-gray-500 font-mono">Live Bounces</span>
+          <span class="text-[10px] text-slate-500 font-mono font-bold">Bounces</span>
         </div>
-        <div id="pinballActionsList" class="space-y-2 text-xs font-mono max-h-40 overflow-y-auto">
-          <div id="pinEmptyState" class="text-gray-500 text-center py-6 italic">Queue empty. Bounces appear here.</div>
+        <div id="pinballActionsList" class="space-y-2 text-xs font-mono max-h-48 overflow-y-auto">
+          <div id="pinEmptyState" class="text-slate-400 text-center py-8 italic">Queue clean. Incoming bounces appear here live.</div>
         </div>
       </div>
 
     </div>
 
-    <!-- 3. FRESH VOICE STREAM -->
-    <div class="bg-gray-950 border border-gray-800 rounded-2xl p-3.5 space-y-1">
+    <!-- 3. VOICE STREAM DISPLAY -->
+    <div class="bg-slate-900 text-white rounded-2xl p-3.5 space-y-1 shadow-inner">
       <div class="flex justify-between items-center text-xs">
-        <span class="font-bold text-gray-300 font-mono flex items-center space-x-2">
-          <span class="w-2 h-2 rounded-full bg-brand-400 inline-block"></span>
-          <span>Fresh Live Voice Stream:</span>
+        <span class="font-bold text-slate-200 font-mono flex items-center space-x-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
+          <span>Fresh Voice Stream:</span>
         </span>
         <span id="listeningBadge" class="hidden text-[10px] text-red-400 font-bold animate-pulse font-mono">● RECORDING</span>
       </div>
-      <p id="liveTranscriptText" class="text-xs text-gray-400 italic font-mono">"Tap the microphone above to speak..."</p>
+      <p id="liveTranscriptText" class="text-xs text-slate-300 italic font-mono">"Tap the microphone above to speak..."</p>
     </div>
 
     <!-- 4. CLEAN 4-STAGE OPERATIONAL DOORS -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      <button onclick="openStageDoor(1)" class="bg-gray-900/90 hover:bg-gray-800 border border-blue-500/30 hover:border-blue-400 p-4 rounded-2xl text-center transition group space-y-1">
-        <div class="text-xl">📥</div>
-        <div class="text-xs font-bold text-blue-400">1. Intake & Vault</div>
-        <div class="text-[10px] text-gray-400">Customer Drop-off</div>
+      <button onclick="openStageDoor(1)" class="bg-white hover:bg-slate-50 border-2 border-blue-200 p-4 rounded-2xl text-center transition shadow-sm space-y-1">
+        <div class="text-2xl">📥</div>
+        <div class="text-xs font-black text-blue-700">1. Intake & Vault</div>
+        <div class="text-[10px] text-slate-500 font-medium">Customer Profile</div>
       </button>
 
-      <button onclick="openStageDoor(2)" class="bg-gray-900/90 hover:bg-gray-800 border border-amber-500/30 hover:border-amber-400 p-4 rounded-2xl text-center transition group space-y-1">
-        <div class="text-xl">🛠️</div>
-        <div class="text-xs font-bold text-amber-400">2. Shop Ops / Bench</div>
-        <div class="text-[10px] text-gray-400">Diagnostics & Repair</div>
+      <button onclick="openStageDoor(2)" class="bg-white hover:bg-slate-50 border-2 border-amber-200 p-4 rounded-2xl text-center transition shadow-sm space-y-1">
+        <div class="text-2xl">🛠️</div>
+        <div class="text-xs font-black text-amber-700">2. Shop Ops / Bench</div>
+        <div class="text-[10px] text-slate-500 font-medium">Repair Canvas</div>
       </button>
 
-      <button onclick="openStageDoor(3)" class="bg-gray-900/90 hover:bg-gray-800 border border-emerald-500/30 hover:border-emerald-400 p-4 rounded-2xl text-center transition group space-y-1">
-        <div class="text-xl">📄</div>
-        <div class="text-xs font-bold text-emerald-400">3. Proposal & Pay</div>
-        <div class="text-[10px] text-gray-400">Stripe Invoicing</div>
+      <button onclick="openStageDoor(3)" class="bg-white hover:bg-slate-50 border-2 border-emerald-200 p-4 rounded-2xl text-center transition shadow-sm space-y-1">
+        <div class="text-2xl">📄</div>
+        <div class="text-xs font-black text-emerald-700">3. Proposal & Pay</div>
+        <div class="text-[10px] text-slate-500 font-medium">Stripe Authorization</div>
       </button>
 
-      <button onclick="openStageDoor(4)" class="bg-gray-900/90 hover:bg-gray-800 border border-purple-500/30 hover:border-purple-400 p-4 rounded-2xl text-center transition group space-y-1">
-        <div class="text-xl">🧱</div>
-        <div class="text-xs font-bold text-purple-400">4. Ready Wall</div>
-        <div class="text-[10px] text-gray-400">Staging & Pickup</div>
+      <button onclick="openStageDoor(4)" class="bg-white hover:bg-slate-50 border-2 border-purple-200 p-4 rounded-2xl text-center transition shadow-sm space-y-1">
+        <div class="text-2xl">🧱</div>
+        <div class="text-xs font-black text-purple-700">4. Ready Wall</div>
+        <div class="text-[10px] text-slate-500 font-medium">Fulfillment Staging</div>
       </button>
     </div>
 
     <!-- EXPANDABLE DRAWER -->
-    <div id="activeWorkspaceDrawer" class="hidden bg-gray-950 border border-gray-800 rounded-2xl p-5 space-y-3">
-      <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-        <h3 id="drawerTitle" class="text-sm font-bold text-white">Stage Workspace</h3>
-        <button onclick="closeDrawer()" class="text-gray-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
+    <div id="activeWorkspaceDrawer" class="hidden bg-slate-900 text-white rounded-2xl p-5 space-y-3">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+        <h3 id="drawerTitle" class="text-sm font-bold text-white">Stage Canvas</h3>
+        <button onclick="closeDrawer()" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <div id="drawerBody" class="text-xs text-gray-300"></div>
+      <div id="drawerBody" class="text-xs text-slate-300"></div>
     </div>
 
   </div>
@@ -172,7 +175,6 @@
   <script>
     let isRecording = false;
     let recognition = null;
-    let lastProcessedText = "";
 
     window.onload = function() {
       setupSpeech();
@@ -188,11 +190,7 @@
         recognition.onresult = function(event) {
           const text = event.results[0][0].transcript;
           document.getElementById('liveTranscriptText').innerText = `"${text}"`;
-          
-          if (text !== lastProcessedText) {
-            lastProcessedText = text;
-            parseSpeechToBoard(text);
-          }
+          parseSpeechToBoard(text);
         };
 
         recognition.onend = function() {
@@ -209,10 +207,12 @@
 
     function startDictation() {
       isRecording = true;
-      recognition.start();
-      document.getElementById('masterMicBtn').classList.add('pulse-record');
-      document.getElementById('listeningBadge').classList.remove('hidden');
-      document.getElementById('liveTranscriptText').innerText = "Listening...";
+      try {
+        recognition.start();
+        document.getElementById('masterMicBtn').classList.add('pulse-record');
+        document.getElementById('listeningBadge').classList.remove('hidden');
+        document.getElementById('liveTranscriptText').innerText = "Listening...";
+      } catch(e) { console.log(e); }
     }
 
     function stopDictation() {
@@ -224,39 +224,32 @@
     function parseSpeechToBoard(text) {
       const lower = text.toLowerCase();
       
-      // Route to Calendar if speech mentions schedule, appointment, or time
-      if (lower.includes('schedule') || lower.includes('appointment') || lower.includes('tomorrow') || lower.includes('9:00') || lower.includes('9 am')) {
-        const cal = document.getElementById('calendarEventsList');
-        const emptyState = document.getElementById('calEmptyState');
-        if (emptyState) emptyState.remove();
-
-        const itemHTML = `
-          <div class="bg-gray-900 p-2.5 rounded-xl border border-blue-800/50 flex justify-between items-center">
-            <div>
-              <div class="text-blue-300 font-bold">Scheduled Event</div>
-              <div class="text-[11px] text-gray-400">${text}</div>
+      // Dynamic Calendar Grid Injection
+      if (lower.includes('schedule') || lower.includes('appointment') || lower.includes('tonight') || lower.includes('tomorrow') || lower.includes('9:')) {
+        const slot = document.getElementById('scheduledItemsSlot');
+        slot.insertAdjacentHTML('afterbegin', `
+          <div class="flex items-center justify-between p-2 rounded-lg bg-blue-100 border border-blue-300 text-blue-900 font-bold">
+            <div class="flex items-center space-x-2">
+              <span class="text-[10px] bg-blue-600 text-white px-1.5 py-0.5 rounded font-mono">BOOKED</span>
+              <span class="text-xs">${text}</span>
             </div>
-            <span class="text-[10px] bg-blue-950 text-blue-400 px-2 py-0.5 rounded-full border border-blue-800">Voice Log</span>
+            <span class="text-[10px] text-blue-700 font-mono">Syncing Google Cal...</span>
           </div>
-        `;
-        cal.insertAdjacentHTML('afterbegin', itemHTML);
-      } 
-      // Route to Pinball for all other incoming voice notes / tasks
-      else {
+        `);
+      } else {
         const pin = document.getElementById('pinballActionsList');
         const emptyState = document.getElementById('pinEmptyState');
         if (emptyState) emptyState.remove();
 
-        const itemHTML = `
-          <div class="bg-gray-900 p-2.5 rounded-xl border border-amber-800/50 flex justify-between items-center">
+        pin.insertAdjacentHTML('afterbegin', `
+          <div class="bg-amber-100 p-2.5 rounded-xl border border-amber-300 text-amber-900 flex justify-between items-center font-bold">
             <div>
-              <div class="text-amber-300 font-bold">⚡ Bam! Action Item</div>
-              <div class="text-[11px] text-gray-400">${text}</div>
+              <div class="text-xs">⚡ Bam! Action Item</div>
+              <div class="text-[11px] font-normal text-amber-800">${text}</div>
             </div>
-            <button onclick="openStageDoor(2)" class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-1 rounded-lg border border-amber-500/40">View</button>
+            <button onclick="openStageDoor(2)" class="text-[10px] bg-amber-600 text-white px-2.5 py-1 rounded-lg">Open Card</button>
           </div>
-        `;
-        pin.insertAdjacentHTML('afterbegin', itemHTML);
+        `);
       }
     }
 
@@ -269,41 +262,31 @@
       if (stageNum === 1) {
         title.innerText = "Stage 1: Intake & Customer Vault";
         body.innerHTML = `
-          <div class="space-y-3">
-            <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
-              <div class="font-bold text-brand-400">William Sullivan</div>
-              <div class="text-gray-400">(410) 555-0199 • 1965 Greenspring Dr, Timonium MD</div>
-            </div>
-            <div class="border-2 border-dashed border-gray-800 p-4 rounded-xl text-center">📷 Tap to capture equipment serial tag</div>
+          <div class="space-y-2">
+            <div class="p-3 bg-slate-800 rounded-xl font-bold text-blue-400">William Sullivan • (410) 555-0199 • 1965 Greenspring Dr</div>
+            <p class="text-slate-400">Search 22,283 vault records or tap mic to capture new client intake.</p>
           </div>
         `;
       } else if (stageNum === 2) {
-        title.innerText = "Stage 2: Shop Ops / Workbench";
+        title.innerText = "Stage 2: Shop Ops / Bench";
         body.innerHTML = `
-          <div class="space-y-3">
-            <div class="bg-gray-900 p-3 rounded-xl border border-gray-800">
-              <div class="font-bold text-amber-400">Lux Guardian Vacuum</div>
-              <div class="text-gray-400">Diagnosis: Motor seal check & roller tune-up ($45.00)</div>
-            </div>
+          <div class="space-y-2">
+            <div class="p-3 bg-slate-800 rounded-xl font-bold text-amber-400">Active Bench Slot</div>
+            <p class="text-slate-400">Diagnostics, serial photos, and parts catalog search live here.</p>
           </div>
         `;
       } else if (stageNum === 3) {
-        title.innerText = "Stage 3: Proposal & Stripe Pay";
+        title.innerText = "Stage 3: Proposal & Stripe Authorization";
         body.innerHTML = `
           <div class="space-y-3">
-            <div class="flex justify-between items-center text-sm font-bold text-white">
-              <span>Total Investment:</span>
-              <span class="text-brand-400 font-mono">$47.70</span>
-            </div>
-            <button onclick="alert('Synced to Shop Workbench — Stripe Link Dispatched!')" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-black font-black py-3 rounded-xl text-xs uppercase">🚀 Authorize & Send Stripe Link</button>
+            <button onclick="alert('Synced to Shop Workbench — Stripe Link Dispatched!')" class="w-full bg-emerald-500 text-slate-900 font-black py-3 rounded-xl uppercase tracking-wider">🚀 Authorize & Dispatch Stripe Link</button>
           </div>
         `;
       } else if (stageNum === 4) {
-        title.innerText = "Stage 4: Ready Wall Staging";
+        title.innerText = "Stage 4: Ready Wall Fulfillment";
         body.innerHTML = `
           <div class="space-y-3">
-            <div class="p-3 bg-emerald-950/40 border border-emerald-800 rounded-xl text-emerald-400 font-bold">✅ Staged at Front Desk</div>
-            <button onclick="confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } })" class="w-full bg-purple-600 text-white font-bold py-2 rounded-xl text-xs">🏁 Complete Job & Fire Confetti</button>
+            <button onclick="confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } })" class="w-full bg-purple-600 text-white font-bold py-3 rounded-xl">🏁 Complete Job & Fire Confetti 🎉</button>
           </div>
         `;
       }
