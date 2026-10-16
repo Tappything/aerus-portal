@@ -28,7 +28,7 @@
 
   <div class="physical-card max-w-4xl w-full rounded-3xl p-5 sm:p-8 space-y-6 relative overflow-hidden">
 
-    <!-- 1. HEADER (CURSIVE F, FRESH BADGE LOGO, COMPACT MIC, SUBSCRIBER) -->
+    <!-- 1. HEADER (LAVERNE & SHIRLEY CURSIVE F, REAL EMBEDDED LOGO, COMPACT MIC) -->
     <header class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border-b border-[#E2DACC] pb-5">
       
       <!-- LEFT: CURSIVE F BRANDING -->
@@ -66,7 +66,7 @@
 
     </header>
 
-    <!-- 2. CONTROL BAR: VISUAL CALENDAR GRID & DYNAMIC PINBALL -->
+    <!-- 2. CONTROL BAR: REAL VISUAL CALENDAR & DYNAMIC PINBALL -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       
       <!-- 📅 VISUAL CALENDAR TIMELINE -->
@@ -159,6 +159,7 @@
   <script>
     let isRecording = false;
     let recognition = null;
+    const WEBHOOK_URL = "https://hook.us1.make.com/your-tappything-webhook-id";
 
     window.onload = function() {
       setupSpeech();
@@ -175,6 +176,7 @@
           const text = event.results[0][0].transcript;
           document.getElementById('liveTranscriptText').innerText = `"${text}"`;
           parseSpeechToBoard(text);
+          sendToWebhook(text);
         };
 
         recognition.onend = function() {
@@ -205,10 +207,24 @@
       document.getElementById('listeningBadge').classList.add('hidden');
     }
 
+    function sendToWebhook(transcript) {
+      if (!WEBHOOK_URL || WEBHOOK_URL.includes("your-tappything-webhook-id")) return;
+      fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          transcript: transcript,
+          timestamp: new Date().toISOString(),
+          org: "Aerus Timonium",
+          user: "William Sullivan"
+        })
+      }).catch(err => console.error("Webhook payload dispatch error:", err));
+    }
+
     function parseSpeechToBoard(text) {
       const lower = text.toLowerCase();
       
-      if (lower.includes('schedule') || lower.includes('appointment') || lower.includes('tonight') || lower.includes('tomorrow') || lower.includes('water test') || lower.includes('9:') || lower.includes('10:')) {
+      if (lower.includes('schedule') || lower.includes('appointment') || lower.includes('tonight') || lower.includes('tomorrow') || lower.includes('water test') || lower.includes('9:') || lower.includes('10:') || lower.includes('11:')) {
         const slot = document.getElementById('scheduledItemsSlot');
         slot.insertAdjacentHTML('afterbegin', `
           <div class="p-3 rounded-xl bg-white border border-blue-300 shadow-sm flex items-center justify-between text-slate-800">
