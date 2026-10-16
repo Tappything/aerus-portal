@@ -1,38 +1,202 @@
-// ==========================================
-// TAPPYTHING / FRESH FOREVER CARD ENGINE
-// ==========================================
-
-// 1. OPEN WORK CARD DRAWER WITH FULL VAULT DATA
-function openWorkCard(clientId) {
-  const drawer = document.getElementById('forever-work-drawer') || document.getElementById('activeWorkspaceDrawer');
-  if (drawer) {
-    drawer.classList.remove('hidden');
-    drawer.classList.add('active');
-    // Lock active state to prevent data loss on mobile browser refresh
-    localStorage.setItem('active_card_id', clientId);
-    
-    // Auto-populate customer data if available
-    if (typeof openCustomerForeverCard === 'function') {
-      openCustomerForeverCard(clientId);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fresh TappyThing - Universal Forever Card</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #F7F4EF;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      padding-bottom: 80px;
     }
-  }
-}
+    .header {
+      background: #2E5B3E;
+      color: #fff;
+      padding: 16px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    .pinball-container {
+      padding: 16px;
+    }
+    .card {
+      background: #FFFFFF;
+      border: 1px solid #E0D9CC;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      cursor: pointer;
+    }
+    .card-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #1A3626;
+    }
+    .card-sub {
+      color: #666;
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+    /* BOTTOM SHEET DRAWER */
+    .drawer {
+      position: fixed;
+      bottom: -100%;
+      left: 0;
+      right: 0;
+      height: 75vh;
+      background: #FAF8F5;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
+      transition: bottom 0.3s ease-in-out;
+      z-index: 1000;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .drawer.active {
+      bottom: 0;
+    }
+    .drawer.hidden {
+      bottom: -100%;
+    }
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #E0D9CC;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+    .close-btn {
+      background: #D8CEBE;
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    /* FRESH CONTROL FOOTER */
+    .fresh-forever-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #D8CEBE;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 2px solid #C8BCA8;
+      z-index: 9999;
+    }
+    .action-btn {
+      background: #2E5B3E;
+      color: #ffffff;
+      padding: 12px 22px;
+      border-radius: 25px;
+      border: none;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+  </style>
+</head>
+<body>
 
-// 2. CLOSE WORK CARD DRAWER & CLEAR CACHED STATE
-function closeWorkCard() {
-  const drawer = document.getElementById('forever-work-drawer') || document.getElementById('activeWorkspaceDrawer');
-  if (drawer) {
-    drawer.classList.add('hidden');
-    drawer.classList.remove('active');
-  }
-  // Clear cached ID so it doesn't reopen unexpectedly
-  localStorage.removeItem('active_card_id');
-}
+  <div class="header">
+     Fresh Forever Control Hub
+  </div>
 
-// 3. AUTO-RESTORE ACTIVE CARD ON PAGE REFRESH (ZERO DATA LOSS)
-window.addEventListener('DOMContentLoaded', () => {
-  const savedId = localStorage.getItem('active_card_id');
-  if (savedId) {
-    openWorkCard(savedId);
-  }
-});
+  <div class="pinball-container">
+    <h3>Active Pinball Queue</h3>
+    <div class="card" onclick="openWorkCard('1004')">
+      <div class="card-title">William Sullivan — Water Filter Check</div>
+      <div class="card-sub">Client #1004 | 6110 Glenoak Ave</div>
+      <div class="card-sub" style="color:#2E5B3E; font-weight:bold; margin-top:6px;">Tap to open Forever Work Card</div>
+    </div>
+  </div>
+
+  <!-- FOREVER WORK CARD DRAWER -->
+  <div id="forever-work-drawer" class="drawer hidden">
+    <div class="drawer-header">
+      <div style="font-weight:bold; font-size:1.2rem; color:#2E5B3E;">Forever Work Card</div>
+      <button class="close-btn" onclick="closeWorkCard()">✕</button>
+    </div>
+    <div id="card-content">
+      <h3 id="client-name">William Sullivan</h3>
+      <p id="client-phone"><strong>Phone:</strong> (410) 499-1313</p>
+      <p id="client-address"><strong>Address:</strong> 6110 Glenoak Ave, Baltimore, MD</p>
+      <p id="client-email"><strong>Email:</strong> Williamanyvac@gmail.com</p>
+      <hr style="border:0; border-top:1px solid #E0D9CC; margin:15px 0;">
+      <h4>Work Mode Diagnostic Notes</h4>
+      <textarea style="width:100%; height:80px; border-radius:8px; border:1px solid #ccc; padding:8px;" placeholder="Tap Mic below to record 1-minute audio note..."></textarea>
+    </div>
+  </div>
+
+  <!-- FRESH CONTROL FOOTER BAR -->
+  <div class="fresh-forever-footer">
+    <div style="font-weight:bold; color:#1A3626; font-size:1.1rem;">FRESH 🤵</div>
+    <button class="action-btn" onclick="startVoiceIntake()">
+      🎙️ MIC
+    </button>
+    <button class="action-btn" onclick="triggerCameraUpload()">
+      📷 CAMERA
+    </button>
+  </div>
+
+  <script>
+    // ==========================================
+    // TAPPYTHING / FRESH FOREVER CARD ENGINE
+    // ==========================================
+
+    // 1. OPEN WORK CARD DRAWER WITH FULL VAULT DATA
+    function openWorkCard(clientId) {
+      const drawer = document.getElementById('forever-work-drawer') || document.getElementById('activeWorkspaceDrawer');
+      if (drawer) {
+        drawer.classList.remove('hidden');
+        drawer.classList.add('active');
+        // Lock active state to prevent data loss on mobile browser refresh
+        localStorage.setItem('active_card_id', clientId);
+      }
+    }
+
+    // 2. CLOSE WORK CARD DRAWER & CLEAR CACHED STATE
+    function closeWorkCard() {
+      const drawer = document.getElementById('forever-work-drawer') || document.getElementById('activeWorkspaceDrawer');
+      if (drawer) {
+        drawer.classList.add('hidden');
+        drawer.classList.remove('active');
+      }
+      // Clear cached ID so it doesn't reopen unexpectedly
+      localStorage.removeItem('active_card_id');
+    }
+
+    // 3. AUTO-RESTORE ACTIVE CARD ON PAGE REFRESH (ZERO DATA LOSS)
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedId = localStorage.getItem('active_card_id');
+      if (savedId) {
+        openWorkCard(savedId);
+      }
+    });
+
+    // 4. MOCK VOICE & CAMERA TRIGGERS
+    function startVoiceIntake() {
+      alert("🎙️ Voice Intake Active: Speak into your phone now!");
+    }
+
+    function triggerCameraUpload() {
+      alert("📷 Camera Active: Snap photo of vacuum or equipment!");
+    }
+  </script>
+</body>
+</html>
