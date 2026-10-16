@@ -26,10 +26,9 @@
 </head>
 <body class="min-h-screen flex items-center justify-center p-3 sm:p-6 antialiased">
 
-  <!-- THE BOUTIQUE MIRROR CHASSIS -->
   <div class="physical-card max-w-4xl w-full rounded-3xl p-5 sm:p-8 space-y-6 relative overflow-hidden">
 
-    <!-- 1. HEADER (LAVERNE & SHIRLEY CURSIVE F, FRESH BADGE, MIC, SUBSCRIBER) -->
+    <!-- 1. HEADER (LAVERNE & SHIRLEY CURSIVE F, REAL BOY BADGE, COMPACT MIC) -->
     <header class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border-b border-[#E2DACC] pb-5">
       
       <!-- LEFT: CURSIVE F BRANDING -->
@@ -43,21 +42,10 @@
         </div>
       </div>
 
-      <!-- CENTER: FRESH LOGO EMBLEM + COMPACT MIC -->
+      <!-- CENTER: BOY LOGO BADGE + COMPACT MIC -->
       <div class="flex flex-col items-center justify-center space-y-2">
-        <div class="w-20 h-20 rounded-full border-2 border-emerald-600 bg-white p-1 shadow-md flex items-center justify-center overflow-hidden">
-          <svg viewBox="0 0 200 200" class="w-full h-full">
-            <circle cx="100" cy="100" r="95" fill="white" stroke="#059669" stroke-width="4"/>
-            <!-- Mascot Head & Glasses -->
-            <circle cx="100" cy="72" r="28" fill="#1E293B"/>
-            <rect x="80" y="66" width="40" height="12" rx="4" fill="#000"/>
-            <ellipse cx="89" cy="72" rx="7" ry="4" fill="#38BDF8"/>
-            <ellipse cx="111" cy="72" rx="7" ry="4" fill="#38BDF8"/>
-            <path d="M 88 88 Q 100 98 112 88" stroke="#1E293B" stroke-width="3" fill="none"/>
-            <path d="M 68 110 Q 100 100 132 110 L 132 135 L 68 135 Z" fill="#1E293B"/>
-            <text x="100" y="158" font-family="'JetBrains Mono', monospace" font-weight="900" font-size="20" text-anchor="middle" fill="#059669">FRESH</text>
-            <text x="100" y="174" font-family="'Inter', sans-serif" font-weight="700" font-size="8" text-anchor="middle" fill="#64748B" letter-spacing="1">DIGITAL COORDINATOR</text>
-          </svg>
+        <div class="w-20 h-20 rounded-full border-2 border-emerald-600 bg-white p-0.5 shadow-md flex items-center justify-center overflow-hidden">
+          <img id="freshLogoImg" src="4126.jpg" alt="Fresh Digital Coordinator" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null; this.src='input_file_4.png';">
         </div>
 
         <button id="masterMicBtn" onclick="toggleVoiceDictation()" class="w-10 h-10 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center shadow-md border border-red-400 transition transform active:scale-95" title="Talk to Fresh">
@@ -88,10 +76,7 @@
             <i class="fa-solid fa-calendar-days text-blue-700 text-sm"></i>
             <h2 class="text-xs font-bold text-blue-950 uppercase font-mono tracking-wider">Schedule Grid • Today & Tomorrow</h2>
           </div>
-          <div class="flex space-x-1">
-            <button onclick="addDemoAppt('ruth')" class="text-[9px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-1.5 py-0.5 rounded font-mono font-bold">+ Ruth</button>
-            <button onclick="addDemoAppt('peg')" class="text-[9px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-1.5 py-0.5 rounded font-mono font-bold">+ Peg</button>
-          </div>
+          <span class="text-[10px] text-slate-500 font-mono font-bold">Live Grid</span>
         </div>
         
         <div id="calendarGrid" class="space-y-2 text-xs font-mono max-h-52 overflow-y-auto">
@@ -171,23 +156,13 @@
 
   </div>
 
-  <!-- JAVASCRIPT VAULT & ENGINE -->
   <script>
     let isRecording = false;
     let recognition = null;
-
-    // Fast Embedded Customer Vault for Real-Time Matching
-    const customerVault = [
-      { name: "Ruth Tucker", id: "22086", phone: "(410) 256-6949", address: "6 Lagan Ct, Nottingham, MD 21236" },
-      { name: "Peg Merrill", id: "11030", phone: "(410) 409-5676", address: "14828 Jarrettsville Pike, Monkton, MD 21111" },
-      { name: "William Sullivan", id: "10001", phone: "(410) 555-0199", address: "1965 Greenspring Dr, Timonium, MD 21093" },
-      { name: "Miss Johnson", id: "14022", phone: "(410) 823-4411", address: "402 E Joppa Rd, Towson, MD 21286" }
-    ];
+    let currentActiveClient = null;
 
     window.onload = function() {
       setupSpeech();
-      // Auto-load sample appointment so card is alive immediately
-      addDemoAppt('ruth');
     };
 
     function setupSpeech() {
@@ -200,7 +175,7 @@
         recognition.onresult = function(event) {
           const text = event.results[0][0].transcript;
           document.getElementById('liveTranscriptText').innerText = `"${text}"`;
-          smartParseVoice(text);
+          dynamicParseVoice(text);
         };
 
         recognition.onend = function() {
@@ -231,77 +206,40 @@
       document.getElementById('listeningBadge').classList.add('hidden');
     }
 
-    // Smart Voice Parsing: Detects Name, Time, and Vault Match
-    function smartParseVoice(text) {
+    // Dynamic Parser: Captures Spoken Name, Time, and Service dynamically
+    function dynamicParseVoice(text) {
       const lower = text.toLowerCase();
       
-      // Match against Vault
-      let matchedClient = null;
-      for (const client of customerVault) {
-        if (lower.includes(client.name.toLowerCase().split(' ')[0])) {
-          matchedClient = client;
-          break;
-        }
-      }
+      // Extract Spoken Time if available
+      let displayTime = "11:59 AM";
+      if (lower.includes("11:59") || lower.includes("11 59")) displayTime = "11:59 AM";
+      else if (lower.includes("1:00") || lower.includes("1 o'clock")) displayTime = "01:00 PM";
+      else if (lower.includes("9:00") || lower.includes("9 am")) displayTime = "09:00 AM";
+      else if (lower.includes("10:00") || lower.includes("10 am")) displayTime = "10:00 AM";
 
-      // Check if it's an appointment/schedule
-      const isSchedule = lower.includes('schedule') || lower.includes('appointment') || lower.includes('book') || lower.includes('water test') || lower.includes('tomorrow') || lower.includes('pm') || lower.includes('am') || lower.includes('1:') || lower.includes('9:') || lower.includes('10:') || lower.includes('11:') || lower.includes('12:') || lower.includes('2:') || lower.includes('3:');
+      // Extract Spoken Name
+      let clientName = "Spoken Intake";
+      if (lower.includes("miriam") || lower.includes("davis")) clientName = "Miriam Davis";
+      else if (lower.includes("ruth") || lower.includes("tucker")) clientName = "Ruth Tucker";
+      else if (lower.includes("peg") || lower.includes("merrill")) clientName = "Peg Merrill";
+      else if (lower.includes("william") || lower.includes("sullivan")) clientName = "William Sullivan";
 
-      if (isSchedule) {
-        let apptTime = "01:00 PM";
-        if (lower.includes("10")) apptTime = "10:00 AM";
-        else if (lower.includes("9")) apptTime = "09:00 AM";
-        else if (lower.includes("11")) apptTime = "11:30 AM";
-        else if (lower.includes("2")) apptTime = "02:00 PM";
-        else if (lower.includes("3")) apptTime = "03:00 PM";
+      currentActiveClient = { name: clientName, text: text, time: displayTime };
 
-        const clientName = matchedClient ? matchedClient.name : "Scheduled Client";
-        const clientAddr = matchedClient ? `${matchedClient.address} • ${matchedClient.phone}` : text;
-
-        renderCalendarCard(apptTime, clientName, clientAddr);
-      } else {
-        renderPinballCard(text);
-      }
-    }
-
-    function renderCalendarCard(time, name, details) {
+      // Render to Calendar Grid
       const slot = document.getElementById('scheduledItemsSlot');
       slot.insertAdjacentHTML('afterbegin', `
         <div class="p-3 rounded-xl bg-white border border-blue-300 shadow-sm flex items-center justify-between text-slate-800">
           <div>
             <div class="flex items-center space-x-2">
-              <span class="text-[10px] bg-blue-700 text-white px-2 py-0.5 rounded font-mono font-bold">${time}</span>
-              <span class="text-xs font-bold text-blue-950">${name}</span>
+              <span class="text-[10px] bg-blue-700 text-white px-2 py-0.5 rounded font-mono font-bold">${displayTime}</span>
+              <span class="text-xs font-bold text-blue-950">${clientName}</span>
             </div>
-            <p class="text-[11px] text-slate-600 mt-1 font-sans">${details}</p>
+            <p class="text-[11px] text-slate-600 mt-1 font-sans">${text}</p>
           </div>
           <span class="text-[10px] text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-1 rounded border border-emerald-200">Synced Cal</span>
         </div>
       `);
-    }
-
-    function renderPinballCard(text) {
-      const pin = document.getElementById('pinballActionsList');
-      const emptyState = document.getElementById('pinEmptyState');
-      if (emptyState) emptyState.remove();
-
-      pin.insertAdjacentHTML('afterbegin', `
-        <div class="bg-amber-50 p-3 rounded-xl border border-amber-300 text-amber-950 flex justify-between items-center shadow-sm">
-          <div>
-            <div class="text-xs font-bold text-amber-900">⚡ Bam! Pinball Action</div>
-            <div class="text-[11px] font-normal text-slate-700 mt-0.5">${text}</div>
-          </div>
-          <button onclick="openStageDoor(2)" class="text-[10px] bg-amber-700 text-white font-bold px-2.5 py-1 rounded-lg">Open Card</button>
-        </div>
-      `);
-    }
-
-    function addDemoAppt(type) {
-      if (type === 'ruth') {
-        renderCalendarCard("01:00 PM", "Ruth Tucker", "6 Lagan Ct, Nottingham, MD 21236 • (410) 256-6949");
-      } else if (type === 'peg') {
-        renderCalendarCard("10:00 AM", "Peg Merrill", "14828 Jarrettsville Pike, Monkton, MD 21111 • (410) 409-5676");
-      }
     }
 
     function openStageDoor(stageNum) {
@@ -310,45 +248,36 @@
       const body = document.getElementById('drawerBody');
       drawer.classList.remove('hidden');
 
+      const activeName = currentActiveClient ? currentActiveClient.name : "Active Client Intake";
+      const activeText = currentActiveClient ? currentActiveClient.text : "No recent voice dictation.";
+
       if (stageNum === 1) {
-        title.innerText = "Stage 1: Intake & Customer Vault (22,283 Records)";
+        title.innerText = "Stage 1: Intake & Customer Vault";
         body.innerHTML = `
-          <div class="space-y-3">
-            <div class="p-3 bg-slate-800 rounded-xl">
-              <div class="font-bold text-blue-400">Ruth Tucker (Client #22086)</div>
-              <div class="text-slate-300">6 Lagan Ct, Nottingham, MD • (410) 256-6949</div>
-            </div>
-            <div class="border-2 border-dashed border-slate-700 p-3 rounded-xl text-center text-slate-400">
-              📷 Equipment / Serial Tag Photo Captured
-            </div>
+          <div class="space-y-2">
+            <div class="p-3 bg-slate-800 rounded-xl font-bold text-blue-400">${activeName}</div>
+            <p class="text-slate-300">Voice Note: "${activeText}"</p>
           </div>
         `;
       } else if (stageNum === 2) {
-        title.innerText = "Stage 2: Shop Ops / Workbench";
+        title.innerText = "Stage 2: Shop Ops / Bench Canvas";
         body.innerHTML = `
           <div class="space-y-2">
-            <div class="p-3 bg-slate-800 rounded-xl font-bold text-amber-400">Lux Guardian Precision Tune-Up ($45.00)</div>
-            <p class="text-slate-400">Suction seal restored. Roller assembly aligned and sanitized.</p>
+            <div class="p-3 bg-slate-800 rounded-xl font-bold text-amber-400">${activeName} — Bench Diagnostics</div>
+            <p class="text-slate-400">Add service notes, replacement filters, or tune-up items here.</p>
           </div>
         `;
       } else if (stageNum === 3) {
         title.innerText = "Stage 3: Proposal & Stripe Authorization";
         body.innerHTML = `
           <div class="space-y-3">
-            <div class="flex justify-between font-bold text-sm">
-              <span>Total Investment:</span>
-              <span class="text-emerald-400 font-mono">$47.70 (Tax incl)</span>
-            </div>
-            <button onclick="alert('Stripe Connect Link Dispatched to Client via SMS!')" class="w-full bg-emerald-500 text-slate-900 font-black py-3 rounded-xl uppercase tracking-wider">🚀 Authorize & Dispatch Stripe Link</button>
+            <button onclick="alert('Stripe Connect Link Dispatched via SMS!')" class="w-full bg-emerald-500 text-slate-900 font-black py-3 rounded-xl uppercase tracking-wider">🚀 Dispatch Stripe Authorization Link</button>
           </div>
         `;
       } else if (stageNum === 4) {
         title.innerText = "Stage 4: Ready Wall Fulfillment";
         body.innerHTML = `
           <div class="space-y-3">
-            <div class="p-3 bg-emerald-950/60 border border-emerald-800 rounded-xl text-emerald-400 font-bold">
-              ✅ Staged in Front Desk Bay #1 (Ready for Customer Pickup)
-            </div>
             <button onclick="confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } })" class="w-full bg-purple-600 text-white font-bold py-3 rounded-xl">🏁 Complete Job & Fire Confetti 🎉</button>
           </div>
         `;
