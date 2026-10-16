@@ -3,199 +3,401 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fresh TappyThing - Universal Forever Card</title>
+  <title>Fresh TappyThing — Universal Forever Card Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
   <style>
+    :root {
+      --bg-tan: #C8BCA8;         /* Richer, darker tan background */
+      --card-tan: #DFD7CC;       /* Card tan container */
+      --fresh-green: #2E5B3E;    /* Fresh signature green */
+      --text-dark: #1A3626;     /* Deep readable text */
+      --border-tan: #A89C88;    /* Darker tan border outline */
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: #F7F4EF;
-      color: #333;
+      background-color: var(--bg-tan);
+      color: var(--text-dark);
       margin: 0;
       padding: 0;
-      padding-bottom: 80px;
+      padding-bottom: 90px;
     }
+
     .header {
-      background: #2E5B3E;
-      color: #fff;
+      background: var(--fresh-green);
+      color: #FFFFFF;
       padding: 16px;
       text-align: center;
-      font-weight: bold;
       font-size: 1.2rem;
-    }
-    .pinball-container {
-      padding: 16px;
-    }
-    .card {
-      background: #FFFFFF;
-      border: 1px solid #E0D9CC;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      cursor: pointer;
-    }
-    .card-title {
       font-weight: bold;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .container {
+      padding: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .section-title {
       font-size: 1.1rem;
-      color: #1A3626;
+      font-weight: bold;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      color: var(--fresh-green);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    .card-sub {
-      color: #666;
-      font-size: 0.9rem;
-      margin-top: 4px;
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      background: var(--card-tan);
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border-tan);
+      margin-bottom: 20px;
+      text-align: center;
     }
-    /* BOTTOM SHEET DRAWER */
+
+    .day-box {
+      background: #EFECE6;
+      padding: 8px 4px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      border: 1px solid #D0C6B4;
+    }
+
+    .day-box.active {
+      background: var(--fresh-green);
+      color: #FFFFFF;
+    }
+
+    .pinball-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .forever-card {
+      background: #FAF8F5;
+      border: 2px solid var(--border-tan);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    .forever-card:active {
+      transform: scale(0.98);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .client-name {
+      font-size: 1.15rem;
+      font-weight: bold;
+      color: var(--fresh-green);
+    }
+
+    .client-id {
+      font-size: 0.85rem;
+      background: var(--border-tan);
+      color: #FFFFFF;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-weight: bold;
+    }
+
+    .hub-doors {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .door-btn {
+      background: #FAF8F5;
+      border: 1px solid var(--border-tan);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.85rem;
+      color: var(--fresh-green);
+    }
+
     .drawer {
       position: fixed;
       bottom: -100%;
       left: 0;
       right: 0;
-      height: 75vh;
-      background: #FAF8F5;
-      border-top-left-radius: 20px;
-      border-top-right-radius: 20px;
-      box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
-      transition: bottom 0.3s ease-in-out;
+      height: 80vh;
+      background: #F5F1EA;
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+      box-shadow: 0 -6px 20px rgba(0,0,0,0.25);
+      transition: bottom 0.3s cubic-bezier(0.25, 1, 0.5, 1);
       z-index: 1000;
       padding: 20px;
       overflow-y: auto;
     }
+
     .drawer.active {
       bottom: 0;
     }
-    .drawer.hidden {
-      bottom: -100%;
-    }
-    .drawer-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px solid #E0D9CC;
-      padding-bottom: 10px;
-      margin-bottom: 15px;
-    }
-    .close-btn {
-      background: #D8CEBE;
-      border: none;
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    /* FRESH CONTROL FOOTER */
+
     .fresh-forever-footer {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      background: #D8CEBE;
+      background: #BFAEA0;
       padding: 12px 20px;
       display: flex;
       justify-content: space-around;
       align-items: center;
-      border-top: 2px solid #C8BCA8;
+      border-top: 2px solid #A89584;
       z-index: 9999;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
     }
-    .action-btn {
-      background: #2E5B3E;
-      color: #ffffff;
-      padding: 12px 22px;
-      border-radius: 25px;
-      border: none;
-      font-weight: bold;
-      font-size: 1rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+
+    .pulse-record {
+      animation: pulse-mic 1.2s infinite;
+      background-color: #DC2626 !important;
+    }
+
+    @keyframes pulse-mic {
+      0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.8); }
+      70% { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
     }
   </style>
 </head>
 <body>
 
   <div class="header">
-     Fresh Forever Control Hub
+    Fresh TappyThing Hub 🤵
   </div>
 
-  <div class="pinball-container">
-    <h3>Active Pinball Queue</h3>
-    <div class="card" onclick="openWorkCard('1004')">
-      <div class="card-title">William Sullivan — Water Filter Check</div>
-      <div class="card-sub">Client #1004 | 6110 Glenoak Ave</div>
-      <div class="card-sub" style="color:#2E5B3E; font-weight:bold; margin-top:6px;">Tap to open Forever Work Card</div>
+  <div class="container">
+    
+    <!-- SCHEDULE GRID -->
+    <div class="section-title">
+      <span>📅 Schedule Grid</span>
+      <span style="font-size:0.85rem; font-weight:normal; color:#555;">Oct 2026</span>
     </div>
+    <div class="calendar-grid">
+      <div class="day-box">M</div>
+      <div class="day-box">T</div>
+      <div class="day-box">W</div>
+      <div class="day-box">T</div>
+      <div class="day-box active">F</div>
+      <div class="day-box">S</div>
+      <div class="day-box">S</div>
+    </div>
+
+    <!-- VOICE STREAM STATUS -->
+    <div style="background:#1E293B; color:#fff; padding:12px; border-radius:10px; margin-bottom:15px; font-size:0.85rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-weight:bold; color:#A7F3D0;">🎙️ Live Voice Stream:</span>
+        <span id="listeningBadge" style="display:none; color:#FCA5A5; font-weight:bold;">● LISTENING</span>
+      </div>
+      <p id="liveTranscriptText" style="margin:6px 0 0 0; font-style:italic; color:#CBD5E1;">"Tap MIC intake in bottom bar to speak..."</p>
+    </div>
+
+    <!-- DYNAMIC PINBALL QUEUE -->
+    <div class="section-title">
+      <span>🎯 Pinball Queue</span>
+      <span style="font-size:0.85rem; font-weight:normal; color:#555;" id="card-count">Active Cards: 0</span>
+    </div>
+    
+    <div class="pinball-list" id="pinball-container"></div>
+
+    <!-- SUBSCRIBER HUB DOORS -->
+    <div class="section-title" style="margin-top:25px;">
+      <span>🚪 Subscriber Hub Doors</span>
+    </div>
+    <div class="hub-doors">
+      <div class="door-btn" onclick="openSubscriberDoor(1)">📦 1. Inventory & Parts</div>
+      <div class="door-btn" onclick="openSubscriberDoor(2)">👥 2. Staff Roles</div>
+      <div class="door-btn" onclick="openSubscriberDoor(3)">💵 3. Cash Register</div>
+      <div class="door-btn" onclick="openSubscriberDoor(4)">🌐 4. Growth Hub</div>
+    </div>
+
   </div>
 
-  <!-- FOREVER WORK CARD DRAWER -->
-  <div id="forever-work-drawer" class="drawer hidden">
-    <div class="drawer-header">
-      <div style="font-weight:bold; font-size:1.2rem; color:#2E5B3E;">Forever Work Card</div>
-      <button class="close-btn" onclick="closeWorkCard()">✕</button>
+  <!-- WORKSPACE DRAWER -->
+  <div id="forever-work-drawer" class="drawer">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border-tan); padding-bottom:12px; margin-bottom:16px;">
+      <div style="font-weight:bold; font-size:1.2rem; color:var(--fresh-green);" id="drawer-header-title">Universal Forever Card</div>
+      <button style="background:var(--border-tan); color:#fff; border:none; border-radius:50%; width:36px; height:36px; font-weight:bold; cursor:pointer;" onclick="closeWorkCard()">✕</button>
     </div>
-    <div id="card-content">
-      <h3 id="client-name">William Sullivan</h3>
-      <p id="client-phone"><strong>Phone:</strong> (410) 499-1313</p>
-      <p id="client-address"><strong>Address:</strong> 6110 Glenoak Ave, Baltimore, MD</p>
-      <p id="client-email"><strong>Email:</strong> Williamanyvac@gmail.com</p>
-      <hr style="border:0; border-top:1px solid #E0D9CC; margin:15px 0;">
-      <h4>Work Mode Diagnostic Notes</h4>
-      <textarea style="width:100%; height:80px; border-radius:8px; border:1px solid #ccc; padding:8px;" placeholder="Tap Mic below to record 1-minute audio note..."></textarea>
-    </div>
+    <div id="drawer-card-content"></div>
   </div>
 
-  <!-- FRESH CONTROL FOOTER BAR -->
+  <!-- FRESH CONTROL FOOTER -->
   <div class="fresh-forever-footer">
-    <div style="font-weight:bold; color:#1A3626; font-size:1.1rem;">FRESH 🤵</div>
-    <button class="action-btn" onclick="startVoiceIntake()">
-      🎙️ MIC
+    <div style="font-weight:900; color:var(--fresh-green); font-size:1.2rem;">FRESH 🤵</div>
+    <button id="masterMicBtn" onclick="toggleVoiceDictation()" style="background:var(--fresh-green); color:#fff; padding:12px 22px; border-radius:30px; border:none; font-weight:bold; font-size:0.95rem; cursor:pointer; display:flex; align-items:center; gap:8px;">
+      <i class="fa-solid fa-microphone"></i>
+      <span>🎙️ MIC INTAKE</span>
     </button>
-    <button class="action-btn" onclick="triggerCameraUpload()">
-      📷 CAMERA
+    <button onclick="alert('📷 Camera Trigger: Snap photo of equipment serial tag!')" style="background:#1E293B; color:#fff; padding:12px 22px; border-radius:30px; border:none; font-weight:bold; font-size:0.95rem; cursor:pointer; display:flex; align-items:center; gap:8px;">
+      <i class="fa-solid fa-camera"></i>
+      <span>📷 CAMERA</span>
     </button>
   </div>
 
   <script>
-    // ==========================================
-    // TAPPYTHING / FRESH FOREVER CARD ENGINE
-    // ==========================================
+    let isRecording = false;
+    let recognition = null;
+    let activeCustomer = null;
+    const WEBHOOK_URL = "https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln";
 
-    // 1. OPEN WORK CARD DRAWER WITH FULL VAULT DATA
-    function openWorkCard(clientId) {
-      const drawer = document.getElementById('forever-work-drawer') || document.getElementById('activeWorkspaceDrawer');
-      if (drawer) {
-        drawer.classList.remove('hidden');
-        drawer.classList.add('active');
-        // Lock active state to prevent data loss on mobile browser refresh
-        localStorage.setItem('active_card_id', clientId);
-      }
-    }
+    const vaultDatabase = [
+      { id: "1004", name: "William Sullivan", phone: "(410) 499-1313", address: "6110 Glenoak Ave, Baltimore, MD 21214", email: "Williamanyvac@gmail.com", service: "Water Filter Check & Maintenance", schedule: "Tomorrow 8:00 AM" },
+      { id: "21982", name: "Catherine Wagner", phone: "(443) 520-6265", address: "1010 Maplehurst Ln, Monkton, MD 21111", email: "cwagner@monkton.org", service: "Aerus Water System Inspection", schedule: "Today 10:00 AM" }
+    ];
 
-    // 2. CLOSE WORK CARD DRAWER & CLEAR CACHED STATE
-    function closeWorkCard() {
-      const drawer = document.getElementById('forever-work-drawer') || document.getElementById('activeWorkspaceDrawer');
-      if (drawer) {
-        drawer.classList.add('hidden');
-        drawer.classList.remove('active');
-      }
-      // Clear cached ID so it doesn't reopen unexpectedly
-      localStorage.removeItem('active_card_id');
-    }
-
-    // 3. AUTO-RESTORE ACTIVE CARD ON PAGE REFRESH (ZERO DATA LOSS)
-    window.addEventListener('DOMContentLoaded', () => {
+    window.onload = function() {
+      setupSpeech();
+      renderPinballQueue();
       const savedId = localStorage.getItem('active_card_id');
-      if (savedId) {
-        openWorkCard(savedId);
-      }
-    });
+      if (savedId) openWorkCard(savedId);
+    };
 
-    // 4. MOCK VOICE & CAMERA TRIGGERS
-    function startVoiceIntake() {
-      alert("🎙️ Voice Intake Active: Speak into your phone now!");
+    function setupSpeech() {
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRec();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onresult = function(event) {
+          const text = event.results[0][0].transcript;
+          document.getElementById('liveTranscriptText').innerText = `"${text}"`;
+          handleVoiceInput(text);
+        };
+
+        recognition.onend = function() { stopDictation(); };
+      }
     }
 
-    function triggerCameraUpload() {
-      alert("📷 Camera Active: Snap photo of vacuum or equipment!");
+    function toggleVoiceDictation() {
+      if (!recognition) return alert('Speech recognition supported in Chrome/Edge mobile.');
+      if (!isRecording) startDictation();
+      else stopDictation();
+    }
+
+    function startDictation() {
+      isRecording = true;
+      try {
+        recognition.start();
+        document.getElementById('masterMicBtn').classList.add('pulse-record');
+        document.getElementById('listeningBadge').style.display = 'inline';
+        document.getElementById('liveTranscriptText').innerText = "Listening...";
+      } catch(e) { console.log(e); }
+    }
+
+    function stopDictation() {
+      isRecording = false;
+      document.getElementById('masterMicBtn').classList.remove('pulse-record');
+      document.getElementById('listeningBadge').style.display = 'none';
+    }
+
+    function handleVoiceInput(text) {
+      if (WEBHOOK_URL) {
+        fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ transcript: text, source: "Fresh Forever Card" })
+        }).catch(e => console.error("Webhook error:", e));
+      }
+    }
+
+    function renderPinballQueue() {
+      const container = document.getElementById('pinball-container');
+      container.innerHTML = '';
+      vaultDatabase.forEach(item => {
+        container.innerHTML += `
+          <div class="forever-card" onclick="openWorkCard('${item.id}')">
+            <div class="card-header">
+              <span class="client-name">${item.name}</span>
+              <span class="client-id">#${item.id}</span>
+            </div>
+            <div style="margin-top:8px; font-size:0.95rem; color:#444;">
+              <strong>Task:</strong> ${item.service}<br>
+              <strong>Schedule:</strong> ${item.schedule}<br>
+              <strong>Address:</strong> ${item.address}
+            </div>
+          </div>
+        `;
+      });
+      document.getElementById('card-count').innerText = `Active Cards: ${vaultDatabase.length}`;
+    }
+
+    function openWorkCard(clientId) {
+      const client = vaultDatabase.find(c => c.id === clientId);
+      if (!client) return;
+
+      document.getElementById('drawer-header-title').innerText = "Universal Forever Card";
+      document.getElementById('drawer-card-content').innerHTML = `
+        <div style="background:#FFFFFF; border:1px solid var(--border-tan); border-radius:12px; padding:16px; margin-bottom:15px;">
+          <h2 style="margin:0 0 8px 0; color:var(--fresh-green);">${client.name}</h2>
+          <p style="margin:4px 0;"><strong>Vault ID:</strong> #${client.id}</p>
+          <p style="margin:4px 0;"><strong>Phone:</strong> ${client.phone}</p>
+          <p style="margin:4px 0;"><strong>Address:</strong> ${client.address}</p>
+          <p style="margin:4px 0;"><strong>Email:</strong> ${client.email}</p>
+        </div>
+        <div style="background:#FFFFFF; border:1px solid var(--border-tan); border-radius:12px; padding:16px;">
+          <h4 style="margin:0 0 10px 0; color:var(--fresh-green);">🎙️ Bench Diagnostics & Proposals</h4>
+          <button style="width:100%; background:var(--fresh-green); color:#fff; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom:10px;" onclick="alert('Proposal Link Dispatched!')">🚀 Dispatch Stripe Pay Link ($47.70)</button>
+          <button style="width:100%; background:#8B0000; color:#fff; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="closeWorkCard()">Close Card</button>
+        </div>
+      `;
+
+      document.getElementById('forever-work-drawer').classList.add('active');
+      localStorage.setItem('active_card_id', clientId);
+    }
+
+    function openSubscriberDoor(doorNum) {
+      const drawer = document.getElementById('forever-work-drawer');
+      const title = document.getElementById('drawer-header-title');
+      const content = document.getElementById('drawer-card-content');
+      drawer.classList.add('active');
+
+      if (doorNum === 1) {
+        title.innerText = "Door 1: Inventory Catalog (1,090 Items)";
+        content.innerHTML = `<p><strong>Vault Catalog:</strong> Motor Seals, HEPA Core Filters, Water Reagents.</p>`;
+      } else if (doorNum === 2) {
+        title.innerText = "Door 2: Staff Dynamic Roles";
+        content.innerHTML = `<p>[Counter Intake] • [Bench Lead] • [Parts Specialist] • [Digital VA]</p>`;
+      } else if (doorNum === 3) {
+        title.innerText = "Door 3: Cash Register";
+        content.innerHTML = `<p>Stripe Balance: $1,485.20 Available for payout.</p>`;
+      } else if (doorNum === 4) {
+        title.innerText = "Door 4: Growth Hub";
+        content.innerHTML = `<p>Forever Network & Recall SMS Engine Active.</p>`;
+      }
+    }
+
+    function closeWorkCard() {
+      document.getElementById('forever-work-drawer').classList.remove('active');
+      localStorage.removeItem('active_card_id');
     }
   </script>
 </body>
