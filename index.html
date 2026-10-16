@@ -28,7 +28,7 @@
     <header class="boutique-card rounded-2xl p-4 sm:p-6">
       <div class="flex flex-col md:flex-row items-center justify-between gap-4">
         
-        <!-- LEFT: LAVERNE & SHIRLEY CURSIVE F -->
+        <!-- LEFT: CURSIVE F -->
         <div class="flex items-center gap-3">
           <span class="text-6xl text-emerald-800 font-cursive-f leading-none select-none">F</span>
           <div>
@@ -37,7 +37,7 @@
           </div>
         </div>
 
-        <!-- CENTER: EMBEDDED VECTOR SVG FRESH MASCOT & MIC -->
+        <!-- CENTER: FRESH MASCOT & MIC -->
         <div class="flex flex-col items-center gap-2">
           <div class="w-16 h-16 rounded-full border-2 border-emerald-700 bg-white p-0.5 shadow-md flex items-center justify-center overflow-hidden">
             <svg viewBox="0 0 200 200" class="w-full h-full">
@@ -97,38 +97,18 @@
     <!-- MAIN OPERATIONAL FLOOR -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-      <!-- QUADRANT #1: Schedule Grid (Left) -->
+      <!-- QUADRANT #1: Dynamic Schedule Grid (Left) -->
       <div class="lg:col-span-5 boutique-card rounded-2xl p-5 space-y-4">
         <div class="flex items-center justify-between border-b border-stone-200 pb-3">
           <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📅 SCHEDULE GRID</h2>
-          <span class="text-[11px] font-mono font-bold px-2 py-0.5 bg-stone-200 text-stone-700 rounded">Synced Cal</span>
+          <span class="text-[11px] font-mono font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded">Live Cal Sync</span>
         </div>
         <div id="scheduledItemsSlot" class="space-y-2.5 max-h-80 overflow-y-auto">
-          <div onclick="openWorkstation('Dave & Suzie Gray', '3146 Gracefield Rd Apt FR 209, Silver Spring MD', '(301) 974-1448', 0)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition">
-            <div>
-              <p class="text-[10px] font-bold text-stone-500 font-mono">Tomorrow 11:00 AM</p>
-              <p class="font-bold text-stone-900 text-xs">Dave & Suzie Gray — Silver Spring Dispatch</p>
-            </div>
-            <a href="https://maps.google.com/?q=3146+Gracefield+Rd+Silver+Spring+MD" target="_blank" onclick="event.stopPropagation()" class="text-[10px] font-bold px-2.5 py-1 bg-blue-600 text-white rounded-lg shadow">🗺️ MAP IT</a>
-          </div>
-          <div onclick="openWorkstation('Mrs. Johnson', '124 Main St, Timonium MD', '(410) 555-0199', 189)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition">
-            <div>
-              <p class="text-[10px] font-bold text-stone-500 font-mono">Tomorrow 7:30 AM</p>
-              <p class="font-bold text-stone-900 text-xs">Mrs. Johnson — Laundry Pro Survey</p>
-            </div>
-            <a href="https://maps.google.com/?q=124+Main+St+Timonium+MD" target="_blank" onclick="event.stopPropagation()" class="text-[10px] font-bold px-2.5 py-1 bg-blue-600 text-white rounded-lg shadow">🗺️ MAP IT</a>
-          </div>
-          <div onclick="openWorkstation('Catherine Noblitt', '1 Smeton Pl Unit 1305, Towson MD', '(410) 908-1084', 0)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition">
-            <div>
-              <p class="text-[10px] font-bold text-stone-500 font-mono">Wed Oct 21 @ 12:00 PM</p>
-              <p class="font-bold text-stone-900 text-xs">Catherine Noblitt — Cell & Bulb</p>
-            </div>
-            <a href="https://maps.google.com/?q=1+Smeton+Pl+Towson+MD" target="_blank" onclick="event.stopPropagation()" class="text-[10px] font-bold px-2.5 py-1 bg-blue-600 text-white rounded-lg shadow">🗺️ MAP IT</a>
-          </div>
+          <p id="calEmptyState" class="text-xs text-stone-400 italic p-4 text-center">Syncing Live Calendar Stream...</p>
         </div>
       </div>
 
-      <!-- QUADRANT #2: Pinball Action Zone & Hopper (Right) -->
+      <!-- QUADRANT #2: Dynamic Pinball Action Zone (Right) -->
       <div class="lg:col-span-7 boutique-card rounded-2xl p-5 space-y-4">
         <div class="flex items-center justify-between border-b border-stone-200 pb-3">
           <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📍 PINBALL ACTION ZONE</h2>
@@ -137,44 +117,21 @@
 
         <!-- 4 Dynamic Action Fast Buttons -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <a id="fastCallBtn" href="tel:3019741448" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">📞 CALL</a>
-          <a id="fastTextBtn" href="sms:3019741448" class="p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">💬 TEXT</a>
+          <a id="fastCallBtn" href="tel:" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">📞 CALL</a>
+          <a id="fastTextBtn" href="sms:" class="p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">💬 TEXT</a>
           <button onclick="dispatchStripePay()" class="p-2.5 bg-amber-500 hover:bg-amber-600 text-stone-950 font-extrabold text-xs rounded-xl shadow transition active:scale-95">💳 CHECKOUT</button>
           <button onclick="nextPinballCard()" class="p-2.5 bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs rounded-xl shadow transition active:scale-95">📌 NEXT</button>
         </div>
 
         <div id="pinballQueue" class="space-y-2.5 max-h-64 overflow-y-auto">
-          <div onclick="openWorkstation('Dave & Suzie Gray', '3146 Gracefield Rd Apt FR 209, Silver Spring MD', '(301) 974-1448', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-emerald-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
-            <div>
-              <span class="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wide">Tomorrow 11:00 AM • Silver Spring Dispatch</span>
-              <h3 class="font-bold text-stone-900 text-xs">Dave & Suzie Gray</h3>
-              <p class="text-[11px] text-stone-600">3146 Gracefield Rd Apt FR 209 • (301) 974-1448</p>
-            </div>
-            <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
-          </div>
-          <div onclick="openWorkstation('Catherine Noblitt', '1 Smeton Pl Unit 1305, Towson MD', '(410) 908-1084', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-indigo-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
-            <div>
-              <span class="text-[10px] font-extrabold text-indigo-700 uppercase tracking-wide">Wed Oct 21 @ 12:00 PM • Cell & Bulb Swap</span>
-              <h3 class="font-bold text-stone-900 text-xs">Catherine Noblitt</h3>
-              <p class="text-[11px] text-stone-600">1 Smeton Pl Unit 1305 • (410) 908-1084</p>
-            </div>
-            <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
-          </div>
-          <div onclick="openWorkstation('Chuck Pike', '9724 Red Clover Ct, Parkville MD', '(410) 555-0144', 350)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-amber-500 shadow-sm hover:shadow-md transition flex items-center justify-between">
-            <div>
-              <span class="text-[10px] font-extrabold text-amber-700 uppercase tracking-wide">Tier 1: Cash-Out Complete</span>
-              <h3 class="font-bold text-stone-900 text-xs">Chuck Pike</h3>
-              <p class="text-[11px] text-stone-600">Used Motor Swap + Control Valve | $350.00</p>
-            </div>
-            <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
-          </div>
+          <p id="pinballEmptyState" class="text-xs text-stone-400 italic p-4 text-center">Pinball Hopper Ready • Tap Mic to Stream Cards</p>
         </div>
       </div>
 
     </div>
   </div>
 
-  <!-- FOREVER CARD WORKSTATION DRAWER (3-LAYER CLIENT CHASSIS) -->
+  <!-- FOREVER CARD WORKSTATION DRAWER -->
   <div id="drawerOverlay" onclick="closeWorkstation()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm hidden z-40"></div>
   <div id="workstationDrawer" class="fixed inset-y-0 right-0 w-full max-w-3xl bg-[#FAF9F5] shadow-2xl z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto p-5 sm:p-6 space-y-5">
     
@@ -189,7 +146,7 @@
       <button onclick="closeWorkstation()" class="text-stone-400 hover:text-stone-800 text-2xl font-bold">✕</button>
     </div>
 
-    <!-- LAYER 1: SHOP OPS CANVAS & REPAIR CHECKLIST -->
+    <!-- LAYER 1: SHOP OPS CANVAS -->
     <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
       <div class="flex justify-between items-center">
         <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Layer 1: Shop Ops Canvas</h3>
@@ -202,17 +159,10 @@
         <button id="stage4" onclick="setStage(4)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">4. Ready Wall 🎉</button>
       </div>
 
-      <!-- Staff Checklist (Pristine Unchecked) -->
       <div class="pt-2 border-t border-stone-100 space-y-1.5 text-xs">
         <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="rounded text-emerald-800"> <span>Mona: Customer Intake Logged</span></label>
         <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="rounded text-emerald-800"> <span>Chris: Floor Brush Bristles Pulled (1,090 Catalog)</span></label>
         <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="rounded text-emerald-800"> <span>Mike: Field Diagnostic Audio Complete</span></label>
-      </div>
-
-      <!-- Field Audio Note Player -->
-      <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between text-xs">
-        <span class="font-medium text-stone-700">🔊 Mike's Field Audio Note (0:45)</span>
-        <button onclick="alert('Playing audio memo from Mike...')" class="px-3 py-1 bg-emerald-800 text-white font-bold rounded-lg text-[11px]">▶ PLAY</button>
       </div>
     </div>
 
@@ -245,7 +195,6 @@
             </tr>
           </thead>
           <tbody id="invoiceTableBody" class="divide-y divide-stone-100 font-medium">
-            <!-- Dynamic rows start clean -->
           </tbody>
         </table>
       </div>
@@ -259,7 +208,7 @@
       </div>
     </div>
 
-    <!-- LAYER 3: LIVE READ-ONLY CUSTOMER MIRROR -->
+    <!-- LAYER 3: CUSTOMER MOBILE MIRROR -->
     <div class="bg-stone-900 text-stone-100 rounded-2xl p-4 space-y-2 pointer-events-none opacity-90 shadow-inner">
       <div class="flex items-center justify-between border-b border-stone-800 pb-2">
         <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Layer 3: Customer Mobile View (Read-Only Mirror)</h3>
@@ -278,32 +227,12 @@
       </div>
     </div>
 
-    <!-- LAYER 4: STORAGE BINS -->
-    <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-2.5">
-      <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Layer 4: Storage Bins & Drawers</h3>
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        <button onclick="alert('🗄️ Vault Record Archive: Client permanent history loaded.')" class="p-2.5 bg-stone-50 rounded-xl text-xs font-bold text-stone-800 border border-stone-200 hover:border-emerald-600">🗄️ Vault Records</button>
-        <button onclick="alert('📖 Equipment Manuals: Aerus Beyond & Central Vac PDFs loaded.')" class="p-2.5 bg-stone-50 rounded-xl text-xs font-bold text-stone-800 border border-stone-200 hover:border-emerald-600">📖 Manuals</button>
-        <button onclick="alert('🧾 Receipt History: Lifetime transactions archived.')" class="p-2.5 bg-stone-50 rounded-xl text-xs font-bold text-stone-800 border border-stone-200 hover:border-emerald-600">🧾 Receipts</button>
-        <button onclick="alert('🛋️ Tech Room Notes: Service location & equipment placement.')" class="p-2.5 bg-stone-50 rounded-xl text-xs font-bold text-stone-800 border border-stone-200 hover:border-emerald-600">🛋️ Room Notes</button>
-      </div>
-    </div>
-
   </div>
 
   <script>
     let isListening = false, recognition = null, lastPhrase = '';
     let currentInvoiceItems = [];
-    let currentActivePhone = '301-974-1448';
-
-    const vault = [
-      { name: "William Sullivan", id: "1004", phone: "(410) 499-1313", address: "6110 Glenoak Ave, Baltimore, MD" },
-      { name: "Dave & Suzie Gray", id: "21948", phone: "(301) 974-1448", address: "3146 Gracefield Rd Apt FR 209, Silver Spring, MD" },
-      { name: "Catherine Noblitt", id: "11264", phone: "(410) 908-1084", address: "1 Smeton Pl Unit 1305, Towson, MD" },
-      { name: "Catherine Wagner", id: "21982", phone: "(443) 520-6265", address: "1010 Maplehurst Ln, Monkton, MD" },
-      { name: "Mrs. Johnson", id: "1055", phone: "(410) 555-0199", address: "124 Main St, Timonium, MD" },
-      { name: "Chuck Pike", id: "21009", phone: "(410) 555-0144", address: "9724 Red Clover Ct, Parkville, MD" }
-    ];
+    let currentActivePhone = '';
 
     window.onload = function() {
       setupSpeech();
@@ -347,48 +276,26 @@
     }
 
     function handleVoiceIntake(text) {
-      const lower = text.toLowerCase();
-      let match = vault.find(c => lower.includes(c.name.toLowerCase().split(' ')[0]));
-      
-      if (!match) {
-        match = { name: text.split(' ')[0] || "New Client", id: "NEW", phone: "(410) 555-0100", address: "Local Intake" };
-      }
-
-      // Add to Pinball Queue
       const pinball = document.getElementById('pinballQueue');
+      const emptyState = document.getElementById('pinballEmptyState');
+      if (emptyState) emptyState.remove();
+
       const pinItem = `
-        <div onclick="openWorkstation('${match.name}', '${match.address}', '${match.phone}', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-emerald-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
+        <div onclick="openWorkstation('Dynamic Voice Ticket', 'Local Intake', '(410) 555-0100', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-emerald-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
           <div>
-            <span class="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wide">Voice Intake</span>
-            <h3 class="font-bold text-stone-900 text-xs">${match.name}</h3>
-            <p class="text-[11px] text-stone-600">${match.address} • "${text}"</p>
+            <span class="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wide">Live Voice Intake</span>
+            <h3 class="font-bold text-stone-900 text-xs">${text}</h3>
+            <p class="text-[11px] text-stone-600">Dynamic Ticket Logged</p>
           </div>
           <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
         </div>
       `;
       pinball.insertAdjacentHTML('afterbegin', pinItem);
 
-      // Add to Schedule Grid
-      let timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)?|\d{1,2}\s*(?:AM|PM|am|pm))/i);
-      let timeLabel = timeMatch ? timeMatch[0].toUpperCase() : "3:30 PM";
-
-      const cal = document.getElementById('scheduledItemsSlot');
-      const calItem = `
-        <div onclick="openWorkstation('${match.name}', '${match.address}', '${match.phone}', 0)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition">
-          <div>
-            <p class="text-[10px] font-bold text-stone-500 font-mono">${timeLabel}</p>
-            <p class="font-bold text-stone-900 text-xs">${match.name} — Scheduled</p>
-          </div>
-          <span class="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded">Open Card ➔</span>
-        </div>
-      `;
-      cal.insertAdjacentHTML('afterbegin', calItem);
-
-      // Webhook dispatch to Make.com
       fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transcript: text, customer: match, time: timeLabel, timestamp: new Date().toISOString() })
+        body: JSON.stringify({ transcript: text, timestamp: new Date().toISOString() })
       }).catch(err => console.log('Pipe fired'));
     }
 
