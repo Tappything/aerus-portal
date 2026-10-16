@@ -8,58 +8,36 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #ECE8DF;
-      color: #1C1917;
-    }
-    .font-cursive-f {
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
-      font-weight: 700;
-    }
-    .boutique-card {
-      background-color: #FAF9F5;
-      border: 1px solid #E5E0D8;
-      box-shadow: 0 10px 30px -5px rgba(28, 25, 23, 0.05), 0 4px 6px -2px rgba(28, 25, 23, 0.02);
-    }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #ECE8DF; color: #1C1917; }
+    .font-cursive-f { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700; }
+    .boutique-card { background-color: #FAF9F5; border: 1px solid #E5E0D8; box-shadow: 0 10px 30px -5px rgba(28, 25, 23, 0.05); }
   </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
 
-  <!-- MASTER CONTAINER -->
   <div class="max-w-7xl mx-auto space-y-6">
 
-    <!-- GLOBAL HEADER -->
+    <!-- HEADER -->
     <header class="boutique-card rounded-2xl p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-      <!-- Emerald F Brand -->
       <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-xl bg-emerald-900 text-amber-100 flex items-center justify-center text-3xl font-cursive-f shadow-md">
-          F
-        </div>
+        <div class="w-12 h-12 rounded-xl bg-emerald-900 text-amber-100 flex items-center justify-center text-3xl font-cursive-f shadow-md">F</div>
         <div>
-          <h1 class="text-xl font-bold tracking-tight text-stone-900">TappyThing</h1>
-          <p class="text-xs font-semibold tracking-wider text-emerald-800 uppercase">Aerus Timonium MD — Subscriber</p>
+          <h1 class="text-xl font-bold text-stone-900">TappyThing</h1>
+          <p class="text-xs font-semibold text-emerald-800 uppercase">Aerus Timonium MD — Subscriber</p>
         </div>
       </div>
 
-      <!-- Center Voice & Cam Controls -->
-      <div class="flex items-center gap-3 w-full md:w-auto justify-center">
-        <button id="micBtn" onclick="toggleVoiceIntake()" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-emerald-800 hover:bg-emerald-900 text-amber-50 font-bold rounded-xl shadow-lg transition-all transform active:scale-95">
+      <div class="flex items-center gap-3">
+        <button id="micBtn" onclick="toggleVoiceIntake()" class="flex items-center gap-2 px-6 py-3 bg-emerald-800 hover:bg-emerald-900 text-amber-50 font-bold rounded-xl shadow-lg transition-all">
           <span id="micIcon" class="text-xl">🎙️</span>
-          <span id="micText" class="tracking-wide">TALK TO FRESH</span>
+          <span id="micText">TALK TO FRESH</span>
         </button>
-        <button onclick="triggerCam()" class="p-3 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold rounded-xl shadow transition-all">
-          📷
-        </button>
+        <button onclick="alert('Camera Active')" class="p-3 bg-stone-200 text-stone-800 font-bold rounded-xl shadow">📷</button>
       </div>
 
-      <!-- Mascot Badge -->
       <div class="flex items-center gap-3 border-l border-stone-200 pl-4">
-        <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-900 flex items-center justify-center font-extrabold text-lg shadow-inner">
-          🤵
-        </div>
-        <div class="hidden sm:block">
+        <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-900 flex items-center justify-center font-extrabold text-lg">🤵</div>
+        <div>
           <p class="text-xs font-bold text-stone-900">Fresh Coordinator</p>
           <p class="text-[10px] text-stone-500">Calm The Chaos</p>
         </div>
@@ -68,81 +46,76 @@
 
     <!-- 4 HUB DOORS -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <button onclick="alert('Inventory Hub: 1,090 Parts Loaded')" class="boutique-card p-4 rounded-xl flex items-center justify-between hover:border-emerald-700 transition-all">
+      <button class="boutique-card p-4 rounded-xl flex items-center justify-between hover:border-emerald-700">
         <span class="text-sm font-bold text-stone-800">📦 Inventory (1,090)</span>
-        <span class="text-xs text-stone-400">➔</span>
       </button>
-      <button onclick="alert('Dynamic Staff Roles Active')" class="boutique-card p-4 rounded-xl flex items-center justify-between hover:border-emerald-700 transition-all">
+      <button class="boutique-card p-4 rounded-xl flex items-center justify-between hover:border-emerald-700">
         <span class="text-sm font-bold text-stone-800">👥 Staff Roles</span>
-        <span class="text-xs text-stone-400">➔</span>
       </button>
-      <button onclick="alert('Workiz Cash Register Synced')" class="boutique-card p-4 rounded-xl flex items-center justify-between hover:border-emerald-700 transition-all">
+      <button class="boutique-card p-4 rounded-xl flex items-center justify-between hover:border-emerald-700">
         <span class="text-sm font-bold text-stone-800">💳 Workiz Register</span>
-        <span class="text-xs text-stone-400">➔</span>
       </button>
-      <button onclick="alert('Growth Network Share Link Ready')" class="boutique-card p-4 rounded-xl flex items-center justify-between hover:border-emerald-700 transition-all">
+      <button class="boutique-card p-4 rounded-xl flex items-center justify-between hover:border-emerald-700">
         <span class="text-sm font-bold text-stone-800">🌐 Growth Network</span>
-        <span class="text-xs text-stone-400">➔</span>
       </button>
     </div>
 
-    <!-- MAIN FLOOR: SCHEDULE & PINBALL QUEUE -->
+    <!-- MAIN FLOOR -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-      <!-- Schedule Grid (Left) -->
+      <!-- Schedule Grid -->
       <div class="lg:col-span-5 boutique-card rounded-2xl p-6 space-y-4">
         <div class="flex items-center justify-between border-b border-stone-200 pb-3">
-          <h2 class="font-bold text-stone-900 text-lg flex items-center gap-2">📅 Today's Schedule</h2>
+          <h2 class="font-bold text-stone-900 text-lg">📅 Today's Schedule</h2>
           <span class="text-xs font-semibold px-2.5 py-1 bg-stone-200 text-stone-700 rounded-md">Oct 16, 2026</span>
         </div>
         <div class="space-y-3">
-          <div class="p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm">
+          <div onclick="openWorkstation('Mrs. Johnson', '124 Main St, Timonium MD', '410-555-0199', 189)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition-all">
             <div>
               <p class="text-xs font-bold text-stone-500">1:00 PM</p>
               <p class="font-bold text-stone-900 text-sm">Mrs. Johnson — Central Vac Check</p>
             </div>
-            <span class="text-xs font-bold px-2 py-1 bg-emerald-100 text-emerald-800 rounded">Scheduled</span>
+            <span class="text-xs font-bold px-2 py-1 bg-emerald-100 text-emerald-800 rounded">Open Card ➔</span>
           </div>
-          <div class="p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm">
+          <div onclick="openWorkstation('Chuck Pike', '9724 Red Clover Ct, Parkville MD', '410-555-0144', 350)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition-all">
             <div>
               <p class="text-xs font-bold text-stone-500">2:00 PM</p>
-              <p class="font-bold text-stone-900 text-sm">Chuck Pike — 9724 Red Clover Ct</p>
+              <p class="font-bold text-stone-900 text-sm">Chuck Pike — Drop-off Unit</p>
             </div>
             <span class="text-xs font-bold px-2 py-1 bg-amber-100 text-amber-800 rounded">$350 Cash-Out</span>
+          </div>
+          <div onclick="openWorkstation('William Sullivan', '6110 Glenoak Ave, Baltimore MD', '410-499-1313', 0)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition-all">
+            <div>
+              <p class="text-xs font-bold text-stone-500">3:30 PM</p>
+              <p class="font-bold text-stone-900 text-sm">William Sullivan — Water Testing</p>
+            </div>
+            <span class="text-xs font-bold px-2 py-1 bg-blue-100 text-blue-800 rounded">Vault Verified</span>
           </div>
         </div>
       </div>
 
-      <!-- 3-Tier Pinball Queue (Right) -->
+      <!-- Pinball Tray -->
       <div class="lg:col-span-7 boutique-card rounded-2xl p-6 space-y-4">
         <div class="flex items-center justify-between border-b border-stone-200 pb-3">
-          <h2 class="font-bold text-stone-900 text-lg flex items-center gap-2">🎯 Pinball Tray (Forever Cards)</h2>
+          <h2 class="font-bold text-stone-900 text-lg">🎯 Pinball Tray (Forever Cards)</h2>
           <button onclick="clearPinball()" class="text-xs text-stone-500 hover:text-red-600 font-semibold">Clear Queue</button>
         </div>
 
         <div id="pinballQueue" class="space-y-3">
-          <!-- Tier 1: Cash-Out -->
-          <div onclick="openWorkstation('Chuck Pike', 350)" class="cursor-pointer p-4 bg-white rounded-xl border-l-4 border-amber-500 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
+          <div onclick="openWorkstation('Chuck Pike', '9724 Red Clover Ct, Parkville MD', '410-555-0144', 350)" class="cursor-pointer p-4 bg-white rounded-xl border-l-4 border-amber-500 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
             <div>
-              <div class="flex items-center gap-2">
-                <span class="text-xs font-extrabold text-amber-700 uppercase tracking-wide">Tier 1: Cash-Out</span>
-                <span class="text-xs text-stone-400">• Work Card</span>
-              </div>
+              <span class="text-xs font-extrabold text-amber-700 uppercase">Tier 1: Cash-Out</span>
               <h3 class="font-bold text-stone-900">Chuck Pike</h3>
               <p class="text-xs text-stone-600">Used Motor Swap + Control Valve | $350.00</p>
             </div>
             <span class="text-sm font-bold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg">Open Card ➔</span>
           </div>
 
-          <!-- Tier 2: Quick Turns -->
-          <div onclick="openWorkstation('Mrs. Johnson', 189)" class="cursor-pointer p-4 bg-white rounded-xl border-l-4 border-emerald-600 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
+          <div onclick="openWorkstation('William Sullivan', '6110 Glenoak Ave, Baltimore MD', '410-499-1313', 0)" class="cursor-pointer p-4 bg-white rounded-xl border-l-4 border-emerald-600 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
             <div>
-              <div class="flex items-center gap-2">
-                <span class="text-xs font-extrabold text-emerald-700 uppercase tracking-wide">Tier 2: Quick Turn</span>
-                <span class="text-xs text-stone-400">• Work Card</span>
-              </div>
-              <h3 class="font-bold text-stone-900">Mrs. Johnson</h3>
-              <p class="text-xs text-stone-600">Central Vac Power Module Swap | $189.00</p>
+              <span class="text-xs font-extrabold text-emerald-700 uppercase">Tier 2: Active Intake</span>
+              <h3 class="font-bold text-stone-900">William Sullivan</h3>
+              <p class="text-xs text-stone-600">6110 Glenoak Ave | Water Testing Scheduled 3:30 PM</p>
             </div>
             <span class="text-sm font-bold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg">Open Card ➔</span>
           </div>
@@ -152,26 +125,24 @@
     </div>
   </div>
 
-  <!-- 3-LAYER CLIENT WORKSTATION DRAWER -->
-  <div id="drawerOverlay" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm hidden z-40 transition-opacity"></div>
+  <!-- FOREVER CARD WORKSTATION DRAWER -->
+  <div id="drawerOverlay" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm hidden z-40"></div>
   <div id="workstationDrawer" class="fixed inset-y-0 right-0 w-full max-w-3xl bg-[#FAF9F5] shadow-2xl z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto p-6 space-y-6">
     
     <div class="flex items-center justify-between border-b border-stone-200 pb-4">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-emerald-900 text-amber-100 flex items-center justify-center font-cursive-f text-2xl">
-          F
-        </div>
+        <div class="w-10 h-10 rounded-xl bg-emerald-900 text-amber-100 flex items-center justify-center font-cursive-f text-2xl">F</div>
         <div>
           <h2 id="cardClientName" class="text-xl font-bold text-stone-900">Forever Card Workstation</h2>
-          <p class="text-xs text-emerald-800 font-semibold">Self-Contained Client Drawer</p>
+          <p id="cardClientDetails" class="text-xs text-stone-500 font-semibold">6110 Glenoak Ave • 410-499-1313</p>
         </div>
       </div>
       <button onclick="closeWorkstation()" class="text-stone-400 hover:text-stone-800 text-2xl font-bold">✕</button>
     </div>
 
-    <!-- LAYER 1: SHOP OPS CANVAS (4 STAGES) -->
+    <!-- LAYER 1: SHOP OPS CANVAS -->
     <div class="bg-white rounded-2xl p-5 border border-stone-200 space-y-3">
-      <h3 class="text-xs font-extrabold text-stone-400 uppercase tracking-wider">Layer 1: Shop Ops Canvas</h3>
+      <h3 class="text-xs font-extrabold text-stone-400 uppercase">Layer 1: Shop Ops Canvas</h3>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <button id="stage1" onclick="setStage(1)" class="p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white">1. Intake & Photo</button>
         <button id="stage2" onclick="setStage(2)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">2. Diagnostics</button>
@@ -182,108 +153,88 @@
 
     <!-- LAYER 2: CARD-NATIVE INVOICE BUILDER -->
     <div class="bg-white rounded-2xl p-5 border border-stone-200 space-y-4">
-      <div class="flex items-center justify-between">
-        <h3 class="text-xs font-extrabold text-stone-400 uppercase tracking-wider">Layer 2: Card-Native Invoice Builder</h3>
-        <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded">1,090 Catalog Items Linked</span>
-      </div>
-
-      <!-- Parts Catalog Selector -->
+      <h3 class="text-xs font-extrabold text-stone-400 uppercase">Layer 2: Card-Native Invoice Builder</h3>
       <div class="flex gap-2">
         <select id="partSelect" class="flex-1 text-sm border border-stone-300 rounded-xl p-2.5 bg-stone-50 font-medium">
           <option value="295|50">Used Motor Assembly — $295.00 (Cost: $50.00)</option>
           <option value="55|15">Control Valve Swap — $55.00 (Cost: $15.00)</option>
           <option value="395|131">PC Board - Platinum — $395.00 (Cost: $131.00)</option>
-          <option value="189|35">Control Module Package — $189.00 (Cost: $35.00)</option>
         </select>
-        <button onclick="addInvoiceItem()" class="px-4 py-2 bg-emerald-800 text-white font-bold text-sm rounded-xl hover:bg-emerald-900">+ Add</button>
+        <button onclick="addInvoiceItem()" class="px-4 py-2 bg-emerald-800 text-white font-bold text-sm rounded-xl">+ Add</button>
       </div>
 
-      <!-- Line Items Table -->
       <div class="border border-stone-200 rounded-xl overflow-hidden">
         <table class="w-full text-left text-xs">
           <thead class="bg-stone-100 text-stone-600 font-bold">
-            <tr>
-              <th class="p-2.5">Item</th>
-              <th class="p-2.5">Wholesale</th>
-              <th class="p-2.5">Retail</th>
-              <th class="p-2.5 text-right">Margin</th>
-            </tr>
+            <tr><th class="p-2.5">Item</th><th class="p-2.5">Cost</th><th class="p-2.5">Retail</th><th class="p-2.5 text-right">Margin</th></tr>
           </thead>
           <tbody id="invoiceTableBody" class="divide-y divide-stone-100 font-medium">
             <tr>
-              <td class="p-2.5 text-stone-900">Used Motor Replacement</td>
-              <td class="p-2.5 text-stone-500">$50.00</td>
-              <td class="p-2.5 text-stone-900 font-bold">$295.00</td>
-              <td class="p-2.5 text-right text-emerald-700 font-bold">83.0%</td>
+              <td class="p-2.5 text-stone-900">Water Test & Service Diagnostic</td>
+              <td class="p-2.5 text-stone-500">$0.00</td>
+              <td class="p-2.5 text-stone-900 font-bold">$0.00</td>
+              <td class="p-2.5 text-right text-emerald-700 font-bold">100%</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Live Profit Margin Calculator -->
       <div class="p-3 bg-stone-50 rounded-xl flex items-center justify-between border border-stone-200">
-        <div>
-          <p class="text-[10px] font-extrabold text-stone-400 uppercase tracking-wider">Gross Profit Calculation</p>
-          <p id="profitSummary" class="text-sm font-bold text-stone-900">$245.00 Pure Margin</p>
-        </div>
-        <button onclick="dispatchStripePay()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-stone-950 font-extrabold text-xs rounded-xl shadow transition-all">
-          🚀 1-Tap Stripe Pay Dispatch
-        </button>
+        <p id="profitSummary" class="text-sm font-bold text-stone-900">Total: $0.00</p>
+        <button onclick="alert('Stripe Pay Link Dispatched')" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-stone-950 font-extrabold text-xs rounded-xl shadow">🚀 1-Tap Stripe Pay Dispatch</button>
       </div>
     </div>
 
-    <!-- LAYER 3: LIVE READ-ONLY CUSTOMER MOBILE MIRROR -->
-    <div class="bg-stone-900 text-stone-100 rounded-2xl p-5 space-y-3 shadow-inner">
+    <!-- LAYER 3: LIVE UN-ADJUSTABLE CUSTOMER MIRROR -->
+    <div class="bg-stone-900 text-stone-100 rounded-2xl p-5 space-y-3 pointer-events-none opacity-90 shadow-inner">
       <div class="flex items-center justify-between border-b border-stone-800 pb-2">
-        <h3 class="text-xs font-extrabold text-stone-400 uppercase tracking-wider">Layer 3: Live Customer Mobile View</h3>
-        <span class="text-[10px] bg-emerald-900/80 text-emerald-300 font-bold px-2 py-0.5 rounded">Live Mirror</span>
+        <h3 class="text-xs font-extrabold text-stone-400 uppercase">Layer 3: Live Customer Mobile View (Read-Only)</h3>
+        <span class="text-[10px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded">Mirror Locked</span>
       </div>
       <div class="bg-stone-950 rounded-xl p-4 border border-stone-800 space-y-2">
         <div class="flex items-center justify-between">
           <span class="font-cursive-f text-emerald-400 text-lg">F</span>
-          <span id="mirrorClient" class="text-xs font-bold text-stone-300">Chuck Pike View</span>
+          <span id="mirrorClient" class="text-xs font-bold text-stone-300">William Sullivan Mobile View</span>
         </div>
-        <p class="text-xs text-stone-400">Service Status: <span class="text-amber-400 font-bold">Ready for Pickup</span></p>
+        <p class="text-xs text-stone-400">Status: <span class="text-emerald-400 font-bold">Active Forever Card</span></p>
         <div class="text-right">
-          <p class="text-[10px] text-stone-500">Approved Total</p>
-          <p id="mirrorTotal" class="text-lg font-extrabold text-emerald-400">$350.00</p>
+          <p class="text-[10px] text-stone-500">Service Total</p>
+          <p id="mirrorTotal" class="text-lg font-extrabold text-emerald-400">$0.00</p>
         </div>
       </div>
     </div>
 
-    <!-- LAYER 4: STORAGE BINS & DRAWERS -->
+    <!-- LAYER 4: STORAGE BINS -->
     <div class="bg-white rounded-2xl p-5 border border-stone-200 space-y-3">
-      <h3 class="text-xs font-extrabold text-stone-400 uppercase tracking-wider">Layer 4: Storage Bins & Drawers</h3>
+      <h3 class="text-xs font-extrabold text-stone-400 uppercase">Layer 4: Storage Bins & Drawers</h3>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        <button onclick="alert('Opening Vault Record...')" class="p-3 bg-stone-50 hover:bg-stone-100 rounded-xl text-xs font-bold text-stone-800 border border-stone-200">🗄️ Vault Records</button>
-        <button onclick="alert('Opening Equipment Manuals...')" class="p-3 bg-stone-50 hover:bg-stone-100 rounded-xl text-xs font-bold text-stone-800 border border-stone-200">📖 Manuals</button>
-        <button onclick="alert('Opening Receipt History...')" class="p-3 bg-stone-50 hover:bg-stone-100 rounded-xl text-xs font-bold text-stone-800 border border-stone-200">🧾 Receipts</button>
-        <button onclick="alert('Opening Room Notes...')" class="p-3 bg-stone-50 hover:bg-stone-100 rounded-xl text-xs font-bold text-stone-800 border border-stone-200">🛋️ Room Notes</button>
+        <button onclick="alert('Vault Record: #1004')" class="p-3 bg-stone-50 rounded-xl text-xs font-bold text-stone-800 border border-stone-200">🗄️ Vault Records</button>
+        <button onclick="alert('Equipment Manuals')" class="p-3 bg-stone-50 rounded-xl text-xs font-bold text-stone-800 border border-stone-200">📖 Manuals</button>
+        <button onclick="alert('Receipt History')" class="p-3 bg-stone-50 rounded-xl text-xs font-bold text-stone-800 border border-stone-200">🧾 Receipts</button>
+        <button onclick="alert('Room Notes')" class="p-3 bg-stone-50 rounded-xl text-xs font-bold text-stone-800 border border-stone-200">🛋️ Room Notes</button>
       </div>
     </div>
 
   </div>
 
   <script>
-    // Voice Recognition Engine & Duplicate Lock
-    let isListening = false;
-    let recognition;
-    let lastPhrase = '';
+    let isListening = false, recognition, lastPhrase = '';
 
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       recognition = new SpeechRecognition();
       recognition.continuous = false;
-      recognition.interimResults = false;
-
       recognition.onresult = (event) => {
         const phrase = event.results[0][0].transcript;
         if (phrase !== lastPhrase) {
           lastPhrase = phrase;
-          sendWebhook(phrase);
+          fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ transcript: phrase, timestamp: new Date().toISOString() })
+          }).catch(err => console.log('Pipe fired'));
         }
       };
-
       recognition.onend = () => {
         isListening = false;
         document.getElementById('micText').innerText = 'TALK TO FRESH';
@@ -292,33 +243,20 @@
     }
 
     function toggleVoiceIntake() {
-      if (!recognition) return alert('Speech recognition not supported in this browser.');
-      if (isListening) {
-        recognition.stop();
-      } else {
-        recognition.start();
-        isListening = true;
+      if (!recognition) return alert('Voice recognition unavailable');
+      if (isListening) { recognition.stop(); } 
+      else { 
+        recognition.start(); 
+        isListening = true; 
         document.getElementById('micText').innerText = 'LISTENING...';
         document.getElementById('micIcon').innerText = '⚡';
       }
     }
 
-    function sendWebhook(transcript) {
-      fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transcript: transcript, timestamp: new Date().toISOString() })
-      }).catch(err => console.log('Webhook triggered'));
-    }
-
-    function triggerCam() {
-      alert('Camera Activated: Snap equipment tag or job photo to dump directly onto Forever Card.');
-    }
-
-    // Workstation Drawer Functions
-    function openWorkstation(clientName, amount) {
-      document.getElementById('cardClientName').innerText = clientName + ' — Forever Card';
-      document.getElementById('mirrorClient').innerText = clientName + ' Mobile View';
+    function openWorkstation(name, details, phone, amount) {
+      document.getElementById('cardClientName').innerText = name + ' — Forever Card';
+      document.getElementById('cardClientDetails').innerText = details + ' • ' + phone;
+      document.getElementById('mirrorClient').innerText = name + ' Mobile View';
       document.getElementById('mirrorTotal').innerText = '$' + amount.toFixed(2);
       document.getElementById('drawerOverlay').classList.remove('hidden');
       document.getElementById('workstationDrawer').classList.remove('translate-x-full');
@@ -331,39 +269,24 @@
 
     function setStage(stageNum) {
       for (let i = 1; i <= 4; i++) {
-        const btn = document.getElementById('stage' + i);
-        if (i === stageNum) {
-          btn.className = 'p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white';
-        } else {
-          btn.className = 'p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600';
-        }
+        document.getElementById('stage' + i).className = (i === stageNum) ? 
+          'p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white' : 
+          'p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600';
       }
-      if (stageNum === 4) {
-        confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
-      }
+      if (stageNum === 4) confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
     }
 
     function addInvoiceItem() {
       const select = document.getElementById('partSelect');
       const val = select.value.split('|');
-      const retail = parseFloat(val[0]);
-      const cost = parseFloat(val[1]);
+      const retail = parseFloat(val[0]), cost = parseFloat(val[1]);
       const name = select.options[select.selectedIndex].text.split('—')[0].trim();
       const margin = (((retail - cost) / retail) * 100).toFixed(1);
 
       const tbody = document.getElementById('invoiceTableBody');
       const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td class="p-2.5 text-stone-900">${name}</td>
-        <td class="p-2.5 text-stone-500">$${cost.toFixed(2)}</td>
-        <td class="p-2.5 text-stone-900 font-bold">$${retail.toFixed(2)}</td>
-        <td class="p-2.5 text-right text-emerald-700 font-bold">${margin}%</td>
-      `;
+      tr.innerHTML = `<td class="p-2.5 text-stone-900">${name}</td><td class="p-2.5 text-stone-500">$${cost.toFixed(2)}</td><td class="p-2.5 text-stone-900 font-bold">$${retail.toFixed(2)}</td><td class="p-2.5 text-right text-emerald-700 font-bold">${margin}%</td>`;
       tbody.appendChild(tr);
-    }
-
-    function dispatchStripePay() {
-      alert('Stripe Pay Link dispatched instantly via SMS & Forever Card Mirror!');
     }
 
     function clearPinball() {
