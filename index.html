@@ -28,7 +28,7 @@
 
   <div class="physical-card max-w-4xl w-full rounded-3xl p-5 sm:p-8 space-y-6 relative overflow-hidden">
 
-    <!-- 1. MASTER HEADER WITH LOGO CENTERPIECE -->
+    <!-- 1. MASTER HEADER WITH VECTOR SVG FRESH MASCOT CENTERPIECE -->
     <header class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border-b border-[#E2DACC] pb-5">
       
       <!-- LEFT: CURSIVE 'F' BRANDING -->
@@ -40,18 +40,29 @@
         </div>
       </div>
 
-      <!-- CENTER: LOGO CENTERPIECE (4126.jpg) & MASTER CONTROLS -->
+      <!-- CENTER: VECTOR SVG MASCOT & TOP INTAKE CONTROLS -->
       <div class="flex flex-col items-center justify-center space-y-2">
-        <div class="w-16 h-16 rounded-full border-2 border-emerald-600 bg-white p-0.5 shadow-md flex items-center justify-center overflow-hidden">
-          <img src="4126.jpg" alt="Fresh Logo" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/059669/FFFFFF?text=FRESH';">
+        <div class="w-20 h-20 rounded-full border-2 border-emerald-600 bg-white p-0.5 shadow-md flex items-center justify-center overflow-hidden">
+          <svg viewBox="0 0 200 200" class="w-full h-full">
+            <circle cx="100" cy="100" r="95" fill="white" stroke="#059669" stroke-width="4"/>
+            <path d="M 75 52 Q 88 38 100 42 Q 112 38 125 52 Q 112 46 100 48 Q 88 46 75 52 Z" fill="#1E293B"/>
+            <circle cx="100" cy="72" r="28" fill="#1E293B"/>
+            <rect x="78" y="66" width="44" height="13" rx="4" fill="#000"/>
+            <ellipse cx="88" cy="72" rx="8" ry="4" fill="#38BDF8"/>
+            <ellipse cx="112" cy="72" rx="8" ry="4" fill="#38BDF8"/>
+            <path d="M 88 88 Q 100 98 112 88" stroke="#1E293B" stroke-width="3" fill="none"/>
+            <path d="M 68 110 Q 100 100 132 110 L 132 135 L 68 135 Z" fill="#1E293B"/>
+            <text x="100" y="158" font-family="'JetBrains Mono', monospace" font-weight="900" font-size="20" text-anchor="middle" fill="#059669">FRESH</text>
+            <text x="100" y="174" font-family="'Inter', sans-serif" font-weight="700" font-size="8" text-anchor="middle" fill="#64748B">DIGITAL COORDINATOR</text>
+          </svg>
         </div>
 
         <div class="flex items-center space-x-2">
-          <button id="masterMicBtn" onclick="toggleVoiceDictation()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-4 py-2 rounded-full font-bold text-xs flex items-center space-x-1 shadow-md transition transform active:scale-95">
+          <button id="masterMicBtn" onclick="toggleVoiceDictation()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-4 py-2 rounded-full font-bold text-xs flex items-center space-x-1.5 shadow-md transition transform active:scale-95">
             <i class="fa-solid fa-microphone text-xs"></i>
             <span>🎙️ TALK TO FRESH</span>
           </button>
-          <button onclick="alert('📷 Camera Active: Snap photo of equipment serial tag!')" class="bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 rounded-full font-bold text-xs flex items-center space-x-1 shadow-md transition transform active:scale-95">
+          <button onclick="alert('📷 Camera Active: Snap photo of equipment serial tag!')" class="bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 rounded-full font-bold text-xs flex items-center space-x-1.5 shadow-md transition transform active:scale-95">
             <i class="fa-solid fa-camera text-xs"></i>
             <span>📷 CAM</span>
           </button>
@@ -71,7 +82,7 @@
 
     </header>
 
-    <!-- 2. MAIN HUB FLOOR: SCHEDULE GRID + PINBALL QUEUE -->
+    <!-- 2. MAIN HUB FLOOR: SCHEDULE GRID & CLEAN PINBALL QUEUE -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       
       <!-- SCHEDULE GRID -->
@@ -85,7 +96,7 @@
         </div>
         
         <div id="scheduledItemsSlot" class="space-y-2 text-xs font-mono max-h-40 overflow-y-auto">
-          <!-- Scheduled cards populate here -->
+          <!-- Unique scheduled items populate here -->
         </div>
       </div>
 
@@ -145,7 +156,7 @@
       </button>
     </div>
 
-    <!-- EXPANDABLE WORKSPACE DRAWER (WITH EMBEDDED CUSTOMER VIEW AT BOTTOM) -->
+    <!-- EXPANDABLE FOREVER WORKSPACE DRAWER -->
     <div id="forever-work-drawer" class="hidden bg-slate-900 text-white rounded-2xl p-5 space-y-4">
       <div class="flex justify-between items-center border-b border-slate-800 pb-2">
         <h3 id="drawerTitle" class="text-sm font-bold text-white">Forever Card Workspace</h3>
@@ -160,9 +171,10 @@
     let isRecording = false;
     let recognition = null;
     let activeCustomer = null;
-    let processedRecords = new Set();
+    let lastProcessedText = "";
     const WEBHOOK_URL = "https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln";
 
+    // 22,283 Customer Vault Match Array
     const vault = [
       { name: "William Sullivan", id: "1004", phone: "4104991313", phoneDisp: "(410) 499-1313", address: "6110 Glenoak Ave, Baltimore, MD 21214", email: "Williamanyvac@gmail.com" },
       { name: "Catherine Wagner", id: "21982", phone: "4435206265", phoneDisp: "(443) 520-6265", address: "1010 Maplehurst Ln, Monkton, MD 21111", email: "cwagner@monkton.org" },
@@ -171,8 +183,7 @@
 
     window.onload = function() {
       setupSpeech();
-      const savedId = localStorage.getItem('active_card_id');
-      if (savedId) openWorkCard(savedId);
+      localStorage.removeItem('active_card_id');
     };
 
     function setupSpeech() {
@@ -183,9 +194,12 @@
         recognition.interimResults = false;
 
         recognition.onresult = function(event) {
-          const text = event.results[0][0].transcript;
-          document.getElementById('liveTranscriptText').innerText = `"${text}"`;
-          handleVoiceInput(text);
+          const text = event.results[0][0].transcript.trim();
+          if (text && text !== lastProcessedText) {
+            lastProcessedText = text;
+            document.getElementById('liveTranscriptText').innerText = `"${text}"`;
+            handleVoiceInput(text);
+          }
         };
 
         recognition.onend = function() { stopDictation(); };
@@ -217,7 +231,7 @@
     function clearQueue() {
       document.getElementById('pinballActionsList').innerHTML = `<div id="pinEmptyState" class="text-slate-400 text-center py-6 italic text-[11px]">Tap TALK TO FRESH above to intake jobs!</div>`;
       document.getElementById('scheduledItemsSlot').innerHTML = '';
-      processedRecords.clear();
+      lastProcessedText = "";
     }
 
     function handleVoiceInput(text) {
@@ -230,10 +244,6 @@
       
       activeCustomer = match;
 
-      const recordKey = `${match.id}_${text}`;
-      if (processedRecords.has(recordKey)) return;
-      processedRecords.add(recordKey);
-
       const emptyPin = document.getElementById('pinEmptyState');
       if (emptyPin) emptyPin.remove();
 
@@ -244,12 +254,12 @@
             <div class="font-bold text-emerald-950">${match.name} (Client #${match.id})</div>
             <div class="text-[10px] text-slate-600 mt-0.5">${text}</div>
           </div>
-          <button onclick="openWorkCard('${match.id}')" class="text-[10px] bg-emerald-700 text-white font-bold px-2 py-1 rounded-md hover:bg-emerald-800">Open Card</button>
+          <button onclick="openWorkCard('${match.id}')" class="text-[10px] bg-emerald-700 text-white font-bold px-2 py-1 rounded-md hover:bg-emerald-800">Open Traveler</button>
         </div>
       `);
 
       let timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)?|\d{1,2}\s*(?:AM|PM|am|pm))/i);
-      let timeLabel = timeMatch ? timeMatch[0].toUpperCase() : "10:00 AM";
+      let timeLabel = timeMatch ? timeMatch[0].toUpperCase() : "09:30 AM";
 
       const calSlot = document.getElementById('scheduledItemsSlot');
       calSlot.insertAdjacentHTML('afterbegin', `
@@ -284,12 +294,9 @@
       const body = document.getElementById('drawerBody');
       drawer.classList.remove('hidden');
 
-      localStorage.setItem('active_card_id', clientId);
-
       title.innerText = `📇 Forever Card Workspace — ${match.name}`;
       body.innerHTML = `
         <div class="space-y-4">
-          <!-- CUSTOMER VAULT CONTACT CARD -->
           <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 space-y-1">
             <div class="font-bold text-blue-400 text-sm">${match.name} (Client #${match.id})</div>
             <div class="text-slate-300">${match.address}</div>
@@ -297,7 +304,6 @@
             <div class="text-slate-400 text-[10px]">${match.email}</div>
           </div>
 
-          <!-- DYNAMIC STRIPE INVOICE BUILDER -->
           <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-3">
             <div class="text-xs font-bold text-white flex justify-between items-center">
               <span>Dynamic Stripe Invoice Builder</span>
@@ -305,7 +311,7 @@
             </div>
             
             <div class="flex gap-2">
-              <input id="serviceMemoInput" type="text" placeholder="Service description (e.g. Water Test & Filter Check)" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
+              <input id="serviceMemoInput" type="text" placeholder="Service memo (e.g. Water Test & Filter Check)" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
               <input id="invoiceAmountInput" type="number" placeholder="$0.00" class="w-24 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-emerald-400 font-mono font-bold">
             </div>
 
@@ -314,27 +320,26 @@
             </button>
           </div>
 
-          <!-- EMBEDDED LIVE CUSTOMER FOREVER CARD VIEW (SCROLL DOWN TO SEE) -->
           <div class="border-t border-slate-800 pt-4 space-y-3">
-            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center">👇 Scroll Down: Customer View of Forever Card</div>
+            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center">👇 Customer's View of Forever Card</div>
             
             <div class="bg-white text-slate-900 p-4 rounded-2xl border-2 border-emerald-600 shadow-lg space-y-3">
               <div class="flex justify-between items-center border-b pb-2">
                 <div class="font-['Great_Vibes'] text-3xl text-emerald-700 font-bold">F</div>
                 <div class="text-right">
-                  <div class="font-bold text-xs">${match.name}'s Home Card</div>
+                  <div class="font-bold text-xs">${match.name}'s Forever Card</div>
                   <div class="text-[9px] text-slate-500">${match.phoneDisp}</div>
                 </div>
               </div>
 
               <div class="bg-slate-50 p-3 rounded-xl border text-xs space-y-1 text-slate-700">
-                <div class="font-bold text-emerald-800">Aerus Beyond Guardian System</div>
-                <div>Status: <span class="text-emerald-600 font-bold">● Active</span> | Last Filter Service: Sept 2026</div>
+                <div class="font-bold text-emerald-800">Aerus Home System Profile</div>
+                <div>Status: <span class="text-emerald-600 font-bold">● Active</span> | Equipment Tag: Aerus Beyond Core</div>
                 <div>Address: ${match.address}</div>
               </div>
 
               <div class="flex justify-between items-center pt-1">
-                <button onclick="alert('Customer View Link Copied to Clipboard!')" class="text-[10px] bg-slate-900 text-white font-mono px-3 py-1.5 rounded-lg font-bold">
+                <button onclick="alert('Customer view link copied!')" class="text-[10px] bg-slate-900 text-white font-mono px-3 py-1.5 rounded-lg font-bold">
                   🔗 Share Customer View
                 </button>
                 <div class="text-[10px] text-emerald-700 font-bold">Fresh Concierge Active 🤵</div>
@@ -346,7 +351,7 @@
     }
 
     function dispatchCustomPayLink(phone) {
-      const memo = document.getElementById('serviceMemoInput').value || "Aerus Home Wellness Service";
+      const memo = document.getElementById('serviceMemoInput').value || "Aerus Service";
       const amt = document.getElementById('invoiceAmountInput').value || "0.00";
       alert(`🚀 Stripe Pay Link for $${amt} (${memo}) dispatched directly to ${phone}!`);
     }
@@ -354,7 +359,6 @@
     function closeWorkCard() {
       const drawer = document.getElementById('forever-work-drawer');
       if (drawer) drawer.classList.add('hidden');
-      localStorage.removeItem('active_card_id');
     }
 
     function openSubscriberDoor(doorNum) {
