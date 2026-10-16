@@ -104,26 +104,26 @@
           <span class="text-[11px] font-mono font-bold px-2 py-0.5 bg-stone-200 text-stone-700 rounded">Synced Cal</span>
         </div>
         <div id="scheduledItemsSlot" class="space-y-2.5 max-h-80 overflow-y-auto">
+          <div onclick="openWorkstation('Dave & Suzie Gray', '3146 Gracefield Rd Apt FR 209, Silver Spring MD', '(301) 974-1448', 0)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition">
+            <div>
+              <p class="text-[10px] font-bold text-stone-500 font-mono">Tomorrow 11:00 AM</p>
+              <p class="font-bold text-stone-900 text-xs">Dave & Suzie Gray — Silver Spring Dispatch</p>
+            </div>
+            <a href="https://maps.google.com/?q=3146+Gracefield+Rd+Silver+Spring+MD" target="_blank" onclick="event.stopPropagation()" class="text-[10px] font-bold px-2.5 py-1 bg-blue-600 text-white rounded-lg shadow">🗺️ MAP IT</a>
+          </div>
           <div onclick="openWorkstation('Mrs. Johnson', '124 Main St, Timonium MD', '(410) 555-0199', 189)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition">
             <div>
               <p class="text-[10px] font-bold text-stone-500 font-mono">Tomorrow 7:30 AM</p>
               <p class="font-bold text-stone-900 text-xs">Mrs. Johnson — Laundry Pro Survey</p>
             </div>
-            <a href="https://maps.google.com" target="_blank" onclick="event.stopPropagation()" class="text-[10px] font-bold px-2.5 py-1 bg-blue-600 text-white rounded-lg">🗺️ MAP IT</a>
+            <a href="https://maps.google.com/?q=124+Main+St+Timonium+MD" target="_blank" onclick="event.stopPropagation()" class="text-[10px] font-bold px-2.5 py-1 bg-blue-600 text-white rounded-lg shadow">🗺️ MAP IT</a>
           </div>
           <div onclick="openWorkstation('Catherine Noblitt', '1 Smeton Pl Unit 1305, Towson MD', '(410) 908-1084', 0)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition">
             <div>
               <p class="text-[10px] font-bold text-stone-500 font-mono">Wed Oct 21 @ 12:00 PM</p>
               <p class="font-bold text-stone-900 text-xs">Catherine Noblitt — Cell & Bulb</p>
             </div>
-            <a href="https://maps.google.com" target="_blank" onclick="event.stopPropagation()" class="text-[10px] font-bold px-2.5 py-1 bg-blue-600 text-white rounded-lg">🗺️ MAP IT</a>
-          </div>
-          <div onclick="openWorkstation('Chuck Pike', '9724 Red Clover Ct, Parkville MD', '(410) 555-0144', 350)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition">
-            <div>
-              <p class="text-[10px] font-bold text-stone-500 font-mono">Today 2:00 PM</p>
-              <p class="font-bold text-stone-900 text-xs">Chuck Pike — Drop-off Unit</p>
-            </div>
-            <span class="text-[10px] font-bold px-2 py-0.5 bg-amber-100 text-amber-800 rounded font-mono">$350 Cash-Out</span>
+            <a href="https://maps.google.com/?q=1+Smeton+Pl+Towson+MD" target="_blank" onclick="event.stopPropagation()" class="text-[10px] font-bold px-2.5 py-1 bg-blue-600 text-white rounded-lg shadow">🗺️ MAP IT</a>
           </div>
         </div>
       </div>
@@ -135,18 +135,26 @@
           <button onclick="clearPinball()" class="text-xs text-red-600 hover:underline font-bold font-mono">Clear Queue</button>
         </div>
 
-        <!-- 4 Fast Action Buttons -->
+        <!-- 4 Dynamic Action Fast Buttons -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <a id="fastCallBtn" href="tel:4104991313" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow">📞 CALL</a>
-          <a id="fastTextBtn" href="sms:4104991313" class="p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow">💬 TEXT</a>
-          <button onclick="dispatchStripePay()" class="p-2.5 bg-amber-500 hover:bg-amber-600 text-stone-950 font-extrabold text-xs rounded-xl shadow">💳 CHECKOUT</button>
-          <button onclick="nextPinballCard()" class="p-2.5 bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs rounded-xl shadow">📌 NEXT</button>
+          <a id="fastCallBtn" href="tel:3019741448" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">📞 CALL</a>
+          <a id="fastTextBtn" href="sms:3019741448" class="p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">💬 TEXT</a>
+          <button onclick="dispatchStripePay()" class="p-2.5 bg-amber-500 hover:bg-amber-600 text-stone-950 font-extrabold text-xs rounded-xl shadow transition active:scale-95">💳 CHECKOUT</button>
+          <button onclick="nextPinballCard()" class="p-2.5 bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs rounded-xl shadow transition active:scale-95">📌 NEXT</button>
         </div>
 
         <div id="pinballQueue" class="space-y-2.5 max-h-64 overflow-y-auto">
+          <div onclick="openWorkstation('Dave & Suzie Gray', '3146 Gracefield Rd Apt FR 209, Silver Spring MD', '(301) 974-1448', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-emerald-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wide">Tomorrow 11:00 AM • Silver Spring Dispatch</span>
+              <h3 class="font-bold text-stone-900 text-xs">Dave & Suzie Gray</h3>
+              <p class="text-[11px] text-stone-600">3146 Gracefield Rd Apt FR 209 • (301) 974-1448</p>
+            </div>
+            <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
+          </div>
           <div onclick="openWorkstation('Catherine Noblitt', '1 Smeton Pl Unit 1305, Towson MD', '(410) 908-1084', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-indigo-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
             <div>
-              <span class="text-[10px] font-extrabold text-indigo-700 uppercase tracking-wide">Wed 12:00 PM • Cell & Bulb Swap</span>
+              <span class="text-[10px] font-extrabold text-indigo-700 uppercase tracking-wide">Wed Oct 21 @ 12:00 PM • Cell & Bulb Swap</span>
               <h3 class="font-bold text-stone-900 text-xs">Catherine Noblitt</h3>
               <p class="text-[11px] text-stone-600">1 Smeton Pl Unit 1305 • (410) 908-1084</p>
             </div>
@@ -154,17 +162,9 @@
           </div>
           <div onclick="openWorkstation('Chuck Pike', '9724 Red Clover Ct, Parkville MD', '(410) 555-0144', 350)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-amber-500 shadow-sm hover:shadow-md transition flex items-center justify-between">
             <div>
-              <span class="text-[10px] font-extrabold text-amber-700 uppercase tracking-wide">Tier 1: Cash-Out</span>
+              <span class="text-[10px] font-extrabold text-amber-700 uppercase tracking-wide">Tier 1: Cash-Out Complete</span>
               <h3 class="font-bold text-stone-900 text-xs">Chuck Pike</h3>
               <p class="text-[11px] text-stone-600">Used Motor Swap + Control Valve | $350.00</p>
-            </div>
-            <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
-          </div>
-          <div onclick="openWorkstation('Mrs. Johnson', '124 Main St, Timonium MD', '(410) 555-0199', 189)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-emerald-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
-            <div>
-              <span class="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wide">Tier 2: Quick Turn</span>
-              <h3 class="font-bold text-stone-900 text-xs">Mrs. Johnson</h3>
-              <p class="text-[11px] text-stone-600">Laundry Pro 3.0 Survey & Overhaul | $189.00</p>
             </div>
             <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
           </div>
@@ -202,9 +202,9 @@
         <button id="stage4" onclick="setStage(4)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">4. Ready Wall 🎉</button>
       </div>
 
-      <!-- Staff Checklist -->
+      <!-- Staff Checklist (Pristine Unchecked) -->
       <div class="pt-2 border-t border-stone-100 space-y-1.5 text-xs">
-        <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked class="rounded text-emerald-800"> <span>Mona: Customer Intake Logged</span></label>
+        <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="rounded text-emerald-800"> <span>Mona: Customer Intake Logged</span></label>
         <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="rounded text-emerald-800"> <span>Chris: Floor Brush Bristles Pulled (1,090 Catalog)</span></label>
         <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="rounded text-emerald-800"> <span>Mike: Field Diagnostic Audio Complete</span></label>
       </div>
@@ -245,7 +245,7 @@
             </tr>
           </thead>
           <tbody id="invoiceTableBody" class="divide-y divide-stone-100 font-medium">
-            <!-- Dynamic rows -->
+            <!-- Dynamic rows start clean -->
           </tbody>
         </table>
       </div>
@@ -294,13 +294,13 @@
   <script>
     let isListening = false, recognition = null, lastPhrase = '';
     let currentInvoiceItems = [];
-    let currentActivePhone = '410-499-1313';
+    let currentActivePhone = '301-974-1448';
 
     const vault = [
       { name: "William Sullivan", id: "1004", phone: "(410) 499-1313", address: "6110 Glenoak Ave, Baltimore, MD" },
+      { name: "Dave & Suzie Gray", id: "21948", phone: "(301) 974-1448", address: "3146 Gracefield Rd Apt FR 209, Silver Spring, MD" },
       { name: "Catherine Noblitt", id: "11264", phone: "(410) 908-1084", address: "1 Smeton Pl Unit 1305, Towson, MD" },
       { name: "Catherine Wagner", id: "21982", phone: "(443) 520-6265", address: "1010 Maplehurst Ln, Monkton, MD" },
-      { name: "Suzie Gray", id: "21948", phone: "(301) 974-1448", address: "Silver Spring, MD" },
       { name: "Mrs. Johnson", id: "1055", phone: "(410) 555-0199", address: "124 Main St, Timonium, MD" },
       { name: "Chuck Pike", id: "21009", phone: "(410) 555-0144", address: "9724 Red Clover Ct, Parkville, MD" }
     ];
