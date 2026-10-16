@@ -30,6 +30,7 @@
 
     <!-- 1. HEADER -->
     <header class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border-b border-[#E2DACC] pb-5">
+      
       <div class="flex items-center space-x-3 justify-center md:justify-start">
         <div class="text-5xl font-['Great_Vibes'] text-emerald-700 font-bold select-none drop-shadow-sm pr-1">F</div>
         <div>
@@ -67,6 +68,7 @@
           </div>
         </div>
       </div>
+
     </header>
 
     <!-- 2. CONTROL BAR: VISUAL CALENDAR & PINBALL MASTER HOPPER -->
@@ -84,10 +86,6 @@
         
         <div id="calendarGrid" class="space-y-2 text-xs font-mono max-h-52 overflow-y-auto">
           <div id="scheduledItemsSlot" class="space-y-2"></div>
-          <div class="flex items-center space-x-2 p-2 rounded-xl bg-white/70 border border-[#E2DACC]">
-            <span class="w-16 font-bold text-slate-400 text-[10px]">09:00 AM</span>
-            <span class="text-slate-400 text-[11px] italic">Open Schedule Slot</span>
-          </div>
         </div>
       </div>
 
@@ -101,7 +99,7 @@
           <span class="text-[10px] text-slate-500 font-mono font-bold">Master Hopper</span>
         </div>
         <div id="pinballActionsList" class="space-y-2 text-xs font-mono max-h-52 overflow-y-auto">
-          <div id="pinEmptyState" class="text-slate-400 text-center py-8 italic">Queue clean. Speak or tap to drop active items here!</div>
+          <div id="pinEmptyState" class="text-slate-400 text-center py-8 italic">Queue clean. Speak to drop active items here!</div>
         </div>
       </div>
 
@@ -164,7 +162,6 @@
 
     const WEBHOOK_URL = "https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln";
 
-    // Extended Embedded Customer Vault
     const vault = [
       { name: "Ruth Tucker", id: "22086", phone: "(410) 256-6949", address: "6 Lagan Ct, Nottingham, MD 21236" },
       { name: "Peg Merrill", id: "11030", phone: "(410) 409-5676", address: "14828 Jarrettsville Pike, Monkton, MD 21111" },
@@ -188,7 +185,7 @@
         recognition.onresult = function(event) {
           const text = event.results[0][0].transcript;
           document.getElementById('liveTranscriptText').innerText = `"${text}"`;
-          handleFullVoiceWorkflow(text);
+          handleVoiceInput(text);
         };
 
         recognition.onend = function() { stopDictation(); };
@@ -214,29 +211,20 @@
     function stopDictation() {
       isRecording = false;
       document.getElementById('masterMicBtn').classList.remove('pulse-record');
-      document.getElementById('listeningBadge').classList.hidden = true;
+      document.getElementById('listeningBadge').classList.add('hidden');
     }
 
-    function handleFullVoiceWorkflow(text) {
+    function handleVoiceInput(text) {
       const lower = text.toLowerCase();
-      let matchedClient = null;
-
-      // 1. DYNAMIC VAULT MATCHING
-      for (const client of vault) {
-        const firstName = client.name.toLowerCase().split(' ')[0];
-        if (lower.includes(firstName)) {
-          matchedClient = client;
-          break;
-        }
+      let match = vault.find(c => lower.includes(c.name.toLowerCase().split(' ')[0]));
+      
+      if (!match) {
+        match = { name: text.split(' ')[0] || "Customer Intake", id: "NEW", phone: "(410) 555-0100", address: "Timonium, MD" };
       }
+      
+      activeCustomer = match;
 
-      if (!matchedClient) {
-        matchedClient = { name: "Guest Customer", id: "NEW", phone: "Unlisted", address: "Local Intake" };
-      }
-
-      activeCustomer = matchedClient;
-
-      // 2. DROP INTO PINBALL HOPPER
+      // Update Pinball Action Zone
       const pinList = document.getElementById('pinballActionsList');
       const emptyPin = document.getElementById('pinEmptyState');
       if (emptyPin) emptyPin.remove();
@@ -244,57 +232,38 @@
       pinList.insertAdjacentHTML('afterbegin', `
         <div class="bg-amber-50 p-3 rounded-xl border border-amber-300 text-amber-950 flex justify-between items-center shadow-sm">
           <div>
-            <div class="text-xs font-bold text-amber-900">⚡ Pinball: ${matchedClient.name}</div>
+            <div class="text-xs font-bold text-amber-900">⚡ Pinball: ${match.name}</div>
             <div class="text-[11px] font-normal text-slate-700 mt-0.5">${text}</div>
           </div>
-          <button onclick="openCustomerCard('${matchedClient.id}')" class="text-[10px] bg-amber-700 text-white font-bold px-2.5 py-1 rounded-lg hover:bg-amber-800">View Profile</button>
+          <button onclick="openStageDoor(1)" class="text-[10px] bg-amber-700 text-white font-bold px-2.5 py-1 rounded-lg">View Profile</button>
         </div>
       `);
 
-      // 3. EXTRACT TIME & RENDER TO CALENDAR
+      // Update Schedule Grid
       let timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)?|\d{1,2}\s*(?:AM|PM|am|pm))/i);
-      let timeLabel = timeMatch ? timeMatch[0].toUpperCase() : "11:00 AM";
+      let timeLabel = timeMatch ? timeMatch[0].toUpperCase() : "08:35 AM";
 
-      if (lower.includes('schedule') || lower.includes('appointment') || lower.includes('tomorrow') || lower.includes('water test') || lower.includes('am') || lower.includes('pm')) {
-        addCalendarEntry(matchedClient.name, timeLabel, `${matchedClient.address} • ${matchedClient.phone}`);
-      }
-
-      // 4. FIRE TO MAKE WEBHOOK
-      if (WEBHOOK_URL) {
-        fetch(WEBHOOK_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            transcript: text,
-            customer: matchedClient,
-            time: timeLabel,
-            timestamp: new Date().toISOString()
-          })
-        }).catch(e => console.error("Webhook error:", e));
-      }
-    }
-
-    function addCalendarEntry(name, time, details) {
       const calSlot = document.getElementById('scheduledItemsSlot');
       calSlot.insertAdjacentHTML('afterbegin', `
         <div class="p-3 rounded-xl bg-white border border-blue-300 shadow-sm flex items-center justify-between text-slate-800">
           <div>
             <div class="flex items-center space-x-2">
-              <span class="text-[10px] bg-blue-700 text-white px-2 py-0.5 rounded font-mono font-bold">${time}</span>
-              <span class="text-xs font-bold text-blue-950">${name}</span>
+              <span class="text-[10px] bg-blue-700 text-white px-2 py-0.5 rounded font-mono font-bold">${timeLabel}</span>
+              <span class="text-xs font-bold text-blue-950">${match.name}</span>
             </div>
-            <p class="text-[11px] text-slate-600 mt-1 font-sans">${details}</p>
+            <p class="text-[11px] text-slate-600 mt-1 font-sans">${match.address} • ${match.phone}</p>
           </div>
-          <button onclick="openStageDoor(1)" class="text-[10px] text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-1 rounded border border-emerald-200 hover:bg-emerald-100">Synced Cal</button>
+          <span class="text-[10px] text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-1 rounded border border-emerald-200">Synced Cal</span>
         </div>
       `);
-    }
 
-    function openCustomerCard(clientId) {
-      const match = vault.find(c => c.id === clientId) || activeCustomer;
-      if (match) {
-        activeCustomer = match;
-        openStageDoor(1);
+      // Send to Webhook
+      if (WEBHOOK_URL) {
+        fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ transcript: text, customer: match, time: timeLabel })
+        }).catch(e => console.error("Webhook error:", e));
       }
     }
 
@@ -304,35 +273,31 @@
       const body = document.getElementById('drawerBody');
       drawer.classList.remove('hidden');
 
-      const cust = activeCustomer || { name: "Select or Speak Customer", id: "N/A", address: "No active card selected", phone: "" };
+      const cust = activeCustomer || { name: "Vivian Fulton", id: "8955", address: "1613 Burnwood Rd Baltimore, MD 21239", phone: "(410) 532-2985" };
 
       if (stageNum === 1) {
-        title.innerText = "Stage 1: Intake & Vault Lookup";
+        title.innerText = "Stage 1: Intake & Customer Vault";
         body.innerHTML = `
-          <div class="space-y-3">
-            <div class="p-3 bg-slate-800 rounded-xl space-y-1 border border-slate-700">
-              <div class="font-bold text-blue-400 text-sm">${cust.name} (Client #${cust.id})</div>
-              <div class="text-slate-300">${cust.address}</div>
-              <div class="text-emerald-400 font-mono">${cust.phone}</div>
-            </div>
+          <div class="p-3 bg-slate-800 rounded-xl space-y-1">
+            <div class="font-bold text-blue-400 text-sm">${cust.name} (Client #${cust.id})</div>
+            <div class="text-slate-300">${cust.address}</div>
+            <div class="text-emerald-400 font-mono">${cust.phone}</div>
           </div>
         `;
       } else if (stageNum === 2) {
-        title.innerText = "Stage 2: Shop Ops / Bench Diagnostics";
+        title.innerText = "Stage 2: Shop Ops / Bench Canvas";
         body.innerHTML = `
-          <div class="space-y-3">
-            <div class="p-3 bg-slate-800 rounded-xl space-y-1">
-              <div class="font-bold text-amber-400">Customer: ${cust.name}</div>
-              <p class="text-slate-300">Intake Diagnostic: Unit submitted for bench tune-up.</p>
-            </div>
+          <div class="p-3 bg-slate-800 rounded-xl space-y-1">
+            <div class="font-bold text-amber-400">Customer: ${cust.name}</div>
+            <p class="text-slate-300">Intake Diagnostic: Bench Service Requested.</p>
           </div>
         `;
       } else if (stageNum === 3) {
         title.innerText = `Stage 3: Live Proposal for ${cust.name}`;
         body.innerHTML = `
-          <div class="space-y-3 bg-slate-950 p-4 rounded-xl border border-slate-800">
+          <div class="p-4 bg-slate-950 rounded-xl space-y-3">
             <div class="flex justify-between text-xs text-slate-300">
-              <span>Standard Aerus Service Inspection</span>
+              <span>Aerus Water/Air Service Inspection</span>
               <span class="font-mono">$45.00</span>
             </div>
             <button onclick="alert('Stripe Pay Link Dispatched to ' + cust.phone)" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black py-3 rounded-xl uppercase tracking-wider transition">🚀 Dispatch Stripe Pay Link to ${cust.name}</button>
@@ -341,11 +306,8 @@
       } else if (stageNum === 4) {
         title.innerText = "Stage 4: Ready Wall Fulfillment";
         body.innerHTML = `
-          <div class="space-y-3">
-            <div class="p-3 bg-emerald-950/60 border border-emerald-800 rounded-xl text-emerald-400 font-bold">
-              ✅ Staged at Front Counter Shelf A for ${cust.name}
-            </div>
-            <button onclick="confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } })" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-xl transition">Complete Job & Fire Confetti 🎉</button>
+          <div class="p-3 bg-emerald-950/60 border border-emerald-800 rounded-xl text-emerald-400 font-bold">
+            ✅ Staged at Front Counter Shelf A for ${cust.name}
           </div>
         `;
       }
