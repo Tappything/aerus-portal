@@ -30,8 +30,6 @@
 
     <!-- 1. HEADER -->
     <header class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border-b border-[#E2DACC] pb-5">
-      
-      <!-- LEFT: CURSIVE F BRANDING -->
       <div class="flex items-center space-x-3 justify-center md:justify-start">
         <div class="text-5xl font-['Great_Vibes'] text-emerald-700 font-bold select-none drop-shadow-sm pr-1">F</div>
         <div>
@@ -40,7 +38,6 @@
         </div>
       </div>
 
-      <!-- CENTER: EMBLEM + DYNAMIC MIC -->
       <div class="flex flex-col items-center justify-center space-y-2">
         <div class="w-20 h-20 rounded-full border-2 border-emerald-600 bg-white p-1 shadow-md flex items-center justify-center overflow-hidden">
           <svg viewBox="0 0 200 200" class="w-full h-full">
@@ -61,7 +58,6 @@
         </button>
       </div>
 
-      <!-- RIGHT: SUBSCRIBER IDENTITY -->
       <div class="flex items-center space-x-3 justify-center md:justify-end">
         <div class="text-center md:text-right">
           <div id="displayOrgName" class="text-sm font-black text-slate-900 tracking-wide">Aerus Timonium</div>
@@ -71,7 +67,6 @@
           </div>
         </div>
       </div>
-
     </header>
 
     <!-- 2. CONTROL BAR: VISUAL CALENDAR & PINBALL MASTER HOPPER -->
@@ -84,10 +79,7 @@
             <i class="fa-solid fa-calendar-days text-blue-700 text-sm"></i>
             <h2 class="text-xs font-bold text-blue-950 uppercase font-mono tracking-wider">Schedule Grid • Today & Tomorrow</h2>
           </div>
-          <div class="flex space-x-1">
-            <button onclick="quickAddAppt('Ruth Tucker', '01:00 PM', '6 Lagan Ct, Nottingham, MD • (410) 256-6949')" class="text-[9px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-1.5 py-0.5 rounded font-mono font-bold">+ Ruth</button>
-            <button onclick="quickAddAppt('Peg Merrill', '10:00 AM', '14828 Jarrettsville Pike, Monkton, MD • (410) 409-5676')" class="text-[9px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-1.5 py-0.5 rounded font-mono font-bold">+ Peg</button>
-          </div>
+          <span class="text-[10px] text-slate-500 font-mono font-bold">Live Grid</span>
         </div>
         
         <div id="calendarGrid" class="space-y-2 text-xs font-mono max-h-52 overflow-y-auto">
@@ -109,7 +101,7 @@
           <span class="text-[10px] text-slate-500 font-mono font-bold">Master Hopper</span>
         </div>
         <div id="pinballActionsList" class="space-y-2 text-xs font-mono max-h-52 overflow-y-auto">
-          <div id="pinEmptyState" class="text-slate-400 text-center py-8 italic">Queue clean. Speak or search to drop active items here!</div>
+          <div id="pinEmptyState" class="text-slate-400 text-center py-8 italic">Queue clean. Speak or tap to drop active items here!</div>
         </div>
       </div>
 
@@ -168,25 +160,22 @@
   <script>
     let isRecording = false;
     let recognition = null;
-    let activeCustomer = { name: "Ruth Tucker", id: "22086", phone: "(410) 256-6949", address: "6 Lagan Ct, Nottingham, MD 21236" };
-    let invoiceItems = [
-      { desc: "Lux Guardian Motor Service & Seal", price: 45.00 },
-      { desc: "Pre-Filter Element", price: 18.50 }
-    ];
+    let activeCustomer = null;
 
     const WEBHOOK_URL = "https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln";
 
-    // Fast Embedded Customer Vault Sample
+    // Extended Embedded Customer Vault
     const vault = [
       { name: "Ruth Tucker", id: "22086", phone: "(410) 256-6949", address: "6 Lagan Ct, Nottingham, MD 21236" },
       { name: "Peg Merrill", id: "11030", phone: "(410) 409-5676", address: "14828 Jarrettsville Pike, Monkton, MD 21111" },
       { name: "Stella Frank", id: "19992", phone: "(410) 555-0188", address: "1999 Royal Rd, Timonium, MD 21093" },
-      { name: "William Sullivan", id: "10001", phone: "(410) 555-0199", address: "1965 Greenspring Dr, Timonium, MD 21093" }
+      { name: "Miriam Davis", id: "1017", phone: "(443) 693-2380", address: "1319 Elk Forest Rd, Elkton, MD 21921" },
+      { name: "Vivian Fulton", id: "8955", phone: "(410) 532-2985", address: "1613 Burnwood Rd, Baltimore, MD 21239" },
+      { name: "William Sullivan", id: "10001", phone: "(410) 499-1313", address: "1965 Greenspring Dr, Timonium, MD 21093" }
     ];
 
     window.onload = function() {
       setupSpeech();
-      quickAddAppt("Ruth Tucker", "01:00 PM", "6 Lagan Ct, Nottingham, MD • (410) 256-6949");
     };
 
     function setupSpeech() {
@@ -225,21 +214,29 @@
     function stopDictation() {
       isRecording = false;
       document.getElementById('masterMicBtn').classList.remove('pulse-record');
-      document.getElementById('listeningBadge').classList.add('hidden');
+      document.getElementById('listeningBadge').classList.hidden = true;
     }
 
     function handleFullVoiceWorkflow(text) {
       const lower = text.toLowerCase();
+      let matchedClient = null;
 
-      // 1. Vault Matching
+      // 1. DYNAMIC VAULT MATCHING
       for (const client of vault) {
-        if (lower.includes(client.name.toLowerCase().split(' ')[0])) {
-          activeCustomer = client;
+        const firstName = client.name.toLowerCase().split(' ')[0];
+        if (lower.includes(firstName)) {
+          matchedClient = client;
           break;
         }
       }
 
-      // 2. Drop into Pinball Hopper
+      if (!matchedClient) {
+        matchedClient = { name: "Guest Customer", id: "NEW", phone: "Unlisted", address: "Local Intake" };
+      }
+
+      activeCustomer = matchedClient;
+
+      // 2. DROP INTO PINBALL HOPPER
       const pinList = document.getElementById('pinballActionsList');
       const emptyPin = document.getElementById('pinEmptyState');
       if (emptyPin) emptyPin.remove();
@@ -247,39 +244,37 @@
       pinList.insertAdjacentHTML('afterbegin', `
         <div class="bg-amber-50 p-3 rounded-xl border border-amber-300 text-amber-950 flex justify-between items-center shadow-sm">
           <div>
-            <div class="text-xs font-bold text-amber-900">⚡ Pinball: ${activeCustomer.name}</div>
+            <div class="text-xs font-bold text-amber-900">⚡ Pinball: ${matchedClient.name}</div>
             <div class="text-[11px] font-normal text-slate-700 mt-0.5">${text}</div>
           </div>
-          <button onclick="openStageDoor(1)" class="text-[10px] bg-amber-700 text-white font-bold px-2.5 py-1 rounded-lg">View Profile</button>
+          <button onclick="openCustomerCard('${matchedClient.id}')" class="text-[10px] bg-amber-700 text-white font-bold px-2.5 py-1 rounded-lg hover:bg-amber-800">View Profile</button>
         </div>
       `);
 
-      // 3. Extract Time & Render to Calendar
-      let apptTime = "08:45 AM";
-      if (lower.includes("1:00") || lower.includes("1 pm")) apptTime = "01:00 PM";
-      else if (lower.includes("10:00") || lower.includes("10 am")) apptTime = "10:00 AM";
-      else if (lower.includes("7:15")) apptTime = "07:15 AM";
+      // 3. EXTRACT TIME & RENDER TO CALENDAR
+      let timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)?|\d{1,2}\s*(?:AM|PM|am|pm))/i);
+      let timeLabel = timeMatch ? timeMatch[0].toUpperCase() : "11:00 AM";
 
       if (lower.includes('schedule') || lower.includes('appointment') || lower.includes('tomorrow') || lower.includes('water test') || lower.includes('am') || lower.includes('pm')) {
-        quickAddAppt(activeCustomer.name, apptTime, `${activeCustomer.address} • ${activeCustomer.phone}`);
+        addCalendarEntry(matchedClient.name, timeLabel, `${matchedClient.address} • ${matchedClient.phone}`);
       }
 
-      // 4. Fire to Live Make.com Webhook
+      // 4. FIRE TO MAKE WEBHOOK
       if (WEBHOOK_URL) {
         fetch(WEBHOOK_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             transcript: text,
-            customer: activeCustomer,
-            time: apptTime,
+            customer: matchedClient,
+            time: timeLabel,
             timestamp: new Date().toISOString()
           })
         }).catch(e => console.error("Webhook error:", e));
       }
     }
 
-    function quickAddAppt(name, time, details) {
+    function addCalendarEntry(name, time, details) {
       const calSlot = document.getElementById('scheduledItemsSlot');
       calSlot.insertAdjacentHTML('afterbegin', `
         <div class="p-3 rounded-xl bg-white border border-blue-300 shadow-sm flex items-center justify-between text-slate-800">
@@ -290,13 +285,13 @@
             </div>
             <p class="text-[11px] text-slate-600 mt-1 font-sans">${details}</p>
           </div>
-          <span class="text-[10px] text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-1 rounded border border-emerald-200">Synced Cal</span>
+          <button onclick="openStageDoor(1)" class="text-[10px] text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-1 rounded border border-emerald-200 hover:bg-emerald-100">Synced Cal</button>
         </div>
       `);
     }
 
-    function searchVaultManual(query) {
-      const match = vault.find(c => c.name.toLowerCase().includes(query.toLowerCase()));
+    function openCustomerCard(clientId) {
+      const match = vault.find(c => c.id === clientId) || activeCustomer;
       if (match) {
         activeCustomer = match;
         openStageDoor(1);
@@ -309,18 +304,16 @@
       const body = document.getElementById('drawerBody');
       drawer.classList.remove('hidden');
 
+      const cust = activeCustomer || { name: "Select or Speak Customer", id: "N/A", address: "No active card selected", phone: "" };
+
       if (stageNum === 1) {
         title.innerText = "Stage 1: Intake & Vault Lookup";
         body.innerHTML = `
           <div class="space-y-3">
-            <div class="flex space-x-2">
-              <input id="vaultSearchInput" type="text" placeholder="Search vault names..." class="w-full bg-slate-800 border border-slate-700 px-3 py-2 rounded-xl text-white text-xs">
-              <button onclick="searchVaultManual(document.getElementById('vaultSearchInput').value)" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-xl font-bold text-xs text-white">Search</button>
-            </div>
-            <div class="p-3 bg-slate-800 rounded-xl space-y-1">
-              <div class="font-bold text-blue-400 text-sm">${activeCustomer.name} (Client #${activeCustomer.id})</div>
-              <div class="text-slate-300">${activeCustomer.address}</div>
-              <div class="text-emerald-400 font-mono">${activeCustomer.phone}</div>
+            <div class="p-3 bg-slate-800 rounded-xl space-y-1 border border-slate-700">
+              <div class="font-bold text-blue-400 text-sm">${cust.name} (Client #${cust.id})</div>
+              <div class="text-slate-300">${cust.address}</div>
+              <div class="text-emerald-400 font-mono">${cust.phone}</div>
             </div>
           </div>
         `;
@@ -329,68 +322,33 @@
         body.innerHTML = `
           <div class="space-y-3">
             <div class="p-3 bg-slate-800 rounded-xl space-y-1">
-              <div class="font-bold text-amber-400">Active Machine: Lux Guardian Platinum</div>
-              <p class="text-slate-300">Intake Symptom: Low suction, motor seal degraded.</p>
+              <div class="font-bold text-amber-400">Customer: ${cust.name}</div>
+              <p class="text-slate-300">Intake Diagnostic: Unit submitted for bench tune-up.</p>
             </div>
-            <button onclick="addInvoiceItem('Precision Tune-Up Labor', 55.00)" class="w-full bg-amber-600 hover:bg-amber-500 py-2.5 rounded-xl font-bold text-xs text-white">+ Add Labor ($55.00) to Proposal</button>
           </div>
         `;
       } else if (stageNum === 3) {
-        renderInvoiceDrawer();
+        title.innerText = `Stage 3: Live Proposal for ${cust.name}`;
+        body.innerHTML = `
+          <div class="space-y-3 bg-slate-950 p-4 rounded-xl border border-slate-800">
+            <div class="flex justify-between text-xs text-slate-300">
+              <span>Standard Aerus Service Inspection</span>
+              <span class="font-mono">$45.00</span>
+            </div>
+            <button onclick="alert('Stripe Pay Link Dispatched to ' + cust.phone)" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black py-3 rounded-xl uppercase tracking-wider transition">🚀 Dispatch Stripe Pay Link to ${cust.name}</button>
+          </div>
+        `;
       } else if (stageNum === 4) {
         title.innerText = "Stage 4: Ready Wall Fulfillment";
         body.innerHTML = `
           <div class="space-y-3">
             <div class="p-3 bg-emerald-950/60 border border-emerald-800 rounded-xl text-emerald-400 font-bold">
-              ✅ Staged at Front Counter Shelf A for ${activeCustomer.name}
+              ✅ Staged at Front Counter Shelf A for ${cust.name}
             </div>
             <button onclick="confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } })" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-xl transition">Complete Job & Fire Confetti 🎉</button>
           </div>
         `;
       }
-    }
-
-    function addInvoiceItem(desc, price) {
-      invoiceItems.push({ desc, price });
-      alert(`Added "${desc}" to proposal!`);
-    }
-
-    function renderInvoiceDrawer() {
-      const title = document.getElementById('drawerTitle');
-      const body = document.getElementById('drawerBody');
-      title.innerText = `Stage 3: Live Proposal for ${activeCustomer.name}`;
-
-      let subtotal = invoiceItems.reduce((sum, item) => sum + item.price, 0);
-      let tax = subtotal * 0.06;
-      let total = subtotal + tax;
-
-      let itemsHtml = invoiceItems.map(item => `
-        <div class="flex justify-between py-1 border-b border-slate-800 text-slate-300">
-          <span>${item.desc}</span>
-          <span class="font-mono text-white">${item.price.toFixed(2)}</span>
-        </div>
-      `).join('');
-
-      body.innerHTML = `
-        <div class="space-y-3 bg-slate-950 p-4 rounded-xl border border-slate-800">
-          <div class="space-y-1 mb-2">
-            ${itemsHtml}
-          </div>
-          <div class="flex justify-between text-xs text-slate-400 pt-2 border-t border-slate-800">
-            <span>Subtotal:</span>
-            <span class="font-mono">$${subtotal.toFixed(2)}</span>
-          </div>
-          <div class="flex justify-between text-xs text-slate-400">
-            <span>MD State Sales Tax (6%):</span>
-            <span class="font-mono">$${tax.toFixed(2)}</span>
-          </div>
-          <div class="flex justify-between font-black text-white text-sm pt-2 border-t border-slate-800">
-            <span>Total Amount:</span>
-            <span class="text-emerald-400 font-mono">$${total.toFixed(2)}</span>
-          </div>
-          <button onclick="alert('Stripe Pay Link Dispatched to ' + activeCustomer.phone)" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black py-3 rounded-xl uppercase tracking-wider transition">🚀 Dispatch Stripe Pay Link to ${activeCustomer.name}</button>
-        </div>
-      `;
     }
 
     function closeDrawer() {
