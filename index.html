@@ -3,390 +3,371 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Forever Card™ — Powered by TappyThing</title>
+  <title>TappyThing — Digital Coordinator System</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body { background-color: #ECE8DF; color: #1E293B; font-family: 'Inter', sans-serif; }
-    .physical-card {
-      background: #FAF9F5;
-      border: 2px solid #D6CEC0;
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.12), 0 0 15px rgba(16, 185, 129, 0.08);
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #ECE8DF;
+      color: #1C1917;
     }
-    .pulse-record { animation: pulse-mic 1.2s infinite; background-color: #DC2626 !important; }
-    @keyframes pulse-mic {
-      0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.8); }
-      70% { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+    .font-cursive-f {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 700;
+    }
+    .boutique-card {
+      background-color: #FAF9F5;
+      border: 1px solid #E5E0D8;
+      box-shadow: 0 10px 30px -5px rgba(28, 25, 23, 0.05), 0 4px 6px -2px rgba(28, 25, 23, 0.02);
     }
   </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-3 sm:p-6 antialiased">
+<body class="min-h-screen p-4 md:p-8">
 
-  <div class="physical-card max-w-4xl w-full rounded-3xl p-5 sm:p-8 space-y-6 relative overflow-hidden">
+  <!-- MASTER CONTAINER -->
+  <div class="max-w-7xl mx-auto space-y-6">
 
-    <!-- 1. MASTER HEADER WITH VECTOR SVG FRESH MASCOT CENTERPIECE -->
-    <header class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border-b border-[#E2DACC] pb-5">
-      
-      <!-- LEFT: CURSIVE 'F' BRANDING -->
-      <div class="flex items-center space-x-3 justify-center md:justify-start">
-        <div class="text-5xl font-['Great_Vibes'] text-emerald-700 font-bold select-none drop-shadow-sm pr-1">F</div>
+    <!-- GLOBAL HEADER -->
+    <header class="boutique-card rounded-2xl p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <!-- Emerald F Brand -->
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-emerald-900 text-amber-100 flex items-center justify-center text-3xl font-cursive-f shadow-md">
+          F
+        </div>
         <div>
-          <h1 class="text-base font-black tracking-wider text-slate-900 uppercase font-mono">FOREVER CARD<span class="text-emerald-700">™</span></h1>
-          <p class="text-[11px] text-slate-500 font-medium">Powered by TappyThing</p>
+          <h1 class="text-xl font-bold tracking-tight text-stone-900">TappyThing</h1>
+          <p class="text-xs font-semibold tracking-wider text-emerald-800 uppercase">Aerus Timonium MD — Subscriber</p>
         </div>
       </div>
 
-      <!-- CENTER: VECTOR SVG MASCOT & TOP INTAKE CONTROLS -->
-      <div class="flex flex-col items-center justify-center space-y-2">
-        <div class="w-20 h-20 rounded-full border-2 border-emerald-600 bg-white p-0.5 shadow-md flex items-center justify-center overflow-hidden">
-          <svg viewBox="0 0 200 200" class="w-full h-full">
-            <circle cx="100" cy="100" r="95" fill="white" stroke="#059669" stroke-width="4"/>
-            <path d="M 75 52 Q 88 38 100 42 Q 112 38 125 52 Q 112 46 100 48 Q 88 46 75 52 Z" fill="#1E293B"/>
-            <circle cx="100" cy="72" r="28" fill="#1E293B"/>
-            <rect x="78" y="66" width="44" height="13" rx="4" fill="#000"/>
-            <ellipse cx="88" cy="72" rx="8" ry="4" fill="#38BDF8"/>
-            <ellipse cx="112" cy="72" rx="8" ry="4" fill="#38BDF8"/>
-            <path d="M 88 88 Q 100 98 112 88" stroke="#1E293B" stroke-width="3" fill="none"/>
-            <path d="M 68 110 Q 100 100 132 110 L 132 135 L 68 135 Z" fill="#1E293B"/>
-            <text x="100" y="158" font-family="'JetBrains Mono', monospace" font-weight="900" font-size="20" text-anchor="middle" fill="#059669">FRESH</text>
-            <text x="100" y="174" font-family="'Inter', sans-serif" font-weight="700" font-size="8" text-anchor="middle" fill="#64748B">DIGITAL COORDINATOR</text>
-          </svg>
-        </div>
-
-        <div class="flex items-center space-x-2">
-          <button id="masterMicBtn" onclick="toggleVoiceDictation()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-4 py-2 rounded-full font-bold text-xs flex items-center space-x-1.5 shadow-md transition transform active:scale-95">
-            <i class="fa-solid fa-microphone text-xs"></i>
-            <span>🎙️ TALK TO FRESH</span>
-          </button>
-          <button onclick="alert('📷 Camera Active: Snap photo of equipment serial tag!')" class="bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 rounded-full font-bold text-xs flex items-center space-x-1.5 shadow-md transition transform active:scale-95">
-            <i class="fa-solid fa-camera text-xs"></i>
-            <span>📷 CAM</span>
-          </button>
-        </div>
+      <!-- Center Voice & Cam Controls -->
+      <div class="flex items-center gap-3 w-full md:w-auto justify-center">
+        <button id="micBtn" onclick="toggleVoiceIntake()" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-emerald-800 hover:bg-emerald-900 text-amber-50 font-bold rounded-xl shadow-lg transition-all transform active:scale-95">
+          <span id="micIcon" class="text-xl">🎙️</span>
+          <span id="micText" class="tracking-wide">TALK TO FRESH</span>
+        </button>
+        <button onclick="triggerCam()" class="p-3 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold rounded-xl shadow transition-all">
+          📷
+        </button>
       </div>
 
-      <!-- RIGHT: SUBSCRIBER IDENTITY -->
-      <div class="flex items-center space-x-3 justify-center md:justify-end">
-        <div class="text-center md:text-right">
-          <div id="displayOrgName" class="text-sm font-black text-slate-900 tracking-wide">Aerus Timonium</div>
-          <div class="text-[11px] text-emerald-700 flex items-center justify-center md:justify-end space-x-1 font-mono font-bold">
-            <span class="w-2 h-2 rounded-full bg-emerald-600 inline-block animate-ping"></span>
-            <span>Subscriber Hub Active</span>
-          </div>
+      <!-- Mascot Badge -->
+      <div class="flex items-center gap-3 border-l border-stone-200 pl-4">
+        <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-900 flex items-center justify-center font-extrabold text-lg shadow-inner">
+          🤵
+        </div>
+        <div class="hidden sm:block">
+          <p class="text-xs font-bold text-stone-900">Fresh Coordinator</p>
+          <p class="text-[10px] text-stone-500">Calm The Chaos</p>
         </div>
       </div>
-
     </header>
 
-    <!-- 2. MAIN HUB FLOOR: SCHEDULE GRID & CLEAN PINBALL QUEUE -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      
-      <!-- SCHEDULE GRID -->
-      <div class="bg-[#F3EFE6] border border-[#E2DACC] rounded-2xl p-4 space-y-3 min-h-[180px]">
-        <div class="flex items-center justify-between border-b border-[#E2DACC] pb-2">
-          <div class="flex items-center space-x-2">
-            <i class="fa-solid fa-calendar-days text-blue-700 text-sm"></i>
-            <h2 class="text-xs font-bold text-blue-950 uppercase font-mono tracking-wider">Schedule Grid</h2>
+    <!-- 4 HUB DOORS -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <button onclick="alert('Inventory Hub: 1,090 Parts Loaded')" class="boutique-card p-4 rounded-xl flex items-center justify-between hover:border-emerald-700 transition-all">
+        <span class="text-sm font-bold text-stone-800">📦 Inventory (1,090)</span>
+        <span class="text-xs text-stone-400">➔</span>
+      </button>
+      <button onclick="alert('Dynamic Staff Roles Active')" class="boutique-card p-4 rounded-xl flex items-center justify-between hover:border-emerald-700 transition-all">
+        <span class="text-sm font-bold text-stone-800">👥 Staff Roles</span>
+        <span class="text-xs text-stone-400">➔</span>
+      </button>
+      <button onclick="alert('Workiz Cash Register Synced')" class="boutique-card p-4 rounded-xl flex items-center justify-between hover:border-emerald-700 transition-all">
+        <span class="text-sm font-bold text-stone-800">💳 Workiz Register</span>
+        <span class="text-xs text-stone-400">➔</span>
+      </button>
+      <button onclick="alert('Growth Network Share Link Ready')" class="boutique-card p-4 rounded-xl flex items-center justify-between hover:border-emerald-700 transition-all">
+        <span class="text-sm font-bold text-stone-800">🌐 Growth Network</span>
+        <span class="text-xs text-stone-400">➔</span>
+      </button>
+    </div>
+
+    <!-- MAIN FLOOR: SCHEDULE & PINBALL QUEUE -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Schedule Grid (Left) -->
+      <div class="lg:col-span-5 boutique-card rounded-2xl p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-stone-200 pb-3">
+          <h2 class="font-bold text-stone-900 text-lg flex items-center gap-2">📅 Today's Schedule</h2>
+          <span class="text-xs font-semibold px-2.5 py-1 bg-stone-200 text-stone-700 rounded-md">Oct 16, 2026</span>
+        </div>
+        <div class="space-y-3">
+          <div class="p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm">
+            <div>
+              <p class="text-xs font-bold text-stone-500">1:00 PM</p>
+              <p class="font-bold text-stone-900 text-sm">Mrs. Johnson — Central Vac Check</p>
+            </div>
+            <span class="text-xs font-bold px-2 py-1 bg-emerald-100 text-emerald-800 rounded">Scheduled</span>
           </div>
-          <span class="text-[10px] text-slate-500 font-mono font-bold">Synced Cal</span>
-        </div>
-        
-        <div id="scheduledItemsSlot" class="space-y-2 text-xs font-mono max-h-40 overflow-y-auto">
-          <!-- Unique scheduled items populate here -->
-        </div>
-      </div>
-
-      <!-- PINBALL QUEUE -->
-      <div class="bg-[#F3EFE6] border border-[#E2DACC] rounded-2xl p-4 space-y-3 min-h-[180px]">
-        <div class="flex items-center justify-between border-b border-[#E2DACC] pb-2">
-          <div class="flex items-center space-x-2">
-            <span class="text-sm">🎯</span>
-            <h2 class="text-xs font-bold text-amber-950 uppercase font-mono tracking-wider">Pinball Queue</h2>
+          <div class="p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm">
+            <div>
+              <p class="text-xs font-bold text-stone-500">2:00 PM</p>
+              <p class="font-bold text-stone-900 text-sm">Chuck Pike — 9724 Red Clover Ct</p>
+            </div>
+            <span class="text-xs font-bold px-2 py-1 bg-amber-100 text-amber-800 rounded">$350 Cash-Out</span>
           </div>
-          <button onclick="clearQueue()" class="text-[10px] text-red-600 font-mono font-bold underline">Clear Queue</button>
-        </div>
-
-        <div id="pinballActionsList" class="space-y-2 text-xs font-mono max-h-40 overflow-y-auto">
-          <div id="pinEmptyState" class="text-slate-400 text-center py-6 italic text-[11px]">Tap TALK TO FRESH above to intake jobs!</div>
         </div>
       </div>
 
-    </div>
+      <!-- 3-Tier Pinball Queue (Right) -->
+      <div class="lg:col-span-7 boutique-card rounded-2xl p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-stone-200 pb-3">
+          <h2 class="font-bold text-stone-900 text-lg flex items-center gap-2">🎯 Pinball Tray (Forever Cards)</h2>
+          <button onclick="clearPinball()" class="text-xs text-stone-500 hover:text-red-600 font-semibold">Clear Queue</button>
+        </div>
 
-    <!-- 3. LIVE VOICE STREAM -->
-    <div class="bg-slate-900 text-white rounded-2xl p-3.5 space-y-1 shadow-inner">
-      <div class="flex justify-between items-center text-xs">
-        <span class="font-bold text-slate-200 font-mono flex items-center space-x-2">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
-          <span>Fresh Voice Stream:</span>
-        </span>
-        <span id="listeningBadge" class="hidden text-[10px] text-red-400 font-bold animate-pulse font-mono">● LISTENING</span>
+        <div id="pinballQueue" class="space-y-3">
+          <!-- Tier 1: Cash-Out -->
+          <div onclick="openWorkstation('Chuck Pike', 350)" class="cursor-pointer p-4 bg-white rounded-xl border-l-4 border-amber-500 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-extrabold text-amber-700 uppercase tracking-wide">Tier 1: Cash-Out</span>
+                <span class="text-xs text-stone-400">• Work Card</span>
+              </div>
+              <h3 class="font-bold text-stone-900">Chuck Pike</h3>
+              <p class="text-xs text-stone-600">Used Motor Swap + Control Valve | $350.00</p>
+            </div>
+            <span class="text-sm font-bold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg">Open Card ➔</span>
+          </div>
+
+          <!-- Tier 2: Quick Turns -->
+          <div onclick="openWorkstation('Mrs. Johnson', 189)" class="cursor-pointer p-4 bg-white rounded-xl border-l-4 border-emerald-600 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-extrabold text-emerald-700 uppercase tracking-wide">Tier 2: Quick Turn</span>
+                <span class="text-xs text-stone-400">• Work Card</span>
+              </div>
+              <h3 class="font-bold text-stone-900">Mrs. Johnson</h3>
+              <p class="text-xs text-stone-600">Central Vac Power Module Swap | $189.00</p>
+            </div>
+            <span class="text-sm font-bold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg">Open Card ➔</span>
+          </div>
+        </div>
       </div>
-      <p id="liveTranscriptText" class="text-xs text-slate-300 italic font-mono">"Tap TALK TO FRESH above to speak..."</p>
+
     </div>
+  </div>
 
-    <!-- 4. SUBSCRIBER HUB DOORS -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      <button onclick="openSubscriberDoor(1)" class="bg-white hover:bg-slate-50 border-2 border-blue-200 p-3 rounded-2xl text-center transition shadow-sm space-y-1">
-        <div class="text-xl">📦</div>
-        <div class="text-xs font-black text-blue-800">1. Inventory & Parts</div>
-        <div class="text-[10px] text-slate-500 font-medium">1,090 Catalog</div>
-      </button>
-
-      <button onclick="openSubscriberDoor(2)" class="bg-white hover:bg-slate-50 border-2 border-amber-200 p-3 rounded-2xl text-center transition shadow-sm space-y-1">
-        <div class="text-xl">👥</div>
-        <div class="text-xs font-black text-amber-800">2. Staff Roles</div>
-        <div class="text-[10px] text-slate-500 font-medium">Dynamic Dispatch</div>
-      </button>
-
-      <button onclick="openSubscriberDoor(3)" class="bg-white hover:bg-slate-50 border-2 border-emerald-200 p-3 rounded-2xl text-center transition shadow-sm space-y-1">
-        <div class="text-xl">💵</div>
-        <div class="text-xs font-black text-emerald-800">3. Cash Register</div>
-        <div class="text-[10px] text-slate-500 font-medium">Stripe Balance</div>
-      </button>
-
-      <button onclick="openSubscriberDoor(4)" class="bg-white hover:bg-slate-50 border-2 border-purple-200 p-3 rounded-2xl text-center transition shadow-sm space-y-1">
-        <div class="text-xl">🌐</div>
-        <div class="text-xs font-black text-purple-800">4. Growth Hub</div>
-        <div class="text-[10px] text-slate-500 font-medium">Forever Network</div>
-      </button>
-    </div>
-
-    <!-- EXPANDABLE FOREVER WORKSPACE DRAWER -->
-    <div id="forever-work-drawer" class="hidden bg-slate-900 text-white rounded-2xl p-5 space-y-4">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-        <h3 id="drawerTitle" class="text-sm font-bold text-white">Forever Card Workspace</h3>
-        <button onclick="closeWorkCard()" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
+  <!-- 3-LAYER CLIENT WORKSTATION DRAWER -->
+  <div id="drawerOverlay" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm hidden z-40 transition-opacity"></div>
+  <div id="workstationDrawer" class="fixed inset-y-0 right-0 w-full max-w-3xl bg-[#FAF9F5] shadow-2xl z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto p-6 space-y-6">
+    
+    <div class="flex items-center justify-between border-b border-stone-200 pb-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-900 text-amber-100 flex items-center justify-center font-cursive-f text-2xl">
+          F
+        </div>
+        <div>
+          <h2 id="cardClientName" class="text-xl font-bold text-stone-900">Forever Card Workstation</h2>
+          <p class="text-xs text-emerald-800 font-semibold">Self-Contained Client Drawer</p>
+        </div>
       </div>
-      <div id="drawerBody" class="text-xs text-slate-300"></div>
+      <button onclick="closeWorkstation()" class="text-stone-400 hover:text-stone-800 text-2xl font-bold">✕</button>
+    </div>
+
+    <!-- LAYER 1: SHOP OPS CANVAS (4 STAGES) -->
+    <div class="bg-white rounded-2xl p-5 border border-stone-200 space-y-3">
+      <h3 class="text-xs font-extrabold text-stone-400 uppercase tracking-wider">Layer 1: Shop Ops Canvas</h3>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <button id="stage1" onclick="setStage(1)" class="p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white">1. Intake & Photo</button>
+        <button id="stage2" onclick="setStage(2)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">2. Diagnostics</button>
+        <button id="stage3" onclick="setStage(3)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">3. Proposal</button>
+        <button id="stage4" onclick="setStage(4)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">4. Ready Wall 🎉</button>
+      </div>
+    </div>
+
+    <!-- LAYER 2: CARD-NATIVE INVOICE BUILDER -->
+    <div class="bg-white rounded-2xl p-5 border border-stone-200 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs font-extrabold text-stone-400 uppercase tracking-wider">Layer 2: Card-Native Invoice Builder</h3>
+        <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded">1,090 Catalog Items Linked</span>
+      </div>
+
+      <!-- Parts Catalog Selector -->
+      <div class="flex gap-2">
+        <select id="partSelect" class="flex-1 text-sm border border-stone-300 rounded-xl p-2.5 bg-stone-50 font-medium">
+          <option value="295|50">Used Motor Assembly — $295.00 (Cost: $50.00)</option>
+          <option value="55|15">Control Valve Swap — $55.00 (Cost: $15.00)</option>
+          <option value="395|131">PC Board - Platinum — $395.00 (Cost: $131.00)</option>
+          <option value="189|35">Control Module Package — $189.00 (Cost: $35.00)</option>
+        </select>
+        <button onclick="addInvoiceItem()" class="px-4 py-2 bg-emerald-800 text-white font-bold text-sm rounded-xl hover:bg-emerald-900">+ Add</button>
+      </div>
+
+      <!-- Line Items Table -->
+      <div class="border border-stone-200 rounded-xl overflow-hidden">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-stone-100 text-stone-600 font-bold">
+            <tr>
+              <th class="p-2.5">Item</th>
+              <th class="p-2.5">Wholesale</th>
+              <th class="p-2.5">Retail</th>
+              <th class="p-2.5 text-right">Margin</th>
+            </tr>
+          </thead>
+          <tbody id="invoiceTableBody" class="divide-y divide-stone-100 font-medium">
+            <tr>
+              <td class="p-2.5 text-stone-900">Used Motor Replacement</td>
+              <td class="p-2.5 text-stone-500">$50.00</td>
+              <td class="p-2.5 text-stone-900 font-bold">$295.00</td>
+              <td class="p-2.5 text-right text-emerald-700 font-bold">83.0%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Live Profit Margin Calculator -->
+      <div class="p-3 bg-stone-50 rounded-xl flex items-center justify-between border border-stone-200">
+        <div>
+          <p class="text-[10px] font-extrabold text-stone-400 uppercase tracking-wider">Gross Profit Calculation</p>
+          <p id="profitSummary" class="text-sm font-bold text-stone-900">$245.00 Pure Margin</p>
+        </div>
+        <button onclick="dispatchStripePay()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-stone-950 font-extrabold text-xs rounded-xl shadow transition-all">
+          🚀 1-Tap Stripe Pay Dispatch
+        </button>
+      </div>
+    </div>
+
+    <!-- LAYER 3: LIVE READ-ONLY CUSTOMER MOBILE MIRROR -->
+    <div class="bg-stone-900 text-stone-100 rounded-2xl p-5 space-y-3 shadow-inner">
+      <div class="flex items-center justify-between border-b border-stone-800 pb-2">
+        <h3 class="text-xs font-extrabold text-stone-400 uppercase tracking-wider">Layer 3: Live Customer Mobile View</h3>
+        <span class="text-[10px] bg-emerald-900/80 text-emerald-300 font-bold px-2 py-0.5 rounded">Live Mirror</span>
+      </div>
+      <div class="bg-stone-950 rounded-xl p-4 border border-stone-800 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="font-cursive-f text-emerald-400 text-lg">F</span>
+          <span id="mirrorClient" class="text-xs font-bold text-stone-300">Chuck Pike View</span>
+        </div>
+        <p class="text-xs text-stone-400">Service Status: <span class="text-amber-400 font-bold">Ready for Pickup</span></p>
+        <div class="text-right">
+          <p class="text-[10px] text-stone-500">Approved Total</p>
+          <p id="mirrorTotal" class="text-lg font-extrabold text-emerald-400">$350.00</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAYER 4: STORAGE BINS & DRAWERS -->
+    <div class="bg-white rounded-2xl p-5 border border-stone-200 space-y-3">
+      <h3 class="text-xs font-extrabold text-stone-400 uppercase tracking-wider">Layer 4: Storage Bins & Drawers</h3>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <button onclick="alert('Opening Vault Record...')" class="p-3 bg-stone-50 hover:bg-stone-100 rounded-xl text-xs font-bold text-stone-800 border border-stone-200">🗄️ Vault Records</button>
+        <button onclick="alert('Opening Equipment Manuals...')" class="p-3 bg-stone-50 hover:bg-stone-100 rounded-xl text-xs font-bold text-stone-800 border border-stone-200">📖 Manuals</button>
+        <button onclick="alert('Opening Receipt History...')" class="p-3 bg-stone-50 hover:bg-stone-100 rounded-xl text-xs font-bold text-stone-800 border border-stone-200">🧾 Receipts</button>
+        <button onclick="alert('Opening Room Notes...')" class="p-3 bg-stone-50 hover:bg-stone-100 rounded-xl text-xs font-bold text-stone-800 border border-stone-200">🛋️ Room Notes</button>
+      </div>
     </div>
 
   </div>
 
   <script>
-    let isRecording = false;
-    let recognition = null;
-    let activeCustomer = null;
-    let lastProcessedText = "";
-    const WEBHOOK_URL = "https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln";
+    // Voice Recognition Engine & Duplicate Lock
+    let isListening = false;
+    let recognition;
+    let lastPhrase = '';
 
-    // 22,283 Customer Vault Match Array
-    const vault = [
-      { name: "William Sullivan", id: "1004", phone: "4104991313", phoneDisp: "(410) 499-1313", address: "6110 Glenoak Ave, Baltimore, MD 21214", email: "Williamanyvac@gmail.com" },
-      { name: "Catherine Wagner", id: "21982", phone: "4435206265", phoneDisp: "(443) 520-6265", address: "1010 Maplehurst Ln, Monkton, MD 21111", email: "cwagner@monkton.org" },
-      { name: "Suzie Gray", id: "21948", phone: "3019741448", phoneDisp: "(301) 974-1448", address: "Silver Spring, MD", email: "suzie@example.com" }
-    ];
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
 
-    window.onload = function() {
-      setupSpeech();
-      localStorage.removeItem('active_card_id');
-    };
+      recognition.onresult = (event) => {
+        const phrase = event.results[0][0].transcript;
+        if (phrase !== lastPhrase) {
+          lastPhrase = phrase;
+          sendWebhook(phrase);
+        }
+      };
 
-    function setupSpeech() {
-      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SpeechRec();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-
-        recognition.onresult = function(event) {
-          const text = event.results[0][0].transcript.trim();
-          if (text && text !== lastProcessedText) {
-            lastProcessedText = text;
-            document.getElementById('liveTranscriptText').innerText = `"${text}"`;
-            handleVoiceInput(text);
-          }
-        };
-
-        recognition.onend = function() { stopDictation(); };
-      }
+      recognition.onend = () => {
+        isListening = false;
+        document.getElementById('micText').innerText = 'TALK TO FRESH';
+        document.getElementById('micIcon').innerText = '🎙️';
+      };
     }
 
-    function toggleVoiceDictation() {
-      if (!recognition) return alert('Speech recognition supported in Chrome/Edge.');
-      if (!isRecording) startDictation();
-      else stopDictation();
-    }
-
-    function startDictation() {
-      isRecording = true;
-      try {
+    function toggleVoiceIntake() {
+      if (!recognition) return alert('Speech recognition not supported in this browser.');
+      if (isListening) {
+        recognition.stop();
+      } else {
         recognition.start();
-        document.getElementById('masterMicBtn').classList.add('pulse-record');
-        document.getElementById('listeningBadge').classList.remove('hidden');
-        document.getElementById('liveTranscriptText').innerText = "Listening...";
-      } catch(e) { console.log(e); }
-    }
-
-    function stopDictation() {
-      isRecording = false;
-      document.getElementById('masterMicBtn').classList.remove('pulse-record');
-      document.getElementById('listeningBadge').classList.add('hidden');
-    }
-
-    function clearQueue() {
-      document.getElementById('pinballActionsList').innerHTML = `<div id="pinEmptyState" class="text-slate-400 text-center py-6 italic text-[11px]">Tap TALK TO FRESH above to intake jobs!</div>`;
-      document.getElementById('scheduledItemsSlot').innerHTML = '';
-      lastProcessedText = "";
-    }
-
-    function handleVoiceInput(text) {
-      const lower = text.toLowerCase();
-      let match = vault.find(c => lower.includes(c.name.toLowerCase().split(' ')[0]));
-      
-      if (!match) {
-        match = { name: text.split(' ')[0] || "Guest Client", id: "NEW", phoneDisp: "(410) 555-0100", address: "Local Intake", email: "" };
-      }
-      
-      activeCustomer = match;
-
-      const emptyPin = document.getElementById('pinEmptyState');
-      if (emptyPin) emptyPin.remove();
-
-      const container = document.getElementById('pinballActionsList');
-      container.insertAdjacentHTML('afterbegin', `
-        <div class="p-2.5 rounded-xl bg-white border border-emerald-300 flex justify-between items-center shadow-sm text-xs">
-          <div>
-            <div class="font-bold text-emerald-950">${match.name} (Client #${match.id})</div>
-            <div class="text-[10px] text-slate-600 mt-0.5">${text}</div>
-          </div>
-          <button onclick="openWorkCard('${match.id}')" class="text-[10px] bg-emerald-700 text-white font-bold px-2 py-1 rounded-md hover:bg-emerald-800">Open Traveler</button>
-        </div>
-      `);
-
-      let timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)?|\d{1,2}\s*(?:AM|PM|am|pm))/i);
-      let timeLabel = timeMatch ? timeMatch[0].toUpperCase() : "09:30 AM";
-
-      const calSlot = document.getElementById('scheduledItemsSlot');
-      calSlot.insertAdjacentHTML('afterbegin', `
-        <div class="p-2.5 rounded-xl bg-white border border-blue-300 shadow-sm flex items-center justify-between text-slate-800 text-xs">
-          <div>
-            <div class="flex items-center space-x-2">
-              <span class="text-[10px] bg-blue-700 text-white px-2 py-0.5 rounded font-mono font-bold">${timeLabel}</span>
-              <span class="font-bold text-blue-950">${match.name}</span>
-            </div>
-            <p class="text-[10px] text-slate-600 mt-0.5">${match.address} • ${match.phoneDisp}</p>
-          </div>
-          <button onclick="openWorkCard('${match.id}')" class="text-[10px] text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-1 rounded border border-emerald-200">Synced Cal</button>
-        </div>
-      `);
-
-      if (WEBHOOK_URL) {
-        fetch(WEBHOOK_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ transcript: text, customer: match, time: timeLabel })
-        }).catch(e => console.error("Webhook error:", e));
+        isListening = true;
+        document.getElementById('micText').innerText = 'LISTENING...';
+        document.getElementById('micIcon').innerText = '⚡';
       }
     }
 
-    function openWorkCard(clientId) {
-      const match = vault.find(c => c.id === clientId) || activeCustomer;
-      if (!match) return;
+    function sendWebhook(transcript) {
+      fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transcript: transcript, timestamp: new Date().toISOString() })
+      }).catch(err => console.log('Webhook triggered'));
+    }
 
-      activeCustomer = match;
-      const drawer = document.getElementById('forever-work-drawer');
-      const title = document.getElementById('drawerTitle');
-      const body = document.getElementById('drawerBody');
-      drawer.classList.remove('hidden');
+    function triggerCam() {
+      alert('Camera Activated: Snap equipment tag or job photo to dump directly onto Forever Card.');
+    }
 
-      title.innerText = `📇 Forever Card Workspace — ${match.name}`;
-      body.innerHTML = `
-        <div class="space-y-4">
-          <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 space-y-1">
-            <div class="font-bold text-blue-400 text-sm">${match.name} (Client #${match.id})</div>
-            <div class="text-slate-300">${match.address}</div>
-            <div class="text-emerald-400 font-mono">${match.phoneDisp}</div>
-            <div class="text-slate-400 text-[10px]">${match.email}</div>
-          </div>
+    // Workstation Drawer Functions
+    function openWorkstation(clientName, amount) {
+      document.getElementById('cardClientName').innerText = clientName + ' — Forever Card';
+      document.getElementById('mirrorClient').innerText = clientName + ' Mobile View';
+      document.getElementById('mirrorTotal').innerText = '$' + amount.toFixed(2);
+      document.getElementById('drawerOverlay').classList.remove('hidden');
+      document.getElementById('workstationDrawer').classList.remove('translate-x-full');
+    }
 
-          <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-3">
-            <div class="text-xs font-bold text-white flex justify-between items-center">
-              <span>Dynamic Stripe Invoice Builder</span>
-              <span class="text-[10px] text-emerald-400 font-mono">Workiz Terminal</span>
-            </div>
-            
-            <div class="flex gap-2">
-              <input id="serviceMemoInput" type="text" placeholder="Service memo (e.g. Water Test & Filter Check)" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
-              <input id="invoiceAmountInput" type="number" placeholder="$0.00" class="w-24 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-emerald-400 font-mono font-bold">
-            </div>
+    function closeWorkstation() {
+      document.getElementById('drawerOverlay').classList.add('hidden');
+      document.getElementById('workstationDrawer').classList.add('translate-x-full');
+    }
 
-            <button onclick="dispatchCustomPayLink('${match.phoneDisp}')" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
-              🚀 Dispatch Custom Stripe Pay Link
-            </button>
-          </div>
+    function setStage(stageNum) {
+      for (let i = 1; i <= 4; i++) {
+        const btn = document.getElementById('stage' + i);
+        if (i === stageNum) {
+          btn.className = 'p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white';
+        } else {
+          btn.className = 'p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600';
+        }
+      }
+      if (stageNum === 4) {
+        confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+      }
+    }
 
-          <div class="border-t border-slate-800 pt-4 space-y-3">
-            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center">👇 Customer's View of Forever Card</div>
-            
-            <div class="bg-white text-slate-900 p-4 rounded-2xl border-2 border-emerald-600 shadow-lg space-y-3">
-              <div class="flex justify-between items-center border-b pb-2">
-                <div class="font-['Great_Vibes'] text-3xl text-emerald-700 font-bold">F</div>
-                <div class="text-right">
-                  <div class="font-bold text-xs">${match.name}'s Forever Card</div>
-                  <div class="text-[9px] text-slate-500">${match.phoneDisp}</div>
-                </div>
-              </div>
+    function addInvoiceItem() {
+      const select = document.getElementById('partSelect');
+      const val = select.value.split('|');
+      const retail = parseFloat(val[0]);
+      const cost = parseFloat(val[1]);
+      const name = select.options[select.selectedIndex].text.split('—')[0].trim();
+      const margin = (((retail - cost) / retail) * 100).toFixed(1);
 
-              <div class="bg-slate-50 p-3 rounded-xl border text-xs space-y-1 text-slate-700">
-                <div class="font-bold text-emerald-800">Aerus Home System Profile</div>
-                <div>Status: <span class="text-emerald-600 font-bold">● Active</span> | Equipment Tag: Aerus Beyond Core</div>
-                <div>Address: ${match.address}</div>
-              </div>
-
-              <div class="flex justify-between items-center pt-1">
-                <button onclick="alert('Customer view link copied!')" class="text-[10px] bg-slate-900 text-white font-mono px-3 py-1.5 rounded-lg font-bold">
-                  🔗 Share Customer View
-                </button>
-                <div class="text-[10px] text-emerald-700 font-bold">Fresh Concierge Active 🤵</div>
-              </div>
-            </div>
-          </div>
-        </div>
+      const tbody = document.getElementById('invoiceTableBody');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="p-2.5 text-stone-900">${name}</td>
+        <td class="p-2.5 text-stone-500">$${cost.toFixed(2)}</td>
+        <td class="p-2.5 text-stone-900 font-bold">$${retail.toFixed(2)}</td>
+        <td class="p-2.5 text-right text-emerald-700 font-bold">${margin}%</td>
       `;
+      tbody.appendChild(tr);
     }
 
-    function dispatchCustomPayLink(phone) {
-      const memo = document.getElementById('serviceMemoInput').value || "Aerus Service";
-      const amt = document.getElementById('invoiceAmountInput').value || "0.00";
-      alert(`🚀 Stripe Pay Link for $${amt} (${memo}) dispatched directly to ${phone}!`);
+    function dispatchStripePay() {
+      alert('Stripe Pay Link dispatched instantly via SMS & Forever Card Mirror!');
     }
 
-    function closeWorkCard() {
-      const drawer = document.getElementById('forever-work-drawer');
-      if (drawer) drawer.classList.add('hidden');
-    }
-
-    function openSubscriberDoor(doorNum) {
-      const drawer = document.getElementById('forever-work-drawer');
-      const title = document.getElementById('drawerTitle');
-      const body = document.getElementById('drawerBody');
-      drawer.classList.remove('hidden');
-
-      if (doorNum === 1) {
-        title.innerText = "Door 1: Inventory & Parts Catalog";
-        body.innerHTML = `<p class="text-slate-300">Accessing 1,090 Aerus verified inventory items...</p>`;
-      } else if (doorNum === 2) {
-        title.innerText = "Door 2: Staff Roles & Dynamic Dispatch";
-        body.innerHTML = `
-          <div class="space-y-2 font-mono text-xs">
-            <div class="p-2 bg-slate-800 rounded border border-slate-700 text-blue-300">[Counter Intake] — Mona / Front Desk</div>
-            <div class="p-2 bg-slate-800 rounded border border-slate-700 text-amber-300">[Master Bench Tech] — Chris / Parts Lead</div>
-            <div class="p-2 bg-slate-800 rounded border border-slate-700 text-emerald-300">[Field Installations] — Mike / Tech</div>
-            <div class="p-2 bg-slate-800 rounded border border-slate-700 text-purple-300">[Digital VA] — Norby / FOAS Lead</div>
-          </div>
-        `;
-      } else if (doorNum === 3) {
-        title.innerText = "Door 3: Cash Register & Stripe Terminal";
-        body.innerHTML = `<p class="text-slate-300">Workiz Terminal • Available Payout Balance: $1,485.20</p>`;
-      } else if (doorNum === 4) {
-        title.innerText = "Door 4: Growth Hub & Forever Network";
-        body.innerHTML = `<p class="text-slate-300">Forever Network • Automated SMS Recall Engine Active</p>`;
-      }
+    function clearPinball() {
+      document.getElementById('pinballQueue').innerHTML = '<p class="text-xs text-stone-400 italic p-4 text-center">Pinball tray clear!</p>';
     }
   </script>
 </body>
