@@ -10,7 +10,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <style>
-    body { background-color: #ECE8DF; color: #1E293B; font-family: 'Inter', sans-serif; padding-bottom: 90px; }
+    body { background-color: #ECE8DF; color: #1E293B; font-family: 'Inter', sans-serif; }
     .physical-card {
       background: #FAF9F5;
       border: 2px solid #D6CEC0;
@@ -22,30 +22,16 @@
       70% { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
       100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
     }
-    .fresh-control-footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #FAF9F5;
-      border-top: 2px solid #D6CEC0;
-      padding: 10px 20px;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      z-index: 9999;
-      box-shadow: 0 -4px 15px rgba(0,0,0,0.08);
-    }
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-3 sm:p-6 antialiased">
 
   <div class="physical-card max-w-4xl w-full rounded-3xl p-5 sm:p-8 space-y-6 relative overflow-hidden">
 
-    <!-- 1. LUXURY FOREVER CARD HEADER -->
+    <!-- 1. MASTER HEADER WITH LOGO CENTERPIECE -->
     <header class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border-b border-[#E2DACC] pb-5">
       
-      <!-- LEFT: CURSIVE 'F' BRANDING (LAVERNE & SHIRLEY STYLE) -->
+      <!-- LEFT: CURSIVE 'F' BRANDING -->
       <div class="flex items-center space-x-3 justify-center md:justify-start">
         <div class="text-5xl font-['Great_Vibes'] text-emerald-700 font-bold select-none drop-shadow-sm pr-1">F</div>
         <div>
@@ -54,23 +40,22 @@
         </div>
       </div>
 
-      <!-- CENTER: EMBEDDED FRESH MASCOT LOGO -->
-      <div class="flex flex-col items-center justify-center space-y-1">
+      <!-- CENTER: LOGO CENTERPIECE (4126.jpg) & MASTER CONTROLS -->
+      <div class="flex flex-col items-center justify-center space-y-2">
         <div class="w-16 h-16 rounded-full border-2 border-emerald-600 bg-white p-0.5 shadow-md flex items-center justify-center overflow-hidden">
-          <svg viewBox="0 0 200 200" class="w-full h-full">
-            <circle cx="100" cy="100" r="95" fill="white" stroke="#059669" stroke-width="4"/>
-            <path d="M 75 52 Q 88 38 100 42 Q 112 38 125 52 Q 112 46 100 48 Q 88 46 75 52 Z" fill="#1E293B"/>
-            <circle cx="100" cy="72" r="28" fill="#1E293B"/>
-            <rect x="78" y="66" width="44" height="13" rx="4" fill="#000"/>
-            <ellipse cx="88" cy="72" rx="8" ry="4" fill="#38BDF8"/>
-            <ellipse cx="112" cy="72" rx="8" ry="4" fill="#38BDF8"/>
-            <path d="M 88 88 Q 100 98 112 88" stroke="#1E293B" stroke-width="3" fill="none"/>
-            <path d="M 68 110 Q 100 100 132 110 L 132 135 L 68 135 Z" fill="#1E293B"/>
-            <text x="100" y="158" font-family="'JetBrains Mono', monospace" font-weight="900" font-size="20" text-anchor="middle" fill="#059669">FRESH</text>
-            <text x="100" y="174" font-family="'Inter', sans-serif" font-weight="700" font-size="8" text-anchor="middle" fill="#64748B">DIGITAL COORDINATOR</text>
-          </svg>
+          <img src="4126.jpg" alt="Fresh Logo" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/059669/FFFFFF?text=FRESH';">
         </div>
-        <span class="text-[10px] font-mono font-bold text-emerald-800">Coordinator Active</span>
+
+        <div class="flex items-center space-x-2">
+          <button id="masterMicBtn" onclick="toggleVoiceDictation()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-4 py-2 rounded-full font-bold text-xs flex items-center space-x-1 shadow-md transition transform active:scale-95">
+            <i class="fa-solid fa-microphone text-xs"></i>
+            <span>🎙️ TALK TO FRESH</span>
+          </button>
+          <button onclick="alert('📷 Camera Active: Snap photo of equipment serial tag!')" class="bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 rounded-full font-bold text-xs flex items-center space-x-1 shadow-md transition transform active:scale-95">
+            <i class="fa-solid fa-camera text-xs"></i>
+            <span>📷 CAM</span>
+          </button>
+        </div>
       </div>
 
       <!-- RIGHT: SUBSCRIBER IDENTITY -->
@@ -86,45 +71,36 @@
 
     </header>
 
-    <!-- 2. SCHEDULE GRID & SMART PINBALL ACTION ZONE -->
+    <!-- 2. MAIN HUB FLOOR: SCHEDULE GRID + PINBALL QUEUE -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       
-      <!-- 📅 SCHEDULE GRID -->
-      <div class="bg-[#F3EFE6] border border-[#E2DACC] rounded-2xl p-4 space-y-3 min-h-[220px]">
+      <!-- SCHEDULE GRID -->
+      <div class="bg-[#F3EFE6] border border-[#E2DACC] rounded-2xl p-4 space-y-3 min-h-[180px]">
         <div class="flex items-center justify-between border-b border-[#E2DACC] pb-2">
           <div class="flex items-center space-x-2">
             <i class="fa-solid fa-calendar-days text-blue-700 text-sm"></i>
-            <h2 class="text-xs font-bold text-blue-950 uppercase font-mono tracking-wider">Schedule Grid • Live</h2>
+            <h2 class="text-xs font-bold text-blue-950 uppercase font-mono tracking-wider">Schedule Grid</h2>
           </div>
           <span class="text-[10px] text-slate-500 font-mono font-bold">Synced Cal</span>
         </div>
         
-        <div id="calendarGrid" class="space-y-2 text-xs font-mono max-h-52 overflow-y-auto">
-          <div id="scheduledItemsSlot" class="space-y-2"></div>
+        <div id="scheduledItemsSlot" class="space-y-2 text-xs font-mono max-h-40 overflow-y-auto">
+          <!-- Scheduled cards populate here -->
         </div>
       </div>
 
-      <!-- 🎰 PINBALL ACTION ZONE -->
-      <div class="bg-[#F3EFE6] border border-[#E2DACC] rounded-2xl p-4 space-y-3 min-h-[220px]">
+      <!-- PINBALL QUEUE -->
+      <div class="bg-[#F3EFE6] border border-[#E2DACC] rounded-2xl p-4 space-y-3 min-h-[180px]">
         <div class="flex items-center justify-between border-b border-[#E2DACC] pb-2">
           <div class="flex items-center space-x-2">
-            <span class="text-sm">🎰</span>
-            <h2 class="text-xs font-bold text-amber-950 uppercase font-mono tracking-wider">Pinball • Action Zone</h2>
+            <span class="text-sm">🎯</span>
+            <h2 class="text-xs font-bold text-amber-950 uppercase font-mono tracking-wider">Pinball Queue</h2>
           </div>
-          <span class="text-[10px] text-slate-500 font-mono font-bold">Priority Hopper</span>
+          <button onclick="clearQueue()" class="text-[10px] text-red-600 font-mono font-bold underline">Clear Queue</button>
         </div>
 
-        <div id="pinballActionsList" class="space-y-3 text-xs font-mono max-h-52 overflow-y-auto pr-1">
-          <div id="tierHighPriority" class="space-y-1.5">
-            <div class="text-[9px] font-bold text-emerald-800 uppercase tracking-wider">🔥 Ready To Cash Out / High-Ticket</div>
-          </div>
-          <div id="tierQuickWins" class="space-y-1.5">
-            <div class="text-[9px] font-bold text-blue-800 uppercase tracking-wider">⚡ Quick Turns ($5 Belts / Bags)</div>
-          </div>
-          <div id="tierWaitingParts" class="space-y-1.5">
-            <div class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">⏳ Waiting on Parts / On Hold</div>
-          </div>
-          <div id="pinEmptyState" class="text-slate-400 text-center py-6 italic text-[11px]">Queue clean. Tap Mic below to intake jobs!</div>
+        <div id="pinballActionsList" class="space-y-2 text-xs font-mono max-h-40 overflow-y-auto">
+          <div id="pinEmptyState" class="text-slate-400 text-center py-6 italic text-[11px]">Tap TALK TO FRESH above to intake jobs!</div>
         </div>
       </div>
 
@@ -139,40 +115,40 @@
         </span>
         <span id="listeningBadge" class="hidden text-[10px] text-red-400 font-bold animate-pulse font-mono">● LISTENING</span>
       </div>
-      <p id="liveTranscriptText" class="text-xs text-slate-300 italic font-mono">"Tap the microphone in the bottom bar to speak..."</p>
+      <p id="liveTranscriptText" class="text-xs text-slate-300 italic font-mono">"Tap TALK TO FRESH above to speak..."</p>
     </div>
 
     <!-- 4. SUBSCRIBER HUB DOORS -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      <button onclick="openSubscriberDoor(1)" class="bg-white hover:bg-slate-50 border-2 border-blue-200 p-4 rounded-2xl text-center transition shadow-sm space-y-1">
-        <div class="text-2xl">📦</div>
+      <button onclick="openSubscriberDoor(1)" class="bg-white hover:bg-slate-50 border-2 border-blue-200 p-3 rounded-2xl text-center transition shadow-sm space-y-1">
+        <div class="text-xl">📦</div>
         <div class="text-xs font-black text-blue-800">1. Inventory & Parts</div>
-        <div class="text-[10px] text-slate-500 font-medium">1,090 Items Catalog</div>
+        <div class="text-[10px] text-slate-500 font-medium">1,090 Catalog</div>
       </button>
 
-      <button onclick="openSubscriberDoor(2)" class="bg-white hover:bg-slate-50 border-2 border-amber-200 p-4 rounded-2xl text-center transition shadow-sm space-y-1">
-        <div class="text-2xl">👥</div>
+      <button onclick="openSubscriberDoor(2)" class="bg-white hover:bg-slate-50 border-2 border-amber-200 p-3 rounded-2xl text-center transition shadow-sm space-y-1">
+        <div class="text-xl">👥</div>
         <div class="text-xs font-black text-amber-800">2. Staff Roles</div>
         <div class="text-[10px] text-slate-500 font-medium">Dynamic Dispatch</div>
       </button>
 
-      <button onclick="openSubscriberDoor(3)" class="bg-white hover:bg-slate-50 border-2 border-emerald-200 p-4 rounded-2xl text-center transition shadow-sm space-y-1">
-        <div class="text-2xl">💵</div>
+      <button onclick="openSubscriberDoor(3)" class="bg-white hover:bg-slate-50 border-2 border-emerald-200 p-3 rounded-2xl text-center transition shadow-sm space-y-1">
+        <div class="text-xl">💵</div>
         <div class="text-xs font-black text-emerald-800">3. Cash Register</div>
         <div class="text-[10px] text-slate-500 font-medium">Stripe Balance</div>
       </button>
 
-      <button onclick="openSubscriberDoor(4)" class="bg-white hover:bg-slate-50 border-2 border-purple-200 p-4 rounded-2xl text-center transition shadow-sm space-y-1">
-        <div class="text-2xl">🌐</div>
+      <button onclick="openSubscriberDoor(4)" class="bg-white hover:bg-slate-50 border-2 border-purple-200 p-3 rounded-2xl text-center transition shadow-sm space-y-1">
+        <div class="text-xl">🌐</div>
         <div class="text-xs font-black text-purple-800">4. Growth Hub</div>
         <div class="text-[10px] text-slate-500 font-medium">Forever Network</div>
       </button>
     </div>
 
-    <!-- EXPANDABLE FOREVER WORKSPACE DRAWER -->
+    <!-- EXPANDABLE WORKSPACE DRAWER (WITH EMBEDDED CUSTOMER VIEW AT BOTTOM) -->
     <div id="forever-work-drawer" class="hidden bg-slate-900 text-white rounded-2xl p-5 space-y-4">
       <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-        <h3 id="drawerTitle" class="text-sm font-bold text-white">Customer Traveler Workspace</h3>
+        <h3 id="drawerTitle" class="text-sm font-bold text-white">Forever Card Workspace</h3>
         <button onclick="closeWorkCard()" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div id="drawerBody" class="text-xs text-slate-300"></div>
@@ -180,35 +156,17 @@
 
   </div>
 
-  <!-- 5. UNIVERSAL CONTROL FOOTER -->
-  <div class="fresh-control-footer">
-    <div class="flex items-center space-x-2">
-      <span class="text-emerald-800 font-mono font-black text-sm tracking-wider">FRESH 🤵</span>
-    </div>
-    
-    <button id="masterMicBtn" onclick="toggleVoiceDictation()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-full font-bold text-xs flex items-center space-x-2 shadow-lg transition transform active:scale-95">
-      <i class="fa-solid fa-microphone text-sm"></i>
-      <span>🎙️ MIC INTAKE</span>
-    </button>
-
-    <button onclick="alert('📷 Camera Trigger: Snap photo of equipment serial tag!')" class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-full font-bold text-xs flex items-center space-x-2 shadow-md transition transform active:scale-95">
-      <i class="fa-solid fa-camera text-sm"></i>
-      <span>📷 CAMERA</span>
-    </button>
-  </div>
-
   <script>
     let isRecording = false;
     let recognition = null;
     let activeCustomer = null;
+    let processedRecords = new Set();
     const WEBHOOK_URL = "https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln";
 
     const vault = [
-      { name: "Ruth Tucker", id: "22086", phone: "4102566949", phoneDisp: "(410) 256-6949", address: "6 Lagan Ct, Nottingham, MD 21236", email: "ruth@example.com" },
-      { name: "Peg Merrill", id: "11030", phone: "4104095676", phoneDisp: "(410) 409-5676", address: "14828 Jarrettsville Pike, Monkton, MD 21111", email: "" },
-      { name: "Suzie Gray", id: "21948", phone: "3019741448", phoneDisp: "(301) 974-1448", address: "Silver Spring, MD", email: "suzie@example.com" },
-      { name: "Catherine Wagner", id: "21982", phone: "4435206265", phoneDisp: "(443) 520-6265", address: "1010 Maplehurst Ln, Monkton, MD 21111", email: "" },
-      { name: "William Sullivan", id: "1004", phone: "4104991313", phoneDisp: "(410) 499-1313", address: "6110 Glenoak Ave, Baltimore, MD 21214", email: "Williamanyvac@gmail.com" }
+      { name: "William Sullivan", id: "1004", phone: "4104991313", phoneDisp: "(410) 499-1313", address: "6110 Glenoak Ave, Baltimore, MD 21214", email: "Williamanyvac@gmail.com" },
+      { name: "Catherine Wagner", id: "21982", phone: "4435206265", phoneDisp: "(443) 520-6265", address: "1010 Maplehurst Ln, Monkton, MD 21111", email: "cwagner@monkton.org" },
+      { name: "Suzie Gray", id: "21948", phone: "3019741448", phoneDisp: "(301) 974-1448", address: "Silver Spring, MD", email: "suzie@example.com" }
     ];
 
     window.onload = function() {
@@ -256,6 +214,12 @@
       document.getElementById('listeningBadge').classList.add('hidden');
     }
 
+    function clearQueue() {
+      document.getElementById('pinballActionsList').innerHTML = `<div id="pinEmptyState" class="text-slate-400 text-center py-6 italic text-[11px]">Tap TALK TO FRESH above to intake jobs!</div>`;
+      document.getElementById('scheduledItemsSlot').innerHTML = '';
+      processedRecords.clear();
+    }
+
     function handleVoiceInput(text) {
       const lower = text.toLowerCase();
       let match = vault.find(c => lower.includes(c.name.toLowerCase().split(' ')[0]));
@@ -266,35 +230,26 @@
       
       activeCustomer = match;
 
-      let targetTier = "tierQuickWins";
-      let badgeStyle = "bg-blue-100 text-blue-900 border-blue-300";
-
-      if (lower.includes("pay") || lower.includes("stripe") || lower.includes("water test") || lower.includes("install") || lower.includes("proposal")) {
-        targetTier = "tierHighPriority";
-        badgeStyle = "bg-emerald-100 text-emerald-950 border-emerald-400 font-bold";
-      } else if (lower.includes("part") || lower.includes("order") || lower.includes("hold") || lower.includes("waiting")) {
-        targetTier = "tierWaitingParts";
-        badgeStyle = "bg-slate-200 text-slate-800 border-slate-300 opacity-80";
-      }
+      const recordKey = `${match.id}_${text}`;
+      if (processedRecords.has(recordKey)) return;
+      processedRecords.add(recordKey);
 
       const emptyPin = document.getElementById('pinEmptyState');
       if (emptyPin) emptyPin.remove();
 
-      const container = document.getElementById(targetTier);
+      const container = document.getElementById('pinballActionsList');
       container.insertAdjacentHTML('afterbegin', `
-        <div class="p-2.5 rounded-xl border ${badgeStyle} flex justify-between items-center shadow-sm text-xs">
+        <div class="p-2.5 rounded-xl bg-white border border-emerald-300 flex justify-between items-center shadow-sm text-xs">
           <div>
-            <div class="font-bold flex items-center space-x-1">
-              <span>${match.name}</span>
-            </div>
-            <div class="text-[10px] opacity-90 mt-0.5">${text}</div>
+            <div class="font-bold text-emerald-950">${match.name} (Client #${match.id})</div>
+            <div class="text-[10px] text-slate-600 mt-0.5">${text}</div>
           </div>
-          <button onclick="openWorkCard('${match.id}')" class="text-[10px] bg-slate-900 text-white font-bold px-2 py-1 rounded-md hover:bg-slate-800">Open Traveler</button>
+          <button onclick="openWorkCard('${match.id}')" class="text-[10px] bg-emerald-700 text-white font-bold px-2 py-1 rounded-md hover:bg-emerald-800">Open Card</button>
         </div>
       `);
 
       let timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)?|\d{1,2}\s*(?:AM|PM|am|pm))/i);
-      let timeLabel = timeMatch ? timeMatch[0].toUpperCase() : "08:00 AM";
+      let timeLabel = timeMatch ? timeMatch[0].toUpperCase() : "10:00 AM";
 
       const calSlot = document.getElementById('scheduledItemsSlot');
       calSlot.insertAdjacentHTML('afterbegin', `
@@ -304,9 +259,9 @@
               <span class="text-[10px] bg-blue-700 text-white px-2 py-0.5 rounded font-mono font-bold">${timeLabel}</span>
               <span class="font-bold text-blue-950">${match.name}</span>
             </div>
-            <p class="text-[10px] text-slate-600 mt-0.5 font-sans">${match.address} • ${match.phoneDisp}</p>
+            <p class="text-[10px] text-slate-600 mt-0.5">${match.address} • ${match.phoneDisp}</p>
           </div>
-          <button onclick="openWorkCard('${match.id}')" class="text-[10px] text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-1 rounded border border-emerald-200 hover:bg-emerald-100">Synced Cal</button>
+          <button onclick="openWorkCard('${match.id}')" class="text-[10px] text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-1 rounded border border-emerald-200">Synced Cal</button>
         </div>
       `);
 
@@ -331,41 +286,69 @@
 
       localStorage.setItem('active_card_id', clientId);
 
-      const missingEmailTag = !match.email ? `<span class="bg-amber-500/20 text-amber-300 text-[10px] px-2 py-0.5 rounded border border-amber-500/40 ml-2">+ Add Email</span>` : `<span class="text-slate-400 text-[10px] ml-2">${match.email}</span>`;
-
-      title.innerText = `📇 Customer Traveler Workspace — ${match.name}`;
+      title.innerText = `📇 Forever Card Workspace — ${match.name}`;
       body.innerHTML = `
         <div class="space-y-4">
-          <div class="space-y-2">
-            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">4-Stage Shop Ops Canvas:</div>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-[10px] font-bold">
-              <button onclick="alert('Stage 1: Intake Estimate & Drop-off Photo saved for ${match.name}')" class="bg-blue-900/60 hover:bg-blue-800 p-2.5 rounded-xl text-blue-300 border border-blue-700">1. Intake & Photo</button>
-              <button onclick="alert('Stage 2: Bench Diagnostics & Parts selected for ${match.name}')" class="bg-amber-900/60 hover:bg-amber-800 p-2.5 rounded-xl text-amber-300 border border-amber-700">2. Bench Diagnostics</button>
-              <button onclick="alert('Stage 3: Stripe Pay Link dispatched to ${match.phoneDisp}')" class="bg-emerald-900/60 hover:bg-emerald-800 p-2.5 rounded-xl text-emerald-300 border border-emerald-700">3. Proposal & Pay 🚀</button>
-              <button onclick="confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } })" class="bg-purple-900/60 hover:bg-purple-800 p-2.5 rounded-xl text-purple-300 border border-purple-700">4. Ready Wall 🎉</button>
-            </div>
-          </div>
-
+          <!-- CUSTOMER VAULT CONTACT CARD -->
           <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 space-y-1">
-            <div class="font-bold text-blue-400 text-sm flex items-center">
-              <span>${match.name} (Client #${match.id})</span>
-              ${missingEmailTag}
-            </div>
+            <div class="font-bold text-blue-400 text-sm">${match.name} (Client #${match.id})</div>
             <div class="text-slate-300">${match.address}</div>
             <div class="text-emerald-400 font-mono">${match.phoneDisp}</div>
+            <div class="text-slate-400 text-[10px]">${match.email}</div>
           </div>
 
-          <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2">
-            <div class="flex justify-between items-center text-xs font-bold text-white">
-              <span>Beyond Guardian Air & Water Inspection</span>
-              <span class="text-emerald-400 font-mono">$47.70</span>
+          <!-- DYNAMIC STRIPE INVOICE BUILDER -->
+          <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-3">
+            <div class="text-xs font-bold text-white flex justify-between items-center">
+              <span>Dynamic Stripe Invoice Builder</span>
+              <span class="text-[10px] text-emerald-400 font-mono">Workiz Terminal</span>
             </div>
-            <button onclick="alert('Stripe Pay Link Dispatched to ' + '${match.phoneDisp}')" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
-              🚀 Dispatch Stripe Pay Link ($47.70)
+            
+            <div class="flex gap-2">
+              <input id="serviceMemoInput" type="text" placeholder="Service description (e.g. Water Test & Filter Check)" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
+              <input id="invoiceAmountInput" type="number" placeholder="$0.00" class="w-24 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-emerald-400 font-mono font-bold">
+            </div>
+
+            <button onclick="dispatchCustomPayLink('${match.phoneDisp}')" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition">
+              🚀 Dispatch Custom Stripe Pay Link
             </button>
+          </div>
+
+          <!-- EMBEDDED LIVE CUSTOMER FOREVER CARD VIEW (SCROLL DOWN TO SEE) -->
+          <div class="border-t border-slate-800 pt-4 space-y-3">
+            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center">👇 Scroll Down: Customer View of Forever Card</div>
+            
+            <div class="bg-white text-slate-900 p-4 rounded-2xl border-2 border-emerald-600 shadow-lg space-y-3">
+              <div class="flex justify-between items-center border-b pb-2">
+                <div class="font-['Great_Vibes'] text-3xl text-emerald-700 font-bold">F</div>
+                <div class="text-right">
+                  <div class="font-bold text-xs">${match.name}'s Home Card</div>
+                  <div class="text-[9px] text-slate-500">${match.phoneDisp}</div>
+                </div>
+              </div>
+
+              <div class="bg-slate-50 p-3 rounded-xl border text-xs space-y-1 text-slate-700">
+                <div class="font-bold text-emerald-800">Aerus Beyond Guardian System</div>
+                <div>Status: <span class="text-emerald-600 font-bold">● Active</span> | Last Filter Service: Sept 2026</div>
+                <div>Address: ${match.address}</div>
+              </div>
+
+              <div class="flex justify-between items-center pt-1">
+                <button onclick="alert('Customer View Link Copied to Clipboard!')" class="text-[10px] bg-slate-900 text-white font-mono px-3 py-1.5 rounded-lg font-bold">
+                  🔗 Share Customer View
+                </button>
+                <div class="text-[10px] text-emerald-700 font-bold">Fresh Concierge Active 🤵</div>
+              </div>
+            </div>
           </div>
         </div>
       `;
+    }
+
+    function dispatchCustomPayLink(phone) {
+      const memo = document.getElementById('serviceMemoInput').value || "Aerus Home Wellness Service";
+      const amt = document.getElementById('invoiceAmountInput').value || "0.00";
+      alert(`🚀 Stripe Pay Link for $${amt} (${memo}) dispatched directly to ${phone}!`);
     }
 
     function closeWorkCard() {
@@ -381,26 +364,24 @@
       drawer.classList.remove('hidden');
 
       if (doorNum === 1) {
-        title.innerText = "Subscriber Hub Door 1: Inventory & Parts Catalog";
+        title.innerText = "Door 1: Inventory & Parts Catalog";
+        body.innerHTML = `<p class="text-slate-300">Accessing 1,090 Aerus verified inventory items...</p>`;
+      } else if (doorNum === 2) {
+        title.innerText = "Door 2: Staff Roles & Dynamic Dispatch";
         body.innerHTML = `
-          <div class="space-y-2">
-            <p class="text-slate-300">Accessing 1,090 Aerus verified inventory items...</p>
-            <div class="p-3 bg-slate-800 rounded-xl font-mono text-emerald-400">
-- Aerus Lux Guardian Platinum Motor Seal — In Stock (Qty: 14)<br>
-- HEPA Filter Element Core — In Stock (Qty: 28)<br>
-- Water Test Reagent Solution A — In Stock (Qty: 40)
-            </div>
+          <div class="space-y-2 font-mono text-xs">
+            <div class="p-2 bg-slate-800 rounded border border-slate-700 text-blue-300">[Counter Intake] — Mona / Front Desk</div>
+            <div class="p-2 bg-slate-800 rounded border border-slate-700 text-amber-300">[Master Bench Tech] — Chris / Parts Lead</div>
+            <div class="p-2 bg-slate-800 rounded border border-slate-700 text-emerald-300">[Field Installations] — Mike / Tech</div>
+            <div class="p-2 bg-slate-800 rounded border border-slate-700 text-purple-300">[Digital VA] — Norby / FOAS Lead</div>
           </div>
         `;
-      } else if (doorNum === 2) {
-        title.innerText = "Subscriber Hub Door 2: Staff Role Dispatch";
-        body.innerHTML = `<p class="text-slate-300">Dynamic role assignments: [Counter Intake] • [Master Bench Tech] • [Parts Specialist] • [Digital VA]</p>`;
       } else if (doorNum === 3) {
-        title.innerText = "Subscriber Hub Door 3: Cash Register & Stripe Hub";
-        body.innerHTML = `<p class="text-slate-300">Point-of-sale terminal, daily revenue totals, and Stripe payout balances ($1,485.20 Available).</p>`;
+        title.innerText = "Door 3: Cash Register & Stripe Terminal";
+        body.innerHTML = `<p class="text-slate-300">Workiz Terminal • Available Payout Balance: $1,485.20</p>`;
       } else if (doorNum === 4) {
-        title.innerText = "Subscriber Hub Door 4: Growth Hub & Forever Network";
-        body.innerHTML = `<p class="text-slate-300">Automated SMS recall triggers, mini landing page builder, and network switcher.</p>`;
+        title.innerText = "Door 4: Growth Hub & Forever Network";
+        body.innerHTML = `<p class="text-slate-300">Forever Network • Automated SMS Recall Engine Active</p>`;
       }
     }
   </script>
