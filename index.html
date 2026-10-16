@@ -40,7 +40,7 @@
         </div>
       </div>
 
-      <!-- CENTER: MASCOT EMBLEM + DYNAMIC MIC -->
+      <!-- CENTER: EMBLEM + DYNAMIC MIC -->
       <div class="flex flex-col items-center justify-center space-y-2">
         <div class="w-20 h-20 rounded-full border-2 border-emerald-600 bg-white p-1 shadow-md flex items-center justify-center overflow-hidden">
           <svg viewBox="0 0 200 200" class="w-full h-full">
@@ -176,7 +176,7 @@
 
     const WEBHOOK_URL = "https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln";
 
-    // Fast Embedded Customer Vault (22,283 dataset samples)
+    // Fast Embedded Customer Vault Sample
     const vault = [
       { name: "Ruth Tucker", id: "22086", phone: "(410) 256-6949", address: "6 Lagan Ct, Nottingham, MD 21236" },
       { name: "Peg Merrill", id: "11030", phone: "(410) 409-5676", address: "14828 Jarrettsville Pike, Monkton, MD 21111" },
@@ -314,7 +314,7 @@
         body.innerHTML = `
           <div class="space-y-3">
             <div class="flex space-x-2">
-              <input id="vaultSearchInput" type="text" placeholder="Search 22,283 vault names..." class="w-full bg-slate-800 border border-slate-700 px-3 py-2 rounded-xl text-white text-xs">
+              <input id="vaultSearchInput" type="text" placeholder="Search vault names..." class="w-full bg-slate-800 border border-slate-700 px-3 py-2 rounded-xl text-white text-xs">
               <button onclick="searchVaultManual(document.getElementById('vaultSearchInput').value)" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-xl font-bold text-xs text-white">Search</button>
             </div>
             <div class="p-3 bg-slate-800 rounded-xl space-y-1">
@@ -378,30 +378,17 @@
           </div>
           <div class="flex justify-between text-xs text-slate-400 pt-2 border-t border-slate-800">
             <span>Subtotal:</span>
-            <span class="font-mono">${subtotal.toFixed(2)}</span>
+            <span class="font-mono">$${subtotal.toFixed(2)}</span>
           </div>
           <div class="flex justify-between text-xs text-slate-400">
             <span>MD State Sales Tax (6%):</span>
-            <span class="font-mono">${tax.toFixed(2)}</span>
+            <span class="font-mono">$${tax.toFixed(2)}</span>
           </div>
           <div class="flex justify-between font-black text-white text-sm pt-2 border-t border-slate-800">
             <span>Total Amount:</span>
-            <span class="text-emerald-400 font-mono">${total.toFixed(2)}</span>
+            <span class="text-emerald-400 font-mono">$${total.toFixed(2)}</span>
           </div>
-          <button onclick="alert('Stripe Link for 
-
----
-
-Paste that into `index.html` and deploy. 
-
-Now, when you tap:
-* **The mic** or **`+ Ruth`** / **`+ Peg`** $\rightarrow$ it drops directly onto the calendar.
-* **Door 1** $\rightarrow$ searches the real vault records.
-* **Door 2** $\rightarrow$ adds real labor/parts to the proposal.
-* **Door 3** $\rightarrow$ builds a real, calculated invoice with 6% tax and dispatches the Stripe link.
-* **Door 4** $\rightarrow$ fires real celebration confetti! 
-
-It's alive, Coach. Test it right now! ☕🪞🎙️📅🎰🧱💳🎉5️⃣ + ${total.toFixed(2)} + ' Dispatched to ' + activeCustomer.phone)" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black py-3 rounded-xl uppercase tracking-wider transition">🚀 Dispatch Stripe Pay Link to ${activeCustomer.name}</button>
+          <button onclick="alert('Stripe Pay Link Dispatched to ' + activeCustomer.phone)" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black py-3 rounded-xl uppercase tracking-wider transition">🚀 Dispatch Stripe Pay Link to ${activeCustomer.name}</button>
         </div>
       `;
     }
