@@ -97,23 +97,30 @@
     <!-- MAIN OPERATIONAL FLOOR -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-      <!-- Schedule Grid -->
+      <!-- QUADRANT #1: Schedule Grid (Left) -->
       <div class="lg:col-span-5 boutique-card rounded-2xl p-5 space-y-4">
         <div class="flex items-center justify-between border-b border-stone-200 pb-3">
-          <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📅 Today's Schedule Grid</h2>
+          <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📅 SCHEDULE GRID</h2>
           <span class="text-[11px] font-mono font-bold px-2 py-0.5 bg-stone-200 text-stone-700 rounded">Synced Cal</span>
         </div>
-        <div id="scheduledItemsSlot" class="space-y-2.5 max-h-72 overflow-y-auto">
+        <div id="scheduledItemsSlot" class="space-y-2.5 max-h-80 overflow-y-auto">
           <div onclick="openWorkstation('Mrs. Johnson', '124 Main St, Timonium MD', '(410) 555-0199', 189)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition">
             <div>
-              <p class="text-[10px] font-bold text-stone-500 font-mono">1:00 PM</p>
-              <p class="font-bold text-stone-900 text-xs">Mrs. Johnson — Central Vac Check</p>
+              <p class="text-[10px] font-bold text-stone-500 font-mono">Tomorrow 7:30 AM</p>
+              <p class="font-bold text-stone-900 text-xs">Mrs. Johnson — Laundry Pro Survey</p>
             </div>
-            <span class="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded">Open Card ➔</span>
+            <a href="https://maps.google.com" target="_blank" onclick="event.stopPropagation()" class="text-[10px] font-bold px-2.5 py-1 bg-blue-600 text-white rounded-lg">🗺️ MAP IT</a>
+          </div>
+          <div onclick="openWorkstation('Catherine Noblitt', '1 Smeton Pl Unit 1305, Towson MD', '(410) 908-1084', 0)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition">
+            <div>
+              <p class="text-[10px] font-bold text-stone-500 font-mono">Wed Oct 21 @ 12:00 PM</p>
+              <p class="font-bold text-stone-900 text-xs">Catherine Noblitt — Cell & Bulb</p>
+            </div>
+            <a href="https://maps.google.com" target="_blank" onclick="event.stopPropagation()" class="text-[10px] font-bold px-2.5 py-1 bg-blue-600 text-white rounded-lg">🗺️ MAP IT</a>
           </div>
           <div onclick="openWorkstation('Chuck Pike', '9724 Red Clover Ct, Parkville MD', '(410) 555-0144', 350)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition">
             <div>
-              <p class="text-[10px] font-bold text-stone-500 font-mono">2:00 PM</p>
+              <p class="text-[10px] font-bold text-stone-500 font-mono">Today 2:00 PM</p>
               <p class="font-bold text-stone-900 text-xs">Chuck Pike — Drop-off Unit</p>
             </div>
             <span class="text-[10px] font-bold px-2 py-0.5 bg-amber-100 text-amber-800 rounded font-mono">$350 Cash-Out</span>
@@ -121,19 +128,43 @@
         </div>
       </div>
 
-      <!-- Pinball Tray -->
+      <!-- QUADRANT #2: Pinball Action Zone & Hopper (Right) -->
       <div class="lg:col-span-7 boutique-card rounded-2xl p-5 space-y-4">
         <div class="flex items-center justify-between border-b border-stone-200 pb-3">
-          <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">🎯 Pinball Tray (Forever Cards)</h2>
+          <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📍 PINBALL ACTION ZONE</h2>
           <button onclick="clearPinball()" class="text-xs text-red-600 hover:underline font-bold font-mono">Clear Queue</button>
         </div>
 
-        <div id="pinballQueue" class="space-y-2.5 max-h-72 overflow-y-auto">
+        <!-- 4 Fast Action Buttons -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <a id="fastCallBtn" href="tel:4104991313" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow">📞 CALL</a>
+          <a id="fastTextBtn" href="sms:4104991313" class="p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow">💬 TEXT</a>
+          <button onclick="dispatchStripePay()" class="p-2.5 bg-amber-500 hover:bg-amber-600 text-stone-950 font-extrabold text-xs rounded-xl shadow">💳 CHECKOUT</button>
+          <button onclick="nextPinballCard()" class="p-2.5 bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs rounded-xl shadow">📌 NEXT</button>
+        </div>
+
+        <div id="pinballQueue" class="space-y-2.5 max-h-64 overflow-y-auto">
+          <div onclick="openWorkstation('Catherine Noblitt', '1 Smeton Pl Unit 1305, Towson MD', '(410) 908-1084', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-indigo-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-extrabold text-indigo-700 uppercase tracking-wide">Wed 12:00 PM • Cell & Bulb Swap</span>
+              <h3 class="font-bold text-stone-900 text-xs">Catherine Noblitt</h3>
+              <p class="text-[11px] text-stone-600">1 Smeton Pl Unit 1305 • (410) 908-1084</p>
+            </div>
+            <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
+          </div>
           <div onclick="openWorkstation('Chuck Pike', '9724 Red Clover Ct, Parkville MD', '(410) 555-0144', 350)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-amber-500 shadow-sm hover:shadow-md transition flex items-center justify-between">
             <div>
               <span class="text-[10px] font-extrabold text-amber-700 uppercase tracking-wide">Tier 1: Cash-Out</span>
               <h3 class="font-bold text-stone-900 text-xs">Chuck Pike</h3>
               <p class="text-[11px] text-stone-600">Used Motor Swap + Control Valve | $350.00</p>
+            </div>
+            <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
+          </div>
+          <div onclick="openWorkstation('Mrs. Johnson', '124 Main St, Timonium MD', '(410) 555-0199', 189)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-emerald-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wide">Tier 2: Quick Turn</span>
+              <h3 class="font-bold text-stone-900 text-xs">Mrs. Johnson</h3>
+              <p class="text-[11px] text-stone-600">Laundry Pro 3.0 Survey & Overhaul | $189.00</p>
             </div>
             <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
           </div>
@@ -143,7 +174,7 @@
     </div>
   </div>
 
-  <!-- FOREVER CARD WORKSTATION DRAWER -->
+  <!-- FOREVER CARD WORKSTATION DRAWER (3-LAYER CLIENT CHASSIS) -->
   <div id="drawerOverlay" onclick="closeWorkstation()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm hidden z-40"></div>
   <div id="workstationDrawer" class="fixed inset-y-0 right-0 w-full max-w-3xl bg-[#FAF9F5] shadow-2xl z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto p-5 sm:p-6 space-y-5">
     
@@ -158,14 +189,30 @@
       <button onclick="closeWorkstation()" class="text-stone-400 hover:text-stone-800 text-2xl font-bold">✕</button>
     </div>
 
-    <!-- LAYER 1: SHOP OPS CANVAS -->
-    <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-2.5">
-      <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Layer 1: Shop Ops Canvas</h3>
+    <!-- LAYER 1: SHOP OPS CANVAS & REPAIR CHECKLIST -->
+    <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
+      <div class="flex justify-between items-center">
+        <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Layer 1: Shop Ops Canvas</h3>
+        <span class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">Team Sync Active</span>
+      </div>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <button id="stage1" onclick="setStage(1)" class="p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white">1. Intake & Photo</button>
         <button id="stage2" onclick="setStage(2)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">2. Diagnostics</button>
         <button id="stage3" onclick="setStage(3)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">3. Proposal</button>
         <button id="stage4" onclick="setStage(4)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">4. Ready Wall 🎉</button>
+      </div>
+
+      <!-- Staff Checklist -->
+      <div class="pt-2 border-t border-stone-100 space-y-1.5 text-xs">
+        <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked class="rounded text-emerald-800"> <span>Mona: Customer Intake Logged</span></label>
+        <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="rounded text-emerald-800"> <span>Chris: Floor Brush Bristles Pulled (1,090 Catalog)</span></label>
+        <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="rounded text-emerald-800"> <span>Mike: Field Diagnostic Audio Complete</span></label>
+      </div>
+
+      <!-- Field Audio Note Player -->
+      <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between text-xs">
+        <span class="font-medium text-stone-700">🔊 Mike's Field Audio Note (0:45)</span>
+        <button onclick="alert('Playing audio memo from Mike...')" class="px-3 py-1 bg-emerald-800 text-white font-bold rounded-lg text-[11px]">▶ PLAY</button>
       </div>
     </div>
 
@@ -178,10 +225,11 @@
 
       <div class="flex gap-2">
         <select id="partSelect" class="flex-1 text-xs border border-stone-300 rounded-xl p-2 bg-stone-50 font-medium">
+          <option value="1495|450|Laundry Pro 3.0 Unit">Laundry Pro 3.0 Unit — $1,495.00 (Cost: $450.00)</option>
           <option value="295|50|Used Motor Assembly">Used Motor Assembly — $295.00 (Cost: $50.00)</option>
+          <option value="189|35|Full System Overhaul Service">Full System Overhaul Service — $189.00 (Cost: $35.00)</option>
           <option value="55|15|Control Valve Swap">Control Valve Swap — $55.00 (Cost: $15.00)</option>
-          <option value="395|131|PC Board - Platinum">PC Board - Platinum — $395.00 (Cost: $131.00)</option>
-          <option value="189|35|Control Module Package">Control Module Package — $189.00 (Cost: $35.00)</option>
+          <option value="24.95|5|Replacement Floor Brush Bristles">Replacement Floor Brush Bristles — $24.95 (Cost: $5.00)</option>
         </select>
         <button onclick="addInvoiceItem()" class="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow">+ Add</button>
       </div>
@@ -246,10 +294,11 @@
   <script>
     let isListening = false, recognition = null, lastPhrase = '';
     let currentInvoiceItems = [];
-    let currentActivePhone = '';
+    let currentActivePhone = '410-499-1313';
 
     const vault = [
       { name: "William Sullivan", id: "1004", phone: "(410) 499-1313", address: "6110 Glenoak Ave, Baltimore, MD" },
+      { name: "Catherine Noblitt", id: "11264", phone: "(410) 908-1084", address: "1 Smeton Pl Unit 1305, Towson, MD" },
       { name: "Catherine Wagner", id: "21982", phone: "(443) 520-6265", address: "1010 Maplehurst Ln, Monkton, MD" },
       { name: "Suzie Gray", id: "21948", phone: "(301) 974-1448", address: "Silver Spring, MD" },
       { name: "Mrs. Johnson", id: "1055", phone: "(410) 555-0199", address: "124 Main St, Timonium, MD" },
@@ -345,6 +394,8 @@
 
     function openWorkstation(name, details, phone, amount) {
       currentActivePhone = phone;
+      document.getElementById('fastCallBtn').href = 'tel:' + phone.replace(/\D/g, '');
+      document.getElementById('fastTextBtn').href = 'sms:' + phone.replace(/\D/g, '');
       document.getElementById('cardClientName').innerText = name + ' — Forever Card';
       document.getElementById('cardClientDetails').innerText = details + ' • ' + phone;
       document.getElementById('mirrorClient').innerText = name + ' Mobile Card';
@@ -382,7 +433,7 @@
       tbody.innerHTML = '';
       let totalRetail = 0, totalCost = 0;
 
-      currentInvoiceItems.forEach((item, index) => {
+      currentInvoiceItems.forEach((item) => {
         totalRetail += item.retail;
         totalCost += item.cost;
         const margin = (((item.retail - item.cost) / item.retail) * 100).toFixed(1);
@@ -404,6 +455,10 @@
     function dispatchStripePay() {
       const total = document.getElementById('mirrorTotal').innerText;
       alert(`🚀 Stripe Pay Link for ${total} dispatched directly to ${currentActivePhone}!`);
+    }
+
+    function nextPinballCard() {
+      alert('📌 Pinball Queue: Loading next priority customer card...');
     }
 
     function clearPinball() {
