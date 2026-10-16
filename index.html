@@ -40,18 +40,8 @@
       </div>
 
       <div class="flex flex-col items-center justify-center space-y-2">
-        <div class="w-20 h-20 rounded-full border-2 border-emerald-600 bg-white p-1 shadow-md flex items-center justify-center overflow-hidden">
-          <svg viewBox="0 0 200 200" class="w-full h-full">
-            <circle cx="100" cy="100" r="95" fill="white" stroke="#059669" stroke-width="4"/>
-            <circle cx="100" cy="72" r="28" fill="#1E293B"/>
-            <rect x="80" y="66" width="40" height="12" rx="4" fill="#000"/>
-            <ellipse cx="89" cy="72" rx="7" ry="4" fill="#38BDF8"/>
-            <ellipse cx="111" cy="72" rx="7" ry="4" fill="#38BDF8"/>
-            <path d="M 88 88 Q 100 98 112 88" stroke="#1E293B" stroke-width="3" fill="none"/>
-            <path d="M 68 110 Q 100 100 132 110 L 132 135 L 68 135 Z" fill="#1E293B"/>
-            <text x="100" y="158" font-family="'JetBrains Mono', monospace" font-weight="900" font-size="20" text-anchor="middle" fill="#059669">FRESH</text>
-            <text x="100" y="174" font-family="'Inter', sans-serif" font-weight="700" font-size="8" text-anchor="middle" fill="#64748B">DIGITAL COORDINATOR</text>
-          </svg>
+        <div class="w-20 h-20 rounded-full border-2 border-emerald-600 bg-white p-0.5 shadow-md flex items-center justify-center overflow-hidden">
+          <img id="freshLogoImg" src="4126.jpg" alt="Fresh Digital Coordinator" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/10B981/FFFFFF?text=FRESH';">
         </div>
 
         <button id="masterMicBtn" onclick="toggleVoiceDictation()" class="w-10 h-10 bg-slate-900 hover:bg-slate-800 text-white rounded-full flex items-center justify-center shadow-md border border-slate-700 transition transform active:scale-95" title="Talk to Fresh">
@@ -235,13 +225,13 @@
             <div class="text-xs font-bold text-amber-900">⚡ Pinball: ${match.name}</div>
             <div class="text-[11px] font-normal text-slate-700 mt-0.5">${text}</div>
           </div>
-          <button onclick="openStageDoor(1)" class="text-[10px] bg-amber-700 text-white font-bold px-2.5 py-1 rounded-lg">View Profile</button>
+          <button onclick="openCustomerCard('${match.id}')" class="text-[10px] bg-amber-700 text-white font-bold px-2.5 py-1 rounded-lg hover:bg-amber-800">View Profile</button>
         </div>
       `);
 
       // Update Schedule Grid
       let timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)?|\d{1,2}\s*(?:AM|PM|am|pm))/i);
-      let timeLabel = timeMatch ? timeMatch[0].toUpperCase() : "08:35 AM";
+      let timeLabel = timeMatch ? timeMatch[0].toUpperCase() : "08:00 AM";
 
       const calSlot = document.getElementById('scheduledItemsSlot');
       calSlot.insertAdjacentHTML('afterbegin', `
@@ -253,7 +243,7 @@
             </div>
             <p class="text-[11px] text-slate-600 mt-1 font-sans">${match.address} • ${match.phone}</p>
           </div>
-          <span class="text-[10px] text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-1 rounded border border-emerald-200">Synced Cal</span>
+          <button onclick="openCustomerCard('${match.id}')" class="text-[10px] text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-1 rounded border border-emerald-200 hover:bg-emerald-100">Synced Cal</button>
         </div>
       `);
 
@@ -267,13 +257,21 @@
       }
     }
 
+    function openCustomerCard(clientId) {
+      const match = vault.find(c => c.id === clientId) || activeCustomer;
+      if (match) {
+        activeCustomer = match;
+        openStageDoor(1);
+      }
+    }
+
     function openStageDoor(stageNum) {
       const drawer = document.getElementById('activeWorkspaceDrawer');
       const title = document.getElementById('drawerTitle');
       const body = document.getElementById('drawerBody');
       drawer.classList.remove('hidden');
 
-      const cust = activeCustomer || { name: "Vivian Fulton", id: "8955", address: "1613 Burnwood Rd Baltimore, MD 21239", phone: "(410) 532-2985" };
+      const cust = activeCustomer || { name: "Select or Speak Customer", id: "N/A", address: "No active card selected", phone: "" };
 
       if (stageNum === 1) {
         title.innerText = "Stage 1: Intake & Customer Vault";
