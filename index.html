@@ -6,49 +6,67 @@
   <title>FOREVER CARD™ — Powered by TappyThing</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #ECE8DF; color: #1C1917; }
-    .font-cursive-f { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700; }
+    .font-cursive-f { font-family: 'Great Vibes', cursive; }
     .boutique-card { background-color: #FAF9F5; border: 1px solid #E5E0D8; box-shadow: 0 10px 30px -5px rgba(28, 25, 23, 0.05); }
+    .pulse-record { animation: pulse-mic 1.2s infinite; background-color: #DC2626 !important; }
+    @keyframes pulse-mic {
+      0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.8); }
+      70% { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+    }
   </style>
 </head>
-<body class="min-h-screen p-4 md:p-8">
+<body class="min-h-screen p-3 sm:p-6 md:p-8">
 
   <div class="max-w-7xl mx-auto space-y-6">
 
     <!-- MASTER BOUTIQUE HEADER -->
-    <header class="boutique-card rounded-2xl p-6 relative">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+    <header class="boutique-card rounded-2xl p-4 sm:p-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
         
-        <!-- LEFT: ELEGANT F BRAND -->
-        <div class="flex items-center gap-4">
-          <span class="text-6xl text-emerald-900 font-cursive-f leading-none">F</span>
+        <!-- LEFT: LAVERNE & SHIRLEY CURSIVE F -->
+        <div class="flex items-center gap-3">
+          <span class="text-6xl text-emerald-800 font-cursive-f leading-none select-none">F</span>
           <div>
-            <h1 class="text-xl font-extrabold tracking-tight text-stone-900 uppercase">FOREVER CARD™</h1>
-            <p class="text-xs font-semibold text-stone-500">Powered by TappyThing</p>
+            <h1 class="text-base sm:text-lg font-black tracking-wider text-stone-900 uppercase font-mono">FOREVER CARD<span class="text-emerald-800">™</span></h1>
+            <p class="text-[11px] text-stone-500 font-medium">Powered by TappyThing</p>
           </div>
         </div>
 
-        <!-- CENTER: FRESH MASCOT & CONTROLS -->
+        <!-- CENTER: EMBEDDED VECTOR SVG FRESH MASCOT & MIC -->
         <div class="flex flex-col items-center gap-2">
-          <div class="w-14 h-14 rounded-full bg-emerald-900 text-amber-100 flex items-center justify-center text-2xl shadow-md border-2 border-amber-200/50">
-            🤵
+          <div class="w-16 h-16 rounded-full border-2 border-emerald-700 bg-white p-0.5 shadow-md flex items-center justify-center overflow-hidden">
+            <svg viewBox="0 0 200 200" class="w-full h-full">
+              <circle cx="100" cy="100" r="95" fill="white" stroke="#047857" stroke-width="4"/>
+              <path d="M 75 52 Q 88 38 100 42 Q 112 38 125 52 Q 112 46 100 48 Q 88 46 75 52 Z" fill="#1E293B"/>
+              <circle cx="100" cy="72" r="28" fill="#1E293B"/>
+              <rect x="78" y="66" width="44" height="13" rx="4" fill="#000"/>
+              <ellipse cx="88" cy="72" rx="8" ry="4" fill="#38BDF8"/>
+              <ellipse cx="112" cy="72" rx="8" ry="4" fill="#38BDF8"/>
+              <path d="M 88 88 Q 100 98 112 88" stroke="#1E293B" stroke-width="3" fill="none"/>
+              <path d="M 68 110 Q 100 100 132 110 L 132 135 L 68 135 Z" fill="#1E293B"/>
+              <text x="100" y="158" font-family="'JetBrains Mono', monospace" font-weight="900" font-size="20" text-anchor="middle" fill="#047857">FRESH</text>
+              <text x="100" y="174" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="8" text-anchor="middle" fill="#64748B">DIGITAL COORDINATOR</text>
+            </svg>
           </div>
           <div class="flex items-center gap-2">
-            <button id="micBtn" onclick="toggleVoiceIntake()" class="flex items-center gap-2 px-6 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-amber-50 font-bold rounded-xl shadow transition-all">
-              <span id="micIcon" class="text-lg">🎙️</span>
-              <span id="micText" class="text-sm">TALK TO FRESH</span>
+            <button id="masterMicBtn" onclick="toggleVoiceIntake()" class="flex items-center gap-2 px-5 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-amber-50 font-bold rounded-xl shadow transition transform active:scale-95 text-xs">
+              <span id="micIcon">🎙️</span>
+              <span id="micText">TALK TO FRESH</span>
             </button>
-            <button onclick="alert('Camera Active')" class="p-2.5 bg-stone-200 text-stone-800 font-bold rounded-xl shadow hover:bg-stone-300">📷 CAM</button>
+            <button onclick="alert('📷 Camera Active: Snap serial tag or equipment on-site.')" class="px-3.5 py-2.5 bg-stone-200 text-stone-800 font-bold rounded-xl shadow hover:bg-stone-300 text-xs">📷 CAM</button>
           </div>
         </div>
 
-        <!-- RIGHT: SUBSCRIBER HUB IDENTITY -->
-        <div class="text-right hidden md:block">
-          <h2 class="text-base font-extrabold text-stone-900">Aerus Timonium</h2>
-          <p class="text-xs font-bold text-emerald-800 flex items-center justify-end gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+        <!-- RIGHT: SUBSCRIBER IDENTITY -->
+        <div class="text-center md:text-right">
+          <h2 class="text-sm font-extrabold text-stone-900">Aerus Timonium</h2>
+          <p class="text-[11px] font-bold text-emerald-800 flex items-center justify-center md:justify-end gap-1.5 font-mono">
+            <span class="w-2 h-2 rounded-full bg-emerald-600 inline-block animate-ping"></span>
             Subscriber Hub Active
           </p>
         </div>
@@ -58,20 +76,20 @@
 
     <!-- 4 HUB DOORS -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <button class="boutique-card p-4 rounded-xl flex items-center justify-between hover:border-emerald-700 transition-all">
-        <span class="text-sm font-bold text-stone-800">📦 Inventory (1,090)</span>
+      <button onclick="alert('📦 Door 1: 1,090 Verified Parts Loaded')" class="boutique-card p-3.5 rounded-xl flex items-center justify-between hover:border-emerald-700 transition">
+        <span class="text-xs font-bold text-stone-800">📦 Inventory (1,090)</span>
         <span class="text-xs text-stone-400">➔</span>
       </button>
-      <button class="boutique-card p-4 rounded-xl flex items-center justify-between hover:border-emerald-700 transition-all">
-        <span class="text-sm font-bold text-stone-800">👥 Staff Roles</span>
+      <button onclick="alert('👥 Door 2: Mona (Counter), Chris (Bench), Mike (Field), Norby (VA)')" class="boutique-card p-3.5 rounded-xl flex items-center justify-between hover:border-emerald-700 transition">
+        <span class="text-xs font-bold text-stone-800">👥 Staff Roles</span>
         <span class="text-xs text-stone-400">➔</span>
       </button>
-      <button class="boutique-card p-4 rounded-xl flex items-center justify-between hover:border-emerald-700 transition-all">
-        <span class="text-sm font-bold text-stone-800">💳 Workiz Register</span>
+      <button onclick="alert('💳 Door 3: Workiz Register Connected - Payout Ready')" class="boutique-card p-3.5 rounded-xl flex items-center justify-between hover:border-emerald-700 transition">
+        <span class="text-xs font-bold text-stone-800">💳 Workiz Register</span>
         <span class="text-xs text-stone-400">➔</span>
       </button>
-      <button class="boutique-card p-4 rounded-xl flex items-center justify-between hover:border-emerald-700 transition-all">
-        <span class="text-sm font-bold text-stone-800">🌐 Growth Network</span>
+      <button onclick="alert('🌐 Door 4: Growth Network & SMS Recall Active')" class="boutique-card p-3.5 rounded-xl flex items-center justify-between hover:border-emerald-700 transition">
+        <span class="text-xs font-bold text-stone-800">🌐 Growth Network</span>
         <span class="text-xs text-stone-400">➔</span>
       </button>
     </div>
@@ -80,60 +98,44 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
       <!-- Schedule Grid -->
-      <div class="lg:col-span-5 boutique-card rounded-2xl p-6 space-y-4">
+      <div class="lg:col-span-5 boutique-card rounded-2xl p-5 space-y-4">
         <div class="flex items-center justify-between border-b border-stone-200 pb-3">
-          <h2 class="font-bold text-stone-900 text-lg">📅 Today's Schedule</h2>
-          <span class="text-xs font-semibold px-2.5 py-1 bg-stone-200 text-stone-700 rounded-md">Oct 16, 2026</span>
+          <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📅 Today's Schedule Grid</h2>
+          <span class="text-[11px] font-mono font-bold px-2 py-0.5 bg-stone-200 text-stone-700 rounded">Synced Cal</span>
         </div>
-        <div class="space-y-3">
-          <div onclick="openWorkstation('Mrs. Johnson', '124 Main St, Timonium MD', '410-555-0199', 189)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition-all">
+        <div id="scheduledItemsSlot" class="space-y-2.5 max-h-72 overflow-y-auto">
+          <div onclick="openWorkstation('Mrs. Johnson', '124 Main St, Timonium MD', '(410) 555-0199', 189)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition">
             <div>
-              <p class="text-xs font-bold text-stone-500">1:00 PM</p>
-              <p class="font-bold text-stone-900 text-sm">Mrs. Johnson — Central Vac Check</p>
+              <p class="text-[10px] font-bold text-stone-500 font-mono">1:00 PM</p>
+              <p class="font-bold text-stone-900 text-xs">Mrs. Johnson — Central Vac Check</p>
             </div>
-            <span class="text-xs font-bold px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded">Open Card ➔</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded">Open Card ➔</span>
           </div>
-          <div onclick="openWorkstation('Chuck Pike', '9724 Red Clover Ct, Parkville MD', '410-555-0144', 350)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition-all">
+          <div onclick="openWorkstation('Chuck Pike', '9724 Red Clover Ct, Parkville MD', '(410) 555-0144', 350)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition">
             <div>
-              <p class="text-xs font-bold text-stone-500">2:00 PM</p>
-              <p class="font-bold text-stone-900 text-sm">Chuck Pike — Drop-off Unit</p>
+              <p class="text-[10px] font-bold text-stone-500 font-mono">2:00 PM</p>
+              <p class="font-bold text-stone-900 text-xs">Chuck Pike — Drop-off Unit</p>
             </div>
-            <span class="text-xs font-bold px-2.5 py-1 bg-amber-100 text-amber-800 rounded">$350 Cash-Out</span>
-          </div>
-          <div onclick="openWorkstation('William Sullivan', '6110 Glenoak Ave, Baltimore MD', '410-499-1313', 0)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition-all">
-            <div>
-              <p class="text-xs font-bold text-stone-500">3:30 PM</p>
-              <p class="font-bold text-stone-900 text-sm">William Sullivan — Water Testing</p>
-            </div>
-            <span class="text-xs font-bold px-2.5 py-1 bg-blue-100 text-blue-800 rounded">Vault Verified</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 bg-amber-100 text-amber-800 rounded font-mono">$350 Cash-Out</span>
           </div>
         </div>
       </div>
 
       <!-- Pinball Tray -->
-      <div class="lg:col-span-7 boutique-card rounded-2xl p-6 space-y-4">
+      <div class="lg:col-span-7 boutique-card rounded-2xl p-5 space-y-4">
         <div class="flex items-center justify-between border-b border-stone-200 pb-3">
-          <h2 class="font-bold text-stone-900 text-lg">🎯 Pinball Tray (Forever Cards)</h2>
-          <button onclick="clearPinball()" class="text-xs text-stone-500 hover:text-red-600 font-semibold">Clear Queue</button>
+          <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">🎯 Pinball Tray (Forever Cards)</h2>
+          <button onclick="clearPinball()" class="text-xs text-red-600 hover:underline font-bold font-mono">Clear Queue</button>
         </div>
 
-        <div id="pinballQueue" class="space-y-3">
-          <div onclick="openWorkstation('Chuck Pike', '9724 Red Clover Ct, Parkville MD', '410-555-0144', 350)" class="cursor-pointer p-4 bg-white rounded-xl border-l-4 border-amber-500 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
+        <div id="pinballQueue" class="space-y-2.5 max-h-72 overflow-y-auto">
+          <div onclick="openWorkstation('Chuck Pike', '9724 Red Clover Ct, Parkville MD', '(410) 555-0144', 350)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-amber-500 shadow-sm hover:shadow-md transition flex items-center justify-between">
             <div>
-              <span class="text-xs font-extrabold text-amber-700 uppercase tracking-wide">Tier 1: Cash-Out</span>
-              <h3 class="font-bold text-stone-900 text-base">Chuck Pike</h3>
-              <p class="text-xs text-stone-600">Used Motor Swap + Control Valve | $350.00</p>
+              <span class="text-[10px] font-extrabold text-amber-700 uppercase tracking-wide">Tier 1: Cash-Out</span>
+              <h3 class="font-bold text-stone-900 text-xs">Chuck Pike</h3>
+              <p class="text-[11px] text-stone-600">Used Motor Swap + Control Valve | $350.00</p>
             </div>
-            <span class="text-sm font-bold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">Open Card ➔</span>
-          </div>
-
-          <div onclick="openWorkstation('William Sullivan', '6110 Glenoak Ave, Baltimore MD', '410-499-1313', 0)" class="cursor-pointer p-4 bg-white rounded-xl border-l-4 border-emerald-600 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
-            <div>
-              <span class="text-xs font-extrabold text-emerald-700 uppercase tracking-wide">Tier 2: Active Intake</span>
-              <h3 class="font-bold text-stone-900 text-base">William Sullivan</h3>
-              <p class="text-xs text-stone-600">6110 Glenoak Ave | Water Testing Scheduled 3:30 PM</p>
-            </div>
-            <span class="text-sm font-bold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">Open Card ➔</span>
+            <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
           </div>
         </div>
       </div>
@@ -142,23 +144,23 @@
   </div>
 
   <!-- FOREVER CARD WORKSTATION DRAWER -->
-  <div id="drawerOverlay" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm hidden z-40"></div>
-  <div id="workstationDrawer" class="fixed inset-y-0 right-0 w-full max-w-3xl bg-[#FAF9F5] shadow-2xl z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto p-6 space-y-6">
+  <div id="drawerOverlay" onclick="closeWorkstation()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm hidden z-40"></div>
+  <div id="workstationDrawer" class="fixed inset-y-0 right-0 w-full max-w-3xl bg-[#FAF9F5] shadow-2xl z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto p-5 sm:p-6 space-y-5">
     
-    <div class="flex items-center justify-between border-b border-stone-200 pb-4">
+    <div class="flex items-center justify-between border-b border-stone-200 pb-3">
       <div class="flex items-center gap-3">
-        <span class="text-3xl text-emerald-900 font-cursive-f">F</span>
+        <span class="text-4xl text-emerald-800 font-cursive-f">F</span>
         <div>
-          <h2 id="cardClientName" class="text-xl font-bold text-stone-900">Forever Card Workstation</h2>
-          <p id="cardClientDetails" class="text-xs text-stone-500 font-semibold">6110 Glenoak Ave • 410-499-1313</p>
+          <h2 id="cardClientName" class="text-base sm:text-lg font-bold text-stone-900">Forever Card Workstation</h2>
+          <p id="cardClientDetails" class="text-xs text-stone-500 font-semibold font-mono">Loading client details...</p>
         </div>
       </div>
       <button onclick="closeWorkstation()" class="text-stone-400 hover:text-stone-800 text-2xl font-bold">✕</button>
     </div>
 
     <!-- LAYER 1: SHOP OPS CANVAS -->
-    <div class="bg-white rounded-2xl p-5 border border-stone-200 space-y-3">
-      <h3 class="text-xs font-extrabold text-stone-400 uppercase tracking-wider">Layer 1: Shop Ops Canvas</h3>
+    <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-2.5">
+      <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Layer 1: Shop Ops Canvas</h3>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <button id="stage1" onclick="setStage(1)" class="p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white">1. Intake & Photo</button>
         <button id="stage2" onclick="setStage(2)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">2. Diagnostics</button>
@@ -168,112 +170,188 @@
     </div>
 
     <!-- LAYER 2: CARD-NATIVE INVOICE BUILDER -->
-    <div class="bg-white rounded-2xl p-5 border border-stone-200 space-y-4">
-      <h3 class="text-xs font-extrabold text-stone-400 uppercase tracking-wider">Layer 2: Card-Native Invoice Builder</h3>
+    <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
+      <div class="flex justify-between items-center">
+        <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Layer 2: Card-Native Invoice Builder</h3>
+        <span class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-mono">1,090 Catalog Linked</span>
+      </div>
+
       <div class="flex gap-2">
-        <select id="partSelect" class="flex-1 text-sm border border-stone-300 rounded-xl p-2.5 bg-stone-50 font-medium">
-          <option value="295|50">Used Motor Assembly — $295.00 (Cost: $50.00)</option>
-          <option value="55|15">Control Valve Swap — $55.00 (Cost: $15.00)</option>
-          <option value="395|131">PC Board - Platinum — $395.00 (Cost: $131.00)</option>
+        <select id="partSelect" class="flex-1 text-xs border border-stone-300 rounded-xl p-2 bg-stone-50 font-medium">
+          <option value="295|50|Used Motor Assembly">Used Motor Assembly — $295.00 (Cost: $50.00)</option>
+          <option value="55|15|Control Valve Swap">Control Valve Swap — $55.00 (Cost: $15.00)</option>
+          <option value="395|131|PC Board - Platinum">PC Board - Platinum — $395.00 (Cost: $131.00)</option>
+          <option value="189|35|Control Module Package">Control Module Package — $189.00 (Cost: $35.00)</option>
         </select>
-        <button onclick="addInvoiceItem()" class="px-4 py-2 bg-emerald-800 text-white font-bold text-sm rounded-xl">+ Add</button>
+        <button onclick="addInvoiceItem()" class="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow">+ Add</button>
       </div>
 
       <div class="border border-stone-200 rounded-xl overflow-hidden">
         <table class="w-full text-left text-xs">
           <thead class="bg-stone-100 text-stone-600 font-bold">
-            <tr><th class="p-2.5">Item</th><th class="p-2.5">Cost</th><th class="p-2.5">Retail</th><th class="p-2.5 text-right">Margin</th></tr>
+            <tr>
+              <th class="p-2">Item</th>
+              <th class="p-2">Cost</th>
+              <th class="p-2">Retail</th>
+              <th class="p-2 text-right">Margin</th>
+            </tr>
           </thead>
           <tbody id="invoiceTableBody" class="divide-y divide-stone-100 font-medium">
-            <tr>
-              <td class="p-2.5 text-stone-900">Water Test & Service Diagnostic</td>
-              <td class="p-2.5 text-stone-500">$0.00</td>
-              <td class="p-2.5 text-stone-900 font-bold">$0.00</td>
-              <td class="p-2.5 text-right text-emerald-700 font-bold">100%</td>
-            </tr>
+            <!-- Dynamic rows -->
           </tbody>
         </table>
       </div>
 
       <div class="p-3 bg-stone-50 rounded-xl flex items-center justify-between border border-stone-200">
-        <p id="profitSummary" class="text-sm font-bold text-stone-900">Total: $0.00</p>
-        <button onclick="alert('Stripe Pay Link Dispatched')" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-stone-950 font-extrabold text-xs rounded-xl shadow">🚀 1-Tap Stripe Pay Dispatch</button>
+        <div>
+          <p class="text-[10px] font-extrabold text-stone-400 uppercase tracking-wider">Total Staged Ticket</p>
+          <p id="profitSummary" class="text-sm font-bold text-stone-900 font-mono">$0.00</p>
+        </div>
+        <button onclick="dispatchStripePay()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-stone-950 font-extrabold text-xs rounded-xl shadow transition">🚀 1-Tap Stripe Pay Dispatch</button>
       </div>
     </div>
 
     <!-- LAYER 3: LIVE READ-ONLY CUSTOMER MIRROR -->
-    <div class="bg-stone-900 text-stone-100 rounded-2xl p-5 space-y-3 pointer-events-none opacity-90 shadow-inner">
+    <div class="bg-stone-900 text-stone-100 rounded-2xl p-4 space-y-2 pointer-events-none opacity-90 shadow-inner">
       <div class="flex items-center justify-between border-b border-stone-800 pb-2">
-        <h3 class="text-xs font-extrabold text-stone-400 uppercase tracking-wider">Layer 3: Customer Mobile View (Read-Only)</h3>
-        <span class="text-[10px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded">Mirror Locked</span>
+        <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Layer 3: Customer Mobile View (Read-Only Mirror)</h3>
+        <span class="text-[10px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded font-mono">Mirror Locked</span>
       </div>
-      <div class="bg-stone-950 rounded-xl p-4 border border-stone-800 space-y-2">
+      <div class="bg-stone-950 rounded-xl p-3.5 border border-stone-800 space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="font-cursive-f text-emerald-400 text-lg">F</span>
-          <span id="mirrorClient" class="text-xs font-bold text-stone-300">William Sullivan Mobile View</span>
+          <span class="font-cursive-f text-emerald-400 text-2xl">F</span>
+          <span id="mirrorClient" class="text-xs font-bold text-stone-300">Client Mobile Card</span>
         </div>
-        <p class="text-xs text-stone-400">Status: <span class="text-emerald-400 font-bold">Active Forever Card</span></p>
+        <p class="text-xs text-stone-400">Equipment Status: <span class="text-emerald-400 font-bold">● Active Verified</span></p>
         <div class="text-right">
-          <p class="text-[10px] text-stone-500">Service Total</p>
-          <p id="mirrorTotal" class="text-lg font-extrabold text-emerald-400">$0.00</p>
+          <p class="text-[10px] text-stone-500 font-mono">Approved Total</p>
+          <p id="mirrorTotal" class="text-base font-extrabold text-emerald-400 font-mono">$0.00</p>
         </div>
       </div>
     </div>
 
     <!-- LAYER 4: STORAGE BINS -->
-    <div class="bg-white rounded-2xl p-5 border border-stone-200 space-y-3">
-      <h3 class="text-xs font-extrabold text-stone-400 uppercase tracking-wider">Layer 4: Storage Bins & Drawers</h3>
+    <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-2.5">
+      <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Layer 4: Storage Bins & Drawers</h3>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        <button onclick="alert('Vault Record: #1004')" class="p-3 bg-stone-50 rounded-xl text-xs font-bold text-stone-800 border border-stone-200">🗄️ Vault Records</button>
-        <button onclick="alert('Equipment Manuals')" class="p-3 bg-stone-50 rounded-xl text-xs font-bold text-stone-800 border border-stone-200">📖 Manuals</button>
-        <button onclick="alert('Receipt History')" class="p-3 bg-stone-50 rounded-xl text-xs font-bold text-stone-800 border border-stone-200">🧾 Receipts</button>
-        <button onclick="alert('Room Notes')" class="p-3 bg-stone-50 rounded-xl text-xs font-bold text-stone-800 border border-stone-200">🛋️ Room Notes</button>
+        <button onclick="alert('🗄️ Vault Record Archive: Client permanent history loaded.')" class="p-2.5 bg-stone-50 rounded-xl text-xs font-bold text-stone-800 border border-stone-200 hover:border-emerald-600">🗄️ Vault Records</button>
+        <button onclick="alert('📖 Equipment Manuals: Aerus Beyond & Central Vac PDFs loaded.')" class="p-2.5 bg-stone-50 rounded-xl text-xs font-bold text-stone-800 border border-stone-200 hover:border-emerald-600">📖 Manuals</button>
+        <button onclick="alert('🧾 Receipt History: Lifetime transactions archived.')" class="p-2.5 bg-stone-50 rounded-xl text-xs font-bold text-stone-800 border border-stone-200 hover:border-emerald-600">🧾 Receipts</button>
+        <button onclick="alert('🛋️ Tech Room Notes: Service location & equipment placement.')" class="p-2.5 bg-stone-50 rounded-xl text-xs font-bold text-stone-800 border border-stone-200 hover:border-emerald-600">🛋️ Room Notes</button>
       </div>
     </div>
 
   </div>
 
   <script>
-    let isListening = false, recognition, lastPhrase = '';
+    let isListening = false, recognition = null, lastPhrase = '';
+    let currentInvoiceItems = [];
+    let currentActivePhone = '';
 
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.onresult = (event) => {
-        const phrase = event.results[0][0].transcript;
-        if (phrase !== lastPhrase) {
-          lastPhrase = phrase;
-          fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ transcript: phrase, timestamp: new Date().toISOString() })
-          }).catch(err => console.log('Pipe fired'));
-        }
-      };
-      recognition.onend = () => {
-        isListening = false;
-        document.getElementById('micText').innerText = 'TALK TO FRESH';
-        document.getElementById('micIcon').innerText = '🎙️';
-      };
-    }
+    const vault = [
+      { name: "William Sullivan", id: "1004", phone: "(410) 499-1313", address: "6110 Glenoak Ave, Baltimore, MD" },
+      { name: "Catherine Wagner", id: "21982", phone: "(443) 520-6265", address: "1010 Maplehurst Ln, Monkton, MD" },
+      { name: "Suzie Gray", id: "21948", phone: "(301) 974-1448", address: "Silver Spring, MD" },
+      { name: "Mrs. Johnson", id: "1055", phone: "(410) 555-0199", address: "124 Main St, Timonium, MD" },
+      { name: "Chuck Pike", id: "21009", phone: "(410) 555-0144", address: "9724 Red Clover Ct, Parkville, MD" }
+    ];
 
-    function toggleVoiceIntake() {
-      if (!recognition) return alert('Voice recognition unavailable');
-      if (isListening) { recognition.stop(); } 
-      else { 
-        recognition.start(); 
-        isListening = true; 
-        document.getElementById('micText').innerText = 'LISTENING...';
-        document.getElementById('micIcon').innerText = '⚡';
+    window.onload = function() {
+      setupSpeech();
+    };
+
+    function setupSpeech() {
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRec();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onresult = (event) => {
+          const phrase = event.results[0][0].transcript.trim();
+          if (phrase && phrase !== lastPhrase) {
+            lastPhrase = phrase;
+            handleVoiceIntake(phrase);
+          }
+        };
+
+        recognition.onend = () => {
+          isListening = false;
+          document.getElementById('micText').innerText = 'TALK TO FRESH';
+          document.getElementById('micIcon').innerText = '🎙️';
+          document.getElementById('masterMicBtn').classList.remove('pulse-record');
+        };
       }
     }
 
+    function toggleVoiceIntake() {
+      if (!recognition) return alert('Speech recognition supported in Chrome/Edge.');
+      if (isListening) {
+        recognition.stop();
+      } else {
+        recognition.start();
+        isListening = true;
+        document.getElementById('micText').innerText = 'LISTENING...';
+        document.getElementById('micIcon').innerText = '⚡';
+        document.getElementById('masterMicBtn').classList.add('pulse-record');
+      }
+    }
+
+    function handleVoiceIntake(text) {
+      const lower = text.toLowerCase();
+      let match = vault.find(c => lower.includes(c.name.toLowerCase().split(' ')[0]));
+      
+      if (!match) {
+        match = { name: text.split(' ')[0] || "New Client", id: "NEW", phone: "(410) 555-0100", address: "Local Intake" };
+      }
+
+      // Add to Pinball Queue
+      const pinball = document.getElementById('pinballQueue');
+      const pinItem = `
+        <div onclick="openWorkstation('${match.name}', '${match.address}', '${match.phone}', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-emerald-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
+          <div>
+            <span class="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wide">Voice Intake</span>
+            <h3 class="font-bold text-stone-900 text-xs">${match.name}</h3>
+            <p class="text-[11px] text-stone-600">${match.address} • "${text}"</p>
+          </div>
+          <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
+        </div>
+      `;
+      pinball.insertAdjacentHTML('afterbegin', pinItem);
+
+      // Add to Schedule Grid
+      let timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)?|\d{1,2}\s*(?:AM|PM|am|pm))/i);
+      let timeLabel = timeMatch ? timeMatch[0].toUpperCase() : "3:30 PM";
+
+      const cal = document.getElementById('scheduledItemsSlot');
+      const calItem = `
+        <div onclick="openWorkstation('${match.name}', '${match.address}', '${match.phone}', 0)" class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 flex items-center justify-between shadow-sm hover:border-emerald-600 transition">
+          <div>
+            <p class="text-[10px] font-bold text-stone-500 font-mono">${timeLabel}</p>
+            <p class="font-bold text-stone-900 text-xs">${match.name} — Scheduled</p>
+          </div>
+          <span class="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded">Open Card ➔</span>
+        </div>
+      `;
+      cal.insertAdjacentHTML('afterbegin', calItem);
+
+      // Webhook dispatch to Make.com
+      fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transcript: text, customer: match, time: timeLabel, timestamp: new Date().toISOString() })
+      }).catch(err => console.log('Pipe fired'));
+    }
+
     function openWorkstation(name, details, phone, amount) {
+      currentActivePhone = phone;
       document.getElementById('cardClientName').innerText = name + ' — Forever Card';
       document.getElementById('cardClientDetails').innerText = details + ' • ' + phone;
-      document.getElementById('mirrorClient').innerText = name + ' Mobile View';
-      document.getElementById('mirrorTotal').innerText = '$' + amount.toFixed(2);
+      document.getElementById('mirrorClient').innerText = name + ' Mobile Card';
+      
+      currentInvoiceItems = amount > 0 ? [{ name: "Approved Initial Service", cost: amount * 0.2, retail: amount }] : [];
+      renderInvoice();
+
       document.getElementById('drawerOverlay').classList.remove('hidden');
       document.getElementById('workstationDrawer').classList.remove('translate-x-full');
     }
@@ -289,20 +367,43 @@
           'p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white' : 
           'p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600';
       }
-      if (stageNum === 4) confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+      if (stageNum === 4) confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
     }
 
     function addInvoiceItem() {
       const select = document.getElementById('partSelect');
-      const val = select.value.split('|');
-      const retail = parseFloat(val[0]), cost = parseFloat(val[1]);
-      const name = select.options[select.selectedIndex].text.split('—')[0].trim();
-      const margin = (((retail - cost) / retail) * 100).toFixed(1);
+      const [retail, cost, name] = select.value.split('|');
+      currentInvoiceItems.push({ name, cost: parseFloat(cost), retail: parseFloat(retail) });
+      renderInvoice();
+    }
 
+    function renderInvoice() {
       const tbody = document.getElementById('invoiceTableBody');
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td class="p-2.5 text-stone-900">${name}</td><td class="p-2.5 text-stone-500">$${cost.toFixed(2)}</td><td class="p-2.5 text-stone-900 font-bold">$${retail.toFixed(2)}</td><td class="p-2.5 text-right text-emerald-700 font-bold">${margin}%</td>`;
-      tbody.appendChild(tr);
+      tbody.innerHTML = '';
+      let totalRetail = 0, totalCost = 0;
+
+      currentInvoiceItems.forEach((item, index) => {
+        totalRetail += item.retail;
+        totalCost += item.cost;
+        const margin = (((item.retail - item.cost) / item.retail) * 100).toFixed(1);
+        tbody.innerHTML += `
+          <tr>
+            <td class="p-2 text-stone-900">${item.name}</td>
+            <td class="p-2 text-stone-500 font-mono">${item.cost.toFixed(2)}</td>
+            <td class="p-2 text-stone-900 font-bold font-mono">${item.retail.toFixed(2)}</td>
+            <td class="p-2 text-right text-emerald-700 font-bold font-mono">${margin}%</td>
+          </tr>
+        `;
+      });
+
+      const profit = totalRetail - totalCost;
+      document.getElementById('profitSummary').innerText = `${totalRetail.toFixed(2)} (${profit.toFixed(2)} Net Profit)`;
+      document.getElementById('mirrorTotal').innerText = `${totalRetail.toFixed(2)}`;
+    }
+
+    function dispatchStripePay() {
+      const total = document.getElementById('mirrorTotal').innerText;
+      alert(`🚀 Stripe Pay Link for ${total} dispatched directly to ${currentActivePhone}!`);
     }
 
     function clearPinball() {
