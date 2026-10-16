@@ -10,11 +10,11 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <style>
-    body { background-color: #E2E8F0; color: #0F172A; font-family: 'Inter', sans-serif; }
+    body { background-color: #ECE8DF; color: #1E293B; font-family: 'Inter', sans-serif; }
     .physical-card {
-      background: #FFFFFF;
-      border: 2px solid #CBD5E1;
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15), 0 0 15px rgba(16, 185, 129, 0.1);
+      background: #FAF9F5;
+      border: 2px solid #D6CEC0;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.12), 0 0 15px rgba(16, 185, 129, 0.08);
     }
     .pulse-record { animation: pulse-mic 1.2s infinite; }
     @keyframes pulse-mic {
@@ -28,35 +28,24 @@
 
   <div class="physical-card max-w-4xl w-full rounded-3xl p-5 sm:p-8 space-y-6 relative overflow-hidden">
 
-    <!-- 1. HEADER (LAVERNE & SHIRLEY SCRIPT F, REAL BOY LOGO, SMALL MIC, SUBSCRIBER) -->
-    <header class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border-b border-slate-200 pb-5">
+    <!-- 1. HEADER (LAVERNE & SHIRLEY CURSIVE F, REAL EMBEDDED BADGE LOGO, SMALL MIC) -->
+    <header class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border-b border-[#E2DACC] pb-5">
       
       <!-- LEFT: CURSIVE F BRANDING -->
       <div class="flex items-center space-x-3 justify-center md:justify-start">
-        <div class="text-5xl font-['Great_Vibes'] text-emerald-600 font-bold select-none drop-shadow-sm pr-1">
+        <div class="text-5xl font-['Great_Vibes'] text-emerald-700 font-bold select-none drop-shadow-sm pr-1">
           F
         </div>
         <div>
-          <h1 class="text-base font-black tracking-wider text-slate-900 uppercase font-mono">FOREVER CARD<span class="text-emerald-600">™</span></h1>
+          <h1 class="text-base font-black tracking-wider text-slate-900 uppercase font-mono">FOREVER CARD<span class="text-emerald-700">™</span></h1>
           <p class="text-[11px] text-slate-500 font-medium">Powered by TappyThing</p>
         </div>
       </div>
 
-      <!-- CENTER: EMBEDDED BOY LOGO BADGE + COMPACT MIC -->
+      <!-- CENTER: REAL FRESH BOY LOGO EMBLEM + SMALL MIC -->
       <div class="flex flex-col items-center justify-center space-y-2">
-        <div class="w-20 h-20 rounded-full border-2 border-emerald-500 bg-white p-0.5 shadow-md flex items-center justify-center overflow-hidden">
-          <svg viewBox="0 0 200 200" class="w-full h-full">
-            <circle cx="100" cy="100" r="95" fill="white" stroke="#000" stroke-width="5"/>
-            <circle cx="115" cy="80" r="30" fill="#000"/>
-            <ellipse cx="103" cy="77" rx="9" ry="6" fill="white"/>
-            <ellipse cx="127" cy="77" rx="9" ry="6" fill="white"/>
-            <path d="M 100 96 Q 115 110 130 96" stroke="#000" stroke-width="4" fill="none"/>
-            <path d="M 75 130 L 155 130 L 145 185 L 85 185 Z" fill="#000"/>
-            <path d="M 55 110 Q 45 60 65 40 Q 75 30 70 70 Z" fill="#000"/>
-            <path d="M 45 35 Q 30 20 20 40 Q 25 65 50 50 Z" fill="#000"/>
-            <text x="100" y="155" font-family="sans-serif" font-weight="900" font-size="20" text-anchor="middle" fill="#000">FRESH</text>
-            <text x="100" y="172" font-family="sans-serif" font-weight="700" font-size="8" text-anchor="middle" fill="#000">DIGITAL COORDINATOR</text>
-          </svg>
+        <div class="w-20 h-20 rounded-full border-2 border-emerald-600 bg-white p-0.5 shadow-md flex items-center justify-center overflow-hidden">
+          <img id="freshLogoImg" src="" alt="Fresh Digital Coordinator" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null; this.src='4126.jpg';">
         </div>
 
         <button id="masterMicBtn" onclick="toggleVoiceDictation()" class="w-10 h-10 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center shadow-md border border-red-400 transition transform active:scale-95" title="Talk to Fresh">
@@ -68,8 +57,8 @@
       <div class="flex items-center space-x-3 justify-center md:justify-end">
         <div class="text-center md:text-right">
           <div id="displayOrgName" class="text-sm font-black text-slate-900 tracking-wide">Aerus Timonium</div>
-          <div class="text-[11px] text-emerald-600 flex items-center justify-center md:justify-end space-x-1 font-mono font-bold">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-ping"></span>
+          <div class="text-[11px] text-emerald-700 flex items-center justify-center md:justify-end space-x-1 font-mono font-bold">
+            <span class="w-2 h-2 rounded-full bg-emerald-600 inline-block animate-ping"></span>
             <span>Live Card Active</span>
           </div>
         </div>
@@ -81,37 +70,32 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       
       <!-- 📅 VISUAL CALENDAR TIMELINE -->
-      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 min-h-[180px]">
-        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+      <div class="bg-[#F3EFE6] border border-[#E2DACC] rounded-2xl p-4 space-y-3 min-h-[180px]">
+        <div class="flex items-center justify-between border-b border-[#E2DACC] pb-2">
           <div class="flex items-center space-x-2">
-            <i class="fa-solid fa-calendar-days text-blue-600 text-sm"></i>
-            <h2 class="text-xs font-bold text-blue-900 uppercase font-mono tracking-wider">Schedule Grid • Today & Tomorrow</h2>
+            <i class="fa-solid fa-calendar-days text-blue-700 text-sm"></i>
+            <h2 class="text-xs font-bold text-blue-950 uppercase font-mono tracking-wider">Schedule Grid • Today & Tomorrow</h2>
           </div>
           <span class="text-[10px] text-slate-500 font-mono font-bold">Live Grid</span>
         </div>
         
-        <!-- VISUAL SCHEDULE TIMELINE -->
-        <div id="calendarGrid" class="space-y-1.5 text-xs font-mono max-h-48 overflow-y-auto">
-          <div class="flex items-center space-x-2 p-1.5 rounded-lg bg-white border border-slate-200">
-            <span class="w-16 font-bold text-slate-500 text-[10px]">09:00 AM</span>
-            <span class="text-slate-400 text-[11px] italic">Open Slot</span>
+        <div id="calendarGrid" class="space-y-2 text-xs font-mono max-h-48 overflow-y-auto">
+          <div id="scheduledItemsSlot" class="space-y-2">
+            <!-- Spoken events render here in clean cards -->
           </div>
-          <div class="flex items-center space-x-2 p-1.5 rounded-lg bg-white border border-slate-200">
-            <span class="w-16 font-bold text-slate-500 text-[10px]">01:00 PM</span>
-            <span class="text-slate-400 text-[11px] italic">Open Slot</span>
-          </div>
-          <div id="scheduledItemsSlot" class="space-y-1.5">
-            <!-- Voice items stream dynamically right here -->
+          <div class="flex items-center space-x-2 p-2 rounded-xl bg-white border border-[#E2DACC]">
+            <span class="w-16 font-bold text-slate-400 text-[10px]">09:00 AM</span>
+            <span class="text-slate-400 text-[11px] italic">Open Schedule Slot</span>
           </div>
         </div>
       </div>
 
       <!-- 🎰 PINBALL ACTION ZONE -->
-      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 min-h-[180px]">
-        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+      <div class="bg-[#F3EFE6] border border-[#E2DACC] rounded-2xl p-4 space-y-3 min-h-[180px]">
+        <div class="flex items-center justify-between border-b border-[#E2DACC] pb-2">
           <div class="flex items-center space-x-2">
             <span class="text-sm">🎰</span>
-            <h2 class="text-xs font-bold text-amber-900 uppercase font-mono tracking-wider">Pinball • Action Zone</h2>
+            <h2 class="text-xs font-bold text-amber-950 uppercase font-mono tracking-wider">Pinball • Action Zone</h2>
           </div>
           <span class="text-[10px] text-slate-500 font-mono font-bold">Bounces</span>
         </div>
@@ -138,25 +122,25 @@
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
       <button onclick="openStageDoor(1)" class="bg-white hover:bg-slate-50 border-2 border-blue-200 p-4 rounded-2xl text-center transition shadow-sm space-y-1">
         <div class="text-2xl">📥</div>
-        <div class="text-xs font-black text-blue-700">1. Intake & Vault</div>
+        <div class="text-xs font-black text-blue-800">1. Intake & Vault</div>
         <div class="text-[10px] text-slate-500 font-medium">Customer Profile</div>
       </button>
 
       <button onclick="openStageDoor(2)" class="bg-white hover:bg-slate-50 border-2 border-amber-200 p-4 rounded-2xl text-center transition shadow-sm space-y-1">
         <div class="text-2xl">🛠️</div>
-        <div class="text-xs font-black text-amber-700">2. Shop Ops / Bench</div>
+        <div class="text-xs font-black text-amber-800">2. Shop Ops / Bench</div>
         <div class="text-[10px] text-slate-500 font-medium">Repair Canvas</div>
       </button>
 
       <button onclick="openStageDoor(3)" class="bg-white hover:bg-slate-50 border-2 border-emerald-200 p-4 rounded-2xl text-center transition shadow-sm space-y-1">
         <div class="text-2xl">📄</div>
-        <div class="text-xs font-black text-emerald-700">3. Proposal & Pay</div>
+        <div class="text-xs font-black text-emerald-800">3. Proposal & Pay</div>
         <div class="text-[10px] text-slate-500 font-medium">Stripe Authorization</div>
       </button>
 
       <button onclick="openStageDoor(4)" class="bg-white hover:bg-slate-50 border-2 border-purple-200 p-4 rounded-2xl text-center transition shadow-sm space-y-1">
         <div class="text-2xl">🧱</div>
-        <div class="text-xs font-black text-purple-700">4. Ready Wall</div>
+        <div class="text-xs font-black text-purple-800">4. Ready Wall</div>
         <div class="text-[10px] text-slate-500 font-medium">Fulfillment Staging</div>
       </button>
     </div>
@@ -224,16 +208,18 @@
     function parseSpeechToBoard(text) {
       const lower = text.toLowerCase();
       
-      // Dynamic Calendar Grid Injection
-      if (lower.includes('schedule') || lower.includes('appointment') || lower.includes('tonight') || lower.includes('tomorrow') || lower.includes('9:')) {
+      if (lower.includes('schedule') || lower.includes('appointment') || lower.includes('tonight') || lower.includes('tomorrow') || lower.includes('water test') || lower.includes('10:00') || lower.includes('10 pm')) {
         const slot = document.getElementById('scheduledItemsSlot');
         slot.insertAdjacentHTML('afterbegin', `
-          <div class="flex items-center justify-between p-2 rounded-lg bg-blue-100 border border-blue-300 text-blue-900 font-bold">
-            <div class="flex items-center space-x-2">
-              <span class="text-[10px] bg-blue-600 text-white px-1.5 py-0.5 rounded font-mono">BOOKED</span>
-              <span class="text-xs">${text}</span>
+          <div class="p-3 rounded-xl bg-white border border-blue-300 shadow-sm flex items-center justify-between text-slate-800">
+            <div>
+              <div class="flex items-center space-x-2">
+                <span class="text-[10px] bg-blue-700 text-white px-2 py-0.5 rounded font-mono font-bold">10:00 PM</span>
+                <span class="text-xs font-bold text-blue-950">Water Test Appointment</span>
+              </div>
+              <p class="text-[11px] text-slate-600 mt-0.5 font-sans">${text}</p>
             </div>
-            <span class="text-[10px] text-blue-700 font-mono">Syncing Google Cal...</span>
+            <span class="text-[10px] text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-1 rounded border border-emerald-200">Synced Google Cal</span>
           </div>
         `);
       } else {
@@ -242,12 +228,12 @@
         if (emptyState) emptyState.remove();
 
         pin.insertAdjacentHTML('afterbegin', `
-          <div class="bg-amber-100 p-2.5 rounded-xl border border-amber-300 text-amber-900 flex justify-between items-center font-bold">
+          <div class="bg-amber-50 p-3 rounded-xl border border-amber-300 text-amber-950 flex justify-between items-center shadow-sm">
             <div>
-              <div class="text-xs">⚡ Bam! Action Item</div>
-              <div class="text-[11px] font-normal text-amber-800">${text}</div>
+              <div class="text-xs font-bold text-amber-900">⚡ Bam! Pinball Action</div>
+              <div class="text-[11px] font-normal text-slate-700 mt-0.5">${text}</div>
             </div>
-            <button onclick="openStageDoor(2)" class="text-[10px] bg-amber-600 text-white px-2.5 py-1 rounded-lg">Open Card</button>
+            <button onclick="openStageDoor(2)" class="text-[10px] bg-amber-700 text-white font-bold px-2.5 py-1 rounded-lg">View Card</button>
           </div>
         `);
       }
@@ -271,8 +257,8 @@
         title.innerText = "Stage 2: Shop Ops / Bench";
         body.innerHTML = `
           <div class="space-y-2">
-            <div class="p-3 bg-slate-800 rounded-xl font-bold text-amber-400">Active Bench Slot</div>
-            <p class="text-slate-400">Diagnostics, serial photos, and parts catalog search live here.</p>
+            <div class="p-3 bg-slate-800 rounded-xl font-bold text-amber-400">Active Bench Canvas</div>
+            <p class="text-slate-400">Diagnostics, serial photos, and catalog items live here.</p>
           </div>
         `;
       } else if (stageNum === 3) {
