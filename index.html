@@ -28,7 +28,7 @@
 
   <div class="physical-card max-w-4xl w-full rounded-3xl p-5 sm:p-8 space-y-6 relative overflow-hidden">
 
-    <!-- 1. HEADER (CURSIVE F, BOY LOGO BADGE, BLACK-TO-RED MIC, SUBSCRIBER IDENTITY) -->
+    <!-- 1. HEADER -->
     <header class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border-b border-[#E2DACC] pb-5">
       
       <!-- LEFT: CURSIVE F BRANDING -->
@@ -42,13 +42,12 @@
         </div>
       </div>
 
-      <!-- CENTER: BOY LOGO BADGE + BLACK MIC (TURNS RED WHEN SPEAKING) -->
+      <!-- CENTER: BOY LOGO BADGE + BLACK MIC (PULSES RED WHEN RECORDING) -->
       <div class="flex flex-col items-center justify-center space-y-2">
         <div class="w-20 h-20 rounded-full border-2 border-emerald-600 bg-white p-0.5 shadow-md flex items-center justify-center overflow-hidden">
           <img id="freshLogoImg" src="4126.jpg" alt="Fresh Digital Coordinator" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null; this.src='input_file_4.png';">
         </div>
 
-        <!-- Black mic button that turns red when talking -->
         <button id="masterMicBtn" onclick="toggleVoiceDictation()" class="w-10 h-10 bg-slate-900 hover:bg-slate-800 text-white rounded-full flex items-center justify-center shadow-md border border-slate-700 transition transform active:scale-95" title="Talk to Fresh">
           <i id="micIcon" class="fa-solid fa-microphone text-sm"></i>
         </button>
@@ -161,6 +160,9 @@
     let recognition = null;
     let currentVoicePayload = null;
 
+    // LIVE MAKE.COM WEBHOOK URL HARDCODED HERE
+    const WEBHOOK_URL = "https://hook.us2.make.com/g6aw7r8759ar5jr5c7lnb6nvwnuuz67t";
+
     window.onload = function() {
       setupSpeech();
     };
@@ -176,6 +178,7 @@
           const text = event.results[0][0].transcript;
           document.getElementById('liveTranscriptText').innerText = `"${text}"`;
           handleVoiceInput(text);
+          sendToMakeWebhook(text);
         };
 
         recognition.onend = function() {
@@ -206,11 +209,26 @@
       document.getElementById('listeningBadge').classList.add('hidden');
     }
 
+    function sendToMakeWebhook(transcript) {
+      if (!WEBHOOK_URL) return;
+      fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          transcript: transcript,
+          timestamp: new Date().toISOString(),
+          org: "Aerus Timonium",
+          user: "William Sullivan"
+        })
+      }).then(res => console.log("Webhook Dispatched Successfully!"))
+        .catch(err => console.error("Webhook dispatch error:", err));
+    }
+
     function handleVoiceInput(text) {
       currentVoicePayload = text;
       const lower = text.toLowerCase();
 
-      // 1. ALL VOICE INPUT LANDS IN PINBALL (MASTER HOPPER)
+      // ALL INPUT BOUNCES INTO PINBALL (MASTER HOPPER)
       const pinList = document.getElementById('pinballActionsList');
       const emptyPin = document.getElementById('pinEmptyState');
       if (emptyPin) emptyPin.remove();
@@ -225,18 +243,17 @@
         </div>
       `);
 
-      // 2. APPOINTMENT TIME DETECTED -> DROPS ONTO SCHEDULE GRID
-      if (lower.includes('8:30') || lower.includes('appointment') || lower.includes('schedule') || lower.includes('tomorrow')) {
-        let displayTime = "08:30 AM";
-        if (lower.includes("8:30")) displayTime = "08:30 AM";
-        else if (lower.includes("1:00") || lower.includes("1 pm")) displayTime = "01:00 PM";
+      // DYNAMIC TIME PARSER FOR SCHEDULE GRID
+      let timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)?|\d{1,2}\s*(?:AM|PM|am|pm))/i);
+      let timeLabel = timeMatch ? timeMatch[0].toUpperCase() : null;
 
+      if (timeLabel || lower.includes('appointment') || lower.includes('schedule') || lower.includes('tomorrow')) {
         const calSlot = document.getElementById('scheduledItemsSlot');
         calSlot.insertAdjacentHTML('afterbegin', `
           <div class="p-3 rounded-xl bg-white border border-blue-300 shadow-sm flex items-center justify-between text-slate-800">
             <div>
               <div class="flex items-center space-x-2">
-                <span class="text-[10px] bg-blue-700 text-white px-2 py-0.5 rounded font-mono font-bold">${displayTime}</span>
+                <span class="text-[10px] bg-blue-700 text-white px-2 py-0.5 rounded font-mono font-bold">${timeLabel || "LOGGED"}</span>
                 <span class="text-xs font-bold text-blue-950">Booked Appointment</span>
               </div>
               <p class="text-[11px] text-slate-600 mt-1 font-sans">${text}</p>
