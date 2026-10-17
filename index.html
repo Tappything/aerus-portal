@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FOREVER CARD™ — Powered by TappyThing</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -35,11 +37,11 @@
     .tab-active { border-bottom: 3px solid #c5a059; color: #1f1e1d; font-weight: 700; }
   </style>
 </head>
-<body class="font-sans min-h-screen p-4 md:p-6 flex justify-center">
+<body class="font-sans min-h-screen p-4 md:p-6 flex justify-center select-none">
 
 <div class="w-full max-w-5xl flex flex-col gap-5 relative">
 
-  <!-- MASTER HEADER -->
+  <!-- MASTER LEXUS-STYLE HEADER -->
   <header class="bg-cardbg border border-bordercolor rounded-2xl p-5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-5 text-center md:text-left">
     <div class="flex items-center gap-3 justify-center md:justify-start">
       <span class="font-cursive text-7xl text-gold font-bold select-none leading-none">F</span>
@@ -83,7 +85,7 @@
 
   <!-- TWO-COLUMN OPERATIONAL FLOOR -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-    <!-- TODAY'S SCHEDULE -->
+    <!-- COLUMN 1: TODAY'S SCHEDULE -->
     <div class="flex flex-col gap-2">
       <div class="text-xs font-extrabold uppercase tracking-widest text-muted flex items-center gap-2">
         <span>📅</span> Today's Schedule
@@ -93,10 +95,10 @@
       </div>
     </div>
 
-    <!-- ACTION QUEUE -->
+    <!-- COLUMN 2: PINBALL ACTION ZONE -->
     <div class="flex flex-col gap-2">
       <div class="text-xs font-extrabold uppercase tracking-widest text-muted flex items-center gap-2">
-        <span>📍</span> Action Queue
+        <span>📍</span> Pinball Action Zone
       </div>
       <div class="bg-cardbg border border-bordercolor rounded-2xl p-4 min-h-[160px]">
         <div id="pinball-list" class="flex flex-col gap-2.5"></div>
@@ -118,6 +120,7 @@
 <!-- 3-ROOM WORKSTATION DRAWER -->
 <div id="workstation-drawer" class="fixed inset-y-0 right-0 w-full max-w-lg bg-cardbg border-l-2 border-gold shadow-2xl p-6 drawer-slide hidden-right-drawer z-50 flex flex-col justify-between overflow-y-auto">
   <div>
+    <!-- DRAWER HEADER -->
     <div class="flex justify-between items-center border-b border-bordercolor pb-3 mb-4">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-full border border-gold bg-white overflow-hidden flex items-center justify-center">
@@ -148,29 +151,33 @@
             </div>
             <span>Forever Card™ Record</span>
           </span>
-          <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">Active</span>
+          <!-- REFINEMENT 2: DYNAMIC STATUS BADGE -->
+          <span id="vault-status-pill" class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">● Status: Intake & Review</span>
         </div>
-        <div class="flex justify-between items-baseline">
+        <div class="flex justify-between items-baseline mt-1">
           <div id="vault-client-name" class="font-bold text-base text-ink">--</div>
           <div id="vault-client-id" class="text-[10px] text-muted font-bold">ID: #VAULT</div>
         </div>
         <div class="text-xs text-muted flex flex-col gap-1 mt-1">
-          <div>📍 <span id="vault-client-address" class="text-ink font-medium">--</span></div>
+          <!-- REFINEMENT 3: ZERO FAKE ADDRESSES -->
+          <div>📍 <span id="vault-client-address" class="text-ink font-medium">Address: Not specified</span></div>
           <div>📞 <span id="vault-client-phone" class="text-ink font-medium">--</span></div>
         </div>
       </div>
 
-      <div class="text-xs font-bold uppercase tracking-wider text-muted mt-1">4-Stage Progression</div>
-      <div class="grid grid-cols-2 gap-2 text-xs">
-        <div class="bg-white p-2.5 rounded-xl border border-bordercolor"><span class="font-bold text-forest block">Stage 1: Intake</span><span class="text-muted text-[10px]">Voice Logged</span></div>
-        <div class="bg-white p-2.5 rounded-xl border border-bordercolor"><span class="font-bold text-gold block">Stage 2: Bench</span><span class="text-muted text-[10px]">Diagnostics</span></div>
-        <div class="bg-white p-2.5 rounded-xl border border-bordercolor"><span class="font-bold text-blue-600 block">Stage 3: Parts</span><span class="text-muted text-[10px]">Catalog Selection</span></div>
-        <div class="bg-white p-2.5 rounded-xl border border-bordercolor"><span class="font-bold text-ink block">Stage 4: Checkout</span><span class="text-muted text-[10px]">Stripe Dispatch</span></div>
-      </div>
-
-      <div class="bg-white p-3.5 rounded-xl border border-bordercolor mt-1">
+      <div class="bg-white p-3.5 rounded-xl border border-bordercolor">
         <div class="text-xs font-bold text-ink mb-1 uppercase">Active Service Note</div>
         <div id="active-card-note" class="text-xs text-muted leading-relaxed">--</div>
+      </div>
+
+      <!-- REFINEMENT 1: MIC & CAM ACTION BUTTONS INSIDE DRAWER ONLY -->
+      <div class="pt-2 flex items-center gap-3">
+        <button onclick="toggleVoiceIntake()" class="flex-1 bg-forest hover:bg-opacity-90 text-white font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition">
+          <span>🎙️</span> <span>Add Voice Note</span>
+        </button>
+        <button onclick="triggerCamera()" class="flex-1 bg-ink hover:bg-black text-white font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-2 transition">
+          <span>📷</span> <span>Attach Photo</span>
+        </button>
       </div>
     </div>
 
@@ -194,7 +201,7 @@
       <button onclick="dispatchStripePay()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition shadow-sm">💳 Dispatch Stripe 1-Tap Payment Link</button>
     </div>
 
-    <!-- ROOM 3: MIRROR -->
+    <!-- ROOM 3: LIVE MIRROR -->
     <div id="room3-content" class="hidden flex flex-col gap-3 text-xs">
       <div class="font-bold uppercase tracking-wider text-muted">Live Customer View Mirror</div>
       <div class="bg-white p-4 rounded-2xl border-2 border-gold shadow-sm flex flex-col gap-2">
@@ -214,6 +221,7 @@
 <script>
   let isListening = false, recognition = null, invoiceLines = [];
 
+  // SPEECH RECOGNITION ENGINE
   if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRec();
@@ -289,22 +297,30 @@
     document.getElementById(`tab-${room}`).classList.add('tab-active');
   }
 
+  // REFINEMENT 5: CONVERSATIONAL FILLER STRIPPING PARSER
   function parseClientName(text) {
     if (!text) return "Direct Intake";
-    const m = text.match(/(?:schedule|call|appt for|appointment for|intake for)\s+([A-Za-z]+\s+[A-Za-z]+|[A-Za-z]+)/i);
+    
+    // Strip leading conversational filler words
+    let cleanText = text.trim().replace(/^(okay|ok|hey|so|um|uh|well|please|can you)\s+/i, '');
+
+    const m = cleanText.match(/(?:schedule|call|appt for|appointment for|intake for)\s+([A-Za-z]+\s+[A-Za-z]+|[A-Za-z]+)/i);
     if (m && m[1]) return m[1].replace(/\b\w/g, l => l.toUpperCase());
-    const words = text.trim().split(' ');
-    if (words.length >= 2 && !['schedule', 'call', 'add', 'new'].includes(words[0].toLowerCase())) {
+
+    const words = cleanText.split(' ');
+    const filterWords = ['schedule', 'call', 'add', 'new', 'intake', 'customer'];
+    if (words.length >= 2 && !filterWords.includes(words[0].toLowerCase())) {
       return words[0].charAt(0).toUpperCase() + words[0].slice(1) + ' ' + words[1].charAt(0).toUpperCase() + words[1].slice(1);
     }
     return "Direct Intake";
   }
 
+  // REFINEMENT 3: NO HARDCODED FAKE ADDRESSES
   function openCustomerCard(text, clientName, address, phone) {
     document.getElementById('drawer-title').innerText = clientName + ' — Workstation';
     document.getElementById('vault-client-name').innerText = clientName;
-    document.getElementById('vault-client-address').innerText = address || "123 Main St, Timonium MD";
-    document.getElementById('vault-client-phone').innerText = phone || "(410) 499-1313";
+    document.getElementById('vault-client-address').innerText = address && address !== "Address Pending" ? address : "Address: Not specified";
+    document.getElementById('vault-client-phone').innerText = phone || "Phone: Not specified";
     document.getElementById('active-card-note').innerText = `"${text}"`;
     document.getElementById('mirror-card-body').innerText = `Active Service Request: "${text}"`;
     openWorkstation('room1');
@@ -350,8 +366,8 @@
       id: Date.now(),
       text: text,
       clientName: parsedName,
-      address: "123 Main St, Timonium MD",
-      phone: "(410) 499-1313",
+      address: "Address: Not specified",
+      phone: "Phone: Not specified",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
@@ -379,22 +395,6 @@
     }
   }
 
-  function cardToolbarHtml(itemText) {
-    return `
-      <div class="flex items-center gap-2 mt-2 pt-1.5 border-t border-bordercolor/60">
-        <div class="w-5 h-5 rounded-full border border-gold overflow-hidden flex-shrink-0">
-          <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';">
-        </div>
-        <button onclick="toggleVoiceIntake()" class="px-2 py-0.5 bg-parchment hover:bg-bordercolor text-[10px] font-bold text-ink rounded border border-bordercolor flex items-center gap-0.5">
-          <span>🎙️</span> <span>Mic</span>
-        </button>
-        <button onclick="triggerCamera()" class="px-2 py-0.5 bg-parchment hover:bg-bordercolor text-[10px] font-bold text-ink rounded border border-bordercolor flex items-center gap-0.5">
-          <span>📷</span> <span>Cam</span>
-        </button>
-      </div>
-    `;
-  }
-
   function getStorage() {
     const d = localStorage.getItem('tappything_lexus_v3');
     return d ? JSON.parse(d) : { scheduledCards: [], pinballQueue: [], archive: [] };
@@ -402,6 +402,7 @@
 
   function saveStorage(d) { localStorage.setItem('tappything_lexus_v3', JSON.stringify(d)); }
 
+  // REFINEMENT 1: RENDER DASHBOARD TILES CLEAN AND MINIMAL (NO MINI MIC/CAM BUTTONS ON TILES)
   function render() {
     const store = getStorage();
     const cal = document.getElementById('schedule-list');
@@ -411,15 +412,14 @@
           <div class="flex justify-between items-start">
             <div>
               <div class="font-bold text-ink text-xs">${item.clientName}</div>
-              <p class="text-[11px] text-muted italic">"${item.text}"</p>
-              <div class="text-[10px] text-muted mt-0.5">Scheduled • ${item.timestamp}</div>
+              <p class="text-[11px] text-muted italic mt-0.5">"${item.text}"</p>
+              <div class="text-[10px] text-muted mt-1">Scheduled • ${item.timestamp}</div>
             </div>
-            <div class="flex gap-1.5">
+            <div class="flex gap-1.5 flex-shrink-0">
               <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
               <button onclick="completeItem('calendar', ${item.id})" class="px-2.5 py-1 bg-forest text-white rounded-lg text-xs font-bold transition">Done ✓</button>
             </div>
           </div>
-          ${cardToolbarHtml(item.text)}
         </div>
       `).join('');
 
@@ -430,15 +430,14 @@
           <div class="flex justify-between items-start">
             <div>
               <div class="font-bold text-ink text-xs">${item.clientName}</div>
-              <p class="text-[11px] text-muted italic">"${item.text}"</p>
-              <div class="text-[10px] text-muted mt-0.5">Queued • ${item.timestamp}</div>
+              <p class="text-[11px] text-muted italic mt-0.5">"${item.text}"</p>
+              <div class="text-[10px] text-muted mt-1">Queued • ${item.timestamp}</div>
             </div>
-            <div class="flex gap-1.5">
+            <div class="flex gap-1.5 flex-shrink-0">
               <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
               <button onclick="completeItem('pinball', ${item.id})" class="px-2.5 py-1 bg-forest text-white rounded-lg text-xs font-bold transition">Done ✓</button>
             </div>
           </div>
-          ${cardToolbarHtml(item.text)}
         </div>
       `).join('');
 
