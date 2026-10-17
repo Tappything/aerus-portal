@@ -61,7 +61,7 @@
               <span id="micIcon">🎙️</span>
               <span id="micText">TALK TO FRESH</span>
             </button>
-            <button onclick="alert('📷 Camera Active: Snap equipment tag on-site.')" class="px-3.5 py-2.5 bg-stone-200 text-stone-800 font-bold rounded-xl shadow hover:bg-stone-300 text-xs">📷 CAM</button>
+            <button onclick="showConfirmation('📷 Camera Ready: Snap equipment tag')" class="px-3.5 py-2.5 bg-stone-200 text-stone-800 font-bold rounded-xl shadow hover:bg-stone-300 text-xs">📷 CAM</button>
           </div>
 
           <!-- SILENT SEARCH & TYPE INPUT BAR -->
@@ -69,7 +69,7 @@
             <input 
               type="text" 
               id="textSearchInput" 
-              placeholder="💬 Type name or note silently..." 
+              placeholder="💬 Type name, appointment, or errand..." 
               onkeypress="if(event.key === 'Enter') handleSearchSubmit()"
               class="flex-1 px-3.5 py-2 rounded-xl border border-stone-300 text-xs font-medium text-stone-900 bg-white focus:outline-none focus:border-emerald-700 shadow-sm"
             />
@@ -82,15 +82,24 @@
           <p id="freshConfirmationBar" class="text-[11px] font-bold text-emerald-800 font-mono hidden"></p>
         </div>
 
-        <!-- RIGHT: SUBSCRIBER IDENTITY -->
+        <!-- RIGHT: SUBSCRIBER IDENTITY & DATA INGESTION -->
         <div class="text-center md:text-right space-y-1">
           <h2 class="text-sm font-extrabold text-stone-900">Aerus Timonium</h2>
           <p class="text-[11px] font-bold text-emerald-800 flex items-center justify-center md:justify-end gap-1.5 font-mono">
             <span class="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
             Subscriber Hub Active
           </p>
-          <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="loadVaultCSV(this)">
-          <input type="file" id="catalogCsvInputHeader" accept=".csv" class="hidden" onchange="loadCatalogCSV(this)">
+          <div class="flex flex-col items-center md:items-end gap-0.5 mt-1 font-mono text-[10px]">
+            <label for="csvInput" class="text-stone-500 hover:text-emerald-800 cursor-pointer underline block">
+              <span id="vaultStatus">📁 Load 22,283 Vault CSV</span>
+            </label>
+            <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="loadVaultCSV(this)">
+
+            <label for="catalogCsvInputHeader" class="text-stone-500 hover:text-emerald-800 cursor-pointer underline block">
+              <span id="catalogStatus">📦 Load 1,090 Catalog CSV</span>
+            </label>
+            <input type="file" id="catalogCsvInputHeader" accept=".csv" class="hidden" onchange="loadCatalogCSV(this)">
+          </div>
         </div>
 
       </div>
@@ -105,8 +114,8 @@
           <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📅 SCHEDULED FOREVER CARDS</h2>
           <span class="text-[11px] font-mono font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded">Time Stream Active</span>
         </div>
-        <div id="scheduledItemsSlot" class="space-y-2.5 max-h-80 overflow-y-auto">
-          <!-- Dynamically Populated -->
+        <div id="scheduledItemsSlot" class="space-y-2.5 max-h-96 overflow-y-auto">
+          <!-- Populated from LocalStorage -->
         </div>
       </div>
 
@@ -117,8 +126,8 @@
           <span class="text-[11px] font-mono font-bold text-stone-400">Routed to Sissy (Norby)</span>
         </div>
 
-        <div id="pinballQueue" class="space-y-2.5 max-h-80 overflow-y-auto">
-          <p id="pinballEmptyState" class="text-xs text-stone-400 italic p-4 text-center">Pinball Hopper Ready • Voice notes route here for Sissy to verify</p>
+        <div id="pinballQueue" class="space-y-2.5 max-h-96 overflow-y-auto">
+          <p id="pinballEmptyState" class="text-xs text-stone-400 italic p-4 text-center">Pinball Hopper Ready • Voice notes & errands route here</p>
         </div>
       </div>
 
@@ -177,17 +186,17 @@
         
         <div class="flex items-center justify-between pt-1">
           <label class="px-3.5 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold text-xs rounded-xl shadow cursor-pointer flex items-center gap-1.5">
-            📎 Attach Sell Sheet / File
+            📎 Attach File / Photo
             <input type="file" class="hidden" onchange="showConfirmation('📎 File attached to Forever Card!')">
           </label>
           <span class="text-[10px] text-stone-400 font-mono">PDFs, Photos, Spec Sheets</span>
         </div>
       </div>
 
-      <!-- DYNAMIC ACTIVE TASKS & ERRANDS CHECKLIST INSIDE WORKSTATION -->
+      <!-- DYNAMIC ACTIVE TASKS & ERRANDS CHECKLIST -->
       <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
         <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider flex items-center justify-between">
-          <span>🛒 Active Tasks & Shared Errands</span>
+          <span>🛒 Active Tasks & Errands</span>
           <span id="taskCountBadge" class="text-emerald-700 font-mono font-bold">0 Pending</span>
         </h3>
         <div id="drawerTasksContainer" class="space-y-2 text-xs">
@@ -201,6 +210,7 @@
       <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
         <div class="flex justify-between items-center">
           <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Line Item Catalog Builder</h3>
+          <span id="catalogBadge" class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-mono">1,090 Catalog Linked</span>
         </div>
 
         <div class="flex gap-2">
@@ -261,8 +271,9 @@
   <script>
     let vaultData = [];
     let catalogData = [];
-    let scheduledCards = []; 
-    let activeTasks = []; // Shared tasks & errands array
+    // Load persisted cards from LocalStorage
+    let scheduledCards = JSON.parse(localStorage.getItem('tappy_scheduled_cards') || '[]'); 
+    let activeTasks = JSON.parse(localStorage.getItem('tappy_active_tasks') || '[]');
     let isListening = false, recognition = null, lastPhrase = '';
     let currentInvoiceItems = [];
     let currentActivePhone = '';
@@ -272,7 +283,7 @@
       setupSpeech();
       renderScheduledCards();
 
-      // Silent Auto-Fetch for CSV files
+      // Auto-load CSV files if present in root
       fetch('export_export (34).csv').then(r => r.text()).then(t => parseVaultCSVText(t)).catch(e => console.log('Vault auto-load ready'));
       fetch('export_export (35).csv').then(r => r.text()).then(t => parseCatalogCSVText(t)).catch(e => console.log('Catalog auto-load ready'));
     };
@@ -359,7 +370,7 @@
       }
 
       slot.innerHTML = '';
-      scheduledCards.forEach(card => {
+      scheduledCards.forEach((card, idx) => {
         slot.innerHTML += `
           <div onclick="openWorkstation('${card.name}', '${card.address}', '${card.phone}', ${card.ticketAmount || 0})" 
                class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 shadow-sm hover:border-emerald-700 hover:shadow-md transition flex items-center justify-between">
@@ -371,30 +382,47 @@
               <h3 class="font-bold text-stone-900 text-xs">${card.name}</h3>
               <p class="text-[11px] text-stone-500">${card.address}</p>
             </div>
-            <div class="text-right">
-              <span class="text-[10px] bg-emerald-50 text-emerald-800 font-bold px-2 py-0.5 rounded border border-emerald-200 block">Open Card ➔</span>
+            <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
+              <button onclick="removeScheduledCard(${idx})" class="text-stone-300 hover:text-red-500 text-xs p-1" title="Clear Card">✕</button>
+              <span class="text-[10px] bg-emerald-50 text-emerald-800 font-bold px-2 py-0.5 rounded border border-emerald-200">Open ➔</span>
             </div>
           </div>
         `;
       });
     }
 
+    function removeScheduledCard(idx) {
+      scheduledCards.splice(idx, 1);
+      localStorage.setItem('tappy_scheduled_cards', JSON.stringify(scheduledCards));
+      renderScheduledCards();
+      showConfirmation("Card cleared from schedule");
+    }
+
     function pushToScheduleDirect(id, name, address, phone, timeStr) {
-      scheduledCards.push({
+      scheduledCards.unshift({
         id: id || "VAULT",
         name: name,
         time: timeStr,
-        address: address || "Address Pending",
-        phone: phone || "",
+        address: address || "1965 Greenspring Dr, Timonium",
+        phone: phone || "(410) 499-1313",
         ticketAmount: 0,
         networkingStatus: true
       });
+      localStorage.setItem('tappy_scheduled_cards', JSON.stringify(scheduledCards));
       renderScheduledCards();
-      showConfirmation(`Card scheduled for ${timeStr}`);
+      showConfirmation(`Scheduled for ${timeStr}`);
     }
 
     function parseVaultCSVText(text) {
-      Papa.parse(text, { header: true, skipEmptyLines: true, complete: r => { vaultData = r.data; } });
+      Papa.parse(text, { 
+        header: true, 
+        skipEmptyLines: true, 
+        complete: r => { 
+          vaultData = r.data; 
+          const elem = document.getElementById('vaultStatus');
+          if (elem) elem.innerText = `⚡ ${vaultData.length.toLocaleString()} Vault Records Ready`;
+        } 
+      });
     }
 
     function parseCatalogCSVText(text) {
@@ -404,54 +432,84 @@
         complete: function(r) {
           catalogData = r.data;
           const select = document.getElementById('partSelect');
-          select.innerHTML = '<option value="">Select catalog part or service...</option>';
+          select.innerHTML = '<option value="">Select from 1,090 Catalog Parts...</option>';
+          let count = 0;
           catalogData.forEach(item => {
             const name = item['Name'] || item['Item / Service'] || '';
             const price = parseFloat(item['Price'] || 0).toFixed(2);
             const cost = parseFloat(item['Cost'] || 0).toFixed(2);
-            if (name) select.innerHTML += `<option value="${price}|${cost}|${name}">${name} — $${price}</option>`;
+            if (name) {
+              select.innerHTML += `<option value="${price}|${cost}|${name}">${name} — ${price}</option>`;
+              count++;
+            }
           });
+          const elem = document.getElementById('catalogStatus');
+          if (elem) elem.innerText = `⚡ ${count.toLocaleString()} Catalog Parts Ready`;
         }
       });
     }
 
-    // Smart Intake Router — Detects Shared Operational Errands & Tasks
+    function loadVaultCSV(input) {
+      const file = input.files[0];
+      if (!file) return;
+      Papa.parse(file, { header: true, skipEmptyLines: true, complete: r => parseVaultCSVText(Papa.unparse(r.data)) });
+    }
+
+    function loadCatalogCSV(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => parseCatalogCSVText(e.target.result);
+      reader.readAsText(file);
+    }
+
+    // Smart Intake Engine: Calendar + Errands + Pinball
     function handleVoiceIntake(text) {
       const emptyState = document.getElementById('pinballEmptyState');
       if (emptyState) emptyState.remove();
 
       const query = text.toLowerCase().trim();
+      
+      // 1. Time Extraction (e.g., 2pm, 2 pm, 9:00, 9:15 am, 8:30)
+      const timeMatch = text.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/i);
+      const extractedTime = timeMatch ? `Today — ${timeMatch[0].toUpperCase()}` : null;
+
+      // 2. Errand Keywords
       const errandKeywords = ['milk', 'gas', 'grocery', 'pick up', 'errand', 'buy', "bj's", 'bjs', 'store', 'hardware', 'supplies'];
       const isErrand = errandKeywords.some(kw => query.includes(kw));
 
-      if (isErrand) {
-        // Shared Errand / Task Router
-        const taskId = 'TASK-' + Math.floor(1000 + Math.random() * 9000);
-        activeTasks.push({ id: taskId, text: text, done: false });
-        renderErrandPinballCard(taskId, text);
-        showConfirmation("🛒 Shared errand logged to Pinball for William");
-      } else {
-        const timeMatch = text.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/i);
-        const extractedTime = timeMatch ? `Today — ${timeMatch[0].toUpperCase()}` : null;
+      // 3. Vault Search
+      const matches = vaultData.filter(client => {
+        const name = (client['Name'] || '').toLowerCase();
+        return name && (name.includes(query) || query.includes(name) || (query.includes('william') && name.includes('william sullivan')));
+      });
 
-        const matches = vaultData.filter(client => {
-          const name = (client['Name'] || '').toLowerCase();
-          return name.includes(query) || query.includes(name);
-        });
-
-        if (extractedTime && matches.length > 0) {
+      if (extractedTime) {
+        // ALWAYS GOES TO CALENDAR IF TIME IS MENTIONED
+        if (matches.length > 0) {
           const client = matches[0];
           pushToScheduleDirect(client['Client #'], client['Name'], client['Address'], client['Phone'], extractedTime);
         } else {
-          if (matches.length > 0) {
-            matches.slice(0, 3).forEach(client => renderMatchedCard(client, text));
-          } else {
-            renderRawIntakeCard(text);
-          }
-          showConfirmation("Intake queued to Pinball for Sissy");
+          pushToScheduleDirect("23377", text, "1965 Greenspring Dr, Timonium", "(410) 499-1313", extractedTime);
         }
+      } else if (isErrand) {
+        // LOGS AS A TASK/ERRAND IN PINBALL FOR WILLIAM
+        const taskId = 'TASK-' + Math.floor(1000 + Math.random() * 9000);
+        activeTasks.push({ id: taskId, text: text, done: false });
+        localStorage.setItem('tappy_active_tasks', JSON.stringify(activeTasks));
+        renderErrandPinballCard(taskId, text);
+        showConfirmation("🛒 Errand logged to Pinball for William");
+      } else {
+        // REGULAR CUSTOMER NOTE OR PINBALL INTAKE
+        if (matches.length > 0) {
+          matches.slice(0, 3).forEach(client => renderMatchedCard(client, text));
+        } else {
+          renderRawIntakeCard(text);
+        }
+        showConfirmation("Intake queued to Pinball for Sissy");
       }
 
+      // Webhook Pipe to Make.com
       fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -489,7 +547,7 @@
             <p class="text-[11px] text-stone-600">${address} • ${client['Phone'] || ''}</p>
             <p class="text-[10px] text-amber-700 font-medium">💬 "${originalSpeech}"</p>
           </div>
-          <button onclick="event.stopPropagation(); pushToScheduleDirect('${clientId}', '${name}', '${address}', '${cleanPhone}', 'Today — 9:00 AM')" class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 hover:bg-emerald-100">📅 Schedule ➔</button>
+          <button onclick="event.stopPropagation(); pushToScheduleDirect('${clientId}', '${name}', '${address}', '${cleanPhone}', 'Today — Scheduled')" class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 hover:bg-emerald-100">📅 Schedule ➔</button>
         </div>
       `;
       queue.insertAdjacentHTML('afterbegin', cardHTML);
@@ -498,7 +556,7 @@
     function renderRawIntakeCard(text) {
       const queue = document.getElementById('pinballQueue');
       const cardHTML = `
-        <div onclick="openWorkstation('Voice Intake', 'New Record', '(410) 555-0100', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-blue-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
+        <div onclick="openWorkstation('Voice Intake', 'New Record', '(410) 499-1313', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-blue-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
           <div>
             <span class="text-[10px] font-extrabold text-blue-700 uppercase tracking-wide">Live Intake Card</span>
             <h3 class="font-bold text-stone-900 text-xs">"${text}"</h3>
@@ -559,6 +617,7 @@
 
     function toggleTaskDone(idx) {
       activeTasks[idx].done = !activeTasks[idx].done;
+      localStorage.setItem('tappy_active_tasks', JSON.stringify(activeTasks));
       renderDrawerTasks();
     }
 
@@ -573,7 +632,7 @@
 
     function addInvoiceItem() {
       const select = document.getElementById('partSelect');
-      if (!select.value) return alert('Select a catalog item first!');
+      if (!select.value) return showConfirmation('Select a catalog item first!');
       const [retail, cost, name] = select.value.split('|');
       currentInvoiceItems.push({ name, cost: parseFloat(cost), retail: parseFloat(retail) });
       renderInvoice();
@@ -591,16 +650,16 @@
         tbody.innerHTML += `
           <tr>
             <td class="p-2 text-stone-900">${item.name}</td>
-            <td class="p-2 text-stone-500 font-mono">$${item.cost.toFixed(2)}</td>
-            <td class="p-2 text-stone-900 font-bold font-mono">$${item.retail.toFixed(2)}</td>
+            <td class="p-2 text-stone-500 font-mono">${item.cost.toFixed(2)}</td>
+            <td class="p-2 text-stone-900 font-bold font-mono">${item.retail.toFixed(2)}</td>
             <td class="p-2 text-right text-emerald-700 font-bold font-mono">${margin}%</td>
           </tr>
         `;
       });
 
       const profit = totalRetail - totalCost;
-      document.getElementById('profitSummary').innerText = `$${totalRetail.toFixed(2)} ($${profit.toFixed(2)} Net Profit)`;
-      document.getElementById('mirrorTotal').innerText = `$${totalRetail.toFixed(2)}`;
+      document.getElementById('profitSummary').innerText = `${totalRetail.toFixed(2)} (${profit.toFixed(2)} Net Profit)`;
+      document.getElementById('mirrorTotal').innerText = `${totalRetail.toFixed(2)}`;
     }
 
     function dispatchStripePay() {
