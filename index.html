@@ -6,7 +6,7 @@
   <title>FOREVER CARD™ — Powered by TappyThing</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <!-- PapaParse for 5ms In-Memory Vault (22,283) & Catalog (1,090) Ingestion -->
+  <!-- PapaParse for 5ms Client-Side In-Memory Search (22,283 Vault + 1,090 Catalog) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -39,21 +39,15 @@
           </div>
         </div>
 
-        <!-- CENTER: EMBEDDED VECTOR SVG FRESH MASCOT & CONTROLS -->
+        <!-- CENTER: TYLER'S FRESH LOGO MASCOT & CONTROLS -->
         <div class="flex flex-col items-center gap-2 w-full max-w-sm">
           <div class="w-16 h-16 rounded-full border-2 border-emerald-700 bg-white p-0.5 shadow-md flex items-center justify-center overflow-hidden">
-            <svg viewBox="0 0 200 200" class="w-full h-full">
-              <circle cx="100" cy="100" r="95" fill="white" stroke="#047857" stroke-width="4"/>
-              <path d="M 75 52 Q 88 38 100 42 Q 112 38 125 52 Q 112 46 100 48 Q 88 46 75 52 Z" fill="#1E293B"/>
-              <circle cx="100" cy="72" r="28" fill="#1E293B"/>
-              <rect x="78" y="66" width="44" height="13" rx="4" fill="#000"/>
-              <ellipse cx="88" cy="72" rx="8" ry="4" fill="#38BDF8"/>
-              <ellipse cx="112" cy="72" rx="8" ry="4" fill="#38BDF8"/>
-              <path d="M 88 88 Q 100 98 112 88" stroke="#1E293B" stroke-width="3" fill="none"/>
-              <path d="M 68 110 Q 100 100 132 110 L 132 135 L 68 135 Z" fill="#1E293B"/>
-              <text x="100" y="158" font-family="'JetBrains Mono', monospace" font-weight="900" font-size="20" text-anchor="middle" fill="#047857">FRESH</text>
-              <text x="100" y="174" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="8" text-anchor="middle" fill="#64748B">DIGITAL COORDINATOR</text>
-            </svg>
+            <img 
+              src="fresh_logo.png" 
+              alt="FRESH Digital Coordinator" 
+              class="w-full h-full object-cover rounded-full"
+              onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';"
+            />
           </div>
 
           <!-- VOICE & CAM ROW -->
@@ -119,34 +113,37 @@
         <span class="text-xs font-bold text-stone-800">💳 Workiz Register</span>
         <span class="text-xs text-stone-400">➔</span>
       </button>
-      <button onclick="alert('🌐 Growth Network & Client SMS Recall active.')" class="boutique-card p-3.5 rounded-xl flex items-center justify-between hover:border-emerald-700 transition">
-        <span class="text-xs font-bold text-stone-800">🌐 Growth Network</span>
-        <span class="text-xs text-stone-400">➔</span>
+      <button onclick="toggleGlobalNetworking()" class="boutique-card p-3.5 rounded-xl flex items-center justify-between hover:border-emerald-700 transition border-l-4 border-l-emerald-600">
+        <div class="text-left">
+          <span class="text-xs font-bold text-stone-800 block">🌐 Forever Networking</span>
+          <span id="networkingStatusLabel" class="text-[10px] text-emerald-700 font-bold font-mono">GLOBAL SWITCH: ON</span>
+        </div>
+        <span class="text-xs text-stone-400">⚡</span>
       </button>
     </div>
 
     <!-- MAIN OPERATIONAL FLOOR -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-      <!-- QUADRANT #1: Dynamic Schedule Grid (Left) -->
+      <!-- QUADRANT #1: Dynamic Schedule Grid (Time-Ordered Forever Cards) -->
       <div class="lg:col-span-5 boutique-card rounded-2xl p-5 space-y-4">
         <div class="flex items-center justify-between border-b border-stone-200 pb-3">
-          <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📅 SCHEDULE GRID</h2>
-          <span class="text-[11px] font-mono font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded">Live Cal Sync</span>
+          <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📅 SCHEDULED FOREVER CARDS</h2>
+          <span class="text-[11px] font-mono font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded">Time Stream Active</span>
         </div>
         <div id="scheduledItemsSlot" class="space-y-2.5 max-h-80 overflow-y-auto">
-          <p id="calEmptyState" class="text-xs text-stone-400 italic p-4 text-center">Syncing Live Calendar Stream...</p>
+          <!-- Dynamically populated with scheduled Forever Cards -->
         </div>
       </div>
 
-      <!-- QUADRANT #2: Dynamic Pinball Action Zone (Right) -->
+      <!-- QUADRANT #2: Dynamic Pinball Action Zone (Action Queue Forever Cards) -->
       <div class="lg:col-span-7 boutique-card rounded-2xl p-5 space-y-4">
         <div class="flex items-center justify-between border-b border-stone-200 pb-3">
           <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📍 PINBALL ACTION ZONE</h2>
           <button onclick="clearPinball()" class="text-xs text-red-600 hover:underline font-bold font-mono">Clear Queue</button>
         </div>
 
-        <!-- 4 Dynamic Action Fast Buttons -->
+        <!-- 4 Dynamic Fast Action Buttons -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
           <a id="fastCallBtn" href="tel:" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">📞 CALL</a>
           <a id="fastTextBtn" href="sms:" class="p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">💬 TEXT</a>
@@ -181,7 +178,7 @@
     <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
       <div class="flex justify-between items-center">
         <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Layer 1: Shop Ops Canvas</h3>
-        <span class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">Team Sync Active</span>
+        <span id="cardNetworkingBadge" class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-mono">🌐 Networking Active</span>
       </div>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <button id="stage1" onclick="setStage(1)" class="p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white">1. Intake & Photo</button>
@@ -258,9 +255,42 @@
     let isListening = false, recognition = null, lastPhrase = '';
     let currentInvoiceItems = [];
     let currentActivePhone = '';
+    let isGlobalNetworkingOn = true;
+
+    // Seeded Scheduled Forever Cards Stream
+    const scheduledCards = [
+      {
+        id: "11264",
+        name: "Catherine Noblitt",
+        time: "8:30 AM",
+        address: "1 Smeton Pl Unit 1305, Towson, MD",
+        phone: "4109081084",
+        ticketAmount: 0,
+        networkingStatus: true
+      },
+      {
+        id: "10432",
+        name: "William Sullivan",
+        time: "10:15 AM",
+        address: "Aerus Timonium Shop Floor",
+        phone: "4105550199",
+        ticketAmount: 1495.00,
+        networkingStatus: true
+      },
+      {
+        id: "11890",
+        name: "Suzie Gray",
+        time: "1:00 PM",
+        address: "12 Birch Ave, Lutherville, MD",
+        phone: "4105550144",
+        ticketAmount: 189.00,
+        networkingStatus: false
+      }
+    ];
 
     window.onload = function() {
       setupSpeech();
+      renderScheduledCards();
     };
 
     function setupSpeech() {
@@ -308,7 +338,39 @@
       input.value = '';
     }
 
-    // Door 1 Multi-Ingestion Trigger
+    function toggleGlobalNetworking() {
+      isGlobalNetworkingOn = !isGlobalNetworkingOn;
+      const label = document.getElementById('networkingStatusLabel');
+      label.innerText = isGlobalNetworkingOn ? "GLOBAL SWITCH: ON" : "GLOBAL SWITCH: OFF";
+      label.className = isGlobalNetworkingOn ? "text-[10px] text-emerald-700 font-bold font-mono" : "text-[10px] text-stone-400 font-bold font-mono";
+      alert(`🌐 Forever Networking Global Commerce Switch is now ${isGlobalNetworkingOn ? 'ON' : 'OFF'}!`);
+    }
+
+    // Render Time-Ordered Schedule Stream of Forever Cards
+    function renderScheduledCards() {
+      const slot = document.getElementById('scheduledItemsSlot');
+      slot.innerHTML = '';
+      scheduledCards.forEach(card => {
+        slot.innerHTML += `
+          <div onclick="openWorkstation('${card.name}', '${card.address}', '${card.phone}', ${card.ticketAmount})" 
+               class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 shadow-sm hover:border-emerald-700 hover:shadow-md transition flex items-center justify-between">
+            <div class="space-y-0.5">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-emerald-800 text-xs font-mono">${card.time}</span>
+                <span class="text-[10px] font-extrabold text-stone-400 font-mono">#${card.id}</span>
+              </div>
+              <h3 class="font-bold text-stone-900 text-xs">${card.name}</h3>
+              <p class="text-[11px] text-stone-500">${card.address}</p>
+            </div>
+            <div class="text-right">
+              <span class="text-[10px] bg-emerald-50 text-emerald-800 font-bold px-2 py-0.5 rounded border border-emerald-200 block">Open Card ➔</span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // Door 1 Ingestion Trigger
     function triggerDoor1Ingestion() {
       const choice = confirm("Tap 'OK' to load Customer Vault CSV (22,283) or 'Cancel' to load Catalog CSV (1,090).");
       if (choice) {
@@ -318,7 +380,7 @@
       }
     }
 
-    // 22,283 Vault CSV Ingestion
+    // 22,283 Vault Ingestion
     function loadVaultCSV(input) {
       const file = input.files[0];
       if (!file) return;
@@ -335,7 +397,7 @@
       });
     }
 
-    // 1,090 Catalog CSV Ingestion
+    // 1,090 Catalog Ingestion
     function loadCatalogCSV(input) {
       const file = input.files[0];
       if (!file) return;
@@ -402,7 +464,7 @@
       const cardHTML = `
         <div onclick="openWorkstation('${name}', '${address}', '${cleanPhone}', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-emerald-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
           <div class="space-y-0.5">
-            <span class="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wide">Vault Match (#${clientId})</span>
+            <span class="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wide">Forever Card Match (#${clientId})</span>
             <h3 class="font-bold text-stone-900 text-xs">${name}</h3>
             <p class="text-[11px] text-stone-600">${address} • ${client['Phone'] || ''}</p>
             <p class="text-[10px] text-amber-700 font-medium">💬 "${originalSpeech}"</p>
@@ -422,7 +484,7 @@
       const cardHTML = `
         <div onclick="openWorkstation('Voice Intake', 'New Record', '(410) 555-0100', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-blue-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
           <div>
-            <span class="text-[10px] font-extrabold text-blue-700 uppercase tracking-wide">Live Intake</span>
+            <span class="text-[10px] font-extrabold text-blue-700 uppercase tracking-wide">Live Intake Card</span>
             <h3 class="font-bold text-stone-900 text-xs">"${text}"</h3>
             <p class="text-[11px] text-stone-500">Queued for Pinball processing</p>
           </div>
