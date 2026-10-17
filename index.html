@@ -20,6 +20,8 @@
       70% { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
       100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
     }
+    .room-tab-active { background-color: #065F46; color: #FAF9F5; border-color: #065F46; }
+    .room-tab-inactive { background-color: #E5E0D8; color: #44403C; }
   </style>
 </head>
 <body class="min-h-screen p-3 sm:p-6 md:p-8">
@@ -30,12 +32,15 @@
     <header class="boutique-card rounded-2xl p-4 sm:p-6">
       <div class="flex flex-col md:flex-row items-center justify-between gap-4">
         
-        <!-- LEFT: LAVERNE & SHIRLEY CURSIVE F -->
+        <!-- LEFT: LAVERNE & SHIRLEY CURSIVE F + NETWORKING SWITCH -->
         <div class="flex items-center gap-3">
           <span class="text-6xl text-emerald-800 font-cursive-f leading-none select-none">F</span>
           <div>
             <h1 class="text-base sm:text-lg font-black tracking-wider text-stone-900 uppercase font-mono">FOREVER CARD<span class="text-emerald-800">™</span></h1>
-            <p class="text-[11px] text-stone-500 font-medium">Powered by TappyThing</p>
+            <button onclick="toggleGlobalNetworking()" class="mt-1 flex items-center gap-1.5 px-2.5 py-1 bg-emerald-100 border border-emerald-300 rounded-lg text-[10px] font-bold text-emerald-800 font-mono hover:bg-emerald-200 transition">
+              <span id="networkingStatusDot" class="w-2 h-2 rounded-full bg-emerald-600 inline-block animate-ping"></span>
+              <span id="networkingStatusLabel">🌐 Forever Networking: ON</span>
+            </button>
           </div>
         </div>
 
@@ -80,7 +85,7 @@
         <div class="text-center md:text-right space-y-1">
           <h2 class="text-sm font-extrabold text-stone-900">Aerus Timonium</h2>
           <p class="text-[11px] font-bold text-emerald-800 flex items-center justify-center md:justify-end gap-1.5 font-mono">
-            <span class="w-2 h-2 rounded-full bg-emerald-600 inline-block animate-ping"></span>
+            <span class="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
             Subscriber Hub Active
           </p>
           <div class="flex flex-col items-center md:items-end gap-0.5 mt-1 font-mono text-[10px]">
@@ -98,29 +103,6 @@
 
       </div>
     </header>
-
-    <!-- 4 HUB DOORS -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <button onclick="triggerDoor1Ingestion()" class="boutique-card p-3.5 rounded-xl flex items-center justify-between hover:border-emerald-700 transition">
-        <span class="text-xs font-bold text-stone-800">📦 Vault & Catalog Ingestion</span>
-        <span class="text-xs text-stone-400">➔</span>
-      </button>
-      <button onclick="alert('👥 Staff Roles: Mona (Counter), Chris (Bench), Mike (Field), Norby (VA)')" class="boutique-card p-3.5 rounded-xl flex items-center justify-between hover:border-emerald-700 transition">
-        <span class="text-xs font-bold text-stone-800">👥 Staff Roles</span>
-        <span class="text-xs text-stone-400">➔</span>
-      </button>
-      <button onclick="alert('💳 Workiz Register: Stripe Connect active.')" class="boutique-card p-3.5 rounded-xl flex items-center justify-between hover:border-emerald-700 transition">
-        <span class="text-xs font-bold text-stone-800">💳 Workiz Register</span>
-        <span class="text-xs text-stone-400">➔</span>
-      </button>
-      <button onclick="toggleGlobalNetworking()" class="boutique-card p-3.5 rounded-xl flex items-center justify-between hover:border-emerald-700 transition border-l-4 border-l-emerald-600">
-        <div class="text-left">
-          <span class="text-xs font-bold text-stone-800 block">🌐 Forever Networking</span>
-          <span id="networkingStatusLabel" class="text-[10px] text-emerald-700 font-bold font-mono">GLOBAL SWITCH: ON</span>
-        </div>
-        <span class="text-xs text-stone-400">⚡</span>
-      </button>
-    </div>
 
     <!-- MAIN OPERATIONAL FLOOR -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -159,10 +141,11 @@
     </div>
   </div>
 
-  <!-- FOREVER CARD WORKSTATION DRAWER (3-LAYER CLIENT CHASSIS) -->
+  <!-- FOREVER CARD WORKSTATION DRAWER (3 FOCUSED ROOMS) -->
   <div id="drawerOverlay" onclick="closeWorkstation()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm hidden z-40"></div>
   <div id="workstationDrawer" class="fixed inset-y-0 right-0 w-full max-w-3xl bg-[#FAF9F5] shadow-2xl z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto p-5 sm:p-6 space-y-5">
     
+    <!-- DRAWER HEADER -->
     <div class="flex items-center justify-between border-b border-stone-200 pb-3">
       <div class="flex items-center gap-3">
         <span class="text-4xl text-emerald-800 font-cursive-f">F</span>
@@ -174,75 +157,102 @@
       <button onclick="closeWorkstation()" class="text-stone-400 hover:text-stone-800 text-2xl font-bold">✕</button>
     </div>
 
-    <!-- LAYER 1: SHOP OPS CANVAS -->
-    <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
-      <div class="flex justify-between items-center">
-        <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Layer 1: Shop Ops Canvas</h3>
-        <span id="cardNetworkingBadge" class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-mono">🌐 Networking Active</span>
+    <!-- ROOM SWITCHER TABS -->
+    <div class="grid grid-cols-3 gap-2">
+      <button id="tabRoom1" onclick="switchRoom(1)" class="p-2.5 rounded-xl font-bold text-xs shadow transition room-tab-active">🔧 Shop Ops</button>
+      <button id="tabRoom2" onclick="switchRoom(2)" class="p-2.5 rounded-xl font-bold text-xs shadow transition room-tab-inactive">💳 Invoice Room</button>
+      <button id="tabRoom3" onclick="switchRoom(3)" class="p-2.5 rounded-xl font-bold text-xs shadow transition room-tab-inactive">🪞 Live Mirror</button>
+    </div>
+
+    <!-- ROOM 1: SHOP OPS ENGINE ROOM -->
+    <div id="room1Content" class="space-y-4">
+      <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
+        <div class="flex justify-between items-center">
+          <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">4-Stage Progression</h3>
+          <span id="cardNetworkingBadge" class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-mono">🌐 Active</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <button id="stage1" onclick="setStage(1)" class="p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white">1. Intake & Photo</button>
+          <button id="stage2" onclick="setStage(2)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">2. Diagnostics</button>
+          <button id="stage3" onclick="setStage(3)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">3. Proposal</button>
+          <button id="stage4" onclick="setStage(4)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">4. Ready Wall 🎉</button>
+        </div>
       </div>
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        <button id="stage1" onclick="setStage(1)" class="p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white">1. Intake & Photo</button>
-        <button id="stage2" onclick="setStage(2)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">2. Diagnostics</button>
-        <button id="stage3" onclick="setStage(3)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">3. Proposal</button>
-        <button id="stage4" onclick="setStage(4)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">4. Ready Wall 🎉</button>
+
+      <!-- EQUIPMENT DIAGNOSTICS & ATTACHMENTS -->
+      <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
+        <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Equipment Diagnostics & Sales Collateral</h3>
+        <textarea id="techNotesInput" rows="3" placeholder="Enter diagnostic observations, unit serials, or field notes..." class="w-full p-3 rounded-xl border border-stone-300 text-xs text-stone-900 bg-stone-50 focus:outline-none focus:border-emerald-700 font-medium"></textarea>
+        
+        <div class="flex items-center justify-between pt-1">
+          <label class="px-3.5 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold text-xs rounded-xl shadow cursor-pointer flex items-center gap-1.5">
+            📎 Attach Sell Sheet / File
+            <input type="file" class="hidden" onchange="alert('📎 File attached to Forever Card Proposal!')">
+          </label>
+          <span class="text-[10px] text-stone-400 font-mono">PDFs, Photos, Spec Sheets</span>
+        </div>
       </div>
     </div>
 
-    <!-- LAYER 2: CARD-NATIVE INVOICE BUILDER (DYNAMIC 1,090 CATALOG) -->
-    <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
-      <div class="flex justify-between items-center">
-        <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Layer 2: Card-Native Invoice Builder</h3>
-        <span id="catalogBadge" class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-mono">Dynamic Catalog Linked</span>
-      </div>
-
-      <div class="flex gap-2">
-        <input type="file" id="catalogCsvInputDrawer" accept=".csv" class="hidden" onchange="loadCatalogCSV(this)">
-        <select id="partSelect" class="flex-1 text-xs border border-stone-300 rounded-xl p-2 bg-stone-50 font-medium">
-          <option value="">📁 Load export_export (35).csv to search 1,090 parts...</option>
-        </select>
-        <button onclick="document.getElementById('catalogCsvInputDrawer').click()" class="px-3 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold text-xs rounded-xl shadow">📁 CSV</button>
-        <button onclick="addInvoiceItem()" class="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow">+ Add</button>
-      </div>
-
-      <div class="border border-stone-200 rounded-xl overflow-hidden">
-        <table class="w-full text-left text-xs">
-          <thead class="bg-stone-100 text-stone-600 font-bold">
-            <tr>
-              <th class="p-2">Item</th>
-              <th class="p-2">Cost</th>
-              <th class="p-2">Retail</th>
-              <th class="p-2 text-right">Margin</th>
-            </tr>
-          </thead>
-          <tbody id="invoiceTableBody" class="divide-y divide-stone-100 font-medium">
-          </tbody>
-        </table>
-      </div>
-
-      <div class="p-3 bg-stone-50 rounded-xl flex items-center justify-between border border-stone-200">
-        <div>
-          <p class="text-[10px] font-extrabold text-stone-400 uppercase tracking-wider">Total Staged Ticket</p>
-          <p id="profitSummary" class="text-sm font-bold text-stone-900 font-mono">$0.00</p>
+    <!-- ROOM 2: INVOICE & CHECKOUT ROOM -->
+    <div id="room2Content" class="space-y-4 hidden">
+      <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
+        <div class="flex justify-between items-center">
+          <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Line Item Catalog Builder</h3>
+          <span id="catalogBadge" class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-mono">1,090 Catalog Linked</span>
         </div>
-        <button onclick="dispatchStripePay()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-stone-950 font-extrabold text-xs rounded-xl shadow transition">🚀 1-Tap Stripe Pay Dispatch</button>
+
+        <div class="flex gap-2">
+          <input type="file" id="catalogCsvInputDrawer" accept=".csv" class="hidden" onchange="loadCatalogCSV(this)">
+          <select id="partSelect" class="flex-1 text-xs border border-stone-300 rounded-xl p-2 bg-stone-50 font-medium">
+            <option value="">📁 Load catalog CSV to search 1,090 parts...</option>
+          </select>
+          <button onclick="document.getElementById('catalogCsvInputDrawer').click()" class="px-3 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold text-xs rounded-xl shadow">📁 CSV</button>
+          <button onclick="addInvoiceItem()" class="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow">+ Add</button>
+        </div>
+
+        <div class="border border-stone-200 rounded-xl overflow-hidden">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-stone-100 text-stone-600 font-bold">
+              <tr>
+                <th class="p-2">Item</th>
+                <th class="p-2">Cost</th>
+                <th class="p-2">Retail</th>
+                <th class="p-2 text-right">Margin</th>
+              </tr>
+            </thead>
+            <tbody id="invoiceTableBody" class="divide-y divide-stone-100 font-medium">
+            </tbody>
+          </table>
+        </div>
+
+        <div class="p-3 bg-stone-50 rounded-xl flex items-center justify-between border border-stone-200">
+          <div>
+            <p class="text-[10px] font-extrabold text-stone-400 uppercase tracking-wider">Total Staged Ticket</p>
+            <p id="profitSummary" class="text-sm font-bold text-stone-900 font-mono">$0.00</p>
+          </div>
+          <button onclick="dispatchStripePay()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-stone-950 font-extrabold text-xs rounded-xl shadow transition">🚀 1-Tap Stripe Pay Dispatch</button>
+        </div>
       </div>
     </div>
 
-    <!-- LAYER 3: CUSTOMER MOBILE MIRROR -->
-    <div class="bg-stone-900 text-stone-100 rounded-2xl p-4 space-y-2 pointer-events-none opacity-90 shadow-inner">
-      <div class="flex items-center justify-between border-b border-stone-800 pb-2">
-        <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Layer 3: Customer Mobile View (Read-Only Mirror)</h3>
-        <span class="text-[10px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded font-mono">Mirror Locked</span>
-      </div>
-      <div class="bg-stone-950 rounded-xl p-3.5 border border-stone-800 space-y-1.5">
-        <div class="flex items-center justify-between">
-          <span class="font-cursive-f text-emerald-400 text-2xl">F</span>
-          <span id="mirrorClient" class="text-xs font-bold text-stone-300">Client Mobile Card</span>
+    <!-- ROOM 3: CUSTOMER LIVE MIRROR (SAFE SANITIZED PREVIEW) -->
+    <div id="room3Content" class="space-y-4 hidden">
+      <div class="bg-stone-900 text-stone-100 rounded-2xl p-5 space-y-3 shadow-inner">
+        <div class="flex items-center justify-between border-b border-stone-800 pb-2">
+          <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Customer Mobile Card View (Read-Only)</h3>
+          <span class="text-[10px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded font-mono">Sanitized Preview</span>
         </div>
-        <p class="text-xs text-stone-400">Equipment Status: <span class="text-emerald-400 font-bold">● Active Verified</span></p>
-        <div class="text-right">
-          <p class="text-[10px] text-stone-500 font-mono">Approved Total</p>
-          <p id="mirrorTotal" class="text-base font-extrabold text-emerald-400 font-mono">$0.00</p>
+        <div class="bg-stone-950 rounded-xl p-4 border border-stone-800 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-cursive-f text-emerald-400 text-3xl">F</span>
+            <span id="mirrorClient" class="text-xs font-bold text-stone-300">Client Mobile Card</span>
+          </div>
+          <p class="text-xs text-stone-400">Equipment Status: <span class="text-emerald-400 font-bold">● Active Verified</span></p>
+          <div class="text-right pt-2 border-t border-stone-800">
+            <p class="text-[10px] text-stone-500 font-mono">Approved Total</p>
+            <p id="mirrorTotal" class="text-lg font-extrabold text-emerald-400 font-mono">$0.00</p>
+          </div>
         </div>
       </div>
     </div>
@@ -311,9 +321,24 @@
     function toggleGlobalNetworking() {
       isGlobalNetworkingOn = !isGlobalNetworkingOn;
       const label = document.getElementById('networkingStatusLabel');
-      label.innerText = isGlobalNetworkingOn ? "GLOBAL SWITCH: ON" : "GLOBAL SWITCH: OFF";
-      label.className = isGlobalNetworkingOn ? "text-[10px] text-emerald-700 font-bold font-mono" : "text-[10px] text-stone-400 font-bold font-mono";
+      const dot = document.getElementById('networkingStatusDot');
+      label.innerText = isGlobalNetworkingOn ? "🌐 Forever Networking: ON" : "🌐 Forever Networking: OFF";
+      dot.className = isGlobalNetworkingOn ? "w-2 h-2 rounded-full bg-emerald-600 inline-block animate-ping" : "w-2 h-2 rounded-full bg-stone-400 inline-block";
       alert(`🌐 Forever Networking Global Commerce Switch is now ${isGlobalNetworkingOn ? 'ON' : 'OFF'}!`);
+    }
+
+    function switchRoom(roomNum) {
+      for (let i = 1; i <= 3; i++) {
+        const content = document.getElementById('room' + i + 'Content');
+        const tab = document.getElementById('tabRoom' + i);
+        if (i === roomNum) {
+          content.classList.remove('hidden');
+          tab.className = "p-2.5 rounded-xl font-bold text-xs shadow transition room-tab-active";
+        } else {
+          content.classList.add('hidden');
+          tab.className = "p-2.5 rounded-xl font-bold text-xs shadow transition room-tab-inactive";
+        }
+      }
     }
 
     // Dynamic Render for Schedule Grid
@@ -345,9 +370,8 @@
       });
     }
 
-    // Schedule Engine Helper
-    function scheduleForeverCard(id, name, address, phone) {
-      const timeStr = prompt(`Set schedule time slot for ${name}:`, "Today — 10:00 AM");
+    function scheduleForeverCard(id, name, address, phone, defaultTime) {
+      const timeStr = prompt(`Set schedule time slot for ${name}:`, defaultTime || "Today — 10:00 AM");
       if (!timeStr) return;
 
       scheduledCards.push({
@@ -364,17 +388,6 @@
       confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
     }
 
-    // Door 1 Ingestion Trigger
-    function triggerDoor1Ingestion() {
-      const choice = confirm("Tap 'OK' to load Customer Vault CSV (22,283) or 'Cancel' to load Catalog CSV (1,090).");
-      if (choice) {
-        document.getElementById('csvInput').click();
-      } else {
-        document.getElementById('catalogCsvInputHeader').click();
-      }
-    }
-
-    // 22,283 Vault Ingestion
     function loadVaultCSV(input) {
       const file = input.files[0];
       if (!file) return;
@@ -391,7 +404,6 @@
       });
     }
 
-    // 1,090 Catalog Ingestion
     function loadCatalogCSV(input) {
       const file = input.files[0];
       if (!file) return;
@@ -424,31 +436,37 @@
       });
     }
 
+    // Voice & Text Intake with Time Parsing & Sissy Queueing
     function handleVoiceIntake(text) {
       const emptyState = document.getElementById('pinballEmptyState');
       if (emptyState) emptyState.remove();
 
       const query = text.toLowerCase().trim();
+      
+      // Auto-extract times like 9:15 or 11:30
+      const timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:am|pm)?)/i);
+      const extractedTime = timeMatch ? `Today — ${timeMatch[0]}` : "Today — TBD";
+
       const matches = vaultData.filter(client => {
         const name = (client['Name'] || '').toLowerCase();
         return name.includes(query) || query.includes(name);
       });
 
       if (matches.length > 0) {
-        matches.slice(0, 4).forEach(client => renderMatchedCard(client, text));
+        matches.slice(0, 4).forEach(client => renderMatchedCard(client, text, extractedTime));
       } else {
-        renderRawIntakeCard(text);
+        renderRawIntakeCard(text, extractedTime);
       }
 
-      // Webhook Dispatch to Make.com
+      // Webhook Pipe
       fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transcript: text, timestamp: new Date().toISOString() })
+        body: JSON.stringify({ transcript: text, assignedTo: "Sissy (Norby)", timestamp: new Date().toISOString() })
       }).catch(err => console.log('Pipe fired'));
     }
 
-    function renderMatchedCard(client, originalSpeech) {
+    function renderMatchedCard(client, originalSpeech, extractedTime) {
       const queue = document.getElementById('pinballQueue');
       const cleanPhone = (client['Phone'] || '').replace(/\D/g, '');
       const name = client['Name'] || 'Client';
@@ -464,7 +482,7 @@
             <p class="text-[10px] text-amber-700 font-medium">💬 "${originalSpeech}"</p>
           </div>
           <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
-            <button onclick="scheduleForeverCard('${clientId}', '${name}', '${address}', '${cleanPhone}')" class="p-2 bg-emerald-100 text-emerald-800 rounded-lg text-xs font-bold hover:bg-emerald-200">📅 Schedule</button>
+            <button onclick="scheduleForeverCard('${clientId}', '${name}', '${address}', '${cleanPhone}', '${extractedTime}')" class="p-2 bg-emerald-100 text-emerald-800 rounded-lg text-xs font-bold hover:bg-emerald-200">📅 Schedule</button>
             <a href="tel:${cleanPhone}" class="p-2 bg-emerald-600 text-white rounded-lg text-xs font-bold">📞</a>
             <a href="sms:${cleanPhone}" class="p-2 bg-indigo-600 text-white rounded-lg text-xs font-bold">💬</a>
           </div>
@@ -473,16 +491,16 @@
       queue.insertAdjacentHTML('afterbegin', cardHTML);
     }
 
-    function renderRawIntakeCard(text) {
+    function renderRawIntakeCard(text, extractedTime) {
       const queue = document.getElementById('pinballQueue');
       const cardHTML = `
         <div onclick="openWorkstation('Voice Intake', 'New Record', '(410) 555-0100', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-blue-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
           <div>
             <span class="text-[10px] font-extrabold text-blue-700 uppercase tracking-wide">Live Intake Card</span>
             <h3 class="font-bold text-stone-900 text-xs">"${text}"</h3>
-            <p class="text-[11px] text-stone-500">Queued for Pinball processing</p>
+            <p class="text-[11px] text-stone-500">Suggested: ${extractedTime}</p>
           </div>
-          <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
+          <button onclick="event.stopPropagation(); scheduleForeverCard('RAW', 'Voice Intake', 'Location TBD', '4105550100', '${extractedTime}')" class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 hover:bg-emerald-100">📅 Schedule ➔</button>
         </div>
       `;
       queue.insertAdjacentHTML('afterbegin', cardHTML);
@@ -499,6 +517,7 @@
       currentInvoiceItems = amount > 0 ? [{ name: "Approved Initial Service", cost: amount * 0.2, retail: amount }] : [];
       renderInvoice();
 
+      switchRoom(1);
       document.getElementById('drawerOverlay').classList.remove('hidden');
       document.getElementById('workstationDrawer').classList.remove('translate-x-full');
     }
