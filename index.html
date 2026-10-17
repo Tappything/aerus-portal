@@ -79,6 +79,7 @@
               GO
             </button>
           </div>
+          <p id="freshConfirmationBar" class="text-[11px] font-bold text-emerald-800 font-mono hidden"></p>
         </div>
 
         <!-- RIGHT: SUBSCRIBER IDENTITY & DATA INGESTION -->
@@ -171,7 +172,7 @@
         </div>
       </div>
 
-      <!-- DIRECT COMMUNICATION ACTION BAR INSIDE WORKSTATION -->
+      <!-- DIRECT COMMUNICATION ACTION BAR -->
       <div class="grid grid-cols-2 gap-2">
         <a id="drawerCallBtn" href="tel:" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">📞 Call Customer</a>
         <a id="drawerTextBtn" href="sms:" class="p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">💬 Text Customer</a>
@@ -185,7 +186,7 @@
         <div class="flex items-center justify-between pt-1">
           <label class="px-3.5 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold text-xs rounded-xl shadow cursor-pointer flex items-center gap-1.5">
             📎 Attach Sell Sheet / File
-            <input type="file" class="hidden" onchange="alert('📎 File attached to Forever Card Proposal!')">
+            <input type="file" class="hidden" onchange="showConfirmation('📎 File attached to Forever Card Proposal!')">
           </label>
           <span class="text-[10px] text-stone-400 font-mono">PDFs, Photos, Spec Sheets</span>
         </div>
@@ -234,7 +235,7 @@
       </div>
     </div>
 
-    <!-- ROOM 3: CUSTOMER LIVE MIRROR (SAFE SANITIZED PREVIEW) -->
+    <!-- ROOM 3: CUSTOMER LIVE MIRROR -->
     <div id="room3Content" class="space-y-4 hidden">
       <div class="bg-stone-900 text-stone-100 rounded-2xl p-5 space-y-3 shadow-inner">
         <div class="flex items-center justify-between border-b border-stone-800 pb-2">
@@ -269,22 +270,13 @@
     window.onload = function() {
       setupSpeech();
       renderScheduledCards();
-      
-      // Auto-load catalog if available locally
-      fetch('export_export (35).csv')
-        .then(res => res.text())
-        .then(csvText => parseCatalogCSVText(csvText))
-        .catch(e => console.log("Manual catalog upload ready"));
     };
 
-    function speakToUser(text) {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 1.0;
-        utterance.pitch = 1.0;
-        window.speechSynthesis.speak(utterance);
-      }
+    function showConfirmation(msg) {
+      const bar = document.getElementById('freshConfirmationBar');
+      bar.innerText = `⚡ FRESH: ${msg}`;
+      bar.classList.remove('hidden');
+      setTimeout(() => bar.classList.add('hidden'), 4000);
     }
 
     function setupSpeech() {
@@ -357,7 +349,7 @@
     function renderScheduledCards() {
       const slot = document.getElementById('scheduledItemsSlot');
       if (!scheduledCards || scheduledCards.length === 0) {
-        slot.innerHTML = '<p class="text-xs text-stone-400 italic p-4 text-center">Schedule Hopper Ready • Sissy schedules confirmed Pinball cards here</p>';
+        slot.innerHTML = '<p class="text-xs text-stone-400 italic p-4 text-center">Schedule Hopper Ready • Intake jobs by voice or type to schedule</p>';
         return;
       }
 
@@ -382,10 +374,7 @@
       });
     }
 
-    function scheduleForeverCard(id, name, address, phone) {
-      const timeStr = prompt(`Set exact time slot for ${name}:`, "Today — 10:00 AM");
-      if (!timeStr) return;
-
+    function pushToScheduleDirect(id, name, address, phone, timeStr) {
       scheduledCards.push({
         id: id || "VAULT",
         name: name,
@@ -395,9 +384,8 @@
         ticketAmount: 0,
         networkingStatus: true
       });
-
       renderScheduledCards();
-      speakToUser(`Scheduled ${name} for ${timeStr}`);
+      showConfirmation(`Card scheduled for ${timeStr}`);
     }
 
     function loadVaultCSV(input) {
@@ -454,27 +442,37 @@
       reader.readAsText(file);
     }
 
-    // Voice Intake routed cleanly to Sissy's Pinball Queue
+    // Direct Time Parser & Automatic Calendar Router
     function handleVoiceIntake(text) {
       const emptyState = document.getElementById('pinballEmptyState');
       if (emptyState) emptyState.remove();
 
       const query = text.toLowerCase().trim();
       
+      // Smart Time Extractor (e.g., 9:00, 9:15, 11:30, 2:00pm, 8:30)
+      const timeMatch = text.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/i);
+      const extractedTime = timeMatch ? `Today — ${timeMatch[0]}` : null;
+
       const matches = vaultData.filter(client => {
         const name = (client['Name'] || '').toLowerCase();
         return name.includes(query) || query.includes(name);
       });
 
-      if (matches.length > 0) {
-        matches.slice(0, 3).forEach(client => renderMatchedCard(client, text));
-        speakToUser(`Found ${matches[0]['Name']} in vault. Queued for Sissy.`);
+      if (extractedTime && matches.length > 0) {
+        // Direct-to-Calendar Route with Real Vault Data
+        const client = matches[0];
+        pushToScheduleDirect(client['Client #'], client['Name'], client['Address'], client['Phone'], extractedTime);
       } else {
-        renderRawIntakeCard(text);
-        speakToUser("Intake recorded and queued for Sissy.");
+        // Route to Pinball for Sissy
+        if (matches.length > 0) {
+          matches.slice(0, 3).forEach(client => renderMatchedCard(client, text));
+        } else {
+          renderRawIntakeCard(text);
+        }
+        showConfirmation("Intake queued to Pinball for Sissy");
       }
 
-      // Webhook Pipe to Make.com
+      // Webhook Pipe
       fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -497,11 +495,7 @@
             <p class="text-[11px] text-stone-600">${address} • ${client['Phone'] || ''}</p>
             <p class="text-[10px] text-amber-700 font-medium">💬 "${originalSpeech}"</p>
           </div>
-          <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
-            <button onclick="scheduleForeverCard('${clientId}', '${name}', '${address}', '${cleanPhone}')" class="p-2 bg-emerald-100 text-emerald-800 rounded-lg text-xs font-bold hover:bg-emerald-200">📅 Schedule</button>
-            <a href="tel:${cleanPhone}" class="p-2 bg-emerald-600 text-white rounded-lg text-xs font-bold">📞</a>
-            <a href="sms:${cleanPhone}" class="p-2 bg-indigo-600 text-white rounded-lg text-xs font-bold">💬</a>
-          </div>
+          <button onclick="event.stopPropagation(); pushToScheduleDirect('${clientId}', '${name}', '${address}', '${cleanPhone}', 'Today — 9:00 AM')" class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 hover:bg-emerald-100">📅 Schedule ➔</button>
         </div>
       `;
       queue.insertAdjacentHTML('afterbegin', cardHTML);
@@ -516,7 +510,7 @@
             <h3 class="font-bold text-stone-900 text-xs">"${text}"</h3>
             <p class="text-[11px] text-stone-500">Queued for Sissy</p>
           </div>
-          <button onclick="event.stopPropagation(); scheduleForeverCard('RAW', 'Voice Intake', 'Location Pending', '4105550100')" class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 hover:bg-emerald-100">📅 Schedule ➔</button>
+          <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
         </div>
       `;
       queue.insertAdjacentHTML('afterbegin', cardHTML);
@@ -586,7 +580,7 @@
 
     function dispatchStripePay() {
       const total = document.getElementById('mirrorTotal').innerText;
-      alert(`🚀 Stripe Pay Link for ${total} dispatched directly to ${currentActivePhone}!`);
+      showConfirmation(`Stripe Pay Link for ${total} dispatched to ${currentActivePhone}`);
     }
   </script>
 </body>
