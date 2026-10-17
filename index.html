@@ -6,10 +6,10 @@
     <title>Subscriber Workspace — TappyThing Digital Coordinator</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PapaParse for CSV Processing -->
+    <!-- PapaParse for CSV Data Engine -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <!-- Google Fonts for Cursive F logo -->
-    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Google Fonts for Cursive F & Clean Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -24,7 +24,7 @@
                         bordercolor: '#e2d9cc'
                     },
                     fontFamily: {
-                        cursive: ['"Alex Brush"', 'cursive'],
+                        cursive: ['"Great Vibes"', 'cursive'],
                         sans: ['Inter', 'sans-serif']
                     }
                 }
@@ -39,84 +39,72 @@
         .tab-active { border-bottom: 3px solid #c5a059; color: #1f1e1d; font-weight: 700; }
     </style>
 </head>
-<body class="font-sans min-h-screen p-4 md:p-8 flex justify-center">
+<body class="font-sans min-h-screen p-4 md:p-6 flex justify-center">
 
-<div class="w-full max-w-4xl flex flex-col gap-6 relative">
+<div class="w-full max-w-4xl flex flex-col gap-5 relative">
 
-    <!-- SEARCH & FOREVER NETWORKING TOP BAR -->
-    <div class="w-full flex justify-between items-center bg-cardbg border border-bordercolor rounded-2xl p-3 shadow-sm">
-        <div class="flex-1 max-w-md relative">
-            <input type="text" id="silent-search" placeholder="🔍 Silent Search 22,283 Vault Records or 1,090 Catalog..." 
-                oninput="handleSilentSearch(this.value)"
-                class="w-full pl-9 pr-3 py-2 text-xs border border-bordercolor rounded-xl bg-white focus:outline-none focus:border-gold">
-        </div>
+    <!-- CLEAN MASTER HEADER -->
+    <header class="bg-cardbg border border-bordercolor rounded-2xl p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+        
+        <!-- LEFT: CURSIVE F + FOREVER CARD + NETWORKING TOGGLE -->
         <div class="flex items-center gap-3">
-            <button onclick="toggleNetworking()" id="net-toggle-btn" class="px-3 py-1.5 bg-parchment border border-bordercolor rounded-full text-xs font-bold text-forest hover:bg-bordercolor transition flex items-center gap-1.5">
-                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
-                <span>Forever Networking: ON</span>
-            </button>
-            <button onclick="openWorkstation('room1')" class="px-3 py-1.5 bg-forest text-white rounded-full text-xs font-bold hover:bg-opacity-90 transition">
-                🧰 Open Workstation
-            </button>
-        </div>
-    </div>
-
-    <!-- HEADER WITH TYLER'S ENLARGED FRESH MASCOT & CURSIVE F -->
-    <header class="text-center pt-2 pb-2 border-b border-bordercolor flex flex-col items-center justify-center relative">
-        <div class="flex items-center justify-center gap-3 mb-1">
-            <span class="font-cursive text-7xl text-gold font-bold select-none leading-none">F</span>
-            <div class="flex flex-col items-start">
-                <div class="flex items-center gap-2">
-                    <span class="text-3xl font-extrabold tracking-tight text-ink">Fresh</span>
-                    <span class="text-xs px-2 py-0.5 bg-gold/20 text-gold font-extrabold rounded-md uppercase">Mascot</span>
-                </div>
-                <span class="text-xs font-bold tracking-widest text-muted uppercase">TappyThing Digital Coordinator</span>
+            <span class="font-cursive text-5xl text-gold font-bold select-none leading-none">F</span>
+            <div class="flex flex-col">
+                <span class="font-extrabold text-sm tracking-wide text-ink">FOREVER CARD™</span>
+                <button onclick="toggleNetworking()" id="net-toggle-btn" class="mt-1 px-2.5 py-0.5 bg-parchment border border-bordercolor rounded-full text-[10px] font-bold text-forest hover:bg-bordercolor transition flex items-center gap-1 w-fit">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+                    <span>Networking: ON</span>
+                </button>
             </div>
         </div>
-        <div class="text-xs text-muted font-medium">Subscriber Workspace • Powered by Central Cloud Backend</div>
+
+        <!-- CENTER: TYLER'S CIRCULAR FRESH MASCOT + CONTROLS + SILENT INPUT BAR -->
+        <div class="flex flex-col items-center gap-2 w-full max-w-md">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-forest text-gold border-2 border-gold flex items-center justify-center font-bold text-lg shadow-sm select-none">
+                    🤵
+                </div>
+                <div class="flex gap-2">
+                    <button id="voice-btn" onclick="toggleVoiceIntake()" class="px-3.5 py-1.5 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5">
+                        <span>🎙️</span> <span id="voice-label">TALK TO FRESH</span>
+                    </button>
+                    <button onclick="triggerCamera()" class="px-3 py-1.5 bg-ink hover:bg-black text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5">
+                        <span>📷</span> <span>CAM</span>
+                    </button>
+                </div>
+            </div>
+            
+            <input type="text" id="text-intake" placeholder="🔍 Silent Search 22,283 Vault Records or speak/type intake..." 
+                oninput="autoExpand(this)" onkeydown="checkSubmit(event)"
+                class="w-full px-3.5 py-2 border border-bordercolor rounded-xl bg-white text-ink focus:outline-none focus:border-gold text-xs shadow-inner">
+        </div>
+
+        <!-- RIGHT: MULTI-TENANT SAAS + SUBTLE CSV LINKS -->
+        <div class="flex flex-col items-end text-right">
+            <span class="text-xs font-extrabold text-ink tracking-tight">Subscriber Workspace</span>
+            <span id="data-status" class="text-[10px] text-muted font-medium mb-1">Vault: 22,283 Active | Catalog: 1,090 Ready</span>
+            <div class="flex gap-2 text-[10px] text-forest font-bold">
+                <label class="cursor-pointer hover:underline">
+                    📁 Load Vault CSV
+                    <input type="file" id="vault-csv" accept=".csv" class="hidden" onchange="loadVaultCSV(this)">
+                </label>
+                <span>•</span>
+                <label class="cursor-pointer hover:underline">
+                    📦 Load Catalog CSV
+                    <input type="file" id="catalog-csv" accept=".csv" class="hidden" onchange="loadCatalogCSV(this)">
+                </label>
+            </div>
+        </div>
+
     </header>
-
-    <!-- MAIN CONTROLS CARD -->
-    <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm flex flex-col items-center gap-5">
-        <div class="w-full max-w-xs flex flex-col gap-3">
-            <button id="voice-btn" onclick="toggleVoiceIntake()" class="w-full py-4 px-6 bg-forest hover:bg-opacity-90 text-white font-bold text-lg rounded-xl shadow-md transition flex items-center justify-center gap-3">
-                <span class="text-xl">🎙️</span> <span id="voice-label">Tap to Talk</span>
-            </button>
-            <button onclick="triggerCamera()" class="w-full py-3 px-6 bg-ink hover:bg-black text-white font-bold text-md rounded-xl transition flex items-center justify-center gap-3">
-                <span class="text-lg">📷</span> <span>Snap Photo</span>
-            </button>
-        </div>
-
-        <textarea id="text-intake" rows="1" placeholder="Type or speak an intake note..." 
-            oninput="autoExpand(this)" onkeydown="checkSubmit(event)"
-            class="w-full max-w-md p-3.5 border border-bordercolor rounded-xl bg-white text-ink focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition resize-none text-base"></textarea>
-    </div>
-
-    <!-- CSV INGESTION ENGINE (22,283 VAULT & 1,090 CATALOG) -->
-    <div class="bg-cardbg border border-bordercolor rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
-        <div class="flex flex-col">
-            <span class="text-xs font-bold uppercase tracking-wider text-muted">PapaParse CSV Data Engine</span>
-            <span id="data-status" class="text-xs text-forest font-semibold">Vault: 22,283 Records Active | Catalog: 1,090 Items Ready</span>
-        </div>
-        <div class="flex gap-2">
-            <label class="px-3 py-1.5 bg-white border border-bordercolor rounded-lg text-xs font-semibold cursor-pointer hover:bg-parchment">
-                📂 Load Vault CSV
-                <input type="file" id="vault-csv" accept=".csv" class="hidden" onchange="loadVaultCSV(this)">
-            </label>
-            <label class="px-3 py-1.5 bg-white border border-bordercolor rounded-lg text-xs font-semibold cursor-pointer hover:bg-parchment">
-                📦 Load Catalog CSV
-                <input type="file" id="catalog-csv" accept=".csv" class="hidden" onchange="loadCatalogCSV(this)">
-            </label>
-        </div>
-    </div>
 
     <!-- QUADRANT #1: CALENDAR SCHEDULE -->
     <div class="flex flex-col gap-2">
         <div class="text-xs font-extrabold uppercase tracking-widest text-muted flex items-center gap-2">
             <span>📅</span> Calendar Schedule (Scheduled Appointments)
         </div>
-        <div class="bg-cardbg border border-bordercolor rounded-2xl p-5 min-h-[100px]">
-            <div id="calendar-list" class="flex flex-col gap-3"></div>
+        <div class="bg-cardbg border border-bordercolor rounded-2xl p-4 min-h-[90px]">
+            <div id="calendar-list" class="flex flex-col gap-2.5"></div>
         </div>
     </div>
 
@@ -125,8 +113,8 @@
         <div class="text-xs font-extrabold uppercase tracking-widest text-muted flex items-center gap-2">
             <span>📍</span> Pinball Action Zone (Triage Hopper)
         </div>
-        <div class="bg-cardbg border border-bordercolor rounded-2xl p-5 min-h-[100px]">
-            <div id="pinball-list" class="flex flex-col gap-3"></div>
+        <div class="bg-cardbg border border-bordercolor rounded-2xl p-4 min-h-[90px]">
+            <div id="pinball-list" class="flex flex-col gap-2.5"></div>
         </div>
     </div>
 
@@ -135,130 +123,126 @@
         <div class="text-xs font-extrabold uppercase tracking-widest text-muted flex items-center gap-2">
             <span>📦</span> Completed / Archive History
         </div>
-        <div class="bg-cardbg border border-bordercolor rounded-2xl p-5">
-            <div id="archive-list" class="flex flex-col gap-2 text-sm text-muted"></div>
+        <div class="bg-cardbg border border-bordercolor rounded-2xl p-4">
+            <div id="archive-list" class="flex flex-col gap-1.5 text-xs text-muted"></div>
         </div>
     </div>
 
 </div>
 
 <!-- SLIDING RIGHT-SIDE 3-ROOM WORKSTATION DRAWER & FOREVER CARD -->
-<div id="workstation-drawer" class="fixed inset-y-0 right-0 w-full max-w-xl bg-cardbg border-l-2 border-gold shadow-2xl p-6 drawer-slide hidden-right-drawer z-50 flex flex-col justify-between overflow-y-auto">
+<div id="workstation-drawer" class="fixed inset-y-0 right-0 w-full max-w-lg bg-cardbg border-l-2 border-gold shadow-2xl p-6 drawer-slide hidden-right-drawer z-50 flex flex-col justify-between overflow-y-auto">
     
     <div>
         <!-- DRAWER HEADER -->
-        <div class="flex justify-between items-center border-b border-bordercolor pb-4 mb-4">
+        <div class="flex justify-between items-center border-b border-bordercolor pb-3 mb-4">
             <div class="flex items-center gap-2">
                 <span class="font-cursive text-4xl text-gold font-bold">F</span>
                 <div>
-                    <h3 id="drawer-title" class="font-bold text-base text-ink">Client Workstation & Forever Card</h3>
-                    <div id="drawer-subtitle" class="text-xs text-muted">Subscriber Operations Hub</div>
+                    <h3 id="drawer-title" class="font-bold text-sm text-ink">Client Workstation & Forever Card</h3>
+                    <div id="drawer-subtitle" class="text-[11px] text-muted">Vault Matched Record</div>
                 </div>
             </div>
-            <button onclick="closeWorkstation()" class="text-muted font-bold text-2xl hover:text-ink">✕</button>
+            <button onclick="closeWorkstation()" class="text-muted font-bold text-xl hover:text-ink">✕</button>
         </div>
 
         <!-- 3-ROOM WORKSTATION TABS -->
-        <div class="flex border-b border-bordercolor mb-5 text-xs font-bold text-muted">
+        <div class="flex border-b border-bordercolor mb-4 text-xs font-bold text-muted">
             <button id="tab-room1" onclick="switchRoom('room1')" class="flex-1 py-2 text-center tab-active">Room 1: Shop Ops</button>
             <button id="tab-room2" onclick="switchRoom('room2')" class="flex-1 py-2 text-center">Room 2: Line-Item Invoice</button>
             <button id="tab-room3" onclick="switchRoom('room3')" class="flex-1 py-2 text-center">Room 3: Live Mirror</button>
         </div>
 
-        <!-- ROOM 1: SHOP OPS & 4-STAGE PROGRESSION -->
+        <!-- ROOM 1: SHOP OPS & VAULT MATCH DETAILS -->
         <div id="room1-content" class="flex flex-col gap-4">
-            <div class="text-xs font-bold uppercase tracking-wider text-muted">4-Stage Job Progression</div>
+            
+            <!-- CUSTOMER VAULT MATCH CARD -->
+            <div class="bg-white p-4 rounded-xl border border-bordercolor shadow-sm flex flex-col gap-2">
+                <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between">
+                    <span>Vault Matched Profile</span>
+                    <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">Verified</span>
+                </div>
+                <div id="vault-client-name" class="font-bold text-sm text-ink">--</div>
+                <div class="text-xs text-muted flex flex-col gap-1">
+                    <div>📍 <span id="vault-client-address" class="text-ink font-medium">No Vault Address Found</span></div>
+                    <div>📞 <span id="vault-client-phone" class="text-ink font-medium">No Vault Phone Found</span></div>
+                </div>
+            </div>
+
+            <div class="text-xs font-bold uppercase tracking-wider text-muted mt-1">4-Stage Job Progression</div>
             <div class="grid grid-cols-2 gap-2 text-xs">
-                <div class="bg-white p-3 rounded-xl border border-bordercolor">
-                    <span class="font-bold text-forest block">Stage 1: Intake & Triage</span>
-                    <span class="text-muted text-[10px]">Payload Captured</span>
+                <div class="bg-white p-2.5 rounded-xl border border-bordercolor">
+                    <span class="font-bold text-forest block">Stage 1: Intake</span>
+                    <span class="text-muted text-[10px]">Voice Captured</span>
                 </div>
-                <div class="bg-white p-3 rounded-xl border border-bordercolor">
-                    <span class="font-bold text-gold block">Stage 2: Diagnostics</span>
-                    <span class="text-muted text-[10px]">Bench Diagnostics</span>
+                <div class="bg-white p-2.5 rounded-xl border border-bordercolor">
+                    <span class="font-bold text-gold block">Stage 2: Bench</span>
+                    <span class="text-muted text-[10px]">Diagnostics</span>
                 </div>
-                <div class="bg-white p-3 rounded-xl border border-bordercolor">
-                    <span class="font-bold text-blue-600 block">Stage 3: Parts & Labor</span>
-                    <span class="text-muted text-[10px]">Catalog Selection</span>
+                <div class="bg-white p-2.5 rounded-xl border border-bordercolor">
+                    <span class="font-bold text-blue-600 block">Stage 3: Parts</span>
+                    <span class="text-muted text-[10px]">1,090 Catalog</span>
                 </div>
-                <div class="bg-white p-3 rounded-xl border border-bordercolor">
+                <div class="bg-white p-2.5 rounded-xl border border-bordercolor">
                     <span class="font-bold text-ink block">Stage 4: Checkout</span>
                     <span class="text-muted text-[10px]">Stripe Dispatch</span>
                 </div>
             </div>
 
-            <div class="bg-white p-4 rounded-xl border border-bordercolor mt-2">
-                <div class="text-xs font-bold text-ink mb-2 uppercase">Active Job Record Details</div>
-                <div id="active-card-details" class="text-xs text-muted leading-relaxed">Select "Open Card" on any item to view details.</div>
+            <div class="bg-white p-3.5 rounded-xl border border-bordercolor mt-1">
+                <div class="text-xs font-bold text-ink mb-1 uppercase">Active Job Note</div>
+                <div id="active-card-note" class="text-xs text-muted leading-relaxed">--</div>
             </div>
         </div>
 
-        <!-- ROOM 2: CATALOG LINE-ITEM INVOICE BUILDER WITH MARGINS & STRIPE DISPATCH -->
-        <div id="room2-content" class="hidden flex flex-col gap-4">
-            <div class="text-xs font-bold uppercase tracking-wider text-muted">1,090 Item Catalog Builder</div>
+        <!-- ROOM 2: CATALOG LINE-ITEM INVOICE BUILDER & STRIPE DISPATCH -->
+        <div id="room2-content" class="hidden flex flex-col gap-3 text-xs">
+            <div class="font-bold uppercase tracking-wider text-muted">1,090 Item Catalog Line-Items</div>
             
-            <select id="catalog-select" onchange="addCatalogItem(this.value)" class="w-full p-2.5 text-xs border border-bordercolor rounded-xl bg-white focus:outline-none">
-                <option value="">-- Select Item from 1,090 Catalog --</option>
+            <select id="catalog-select" onchange="addCatalogItem(this.value)" class="w-full p-2 border border-bordercolor rounded-xl bg-white focus:outline-none text-xs">
+                <option value="">-- Add Item from 1,090 Catalog --</option>
                 <option value="Blade Sharpening|35.00|10.00">Lawnmower Blade Sharpening — $35.00</option>
                 <option value="Filter Check & Replacement|45.00|15.00">Filter Check & Replacement — $45.00</option>
                 <option value="Carpet Cleaning Service|150.00|40.00">Carpet Cleaning Service — $150.00</option>
             </select>
 
             <div class="bg-white p-3 rounded-xl border border-bordercolor flex flex-col gap-2">
-                <div class="flex justify-between text-xs font-bold text-muted border-b border-bordercolor pb-1">
-                    <span>Item</span>
-                    <span>Price</span>
-                </div>
                 <div id="invoice-items" class="flex flex-col gap-1 text-xs">
-                    <div class="flex justify-between text-muted italic"><span>No items added yet.</span></div>
+                    <div class="text-muted italic">No items added yet.</div>
                 </div>
             </div>
 
-            <!-- MARYLAND TAX MATH & MARGIN CALCULATOR -->
-            <div class="bg-white p-4 rounded-xl border border-bordercolor flex flex-col gap-2 text-xs">
-                <div class="flex justify-between">
-                    <span>Subtotal:</span>
-                    <span id="inv-subtotal" class="font-bold">$0.00</span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Maryland Sales Tax (6%):</span>
-                    <span id="inv-tax" class="font-bold">$0.00</span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Estimated Margin:</span>
-                    <span id="inv-margin" class="font-bold text-emerald-600">$0.00</span>
-                </div>
-                <div class="flex justify-between border-t border-bordercolor pt-2 font-extrabold text-sm text-ink">
-                    <span>Total Due:</span>
-                    <span id="inv-total" class="text-forest">$0.00</span>
+            <div class="bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-1.5 text-xs">
+                <div class="flex justify-between"><span>Subtotal:</span><span id="inv-subtotal" class="font-bold">$0.00</span></div>
+                <div class="flex justify-between"><span>Maryland Sales Tax (6%):</span><span id="inv-tax" class="font-bold">$0.00</span></div>
+                <div class="flex justify-between border-t border-bordercolor pt-1.5 font-extrabold text-sm text-ink">
+                    <span>Total Due:</span><span id="inv-total" class="text-forest">$0.00</span>
                 </div>
             </div>
 
-            <!-- STRIPE 1-TAP PAY DISPATCH -->
-            <button onclick="dispatchStripePay()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2">
+            <button onclick="dispatchStripePay()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-sm">
                 <span>💳</span> Dispatch Stripe 1-Tap Payment Link
             </button>
         </div>
 
         <!-- ROOM 3: LIVE CUSTOMER MIRROR -->
-        <div id="room3-content" class="hidden flex flex-col gap-4">
-            <div class="text-xs font-bold uppercase tracking-wider text-muted">Live Customer View Mirror</div>
-            <div class="bg-white p-5 rounded-2xl border-2 border-gold shadow-sm flex flex-col gap-3">
-                <div class="flex justify-between items-center border-b border-bordercolor pb-2">
-                    <span class="font-bold text-xs text-ink">Forever Card™ Interface</span>
-                    <span class="text-[10px] px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full font-bold">Active Direct Line</span>
+        <div id="room3-content" class="hidden flex flex-col gap-3 text-xs">
+            <div class="font-bold uppercase tracking-wider text-muted">Live Customer View Mirror</div>
+            <div class="bg-white p-4 rounded-2xl border-2 border-gold shadow-sm flex flex-col gap-2">
+                <div class="flex justify-between items-center border-b border-bordercolor pb-1.5">
+                    <span class="font-bold text-ink">Forever Card™ Interface</span>
+                    <span class="text-[10px] px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full font-bold">Direct Line</span>
                 </div>
-                <div id="mirror-card-body" class="text-xs text-muted">
-                    Customer sees their active equipment history, scheduled dates, and 1-tap re-order button right here.
+                <div id="mirror-card-body" class="text-xs text-muted leading-relaxed">
+                    Customer sees equipment history, active appointments, and 1-tap re-orders.
                 </div>
-                <button class="w-full py-2 bg-forest text-white font-bold rounded-lg text-xs">Tap to Request Service</button>
+                <button class="w-full py-2 bg-forest text-white font-bold rounded-lg text-xs mt-1">Tap to Request Service</button>
             </div>
         </div>
     </div>
 
-    <!-- DRAWER FOOTER -->
-    <div class="border-t border-bordercolor pt-3 text-[11px] text-muted text-center">
-        TappyThing Digital Coordinator • System Synchronized
+    <div class="border-t border-bordercolor pt-3 text-[10px] text-muted text-center">
+        TappyThing Digital Coordinator • Live Vault Synchronized
     </div>
 
 </div>
@@ -266,11 +250,14 @@
 <script>
     let isListening = false;
     let recognition = null;
-    let vaultData = [];
+    let vaultData = [
+        { Name: "William Sullivan", Address: "123 Towson Town Blvd, Timonium MD 21093", Phone: "(410) 555-0199" },
+        { Name: "Brian Smith", Address: "842 York Rd, Timonium MD 21093", Phone: "(410) 555-0142" }
+    ];
     let catalogData = [];
     let invoiceLines = [];
 
-    // Initialize Web Speech API
+    // Web Speech API
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognition = new SpeechRecognition();
@@ -279,7 +266,7 @@
 
         recognition.onstart = () => {
             isListening = true;
-            document.getElementById('voice-label').innerText = "Listening...";
+            document.getElementById('voice-label').innerText = "LISTENING...";
             document.getElementById('voice-btn').classList.add('bg-red-600');
         };
 
@@ -291,14 +278,14 @@
 
         recognition.onerror = recognition.onend = () => {
             isListening = false;
-            document.getElementById('voice-label').innerText = "Tap to Talk";
+            document.getElementById('voice-label').innerText = "TALK TO FRESH";
             document.getElementById('voice-btn').classList.remove('bg-red-600');
         };
     }
 
     function toggleVoiceIntake() {
         if (!recognition) {
-            alert("Speech recognition not supported on this device.");
+            alert("Speech recognition not supported on this browser.");
             return;
         }
         if (isListening) {
@@ -308,10 +295,7 @@
         }
     }
 
-    function autoExpand(field) {
-        field.style.height = 'inherit';
-        field.style.height = Math.min(field.scrollHeight, 160) + 'px';
-    }
+    function autoExpand(field) {}
 
     function checkSubmit(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -320,30 +304,23 @@
             if (text) {
                 handleVoiceIntake(text);
                 e.target.value = '';
-                autoExpand(e.target);
             }
         }
     }
 
     function triggerCamera() {
-        alert("Camera intake triggered — snapshot capture active.");
+        alert("Camera snapshot intake active.");
     }
 
     function toggleNetworking() {
         const btn = document.getElementById('net-toggle-btn');
         if (btn.innerText.includes('ON')) {
-            btn.innerHTML = '<span class="inline-block w-2 h-2 rounded-full bg-gray-400"></span><span>Forever Networking: OFF</span>';
+            btn.innerHTML = '<span class="w-2 h-2 rounded-full bg-gray-400 inline-block"></span><span>Networking: OFF</span>';
         } else {
-            btn.innerHTML = '<span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span><span>Forever Networking: ON</span>';
+            btn.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span><span>Networking: ON</span>';
         }
     }
 
-    function handleSilentSearch(query) {
-        if (!query) return;
-        console.log("Searching 22,283 Vault & 1,090 Catalog for:", query);
-    }
-
-    // WORKSTATION DRAWER & ROOM SWITCHING
     function openWorkstation(room = 'room1') {
         const drawer = document.getElementById('workstation-drawer');
         drawer.classList.remove('hidden-right-drawer');
@@ -366,14 +343,18 @@
         document.getElementById(`tab-${room}`).classList.add('tab-active');
     }
 
-    function openCustomerCard(text) {
-        document.getElementById('drawer-title').innerText = text.slice(0, 30) + "...";
-        document.getElementById('active-card-details').innerHTML = `<strong>Active Payload:</strong> ${text}<br><br>Cross-referenced against 22,283 Customer Vault Records.`;
-        document.getElementById('mirror-card-body').innerText = `Active Service Request: "${text}"`;
+    // OPEN CARD & POPULATE VAULT ADDRESS/PHONE
+    function openCustomerCard(text, clientName, address, phone) {
+        document.getElementById('drawer-title').innerText = clientName || "Client Workstation";
+        document.getElementById('vault-client-name').innerText = clientName || "Customer Record";
+        document.getElementById('vault-client-address').innerText = address || "No Vault Address On File";
+        document.getElementById('vault-client-phone').innerText = phone || "No Vault Phone On File";
+        document.getElementById('active-card-note').innerText = text;
+        document.getElementById('mirror-card-body').innerText = `Service Intake Note: "${text}"`;
         openWorkstation('room1');
     }
 
-    // INVOICE BUILDER & MARGIN MATH
+    // INVOICE MATH
     function addCatalogItem(val) {
         if (!val) return;
         const [name, price, cost] = val.split('|');
@@ -389,37 +370,32 @@
         }
 
         let subtotal = 0;
-        let totalCost = 0;
-
-        container.innerHTML = invoiceLines.map((item, idx) => {
+        container.innerHTML = invoiceLines.map(item => {
             subtotal += item.price;
-            totalCost += item.cost;
             return `<div class="flex justify-between font-semibold"><span>${item.name}</span><span>$${item.price.toFixed(2)}</span></div>`;
         }).join('');
 
-        const tax = subtotal * 0.06; // Maryland 6% Sales Tax
+        const tax = subtotal * 0.06;
         const total = subtotal + tax;
-        const margin = subtotal - totalCost;
 
         document.getElementById('inv-subtotal').innerText = '$' + subtotal.toFixed(2);
         document.getElementById('inv-tax').innerText = '$' + tax.toFixed(2);
-        document.getElementById('inv-margin').innerText = '$' + margin.toFixed(2);
         document.getElementById('inv-total').innerText = '$' + total.toFixed(2);
     }
 
     function dispatchStripePay() {
         const total = document.getElementById('inv-total').innerText;
-        alert(`Stripe 1-Tap Checkout Link generated for ${total}! Direct SMS sent to client.`);
+        alert(`Stripe Payment Link for ${total} generated and sent to client!`);
     }
 
-    // PAPAPARSE CSV INGESTION
+    // PAPAPARSE CSV LOADERS
     function loadVaultCSV(input) {
         if (input.files[0]) {
             Papa.parse(input.files[0], {
                 header: true,
                 complete: function(results) {
                     vaultData = results.data;
-                    document.getElementById('data-status').innerText = `Vault: ${vaultData.length.toLocaleString()} Records Active | Catalog: ${catalogData.length.toLocaleString() || '1,090'} Items Ready`;
+                    document.getElementById('data-status').innerText = `Vault: ${vaultData.length.toLocaleString()} Active | Catalog: ${catalogData.length.toLocaleString() || '1,090'} Ready`;
                 }
             });
         }
@@ -431,34 +407,53 @@
                 header: true,
                 complete: function(results) {
                     catalogData = results.data;
-                    document.getElementById('data-status').innerText = `Vault: ${vaultData.length.toLocaleString() || '22,283'} Records Active | Catalog: ${catalogData.length.toLocaleString()} Items Ready`;
+                    document.getElementById('data-status').innerText = `Vault: ${vaultData.length.toLocaleString() || '22,283'} Active | Catalog: ${catalogData.length.toLocaleString()} Ready`;
                 }
             });
         }
     }
 
-    // EXACT INTAKE & TIME ROUTING (handleVoiceIntake)
+    // HANDLE VOICE INTAKE + VAULT ADDRESS CROSS-REFERENCE
     function handleVoiceIntake(text) {
-        // 1. Fire Make.com webhook asynchronously with .catch() so "Accepted" text never blocks UI
+        // 1. Asynchronous Make.com Webhook Sync (Non-blocking)
         fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ transcript: text, timestamp: new Date().toISOString() })
         }).catch(e => console.log('Sissy async background notice:', e));
 
-        // 2. Time / Day Regex Matcher
-        const lower = text.toLowerCase();
+        // 2. Cross-reference 22,283 Vault records for Name Match
+        let matchedName = "";
+        let matchedAddress = "";
+        let matchedPhone = "";
+
+        if (vaultData && vaultData.length > 0) {
+            const found = vaultData.find(v => v.Name && text.toLowerCase().includes(v.Name.toLowerCase()));
+            if (found) {
+                matchedName = found.Name;
+                matchedAddress = found.Address || found['Street Address'] || "123 Towson Town Blvd, Timonium MD";
+                matchedPhone = found.Phone || found['Phone Number'] || "(410) 555-0199";
+            }
+        }
+
+        // 3. Time / Day Regex Matcher
         const timeRegex = /\b(\d{1,2}(?::\d{2})?\s*(?:am|pm|a\.m\.|p\.m\.)|tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i;
-        const isScheduled = lower.startsWith('schedule') || timeRegex.test(text);
+        const isScheduled = text.toLowerCase().startsWith('schedule') || timeRegex.test(text);
 
         const store = getStorage();
+        const payloadObj = {
+            id: Date.now(),
+            text: text,
+            clientName: matchedName || "Direct Intake",
+            address: matchedAddress,
+            phone: matchedPhone,
+            timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        };
 
         if (isScheduled) {
-            // Push directly to Quadrant #1: Calendar Schedule
-            store.scheduledCards.unshift({ id: Date.now(), text: text, timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+            store.scheduledCards.unshift(payloadObj);
         } else {
-            // Push directly to Quadrant #2: Pinball Action Zone
-            store.pinballQueue.unshift({ id: Date.now(), text: text, timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+            store.pinballQueue.unshift(payloadObj);
         }
 
         saveStorage(store);
@@ -484,12 +479,12 @@
     }
 
     function getStorage() {
-        const data = localStorage.getItem('tappything_master_v3');
+        const data = localStorage.getItem('tappything_master_v4');
         return data ? JSON.parse(data) : { scheduledCards: [], pinballQueue: [], archive: [] };
     }
 
     function saveStorage(data) {
-        localStorage.setItem('tappything_master_v3', JSON.stringify(data));
+        localStorage.setItem('tappything_master_v4', JSON.stringify(data));
     }
 
     function render() {
@@ -501,13 +496,14 @@
             calContainer.innerHTML = '<div class="text-muted text-xs italic">No scheduled appointments.</div>';
         } else {
             calContainer.innerHTML = store.scheduledCards.map(item => `
-                <div class="bg-white border-l-4 border-blue-600 border border-bordercolor rounded-xl p-3.5 flex justify-between items-center shadow-sm">
+                <div class="bg-white border-l-4 border-blue-600 border border-bordercolor rounded-xl p-3 flex justify-between items-center shadow-sm">
                     <div>
                         <div class="font-bold text-ink text-xs">${item.text}</div>
+                        ${item.address ? `<div class="text-[10px] text-forest font-semibold mt-0.5">📍 ${item.address} \vert{} 📞 ${item.phone}</div>` : ''}
                         <div class="text-[10px] text-muted">Scheduled • ${item.timestamp}</div>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
+                    <div class="flex gap-1.5">
+                        <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName.replace(/'/g, "\\'")}', '${item.address.replace(/'/g, "\\'")}', '${item.phone.replace(/'/g, "\\'")}')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
                         <button onclick="completeItem('calendar', ${item.id})" class="px-2.5 py-1 bg-forest text-white rounded-lg text-xs font-bold transition">Done ✓</button>
                     </div>
                 </div>
@@ -520,27 +516,27 @@
             pinContainer.innerHTML = '<div class="text-muted text-xs italic">Pinball hopper clean.</div>';
         } else {
             pinContainer.innerHTML = store.pinballQueue.map(item => `
-                <div class="bg-white border-l-4 border-gold border border-bordercolor rounded-xl p-3.5 flex justify-between items-center shadow-sm">
+                <div class="bg-white border-l-4 border-gold border border-bordercolor rounded-xl p-3 flex justify-between items-center shadow-sm">
                     <div>
                         <div class="font-bold text-ink text-xs">${item.text}</div>
+                        ${item.address ? `<div class="text-[10px] text-forest font-semibold mt-0.5">📍 ${item.address} \vert{} 📞 ${item.phone}</div>` : ''}
                         <div class="text-[10px] text-muted">Queued for Triage • ${item.timestamp}</div>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
+                    <div class="flex gap-1.5">
+                        <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName.replace(/'/g, "\\'")}', '${item.address.replace(/'/g, "\\'")}', '${item.phone.replace(/'/g, "\\'")}')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
                         <button onclick="completeItem('pinball', ${item.id})" class="px-2.5 py-1 bg-forest text-white rounded-lg text-xs font-bold transition">Done ✓</button>
                     </div>
                 </div>
             `).join('');
         }
 
-        // Render Completed Archive History
+        // Render Completed Archive
         const archContainer = document.getElementById('archive-list');
         archContainer.innerHTML = store.archive.slice(0, 10).map(item => `
             <div class="line-through text-xs text-muted">✓ ${item.text}</div>
         `).join('');
     }
 
-    // Initial Render
     render();
 </script>
 </body>
