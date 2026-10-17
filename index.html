@@ -41,44 +41,46 @@
 
 <div class="w-full max-w-5xl flex flex-col gap-5 relative">
 
-    <!-- MASTER HEADER (LUXURY LEXUS STANDARD) -->
-    <header class="bg-cardbg border border-bordercolor rounded-2xl p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+    <!-- MASTER HEADER (MOBILE CENTERED & PROMINENT BRANDING) -->
+    <header class="bg-cardbg border border-bordercolor rounded-2xl p-5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-5 text-center md:text-left">
         
-        <!-- LEFT: CURSIVE F + FOREVER CARD + NETWORKING TOGGLE -->
-        <div class="flex items-center gap-3">
+        <!-- LEFT: CURSIVE F + FOREVER CARD + SUBTITLE -->
+        <div class="flex items-center gap-3 justify-center md:justify-start">
             <span class="font-cursive text-7xl text-gold font-bold select-none leading-none">F</span>
             <div class="flex flex-col">
-                <span class="font-extrabold text-sm tracking-wide text-ink">FOREVER CARD™</span>
-                <button onclick="toggleNetworking()" id="net-toggle-btn" class="mt-1 px-2.5 py-0.5 bg-parchment border border-bordercolor rounded-full text-[10px] font-bold text-forest hover:bg-bordercolor transition flex items-center gap-1 w-fit">
+                <span class="font-extrabold text-base tracking-wide text-ink leading-tight">FOREVER CARD™</span>
+                <span class="text-xs font-bold text-forest tracking-normal">Powered by TappyThing</span>
+                <button onclick="toggleNetworking()" id="net-toggle-btn" class="mt-1.5 px-2.5 py-0.5 bg-parchment border border-bordercolor rounded-full text-[10px] font-bold text-forest hover:bg-bordercolor transition flex items-center gap-1 w-fit mx-auto md:mx-0">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
                     <span>Networking: ON</span>
                 </button>
             </div>
         </div>
 
-        <!-- CENTER: TYLER'S CIRCULAR FRESH MASCOT EMBLEM + CONTROLS + SILENT INPUT BAR -->
-        <div class="flex flex-col items-center gap-2 w-full max-w-md">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-full bg-forest text-gold border-2 border-gold flex items-center justify-center font-bold text-2xl shadow-md select-none">
-                    🤵
-                </div>
-                <div class="flex gap-2">
-                    <button id="voice-btn" onclick="toggleVoiceIntake()" class="px-4 py-2 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5">
-                        <span>🎙️</span> <span id="voice-label">TALK TO FRESH</span>
-                    </button>
-                    <button onclick="triggerCamera()" class="px-3.5 py-2 bg-ink hover:bg-black text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5">
-                        <span>📷</span> <span>CAM</span>
-                    </button>
-                </div>
+        <!-- CENTER: PROMINENT FRESH MASCOT EMBLEM (4X SCALE) + CONTROLS + SILENT SEARCH -->
+        <div class="flex flex-col items-center gap-3 w-full max-w-md mx-auto">
+            
+            <!-- PROMINENT FRESH EMBLEM LOGO (THE "G" OF TAPPYTHING) -->
+            <div class="w-24 h-24 rounded-full border-4 border-gold bg-white shadow-lg overflow-hidden flex items-center justify-center relative">
+                <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';">
+            </div>
+
+            <div class="flex gap-2 justify-center w-full">
+                <button id="voice-btn" onclick="toggleVoiceIntake()" class="px-5 py-2.5 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2">
+                    <span>🎙️</span> <span id="voice-label">TALK TO FRESH</span>
+                </button>
+                <button onclick="triggerCamera()" class="px-4 py-2.5 bg-ink hover:bg-black text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5">
+                    <span>📷</span> <span>CAM</span>
+                </button>
             </div>
             
             <input type="text" id="text-intake" placeholder="🔍 Search or speak/type intake note..." 
                 onkeydown="checkSubmit(event)"
-                class="w-full px-3.5 py-2 border border-bordercolor rounded-xl bg-white text-ink focus:outline-none focus:border-gold text-xs shadow-inner">
+                class="w-full px-3.5 py-2 border border-bordercolor rounded-xl bg-white text-ink focus:outline-none focus:border-gold text-xs shadow-inner text-center md:text-left">
         </div>
 
         <!-- RIGHT: MULTI-TENANT SAAS SUBHEADER -->
-        <div class="flex flex-col items-end text-right">
+        <div class="flex flex-col items-center md:items-end text-center md:text-right">
             <span class="text-xs font-extrabold text-ink tracking-tight">Subscriber Workspace</span>
             <span id="system-status" class="text-[10px] text-forest font-bold mt-0.5">⚡ Digital Coordinator Active</span>
         </div>
@@ -86,7 +88,7 @@
     </header>
 
     <!-- LIVE STATUS BANNER -->
-    <div id="status-banner" class="hidden bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs px-4 py-2 rounded-xl font-bold transition"></div>
+    <div id="status-banner" class="hidden bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs px-4 py-2 rounded-xl font-bold transition text-center"></div>
 
     <!-- TWO-COLUMN OPERATIONAL FLOOR -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -131,11 +133,13 @@
     <div>
         <!-- DRAWER HEADER -->
         <div class="flex justify-between items-center border-b border-bordercolor pb-3 mb-4">
-            <div class="flex items-center gap-2">
-                <span class="font-cursive text-4xl text-gold font-bold">F</span>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full border border-gold bg-white overflow-hidden flex items-center justify-center">
+                    <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';">
+                </div>
                 <div>
                     <h3 id="drawer-title" class="font-bold text-sm text-ink">Client Workstation & Forever Card</h3>
-                    <div id="drawer-subtitle" class="text-[11px] text-muted">Sissy Backend Verified</div>
+                    <div id="drawer-subtitle" class="text-[11px] text-muted">Sissy Cloud Backend Verified</div>
                 </div>
             </div>
             <button onclick="closeWorkstation()" class="text-muted font-bold text-xl hover:text-ink">✕</button>
@@ -150,11 +154,12 @@
 
         <!-- ROOM 1: SHOP OPS & ACTIVE RECORD -->
         <div id="room1-content" class="flex flex-col gap-4">
-            
             <div class="bg-white p-4 rounded-xl border border-bordercolor shadow-sm flex flex-col gap-2">
                 <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between">
-                    <span class="flex items-center gap-1.5">
-                        <span class="w-5 h-5 rounded-full bg-forest text-gold flex items-center justify-center text-[10px]">🤵</span>
+                    <span class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-full border border-gold overflow-hidden">
+                            <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';">
+                        </div>
                         <span>Forever Card™ Record</span>
                     </span>
                     <span id="vault-badge" class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">Active</span>
@@ -198,7 +203,6 @@
         <!-- ROOM 2: CATALOG INVOICING & STRIPE DISPATCH -->
         <div id="room2-content" class="hidden flex flex-col gap-3 text-xs">
             <div class="font-bold uppercase tracking-wider text-muted">Line-Item Catalog Builder</div>
-            
             <select id="catalog-select" onchange="addCatalogItem(this.value)" class="w-full p-2 border border-bordercolor rounded-xl bg-white focus:outline-none text-xs">
                 <option value="">-- Add Catalog Item --</option>
                 <option value="Lawnmower Blade Sharpening|35.00">Lawnmower Blade Sharpening — $35.00</option>
@@ -398,7 +402,6 @@
             body: JSON.stringify({ transcript: text, timestamp: new Date().toISOString() })
         }).catch(e => console.log('Sissy sync notice:', e));
 
-        // Time / Day Regex Matcher for instant local presentation
         const timeRegex = /\b(\d{1,2}(?::\d{2})?\s*(?:am|pm|a\.m\.|p\.m\.)|tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i;
         const lower = text.toLowerCase();
         const isScheduled = lower.startsWith('schedule') || timeRegex.test(text);
@@ -440,14 +443,15 @@
     }
 
     function cardToolbarHtml(itemText) {
-        const safeText = itemText.replace(/'/g, "\\'");
         return `
-            <div class="flex items-center gap-1.5 mt-2 pt-1.5 border-t border-bordercolor/60">
-                <span class="w-4 h-4 rounded-full bg-forest text-gold text-[8px] font-bold flex items-center justify-center">🤵</span>
-                <button onclick="toggleVoiceIntake()" class="px-1.5 py-0.5 bg-parchment hover:bg-bordercolor text-[10px] font-bold text-ink rounded border border-bordercolor flex items-center gap-0.5">
+            <div class="flex items-center gap-2 mt-2 pt-1.5 border-t border-bordercolor/60">
+                <div class="w-5 h-5 rounded-full border border-gold overflow-hidden flex-shrink-0">
+                    <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';">
+                </div>
+                <button onclick="toggleVoiceIntake()" class="px-2 py-0.5 bg-parchment hover:bg-bordercolor text-[10px] font-bold text-ink rounded border border-bordercolor flex items-center gap-0.5">
                     <span>🎙️</span> <span>Mic</span>
                 </button>
-                <button onclick="triggerCamera()" class="px-1.5 py-0.5 bg-parchment hover:bg-bordercolor text-[10px] font-bold text-ink rounded border border-bordercolor flex items-center gap-0.5">
+                <button onclick="triggerCamera()" class="px-2 py-0.5 bg-parchment hover:bg-bordercolor text-[10px] font-bold text-ink rounded border border-bordercolor flex items-center gap-0.5">
                     <span>📷</span> <span>Cam</span>
                 </button>
             </div>
@@ -455,12 +459,12 @@
     }
 
     function getStorage() {
-        const data = localStorage.getItem('tappything_lexus_v1');
+        const data = localStorage.getItem('tappything_lexus_v2');
         return data ? JSON.parse(data) : { scheduledCards: [], pinballQueue: [], archive: [] };
     }
 
     function saveStorage(data) {
-        localStorage.setItem('tappything_lexus_v1', JSON.stringify(data));
+        localStorage.setItem('tappything_lexus_v2', JSON.stringify(data));
     }
 
     function render() {
