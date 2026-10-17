@@ -6,7 +6,7 @@
   <title>FOREVER CARD™ — Powered by TappyThing</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <!-- PapaParse for 5ms Client-Side In-Memory Search (22,283 Vault + 1,090 Catalog) -->
+  <!-- PapaParse for 5ms In-Memory Search (22,283 Vault + 1,090 Catalog) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -132,11 +132,11 @@
           <span class="text-[11px] font-mono font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded">Time Stream Active</span>
         </div>
         <div id="scheduledItemsSlot" class="space-y-2.5 max-h-80 overflow-y-auto">
-          <!-- Dynamically populated with scheduled Forever Cards -->
+          <!-- Dynamically Populated -->
         </div>
       </div>
 
-      <!-- QUADRANT #2: Dynamic Pinball Action Zone (Action Queue Forever Cards) -->
+      <!-- QUADRANT #2: Dynamic Pinball Action Zone -->
       <div class="lg:col-span-7 boutique-card rounded-2xl p-5 space-y-4">
         <div class="flex items-center justify-between border-b border-stone-200 pb-3">
           <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📍 PINBALL ACTION ZONE</h2>
@@ -252,41 +252,11 @@
   <script>
     let vaultData = [];
     let catalogData = [];
+    let scheduledCards = []; // Pure Dynamic In-Memory Array
     let isListening = false, recognition = null, lastPhrase = '';
     let currentInvoiceItems = [];
     let currentActivePhone = '';
     let isGlobalNetworkingOn = true;
-
-    // Seeded Scheduled Forever Cards Stream
-    const scheduledCards = [
-      {
-        id: "11264",
-        name: "Catherine Noblitt",
-        time: "8:30 AM",
-        address: "1 Smeton Pl Unit 1305, Towson, MD",
-        phone: "4109081084",
-        ticketAmount: 0,
-        networkingStatus: true
-      },
-      {
-        id: "10432",
-        name: "William Sullivan",
-        time: "10:15 AM",
-        address: "Aerus Timonium Shop Floor",
-        phone: "4105550199",
-        ticketAmount: 1495.00,
-        networkingStatus: true
-      },
-      {
-        id: "11890",
-        name: "Suzie Gray",
-        time: "1:00 PM",
-        address: "12 Birch Ave, Lutherville, MD",
-        phone: "4105550144",
-        ticketAmount: 189.00,
-        networkingStatus: false
-      }
-    ];
 
     window.onload = function() {
       setupSpeech();
@@ -346,13 +316,18 @@
       alert(`🌐 Forever Networking Global Commerce Switch is now ${isGlobalNetworkingOn ? 'ON' : 'OFF'}!`);
     }
 
-    // Render Time-Ordered Schedule Stream of Forever Cards
+    // Dynamic Render for Schedule Grid
     function renderScheduledCards() {
       const slot = document.getElementById('scheduledItemsSlot');
+      if (!scheduledCards || scheduledCards.length === 0) {
+        slot.innerHTML = '<p class="text-xs text-stone-400 italic p-4 text-center">Schedule Hopper Ready • Intake jobs by voice or type to schedule</p>';
+        return;
+      }
+
       slot.innerHTML = '';
       scheduledCards.forEach(card => {
         slot.innerHTML += `
-          <div onclick="openWorkstation('${card.name}', '${card.address}', '${card.phone}', ${card.ticketAmount})" 
+          <div onclick="openWorkstation('${card.name}', '${card.address}', '${card.phone}', ${card.ticketAmount || 0})" 
                class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 shadow-sm hover:border-emerald-700 hover:shadow-md transition flex items-center justify-between">
             <div class="space-y-0.5">
               <div class="flex items-center gap-2">
@@ -368,6 +343,25 @@
           </div>
         `;
       });
+    }
+
+    // Schedule Engine Helper
+    function scheduleForeverCard(id, name, address, phone) {
+      const timeStr = prompt(`Set schedule time slot for ${name}:`, "Today — 10:00 AM");
+      if (!timeStr) return;
+
+      scheduledCards.push({
+        id: id || "VAULT",
+        name: name,
+        time: timeStr,
+        address: address || "Address Pending",
+        phone: phone || "",
+        ticketAmount: 0,
+        networkingStatus: true
+      });
+
+      renderScheduledCards();
+      confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
     }
 
     // Door 1 Ingestion Trigger
@@ -470,9 +464,9 @@
             <p class="text-[10px] text-amber-700 font-medium">💬 "${originalSpeech}"</p>
           </div>
           <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
+            <button onclick="scheduleForeverCard('${clientId}', '${name}', '${address}', '${cleanPhone}')" class="p-2 bg-emerald-100 text-emerald-800 rounded-lg text-xs font-bold hover:bg-emerald-200">📅 Schedule</button>
             <a href="tel:${cleanPhone}" class="p-2 bg-emerald-600 text-white rounded-lg text-xs font-bold">📞</a>
             <a href="sms:${cleanPhone}" class="p-2 bg-indigo-600 text-white rounded-lg text-xs font-bold">💬</a>
-            <a href="https://maps.google.com/?q=${encodeURIComponent(address)}" target="_blank" class="p-2 bg-amber-500 text-stone-900 rounded-lg text-xs font-bold">🗺️</a>
           </div>
         </div>
       `;
