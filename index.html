@@ -44,9 +44,9 @@
           </div>
         </div>
 
-        <!-- CENTER: TYLER'S FRESH LOGO MASCOT & CONTROLS -->
+        <!-- CENTER: TYLER'S ENLARGED FRESH LOGO MASCOT (w-20 h-20) & CONTROLS -->
         <div class="flex flex-col items-center gap-2 w-full max-w-sm">
-          <div class="w-16 h-16 rounded-full border-2 border-emerald-700 bg-white p-0.5 shadow-md flex items-center justify-center overflow-hidden">
+          <div class="w-20 h-20 rounded-full border-2 border-emerald-700 bg-white p-0.5 shadow-md flex items-center justify-center overflow-hidden">
             <img 
               src="fresh_logo.png" 
               alt="FRESH Digital Coordinator" 
@@ -82,24 +82,15 @@
           <p id="freshConfirmationBar" class="text-[11px] font-bold text-emerald-800 font-mono hidden"></p>
         </div>
 
-        <!-- RIGHT: SUBSCRIBER IDENTITY & DATA INGESTION -->
+        <!-- RIGHT: SUBSCRIBER IDENTITY -->
         <div class="text-center md:text-right space-y-1">
           <h2 class="text-sm font-extrabold text-stone-900">Aerus Timonium</h2>
           <p class="text-[11px] font-bold text-emerald-800 flex items-center justify-center md:justify-end gap-1.5 font-mono">
             <span class="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
             Subscriber Hub Active
           </p>
-          <div class="flex flex-col items-center md:items-end gap-0.5 mt-1 font-mono text-[10px]">
-            <label for="csvInput" class="text-stone-500 hover:text-emerald-800 cursor-pointer underline block">
-              <span id="vaultStatus">📁 Load 22,283 Vault CSV</span>
-            </label>
-            <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="loadVaultCSV(this)">
-
-            <label for="catalogCsvInputHeader" class="text-stone-500 hover:text-emerald-800 cursor-pointer underline block">
-              <span id="catalogStatus">📦 Load 1,090 Catalog CSV</span>
-            </label>
-            <input type="file" id="catalogCsvInputHeader" accept=".csv" class="hidden" onchange="loadCatalogCSV(this)">
-          </div>
+          <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="loadVaultCSV(this)">
+          <input type="file" id="catalogCsvInputHeader" accept=".csv" class="hidden" onchange="loadCatalogCSV(this)">
         </div>
 
       </div>
@@ -114,8 +105,8 @@
           <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📅 SCHEDULED FOREVER CARDS</h2>
           <span class="text-[11px] font-mono font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded">Time Stream Active</span>
         </div>
-        <div id:="scheduledItemsSlot" id="scheduledItemsSlot" class="space-y-2.5 max-h-80 overflow-y-auto">
-          <!-- Dynamically Populated & Stored in LocalStorage -->
+        <div id="scheduledItemsSlot" class="space-y-2.5 max-h-80 overflow-y-auto">
+          <!-- Dynamically Populated -->
         </div>
       </div>
 
@@ -168,27 +159,39 @@
           <button id="stage1" onclick="setStage(1)" class="p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white">1. Intake & Photo</button>
           <button id="stage2" onclick="setStage(2)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">2. Diagnostics</button>
           <button id="stage3" onclick="setStage(3)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">3. Proposal</button>
-          <button id="stage4" onclick="setStage(4)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">4. Ready Wall 🎉</button>
+          <button id="stage4" onclick="setStage(4)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">4. Ready / Complete 🎉</button>
         </div>
       </div>
 
-      <!-- DIRECT COMMUNICATION ACTION BAR -->
-      <div class="grid grid-cols-2 gap-2">
-        <a id="drawerCallBtn" href="tel:" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">📞 Call Customer</a>
-        <a id="drawerTextBtn" href="sms:" class="p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">💬 Text Customer</a>
+      <!-- DIRECT COMMUNICATION & IN-DRAWER MIC ACTION BAR -->
+      <div class="grid grid-cols-3 gap-2">
+        <a id="drawerCallBtn" href="tel:" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">📞 Call</a>
+        <a id="drawerTextBtn" href="sms:" class="p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">💬 Text</a>
+        <button onclick="toggleVoiceIntake()" class="p-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">🎙️ Note to Card</button>
       </div>
 
       <!-- EQUIPMENT DIAGNOSTICS & ATTACHMENTS -->
       <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
-        <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Equipment Diagnostics & Sales Collateral</h3>
+        <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Equipment Diagnostics & Field Notes</h3>
         <textarea id="techNotesInput" rows="3" placeholder="Enter diagnostic observations, unit serials, or field notes..." class="w-full p-3 rounded-xl border border-stone-300 text-xs text-stone-900 bg-stone-50 focus:outline-none focus:border-emerald-700 font-medium"></textarea>
         
         <div class="flex items-center justify-between pt-1">
           <label class="px-3.5 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold text-xs rounded-xl shadow cursor-pointer flex items-center gap-1.5">
             📎 Attach Sell Sheet / File
-            <input type="file" class="hidden" onchange="showConfirmation('📎 File attached to Forever Card Proposal!')">
+            <input type="file" class="hidden" onchange="showConfirmation('📎 File attached to Forever Card!')">
           </label>
           <span class="text-[10px] text-stone-400 font-mono">PDFs, Photos, Spec Sheets</span>
+        </div>
+      </div>
+
+      <!-- DYNAMIC ACTIVE TASKS & ERRANDS CHECKLIST INSIDE WORKSTATION -->
+      <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
+        <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider flex items-center justify-between">
+          <span>🛒 Active Tasks & Shared Errands</span>
+          <span id="taskCountBadge" class="text-emerald-700 font-mono font-bold">0 Pending</span>
+        </h3>
+        <div id="drawerTasksContainer" class="space-y-2 text-xs">
+          <p class="text-stone-400 italic">No open errands for this card.</p>
         </div>
       </div>
     </div>
@@ -198,15 +201,12 @@
       <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
         <div class="flex justify-between items-center">
           <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Line Item Catalog Builder</h3>
-          <span id="catalogBadge" class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-mono">1,090 Catalog Linked</span>
         </div>
 
         <div class="flex gap-2">
-          <input type="file" id="catalogCsvInputDrawer" accept=".csv" class="hidden" onchange="loadCatalogCSV(this)">
           <select id="partSelect" class="flex-1 text-xs border border-stone-300 rounded-xl p-2 bg-stone-50 font-medium">
             <option value="">📁 Select catalog part or service...</option>
           </select>
-          <button onclick="document.getElementById('catalogCsvInputDrawer').click()" class="px-3 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold text-xs rounded-xl shadow">📁 CSV</button>
           <button onclick="addInvoiceItem()" class="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow">+ Add</button>
         </div>
 
@@ -261,8 +261,8 @@
   <script>
     let vaultData = [];
     let catalogData = [];
-    // Load persisted cards from LocalStorage so appointments NEVER vanish on reload
-    let scheduledCards = JSON.parse(localStorage.getItem('tappy_scheduled_cards') || '[]'); 
+    let scheduledCards = []; 
+    let activeTasks = []; // Shared tasks & errands array
     let isListening = false, recognition = null, lastPhrase = '';
     let currentInvoiceItems = [];
     let currentActivePhone = '';
@@ -271,6 +271,10 @@
     window.onload = function() {
       setupSpeech();
       renderScheduledCards();
+
+      // Silent Auto-Fetch for CSV files
+      fetch('export_export (34).csv').then(r => r.text()).then(t => parseVaultCSVText(t)).catch(e => console.log('Vault auto-load ready'));
+      fetch('export_export (35).csv').then(r => r.text()).then(t => parseCatalogCSVText(t)).catch(e => console.log('Catalog auto-load ready'));
     };
 
     function showConfirmation(msg) {
@@ -355,7 +359,7 @@
       }
 
       slot.innerHTML = '';
-      scheduledCards.forEach((card, index) => {
+      scheduledCards.forEach(card => {
         slot.innerHTML += `
           <div onclick="openWorkstation('${card.name}', '${card.address}', '${card.phone}', ${card.ticketAmount || 0})" 
                class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 shadow-sm hover:border-emerald-700 hover:shadow-md transition flex items-center justify-between">
@@ -376,115 +380,98 @@
     }
 
     function pushToScheduleDirect(id, name, address, phone, timeStr) {
-      scheduledCards.unshift({
+      scheduledCards.push({
         id: id || "VAULT",
         name: name,
         time: timeStr,
         address: address || "Address Pending",
-        phone: phone || "(410) 499-1313",
+        phone: phone || "",
         ticketAmount: 0,
         networkingStatus: true
       });
-      // Save permanently to browser localStorage
-      localStorage.setItem('tappy_scheduled_cards', JSON.stringify(scheduledCards));
       renderScheduledCards();
       showConfirmation(`Card scheduled for ${timeStr}`);
     }
 
-    function loadVaultCSV(input) {
-      const file = input.files[0];
-      if (!file) return;
-
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: function(results) {
-          vaultData = results.data;
-          const statusElem = document.getElementById('vaultStatus');
-          statusElem.innerText = `⚡ ${vaultData.length.toLocaleString()} Vault Records In-Memory`;
-          statusElem.className = "text-[10px] text-emerald-700 font-bold font-mono block";
-        }
-      });
+    function parseVaultCSVText(text) {
+      Papa.parse(text, { header: true, skipEmptyLines: true, complete: r => { vaultData = r.data; } });
     }
 
-    function parseCatalogCSVText(csvText) {
-      Papa.parse(csvText, {
+    function parseCatalogCSVText(text) {
+      Papa.parse(text, {
         header: true,
         skipEmptyLines: true,
-        complete: function(results) {
-          catalogData = results.data;
+        complete: function(r) {
+          catalogData = r.data;
           const select = document.getElementById('partSelect');
-          select.innerHTML = '<option value="">Select from 1,090 Catalog Parts...</option>';
-
-          let validCount = 0;
+          select.innerHTML = '<option value="">Select catalog part or service...</option>';
           catalogData.forEach(item => {
             const name = item['Name'] || item['Item / Service'] || '';
             const price = parseFloat(item['Price'] || 0).toFixed(2);
             const cost = parseFloat(item['Cost'] || 0).toFixed(2);
-            if (name) {
-              select.innerHTML += `<option value="${price}|${cost}|${name}">${name} — ${price} (Cost: ${cost})</option>`;
-              validCount++;
-            }
+            if (name) select.innerHTML += `<option value="${price}|${cost}|${name}">${name} — $${price}</option>`;
           });
-
-          const statusElem = document.getElementById('catalogStatus');
-          if (statusElem) {
-            statusElem.innerText = `⚡ ${validCount.toLocaleString()} Catalog Parts Linked`;
-            statusElem.className = "text-[10px] text-emerald-700 font-bold font-mono block";
-          }
-          document.getElementById('catalogBadge').innerText = `${validCount.toLocaleString()} Catalog Parts Active`;
         }
       });
     }
 
-    function loadCatalogCSV(input) {
-      const file = input.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) { parseCatalogCSVText(e.target.result); };
-      reader.readAsText(file);
-    }
-
-    // Bulletproof Time Parser & Auto-Calendar Router
+    // Smart Intake Router — Detects Shared Operational Errands & Tasks
     function handleVoiceIntake(text) {
       const emptyState = document.getElementById('pinballEmptyState');
       if (emptyState) emptyState.remove();
 
       const query = text.toLowerCase().trim();
-      
-      // Captures "2 pm", "2pm", "9:00", "9:15 am", "8:30", "11 am", "10am"
-      const timeMatch = text.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/i);
-      const extractedTime = timeMatch ? `Today — ${timeMatch[0].toUpperCase()}` : null;
+      const errandKeywords = ['milk', 'gas', 'grocery', 'pick up', 'errand', 'buy', "bj's", 'bjs', 'store', 'hardware', 'supplies'];
+      const isErrand = errandKeywords.some(kw => query.includes(kw));
 
-      const matches = vaultData.filter(client => {
-        const name = (client['Name'] || '').toLowerCase();
-        return name.includes(query) || query.includes(name);
-      });
+      if (isErrand) {
+        // Shared Errand / Task Router
+        const taskId = 'TASK-' + Math.floor(1000 + Math.random() * 9000);
+        activeTasks.push({ id: taskId, text: text, done: false });
+        renderErrandPinballCard(taskId, text);
+        showConfirmation("🛒 Shared errand logged to Pinball for William");
+      } else {
+        const timeMatch = text.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/i);
+        const extractedTime = timeMatch ? `Today — ${timeMatch[0].toUpperCase()}` : null;
 
-      if (extractedTime) {
-        // Direct-to-Calendar Route (Zero Popups)
-        if (matches.length > 0) {
+        const matches = vaultData.filter(client => {
+          const name = (client['Name'] || '').toLowerCase();
+          return name.includes(query) || query.includes(name);
+        });
+
+        if (extractedTime && matches.length > 0) {
           const client = matches[0];
           pushToScheduleDirect(client['Client #'], client['Name'], client['Address'], client['Phone'], extractedTime);
         } else {
-          pushToScheduleDirect("VAULT-23377", text, "1965 Greenspring Dr, Timonium", "(410) 499-1313", extractedTime);
+          if (matches.length > 0) {
+            matches.slice(0, 3).forEach(client => renderMatchedCard(client, text));
+          } else {
+            renderRawIntakeCard(text);
+          }
+          showConfirmation("Intake queued to Pinball for Sissy");
         }
-      } else {
-        // Route to Pinball for Sissy
-        if (matches.length > 0) {
-          matches.slice(0, 3).forEach(client => renderMatchedCard(client, text));
-        } else {
-          renderRawIntakeCard(text);
-        }
-        showConfirmation("Intake queued to Pinball for Sissy");
       }
 
-      // Webhook Pipe
       fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ transcript: text, assignedTo: "Sissy (Norby)", timestamp: new Date().toISOString() })
       }).catch(err => console.log('Pipe fired'));
+    }
+
+    function renderErrandPinballCard(taskId, text) {
+      const queue = document.getElementById('pinballQueue');
+      const cardHTML = `
+        <div onclick="openWorkstation('William Sullivan', '1965 Greenspring Dr, Timonium', '4104991313', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-amber-500 shadow-sm hover:shadow-md transition flex items-center justify-between">
+          <div class="space-y-0.5">
+            <span class="text-[10px] font-extrabold text-amber-700 uppercase tracking-wide">🛒 Shared Errand / Task (#${taskId})</span>
+            <h3 class="font-bold text-stone-900 text-xs">"${text}"</h3>
+            <p class="text-[11px] text-stone-500">Assigned: William Sullivan (Shop/Home)</p>
+          </div>
+          <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
+        </div>
+      `;
+      queue.insertAdjacentHTML('afterbegin', cardHTML);
     }
 
     function renderMatchedCard(client, originalSpeech) {
@@ -497,12 +484,12 @@
       const cardHTML = `
         <div onclick="openWorkstation('${name}', '${address}', '${cleanPhone}', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-emerald-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
           <div class="space-y-0.5">
-            <span class="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wide">Forever Card Match (#${clientId})</span>
+            <span class="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wide">Vault Match (#${clientId})</span>
             <h3 class="font-bold text-stone-900 text-xs">${name}</h3>
             <p class="text-[11px] text-stone-600">${address} • ${client['Phone'] || ''}</p>
             <p class="text-[10px] text-amber-700 font-medium">💬 "${originalSpeech}"</p>
           </div>
-          <button onclick="event.stopPropagation(); pushToScheduleDirect('${clientId}', '${name}', '${address}', '${cleanPhone}', 'Today — Scheduled')" class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 hover:bg-emerald-100">📅 Schedule ➔</button>
+          <button onclick="event.stopPropagation(); pushToScheduleDirect('${clientId}', '${name}', '${address}', '${cleanPhone}', 'Today — 9:00 AM')" class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 hover:bg-emerald-100">📅 Schedule ➔</button>
         </div>
       `;
       queue.insertAdjacentHTML('afterbegin', cardHTML);
@@ -511,13 +498,13 @@
     function renderRawIntakeCard(text) {
       const queue = document.getElementById('pinballQueue');
       const cardHTML = `
-        <div onclick="openWorkstation('Voice Intake', 'New Record', '(410) 499-1313', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-blue-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
+        <div onclick="openWorkstation('Voice Intake', 'New Record', '(410) 555-0100', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-blue-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
           <div>
             <span class="text-[10px] font-extrabold text-blue-700 uppercase tracking-wide">Live Intake Card</span>
             <h3 class="font-bold text-stone-900 text-xs">"${text}"</h3>
             <p class="text-[11px] text-stone-500">Queued for Sissy</p>
           </div>
-          <button onclick="event.stopPropagation(); pushToScheduleDirect('INTAKE', text, '1965 Greenspring Dr, Timonium', '(410) 499-1313', 'Today — Scheduled')" class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 hover:bg-emerald-100">📅 Schedule ➔</button>
+          <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
         </div>
       `;
       queue.insertAdjacentHTML('afterbegin', cardHTML);
@@ -533,6 +520,7 @@
       
       currentInvoiceItems = amount > 0 ? [{ name: "Approved Initial Service", cost: amount * 0.2, retail: amount }] : [];
       renderInvoice();
+      renderDrawerTasks();
 
       switchRoom(1);
       document.getElementById('drawerOverlay').classList.remove('hidden');
@@ -542,6 +530,36 @@
     function closeWorkstation() {
       document.getElementById('drawerOverlay').classList.add('hidden');
       document.getElementById('workstationDrawer').classList.add('translate-x-full');
+    }
+
+    function renderDrawerTasks() {
+      const container = document.getElementById('drawerTasksContainer');
+      const badge = document.getElementById('taskCountBadge');
+      if (activeTasks.length === 0) {
+        container.innerHTML = '<p class="text-stone-400 italic">No open errands for this card.</p>';
+        badge.innerText = '0 Pending';
+        return;
+      }
+
+      const pending = activeTasks.filter(t => !t.done).length;
+      badge.innerText = `${pending} Pending`;
+      container.innerHTML = '';
+      activeTasks.forEach((t, idx) => {
+        container.innerHTML += `
+          <div class="flex items-center justify-between p-2 rounded-lg bg-stone-50 border border-stone-200">
+            <label class="flex items-center gap-2 cursor-pointer ${t.done ? 'line-through text-stone-400' : 'text-stone-900 font-medium'}">
+              <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTaskDone(${idx})" class="rounded text-emerald-700">
+              <span>${t.text}</span>
+            </label>
+            <span class="text-[10px] font-mono text-stone-400">#${t.id}</span>
+          </div>
+        `;
+      });
+    }
+
+    function toggleTaskDone(idx) {
+      activeTasks[idx].done = !activeTasks[idx].done;
+      renderDrawerTasks();
     }
 
     function setStage(stageNum) {
@@ -573,16 +591,16 @@
         tbody.innerHTML += `
           <tr>
             <td class="p-2 text-stone-900">${item.name}</td>
-            <td class="p-2 text-stone-500 font-mono">${item.cost.toFixed(2)}</td>
-            <td class="p-2 text-stone-900 font-bold font-mono">${item.retail.toFixed(2)}</td>
+            <td class="p-2 text-stone-500 font-mono">$${item.cost.toFixed(2)}</td>
+            <td class="p-2 text-stone-900 font-bold font-mono">$${item.retail.toFixed(2)}</td>
             <td class="p-2 text-right text-emerald-700 font-bold font-mono">${margin}%</td>
           </tr>
         `;
       });
 
       const profit = totalRetail - totalCost;
-      document.getElementById('profitSummary').innerText = `${totalRetail.toFixed(2)} (${profit.toFixed(2)} Net Profit)`;
-      document.getElementById('mirrorTotal').innerText = `${totalRetail.toFixed(2)}`;
+      document.getElementById('profitSummary').innerText = `$${totalRetail.toFixed(2)} ($${profit.toFixed(2)} Net Profit)`;
+      document.getElementById('mirrorTotal').innerText = `$${totalRetail.toFixed(2)}`;
     }
 
     function dispatchStripePay() {
