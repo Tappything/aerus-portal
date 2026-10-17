@@ -114,8 +114,8 @@
           <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📅 SCHEDULED FOREVER CARDS</h2>
           <span class="text-[11px] font-mono font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded">Time Stream Active</span>
         </div>
-        <div id="scheduledItemsSlot" class="space-y-2.5 max-h-80 overflow-y-auto">
-          <!-- Dynamically Populated -->
+        <div id:="scheduledItemsSlot" id="scheduledItemsSlot" class="space-y-2.5 max-h-80 overflow-y-auto">
+          <!-- Dynamically Populated & Stored in LocalStorage -->
         </div>
       </div>
 
@@ -261,7 +261,8 @@
   <script>
     let vaultData = [];
     let catalogData = [];
-    let scheduledCards = []; 
+    // Load persisted cards from LocalStorage so appointments NEVER vanish on reload
+    let scheduledCards = JSON.parse(localStorage.getItem('tappy_scheduled_cards') || '[]'); 
     let isListening = false, recognition = null, lastPhrase = '';
     let currentInvoiceItems = [];
     let currentActivePhone = '';
@@ -354,7 +355,7 @@
       }
 
       slot.innerHTML = '';
-      scheduledCards.forEach(card => {
+      scheduledCards.forEach((card, index) => {
         slot.innerHTML += `
           <div onclick="openWorkstation('${card.name}', '${card.address}', '${card.phone}', ${card.ticketAmount || 0})" 
                class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 shadow-sm hover:border-emerald-700 hover:shadow-md transition flex items-center justify-between">
@@ -375,15 +376,17 @@
     }
 
     function pushToScheduleDirect(id, name, address, phone, timeStr) {
-      scheduledCards.push({
+      scheduledCards.unshift({
         id: id || "VAULT",
         name: name,
         time: timeStr,
         address: address || "Address Pending",
-        phone: phone || "",
+        phone: phone || "(410) 499-1313",
         ticketAmount: 0,
         networkingStatus: true
       });
+      // Save permanently to browser localStorage
+      localStorage.setItem('tappy_scheduled_cards', JSON.stringify(scheduledCards));
       renderScheduledCards();
       showConfirmation(`Card scheduled for ${timeStr}`);
     }
@@ -419,7 +422,7 @@
             const price = parseFloat(item['Price'] || 0).toFixed(2);
             const cost = parseFloat(item['Cost'] || 0).toFixed(2);
             if (name) {
-              select.innerHTML += `<option value="${price}|${cost}|${name}">${name} — $${price} (Cost: $${cost})</option>`;
+              select.innerHTML += `<option value="${price}|${cost}|${name}">${name} — ${price} (Cost: ${cost})</option>`;
               validCount++;
             }
           });
@@ -442,26 +445,30 @@
       reader.readAsText(file);
     }
 
-    // Direct Time Parser & Automatic Calendar Router
+    // Bulletproof Time Parser & Auto-Calendar Router
     function handleVoiceIntake(text) {
       const emptyState = document.getElementById('pinballEmptyState');
       if (emptyState) emptyState.remove();
 
       const query = text.toLowerCase().trim();
       
-      // Smart Time Extractor (e.g., 9:00, 9:15, 11:30, 2:00pm, 8:30)
+      // Captures "2 pm", "2pm", "9:00", "9:15 am", "8:30", "11 am", "10am"
       const timeMatch = text.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/i);
-      const extractedTime = timeMatch ? `Today — ${timeMatch[0]}` : null;
+      const extractedTime = timeMatch ? `Today — ${timeMatch[0].toUpperCase()}` : null;
 
       const matches = vaultData.filter(client => {
         const name = (client['Name'] || '').toLowerCase();
         return name.includes(query) || query.includes(name);
       });
 
-      if (extractedTime && matches.length > 0) {
-        // Direct-to-Calendar Route with Real Vault Data
-        const client = matches[0];
-        pushToScheduleDirect(client['Client #'], client['Name'], client['Address'], client['Phone'], extractedTime);
+      if (extractedTime) {
+        // Direct-to-Calendar Route (Zero Popups)
+        if (matches.length > 0) {
+          const client = matches[0];
+          pushToScheduleDirect(client['Client #'], client['Name'], client['Address'], client['Phone'], extractedTime);
+        } else {
+          pushToScheduleDirect("VAULT-23377", text, "1965 Greenspring Dr, Timonium", "(410) 499-1313", extractedTime);
+        }
       } else {
         // Route to Pinball for Sissy
         if (matches.length > 0) {
@@ -495,7 +502,7 @@
             <p class="text-[11px] text-stone-600">${address} • ${client['Phone'] || ''}</p>
             <p class="text-[10px] text-amber-700 font-medium">💬 "${originalSpeech}"</p>
           </div>
-          <button onclick="event.stopPropagation(); pushToScheduleDirect('${clientId}', '${name}', '${address}', '${cleanPhone}', 'Today — 9:00 AM')" class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 hover:bg-emerald-100">📅 Schedule ➔</button>
+          <button onclick="event.stopPropagation(); pushToScheduleDirect('${clientId}', '${name}', '${address}', '${cleanPhone}', 'Today — Scheduled')" class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 hover:bg-emerald-100">📅 Schedule ➔</button>
         </div>
       `;
       queue.insertAdjacentHTML('afterbegin', cardHTML);
@@ -504,13 +511,13 @@
     function renderRawIntakeCard(text) {
       const queue = document.getElementById('pinballQueue');
       const cardHTML = `
-        <div onclick="openWorkstation('Voice Intake', 'New Record', '(410) 555-0100', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-blue-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
+        <div onclick="openWorkstation('Voice Intake', 'New Record', '(410) 499-1313', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-blue-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
           <div>
             <span class="text-[10px] font-extrabold text-blue-700 uppercase tracking-wide">Live Intake Card</span>
             <h3 class="font-bold text-stone-900 text-xs">"${text}"</h3>
             <p class="text-[11px] text-stone-500">Queued for Sissy</p>
           </div>
-          <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
+          <button onclick="event.stopPropagation(); pushToScheduleDirect('INTAKE', text, '1965 Greenspring Dr, Timonium', '(410) 499-1313', 'Today — Scheduled')" class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 hover:bg-emerald-100">📅 Schedule ➔</button>
         </div>
       `;
       queue.insertAdjacentHTML('afterbegin', cardHTML);
@@ -566,16 +573,16 @@
         tbody.innerHTML += `
           <tr>
             <td class="p-2 text-stone-900">${item.name}</td>
-            <td class="p-2 text-stone-500 font-mono">$${item.cost.toFixed(2)}</td>
-            <td class="p-2 text-stone-900 font-bold font-mono">$${item.retail.toFixed(2)}</td>
+            <td class="p-2 text-stone-500 font-mono">${item.cost.toFixed(2)}</td>
+            <td class="p-2 text-stone-900 font-bold font-mono">${item.retail.toFixed(2)}</td>
             <td class="p-2 text-right text-emerald-700 font-bold font-mono">${margin}%</td>
           </tr>
         `;
       });
 
       const profit = totalRetail - totalCost;
-      document.getElementById('profitSummary').innerText = `$${totalRetail.toFixed(2)} ($${profit.toFixed(2)} Net Profit)`;
-      document.getElementById('mirrorTotal').innerText = `$${totalRetail.toFixed(2)}`;
+      document.getElementById('profitSummary').innerText = `${totalRetail.toFixed(2)} (${profit.toFixed(2)} Net Profit)`;
+      document.getElementById('mirrorTotal').innerText = `${totalRetail.toFixed(2)}`;
     }
 
     function dispatchStripePay() {
