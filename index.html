@@ -6,7 +6,7 @@
   <title>FOREVER CARD™ — Powered by TappyThing</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <!-- PapaParse for 5ms Client-Side In-Memory Vault Search (22,283 Records) -->
+  <!-- PapaParse for 5ms In-Memory Vault (22,283) & Catalog (1,090) Ingestion -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -82,18 +82,23 @@
           </div>
         </div>
 
-        <!-- RIGHT: SUBSCRIBER IDENTITY & VAULT STATUS -->
-        <div class="text-center md:text-right">
+        <!-- RIGHT: SUBSCRIBER IDENTITY & DATA INGESTION -->
+        <div class="text-center md:text-right space-y-1">
           <h2 class="text-sm font-extrabold text-stone-900">Aerus Timonium</h2>
           <p class="text-[11px] font-bold text-emerald-800 flex items-center justify-center md:justify-end gap-1.5 font-mono">
             <span class="w-2 h-2 rounded-full bg-emerald-600 inline-block animate-ping"></span>
             Subscriber Hub Active
           </p>
-          <div class="mt-1">
-            <label for="csvInput" class="text-[10px] text-stone-500 hover:text-emerald-800 cursor-pointer underline font-mono block">
+          <div class="flex flex-col items-center md:items-end gap-0.5 mt-1 font-mono text-[10px]">
+            <label for="csvInput" class="text-stone-500 hover:text-emerald-800 cursor-pointer underline block">
               <span id="vaultStatus">📁 Load 22,283 Vault CSV</span>
             </label>
             <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="loadVaultCSV(this)">
+
+            <label for="catalogCsvInputHeader" class="text-stone-500 hover:text-emerald-800 cursor-pointer underline block">
+              <span id="catalogStatus">📦 Load 1,090 Catalog CSV</span>
+            </label>
+            <input type="file" id="catalogCsvInputHeader" accept=".csv" class="hidden" onchange="loadCatalogCSV(this)">
           </div>
         </div>
 
@@ -102,8 +107,8 @@
 
     <!-- 4 HUB DOORS -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <button onclick="document.getElementById('csvInput').click()" class="boutique-card p-3.5 rounded-xl flex items-center justify-between hover:border-emerald-700 transition">
-        <span class="text-xs font-bold text-stone-800">📦 Vault (22,283)</span>
+      <button onclick="triggerDoor1Ingestion()" class="boutique-card p-3.5 rounded-xl flex items-center justify-between hover:border-emerald-700 transition">
+        <span class="text-xs font-bold text-stone-800">📦 Vault & Catalog Ingestion</span>
         <span class="text-xs text-stone-400">➔</span>
       </button>
       <button onclick="alert('👥 Staff Roles: Mona (Counter), Chris (Bench), Mike (Field), Norby (VA)')" class="boutique-card p-3.5 rounded-xl flex items-center justify-between hover:border-emerald-700 transition">
@@ -184,29 +189,21 @@
         <button id="stage3" onclick="setStage(3)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">3. Proposal</button>
         <button id="stage4" onclick="setStage(4)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">4. Ready Wall 🎉</button>
       </div>
-
-      <div class="pt-2 border-t border-stone-100 space-y-1.5 text-xs">
-        <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="rounded text-emerald-800"> <span>Mona: Customer Intake Logged</span></label>
-        <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="rounded text-emerald-800"> <span>Chris: Floor Brush Bristles Pulled (1,090 Catalog)</span></label>
-        <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="rounded text-emerald-800"> <span>Mike: Field Diagnostic Audio Complete</span></label>
-      </div>
     </div>
 
-    <!-- LAYER 2: CARD-NATIVE INVOICE BUILDER -->
+    <!-- LAYER 2: CARD-NATIVE INVOICE BUILDER (DYNAMIC 1,090 CATALOG) -->
     <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
       <div class="flex justify-between items-center">
         <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Layer 2: Card-Native Invoice Builder</h3>
-        <span class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-mono">1,090 Catalog Linked</span>
+        <span id="catalogBadge" class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-mono">Dynamic Catalog Linked</span>
       </div>
 
       <div class="flex gap-2">
+        <input type="file" id="catalogCsvInputDrawer" accept=".csv" class="hidden" onchange="loadCatalogCSV(this)">
         <select id="partSelect" class="flex-1 text-xs border border-stone-300 rounded-xl p-2 bg-stone-50 font-medium">
-          <option value="1495|450|Laundry Pro 3.0 Unit">Laundry Pro 3.0 Unit — $1,495.00 (Cost: $450.00)</option>
-          <option value="295|50|Used Motor Assembly">Used Motor Assembly — $295.00 (Cost: $50.00)</option>
-          <option value="189|35|Full System Overhaul Service">Full System Overhaul Service — $189.00 (Cost: $35.00)</option>
-          <option value="55|15|Control Valve Swap">Control Valve Swap — $55.00 (Cost: $15.00)</option>
-          <option value="24.95|5|Replacement Floor Brush Bristles">Replacement Floor Brush Bristles — $24.95 (Cost: $5.00)</option>
+          <option value="">📁 Load export_export (35).csv to search 1,090 parts...</option>
         </select>
+        <button onclick="document.getElementById('catalogCsvInputDrawer').click()" class="px-3 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold text-xs rounded-xl shadow">📁 CSV</button>
         <button onclick="addInvoiceItem()" class="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow">+ Add</button>
       </div>
 
@@ -257,6 +254,7 @@
 
   <script>
     let vaultData = [];
+    let catalogData = [];
     let isListening = false, recognition = null, lastPhrase = '';
     let currentInvoiceItems = [];
     let currentActivePhone = '';
@@ -310,7 +308,17 @@
       input.value = '';
     }
 
-    // In-Memory PapaParse Ingestion (22,283 Records)
+    // Door 1 Multi-Ingestion Trigger
+    function triggerDoor1Ingestion() {
+      const choice = confirm("Tap 'OK' to load Customer Vault CSV (22,283) or 'Cancel' to load Catalog CSV (1,090).");
+      if (choice) {
+        document.getElementById('csvInput').click();
+      } else {
+        document.getElementById('catalogCsvInputHeader').click();
+      }
+    }
+
+    // 22,283 Vault CSV Ingestion
     function loadVaultCSV(input) {
       const file = input.files[0];
       if (!file) return;
@@ -320,8 +328,42 @@
         skipEmptyLines: true,
         complete: function(results) {
           vaultData = results.data;
-          document.getElementById('vaultStatus').innerText = `⚡ ${vaultData.length.toLocaleString()} Records In-Memory`;
-          document.getElementById('vaultStatus').className = "text-[10px] text-emerald-700 font-bold font-mono block";
+          const statusElem = document.getElementById('vaultStatus');
+          statusElem.innerText = `⚡ ${vaultData.length.toLocaleString()} Vault Records In-Memory`;
+          statusElem.className = "text-[10px] text-emerald-700 font-bold font-mono block";
+        }
+      });
+    }
+
+    // 1,090 Catalog CSV Ingestion
+    function loadCatalogCSV(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          catalogData = results.data;
+          const select = document.getElementById('partSelect');
+          select.innerHTML = '<option value="">Select from 1,090 Catalog Items...</option>';
+
+          let validCount = 0;
+          catalogData.forEach(item => {
+            const name = item['Name'] || item['Item / Service'] || '';
+            const price = parseFloat(item['Price'] || 0).toFixed(2);
+            const cost = parseFloat(item['Cost'] || 0).toFixed(2);
+            if (name) {
+              select.innerHTML += `<option value="${price}|${cost}|${name}">${name} — $${price} (Cost: $${cost})</option>`;
+              validCount++;
+            }
+          });
+
+          const statusElem = document.getElementById('catalogStatus');
+          statusElem.innerText = `⚡ ${validCount.toLocaleString()} Catalog Parts Linked`;
+          statusElem.className = "text-[10px] text-emerald-700 font-bold font-mono block";
+
+          document.getElementById('catalogBadge').innerText = `${validCount.toLocaleString()} Catalog Parts Active`;
         }
       });
     }
@@ -421,6 +463,7 @@
 
     function addInvoiceItem() {
       const select = document.getElementById('partSelect');
+      if (!select.value) return alert('Select a catalog item first!');
       const [retail, cost, name] = select.value.split('|');
       currentInvoiceItems.push({ name, cost: parseFloat(cost), retail: parseFloat(retail) });
       renderInvoice();
@@ -438,16 +481,16 @@
         tbody.innerHTML += `
           <tr>
             <td class="p-2 text-stone-900">${item.name}</td>
-            <td class="p-2 text-stone-500 font-mono">${item.cost.toFixed(2)}</td>
-            <td class="p-2 text-stone-900 font-bold font-mono">${item.retail.toFixed(2)}</td>
+            <td class="p-2 text-stone-500 font-mono">$${item.cost.toFixed(2)}</td>
+            <td class="p-2 text-stone-900 font-bold font-mono">$${item.retail.toFixed(2)}</td>
             <td class="p-2 text-right text-emerald-700 font-bold font-mono">${margin}%</td>
           </tr>
         `;
       });
 
       const profit = totalRetail - totalCost;
-      document.getElementById('profitSummary').innerText = `${totalRetail.toFixed(2)} (${profit.toFixed(2)} Net Profit)`;
-      document.getElementById('mirrorTotal').innerText = `${totalRetail.toFixed(2)}`;
+      document.getElementById('profitSummary').innerText = `$${totalRetail.toFixed(2)} ($${profit.toFixed(2)} Net Profit)`;
+      document.getElementById('mirrorTotal').innerText = `$${totalRetail.toFixed(2)}`;
     }
 
     function dispatchStripePay() {
