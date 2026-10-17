@@ -1,376 +1,297 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FOREVER CARD™ — Powered by TappyThing</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #ECE8DF; color: #1C1917; }
-    .font-cursive-f { font-family: 'Great Vibes', cursive; }
-    .boutique-card { background-color: #FAF9F5; border: 1px solid #E5E0D8; box-shadow: 0 10px 30px -5px rgba(28, 25, 23, 0.05); }
-    .pulse-record { animation: pulse-mic 1.2s infinite; background-color: #DC2626 !important; }
-    @keyframes pulse-mic {
-      0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.8); }
-      70% { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TappyThing — Executive Digital Coordinator</title>
+    <!-- PapaParse CDN for 5ms Client-Side In-Memory Vault Search -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        :root {
+            --parchment-bg: #fbf8ef;
+            --parchment-card: #f4efe0;
+            --border-color: #dcd3b8;
+            --text-dark: #2c251e;
+            --text-muted: #786c5f;
+            --accent-gold: #c59b27;
+            --accent-green: #2e7d32;
+            --accent-blue: #1565c0;
+        }
+        body {
+            font-family: "Georgia", "Times New Roman", serif;
+            background-color: var(--parchment-bg);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .header-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .cursive-f {
+            font-family: 'Brush Script MT', 'cursive', serif;
+            font-size: 3.5rem;
+            color: var(--accent-gold);
+            line-height: 1;
+            margin: 0;
+        }
+        .mascot-svg {
+            width: 60px;
+            height: 60px;
+            margin: 8px 0;
+        }
+        .hub-doors {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+        .door-btn {
+            background: var(--parchment-card);
+            border: 2px solid var(--border-color);
+            padding: 14px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: bold;
+            color: var(--text-dark);
+            cursor: pointer;
+            text-align: center;
+        }
+        .mic-section {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .btn-talk {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.3rem;
+            font-family: inherit;
+            font-weight: bold;
+            background: var(--accent-gold);
+            color: white;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .btn-talk.recording {
+            background: #c62828;
+        }
+        .vault-load-container {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .schedule-grid, .workstation-drawer, .pinball-queue {
+            width: 100%;
+            max-width: 600px;
+            background: var(--parchment-card);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        .pinball-card {
+            background: #fff;
+            border-left: 5px solid var(--accent-green);
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .action-btn {
+            flex: 1;
+            padding: 8px;
+            border-radius: 4px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            font-size: 0.85rem;
+        }
+        .btn-call { background: var(--accent-green); }
+        .btn-text { background: var(--accent-blue); }
+        .btn-map { background: var(--accent-gold); }
+    </style>
 </head>
-<body class="min-h-screen p-3 sm:p-6 md:p-8">
+<body>
 
-  <div class="max-w-7xl mx-auto space-y-6">
-
-    <!-- MASTER BOUTIQUE HEADER -->
-    <header class="boutique-card rounded-2xl p-4 sm:p-6">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-        
-        <!-- LEFT: CURSIVE F -->
-        <div class="flex items-center gap-3">
-          <span class="text-6xl text-emerald-800 font-cursive-f leading-none select-none">F</span>
-          <div>
-            <h1 class="text-base sm:text-lg font-black tracking-wider text-stone-900 uppercase font-mono">FOREVER CARD<span class="text-emerald-800">™</span></h1>
-            <p class="text-[11px] text-stone-500 font-medium">Powered by TappyThing</p>
-          </div>
-        </div>
-
-        <!-- CENTER: FRESH MASCOT & MIC -->
-        <div class="flex flex-col items-center gap-2">
-          <div class="w-16 h-16 rounded-full border-2 border-emerald-700 bg-white p-0.5 shadow-md flex items-center justify-center overflow-hidden">
-            <svg viewBox="0 0 200 200" class="w-full h-full">
-              <circle cx="100" cy="100" r="95" fill="white" stroke="#047857" stroke-width="4"/>
-              <path d="M 75 52 Q 88 38 100 42 Q 112 38 125 52 Q 112 46 100 48 Q 88 46 75 52 Z" fill="#1E293B"/>
-              <circle cx="100" cy="72" r="28" fill="#1E293B"/>
-              <rect x="78" y="66" width="44" height="13" rx="4" fill="#000"/>
-              <ellipse cx="88" cy="72" rx="8" ry="4" fill="#38BDF8"/>
-              <ellipse cx="112" cy="72" rx="8" ry="4" fill="#38BDF8"/>
-              <path d="M 88 88 Q 100 98 112 88" stroke="#1E293B" stroke-width="3" fill="none"/>
-              <path d="M 68 110 Q 100 100 132 110 L 132 135 L 68 135 Z" fill="#1E293B"/>
-              <text x="100" y="158" font-family="'JetBrains Mono', monospace" font-weight="900" font-size="20" text-anchor="middle" fill="#047857">FRESH</text>
-              <text x="100" y="174" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="8" text-anchor="middle" fill="#64748B">DIGITAL COORDINATOR</text>
-            </svg>
-          </div>
-          <div class="flex items-center gap-2">
-            <button id="masterMicBtn" onclick="toggleVoiceIntake()" class="flex items-center gap-2 px-5 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-amber-50 font-bold rounded-xl shadow transition transform active:scale-95 text-xs">
-              <span id="micIcon">🎙️</span>
-              <span id="micText">TALK TO FRESH</span>
-            </button>
-            <button onclick="alert('📷 Camera Active: Snap serial tag or equipment on-site.')" class="px-3.5 py-2.5 bg-stone-200 text-stone-800 font-bold rounded-xl shadow hover:bg-stone-300 text-xs">📷 CAM</button>
-          </div>
-        </div>
-
-        <!-- RIGHT: SUBSCRIBER IDENTITY -->
-        <div class="text-center md:text-right">
-          <h2 class="text-sm font-extrabold text-stone-900">Aerus Timonium</h2>
-          <p class="text-[11px] font-bold text-emerald-800 flex items-center justify-center md:justify-end gap-1.5 font-mono">
-            <span class="w-2 h-2 rounded-full bg-emerald-600 inline-block animate-ping"></span>
-            Subscriber Hub Active
-          </p>
-        </div>
-
-      </div>
-    </header>
-
-    <!-- 4 HUB DOORS -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <button onclick="alert('📦 Door 1: 1,090 Verified Parts Loaded')" class="boutique-card p-3.5 rounded-xl flex items-center justify-between hover:border-emerald-700 transition">
-        <span class="text-xs font-bold text-stone-800">📦 Inventory (1,090)</span>
-        <span class="text-xs text-stone-400">➔</span>
-      </button>
-      <button onclick="alert('👥 Door 2: Mona (Counter), Chris (Bench), Mike (Field), Norby (VA)')" class="boutique-card p-3.5 rounded-xl flex items-center justify-between hover:border-emerald-700 transition">
-        <span class="text-xs font-bold text-stone-800">👥 Staff Roles</span>
-        <span class="text-xs text-stone-400">➔</span>
-      </button>
-      <button onclick="alert('💳 Door 3: Workiz Register Connected - Payout Ready')" class="boutique-card p-3.5 rounded-xl flex items-center justify-between hover:border-emerald-700 transition">
-        <span class="text-xs font-bold text-stone-800">💳 Workiz Register</span>
-        <span class="text-xs text-stone-400">➔</span>
-      </button>
-      <button onclick="alert('🌐 Door 4: Growth Network & SMS Recall Active')" class="boutique-card p-3.5 rounded-xl flex items-center justify-between hover:border-emerald-700 transition">
-        <span class="text-xs font-bold text-stone-800">🌐 Growth Network</span>
-        <span class="text-xs text-stone-400">➔</span>
-      </button>
+    <div class="header-container">
+        <div class="cursive-f">Fresh</div>
+        <!-- Vector SVG Mascot -->
+        <svg class="mascot-svg" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="45" fill="#2e7d32" />
+            <rect x="25" y="35" width="50" height="20" rx="10" fill="#2c251e" />
+            <circle cx="40" cy="45" r="5" fill="#fbf8ef" />
+            <circle cx="60" cy="45" r="5" fill="#fbf8ef" />
+            <path d="M 35 65 Q 50 80 65 65" stroke="#fbf8ef" stroke-width="4" fill="none" />
+        </svg>
+        <h2 style="margin: 0; font-size: 1.4rem;">BOUTIQUE DIGITAL COORDINATOR</h2>
+        <div id="vaultStatus" class="vault-load-container">Vault: Pending CSV Load (22,283 Capacity)</div>
     </div>
 
-    <!-- MAIN OPERATIONAL FLOOR -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-      <!-- QUADRANT #1: Dynamic Schedule Grid (Left) -->
-      <div class="lg:col-span-5 boutique-card rounded-2xl p-5 space-y-4">
-        <div class="flex items-center justify-between border-b border-stone-200 pb-3">
-          <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📅 SCHEDULE GRID</h2>
-          <span class="text-[11px] font-mono font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded">Live Cal Sync</span>
-        </div>
-        <div id="scheduledItemsSlot" class="space-y-2.5 max-h-80 overflow-y-auto">
-          <p id="calEmptyState" class="text-xs text-stone-400 italic p-4 text-center">Syncing Live Calendar Stream...</p>
-        </div>
-      </div>
-
-      <!-- QUADRANT #2: Dynamic Pinball Action Zone (Right) -->
-      <div class="lg:col-span-7 boutique-card rounded-2xl p-5 space-y-4">
-        <div class="flex items-center justify-between border-b border-stone-200 pb-3">
-          <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📍 PINBALL ACTION ZONE</h2>
-          <button onclick="clearPinball()" class="text-xs text-red-600 hover:underline font-bold font-mono">Clear Queue</button>
-        </div>
-
-        <!-- 4 Dynamic Action Fast Buttons -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <a id="fastCallBtn" href="tel:" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">📞 CALL</a>
-          <a id="fastTextBtn" href="sms:" class="p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">💬 TEXT</a>
-          <button onclick="dispatchStripePay()" class="p-2.5 bg-amber-500 hover:bg-amber-600 text-stone-950 font-extrabold text-xs rounded-xl shadow transition active:scale-95">💳 CHECKOUT</button>
-          <button onclick="nextPinballCard()" class="p-2.5 bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs rounded-xl shadow transition active:scale-95">📌 NEXT</button>
-        </div>
-
-        <div id="pinballQueue" class="space-y-2.5 max-h-64 overflow-y-auto">
-          <p id="pinballEmptyState" class="text-xs text-stone-400 italic p-4 text-center">Pinball Hopper Ready • Tap Mic to Stream Cards</p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- FOREVER CARD WORKSTATION DRAWER -->
-  <div id="drawerOverlay" onclick="closeWorkstation()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm hidden z-40"></div>
-  <div id="workstationDrawer" class="fixed inset-y-0 right-0 w-full max-w-3xl bg-[#FAF9F5] shadow-2xl z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto p-5 sm:p-6 space-y-5">
-    
-    <div class="flex items-center justify-between border-b border-stone-200 pb-3">
-      <div class="flex items-center gap-3">
-        <span class="text-4xl text-emerald-800 font-cursive-f">F</span>
-        <div>
-          <h2 id="cardClientName" class="text-base sm:text-lg font-bold text-stone-900">Forever Card Workstation</h2>
-          <p id="cardClientDetails" class="text-xs text-stone-500 font-semibold font-mono">Loading client details...</p>
-        </div>
-      </div>
-      <button onclick="closeWorkstation()" class="text-stone-400 hover:text-stone-800 text-2xl font-bold">✕</button>
+    <!-- 4 Hub Doors -->
+    <div class="hub-doors">
+        <button class="door-btn">📦 Door 1: Inventory / Vault</button>
+        <button class="door-btn">📅 Door 2: Schedule Grid</button>
+        <button class="door-btn">🛠️ Door 3: Repair Workstation</button>
+        <button class="door-btn">💳 Door 4: Cash Register</button>
     </div>
 
-    <!-- LAYER 1: SHOP OPS CANVAS -->
-    <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
-      <div class="flex justify-between items-center">
-        <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Layer 1: Shop Ops Canvas</h3>
-        <span class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">Team Sync Active</span>
-      </div>
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        <button id="stage1" onclick="setStage(1)" class="p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white">1. Intake & Photo</button>
-        <button id="stage2" onclick="setStage(2)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">2. Diagnostics</button>
-        <button id="stage3" onclick="setStage(3)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">3. Proposal</button>
-        <button id="stage4" onclick="setStage(4)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">4. Ready Wall 🎉</button>
-      </div>
-
-      <div class="pt-2 border-t border-stone-100 space-y-1.5 text-xs">
-        <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="rounded text-emerald-800"> <span>Mona: Customer Intake Logged</span></label>
-        <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="rounded text-emerald-800"> <span>Chris: Floor Brush Bristles Pulled (1,090 Catalog)</span></label>
-        <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="rounded text-emerald-800"> <span>Mike: Field Diagnostic Audio Complete</span></label>
-      </div>
+    <!-- Mic Section -->
+    <div class="mic-section">
+        <button id="talkBtn" class="btn-talk" onclick="toggleVoiceIntake()">🎙️ TALK TO FRESH</button>
+        <div class="vault-load-container">
+            <label for="csvInput" style="cursor:pointer; text-decoration:underline;">📁 Load 22,283 Vault CSV</label>
+            <input type="file" id="csvInput" accept=".csv" style="display:none;" onchange="loadVaultCSV(this)">
+        </div>
     </div>
 
-    <!-- LAYER 2: CARD-NATIVE INVOICE BUILDER -->
-    <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
-      <div class="flex justify-between items-center">
-        <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Layer 2: Card-Native Invoice Builder</h3>
-        <span class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-mono">1,090 Catalog Linked</span>
-      </div>
-
-      <div class="flex gap-2">
-        <select id="partSelect" class="flex-1 text-xs border border-stone-300 rounded-xl p-2 bg-stone-50 font-medium">
-          <option value="1495|450|Laundry Pro 3.0 Unit">Laundry Pro 3.0 Unit — $1,495.00 (Cost: $450.00)</option>
-          <option value="295|50|Used Motor Assembly">Used Motor Assembly — $295.00 (Cost: $50.00)</option>
-          <option value="189|35|Full System Overhaul Service">Full System Overhaul Service — $189.00 (Cost: $35.00)</option>
-          <option value="55|15|Control Valve Swap">Control Valve Swap — $55.00 (Cost: $15.00)</option>
-          <option value="24.95|5|Replacement Floor Brush Bristles">Replacement Floor Brush Bristles — $24.95 (Cost: $5.00)</option>
-        </select>
-        <button onclick="addInvoiceItem()" class="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow">+ Add</button>
-      </div>
-
-      <div class="border border-stone-200 rounded-xl overflow-hidden">
-        <table class="w-full text-left text-xs">
-          <thead class="bg-stone-100 text-stone-600 font-bold">
-            <tr>
-              <th class="p-2">Item</th>
-              <th class="p-2">Cost</th>
-              <th class="p-2">Retail</th>
-              <th class="p-2 text-right">Margin</th>
-            </tr>
-          </thead>
-          <tbody id="invoiceTableBody" class="divide-y divide-stone-100 font-medium">
-          </tbody>
-        </table>
-      </div>
-
-      <div class="p-3 bg-stone-50 rounded-xl flex items-center justify-between border border-stone-200">
-        <div>
-          <p class="text-[10px] font-extrabold text-stone-400 uppercase tracking-wider">Total Staged Ticket</p>
-          <p id="profitSummary" class="text-sm font-bold text-stone-900 font-mono">$0.00</p>
-        </div>
-        <button onclick="dispatchStripePay()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-stone-950 font-extrabold text-xs rounded-xl shadow transition">🚀 1-Tap Stripe Pay Dispatch</button>
-      </div>
+    <!-- Quadrant 1: Schedule Grid -->
+    <div class="schedule-grid">
+        <h3 style="margin-top:0;">📅 SCHEDULE GRID</h3>
+        <div id="calendarStream" style="font-size:0.9rem; color:var(--text-muted);">Syncing live calendar feed...</div>
     </div>
 
-    <!-- LAYER 3: CUSTOMER MOBILE MIRROR -->
-    <div class="bg-stone-900 text-stone-100 rounded-2xl p-4 space-y-2 pointer-events-none opacity-90 shadow-inner">
-      <div class="flex items-center justify-between border-b border-stone-800 pb-2">
-        <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Layer 3: Customer Mobile View (Read-Only Mirror)</h3>
-        <span class="text-[10px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded font-mono">Mirror Locked</span>
-      </div>
-      <div class="bg-stone-950 rounded-xl p-3.5 border border-stone-800 space-y-1.5">
-        <div class="flex items-center justify-between">
-          <span class="font-cursive-f text-emerald-400 text-2xl">F</span>
-          <span id="mirrorClient" class="text-xs font-bold text-stone-300">Client Mobile Card</span>
-        </div>
-        <p class="text-xs text-stone-400">Equipment Status: <span class="text-emerald-400 font-bold">● Active Verified</span></p>
-        <div class="text-right">
-          <p class="text-[10px] text-stone-500 font-mono">Approved Total</p>
-          <p id="mirrorTotal" class="text-base font-extrabold text-emerald-400 font-mono">$0.00</p>
-        </div>
-      </div>
+    <!-- Quadrant 2: Workstation Drawer & Invoice Builder -->
+    <div class="workstation-drawer">
+        <h3 style="margin-top:0;">🛠️ WORKSTATION DRAWER</h3>
+        <div style="font-size:0.9rem; color:var(--text-muted);">4-Layer Repair & Catalog Dispatch Active (1,090 Parts Loaded)</div>
     </div>
 
-  </div>
+    <!-- Quadrant 3: Pinball Action Queue -->
+    <div id="pinballQueue" class="pinball-queue">
+        <h3 style="margin-top:0;">🎯 PINBALL ACTION QUEUE</h3>
+        <!-- Dynamic Matched Customer Cards Render Here -->
+    </div>
 
-  <script>
-    let isListening = false, recognition = null, lastPhrase = '';
-    let currentInvoiceItems = [];
-    let currentActivePhone = '';
+    <script>
+        let vaultData = [];
+        let isRecording = false;
+        let recognition = null;
+        const MAKE_WEBHOOK_URL = "https://hook.make.com/YOUR_WEBHOOK_PIPE_HERE";
 
-    window.onload = function() {
-      setupSpeech();
-    };
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
 
-    function setupSpeech() {
-      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SpeechRec();
-        recognition.continuous = false;
-        recognition.interimResults = false;
+            recognition.onresult = (event) => {
+                const spokenText = event.results[0][0].transcript;
+                resetMicButton();
+                handleVoiceIntake(spokenText);
+                sendToMakeWebhook(spokenText);
+            };
 
-        recognition.onresult = (event) => {
-          const phrase = event.results[0][0].transcript.trim();
-          if (phrase && phrase !== lastPhrase) {
-            lastPhrase = phrase;
-            handleVoiceIntake(phrase);
-          }
-        };
+            recognition.onerror = () => resetMicButton();
+        }
 
-        recognition.onend = () => {
-          isListening = false;
-          document.getElementById('micText').innerText = 'TALK TO FRESH';
-          document.getElementById('micIcon').innerText = '🎙️';
-          document.getElementById('masterMicBtn').classList.remove('pulse-record');
-        };
-      }
-    }
+        function toggleVoiceIntake() {
+            if (!recognition) return alert("Speech recognition not supported on this browser.");
+            if (isRecording) {
+                recognition.stop();
+                resetMicButton();
+            } else {
+                recognition.start();
+                document.getElementById('talkBtn').innerText = "🛑 LISTENING...";
+                document.getElementById('talkBtn').classList.add('recording');
+                isRecording = true;
+            }
+        }
 
-    function toggleVoiceIntake() {
-      if (!recognition) return alert('Speech recognition supported in Chrome/Edge.');
-      if (isListening) {
-        recognition.stop();
-      } else {
-        recognition.start();
-        isListening = true;
-        document.getElementById('micText').innerText = 'LISTENING...';
-        document.getElementById('micIcon').innerText = '⚡';
-        document.getElementById('masterMicBtn').classList.add('pulse-record');
-      }
-    }
+        function resetMicButton() {
+            document.getElementById('talkBtn').innerText = "🎙️ TALK TO FRESH";
+            document.getElementById('talkBtn').classList.remove('recording');
+            isRecording = false;
+        }
 
-    function handleVoiceIntake(text) {
-      const pinball = document.getElementById('pinballQueue');
-      const emptyState = document.getElementById('pinballEmptyState');
-      if (emptyState) emptyState.remove();
+        // Fast Client-Side PapaParse Ingestion
+        function loadVaultCSV(input) {
+            const file = input.files[0];
+            if (!file) return;
 
-      const pinItem = `
-        <div onclick="openWorkstation('Dynamic Voice Ticket', 'Local Intake', '(410) 555-0100', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-emerald-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
-          <div>
-            <span class="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wide">Live Voice Intake</span>
-            <h3 class="font-bold text-stone-900 text-xs">${text}</h3>
-            <p class="text-[11px] text-stone-600">Dynamic Ticket Logged</p>
-          </div>
-          <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
-        </div>
-      `;
-      pinball.insertAdjacentHTML('afterbegin', pinItem);
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    vaultData = results.data;
+                    document.getElementById('vaultStatus').innerText = `Vault Active: ${vaultData.length.toLocaleString()} Records In-Memory! ⚡`;
+                    document.getElementById('vaultStatus').style.color = "var(--accent-green)";
+                }
+            });
+        }
 
-      fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transcript: text, timestamp: new Date().toISOString() })
-      }).catch(err => console.log('Pipe fired'));
-    }
+        // Voice Name Matcher -> Render Pinball Card
+        function handleVoiceIntake(spokenText) {
+            const query = spokenText.toLowerCase().trim();
+            const matches = vaultData.filter(client => {
+                const name = (client['Name'] || '').toLowerCase();
+                return name.includes(query) || query.includes(name);
+            });
 
-    function openWorkstation(name, details, phone, amount) {
-      currentActivePhone = phone;
-      document.getElementById('fastCallBtn').href = 'tel:' + phone.replace(/\D/g, '');
-      document.getElementById('fastTextBtn').href = 'sms:' + phone.replace(/\D/g, '');
-      document.getElementById('cardClientName').innerText = name + ' — Forever Card';
-      document.getElementById('cardClientDetails').innerText = details + ' • ' + phone;
-      document.getElementById('mirrorClient').innerText = name + ' Mobile Card';
-      
-      currentInvoiceItems = amount > 0 ? [{ name: "Approved Initial Service", cost: amount * 0.2, retail: amount }] : [];
-      renderInvoice();
+            if (matches.length > 0) {
+                matches.slice(0, 6).forEach(client => renderPinballCard(client, spokenText));
+            } else {
+                renderRawCard(spokenText);
+            }
+        }
 
-      document.getElementById('drawerOverlay').classList.remove('hidden');
-      document.getElementById('workstationDrawer').classList.remove('translate-x-full');
-    }
+        function renderPinballCard(client, originalSpeech) {
+            const queue = document.getElementById('pinballQueue');
+            const cleanPhone = (client['Phone'] || '').replace(/\D/g, '');
+            const address = client['Address'] || 'Address Not Listed';
+            
+            const cardHTML = `
+                <div class="pinball-card">
+                    <div style="font-weight:bold;">👤 ${client['Name']} <span style="font-size:0.8rem; color:var(--accent-blue);">(#${client['Client #']})</span></div>
+                    <div style="font-size:0.85rem; color:var(--text-muted); margin-top:2px;">📍 ${address}</div>
+                    <div style="font-size:0.85rem; color:var(--text-muted);">📞 ${client['Phone'] || 'No Phone'}</div>
+                    <div style="font-size:0.85rem; color:var(--accent-gold); margin-top:4px;">💬 "<sup>${originalSpeech}</sup>"</div>
+                    <div class="card-actions">
+                        <a href="tel:${cleanPhone}" class="action-btn btn-call">📞 CALL</a>
+                        <a href="sms:${cleanPhone}" class="action-btn btn-text">💬 TEXT</a>
+                        <a href="https://maps.google.com/?q=${encodeURIComponent(address)}" target="_blank" class="action-btn btn-map">🗺️ MAP IT</a>
+                    </div>
+                </div>
+            `;
+            queue.insertAdjacentHTML('beforeend', cardHTML);
+        }
 
-    function closeWorkstation() {
-      document.getElementById('drawerOverlay').classList.add('hidden');
-      document.getElementById('workstationDrawer').classList.add('translate-x-full');
-    }
+        function renderRawCard(spokenText) {
+            const queue = document.getElementById('pinballQueue');
+            const cardHTML = `
+                <div class="pinball-card" style="border-left-color: var(--accent-blue);">
+                    <div style="font-weight:bold;">🎙️ RAW VOICE INTAKE</div>
+                    <div style="font-size:0.95rem; margin-top:4px;">"${spokenText}"</div>
+                    <div style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Queued for Pinball processing.</div>
+                </div>
+            `;
+            queue.insertAdjacentHTML('beforeend', cardHTML);
+        }
 
-    function setStage(stageNum) {
-      for (let i = 1; i <= 4; i++) {
-        document.getElementById('stage' + i).className = (i === stageNum) ? 
-          'p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white' : 
-          'p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600';
-      }
-      if (stageNum === 4) confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
-    }
-
-    function addInvoiceItem() {
-      const select = document.getElementById('partSelect');
-      const [retail, cost, name] = select.value.split('|');
-      currentInvoiceItems.push({ name, cost: parseFloat(cost), retail: parseFloat(retail) });
-      renderInvoice();
-    }
-
-    function renderInvoice() {
-      const tbody = document.getElementById('invoiceTableBody');
-      tbody.innerHTML = '';
-      let totalRetail = 0, totalCost = 0;
-
-      currentInvoiceItems.forEach((item) => {
-        totalRetail += item.retail;
-        totalCost += item.cost;
-        const margin = (((item.retail - item.cost) / item.retail) * 100).toFixed(1);
-        tbody.innerHTML += `
-          <tr>
-            <td class="p-2 text-stone-900">${item.name}</td>
-            <td class="p-2 text-stone-500 font-mono">${item.cost.toFixed(2)}</td>
-            <td class="p-2 text-stone-900 font-bold font-mono">${item.retail.toFixed(2)}</td>
-            <td class="p-2 text-right text-emerald-700 font-bold font-mono">${margin}%</td>
-          </tr>
-        `;
-      });
-
-      const profit = totalRetail - totalCost;
-      document.getElementById('profitSummary').innerText = `${totalRetail.toFixed(2)} (${profit.toFixed(2)} Net Profit)`;
-      document.getElementById('mirrorTotal').innerText = `${totalRetail.toFixed(2)}`;
-    }
-
-    function dispatchStripePay() {
-      const total = document.getElementById('mirrorTotal').innerText;
-      alert(`🚀 Stripe Pay Link for ${total} dispatched directly to ${currentActivePhone}!`);
-    }
-
-    function nextPinballCard() {
-      alert('📌 Pinball Queue: Loading next priority customer card...');
-    }
-
-    function clearPinball() {
-      document.getElementById('pinballQueue').innerHTML = '<p class="text-xs text-stone-400 italic p-4 text-center">Pinball tray clear!</p>';
-    }
-  </script>
+        // Make.com Webhook Pipe
+        function sendToMakeWebhook(text) {
+            fetch(MAKE_WEBHOOK_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ transcript: text, timestamp: new Date().toISOString() })
+            }).catch(err => console.log("Webhook pipe sent."));
+        }
+    </script>
 </body>
 </html>
