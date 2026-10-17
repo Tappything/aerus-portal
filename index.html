@@ -55,18 +55,18 @@
 
     <!-- CENTER: FRESH MASCOT EMBLEM + CONTROLS -->
     <div class="flex flex-col items-center gap-3 w-full max-w-md mx-auto">
-      <div class="w-20 h-20 rounded-full border-4 border-gold bg-white shadow-lg overflow-hidden flex items-center justify-center relative">
+      <div class="w-28 h-28 rounded-full border-4 border-gold bg-white shadow-lg overflow-hidden flex items-center justify-center relative flex-shrink-0">
         <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';">
       </div>
       <div class="flex gap-2 justify-center w-full">
-        <button id="voice-btn" onclick="toggleVoiceIntake()" class="px-5 py-2.5 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2">
+        <button id="voice-btn" onclick="toggleVoiceIntake()" class="flex-1 max-w-[180px] py-2.5 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
           <span>🎙️</span> <span id="voice-label">TALK TO FRESH</span>
         </button>
-        <button onclick="triggerCamera()" class="px-4 py-2.5 bg-ink hover:bg-black text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5">
+        <button onclick="triggerCamera()" class="flex-1 max-w-[180px] py-2.5 bg-ink hover:bg-black text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5">
           <span>📷</span> <span>CAM</span>
         </button>
       </div>
-      <input type="text" id="text-intake" placeholder="🔍 Speak or type intake note (e.g. Schedule Mary Cole at 10am)..." 
+      <input type="text" id="text-intake" placeholder="💬 Type or speak a note..." 
         onkeydown="checkSubmit(event)"
         class="w-full px-3.5 py-2 border border-bordercolor rounded-xl bg-white text-ink focus:outline-none focus:border-gold text-xs shadow-inner text-center md:text-left">
     </div>
@@ -321,59 +321,11 @@
     const c = document.getElementById('invoice-items');
     if (invoiceLines.length === 0) { c.innerHTML = '<div class="text-muted italic">No items added yet.</div>'; return; }
     let sub = 0;
-    c.innerHTML = invoiceLines.map(i => { sub += i.price; return `<div class="flex justify-between font-semibold"><span>${i.name}</span><span>${i.price.toFixed(2)}</span></div>`; }).join('');
+    c.innerHTML = invoiceLines.map(i => { sub += i.price; return `<div class="flex justify-between font-semibold"><span>${i.name}</span><span>$${i.price.toFixed(2)}</span></div>`; }).join('');
     const tax = sub * 0.06;
-    document.getElementById('inv-subtotal').innerText = '
-
----
-
-### **Your Single Deploy Action:**
-1. Copy the code block above.
-2. Paste it into your `index.html` file and **Deploy / Save**.
-
----
-
-### **Test It (30 Seconds):**
-Say: *"Schedule Mary Cole for filter replacement tomorrow at 10am"*.
-* The card will show **Mary Cole**.
-* Tapping **Open Card ➔** will slide out the Boutique Parchment drawer with **Mary Cole** at the top.
-* The headers read **`📅 Today's Schedule`** and **`📍 Action Queue`**.
-
-Deploy and test this, then get inside and warm up! + sub.toFixed(2);
-    document.getElementById('inv-tax').innerText = '
-
----
-
-### **Your Single Deploy Action:**
-1. Copy the code block above.
-2. Paste it into your __CODE_BLOCK_6__ file and **Deploy / Save**.
-
----
-
-### **Test It (30 Seconds):**
-Say: *"Schedule Mary Cole for filter replacement tomorrow at 10am"*.
-* The card will show **Mary Cole**.
-* Tapping **Open Card ➔** will slide out the Boutique Parchment drawer with **Mary Cole** at the top.
-* The headers read **__CODE_BLOCK_7__** and **__CODE_BLOCK_8__**.
-
-Deploy and test this, then get inside and warm up! + tax.toFixed(2);
-    document.getElementById('inv-total').innerText = '
-
----
-
-### **Your Single Deploy Action:**
-1. Copy the code block above.
-2. Paste it into your __CODE_BLOCK_6__ file and **Deploy / Save**.
-
----
-
-### **Test It (30 Seconds):**
-Say: *"Schedule Mary Cole for filter replacement tomorrow at 10am"*.
-* The card will show **Mary Cole**.
-* Tapping **Open Card ➔** will slide out the Boutique Parchment drawer with **Mary Cole** at the top.
-* The headers read **__CODE_BLOCK_7__** and **__CODE_BLOCK_8__**.
-
-Deploy and test this, then get inside and warm up! + (sub + tax).toFixed(2);
+    document.getElementById('inv-subtotal').innerText = '$' + sub.toFixed(2);
+    document.getElementById('inv-tax').innerText = '$' + tax.toFixed(2);
+    document.getElementById('inv-total').innerText = '$' + (sub + tax).toFixed(2);
   }
 
   function dispatchStripePay() {
@@ -382,7 +334,7 @@ Deploy and test this, then get inside and warm up! + (sub + tax).toFixed(2);
 
   function handleVoiceIntake(text) {
     showStatus("⚡ FRESH: Got it! Sissy is routing to Forever Card...");
-    fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
+    fetch('https://hook.us2.make.com/ii5yklk5cgwsij', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ transcript: text, timestamp: new Date().toISOString() })
