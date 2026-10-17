@@ -1,671 +1,409 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FOREVER CARD™ — Powered by TappyThing</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <!-- PapaParse for 5ms In-Memory Search (22,283 Vault + 1,090 Catalog) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #ECE8DF; color: #1C1917; }
-    .font-cursive-f { font-family: 'Great Vibes', cursive; }
-    .boutique-card { background-color: #FAF9F5; border: 1px solid #E5E0D8; box-shadow: 0 10px 30px -5px rgba(28, 25, 23, 0.05); }
-    .pulse-record { animation: pulse-mic 1.2s infinite; background-color: #DC2626 !important; }
-    @keyframes pulse-mic {
-      0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.8); }
-      70% { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
-    }
-    .room-tab-active { background-color: #065F46; color: #FAF9F5; border-color: #065F46; }
-    .room-tab-inactive { background-color: #E5E0D8; color: #44403C; }
-  </style>
-</head>
-<body class="min-h-screen p-3 sm:p-6 md:p-8">
+<script>
+  let vaultData = [];
+  let catalogData = [];
+  let scheduledCards = JSON.parse(localStorage.getItem('tappy_scheduled_cards') || '[]'); 
+  let activeTasks = JSON.parse(localStorage.getItem('tappy_active_tasks') || '[]');
+  let isListening = false, recognition = null, lastPhrase = '';
+  let currentInvoiceItems = [];
+  let currentActivePhone = '';
+  let isGlobalNetworkingOn = true;
 
-  <div class="max-w-7xl mx-auto space-y-6">
+  window.onload = function() {
+    setupSpeech();
+    renderScheduledCards();
 
-    <!-- MASTER BOUTIQUE HEADER -->
-    <header class="boutique-card rounded-2xl p-4 sm:p-6">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-        
-        <!-- LEFT: LAVERNE & SHIRLEY CURSIVE F + NETWORKING SWITCH -->
-        <div class="flex items-center gap-3">
-          <span class="text-6xl text-emerald-800 font-cursive-f leading-none select-none">F</span>
-          <div>
-            <h1 class="text-base sm:text-lg font-black tracking-wider text-stone-900 uppercase font-mono">FOREVER CARD<span class="text-emerald-800">™</span></h1>
-            <button onclick="toggleGlobalNetworking()" class="mt-1 flex items-center gap-1.5 px-2.5 py-1 bg-emerald-100 border border-emerald-300 rounded-lg text-[10px] font-bold text-emerald-800 font-mono hover:bg-emerald-200 transition">
-              <span id="networkingStatusDot" class="w-2 h-2 rounded-full bg-emerald-600 inline-block animate-ping"></span>
-              <span id="networkingStatusLabel">🌐 Forever Networking: ON</span>
-            </button>
-          </div>
-        </div>
+    // Auto-load background CSVs if present in root
+    fetch('export_export (34).csv').then(r => r.text()).then(t => parseVaultCSVText(t)).catch(e => console.log('Vault auto-load ready'));
+    fetch('export_export (35).csv').then(r => r.text()).then(t => parseCatalogCSVText(t)).catch(e => console.log('Catalog auto-load ready'));
+  };
 
-        <!-- CENTER: TYLER'S ENLARGED FRESH LOGO MASCOT (w-20 h-20) & CONTROLS -->
-        <div class="flex flex-col items-center gap-2 w-full max-w-sm">
-          <div class="w-20 h-20 rounded-full border-2 border-emerald-700 bg-white p-0.5 shadow-md flex items-center justify-center overflow-hidden">
-            <img 
-              src="fresh_logo.png" 
-              alt="FRESH Digital Coordinator" 
-              class="w-full h-full object-cover rounded-full"
-              onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';"
-            />
-          </div>
+  function showConfirmation(msg) {
+    const bar = document.getElementById('freshConfirmationBar');
+    bar.innerText = `⚡ FRESH: ${msg}`;
+    bar.classList.remove('hidden');
+    setTimeout(() => bar.classList.add('hidden'), 4000);
+  }
 
-          <!-- VOICE & CAM ROW -->
-          <div class="flex items-center gap-2">
-            <button id="masterMicBtn" onclick="toggleVoiceIntake()" class="flex items-center gap-2 px-5 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-amber-50 font-bold rounded-xl shadow transition transform active:scale-95 text-xs">
-              <span id="micIcon">🎙️</span>
-              <span id="micText">TALK TO FRESH</span>
-            </button>
-            <button onclick="showConfirmation('📷 Camera Ready: Snap equipment tag')" class="px-3.5 py-2.5 bg-stone-200 text-stone-800 font-bold rounded-xl shadow hover:bg-stone-300 text-xs">📷 CAM</button>
-          </div>
-
-          <!-- SILENT SEARCH & TYPE INPUT BAR -->
-          <div class="flex items-center gap-1.5 w-full mt-1">
-            <input 
-              type="text" 
-              id="textSearchInput" 
-              placeholder="💬 Type name, appointment, or errand..." 
-              onkeypress="if(event.key === 'Enter') handleSearchSubmit()"
-              class="flex-1 px-3.5 py-2 rounded-xl border border-stone-300 text-xs font-medium text-stone-900 bg-white focus:outline-none focus:border-emerald-700 shadow-sm"
-            />
-            <button 
-              onclick="handleSearchSubmit()" 
-              class="px-3.5 py-2 bg-emerald-800 text-white font-bold text-xs rounded-xl hover:bg-emerald-900 transition shadow active:scale-95">
-              GO
-            </button>
-          </div>
-          <p id="freshConfirmationBar" class="text-[11px] font-bold text-emerald-800 font-mono hidden"></p>
-        </div>
-
-        <!-- RIGHT: SUBSCRIBER IDENTITY & DATA INGESTION -->
-        <div class="text-center md:text-right space-y-1">
-          <h2 class="text-sm font-extrabold text-stone-900">Aerus Timonium</h2>
-          <p class="text-[11px] font-bold text-emerald-800 flex items-center justify-center md:justify-end gap-1.5 font-mono">
-            <span class="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
-            Subscriber Hub Active
-          </p>
-          <div class="flex flex-col items-center md:items-end gap-0.5 mt-1 font-mono text-[10px]">
-            <label for="csvInput" class="text-stone-500 hover:text-emerald-800 cursor-pointer underline block">
-              <span id="vaultStatus">📁 Load 22,283 Vault CSV</span>
-            </label>
-            <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="loadVaultCSV(this)">
-
-            <label for="catalogCsvInputHeader" class="text-stone-500 hover:text-emerald-800 cursor-pointer underline block">
-              <span id="catalogStatus">📦 Load 1,090 Catalog CSV</span>
-            </label>
-            <input type="file" id="catalogCsvInputHeader" accept=".csv" class="hidden" onchange="loadCatalogCSV(this)">
-          </div>
-        </div>
-
-      </div>
-    </header>
-
-    <!-- MAIN OPERATIONAL FLOOR -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-      <!-- QUADRANT #1: Dynamic Schedule Grid -->
-      <div class="lg:col-span-5 boutique-card rounded-2xl p-5 space-y-4">
-        <div class="flex items-center justify-between border-b border-stone-200 pb-3">
-          <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📅 SCHEDULED FOREVER CARDS</h2>
-          <span class="text-[11px] font-mono font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded">Time Stream Active</span>
-        </div>
-        <div id="scheduledItemsSlot" class="space-y-2.5 max-h-96 overflow-y-auto">
-          <!-- Populated from LocalStorage -->
-        </div>
-      </div>
-
-      <!-- QUADRANT #2: Dynamic Pinball Action Zone -->
-      <div class="lg:col-span-7 boutique-card rounded-2xl p-5 space-y-4">
-        <div class="flex items-center justify-between border-b border-stone-200 pb-3">
-          <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📍 PINBALL ACTION ZONE</h2>
-          <span class="text-[11px] font-mono font-bold text-stone-400">Routed to Sissy (Norby)</span>
-        </div>
-
-        <div id="pinballQueue" class="space-y-2.5 max-h-96 overflow-y-auto">
-          <p id="pinballEmptyState" class="text-xs text-stone-400 italic p-4 text-center">Pinball Hopper Ready • Voice notes & errands route here</p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- FOREVER CARD WORKSTATION DRAWER -->
-  <div id="drawerOverlay" onclick="closeWorkstation()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm hidden z-40"></div>
-  <div id="workstationDrawer" class="fixed inset-y-0 right-0 w-full max-w-3xl bg-[#FAF9F5] shadow-2xl z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto p-5 sm:p-6 space-y-5">
-    
-    <!-- DRAWER HEADER -->
-    <div class="flex items-center justify-between border-b border-stone-200 pb-3">
-      <div class="flex items-center gap-3">
-        <span class="text-4xl text-emerald-800 font-cursive-f">F</span>
-        <div>
-          <h2 id="cardClientName" class="text-base sm:text-lg font-bold text-stone-900">Forever Card Workstation</h2>
-          <p id="cardClientDetails" class="text-xs text-stone-500 font-semibold font-mono">Loading client details...</p>
-        </div>
-      </div>
-      <button onclick="closeWorkstation()" class="text-stone-400 hover:text-stone-800 text-2xl font-bold">✕</button>
-    </div>
-
-    <!-- ROOM SWITCHER TABS -->
-    <div class="grid grid-cols-3 gap-2">
-      <button id="tabRoom1" onclick="switchRoom(1)" class="p-2.5 rounded-xl font-bold text-xs shadow transition room-tab-active">🔧 Shop Ops</button>
-      <button id="tabRoom2" onclick="switchRoom(2)" class="p-2.5 rounded-xl font-bold text-xs shadow transition room-tab-inactive">💳 Invoice Room</button>
-      <button id="tabRoom3" onclick="switchRoom(3)" class="p-2.5 rounded-xl font-bold text-xs shadow transition room-tab-inactive">🪞 Live Mirror</button>
-    </div>
-
-    <!-- ROOM 1: SHOP OPS ENGINE ROOM -->
-    <div id="room1Content" class="space-y-4">
-      <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
-        <div class="flex justify-between items-center">
-          <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">4-Stage Progression</h3>
-          <span id="cardNetworkingBadge" class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-mono">🌐 Active</span>
-        </div>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <button id="stage1" onclick="setStage(1)" class="p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white">1. Intake & Photo</button>
-          <button id="stage2" onclick="setStage(2)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">2. Diagnostics</button>
-          <button id="stage3" onclick="setStage(3)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">3. Proposal</button>
-          <button id="stage4" onclick="setStage(4)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">4. Ready / Complete 🎉</button>
-        </div>
-      </div>
-
-      <!-- DIRECT COMMUNICATION & IN-DRAWER MIC ACTION BAR -->
-      <div class="grid grid-cols-3 gap-2">
-        <a id="drawerCallBtn" href="tel:" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">📞 Call</a>
-        <a id="drawerTextBtn" href="sms:" class="p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">💬 Text</a>
-        <button onclick="toggleVoiceIntake()" class="p-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">🎙️ Note to Card</button>
-      </div>
-
-      <!-- EQUIPMENT DIAGNOSTICS & ATTACHMENTS -->
-      <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
-        <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Equipment Diagnostics & Field Notes</h3>
-        <textarea id="techNotesInput" rows="3" placeholder="Enter diagnostic observations, unit serials, or field notes..." class="w-full p-3 rounded-xl border border-stone-300 text-xs text-stone-900 bg-stone-50 focus:outline-none focus:border-emerald-700 font-medium"></textarea>
-        
-        <div class="flex items-center justify-between pt-1">
-          <label class="px-3.5 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold text-xs rounded-xl shadow cursor-pointer flex items-center gap-1.5">
-            📎 Attach File / Photo
-            <input type="file" class="hidden" onchange="showConfirmation('📎 File attached to Forever Card!')">
-          </label>
-          <span class="text-[10px] text-stone-400 font-mono">PDFs, Photos, Spec Sheets</span>
-        </div>
-      </div>
-
-      <!-- DYNAMIC ACTIVE TASKS & ERRANDS CHECKLIST -->
-      <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
-        <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider flex items-center justify-between">
-          <span>🛒 Active Tasks & Errands</span>
-          <span id="taskCountBadge" class="text-emerald-700 font-mono font-bold">0 Pending</span>
-        </h3>
-        <div id="drawerTasksContainer" class="space-y-2 text-xs">
-          <p class="text-stone-400 italic">No open errands for this card.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- ROOM 2: INVOICE & CHECKOUT ROOM -->
-    <div id="room2Content" class="space-y-4 hidden">
-      <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
-        <div class="flex justify-between items-center">
-          <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Line Item Catalog Builder</h3>
-          <span id="catalogBadge" class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-mono">1,090 Catalog Linked</span>
-        </div>
-
-        <div class="flex gap-2">
-          <select id="partSelect" class="flex-1 text-xs border border-stone-300 rounded-xl p-2 bg-stone-50 font-medium">
-            <option value="">📁 Select catalog part or service...</option>
-          </select>
-          <button onclick="addInvoiceItem()" class="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow">+ Add</button>
-        </div>
-
-        <div class="border border-stone-200 rounded-xl overflow-hidden">
-          <table class="w-full text-left text-xs">
-            <thead class="bg-stone-100 text-stone-600 font-bold">
-              <tr>
-                <th class="p-2">Item</th>
-                <th class="p-2">Cost</th>
-                <th class="p-2">Retail</th>
-                <th class="p-2 text-right">Margin</th>
-              </tr>
-            </thead>
-            <tbody id="invoiceTableBody" class="divide-y divide-stone-100 font-medium">
-            </tbody>
-          </table>
-        </div>
-
-        <div class="p-3 bg-stone-50 rounded-xl flex items-center justify-between border border-stone-200">
-          <div>
-            <p class="text-[10px] font-extrabold text-stone-400 uppercase tracking-wider">Total Staged Ticket</p>
-            <p id="profitSummary" class="text-sm font-bold text-stone-900 font-mono">$0.00</p>
-          </div>
-          <button onclick="dispatchStripePay()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-stone-950 font-extrabold text-xs rounded-xl shadow transition">🚀 1-Tap Stripe Pay Dispatch</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ROOM 3: CUSTOMER LIVE MIRROR -->
-    <div id="room3Content" class="space-y-4 hidden">
-      <div class="bg-stone-900 text-stone-100 rounded-2xl p-5 space-y-3 shadow-inner">
-        <div class="flex items-center justify-between border-b border-stone-800 pb-2">
-          <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Customer Mobile Card View (Read-Only)</h3>
-          <span class="text-[10px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded font-mono">Sanitized Preview</span>
-        </div>
-        <div class="bg-stone-950 rounded-xl p-4 border border-stone-800 space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="font-cursive-f text-emerald-400 text-3xl">F</span>
-            <span id="mirrorClient" class="text-xs font-bold text-stone-300">Client Mobile Card</span>
-          </div>
-          <p class="text-xs text-stone-400">Equipment Status: <span class="text-emerald-400 font-bold">● Active Verified</span></p>
-          <div class="text-right pt-2 border-t border-stone-800">
-            <p class="text-[10px] text-stone-500 font-mono">Approved Total</p>
-            <p id="mirrorTotal" class="text-lg font-extrabold text-emerald-400 font-mono">$0.00</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <script>
-    let vaultData = [];
-    let catalogData = [];
-    // Load persisted cards from LocalStorage
-    let scheduledCards = JSON.parse(localStorage.getItem('tappy_scheduled_cards') || '[]'); 
-    let activeTasks = JSON.parse(localStorage.getItem('tappy_active_tasks') || '[]');
-    let isListening = false, recognition = null, lastPhrase = '';
-    let currentInvoiceItems = [];
-    let currentActivePhone = '';
-    let isGlobalNetworkingOn = true;
-
-    window.onload = function() {
-      setupSpeech();
-      renderScheduledCards();
-
-      // Auto-load CSV files if present in root
-      fetch('export_export (34).csv').then(r => r.text()).then(t => parseVaultCSVText(t)).catch(e => console.log('Vault auto-load ready'));
-      fetch('export_export (35).csv').then(r => r.text()).then(t => parseCatalogCSVText(t)).catch(e => console.log('Catalog auto-load ready'));
+  // --- MANUAL CSV UPLOAD HANDLERS ---
+  function loadVaultCSV(input) {
+    if (!input.files || !input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      parseVaultCSVText(e.target.result);
+      showConfirmation(`Loaded ${vaultData.length} records into Vault`);
     };
+    reader.readAsText(input.files[0]);
+  }
 
-    function showConfirmation(msg) {
-      const bar = document.getElementById('freshConfirmationBar');
-      bar.innerText = `⚡ FRESH: ${msg}`;
-      bar.classList.remove('hidden');
-      setTimeout(() => bar.classList.add('hidden'), 4000);
+  function loadCatalogCSV(input) {
+    if (!input.files || !input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      parseCatalogCSVText(e.target.result);
+      showConfirmation(`Loaded ${catalogData.length} catalog items`);
+    };
+    reader.readAsText(input.files[0]);
+  }
+
+  function setupSpeech() {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRec();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onresult = (event) => {
+        const phrase = event.results[0][0].transcript.trim();
+        if (phrase && phrase !== lastPhrase) {
+          lastPhrase = phrase;
+          handleVoiceIntake(phrase);
+        }
+      };
+
+      recognition.onerror = () => {
+        isListening = false;
+        document.getElementById('micText').innerText = 'TALK TO FRESH';
+        document.getElementById('micIcon').innerText = '🎙️';
+        document.getElementById('masterMicBtn').classList.remove('pulse-record');
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        document.getElementById('micText').innerText = 'TALK TO FRESH';
+        document.getElementById('micIcon').innerText = '🎙️';
+        document.getElementById('masterMicBtn').classList.remove('pulse-record');
+      };
     }
+  }
 
-    function setupSpeech() {
-      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SpeechRec();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-
-        recognition.onresult = (event) => {
-          const phrase = event.results[0][0].transcript.trim();
-          if (phrase && phrase !== lastPhrase) {
-            lastPhrase = phrase;
-            handleVoiceIntake(phrase);
-          }
-        };
-
-        recognition.onend = () => {
-          isListening = false;
-          document.getElementById('micText').innerText = 'TALK TO FRESH';
-          document.getElementById('micIcon').innerText = '🎙️';
-          document.getElementById('masterMicBtn').classList.remove('pulse-record');
-        };
-      }
+  function toggleVoiceIntake() {
+    if (!recognition) return alert('Speech recognition supported in Chrome/Edge.');
+    if (isListening) {
+      recognition.stop();
+    } else {
+      recognition.start();
+      isListening = true;
+      document.getElementById('micText').innerText = 'LISTENING...';
+      document.getElementById('micIcon').innerText = '⚡';
+      document.getElementById('masterMicBtn').classList.add('pulse-record');
     }
+  }
 
-    function toggleVoiceIntake() {
-      if (!recognition) return alert('Speech recognition supported in Chrome/Edge.');
-      if (isListening) {
-        recognition.stop();
+  function handleSearchSubmit() {
+    const input = document.getElementById('textSearchInput');
+    const val = input.value.trim();
+    if (!val) return;
+    handleVoiceIntake(val);
+    input.value = '';
+  }
+
+  function toggleGlobalNetworking() {
+    isGlobalNetworkingOn = !isGlobalNetworkingOn;
+    const label = document.getElementById('networkingStatusLabel');
+    const dot = document.getElementById('networkingStatusDot');
+    label.innerText = isGlobalNetworkingOn ? "🌐 Forever Networking: ON" : "🌐 Forever Networking: OFF";
+    dot.className = isGlobalNetworkingOn ? "w-2 h-2 rounded-full bg-emerald-600 inline-block animate-ping" : "w-2 h-2 rounded-full bg-stone-400 inline-block";
+  }
+
+  function switchRoom(roomNum) {
+    for (let i = 1; i <= 3; i++) {
+      const content = document.getElementById('room' + i + 'Content');
+      const tab = document.getElementById('tabRoom' + i);
+      if (i === roomNum) {
+        content.classList.remove('hidden');
+        tab.className = "p-2.5 rounded-xl font-bold text-xs shadow transition room-tab-active";
       } else {
-        recognition.start();
-        isListening = true;
-        document.getElementById('micText').innerText = 'LISTENING...';
-        document.getElementById('micIcon').innerText = '⚡';
-        document.getElementById('masterMicBtn').classList.add('pulse-record');
+        content.classList.add('hidden');
+        tab.className = "p-2.5 rounded-xl font-bold text-xs shadow transition room-tab-inactive";
       }
     }
+  }
 
-    function handleSearchSubmit() {
-      const input = document.getElementById('textSearchInput');
-      const val = input.value.trim();
-      if (!val) return;
-      handleVoiceIntake(val);
-      input.value = '';
+  function renderScheduledCards() {
+    const slot = document.getElementById('scheduledItemsSlot');
+    if (!scheduledCards || scheduledCards.length === 0) {
+      slot.innerHTML = '<p class="text-xs text-stone-400 italic p-4 text-center">Schedule Hopper Ready • Intake jobs by voice or type to schedule</p>';
+      return;
     }
 
-    function toggleGlobalNetworking() {
-      isGlobalNetworkingOn = !isGlobalNetworkingOn;
-      const label = document.getElementById('networkingStatusLabel');
-      const dot = document.getElementById('networkingStatusDot');
-      label.innerText = isGlobalNetworkingOn ? "🌐 Forever Networking: ON" : "🌐 Forever Networking: OFF";
-      dot.className = isGlobalNetworkingOn ? "w-2 h-2 rounded-full bg-emerald-600 inline-block animate-ping" : "w-2 h-2 rounded-full bg-stone-400 inline-block";
-    }
+    slot.innerHTML = '';
+    scheduledCards.forEach((card, idx) => {
+      const safeName = (card.name || 'Task').replace(/'/g, "\\'");
+      const safeAddress = (card.address || '').replace(/'/g, "\\'");
+      const safePhone = (card.phone || '').replace(/'/g, "\\'");
+      const safeAmount = card.ticketAmount || 0;
 
-    function switchRoom(roomNum) {
-      for (let i = 1; i <= 3; i++) {
-        const content = document.getElementById('room' + i + 'Content');
-        const tab = document.getElementById('tabRoom' + i);
-        if (i === roomNum) {
-          content.classList.remove('hidden');
-          tab.className = "p-2.5 rounded-xl font-bold text-xs shadow transition room-tab-active";
-        } else {
-          content.classList.add('hidden');
-          tab.className = "p-2.5 rounded-xl font-bold text-xs shadow transition room-tab-inactive";
-        }
-      }
-    }
-
-    function renderScheduledCards() {
-      const slot = document.getElementById('scheduledItemsSlot');
-      if (!scheduledCards || scheduledCards.length === 0) {
-        slot.innerHTML = '<p class="text-xs text-stone-400 italic p-4 text-center">Schedule Hopper Ready • Intake jobs by voice or type to schedule</p>';
-        return;
-      }
-
-      slot.innerHTML = '';
-      scheduledCards.forEach((card, idx) => {
-        slot.innerHTML += `
-          <div onclick="openWorkstation('${card.name}', '${card.address}', '${card.phone}', ${card.ticketAmount || 0})" 
-               class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 shadow-sm hover:border-emerald-700 hover:shadow-md transition flex items-center justify-between">
-            <div class="space-y-0.5">
-              <div class="flex items-center gap-2">
-                <span class="font-bold text-emerald-800 text-xs font-mono">${card.time}</span>
-                <span class="text-[10px] font-extrabold text-stone-400 font-mono">#${card.id}</span>
-              </div>
-              <h3 class="font-bold text-stone-900 text-xs">${card.name}</h3>
-              <p class="text-[11px] text-stone-500">${card.address}</p>
+      slot.innerHTML += `
+        <div onclick="openWorkstation('${safeName}', '${safeAddress}', '${safePhone}', ${safeAmount})" 
+             class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 shadow-sm hover:border-emerald-700 hover:shadow-md transition flex items-center justify-between">
+          <div class="space-y-0.5">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-emerald-800 text-xs font-mono">${card.time}</span>
+              <span class="text-[10px] font-extrabold text-stone-400 font-mono">#${card.id}</span>
             </div>
-            <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
-              <button onclick="removeScheduledCard(${idx})" class="text-stone-300 hover:text-red-500 text-xs p-1" title="Clear Card">✕</button>
-              <span class="text-[10px] bg-emerald-50 text-emerald-800 font-bold px-2 py-0.5 rounded border border-emerald-200">Open ➔</span>
-            </div>
+            <h3 class="font-bold text-stone-900 text-xs">${card.name}</h3>
+            <p class="text-[11px] text-stone-500">${card.address}</p>
           </div>
-        `;
-      });
-    }
+          <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
+            <button onclick="removeScheduledCard(${idx})" class="text-stone-300 hover:text-red-500 text-xs p-1" title="Clear Card">✕</button>
+            <button onclick="openWorkstation('${safeName}', '${safeAddress}', '${safePhone}', ${safeAmount})" class="text-[10px] bg-emerald-50 text-emerald-800 font-bold px-2 py-0.5 rounded border border-emerald-200 hover:bg-emerald-100">Open ➔</button>
+          </div>
+        </div>
+      `;
+    });
+  }
 
-    function removeScheduledCard(idx) {
-      scheduledCards.splice(idx, 1);
-      localStorage.setItem('tappy_scheduled_cards', JSON.stringify(scheduledCards));
-      renderScheduledCards();
-      showConfirmation("Card cleared from schedule");
-    }
+  function removeScheduledCard(idx) {
+    scheduledCards.splice(idx, 1);
+    localStorage.setItem('tappy_scheduled_cards', JSON.stringify(scheduledCards));
+    renderScheduledCards();
+    showConfirmation("Card cleared from schedule");
+  }
 
-    function pushToScheduleDirect(id, name, address, phone, timeStr) {
-      scheduledCards.unshift({
-        id: id || "VAULT",
-        name: name,
-        time: timeStr,
-        address: address || "1965 Greenspring Dr, Timonium",
-        phone: phone || "(410) 499-1313",
-        ticketAmount: 0,
-        networkingStatus: true
-      });
-      localStorage.setItem('tappy_scheduled_cards', JSON.stringify(scheduledCards));
-      renderScheduledCards();
-      showConfirmation(`Scheduled for ${timeStr}`);
-    }
+  function pushToScheduleDirect(id, name, address, phone, timeStr) {
+    scheduledCards.unshift({
+      id: id || "VAULT",
+      name: name,
+      time: timeStr,
+      address: address || "1965 Greenspring Dr, Timonium",
+      phone: phone || "(410) 499-1313",
+      ticketAmount: 0,
+      networkingStatus: true
+    });
+    localStorage.setItem('tappy_scheduled_cards', JSON.stringify(scheduledCards));
+    renderScheduledCards();
+    showConfirmation(`Scheduled for ${timeStr}`);
+  }
 
-    function parseVaultCSVText(text) {
-      Papa.parse(text, { 
-        header: true, 
-        skipEmptyLines: true, 
-        complete: r => { 
-          vaultData = r.data; 
-          const elem = document.getElementById('vaultStatus');
-          if (elem) elem.innerText = `⚡ ${vaultData.length.toLocaleString()} Vault Records Ready`;
-        } 
-      });
-    }
+  function parseVaultCSVText(text) {
+    Papa.parse(text, { header: true, skipEmptyLines: true, complete: r => { vaultData = r.data; } });
+  }
 
-    function parseCatalogCSVText(text) {
-      Papa.parse(text, {
-        header: true,
-        skipEmptyLines: true,
-        complete: function(r) {
-          catalogData = r.data;
-          const select = document.getElementById('partSelect');
-          select.innerHTML = '<option value="">Select from 1,090 Catalog Parts...</option>';
-          let count = 0;
-          catalogData.forEach(item => {
-            const name = item['Name'] || item['Item / Service'] || '';
-            const price = parseFloat(item['Price'] || 0).toFixed(2);
-            const cost = parseFloat(item['Cost'] || 0).toFixed(2);
-            if (name) {
-              select.innerHTML += `<option value="${price}|${cost}|${name}">${name} — ${price}</option>`;
-              count++;
-            }
-          });
-          const elem = document.getElementById('catalogStatus');
-          if (elem) elem.innerText = `⚡ ${count.toLocaleString()} Catalog Parts Ready`;
-        }
-      });
-    }
+  function parseCatalogCSVText(text) {
+    Papa.parse(text, {
+      header: true,
+      skipEmptyLines: true,
+      complete: function(r) {
+        catalogData = r.data;
+        const select = document.getElementById('partSelect');
+        select.innerHTML = '<option value="">Select catalog part or service...</option>';
+        catalogData.forEach(item => {
+          const name = item['Name'] || item['Item / Service'] || '';
+          const price = parseFloat(item['Price'] || 0).toFixed(2);
+          const cost = parseFloat(item['Cost'] || 0).toFixed(2);
+          if (name) select.innerHTML += `<option value="${price}|${cost}|${name}">${name} — ${price}</option>`;
+        });
+      }
+    });
+  }
 
-    function loadVaultCSV(input) {
-      const file = input.files[0];
-      if (!file) return;
-      Papa.parse(file, { header: true, skipEmptyLines: true, complete: r => parseVaultCSVText(Papa.unparse(r.data)) });
-    }
+  function handleVoiceIntake(text) {
+    const emptyState = document.getElementById('pinballEmptyState');
+    if (emptyState) emptyState.remove();
 
-    function loadCatalogCSV(input) {
-      const file = input.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => parseCatalogCSVText(e.target.result);
-      reader.readAsText(file);
-    }
+    const query = text.toLowerCase().trim();
+    
+    // Accurate time regex (requires am/pm, colon, or explicit 'at X')
+    const timeMatch = text.match(/(?:at\s+)?(\d{1,2}(?::\d{2})?\s*(?:am|pm)|\d{1,2}:\d{2})/i);
+    const extractedTime = timeMatch ? `Today — ${timeMatch[0].replace(/^at\s+/i, '').toUpperCase()}` : null;
 
-    // Smart Intake Engine: Calendar + Errands + Pinball
-    function handleVoiceIntake(text) {
-      const emptyState = document.getElementById('pinballEmptyState');
-      if (emptyState) emptyState.remove();
+    const errandKeywords = ['milk', 'gas', 'grocery', 'pick up', 'errand', 'buy', "bj's", 'bjs', 'store', 'hardware', 'supplies'];
+    const isErrand = errandKeywords.some(kw => query.includes(kw));
 
-      const query = text.toLowerCase().trim();
-      
-      // 1. Time Extraction (e.g., 2pm, 2 pm, 9:00, 9:15 am, 8:30)
-      const timeMatch = text.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/i);
-      const extractedTime = timeMatch ? `Today — ${timeMatch[0].toUpperCase()}` : null;
+    const matches = vaultData.filter(client => {
+      const name = (client['Name'] || '').toLowerCase();
+      return name && (name.includes(query) || query.includes(name) || (query.includes('william') && name.includes('william sullivan')));
+    });
 
-      // 2. Errand Keywords
-      const errandKeywords = ['milk', 'gas', 'grocery', 'pick up', 'errand', 'buy', "bj's", 'bjs', 'store', 'hardware', 'supplies'];
-      const isErrand = errandKeywords.some(kw => query.includes(kw));
-
-      // 3. Vault Search
-      const matches = vaultData.filter(client => {
-        const name = (client['Name'] || '').toLowerCase();
-        return name && (name.includes(query) || query.includes(name) || (query.includes('william') && name.includes('william sullivan')));
-      });
-
-      if (extractedTime) {
-        // ALWAYS GOES TO CALENDAR IF TIME IS MENTIONED
-        if (matches.length > 0) {
-          const client = matches[0];
-          pushToScheduleDirect(client['Client #'], client['Name'], client['Address'], client['Phone'], extractedTime);
-        } else {
-          pushToScheduleDirect("23377", text, "1965 Greenspring Dr, Timonium", "(410) 499-1313", extractedTime);
-        }
-      } else if (isErrand) {
-        // LOGS AS A TASK/ERRAND IN PINBALL FOR WILLIAM
-        const taskId = 'TASK-' + Math.floor(1000 + Math.random() * 9000);
-        activeTasks.push({ id: taskId, text: text, done: false });
-        localStorage.setItem('tappy_active_tasks', JSON.stringify(activeTasks));
-        renderErrandPinballCard(taskId, text);
-        showConfirmation("🛒 Errand logged to Pinball for William");
+    if (extractedTime) {
+      if (matches.length > 0) {
+        const client = matches[0];
+        pushToScheduleDirect(client['Client #'], client['Name'], client['Address'], client['Phone'], extractedTime);
       } else {
-        // REGULAR CUSTOMER NOTE OR PINBALL INTAKE
-        if (matches.length > 0) {
-          matches.slice(0, 3).forEach(client => renderMatchedCard(client, text));
-        } else {
-          renderRawIntakeCard(text);
-        }
-        showConfirmation("Intake queued to Pinball for Sissy");
+        pushToScheduleDirect("TASK", text, "1965 Greenspring Dr, Timonium", "(410) 499-1313", extractedTime);
       }
-
-      // Webhook Pipe to Make.com
-      fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transcript: text, assignedTo: "Sissy (Norby)", timestamp: new Date().toISOString() })
-      }).catch(err => console.log('Pipe fired'));
-    }
-
-    function renderErrandPinballCard(taskId, text) {
-      const queue = document.getElementById('pinballQueue');
-      const cardHTML = `
-        <div onclick="openWorkstation('William Sullivan', '1965 Greenspring Dr, Timonium', '4104991313', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-amber-500 shadow-sm hover:shadow-md transition flex items-center justify-between">
-          <div class="space-y-0.5">
-            <span class="text-[10px] font-extrabold text-amber-700 uppercase tracking-wide">🛒 Shared Errand / Task (#${taskId})</span>
-            <h3 class="font-bold text-stone-900 text-xs">"${text}"</h3>
-            <p class="text-[11px] text-stone-500">Assigned: William Sullivan (Shop/Home)</p>
-          </div>
-          <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
-        </div>
-      `;
-      queue.insertAdjacentHTML('afterbegin', cardHTML);
-    }
-
-    function renderMatchedCard(client, originalSpeech) {
-      const queue = document.getElementById('pinballQueue');
-      const cleanPhone = (client['Phone'] || '').replace(/\D/g, '');
-      const name = client['Name'] || 'Client';
-      const address = client['Address'] || 'Address Not Listed';
-      const clientId = client['Client #'] || 'VAULT';
-
-      const cardHTML = `
-        <div onclick="openWorkstation('${name}', '${address}', '${cleanPhone}', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-emerald-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
-          <div class="space-y-0.5">
-            <span class="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wide">Vault Match (#${clientId})</span>
-            <h3 class="font-bold text-stone-900 text-xs">${name}</h3>
-            <p class="text-[11px] text-stone-600">${address} • ${client['Phone'] || ''}</p>
-            <p class="text-[10px] text-amber-700 font-medium">💬 "${originalSpeech}"</p>
-          </div>
-          <button onclick="event.stopPropagation(); pushToScheduleDirect('${clientId}', '${name}', '${address}', '${cleanPhone}', 'Today — Scheduled')" class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 hover:bg-emerald-100">📅 Schedule ➔</button>
-        </div>
-      `;
-      queue.insertAdjacentHTML('afterbegin', cardHTML);
-    }
-
-    function renderRawIntakeCard(text) {
-      const queue = document.getElementById('pinballQueue');
-      const cardHTML = `
-        <div onclick="openWorkstation('Voice Intake', 'New Record', '(410) 499-1313', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-blue-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
-          <div>
-            <span class="text-[10px] font-extrabold text-blue-700 uppercase tracking-wide">Live Intake Card</span>
-            <h3 class="font-bold text-stone-900 text-xs">"${text}"</h3>
-            <p class="text-[11px] text-stone-500">Queued for Sissy</p>
-          </div>
-          <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
-        </div>
-      `;
-      queue.insertAdjacentHTML('afterbegin', cardHTML);
-    }
-
-    function openWorkstation(name, details, phone, amount) {
-      currentActivePhone = phone;
-      document.getElementById('drawerCallBtn').href = 'tel:' + phone.replace(/\D/g, '');
-      document.getElementById('drawerTextBtn').href = 'sms:' + phone.replace(/\D/g, '');
-      document.getElementById('cardClientName').innerText = name + ' — Forever Card';
-      document.getElementById('cardClientDetails').innerText = details + ' • ' + phone;
-      document.getElementById('mirrorClient').innerText = name + ' Mobile Card';
-      
-      currentInvoiceItems = amount > 0 ? [{ name: "Approved Initial Service", cost: amount * 0.2, retail: amount }] : [];
-      renderInvoice();
-      renderDrawerTasks();
-
-      switchRoom(1);
-      document.getElementById('drawerOverlay').classList.remove('hidden');
-      document.getElementById('workstationDrawer').classList.remove('translate-x-full');
-    }
-
-    function closeWorkstation() {
-      document.getElementById('drawerOverlay').classList.add('hidden');
-      document.getElementById('workstationDrawer').classList.add('translate-x-full');
-    }
-
-    function renderDrawerTasks() {
-      const container = document.getElementById('drawerTasksContainer');
-      const badge = document.getElementById('taskCountBadge');
-      if (activeTasks.length === 0) {
-        container.innerHTML = '<p class="text-stone-400 italic">No open errands for this card.</p>';
-        badge.innerText = '0 Pending';
-        return;
-      }
-
-      const pending = activeTasks.filter(t => !t.done).length;
-      badge.innerText = `${pending} Pending`;
-      container.innerHTML = '';
-      activeTasks.forEach((t, idx) => {
-        container.innerHTML += `
-          <div class="flex items-center justify-between p-2 rounded-lg bg-stone-50 border border-stone-200">
-            <label class="flex items-center gap-2 cursor-pointer ${t.done ? 'line-through text-stone-400' : 'text-stone-900 font-medium'}">
-              <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTaskDone(${idx})" class="rounded text-emerald-700">
-              <span>${t.text}</span>
-            </label>
-            <span class="text-[10px] font-mono text-stone-400">#${t.id}</span>
-          </div>
-        `;
-      });
-    }
-
-    function toggleTaskDone(idx) {
-      activeTasks[idx].done = !activeTasks[idx].done;
+    } else if (isErrand) {
+      const taskId = 'TASK-' + Math.floor(1000 + Math.random() * 9000);
+      activeTasks.push({ id: taskId, text: text, done: false });
       localStorage.setItem('tappy_active_tasks', JSON.stringify(activeTasks));
-      renderDrawerTasks();
-    }
-
-    function setStage(stageNum) {
-      for (let i = 1; i <= 4; i++) {
-        document.getElementById('stage' + i).className = (i === stageNum) ? 
-          'p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white' : 
-          'p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600';
+      renderErrandPinballCard(taskId, text);
+      showConfirmation("🛒 Errand logged to Pinball");
+    } else {
+      if (matches.length > 0) {
+        matches.slice(0, 3).forEach(client => renderMatchedCard(client, text));
+      } else {
+        renderRawIntakeCard(text);
       }
-      if (stageNum === 4) confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
+      showConfirmation("Intake queued to Pinball");
     }
 
-    function addInvoiceItem() {
-      const select = document.getElementById('partSelect');
-      if (!select.value) return showConfirmation('Select a catalog item first!');
-      const [retail, cost, name] = select.value.split('|');
-      currentInvoiceItems.push({ name, cost: parseFloat(cost), retail: parseFloat(retail) });
-      renderInvoice();
+    // Background relay to Make.com / Sissy webhook
+    fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transcript: text, assignedTo: "Sissy (Norby)", timestamp: new Date().toISOString() })
+    }).catch(err => console.log('Pipe fired'));
+  }
+
+  function renderErrandPinballCard(taskId, text) {
+    const queue = document.getElementById('pinballQueue');
+    const cardHTML = `
+      <div onclick="openWorkstation('William Sullivan', '1965 Greenspring Dr, Timonium', '4104991313', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-amber-500 shadow-sm hover:shadow-md transition flex items-center justify-between">
+        <div class="space-y-0.5">
+          <span class="text-[10px] font-extrabold text-amber-700 uppercase tracking-wide">🛒 Shared Errand / Task (#${taskId})</span>
+          <h3 class="font-bold text-stone-900 text-xs">"${text}"</h3>
+          <p class="text-[11px] text-stone-500">Assigned: William Sullivan (Shop/Home)</p>
+        </div>
+        <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
+      </div>
+    `;
+    queue.insertAdjacentHTML('afterbegin', cardHTML);
+  }
+
+  function renderMatchedCard(client, originalSpeech) {
+    const queue = document.getElementById('pinballQueue');
+    const cleanPhone = (client['Phone'] || '').replace(/\D/g, '');
+    const name = client['Name'] || 'Client';
+    const address = client['Address'] || 'Address Not Listed';
+    const clientId = client['Client #'] || 'VAULT';
+
+    const cardHTML = `
+      <div onclick="openWorkstation('${name}', '${address}', '${cleanPhone}', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-emerald-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
+        <div class="space-y-0.5">
+          <span class="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wide">Vault Match (#${clientId})</span>
+          <h3 class="font-bold text-stone-900 text-xs">${name}</h3>
+          <p class="text-[11px] text-stone-600">${address} • ${client['Phone'] || ''}</p>
+          <p class="text-[10px] text-amber-700 font-medium">💬 "${originalSpeech}"</p>
+        </div>
+        <button onclick="event.stopPropagation(); pushToScheduleDirect('${clientId}', '${name}', '${address}', '${cleanPhone}', 'Today — Scheduled')" class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 hover:bg-emerald-100">📅 Schedule ➔</button>
+      </div>
+    `;
+    queue.insertAdjacentHTML('afterbegin', cardHTML);
+  }
+
+  function renderRawIntakeCard(text) {
+    const queue = document.getElementById('pinballQueue');
+    const cardHTML = `
+      <div onclick="openWorkstation('${text}', 'Live Intake Record', '(410) 499-1313', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-blue-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-extrabold text-blue-700 uppercase tracking-wide">Live Intake Card</span>
+          <h3 class="font-bold text-stone-900 text-xs">"${text}"</h3>
+          <p class="text-[11px] text-stone-500">Queued for Triage</p>
+        </div>
+        <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
+      </div>
+    `;
+    queue.insertAdjacentHTML('afterbegin', cardHTML);
+  }
+
+  function openWorkstation(name, details, phone, amount) {
+    currentActivePhone = phone;
+    document.getElementById('drawerCallBtn').href = 'tel:' + phone.replace(/\D/g, '');
+    document.getElementById('drawerTextBtn').href = 'sms:' + phone.replace(/\D/g, '');
+    document.getElementById('cardClientName').innerText = name + ' — Forever Card';
+    document.getElementById('cardClientDetails').innerText = details + ' • ' + phone;
+    document.getElementById('mirrorClient').innerText = name + ' Mobile Card';
+
+    const isPersonalOrErrand = name.toLowerCase().includes('william') || name.toLowerCase().includes('pickleball') || details.toLowerCase().includes('intake');
+
+    if (isPersonalOrErrand) {
+      document.getElementById('roomTabsBar').classList.add('hidden');
+      document.getElementById('customerProgressionBox').classList.add('hidden');
+      document.getElementById('equipmentDiagBox').classList.add('hidden');
+    } else {
+      document.getElementById('roomTabsBar').classList.remove('hidden');
+      document.getElementById('customerProgressionBox').classList.remove('hidden');
+      document.getElementById('equipmentDiagBox').classList.remove('hidden');
+    }
+    
+    currentInvoiceItems = amount > 0 ? [{ name: "Approved Initial Service", cost: amount * 0.2, retail: amount }] : [];
+    renderInvoice();
+    renderDrawerTasks();
+
+    switchRoom(1);
+    document.getElementById('drawerOverlay').classList.remove('hidden');
+    document.getElementById('workstationDrawer').classList.remove('translate-x-full');
+  }
+
+  function closeWorkstation() {
+    document.getElementById('drawerOverlay').classList.add('hidden');
+    document.getElementById('workstationDrawer').classList.add('translate-x-full');
+  }
+
+  function renderDrawerTasks() {
+    const container = document.getElementById('drawerTasksContainer');
+    const badge = document.getElementById('taskCountBadge');
+    if (activeTasks.length === 0) {
+      container.innerHTML = '<p class="text-stone-400 italic">No open errands for this card.</p>';
+      badge.innerText = '0 Pending';
+      return;
     }
 
-    function renderInvoice() {
-      const tbody = document.getElementById('invoiceTableBody');
-      tbody.innerHTML = '';
-      let totalRetail = 0, totalCost = 0;
+    const pending = activeTasks.filter(t => !t.done).length;
+    badge.innerText = `${pending} Pending`;
+    container.innerHTML = '';
+    activeTasks.forEach((t, idx) => {
+      container.innerHTML += `
+        <div class="flex items-center justify-between p-2 rounded-lg bg-stone-50 border border-stone-200">
+          <label class="flex items-center gap-2 cursor-pointer ${t.done ? 'line-through text-stone-400' : 'text-stone-900 font-medium'}">
+            <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTaskDone(${idx})" class="rounded text-emerald-700">
+            <span>${t.text}</span>
+          </label>
+          <span class="text-[10px] font-mono text-stone-400">#${t.id}</span>
+        </div>
+      `;
+    });
+  }
 
-      currentInvoiceItems.forEach((item) => {
-        totalRetail += item.retail;
-        totalCost += item.cost;
-        const margin = (((item.retail - item.cost) / item.retail) * 100).toFixed(1);
-        tbody.innerHTML += `
-          <tr>
-            <td class="p-2 text-stone-900">${item.name}</td>
-            <td class="p-2 text-stone-500 font-mono">${item.cost.toFixed(2)}</td>
-            <td class="p-2 text-stone-900 font-bold font-mono">${item.retail.toFixed(2)}</td>
-            <td class="p-2 text-right text-emerald-700 font-bold font-mono">${margin}%</td>
-          </tr>
-        `;
-      });
+  function toggleTaskDone(idx) {
+    activeTasks[idx].done = !activeTasks[idx].done;
+    localStorage.setItem('tappy_active_tasks', JSON.stringify(activeTasks));
+    renderDrawerTasks();
+  }
 
-      const profit = totalRetail - totalCost;
-      document.getElementById('profitSummary').innerText = `${totalRetail.toFixed(2)} (${profit.toFixed(2)} Net Profit)`;
-      document.getElementById('mirrorTotal').innerText = `${totalRetail.toFixed(2)}`;
+  function setStage(stageNum) {
+    for (let i = 1; i <= 4; i++) {
+      document.getElementById('stage' + i).className = (i === stageNum) ? 
+        'p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white' : 
+        'p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600';
     }
+    if (stageNum === 4) confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
+  }
 
-    function dispatchStripePay() {
-      const total = document.getElementById('mirrorTotal').innerText;
-      showConfirmation(`Stripe Pay Link for ${total} dispatched to ${currentActivePhone}`);
-    }
-  </script>
-</body>
-</html>
+  function addInvoiceItem() {
+    const select = document.getElementById('partSelect');
+    if (!select.value) return showConfirmation('Select a catalog item first!');
+    const [retail, cost, name] = select.value.split('|');
+    currentInvoiceItems.push({ name, cost: parseFloat(cost), retail: parseFloat(retail) });
+    renderInvoice();
+  }
+
+  function renderInvoice() {
+    const tbody = document.getElementById('invoiceTableBody');
+    tbody.innerHTML = '';
+    let totalRetail = 0, totalCost = 0;
+
+    currentInvoiceItems.forEach((item) => {
+      totalRetail += item.retail;
+      totalCost += item.cost;
+      const margin = item.retail > 0 ? (((item.retail - item.cost) / item.retail) * 100).toFixed(1) : '0.0';
+      tbody.innerHTML += `
+        <tr>
+          <td class="p-2 text-stone-900">${item.name}</td>
+          <td class="p-2 text-stone-500 font-mono">${item.cost.toFixed(2)}</td>
+          <td class="p-2 text-stone-900 font-bold font-mono">${item.retail.toFixed(2)}</td>
+          <td class="p-2 text-right text-emerald-700 font-bold font-mono">${margin}%</td>
+        </tr>
+      `;
+    });
+
+    const profit = totalRetail - totalCost;
+    document.getElementById('profitSummary').innerText = `${totalRetail.toFixed(2)} (${profit.toFixed(2)} Net Profit)`;
+    document.getElementById('mirrorTotal').innerText = `${totalRetail.toFixed(2)}`;
+  }
+
+  function dispatchStripePay() {
+    const total = document.getElementById('mirrorTotal').innerText;
+    showConfirmation(`Stripe Pay Link for ${total} dispatched to ${currentActivePhone}`);
+  }
+</script>
