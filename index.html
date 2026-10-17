@@ -108,7 +108,7 @@
     <!-- MAIN OPERATIONAL FLOOR -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-      <!-- QUADRANT #1: Dynamic Schedule Grid (CUSTOMER APPOINTMENTS ONLY) -->
+      <!-- QUADRANT #1: Dynamic Schedule Grid (SISSY AI VERIFIED CUSTOMER CARDS) -->
       <div class="lg:col-span-5 boutique-card rounded-2xl p-5 space-y-4">
         <div class="flex items-center justify-between border-b border-stone-200 pb-3">
           <h2 id="calendarTodayLabel" class="font-bold text-stone-900 text-sm flex items-center gap-2">📅 SCHEDULED FOREVER CARDS</h2>
@@ -119,7 +119,7 @@
         </div>
       </div>
 
-      <!-- QUADRANT #2: Dynamic Pinball Action Zone (SISSY UNIVERSAL TRIAGE) -->
+      <!-- QUADRANT #2: Dynamic Pinball Action Zone (SISSY UNIVERSAL TRIAGE & TASKS) -->
       <div class="lg:col-span-7 boutique-card rounded-2xl p-5 space-y-4">
         <div class="flex items-center justify-between border-b border-stone-200 pb-3">
           <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📍 PINBALL ACTION ZONE</h2>
@@ -150,7 +150,7 @@
       <button onclick="closeWorkstation()" class="text-stone-400 hover:text-stone-800 text-2xl font-bold">✕</button>
     </div>
 
-    <!-- ROOM SWITCHER TABS (Hides on Team Member Cards) -->
+    <!-- ROOM SWITCHER TABS -->
     <div id="roomTabsBar" class="grid grid-cols-3 gap-2">
       <button id="tabRoom1" onclick="switchRoom(1)" class="p-2.5 rounded-xl font-bold text-xs shadow transition room-tab-active">🔧 Shop Ops</button>
       <button id="tabRoom2" onclick="switchRoom(2)" class="p-2.5 rounded-xl font-bold text-xs shadow transition room-tab-inactive">💳 Invoice Room</button>
@@ -160,7 +160,7 @@
     <!-- ROOM 1: SHOP OPS ENGINE ROOM -->
     <div id="room1Content" class="space-y-4">
       
-      <!-- CUSTOMER JOB PROGRESSION (Hides on Team Member Cards) -->
+      <!-- CUSTOMER JOB PROGRESSION -->
       <div id="customerProgressionBox" class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
         <div class="flex justify-between items-center">
           <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">4-Stage Progression</h3>
@@ -174,7 +174,7 @@
         </div>
       </div>
 
-      <!-- EXTERNAL CUSTOMER COMMUNICATION BAR (Hides on Team Member Cards) -->
+      <!-- EXTERNAL CUSTOMER COMMUNICATION BAR -->
       <div id="customerCommsBar" class="grid grid-cols-3 gap-2">
         <a id="drawerCallBtn" href="tel:" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">📞 Call Client</a>
         <a id="drawerTextBtn" href="sms:" class="p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">💬 Text Client</a>
@@ -203,7 +203,7 @@
         </div>
       </div>
 
-      <!-- EQUIPMENT DIAGNOSTICS (Hides on Team Member Cards) -->
+      <!-- EQUIPMENT DIAGNOSTICS -->
       <div id="equipmentDiagBox" class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
         <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Equipment Diagnostics & Field Notes</h3>
         <textarea id="techNotesInput" rows="3" placeholder="Enter diagnostic observations, unit serials, or field notes..." class="w-full p-3 rounded-xl border border-stone-300 text-xs text-stone-900 bg-stone-50 focus:outline-none focus:border-emerald-700 font-medium"></textarea>
@@ -306,7 +306,7 @@
       const bar = document.getElementById('freshConfirmationBar');
       bar.innerText = `⚡ FRESH: ${msg}`;
       bar.classList.remove('hidden');
-      setTimeout(() => bar.classList.add('hidden'), 4000);
+      setTimeout(() => bar.classList.add('hidden'), 5000);
     }
 
     function setupSpeech() {
@@ -382,14 +382,6 @@
       const dateStr = today.toLocaleDateString('en-US', options).toUpperCase();
       const dateLabel = document.getElementById('calendarTodayLabel');
       if (dateLabel) dateLabel.innerText = `📅 SCHEDULED — ${dateStr}`;
-    }
-
-    function extractTimeFromText(text) {
-      const strictTimeRegex = /\b(?:at\s+|by\s+)?(\d{1,2}(?::\d{2})?\s*(?:am|pm))\b|\b(\d{1,2}:\d{2})\b|\b(?:at|by)\s+(\d{1,2})\b/i;
-      const match = text.match(strictTimeRegex);
-      if (!match) return null;
-      const rawTime = (match[1] || match[2] || match[3] + ':00').toUpperCase();
-      return rawTime.includes('AM') || rawTime.includes('PM') ? rawTime : `${rawTime} PM`;
     }
 
     function renderScheduledCards() {
@@ -607,95 +599,99 @@
       showConfirmation("Card archived to completed history");
     }
 
-    // SMART INTAKE TRIAGE ENGINE
+    // SISSY CLOUD AI INTAKE ENGINE WITH INSTANT FEEDBACK & 4-SEC FAILSAFE
     function handleVoiceIntake(text) {
+      showConfirmation(`Got it! Sissy is analyzing and routing to Forever Card...`);
+
+      let hasResponded = false;
+
+      // 4-Second Failsafe Timeout
+      const failsafeTimer = setTimeout(() => {
+        if (!hasResponded) {
+          hasResponded = true;
+          executeFallbackRouting(text);
+        }
+      }, 4000);
+
+      // Transmit to Sissy Cloud Webhook Engine (Make.com)
+      fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transcript: text, timestamp: new Date().toISOString() })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (!hasResponded) {
+          hasResponded = true;
+          clearTimeout(failsafeTimer);
+          applySissyAiRouting(data, text);
+        }
+      })
+      .catch(err => {
+        if (!hasResponded) {
+          hasResponded = true;
+          clearTimeout(failsafeTimer);
+          executeFallbackRouting(text);
+        }
+      });
+    }
+
+    function applySissyAiRouting(data, rawText) {
+      if (data.destination === 'calendar') {
+        pushToScheduleDirect(
+          data.clientId || "VAULT", 
+          data.clientName || rawText, 
+          data.address || "Main Shop Address", 
+          data.phone || "", 
+          data.time || "Today — Scheduled"
+        );
+      } else {
+        const taskId = 'TASK-' + Math.floor(1000 + Math.random() * 9000);
+        pinballQueue.unshift({ 
+          type: data.taskType || 'errand', 
+          id: taskId, 
+          text: rawText, 
+          time: data.time || null,
+          name: data.clientName || 'Team Member Task', 
+          address: data.address || 'Main Shop Address', 
+          phone: data.phone || '' 
+        });
+        localStorage.setItem('tappy_pinball_queue', JSON.stringify(pinballQueue));
+        renderPinballQueue();
+        showConfirmation(`Sissy routed task to Pinball`);
+      }
+    }
+
+    function executeFallbackRouting(text) {
+      // Local Search Fallback
       const query = text.toLowerCase().trim();
-      const extractedTime = extractTimeFromText(text);
-
-      const actionKeywords = ['deliver', 'pick up', 'pickup', 'errand', 'buy', 'get', 'store', 'hardware', 'supplies', 'task', 'filters', 'filter', 'vacuum', 'vacuums', 'milk', 'gas', 'grocery', "bj's", 'bjs'];
-      const isActionOrErrand = actionKeywords.some(kw => query.includes(kw));
-
       const matches = vaultData.filter(client => {
         const name = (client['Name'] || '').toLowerCase();
         return name && name.length > 2 && (name.includes(query) || query.includes(name));
       });
 
-      // CASE A: Vault Client Match + Time -> Schedules Real Client in Quadrant #1
-      if (matches.length > 0 && extractedTime) {
+      if (matches.length > 0) {
         const client = matches[0];
-        pushToScheduleDirect(client['Client #'], client['Name'], client['Address'], client['Phone'], extractedTime);
-      } 
-      // CASE B: Task/Errand + Time (NO Client Match) -> Routes to Pinball as Timed Task
-      else if (extractedTime && (isActionOrErrand || matches.length === 0)) {
-        const taskId = 'TASK-' + Math.floor(1000 + Math.random() * 9000);
-        activeTasks.push({ id: taskId, text: text, done: false });
-        localStorage.setItem('tappy_active_tasks', JSON.stringify(activeTasks));
-
         pinballQueue.unshift({ 
-          type: 'timed_errand', 
-          id: taskId, 
+          type: 'match', 
+          clientId: client['Client #'] || 'VAULT', 
+          name: client['Name'] || 'Client', 
+          address: client['Address'] || 'Main Shop Address', 
+          phone: client['Phone'] || '', 
+          originalSpeech: text 
+        });
+      } else {
+        pinballQueue.unshift({ 
+          type: 'raw', 
           text: text, 
-          time: extractedTime, 
-          name: 'Team Member Task', 
-          address: 'Main Shop Address', 
+          name: text, 
+          address: 'Live Intake Record', 
           phone: '' 
         });
-        localStorage.setItem('tappy_pinball_queue', JSON.stringify(pinballQueue));
-        renderPinballQueue();
-        showConfirmation(`⏰ Timed Task (${extractedTime}) routed to Pinball`);
-      } 
-      // CASE C: Errand/Task without Time -> Routes to Pinball as Shared Errand
-      else if (isActionOrErrand) {
-        const taskId = 'TASK-' + Math.floor(1000 + Math.random() * 9000);
-        activeTasks.push({ id: taskId, text: text, done: false });
-        localStorage.setItem('tappy_active_tasks', JSON.stringify(activeTasks));
-        
-        pinballQueue.unshift({ 
-          type: 'errand', 
-          id: taskId, 
-          text: text, 
-          name: 'Team Member Task', 
-          address: 'Main Shop Address', 
-          phone: '' 
-        });
-        localStorage.setItem('tappy_pinball_queue', JSON.stringify(pinballQueue));
-        renderPinballQueue();
-        showConfirmation("🛒 Errand logged to Pinball for Sissy Triage");
-      } 
-      // CASE D: Vault Match without Time OR Raw Intake
-      else {
-        if (matches.length > 0) {
-          matches.slice(0, 3).forEach(client => {
-            const cleanPhone = (client['Phone'] || '').replace(/\D/g, '');
-            pinballQueue.unshift({ 
-              type: 'match', 
-              clientId: client['Client #'] || 'VAULT', 
-              name: client['Name'] || 'Client', 
-              address: client['Address'] || 'Address Pending', 
-              phone: cleanPhone, 
-              originalSpeech: text 
-            });
-          });
-        } else {
-          pinballQueue.unshift({ 
-            type: 'raw', 
-            text: text, 
-            name: text, 
-            address: 'Live Intake Record', 
-            phone: '' 
-          });
-        }
-        localStorage.setItem('tappy_pinball_queue', JSON.stringify(pinballQueue));
-        renderPinballQueue();
-        showConfirmation("Intake queued to Pinball for Sissy Triage");
       }
-
-      // Webhook Pipe to Sissy Back-Office Engine
-      fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transcript: text, assignedTo: "Sissy Back-Office Engine", timestamp: new Date().toISOString() })
-      }).catch(err => console.log('Pipe fired'));
+      localStorage.setItem('tappy_pinball_queue', JSON.stringify(pinballQueue));
+      renderPinballQueue();
+      showConfirmation("Intake safely logged to Pinball");
     }
 
     // STRICT CUSTOMER VS TEAM CARD DRAWER ISOLATION
@@ -707,7 +703,7 @@
       document.getElementById('cardClientDetails').innerText = details + ' • ' + phone;
       document.getElementById('mirrorClient').innerText = name + ' Mobile Card';
 
-      // Clean Separation: Hide Customer Comms, Shop Progression, Diagnostics, and Invoice Rooms on Team Cards
+      // Clean Separation
       const queryName = name.toLowerCase();
       const queryDetails = details.toLowerCase();
       const isTeamMemberCard = queryName.includes('task') || queryName.includes('errand') || queryName.includes('team member') || queryName.includes('pickleball') || queryDetails.includes('intake') || queryDetails.includes('main shop');
@@ -744,7 +740,6 @@
       const taskBadge = document.getElementById('taskCountBadge');
       const archiveBadge = document.getElementById('archiveCountBadge');
 
-      // 1. Render Active Tasks
       const pending = activeTasks.filter(t => !t.done).length;
       taskBadge.innerText = `${pending} Pending`;
       
@@ -765,7 +760,6 @@
         });
       }
 
-      // 2. Render Completed / Archived History
       archiveBadge.innerText = `${archivedTasks.length} Completed`;
       if (archivedTasks.length === 0) {
         archiveContainer.innerHTML = '<p class="text-stone-400 italic">No archived items recorded yet.</p>';
