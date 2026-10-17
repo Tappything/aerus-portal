@@ -122,18 +122,10 @@
       <div class="lg:col-span-7 boutique-card rounded-2xl p-5 space-y-4">
         <div class="flex items-center justify-between border-b border-stone-200 pb-3">
           <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📍 PINBALL ACTION ZONE</h2>
-          <button onclick="clearPinball()" class="text-xs text-red-600 hover:underline font-bold font-mono">Clear Queue</button>
+          <span class="text-[11px] font-mono font-bold text-stone-400">Live Intake Queue</span>
         </div>
 
-        <!-- 4 Dynamic Fast Action Buttons -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <a id="fastCallBtn" href="tel:" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">📞 CALL</a>
-          <a id="fastTextBtn" href="sms:" class="p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">💬 TEXT</a>
-          <button onclick="dispatchStripePay()" class="p-2.5 bg-amber-500 hover:bg-amber-600 text-stone-950 font-extrabold text-xs rounded-xl shadow transition active:scale-95">💳 CHECKOUT</button>
-          <button onclick="nextPinballCard()" class="p-2.5 bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs rounded-xl shadow transition active:scale-95">📌 NEXT</button>
-        </div>
-
-        <div id="pinballQueue" class="space-y-2.5 max-h-64 overflow-y-auto">
+        <div id="pinballQueue" class="space-y-2.5 max-h-80 overflow-y-auto">
           <p id="pinballEmptyState" class="text-xs text-stone-400 italic p-4 text-center">Pinball Hopper Ready • Type or Tap Mic to Pull Cards</p>
         </div>
       </div>
@@ -177,6 +169,12 @@
           <button id="stage3" onclick="setStage(3)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">3. Proposal</button>
           <button id="stage4" onclick="setStage(4)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">4. Ready Wall 🎉</button>
         </div>
+      </div>
+
+      <!-- DIRECT COMMUNICATION ACTION BAR INSIDE WORKSTATION -->
+      <div class="grid grid-cols-2 gap-2">
+        <a id="drawerCallBtn" href="tel:" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">📞 Call Customer</a>
+        <a id="drawerTextBtn" href="sms:" class="p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">💬 Text Customer</a>
       </div>
 
       <!-- EQUIPMENT DIAGNOSTICS & ATTACHMENTS -->
@@ -262,7 +260,7 @@
   <script>
     let vaultData = [];
     let catalogData = [];
-    let scheduledCards = []; // Pure Dynamic In-Memory Array
+    let scheduledCards = []; 
     let isListening = false, recognition = null, lastPhrase = '';
     let currentInvoiceItems = [];
     let currentActivePhone = '';
@@ -324,7 +322,6 @@
       const dot = document.getElementById('networkingStatusDot');
       label.innerText = isGlobalNetworkingOn ? "🌐 Forever Networking: ON" : "🌐 Forever Networking: OFF";
       dot.className = isGlobalNetworkingOn ? "w-2 h-2 rounded-full bg-emerald-600 inline-block animate-ping" : "w-2 h-2 rounded-full bg-stone-400 inline-block";
-      alert(`🌐 Forever Networking Global Commerce Switch is now ${isGlobalNetworkingOn ? 'ON' : 'OFF'}!`);
     }
 
     function switchRoom(roomNum) {
@@ -341,7 +338,6 @@
       }
     }
 
-    // Dynamic Render for Schedule Grid
     function renderScheduledCards() {
       const slot = document.getElementById('scheduledItemsSlot');
       if (!scheduledCards || scheduledCards.length === 0) {
@@ -370,10 +366,7 @@
       });
     }
 
-    function scheduleForeverCard(id, name, address, phone, defaultTime) {
-      const timeStr = prompt(`Set schedule time slot for ${name}:`, defaultTime || "Today — 10:00 AM");
-      if (!timeStr) return;
-
+    function pushToScheduleDirect(id, name, address, phone, timeStr) {
       scheduledCards.push({
         id: id || "VAULT",
         name: name,
@@ -383,9 +376,7 @@
         ticketAmount: 0,
         networkingStatus: true
       });
-
       renderScheduledCards();
-      confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
     }
 
     function loadVaultCSV(input) {
@@ -436,26 +427,37 @@
       });
     }
 
-    // Voice & Text Intake with Time Parsing & Sissy Queueing
+    // Direct Time Parser & Calendar Router (Zero Popups)
     function handleVoiceIntake(text) {
       const emptyState = document.getElementById('pinballEmptyState');
       if (emptyState) emptyState.remove();
 
       const query = text.toLowerCase().trim();
       
-      // Auto-extract times like 9:15 or 11:30
+      // Smart Time Extractor (e.g., 9:15, 11:30, 2:00pm, 8:30)
       const timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:am|pm)?)/i);
-      const extractedTime = timeMatch ? `Today — ${timeMatch[0]}` : "Today — TBD";
+      const extractedTime = timeMatch ? `Today — ${timeMatch[0]}` : null;
 
       const matches = vaultData.filter(client => {
         const name = (client['Name'] || '').toLowerCase();
         return name.includes(query) || query.includes(name);
       });
 
-      if (matches.length > 0) {
-        matches.slice(0, 4).forEach(client => renderMatchedCard(client, text, extractedTime));
+      if (extractedTime) {
+        // Direct-to-Calendar Route
+        if (matches.length > 0) {
+          const client = matches[0];
+          pushToScheduleDirect(client['Client #'], client['Name'], client['Address'], client['Phone'], extractedTime);
+        } else {
+          pushToScheduleDirect("INTAKE", text, "Location Pending", "4105550100", extractedTime);
+        }
       } else {
-        renderRawIntakeCard(text, extractedTime);
+        // Triage Route to Pinball for Sissy
+        if (matches.length > 0) {
+          matches.slice(0, 3).forEach(client => renderMatchedCard(client, text));
+        } else {
+          renderRawIntakeCard(text);
+        }
       }
 
       // Webhook Pipe
@@ -466,7 +468,7 @@
       }).catch(err => console.log('Pipe fired'));
     }
 
-    function renderMatchedCard(client, originalSpeech, extractedTime) {
+    function renderMatchedCard(client, originalSpeech) {
       const queue = document.getElementById('pinballQueue');
       const cleanPhone = (client['Phone'] || '').replace(/\D/g, '');
       const name = client['Name'] || 'Client';
@@ -481,26 +483,22 @@
             <p class="text-[11px] text-stone-600">${address} • ${client['Phone'] || ''}</p>
             <p class="text-[10px] text-amber-700 font-medium">💬 "${originalSpeech}"</p>
           </div>
-          <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
-            <button onclick="scheduleForeverCard('${clientId}', '${name}', '${address}', '${cleanPhone}', '${extractedTime}')" class="p-2 bg-emerald-100 text-emerald-800 rounded-lg text-xs font-bold hover:bg-emerald-200">📅 Schedule</button>
-            <a href="tel:${cleanPhone}" class="p-2 bg-emerald-600 text-white rounded-lg text-xs font-bold">📞</a>
-            <a href="sms:${cleanPhone}" class="p-2 bg-indigo-600 text-white rounded-lg text-xs font-bold">💬</a>
-          </div>
+          <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
         </div>
       `;
       queue.insertAdjacentHTML('afterbegin', cardHTML);
     }
 
-    function renderRawIntakeCard(text, extractedTime) {
+    function renderRawIntakeCard(text) {
       const queue = document.getElementById('pinballQueue');
       const cardHTML = `
         <div onclick="openWorkstation('Voice Intake', 'New Record', '(410) 555-0100', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-blue-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
           <div>
             <span class="text-[10px] font-extrabold text-blue-700 uppercase tracking-wide">Live Intake Card</span>
             <h3 class="font-bold text-stone-900 text-xs">"${text}"</h3>
-            <p class="text-[11px] text-stone-500">Suggested: ${extractedTime}</p>
+            <p class="text-[11px] text-stone-500">Queued for Sissy</p>
           </div>
-          <button onclick="event.stopPropagation(); scheduleForeverCard('RAW', 'Voice Intake', 'Location TBD', '4105550100', '${extractedTime}')" class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 hover:bg-emerald-100">📅 Schedule ➔</button>
+          <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
         </div>
       `;
       queue.insertAdjacentHTML('afterbegin', cardHTML);
@@ -508,8 +506,8 @@
 
     function openWorkstation(name, details, phone, amount) {
       currentActivePhone = phone;
-      document.getElementById('fastCallBtn').href = 'tel:' + phone.replace(/\D/g, '');
-      document.getElementById('fastTextBtn').href = 'sms:' + phone.replace(/\D/g, '');
+      document.getElementById('drawerCallBtn').href = 'tel:' + phone.replace(/\D/g, '');
+      document.getElementById('drawerTextBtn').href = 'sms:' + phone.replace(/\D/g, '');
       document.getElementById('cardClientName').innerText = name + ' — Forever Card';
       document.getElementById('cardClientDetails').innerText = details + ' • ' + phone;
       document.getElementById('mirrorClient').innerText = name + ' Mobile Card';
@@ -533,7 +531,8 @@
           'p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white' : 
           'p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600';
       }
-      if (stageNum === 4) confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
+      // Confetti restricted STRICTLY to Stage 4 Ready Wall / Victory
+      if (stageNum === 4) confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
     }
 
     function addInvoiceItem() {
@@ -571,14 +570,6 @@
     function dispatchStripePay() {
       const total = document.getElementById('mirrorTotal').innerText;
       alert(`🚀 Stripe Pay Link for ${total} dispatched directly to ${currentActivePhone}!`);
-    }
-
-    function nextPinballCard() {
-      alert('📌 Pinball Queue: Loading next priority customer card...');
-    }
-
-    function clearPinball() {
-      document.getElementById('pinballQueue').innerHTML = '<p class="text-xs text-stone-400 italic p-4 text-center">Pinball tray clear!</p>';
     }
   </script>
 </body>
