@@ -107,7 +107,7 @@
     <!-- MAIN OPERATIONAL FLOOR -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-      <!-- QUADRANT #1: Dynamic Schedule Grid (Time-Ordered Forever Cards) -->
+      <!-- QUADRANT #1: Dynamic Schedule Grid -->
       <div class="lg:col-span-5 boutique-card rounded-2xl p-5 space-y-4">
         <div class="flex items-center justify-between border-b border-stone-200 pb-3">
           <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📅 SCHEDULED FOREVER CARDS</h2>
@@ -122,18 +122,18 @@
       <div class="lg:col-span-7 boutique-card rounded-2xl p-5 space-y-4">
         <div class="flex items-center justify-between border-b border-stone-200 pb-3">
           <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📍 PINBALL ACTION ZONE</h2>
-          <span class="text-[11px] font-mono font-bold text-stone-400">Live Intake Queue</span>
+          <span class="text-[11px] font-mono font-bold text-stone-400">Routed to Sissy (Norby)</span>
         </div>
 
         <div id="pinballQueue" class="space-y-2.5 max-h-80 overflow-y-auto">
-          <p id="pinballEmptyState" class="text-xs text-stone-400 italic p-4 text-center">Pinball Hopper Ready • Type or Tap Mic to Pull Cards</p>
+          <p id="pinballEmptyState" class="text-xs text-stone-400 italic p-4 text-center">Pinball Hopper Ready • Voice notes route here for Sissy to verify</p>
         </div>
       </div>
 
     </div>
   </div>
 
-  <!-- FOREVER CARD WORKSTATION DRAWER (3 FOCUSED ROOMS) -->
+  <!-- FOREVER CARD WORKSTATION DRAWER -->
   <div id="drawerOverlay" onclick="closeWorkstation()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm hidden z-40"></div>
   <div id="workstationDrawer" class="fixed inset-y-0 right-0 w-full max-w-3xl bg-[#FAF9F5] shadow-2xl z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto p-5 sm:p-6 space-y-5">
     
@@ -203,7 +203,7 @@
         <div class="flex gap-2">
           <input type="file" id="catalogCsvInputDrawer" accept=".csv" class="hidden" onchange="loadCatalogCSV(this)">
           <select id="partSelect" class="flex-1 text-xs border border-stone-300 rounded-xl p-2 bg-stone-50 font-medium">
-            <option value="">📁 Load catalog CSV to search 1,090 parts...</option>
+            <option value="">📁 Select catalog part or service...</option>
           </select>
           <button onclick="document.getElementById('catalogCsvInputDrawer').click()" class="px-3 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold text-xs rounded-xl shadow">📁 CSV</button>
           <button onclick="addInvoiceItem()" class="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow">+ Add</button>
@@ -269,7 +269,23 @@
     window.onload = function() {
       setupSpeech();
       renderScheduledCards();
+      
+      // Auto-load catalog if available locally
+      fetch('export_export (35).csv')
+        .then(res => res.text())
+        .then(csvText => parseCatalogCSVText(csvText))
+        .catch(e => console.log("Manual catalog upload ready"));
     };
+
+    function speakToUser(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
 
     function setupSpeech() {
       if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -341,7 +357,7 @@
     function renderScheduledCards() {
       const slot = document.getElementById('scheduledItemsSlot');
       if (!scheduledCards || scheduledCards.length === 0) {
-        slot.innerHTML = '<p class="text-xs text-stone-400 italic p-4 text-center">Schedule Hopper Ready • Intake jobs by voice or type to schedule</p>';
+        slot.innerHTML = '<p class="text-xs text-stone-400 italic p-4 text-center">Schedule Hopper Ready • Sissy schedules confirmed Pinball cards here</p>';
         return;
       }
 
@@ -366,7 +382,10 @@
       });
     }
 
-    function pushToScheduleDirect(id, name, address, phone, timeStr) {
+    function scheduleForeverCard(id, name, address, phone) {
+      const timeStr = prompt(`Set exact time slot for ${name}:`, "Today — 10:00 AM");
+      if (!timeStr) return;
+
       scheduledCards.push({
         id: id || "VAULT",
         name: name,
@@ -376,7 +395,9 @@
         ticketAmount: 0,
         networkingStatus: true
       });
+
       renderScheduledCards();
+      speakToUser(`Scheduled ${name} for ${timeStr}`);
     }
 
     function loadVaultCSV(input) {
@@ -395,17 +416,14 @@
       });
     }
 
-    function loadCatalogCSV(input) {
-      const file = input.files[0];
-      if (!file) return;
-
-      Papa.parse(file, {
+    function parseCatalogCSVText(csvText) {
+      Papa.parse(csvText, {
         header: true,
         skipEmptyLines: true,
         complete: function(results) {
           catalogData = results.data;
           const select = document.getElementById('partSelect');
-          select.innerHTML = '<option value="">Select from 1,090 Catalog Items...</option>';
+          select.innerHTML = '<option value="">Select from 1,090 Catalog Parts...</option>';
 
           let validCount = 0;
           catalogData.forEach(item => {
@@ -419,48 +437,44 @@
           });
 
           const statusElem = document.getElementById('catalogStatus');
-          statusElem.innerText = `⚡ ${validCount.toLocaleString()} Catalog Parts Linked`;
-          statusElem.className = "text-[10px] text-emerald-700 font-bold font-mono block";
-
+          if (statusElem) {
+            statusElem.innerText = `⚡ ${validCount.toLocaleString()} Catalog Parts Linked`;
+            statusElem.className = "text-[10px] text-emerald-700 font-bold font-mono block";
+          }
           document.getElementById('catalogBadge').innerText = `${validCount.toLocaleString()} Catalog Parts Active`;
         }
       });
     }
 
-    // Direct Time Parser & Calendar Router (Zero Popups)
+    function loadCatalogCSV(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) { parseCatalogCSVText(e.target.result); };
+      reader.readAsText(file);
+    }
+
+    // Voice Intake routed cleanly to Sissy's Pinball Queue
     function handleVoiceIntake(text) {
       const emptyState = document.getElementById('pinballEmptyState');
       if (emptyState) emptyState.remove();
 
       const query = text.toLowerCase().trim();
       
-      // Smart Time Extractor (e.g., 9:15, 11:30, 2:00pm, 8:30)
-      const timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:am|pm)?)/i);
-      const extractedTime = timeMatch ? `Today — ${timeMatch[0]}` : null;
-
       const matches = vaultData.filter(client => {
         const name = (client['Name'] || '').toLowerCase();
         return name.includes(query) || query.includes(name);
       });
 
-      if (extractedTime) {
-        // Direct-to-Calendar Route
-        if (matches.length > 0) {
-          const client = matches[0];
-          pushToScheduleDirect(client['Client #'], client['Name'], client['Address'], client['Phone'], extractedTime);
-        } else {
-          pushToScheduleDirect("INTAKE", text, "Location Pending", "4105550100", extractedTime);
-        }
+      if (matches.length > 0) {
+        matches.slice(0, 3).forEach(client => renderMatchedCard(client, text));
+        speakToUser(`Found ${matches[0]['Name']} in vault. Queued for Sissy.`);
       } else {
-        // Triage Route to Pinball for Sissy
-        if (matches.length > 0) {
-          matches.slice(0, 3).forEach(client => renderMatchedCard(client, text));
-        } else {
-          renderRawIntakeCard(text);
-        }
+        renderRawIntakeCard(text);
+        speakToUser("Intake recorded and queued for Sissy.");
       }
 
-      // Webhook Pipe
+      // Webhook Pipe to Make.com
       fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -483,7 +497,11 @@
             <p class="text-[11px] text-stone-600">${address} • ${client['Phone'] || ''}</p>
             <p class="text-[10px] text-amber-700 font-medium">💬 "${originalSpeech}"</p>
           </div>
-          <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
+          <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
+            <button onclick="scheduleForeverCard('${clientId}', '${name}', '${address}', '${cleanPhone}')" class="p-2 bg-emerald-100 text-emerald-800 rounded-lg text-xs font-bold hover:bg-emerald-200">📅 Schedule</button>
+            <a href="tel:${cleanPhone}" class="p-2 bg-emerald-600 text-white rounded-lg text-xs font-bold">📞</a>
+            <a href="sms:${cleanPhone}" class="p-2 bg-indigo-600 text-white rounded-lg text-xs font-bold">💬</a>
+          </div>
         </div>
       `;
       queue.insertAdjacentHTML('afterbegin', cardHTML);
@@ -498,7 +516,7 @@
             <h3 class="font-bold text-stone-900 text-xs">"${text}"</h3>
             <p class="text-[11px] text-stone-500">Queued for Sissy</p>
           </div>
-          <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
+          <button onclick="event.stopPropagation(); scheduleForeverCard('RAW', 'Voice Intake', 'Location Pending', '4105550100')" class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 hover:bg-emerald-100">📅 Schedule ➔</button>
         </div>
       `;
       queue.insertAdjacentHTML('afterbegin', cardHTML);
@@ -531,7 +549,6 @@
           'p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white' : 
           'p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600';
       }
-      // Confetti restricted STRICTLY to Stage 4 Ready Wall / Victory
       if (stageNum === 4) confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
     }
 
