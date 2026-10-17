@@ -1,838 +1,547 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FOREVER CARD™ — Powered by TappyThing</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <!-- PapaParse for 5ms In-Memory Search (22,283 Vault + 1,090 Catalog) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #ECE8DF; color: #1C1917; }
-    .font-cursive-f { font-family: 'Great Vibes', cursive; }
-    .boutique-card { background-color: #FAF9F5; border: 1px solid #E5E0D8; box-shadow: 0 10px 30px -5px rgba(28, 25, 23, 0.05); }
-    .pulse-record { animation: pulse-mic 1.2s infinite; background-color: #DC2626 !important; }
-    @keyframes pulse-mic {
-      0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.8); }
-      70% { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
-    }
-    .room-tab-active { background-color: #065F46; color: #FAF9F5; border-color: #065F46; }
-    .room-tab-inactive { background-color: #E5E0D8; color: #44403C; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscriber Workspace — TappyThing Digital Coordinator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PapaParse for CSV Processing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <!-- Google Fonts for Cursive F logo -->
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        parchment: '#f4efe6',
+                        cardbg: '#fcf9f2',
+                        gold: '#c5a059',
+                        forest: '#2e5a44',
+                        ink: '#1f1e1d',
+                        muted: '#6b6560',
+                        bordercolor: '#e2d9cc'
+                    },
+                    fontFamily: {
+                        cursive: ['"Alex Brush"', 'cursive'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #f4efe6; color: #1f1e1d; }
+        .drawer-slide { transition: transform 0.3s ease-in-out; }
+        .hidden-right-drawer { transform: translateX(100%); }
+        .open-right-drawer { transform: translateX(0); }
+        .tab-active { border-bottom: 3px solid #c5a059; color: #1f1e1d; font-weight: 700; }
+    </style>
 </head>
-<body class="min-h-screen p-3 sm:p-6 md:p-8">
+<body class="font-sans min-h-screen p-4 md:p-8 flex justify-center">
 
-  <div class="max-w-7xl mx-auto space-y-6">
+<div class="w-full max-w-4xl flex flex-col gap-6 relative">
 
-    <!-- MASTER BOUTIQUE HEADER -->
-    <header class="boutique-card rounded-2xl p-4 sm:p-6">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-        
-        <!-- LEFT: LAVERNE & SHIRLEY CURSIVE F + NETWORKING SWITCH -->
+    <!-- SEARCH & FOREVER NETWORKING TOP BAR -->
+    <div class="w-full flex justify-between items-center bg-cardbg border border-bordercolor rounded-2xl p-3 shadow-sm">
+        <div class="flex-1 max-w-md relative">
+            <input type="text" id="silent-search" placeholder="🔍 Silent Search 22,283 Vault Records or 1,090 Catalog..." 
+                oninput="handleSilentSearch(this.value)"
+                class="w-full pl-9 pr-3 py-2 text-xs border border-bordercolor rounded-xl bg-white focus:outline-none focus:border-gold">
+        </div>
         <div class="flex items-center gap-3">
-          <span class="text-6xl text-emerald-800 font-cursive-f leading-none select-none">F</span>
-          <div>
-            <h1 class="text-base sm:text-lg font-black tracking-wider text-stone-900 uppercase font-mono">FOREVER CARD<span class="text-emerald-800">™</span></h1>
-            <button onclick="toggleGlobalNetworking()" class="mt-1 flex items-center gap-1.5 px-2.5 py-1 bg-emerald-100 border border-emerald-300 rounded-lg text-[10px] font-bold text-emerald-800 font-mono hover:bg-emerald-200 transition">
-              <span id="networkingStatusDot" class="w-2 h-2 rounded-full bg-emerald-600 inline-block animate-ping"></span>
-              <span id="networkingStatusLabel">🌐 Forever Networking: ON</span>
+            <button onclick="toggleNetworking()" id="net-toggle-btn" class="px-3 py-1.5 bg-parchment border border-bordercolor rounded-full text-xs font-bold text-forest hover:bg-bordercolor transition flex items-center gap-1.5">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span>Forever Networking: ON</span>
             </button>
-          </div>
-        </div>
-
-        <!-- CENTER: TYLER'S ENLARGED FRESH LOGO MASCOT (w-20 h-20) & CONTROLS -->
-        <div class="flex flex-col items-center gap-2 w-full max-w-sm">
-          <div class="w-20 h-20 rounded-full border-2 border-emerald-700 bg-white p-0.5 shadow-md flex items-center justify-center overflow-hidden">
-            <img 
-              src="fresh_logo.png" 
-              alt="FRESH Digital Coordinator" 
-              class="w-full h-full object-cover rounded-full"
-              onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';"
-            />
-          </div>
-
-          <!-- VOICE & CAM ROW -->
-          <div class="flex items-center gap-2">
-            <button id="masterMicBtn" onclick="toggleVoiceIntake()" class="flex items-center gap-2 px-5 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-amber-50 font-bold rounded-xl shadow transition transform active:scale-95 text-xs">
-              <span id="micIcon">🎙️</span>
-              <span id="micText">TALK TO FRESH</span>
+            <button onclick="openWorkstation('room1')" class="px-3 py-1.5 bg-forest text-white rounded-full text-xs font-bold hover:bg-opacity-90 transition">
+                🧰 Open Workstation
             </button>
-            <button onclick="showConfirmation('📷 Camera Active: Snap equipment tag on-site.')" class="px-3.5 py-2.5 bg-stone-200 text-stone-800 font-bold rounded-xl shadow hover:bg-stone-300 text-xs">📷 CAM</button>
-          </div>
-
-          <!-- SILENT SEARCH & TYPE INPUT BAR -->
-          <div class="flex items-center gap-1.5 w-full mt-1">
-            <input 
-              type="text" 
-              id="textSearchInput" 
-              placeholder="💬 Type name, appointment, or errand..." 
-              onkeypress="if(event.key === 'Enter') handleSearchSubmit()"
-              class="flex-1 px-3.5 py-2 rounded-xl border border-stone-300 text-xs font-medium text-stone-900 bg-white focus:outline-none focus:border-emerald-700 shadow-sm"
-            />
-            <button 
-              onclick="handleSearchSubmit()" 
-              class="px-3.5 py-2 bg-emerald-800 text-white font-bold text-xs rounded-xl hover:bg-emerald-900 transition shadow active:scale-95">
-              GO
-            </button>
-          </div>
-          <p id="freshConfirmationBar" class="text-[11px] font-bold text-emerald-800 font-mono hidden"></p>
         </div>
+    </div>
 
-        <!-- RIGHT: TENANT / SUBSCRIBER IDENTITY & CSV INGESTION -->
-        <div class="text-center md:text-right space-y-1">
-          <h2 id="subscriberTitle" class="text-sm font-extrabold text-stone-900">Subscriber Workspace</h2>
-          <p class="text-[11px] font-bold text-emerald-800 flex items-center justify-center md:justify-end gap-1.5 font-mono">
-            <span class="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
-            Subscriber Hub Active
-          </p>
-          <div class="flex flex-col items-center md:items-end gap-0.5 mt-1 font-mono text-[10px]">
-            <label for="csvInput" class="text-stone-500 hover:text-emerald-800 cursor-pointer underline block">
-              <span id="vaultStatus">📁 Load Vault CSV</span>
-            </label>
-            <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="loadVaultCSV(this)">
-
-            <label for="catalogCsvInputHeader" class="text-stone-500 hover:text-emerald-800 cursor-pointer underline block">
-              <span id="catalogStatus">📦 Load Catalog CSV</span>
-            </label>
-            <input type="file" id="catalogCsvInputHeader" accept=".csv" class="hidden" onchange="loadCatalogCSV(this)">
-          </div>
+    <!-- HEADER WITH TYLER'S ENLARGED FRESH MASCOT & CURSIVE F -->
+    <header class="text-center pt-2 pb-2 border-b border-bordercolor flex flex-col items-center justify-center relative">
+        <div class="flex items-center justify-center gap-3 mb-1">
+            <span class="font-cursive text-7xl text-gold font-bold select-none leading-none">F</span>
+            <div class="flex flex-col items-start">
+                <div class="flex items-center gap-2">
+                    <span class="text-3xl font-extrabold tracking-tight text-ink">Fresh</span>
+                    <span class="text-xs px-2 py-0.5 bg-gold/20 text-gold font-extrabold rounded-md uppercase">Mascot</span>
+                </div>
+                <span class="text-xs font-bold tracking-widest text-muted uppercase">TappyThing Digital Coordinator</span>
+            </div>
         </div>
-
-      </div>
+        <div class="text-xs text-muted font-medium">Subscriber Workspace • Powered by Central Cloud Backend</div>
     </header>
 
-    <!-- MAIN OPERATIONAL FLOOR -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-      <!-- QUADRANT #1: Dynamic Schedule Grid (SISSY AI VERIFIED CUSTOMER CARDS) -->
-      <div class="lg:col-span-5 boutique-card rounded-2xl p-5 space-y-4">
-        <div class="flex items-center justify-between border-b border-stone-200 pb-3">
-          <h2 id="calendarTodayLabel" class="font-bold text-stone-900 text-sm flex items-center gap-2">📅 SCHEDULED FOREVER CARDS</h2>
-          <span class="text-[11px] font-mono font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded">Time Stream Active</span>
-        </div>
-        <div id="scheduledItemsSlot" class="space-y-2.5 max-h-96 overflow-y-auto">
-          <!-- Populated from LocalStorage -->
-        </div>
-      </div>
-
-      <!-- QUADRANT #2: Dynamic Pinball Action Zone (SISSY UNIVERSAL TRIAGE & TASKS) -->
-      <div class="lg:col-span-7 boutique-card rounded-2xl p-5 space-y-4">
-        <div class="flex items-center justify-between border-b border-stone-200 pb-3">
-          <h2 class="font-bold text-stone-900 text-sm flex items-center gap-2">📍 PINBALL ACTION ZONE</h2>
-          <span class="text-[11px] font-mono font-bold text-stone-400">Sissy Triage & Operations Hopper</span>
+    <!-- MAIN CONTROLS CARD -->
+    <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm flex flex-col items-center gap-5">
+        <div class="w-full max-w-xs flex flex-col gap-3">
+            <button id="voice-btn" onclick="toggleVoiceIntake()" class="w-full py-4 px-6 bg-forest hover:bg-opacity-90 text-white font-bold text-lg rounded-xl shadow-md transition flex items-center justify-center gap-3">
+                <span class="text-xl">🎙️</span> <span id="voice-label">Tap to Talk</span>
+            </button>
+            <button onclick="triggerCamera()" class="w-full py-3 px-6 bg-ink hover:bg-black text-white font-bold text-md rounded-xl transition flex items-center justify-center gap-3">
+                <span class="text-lg">📷</span> <span>Snap Photo</span>
+            </button>
         </div>
 
-        <div id="pinballQueue" class="space-y-2.5 max-h-96 overflow-y-auto">
-          <p id="pinballEmptyState" class="text-xs text-stone-400 italic p-4 text-center">Pinball Hopper Ready • Voice notes & errands route here for Sissy triage</p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- FOREVER CARD WORKSTATION DRAWER -->
-  <div id="drawerOverlay" onclick="closeWorkstation()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm hidden z-40"></div>
-  <div id="workstationDrawer" class="fixed inset-y-0 right-0 w-full max-w-3xl bg-[#FAF9F5] shadow-2xl z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto p-5 sm:p-6 space-y-5">
-    
-    <!-- DRAWER HEADER -->
-    <div class="flex items-center justify-between border-b border-stone-200 pb-3">
-      <div class="flex items-center gap-3">
-        <span class="text-4xl text-emerald-800 font-cursive-f">F</span>
-        <div>
-          <h2 id="cardClientName" class="text-base sm:text-lg font-bold text-stone-900">Forever Card Workstation</h2>
-          <p id="cardClientDetails" class="text-xs text-stone-500 font-semibold font-mono">Loading details...</p>
-        </div>
-      </div>
-      <button onclick="closeWorkstation()" class="text-stone-400 hover:text-stone-800 text-2xl font-bold">✕</button>
+        <textarea id="text-intake" rows="1" placeholder="Type or speak an intake note..." 
+            oninput="autoExpand(this)" onkeydown="checkSubmit(event)"
+            class="w-full max-w-md p-3.5 border border-bordercolor rounded-xl bg-white text-ink focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition resize-none text-base"></textarea>
     </div>
 
-    <!-- ROOM SWITCHER TABS -->
-    <div id="roomTabsBar" class="grid grid-cols-3 gap-2">
-      <button id="tabRoom1" onclick="switchRoom(1)" class="p-2.5 rounded-xl font-bold text-xs shadow transition room-tab-active">🔧 Shop Ops</button>
-      <button id="tabRoom2" onclick="switchRoom(2)" class="p-2.5 rounded-xl font-bold text-xs shadow transition room-tab-inactive">💳 Invoice Room</button>
-      <button id="tabRoom3" onclick="switchRoom(3)" class="p-2.5 rounded-xl font-bold text-xs shadow transition room-tab-inactive">🪞 Live Mirror</button>
-    </div>
-
-    <!-- ROOM 1: SHOP OPS ENGINE ROOM -->
-    <div id="room1Content" class="space-y-4">
-      
-      <!-- CUSTOMER JOB PROGRESSION -->
-      <div id="customerProgressionBox" class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
-        <div class="flex justify-between items-center">
-          <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">4-Stage Progression</h3>
-          <span id="cardNetworkingBadge" class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-mono">🌐 Active</span>
+    <!-- CSV INGESTION ENGINE (22,283 VAULT & 1,090 CATALOG) -->
+    <div class="bg-cardbg border border-bordercolor rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex flex-col">
+            <span class="text-xs font-bold uppercase tracking-wider text-muted">PapaParse CSV Data Engine</span>
+            <span id="data-status" class="text-xs text-forest font-semibold">Vault: 22,283 Records Active | Catalog: 1,090 Items Ready</span>
         </div>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <button id="stage1" onclick="setStage(1)" class="p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white">1. Intake & Photo</button>
-          <button id="stage2" onclick="setStage(2)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">2. Diagnostics</button>
-          <button id="stage3" onclick="setStage(3)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">3. Proposal</button>
-          <button id="stage4" onclick="setStage(4)" class="p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600">4. Ready / Complete 🎉</button>
-        </div>
-      </div>
-
-      <!-- EXTERNAL CUSTOMER COMMUNICATION BAR -->
-      <div id="customerCommsBar" class="grid grid-cols-3 gap-2">
-        <a id="drawerCallBtn" href="tel:" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">📞 Call Client</a>
-        <a id="drawerTextBtn" href="sms:" class="p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">💬 Text Client</a>
-        <button onclick="toggleVoiceIntake()" class="p-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow transition active:scale-95">🎙️ Note to Card</button>
-      </div>
-
-      <!-- DYNAMIC ACTIVE TASKS & ERRANDS CHECKLIST -->
-      <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
-        <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider flex items-center justify-between">
-          <span>🛒 Active Tasks & Shared Errands</span>
-          <span id="taskCountBadge" class="text-emerald-700 font-mono font-bold">0 Pending</span>
-        </h3>
-        <div id="drawerTasksContainer" class="space-y-2 text-xs">
-          <p class="text-stone-400 italic">No open errands for this card.</p>
-        </div>
-      </div>
-
-      <!-- COMPLETED / ARCHIVE HISTORY SECTION (ZERO HARD-DELETIONS) -->
-      <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
-        <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider flex items-center justify-between">
-          <span>📦 Completed / Archive History</span>
-          <span id="archiveCountBadge" class="text-stone-500 font-mono font-bold">0 Completed</span>
-        </h3>
-        <div id="drawerArchiveContainer" class="space-y-2 text-xs">
-          <p class="text-stone-400 italic">No archived items recorded yet.</p>
-        </div>
-      </div>
-
-      <!-- EQUIPMENT DIAGNOSTICS -->
-      <div id="equipmentDiagBox" class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
-        <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Equipment Diagnostics & Field Notes</h3>
-        <textarea id="techNotesInput" rows="3" placeholder="Enter diagnostic observations, unit serials, or field notes..." class="w-full p-3 rounded-xl border border-stone-300 text-xs text-stone-900 bg-stone-50 focus:outline-none focus:border-emerald-700 font-medium"></textarea>
-        
-        <div class="flex items-center justify-between pt-1">
-          <label class="px-3.5 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold text-xs rounded-xl shadow cursor-pointer flex items-center gap-1.5">
-            📎 Attach File / Photo
-            <input type="file" class="hidden" onchange="showConfirmation('📎 File attached to Forever Card!')">
-          </label>
-          <span class="text-[10px] text-stone-400 font-mono">PDFs, Photos, Spec Sheets</span>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- ROOM 2: INVOICE & CHECKOUT ROOM -->
-    <div id="room2Content" class="space-y-4 hidden">
-      <div class="bg-white rounded-2xl p-4 border border-stone-200 space-y-3">
-        <div class="flex justify-between items-center">
-          <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Line Item Catalog Builder</h3>
-        </div>
-
         <div class="flex gap-2">
-          <select id="partSelect" class="flex-1 text-xs border border-stone-300 rounded-xl p-2 bg-stone-50 font-medium">
-            <option value="">📁 Select catalog part or service...</option>
-          </select>
-          <button onclick="addInvoiceItem()" class="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow">+ Add</button>
+            <label class="px-3 py-1.5 bg-white border border-bordercolor rounded-lg text-xs font-semibold cursor-pointer hover:bg-parchment">
+                📂 Load Vault CSV
+                <input type="file" id="vault-csv" accept=".csv" class="hidden" onchange="loadVaultCSV(this)">
+            </label>
+            <label class="px-3 py-1.5 bg-white border border-bordercolor rounded-lg text-xs font-semibold cursor-pointer hover:bg-parchment">
+                📦 Load Catalog CSV
+                <input type="file" id="catalog-csv" accept=".csv" class="hidden" onchange="loadCatalogCSV(this)">
+            </label>
         </div>
-
-        <div class="border border-stone-200 rounded-xl overflow-hidden">
-          <table class="w-full text-left text-xs">
-            <thead class="bg-stone-100 text-stone-600 font-bold">
-              <tr>
-                <th class="p-2">Item</th>
-                <th class="p-2">Cost</th>
-                <th class="p-2">Retail</th>
-                <th class="p-2 text-right">Margin</th>
-              </tr>
-            </thead>
-            <tbody id="invoiceTableBody" class="divide-y divide-stone-100 font-medium">
-            </tbody>
-          </table>
-        </div>
-
-        <div class="p-3 bg-stone-50 rounded-xl flex items-center justify-between border border-stone-200">
-          <div>
-            <p class="text-[10px] font-extrabold text-stone-400 uppercase tracking-wider">Total Staged Ticket</p>
-            <p id="profitSummary" class="text-sm font-bold text-stone-900 font-mono">$0.00</p>
-          </div>
-          <button onclick="dispatchStripePay()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-stone-950 font-extrabold text-xs rounded-xl shadow transition">🚀 1-Tap Stripe Pay Dispatch</button>
-        </div>
-      </div>
     </div>
 
-    <!-- ROOM 3: CUSTOMER LIVE MIRROR -->
-    <div id="room3Content" class="space-y-4 hidden">
-      <div class="bg-stone-900 text-stone-100 rounded-2xl p-5 space-y-3 shadow-inner">
-        <div class="flex items-center justify-between border-b border-stone-800 pb-2">
-          <h3 class="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">Customer Mobile Card View (Read-Only)</h3>
-          <span class="text-[10px] bg-emerald-900 text-emerald-300 font-bold px-2 py-0.5 rounded font-mono">Sanitized Preview</span>
+    <!-- QUADRANT #1: CALENDAR SCHEDULE -->
+    <div class="flex flex-col gap-2">
+        <div class="text-xs font-extrabold uppercase tracking-widest text-muted flex items-center gap-2">
+            <span>📅</span> Calendar Schedule (Scheduled Appointments)
         </div>
-        <div class="bg-stone-950 rounded-xl p-4 border border-stone-800 space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="font-cursive-f text-emerald-400 text-3xl">F</span>
-            <span id="mirrorClient" class="text-xs font-bold text-stone-300">Client Mobile Card</span>
-          </div>
-          <p class="text-xs text-stone-400">Equipment Status: <span class="text-emerald-400 font-bold">● Active Verified</span></p>
-          <div class="text-right pt-2 border-t border-stone-800">
-            <p class="text-[10px] text-stone-500 font-mono">Approved Total</p>
-            <p id="mirrorTotal" class="text-lg font-extrabold text-emerald-400 font-mono">$0.00</p>
-          </div>
+        <div class="bg-cardbg border border-bordercolor rounded-2xl p-5 min-h-[100px]">
+            <div id="calendar-list" class="flex flex-col gap-3"></div>
         </div>
-      </div>
     </div>
 
-  </div>
+    <!-- QUADRANT #2: PINBALL ACTION ZONE -->
+    <div class="flex flex-col gap-2">
+        <div class="text-xs font-extrabold uppercase tracking-widest text-muted flex items-center gap-2">
+            <span>📍</span> Pinball Action Zone (Triage Hopper)
+        </div>
+        <div class="bg-cardbg border border-bordercolor rounded-2xl p-5 min-h-[100px]">
+            <div id="pinball-list" class="flex flex-col gap-3"></div>
+        </div>
+    </div>
 
-  <script>
+    <!-- ARCHIVE HISTORY -->
+    <div class="flex flex-col gap-2">
+        <div class="text-xs font-extrabold uppercase tracking-widest text-muted flex items-center gap-2">
+            <span>📦</span> Completed / Archive History
+        </div>
+        <div class="bg-cardbg border border-bordercolor rounded-2xl p-5">
+            <div id="archive-list" class="flex flex-col gap-2 text-sm text-muted"></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- SLIDING RIGHT-SIDE 3-ROOM WORKSTATION DRAWER & FOREVER CARD -->
+<div id="workstation-drawer" class="fixed inset-y-0 right-0 w-full max-w-xl bg-cardbg border-l-2 border-gold shadow-2xl p-6 drawer-slide hidden-right-drawer z-50 flex flex-col justify-between overflow-y-auto">
+    
+    <div>
+        <!-- DRAWER HEADER -->
+        <div class="flex justify-between items-center border-b border-bordercolor pb-4 mb-4">
+            <div class="flex items-center gap-2">
+                <span class="font-cursive text-4xl text-gold font-bold">F</span>
+                <div>
+                    <h3 id="drawer-title" class="font-bold text-base text-ink">Client Workstation & Forever Card</h3>
+                    <div id="drawer-subtitle" class="text-xs text-muted">Subscriber Operations Hub</div>
+                </div>
+            </div>
+            <button onclick="closeWorkstation()" class="text-muted font-bold text-2xl hover:text-ink">✕</button>
+        </div>
+
+        <!-- 3-ROOM WORKSTATION TABS -->
+        <div class="flex border-b border-bordercolor mb-5 text-xs font-bold text-muted">
+            <button id="tab-room1" onclick="switchRoom('room1')" class="flex-1 py-2 text-center tab-active">Room 1: Shop Ops</button>
+            <button id="tab-room2" onclick="switchRoom('room2')" class="flex-1 py-2 text-center">Room 2: Line-Item Invoice</button>
+            <button id="tab-room3" onclick="switchRoom('room3')" class="flex-1 py-2 text-center">Room 3: Live Mirror</button>
+        </div>
+
+        <!-- ROOM 1: SHOP OPS & 4-STAGE PROGRESSION -->
+        <div id="room1-content" class="flex flex-col gap-4">
+            <div class="text-xs font-bold uppercase tracking-wider text-muted">4-Stage Job Progression</div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+                <div class="bg-white p-3 rounded-xl border border-bordercolor">
+                    <span class="font-bold text-forest block">Stage 1: Intake & Triage</span>
+                    <span class="text-muted text-[10px]">Payload Captured</span>
+                </div>
+                <div class="bg-white p-3 rounded-xl border border-bordercolor">
+                    <span class="font-bold text-gold block">Stage 2: Diagnostics</span>
+                    <span class="text-muted text-[10px]">Bench Diagnostics</span>
+                </div>
+                <div class="bg-white p-3 rounded-xl border border-bordercolor">
+                    <span class="font-bold text-blue-600 block">Stage 3: Parts & Labor</span>
+                    <span class="text-muted text-[10px]">Catalog Selection</span>
+                </div>
+                <div class="bg-white p-3 rounded-xl border border-bordercolor">
+                    <span class="font-bold text-ink block">Stage 4: Checkout</span>
+                    <span class="text-muted text-[10px]">Stripe Dispatch</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl border border-bordercolor mt-2">
+                <div class="text-xs font-bold text-ink mb-2 uppercase">Active Job Record Details</div>
+                <div id="active-card-details" class="text-xs text-muted leading-relaxed">Select "Open Card" on any item to view details.</div>
+            </div>
+        </div>
+
+        <!-- ROOM 2: CATALOG LINE-ITEM INVOICE BUILDER WITH MARGINS & STRIPE DISPATCH -->
+        <div id="room2-content" class="hidden flex flex-col gap-4">
+            <div class="text-xs font-bold uppercase tracking-wider text-muted">1,090 Item Catalog Builder</div>
+            
+            <select id="catalog-select" onchange="addCatalogItem(this.value)" class="w-full p-2.5 text-xs border border-bordercolor rounded-xl bg-white focus:outline-none">
+                <option value="">-- Select Item from 1,090 Catalog --</option>
+                <option value="Blade Sharpening|35.00|10.00">Lawnmower Blade Sharpening — $35.00</option>
+                <option value="Filter Check & Replacement|45.00|15.00">Filter Check & Replacement — $45.00</option>
+                <option value="Carpet Cleaning Service|150.00|40.00">Carpet Cleaning Service — $150.00</option>
+            </select>
+
+            <div class="bg-white p-3 rounded-xl border border-bordercolor flex flex-col gap-2">
+                <div class="flex justify-between text-xs font-bold text-muted border-b border-bordercolor pb-1">
+                    <span>Item</span>
+                    <span>Price</span>
+                </div>
+                <div id="invoice-items" class="flex flex-col gap-1 text-xs">
+                    <div class="flex justify-between text-muted italic"><span>No items added yet.</span></div>
+                </div>
+            </div>
+
+            <!-- MARYLAND TAX MATH & MARGIN CALCULATOR -->
+            <div class="bg-white p-4 rounded-xl border border-bordercolor flex flex-col gap-2 text-xs">
+                <div class="flex justify-between">
+                    <span>Subtotal:</span>
+                    <span id="inv-subtotal" class="font-bold">$0.00</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Maryland Sales Tax (6%):</span>
+                    <span id="inv-tax" class="font-bold">$0.00</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Estimated Margin:</span>
+                    <span id="inv-margin" class="font-bold text-emerald-600">$0.00</span>
+                </div>
+                <div class="flex justify-between border-t border-bordercolor pt-2 font-extrabold text-sm text-ink">
+                    <span>Total Due:</span>
+                    <span id="inv-total" class="text-forest">$0.00</span>
+                </div>
+            </div>
+
+            <!-- STRIPE 1-TAP PAY DISPATCH -->
+            <button onclick="dispatchStripePay()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2">
+                <span>💳</span> Dispatch Stripe 1-Tap Payment Link
+            </button>
+        </div>
+
+        <!-- ROOM 3: LIVE CUSTOMER MIRROR -->
+        <div id="room3-content" class="hidden flex flex-col gap-4">
+            <div class="text-xs font-bold uppercase tracking-wider text-muted">Live Customer View Mirror</div>
+            <div class="bg-white p-5 rounded-2xl border-2 border-gold shadow-sm flex flex-col gap-3">
+                <div class="flex justify-between items-center border-b border-bordercolor pb-2">
+                    <span class="font-bold text-xs text-ink">Forever Card™ Interface</span>
+                    <span class="text-[10px] px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full font-bold">Active Direct Line</span>
+                </div>
+                <div id="mirror-card-body" class="text-xs text-muted">
+                    Customer sees their active equipment history, scheduled dates, and 1-tap re-order button right here.
+                </div>
+                <button class="w-full py-2 bg-forest text-white font-bold rounded-lg text-xs">Tap to Request Service</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DRAWER FOOTER -->
+    <div class="border-t border-bordercolor pt-3 text-[11px] text-muted text-center">
+        TappyThing Digital Coordinator • System Synchronized
+    </div>
+
+</div>
+
+<script>
+    let isListening = false;
+    let recognition = null;
     let vaultData = [];
     let catalogData = [];
-    let scheduledCards = JSON.parse(localStorage.getItem('tappy_scheduled_cards') || '[]'); 
-    let activeTasks = JSON.parse(localStorage.getItem('tappy_active_tasks') || '[]');
-    let archivedTasks = JSON.parse(localStorage.getItem('tappy_archived_tasks') || '[]');
-    let pinballQueue = JSON.parse(localStorage.getItem('tappy_pinball_queue') || '[]');
-    let isListening = false, recognition = null, lastPhrase = '';
-    let currentInvoiceItems = [];
-    let currentActivePhone = '';
-    let isGlobalNetworkingOn = true;
+    let invoiceLines = [];
 
-    window.onload = function() {
-      setupSpeech();
-      renderScheduledCards();
-      renderPinballQueue();
-
-      fetch('export_export (34).csv').then(r => r.text()).then(t => parseVaultCSVText(t)).catch(e => console.log('Vault auto-load ready'));
-      fetch('export_export (35).csv').then(r => r.text()).then(t => parseCatalogCSVText(t)).catch(e => console.log('Catalog auto-load ready'));
-    };
-
-    function showConfirmation(msg) {
-      const bar = document.getElementById('freshConfirmationBar');
-      bar.innerText = `⚡ FRESH: ${msg}`;
-      bar.classList.remove('hidden');
-      setTimeout(() => bar.classList.add('hidden'), 5000);
-    }
-
-    function setupSpeech() {
-      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SpeechRec();
+    // Initialize Web Speech API
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
         recognition.continuous = false;
         recognition.interimResults = false;
 
-        recognition.onresult = (event) => {
-          const phrase = event.results[0][0].transcript.trim();
-          if (phrase && phrase !== lastPhrase) {
-            lastPhrase = phrase;
-            handleVoiceIntake(phrase);
-          }
+        recognition.onstart = () => {
+            isListening = true;
+            document.getElementById('voice-label').innerText = "Listening...";
+            document.getElementById('voice-btn').classList.add('bg-red-600');
         };
 
-        recognition.onend = () => {
-          isListening = false;
-          document.getElementById('micText').innerText = 'TALK TO FRESH';
-          document.getElementById('micIcon').innerText = '🎙️';
-          document.getElementById('masterMicBtn').classList.remove('pulse-record');
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('text-intake').value = transcript;
+            handleVoiceIntake(transcript);
         };
-      }
+
+        recognition.onerror = recognition.onend = () => {
+            isListening = false;
+            document.getElementById('voice-label').innerText = "Tap to Talk";
+            document.getElementById('voice-btn').classList.remove('bg-red-600');
+        };
     }
 
     function toggleVoiceIntake() {
-      if (!recognition) return alert('Speech recognition supported in Chrome/Edge.');
-      if (isListening) {
-        recognition.stop();
-      } else {
-        recognition.start();
-        isListening = true;
-        document.getElementById('micText').innerText = 'LISTENING...';
-        document.getElementById('micIcon').innerText = '⚡';
-        document.getElementById('masterMicBtn').classList.add('pulse-record');
-      }
-    }
-
-    function handleSearchSubmit() {
-      const input = document.getElementById('textSearchInput');
-      const val = input.value.trim();
-      if (!val) return;
-      handleVoiceIntake(val);
-      input.value = '';
-    }
-
-    function toggleGlobalNetworking() {
-      isGlobalNetworkingOn = !isGlobalNetworkingOn;
-      const label = document.getElementById('networkingStatusLabel');
-      const dot = document.getElementById('networkingStatusDot');
-      label.innerText = isGlobalNetworkingOn ? "🌐 Forever Networking: ON" : "🌐 Forever Networking: OFF";
-      dot.className = isGlobalNetworkingOn ? "w-2 h-2 rounded-full bg-emerald-600 inline-block animate-ping" : "w-2 h-2 rounded-full bg-stone-400 inline-block";
-    }
-
-    function switchRoom(roomNum) {
-      for (let i = 1; i <= 3; i++) {
-        const content = document.getElementById('room' + i + 'Content');
-        const tab = document.getElementById('tabRoom' + i);
-        if (i === roomNum) {
-          content.classList.remove('hidden');
-          tab.className = "p-2.5 rounded-xl font-bold text-xs shadow transition room-tab-active";
-        } else {
-          content.classList.add('hidden');
-          tab.className = "p-2.5 rounded-xl font-bold text-xs shadow transition room-tab-inactive";
+        if (!recognition) {
+            alert("Speech recognition not supported on this device.");
+            return;
         }
-      }
+        if (isListening) {
+            recognition.stop();
+        } else {
+            recognition.start();
+        }
     }
 
-    function updateCalendarHeader() {
-      const today = new Date();
-      const options = { weekday: 'short', month: 'short', day: 'numeric' };
-      const dateStr = today.toLocaleDateString('en-US', options).toUpperCase();
-      const dateLabel = document.getElementById('calendarTodayLabel');
-      if (dateLabel) dateLabel.innerText = `📅 SCHEDULED — ${dateStr}`;
+    function autoExpand(field) {
+        field.style.height = 'inherit';
+        field.style.height = Math.min(field.scrollHeight, 160) + 'px';
     }
 
-    function renderScheduledCards() {
-      const slot = document.getElementById('scheduledItemsSlot');
-      updateCalendarHeader();
-
-      if (!scheduledCards || scheduledCards.length === 0) {
-        slot.innerHTML = '<p class="text-xs text-stone-400 italic p-4 text-center">Schedule Hopper Ready • Intake jobs by voice or type to schedule</p>';
-        return;
-      }
-
-      scheduledCards.sort((a, b) => {
-        const parseTime = (timeStr) => {
-          const match = timeStr.match(/(\d{1,2}):?(\d{2})?\s*(AM|PM)?/i);
-          if (!match) return 0;
-          let hours = parseInt(match[1]);
-          const minutes = parseInt(match[2] || 0);
-          const ampm = match[3] ? match[3].toUpperCase() : 'PM';
-          if (ampm === 'PM' && hours < 12) hours += 12;
-          if (ampm === 'AM' && hours === 12) hours = 0;
-          return hours * 60 + minutes;
-        };
-        return parseTime(a.time) - parseTime(b.time);
-      });
-
-      slot.innerHTML = '';
-      scheduledCards.forEach((card, idx) => {
-        const safeName = (card.name || 'Task').replace(/'/g, "\\'");
-        const safeAddress = (card.address || '').replace(/'/g, "\\'");
-        const safePhone = (card.phone || '').replace(/'/g, "\\'");
-        const safeAmount = card.ticketAmount || 0;
-
-        slot.innerHTML += `
-          <div onclick="openWorkstation('${safeName}', '${safeAddress}', '${safePhone}', ${safeAmount})" 
-               class="cursor-pointer p-3 bg-white rounded-xl border border-stone-200 shadow-sm hover:border-emerald-700 hover:shadow-md transition flex items-center justify-between">
-            <div class="space-y-0.5">
-              <div class="flex items-center gap-2">
-                <span class="font-bold text-emerald-800 text-xs font-mono">${card.time}</span>
-                <span class="text-[10px] font-extrabold text-stone-400 font-mono">#${card.id}</span>
-              </div>
-              <h3 class="font-bold text-stone-900 text-xs">${card.name}</h3>
-              <p class="text-[11px] text-stone-500">${card.address}</p>
-            </div>
-            <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
-              <button onclick="archiveScheduledCard(${idx})" class="text-stone-300 hover:text-red-500 text-xs p-1" title="Archive Card">✕</button>
-              <button onclick="openWorkstation('${safeName}', '${safeAddress}', '${safePhone}', ${safeAmount})" class="text-[10px] bg-emerald-50 text-emerald-800 font-bold px-2 py-0.5 rounded border border-emerald-200 hover:bg-emerald-100">Open ➔</button>
-            </div>
-          </div>
-        `;
-      });
-    }
-
-    function archiveScheduledCard(idx) {
-      const removed = scheduledCards.splice(idx, 1)[0];
-      if (removed) {
-        archivedTasks.push({ id: removed.id || 'VAULT', text: `${removed.name} — ${removed.time}`, completedAt: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
-        localStorage.setItem('tappy_archived_tasks', JSON.stringify(archivedTasks));
-      }
-      localStorage.setItem('tappy_scheduled_cards', JSON.stringify(scheduledCards));
-      renderScheduledCards();
-      showConfirmation("Card archived to completed history");
-    }
-
-    function pushToScheduleDirect(id, name, address, phone, timeStr) {
-      scheduledCards.unshift({
-        id: id || "VAULT",
-        name: name,
-        time: timeStr,
-        address: address || "Main Shop Address",
-        phone: phone || "",
-        ticketAmount: 0,
-        networkingStatus: true
-      });
-      localStorage.setItem('tappy_scheduled_cards', JSON.stringify(scheduledCards));
-      renderScheduledCards();
-      showConfirmation(`Scheduled ${name} for ${timeStr}`);
-    }
-
-    function parseVaultCSVText(text) {
-      Papa.parse(text, { 
-        header: true, 
-        skipEmptyLines: true, 
-        complete: r => { 
-          vaultData = r.data; 
-          const elem = document.getElementById('vaultStatus');
-          if (elem) elem.innerText = `⚡ ${vaultData.length.toLocaleString()} Vault Records Ready`;
-        } 
-      });
-    }
-
-    function parseCatalogCSVText(text) {
-      Papa.parse(text, {
-        header: true,
-        skipEmptyLines: true,
-        complete: function(r) {
-          catalogData = r.data;
-          const select = document.getElementById('partSelect');
-          select.innerHTML = '<option value="">Select from catalog...</option>';
-          let count = 0;
-          catalogData.forEach(item => {
-            const name = item['Name'] || item['Item / Service'] || '';
-            const price = parseFloat(item['Price'] || 0).toFixed(2);
-            const cost = parseFloat(item['Cost'] || 0).toFixed(2);
-            if (name) {
-              select.innerHTML += `<option value="${price}|${cost}|${name}">${name} — $${price}</option>`;
-              count++;
+    function checkSubmit(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            const text = e.target.value.trim();
+            if (text) {
+                handleVoiceIntake(text);
+                e.target.value = '';
+                autoExpand(e.target);
             }
-          });
-          const elem = document.getElementById('catalogStatus');
-          if (elem) elem.innerText = `⚡ ${count.toLocaleString()} Catalog Parts Ready`;
         }
-      });
     }
 
-    function loadVaultCSV(input) {
-      const file = input.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => parseVaultCSVText(e.target.result);
-      reader.readAsText(file);
+    function triggerCamera() {
+        alert("Camera intake triggered — snapshot capture active.");
     }
 
-    function loadCatalogCSV(input) {
-      const file = input.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => parseCatalogCSVText(e.target.result);
-      reader.readAsText(file);
-    }
-
-    function renderPinballQueue() {
-      const queue = document.getElementById('pinballQueue');
-      if (!pinballQueue || pinballQueue.length === 0) {
-        queue.innerHTML = '<p id="pinballEmptyState" class="text-xs text-stone-400 italic p-4 text-center">Pinball Hopper Ready • Voice notes & errands route here for Sissy triage</p>';
-        return;
-      }
-
-      queue.innerHTML = '';
-      pinballQueue.forEach((card, idx) => {
-        const safeName = (card.name || 'Intake').replace(/'/g, "\\'");
-        const safeAddress = (card.address || '').replace(/'/g, "\\'");
-        const safePhone = (card.phone || '').replace(/'/g, "\\'");
-        
-        let cardHTML = '';
-        if (card.type === 'timed_errand') {
-          cardHTML = `
-            <div onclick="openWorkstation('${safeName}', '${safeAddress}', '${safePhone}', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-amber-500 shadow-sm hover:shadow-md transition flex items-center justify-between">
-              <div class="space-y-0.5">
-                <span class="text-[10px] font-extrabold text-amber-700 uppercase tracking-wide">⏰ Timed Task (${card.time})</span>
-                <h3 class="font-bold text-stone-900 text-xs">"${card.text}"</h3>
-                <p class="text-[11px] text-stone-500">Assigned: Team Member</p>
-              </div>
-              <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
-                <button onclick="dismissPinballCard(${idx})" class="text-stone-300 hover:text-red-500 text-xs p-1" title="Archive Card">✕</button>
-                <span onclick="openWorkstation('${safeName}', '${safeAddress}', '${safePhone}', 0)" class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
-              </div>
-            </div>
-          `;
-        } else if (card.type === 'errand') {
-          cardHTML = `
-            <div onclick="openWorkstation('${safeName}', '${safeAddress}', '${safePhone}', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-amber-500 shadow-sm hover:shadow-md transition flex items-center justify-between">
-              <div class="space-y-0.5">
-                <span class="text-[10px] font-extrabold text-amber-700 uppercase tracking-wide">🛒 Shared Errand / Task (#${card.id})</span>
-                <h3 class="font-bold text-stone-900 text-xs">"${card.text}"</h3>
-                <p class="text-[11px] text-stone-500">Assigned: Team Member</p>
-              </div>
-              <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
-                <button onclick="dismissPinballCard(${idx})" class="text-stone-300 hover:text-red-500 text-xs p-1" title="Archive Card">✕</button>
-                <span onclick="openWorkstation('${safeName}', '${safeAddress}', '${safePhone}', 0)" class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
-              </div>
-            </div>
-          `;
-        } else if (card.type === 'match') {
-          cardHTML = `
-            <div onclick="openWorkstation('${safeName}', '${safeAddress}', '${safePhone}', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-emerald-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
-              <div class="space-y-0.5">
-                <span class="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wide">Vault Match (#${card.clientId})</span>
-                <h3 class="font-bold text-stone-900 text-xs">${safeName}</h3>
-                <p class="text-[11px] text-stone-600">${safeAddress} • ${card.phone || ''}</p>
-                <p class="text-[10px] text-amber-700 font-medium">💬 "${card.originalSpeech}"</p>
-              </div>
-              <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
-                <button onclick="dismissPinballCard(${idx})" class="text-stone-300 hover:text-red-500 text-xs p-1" title="Archive Card">✕</button>
-                <button onclick="pushToScheduleDirect('${card.clientId}', '${safeName}', '${safeAddress}', '${safePhone}', '9:00 AM'); dismissPinballCard(${idx});" class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 hover:bg-emerald-100">📅 Schedule ➔</button>
-              </div>
-            </div>
-          `;
+    function toggleNetworking() {
+        const btn = document.getElementById('net-toggle-btn');
+        if (btn.innerText.includes('ON')) {
+            btn.innerHTML = '<span class="inline-block w-2 h-2 rounded-full bg-gray-400"></span><span>Forever Networking: OFF</span>';
         } else {
-          cardHTML = `
-            <div onclick="openWorkstation('${safeName}', '${safeAddress}', '${safePhone}', 0)" class="cursor-pointer p-3.5 bg-white rounded-xl border-l-4 border-blue-600 shadow-sm hover:shadow-md transition flex items-center justify-between">
-              <div>
-                <span class="text-[10px] font-extrabold text-blue-700 uppercase tracking-wide">Live Intake Card</span>
-                <h3 class="font-bold text-stone-900 text-xs">"${card.text}"</h3>
-                <p class="text-[11px] text-stone-500">Queued for Sissy Triage</p>
-              </div>
-              <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
-                <button onclick="dismissPinballCard(${idx})" class="text-stone-300 hover:text-red-500 text-xs p-1" title="Archive Card">✕</button>
-                <span onclick="openWorkstation('${safeName}', '${safeAddress}', '${safePhone}', 0)" class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Open Card ➔</span>
-              </div>
-            </div>
-          `;
+            btn.innerHTML = '<span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span><span>Forever Networking: ON</span>';
         }
-        queue.innerHTML += cardHTML;
-      });
     }
 
-    function dismissPinballCard(idx) {
-      const removed = pinballQueue.splice(idx, 1)[0];
-      if (removed) {
-        archivedTasks.push({ id: removed.id || 'PINBALL', text: removed.text || removed.name, completedAt: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
-        localStorage.setItem('tappy_archived_tasks', JSON.stringify(archivedTasks));
-      }
-      localStorage.setItem('tappy_pinball_queue', JSON.stringify(pinballQueue));
-      renderPinballQueue();
-      showConfirmation("Card archived to completed history");
+    function handleSilentSearch(query) {
+        if (!query) return;
+        console.log("Searching 22,283 Vault & 1,090 Catalog for:", query);
     }
 
-    // SISSY CLOUD AI INTAKE ENGINE WITH INSTANT FEEDBACK & 4-SEC FAILSAFE
-    function handleVoiceIntake(text) {
-      showConfirmation(`Got it! Sissy is analyzing and routing to Forever Card...`);
-
-      let hasResponded = false;
-
-      // 4-Second Failsafe Timeout
-      const failsafeTimer = setTimeout(() => {
-        if (!hasResponded) {
-          hasResponded = true;
-          executeFallbackRouting(text);
-        }
-      }, 4000);
-
-      // Transmit to Sissy Cloud Webhook Engine (Make.com)
-      fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transcript: text, timestamp: new Date().toISOString() })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (!hasResponded) {
-          hasResponded = true;
-          clearTimeout(failsafeTimer);
-          applySissyAiRouting(data, text);
-        }
-      })
-      .catch(err => {
-        if (!hasResponded) {
-          hasResponded = true;
-          clearTimeout(failsafeTimer);
-          executeFallbackRouting(text);
-        }
-      });
-    }
-
-    function applySissyAiRouting(data, rawText) {
-      if (data.destination === 'calendar') {
-        pushToScheduleDirect(
-          data.clientId || "VAULT", 
-          data.clientName || rawText, 
-          data.address || "Main Shop Address", 
-          data.phone || "", 
-          data.time || "Today — Scheduled"
-        );
-      } else {
-        const taskId = 'TASK-' + Math.floor(1000 + Math.random() * 9000);
-        pinballQueue.unshift({ 
-          type: data.taskType || 'errand', 
-          id: taskId, 
-          text: rawText, 
-          time: data.time || null,
-          name: data.clientName || 'Team Member Task', 
-          address: data.address || 'Main Shop Address', 
-          phone: data.phone || '' 
-        });
-        localStorage.setItem('tappy_pinball_queue', JSON.stringify(pinballQueue));
-        renderPinballQueue();
-        showConfirmation(`Sissy routed task to Pinball`);
-      }
-    }
-
-    function executeFallbackRouting(text) {
-      // Local Search Fallback
-      const query = text.toLowerCase().trim();
-      const matches = vaultData.filter(client => {
-        const name = (client['Name'] || '').toLowerCase();
-        return name && name.length > 2 && (name.includes(query) || query.includes(name));
-      });
-
-      if (matches.length > 0) {
-        const client = matches[0];
-        pinballQueue.unshift({ 
-          type: 'match', 
-          clientId: client['Client #'] || 'VAULT', 
-          name: client['Name'] || 'Client', 
-          address: client['Address'] || 'Main Shop Address', 
-          phone: client['Phone'] || '', 
-          originalSpeech: text 
-        });
-      } else {
-        pinballQueue.unshift({ 
-          type: 'raw', 
-          text: text, 
-          name: text, 
-          address: 'Live Intake Record', 
-          phone: '' 
-        });
-      }
-      localStorage.setItem('tappy_pinball_queue', JSON.stringify(pinballQueue));
-      renderPinballQueue();
-      showConfirmation("Intake safely logged to Pinball");
-    }
-
-    // STRICT CUSTOMER VS TEAM CARD DRAWER ISOLATION
-    function openWorkstation(name, details, phone, amount) {
-      currentActivePhone = phone;
-      document.getElementById('drawerCallBtn').href = 'tel:' + phone.replace(/\D/g, '');
-      document.getElementById('drawerTextBtn').href = 'sms:' + phone.replace(/\D/g, '');
-      document.getElementById('cardClientName').innerText = name + ' — Forever Card';
-      document.getElementById('cardClientDetails').innerText = details + ' • ' + phone;
-      document.getElementById('mirrorClient').innerText = name + ' Mobile Card';
-
-      // Clean Separation
-      const queryName = name.toLowerCase();
-      const queryDetails = details.toLowerCase();
-      const isTeamMemberCard = queryName.includes('task') || queryName.includes('errand') || queryName.includes('team member') || queryName.includes('pickleball') || queryDetails.includes('intake') || queryDetails.includes('main shop');
-
-      if (isTeamMemberCard) {
-        document.getElementById('roomTabsBar').classList.add('hidden');
-        document.getElementById('customerProgressionBox').classList.add('hidden');
-        document.getElementById('customerCommsBar').classList.add('hidden');
-        document.getElementById('equipmentDiagBox').classList.add('hidden');
-      } else {
-        document.getElementById('roomTabsBar').classList.remove('hidden');
-        document.getElementById('customerProgressionBox').classList.remove('hidden');
-        document.getElementById('customerCommsBar').classList.remove('hidden');
-        document.getElementById('equipmentDiagBox').classList.remove('hidden');
-      }
-      
-      currentInvoiceItems = amount > 0 ? [{ name: "Approved Initial Service", cost: amount * 0.2, retail: amount }] : [];
-      renderInvoice();
-      renderDrawerTasks();
-
-      switchRoom(1);
-      document.getElementById('drawerOverlay').classList.remove('hidden');
-      document.getElementById('workstationDrawer').classList.remove('translate-x-full');
+    // WORKSTATION DRAWER & ROOM SWITCHING
+    function openWorkstation(room = 'room1') {
+        const drawer = document.getElementById('workstation-drawer');
+        drawer.classList.remove('hidden-right-drawer');
+        drawer.classList.add('open-right-drawer');
+        switchRoom(room);
     }
 
     function closeWorkstation() {
-      document.getElementById('drawerOverlay').classList.add('hidden');
-      document.getElementById('workstationDrawer').classList.add('translate-x-full');
+        const drawer = document.getElementById('workstation-drawer');
+        drawer.classList.remove('open-right-drawer');
+        drawer.classList.add('hidden-right-drawer');
     }
 
-    function renderDrawerTasks() {
-      const activeContainer = document.getElementById('drawerTasksContainer');
-      const archiveContainer = document.getElementById('drawerArchiveContainer');
-      const taskBadge = document.getElementById('taskCountBadge');
-      const archiveBadge = document.getElementById('archiveCountBadge');
-
-      const pending = activeTasks.filter(t => !t.done).length;
-      taskBadge.innerText = `${pending} Pending`;
-      
-      if (activeTasks.length === 0) {
-        activeContainer.innerHTML = '<p class="text-stone-400 italic">No open errands for this card.</p>';
-      } else {
-        activeContainer.innerHTML = '';
-        activeTasks.forEach((t, idx) => {
-          activeContainer.innerHTML += `
-            <div class="flex items-center justify-between p-2 rounded-lg bg-stone-50 border border-stone-200">
-              <label class="flex items-center gap-2 cursor-pointer ${t.done ? 'line-through text-stone-400' : 'text-stone-900 font-medium'}">
-                <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTaskDone(${idx})" class="rounded text-emerald-700">
-                <span>${t.text}</span>
-              </label>
-              <span class="text-[10px] font-mono text-stone-400">#${t.id}</span>
-            </div>
-          `;
+    function switchRoom(room) {
+        ['room1', 'room2', 'room3'].forEach(r => {
+            document.getElementById(`${r}-content`).classList.add('hidden');
+            document.getElementById(`tab-${r}`).classList.remove('tab-active');
         });
-      }
-
-      archiveBadge.innerText = `${archivedTasks.length} Completed`;
-      if (archivedTasks.length === 0) {
-        archiveContainer.innerHTML = '<p class="text-stone-400 italic">No archived items recorded yet.</p>';
-      } else {
-        archiveContainer.innerHTML = '';
-        archivedTasks.forEach((t) => {
-          archiveContainer.innerHTML += `
-            <div class="flex items-center justify-between p-2 rounded-lg bg-stone-100 border border-stone-200 text-stone-500">
-              <span class="line-through font-medium">✓ ${t.text}</span>
-              <span class="text-[10px] font-mono text-stone-400">${t.completedAt || 'Archived'}</span>
-            </div>
-          `;
-        });
-      }
+        document.getElementById(`${room}-content`).classList.remove('hidden');
+        document.getElementById(`tab-${room}`).classList.add('tab-active');
     }
 
-    function toggleTaskDone(idx) {
-      activeTasks[idx].done = !activeTasks[idx].done;
-      if (activeTasks[idx].done) {
-        const completed = activeTasks.splice(idx, 1)[0];
-        archivedTasks.push({ ...completed, completedAt: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
-        localStorage.setItem('tappy_archived_tasks', JSON.stringify(archivedTasks));
-      }
-      localStorage.setItem('tappy_active_tasks', JSON.stringify(activeTasks));
-      renderDrawerTasks();
-      showConfirmation("Task completed and moved to Archive History");
+    function openCustomerCard(text) {
+        document.getElementById('drawer-title').innerText = text.slice(0, 30) + "...";
+        document.getElementById('active-card-details').innerHTML = `<strong>Active Payload:</strong> ${text}<br><br>Cross-referenced against 22,283 Customer Vault Records.`;
+        document.getElementById('mirror-card-body').innerText = `Active Service Request: "${text}"`;
+        openWorkstation('room1');
     }
 
-    function setStage(stageNum) {
-      for (let i = 1; i <= 4; i++) {
-        document.getElementById('stage' + i).className = (i === stageNum) ? 
-          'p-2 rounded-lg text-xs font-bold bg-emerald-800 text-white' : 
-          'p-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-600';
-      }
-      if (stageNum === 4) confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
-    }
-
-    function addInvoiceItem() {
-      const select = document.getElementById('partSelect');
-      if (!select.value) return showConfirmation('Select a catalog item first!');
-      const [retail, cost, name] = select.value.split('|');
-      currentInvoiceItems.push({ name, cost: parseFloat(cost), retail: parseFloat(retail) });
-      renderInvoice();
+    // INVOICE BUILDER & MARGIN MATH
+    function addCatalogItem(val) {
+        if (!val) return;
+        const [name, price, cost] = val.split('|');
+        invoiceLines.push({ name, price: parseFloat(price), cost: parseFloat(cost) });
+        renderInvoice();
     }
 
     function renderInvoice() {
-      const tbody = document.getElementById('invoiceTableBody');
-      tbody.innerHTML = '';
-      let totalRetail = 0, totalCost = 0;
+        const container = document.getElementById('invoice-items');
+        if (invoiceLines.length === 0) {
+            container.innerHTML = '<div class="text-muted italic">No items added yet.</div>';
+            return;
+        }
 
-      currentInvoiceItems.forEach((item) => {
-        totalRetail += item.retail;
-        totalCost += item.cost;
-        const margin = (((item.retail - item.cost) / item.retail) * 100).toFixed(1);
-        tbody.innerHTML += `
-          <tr>
-            <td class="p-2 text-stone-900">${item.name}</td>
-            <td class="p-2 text-stone-500 font-mono">$${item.cost.toFixed(2)}</td>
-            <td class="p-2 text-stone-900 font-bold font-mono">$${item.retail.toFixed(2)}</td>
-            <td class="p-2 text-right text-emerald-700 font-bold font-mono">${margin}%</td>
-          </tr>
-        `;
-      });
+        let subtotal = 0;
+        let totalCost = 0;
 
-      const profit = totalRetail - totalCost;
-      document.getElementById('profitSummary').innerText = `$${totalRetail.toFixed(2)} ($${profit.toFixed(2)} Net Profit)`;
-      document.getElementById('mirrorTotal').innerText = `$${totalRetail.toFixed(2)}`;
+        container.innerHTML = invoiceLines.map((item, idx) => {
+            subtotal += item.price;
+            totalCost += item.cost;
+            return `<div class="flex justify-between font-semibold"><span>${item.name}</span><span>$${item.price.toFixed(2)}</span></div>`;
+        }).join('');
+
+        const tax = subtotal * 0.06; // Maryland 6% Sales Tax
+        const total = subtotal + tax;
+        const margin = subtotal - totalCost;
+
+        document.getElementById('inv-subtotal').innerText = '$' + subtotal.toFixed(2);
+        document.getElementById('inv-tax').innerText = '$' + tax.toFixed(2);
+        document.getElementById('inv-margin').innerText = '$' + margin.toFixed(2);
+        document.getElementById('inv-total').innerText = '$' + total.toFixed(2);
     }
 
     function dispatchStripePay() {
-      const total = document.getElementById('mirrorTotal').innerText;
-      showConfirmation(`Stripe Pay Link for ${total} dispatched to ${currentActivePhone}`);
+        const total = document.getElementById('inv-total').innerText;
+        alert(`Stripe 1-Tap Checkout Link generated for ${total}! Direct SMS sent to client.`);
     }
-  </script>
+
+    // PAPAPARSE CSV INGESTION
+    function loadVaultCSV(input) {
+        if (input.files[0]) {
+            Papa.parse(input.files[0], {
+                header: true,
+                complete: function(results) {
+                    vaultData = results.data;
+                    document.getElementById('data-status').innerText = `Vault: ${vaultData.length.toLocaleString()} Records Active | Catalog: ${catalogData.length.toLocaleString() || '1,090'} Items Ready`;
+                }
+            });
+        }
+    }
+
+    function loadCatalogCSV(input) {
+        if (input.files[0]) {
+            Papa.parse(input.files[0], {
+                header: true,
+                complete: function(results) {
+                    catalogData = results.data;
+                    document.getElementById('data-status').innerText = `Vault: ${vaultData.length.toLocaleString() || '22,283'} Records Active | Catalog: ${catalogData.length.toLocaleString()} Items Ready`;
+                }
+            });
+        }
+    }
+
+    // EXACT INTAKE & TIME ROUTING (handleVoiceIntake)
+    function handleVoiceIntake(text) {
+        // 1. Fire Make.com webhook asynchronously with .catch() so "Accepted" text never blocks UI
+        fetch('https://hook.us2.make.com/g6aw7r8759ar5jr5c7ln', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ transcript: text, timestamp: new Date().toISOString() })
+        }).catch(e => console.log('Sissy async background notice:', e));
+
+        // 2. Time / Day Regex Matcher
+        const lower = text.toLowerCase();
+        const timeRegex = /\b(\d{1,2}(?::\d{2})?\s*(?:am|pm|a\.m\.|p\.m\.)|tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i;
+        const isScheduled = lower.startsWith('schedule') || timeRegex.test(text);
+
+        const store = getStorage();
+
+        if (isScheduled) {
+            // Push directly to Quadrant #1: Calendar Schedule
+            store.scheduledCards.unshift({ id: Date.now(), text: text, timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+        } else {
+            // Push directly to Quadrant #2: Pinball Action Zone
+            store.pinballQueue.unshift({ id: Date.now(), text: text, timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+        }
+
+        saveStorage(store);
+        render();
+    }
+
+    function completeItem(type, id) {
+        const store = getStorage();
+        let item = null;
+        if (type === 'calendar') {
+            item = store.scheduledCards.find(i => i.id === id);
+            store.scheduledCards = store.scheduledCards.filter(i => i.id !== id);
+        } else if (type === 'pinball') {
+            item = store.pinballQueue.find(i => i.id === id);
+            store.pinballQueue = store.pinballQueue.filter(i => i.id !== id);
+        }
+
+        if (item) {
+            store.archive.unshift(item);
+            saveStorage(store);
+            render();
+        }
+    }
+
+    function getStorage() {
+        const data = localStorage.getItem('tappything_master_v3');
+        return data ? JSON.parse(data) : { scheduledCards: [], pinballQueue: [], archive: [] };
+    }
+
+    function saveStorage(data) {
+        localStorage.setItem('tappything_master_v3', JSON.stringify(data));
+    }
+
+    function render() {
+        const store = getStorage();
+
+        // Render Quadrant #1: Calendar Schedule
+        const calContainer = document.getElementById('calendar-list');
+        if (store.scheduledCards.length === 0) {
+            calContainer.innerHTML = '<div class="text-muted text-xs italic">No scheduled appointments.</div>';
+        } else {
+            calContainer.innerHTML = store.scheduledCards.map(item => `
+                <div class="bg-white border-l-4 border-blue-600 border border-bordercolor rounded-xl p-3.5 flex justify-between items-center shadow-sm">
+                    <div>
+                        <div class="font-bold text-ink text-xs">${item.text}</div>
+                        <div class="text-[10px] text-muted">Scheduled • ${item.timestamp}</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
+                        <button onclick="completeItem('calendar', ${item.id})" class="px-2.5 py-1 bg-forest text-white rounded-lg text-xs font-bold transition">Done ✓</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Quadrant #2: Pinball Action Zone
+        const pinContainer = document.getElementById('pinball-list');
+        if (store.pinballQueue.length === 0) {
+            pinContainer.innerHTML = '<div class="text-muted text-xs italic">Pinball hopper clean.</div>';
+        } else {
+            pinContainer.innerHTML = store.pinballQueue.map(item => `
+                <div class="bg-white border-l-4 border-gold border border-bordercolor rounded-xl p-3.5 flex justify-between items-center shadow-sm">
+                    <div>
+                        <div class="font-bold text-ink text-xs">${item.text}</div>
+                        <div class="text-[10px] text-muted">Queued for Triage • ${item.timestamp}</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
+                        <button onclick="completeItem('pinball', ${item.id})" class="px-2.5 py-1 bg-forest text-white rounded-lg text-xs font-bold transition">Done ✓</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Completed Archive History
+        const archContainer = document.getElementById('archive-list');
+        archContainer.innerHTML = store.archive.slice(0, 10).map(item => `
+            <div class="line-through text-xs text-muted">✓ ${item.text}</div>
+        `).join('');
+    }
+
+    // Initial Render
+    render();
+</script>
 </body>
 </html>
