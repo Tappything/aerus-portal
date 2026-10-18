@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FOREVER CARD™ — Powered by TappyThing</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -70,7 +69,10 @@
         class="w-full px-3.5 py-2 border border-bordercolor rounded-xl bg-white text-ink focus:outline-none focus:border-gold text-xs shadow-inner text-center md:text-left">
     </div>
 
-    <div class="hidden md:block w-24"></div>
+    <!-- RIGHT: LIVE SISSY STATUS BADGE -->
+    <div class="flex flex-col items-center md:items-end justify-center min-w-[140px]">
+      <span id="system-status" class="text-[10px] text-emerald-800 font-extrabold bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded-full shadow-sm">⚡ Sissy Coordinator Active</span>
+    </div>
   </header>
 
   <!-- LIVE STATUS BANNER -->
@@ -215,23 +217,7 @@
 </div>
 
 <script>
-  let isListening = false, recognition = null, invoiceLines = [], archiveOpen = false, vaultData = [];
-
-  // IN-MEMORY CSV AUTO-LOAD (22,283 CUSTOMER VAULT)
-  Papa.parse('export_export (34).csv', {
-    download: true,
-    header: true,
-    skipEmptyLines: true,
-    complete: function(results) {
-      if (results && results.data) {
-        vaultData = results.data;
-        console.log(`Vault loaded: ${vaultData.length} customer records ready!`);
-      }
-    },
-    error: function(err) {
-      console.log('Vault auto-load standby:', err);
-    }
-  });
+  let isListening = false, recognition = null, invoiceLines = [], archiveOpen = false;
 
   if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -317,93 +303,10 @@
     document.getElementById(`tab-${room}`).classList.add('tab-active');
   }
 
-  function parseClientName(text) {
-    if (!text) return "Direct Intake";
-    let cleaned = text.trim().replace(/^(okay|hey|so|um|uh|well)\b\s*/i, '');
-    const m = cleaned.match(/(?:schedule|call|appt for|appointment for|intake for)\s+([A-Za-z]+\s+[A-Za-z]+|[A-Za-z]+)/i);
-    if (m && m[1]) return m[1].replace(/\b\w/g, l => l.toUpperCase());
-    const words = cleaned.split(' ');
-    if (words.length >= 2 && !['schedule', 'call', 'add', 'new'].includes(words[0].toLowerCase())) {
-      return words[0].charAt(0).toUpperCase() + words[0].slice(1) + ' ' + words[1].charAt(0).toUpperCase() + words[1].slice(1);
-    }
-    return "Direct Intake";
-  }
-
-  // BUG 1 FIX: FUZZY MULTI-HEADER VAULT LOOKUP
-  function searchLocalVault(text, fallbackName) {
-    if (!vaultData || vaultData.length === 0) return { name: fallbackName, address: "Address: Not specified", phone: "Phone: Not specified" };
-    const lowerText = text.toLowerCase();
-    const match = vaultData.find(row => {
-      const n = (row['Name'] || row['Customer Name'] || row['Client Name'] || '').trim().toLowerCase();
-      const target = fallbackName.trim().toLowerCase();
-      return n && (lowerText.includes(n) || target.includes(n) || n.includes(target) || (n.includes('william') && n.includes('sullivan')));
-    });
-
-    if (match) {
-      return {
-        name: match['Name'] || match['Customer Name'] || match['Client Name'] || fallbackName,
-        address: match['Address'] || match['Billing Address'] || match['Street'] || "Address: Not specified",
-        phone: match['Phone'] || match['Mobile'] || match['Phone Number'] || "Phone: Not specified"
-      };
-    }
-    return { name: fallbackName, address: "Address: Not specified", phone: "Phone: Not specified" };
-  }
-
-  // BUG 2 FIX: MULTI-INTENT SEPARATION (ERRANDS vs APPOINTMENTS)
+  // PURE SISSY-FIRST RECEIVER WORKFLOW
   function handleVoiceIntake(text) {
-    showStatus("⚡ FRESH: Processing intake note...");
+    showStatus("⚡ FRESH: Sissy is processing your note...");
 
-    let mainText = text;
-    let errandText = null;
-
-    // Detect and split errands ("get milk", "pick up gas", "bjs", "groceries", "home depot")
-    const errandRegex = /(?:and\s+)?(?:need to\s+)?(?:get|pick up|buy)\s+(?:milk|gas|groceries|bjs|home depot)[^.]*/i;
-    const errandMatch = text.match(errandRegex);
-
-    if (errandMatch) {
-      errandText = errandMatch[0].trim();
-      mainText = text.replace(errandMatch[0], '').replace(/\s{2,}/g, ' ').trim();
-    }
-
-    const timeRegex = /\b(\d{1,2}(?::\d{2})?\s*(?:am|pm|a\.m\.|p\.m\.)|tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i;
-    const lower = mainText.toLowerCase();
-    const isScheduled = lower.startsWith('schedule') || timeRegex.test(mainText);
-    const parsedName = parseClientName(mainText);
-
-    // 5ms IN-MEMORY FUZZY SEARCH MATCHING
-    const vaultResult = searchLocalVault(mainText, parsedName);
-
-    const store = getStorage();
-
-    // Push separate Errand card to Pinball if detected
-    if (errandText) {
-      store.pinballQueue.unshift({
-        id: Date.now() + 1,
-        text: errandText,
-        clientName: "Personal Errand",
-        address: "Store / Errand",
-        phone: "--",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      });
-    }
-
-    // Push clean Service Card
-    const payload = {
-      id: Date.now(),
-      text: mainText,
-      clientName: vaultResult.name,
-      address: vaultResult.address,
-      phone: vaultResult.phone,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-
-    if (isScheduled) store.scheduledCards.unshift(payload);
-    else store.pinballQueue.unshift(payload);
-
-    saveStorage(store);
-    render();
-
-    // ASYNC MAKE.COM WEBHOOK RESPONSE HANDLING
     fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -412,22 +315,43 @@
     .then(res => res.json())
     .then(data => {
       if (data) {
-        const currentStore = getStorage();
-        const targetList = isScheduled ? currentStore.scheduledCards : currentStore.pinballQueue;
-        const targetCard = targetList.find(c => c.id === payload.id);
+        const store = getStorage();
+        const card = {
+          id: Date.now(),
+          text: data.notes || text,
+          clientName: data.clientName || "Direct Intake",
+          address: data.address || "Address: Not specified",
+          phone: data.phone || "Phone: Not specified",
+          time: data.time || "Time Pending",
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
 
-        if (targetCard) {
-          if (data.clientName) targetCard.clientName = data.clientName;
-          if (data.address) targetCard.address = data.address;
-          if (data.phone) targetCard.phone = data.phone;
-          saveStorage(currentStore);
-          render();
-          showStatus("⚡ Customer verified from Vault!");
+        if (data.destination === 'calendar' || data.isScheduled) {
+          store.scheduledCards.unshift(card);
+        } else {
+          store.pinballQueue.unshift(card);
         }
+
+        saveStorage(store);
+        render();
+        showStatus("⚡ Card organized by Sissy!");
       }
     })
     .catch(e => {
-      console.log('Vault sync fallback:', e);
+      console.log('Sissy receiver fallback:', e);
+      // Hard fallback: log raw note to pinball if offline
+      const store = getStorage();
+      store.pinballQueue.unshift({
+        id: Date.now(),
+        text: text,
+        clientName: "Direct Intake",
+        address: "Address: Not specified",
+        phone: "Phone: Not specified",
+        time: "Pending",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+      saveStorage(store);
+      render();
       showStatus("⚡ Note logged to board!");
     });
   }
@@ -504,7 +428,7 @@
             <div>
               <div class="font-bold text-ink text-xs">${item.clientName}</div>
               <p class="text-[11px] text-muted italic">"${item.text}"</p>
-              <div class="text-[10px] text-muted mt-0.5">Scheduled • ${item.timestamp}</div>
+              <div class="text-[10px] text-muted mt-0.5">Scheduled • ${item.time || item.timestamp}</div>
             </div>
             <div class="flex gap-1.5">
               <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
