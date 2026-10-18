@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FOREVER CARD™ — Powered by TappyThing</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -110,7 +111,7 @@
   </div>
 </div>
 
-<!-- 3-ROOM WORKSTATION DRAWER -->
+<!-- 3-ROOM WORKSTATION DRAWER CONTAINER -->
 <div id="workstation-drawer" class="fixed inset-y-0 right-0 w-full max-w-lg bg-cardbg border-l-2 border-gold shadow-2xl p-6 drawer-slide hidden-right-drawer z-50 flex flex-col justify-between overflow-y-auto">
   <div>
     <div class="flex justify-between items-center border-b border-bordercolor pb-3 mb-4">
@@ -156,7 +157,7 @@
           <div id="vault-client-id" class="text-[10px] text-muted font-bold">ID: #VAULT</div>
         </div>
         <div class="text-xs text-muted flex flex-col gap-1 mt-1">
-          <div>📍 <span id="vault-client-address" class="text-ink font-medium">Searching Vault...</span></div>
+          <div>📍 <span id="vault-client-address" class="text-ink font-medium">--</span></div>
           <div>📞 <span id="vault-client-phone" class="text-ink font-medium">--</span></div>
         </div>
       </div>
@@ -214,7 +215,23 @@
 </div>
 
 <script>
-  let isListening = false, recognition = null, invoiceLines = [], archiveOpen = false;
+  let isListening = false, recognition = null, invoiceLines = [], archiveOpen = false, vaultData = [];
+
+  // IN-MEMORY CSV AUTO-LOAD (22,283 CUSTOMER VAULT)
+  Papa.parse('export_export (34).csv', {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    complete: function(results) {
+      if (results && results.data) {
+        vaultData = results.data;
+        console.log(`Vault loaded: ${vaultData.length} customer records ready!`);
+      }
+    },
+    error: function(err) {
+      console.log('Vault auto-load standby:', err);
+    }
+  });
 
   if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -312,6 +329,20 @@
     return "Direct Intake";
   }
 
+  function searchLocalVault(text, fallbackName) {
+    if (!vaultData || vaultData.length === 0) return { name: fallbackName, address: "Address: Not specified", phone: "Phone: Not specified" };
+    const lowerText = text.toLowerCase();
+    const match = vaultData.find(row => row.Name && lowerText.includes(row.Name.toLowerCase()));
+    if (match) {
+      return {
+        name: match.Name,
+        address: match.Address || "Address: Not specified",
+        phone: match.Phone || "Phone: Not specified"
+      };
+    }
+    return { name: fallbackName, address: "Address: Not specified", phone: "Phone: Not specified" };
+  }
+
   function openCustomerCard(text, clientName, address, phone) {
     document.getElementById('drawer-title').innerText = clientName + ' — Workstation';
     document.getElementById('vault-client-name').innerText = clientName;
@@ -345,20 +376,23 @@
   }
 
   function handleVoiceIntake(text) {
-    showStatus("⚡ FRESH: Searching 22,283 customer vault records...");
+    showStatus("⚡ FRESH: Processing intake note...");
 
     const timeRegex = /\b(\d{1,2}(?::\d{2})?\s*(?:am|pm|a\.m\.|p\.m\.)|tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i;
     const lower = text.toLowerCase();
     const isScheduled = lower.startsWith('schedule') || timeRegex.test(text);
     const parsedName = parseClientName(text);
 
+    // 5ms IN-MEMORY SEARCH MATCHING
+    const vaultResult = searchLocalVault(text, parsedName);
+
     const store = getStorage();
     const payload = {
       id: Date.now(),
       text: text,
-      clientName: parsedName,
-      address: "Searching Vault...",
-      phone: "Searching Vault...",
+      clientName: vaultResult.name,
+      address: vaultResult.address,
+      phone: vaultResult.phone,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
@@ -368,7 +402,7 @@
     saveStorage(store);
     render();
 
-    // ASYNC WEBHOOK RESPONSE HANDLING - SEARCHING VAULT AUTOMATICALLY
+    // ASYNC MAKE.COM WEBHOOK RESPONSE HANDLING
     fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -383,8 +417,8 @@
 
         if (targetCard) {
           if (data.clientName) targetCard.clientName = data.clientName;
-          targetCard.address = data.address || "Address: Not specified";
-          targetCard.phone = data.phone || "Phone: Not specified";
+          if (data.address) targetCard.address = data.address;
+          if (data.phone) targetCard.phone = data.phone;
           saveStorage(currentStore);
           render();
           showStatus("⚡ Customer verified from Vault!");
