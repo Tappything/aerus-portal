@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FOREVER CARD™ — Powered by TappyThing</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -71,7 +70,7 @@
 
     <!-- RIGHT: LIVE SYSTEM STATUS BADGE -->
     <div class="flex flex-col items-center md:items-end justify-center min-w-[140px]">
-      <span id="system-status" class="text-[10px] text-emerald-800 font-extrabold bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded-full shadow-sm">⚡ Vault Standby</span>
+      <span id="system-status" class="text-[10px] text-emerald-800 font-extrabold bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded-full shadow-sm">⚡ Sissy Cloud Active</span>
     </div>
   </header>
 
@@ -180,27 +179,6 @@
 <script>
   let isListening = false, recognition = null, archiveOpen = false;
 
-  // 1. STRICT MULTI-TENANT ARCHITECTURE: EMPTY VAULT ON INIT
-  let vaultData = [];
-
-  // 2. DYNAMIC BACKGROUND CSV LOAD FROM SUBSCRIBER DATABASE
-  Papa.parse(encodeURI('export_export (34).csv'), {
-    download: true,
-    header: true,
-    skipEmptyLines: true,
-    complete: function(r) {
-      if (r && r.data && r.data.length > 0) {
-        vaultData = r.data;
-        console.log(`Vault loaded: ${vaultData.length} records ready!`);
-        const s = document.getElementById('system-status');
-        if (s) s.innerText = `⚡ ${vaultData.length.toLocaleString()} Vault Records Ready`;
-      }
-    },
-    error: function(err) {
-      console.log('CSV Load error:', err);
-    }
-  });
-
   if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRec();
@@ -275,86 +253,63 @@
     d.classList.add('hidden-right-drawer');
   }
 
-  function parseClientName(text) {
-    if (!text) return "Subscriber Note";
-    let cleaned = text.trim().replace(/^(okay|hey|so|um|uh|well)\b\s*/i, '');
-    const m = cleaned.match(/(?:schedule|call|appt for|appointment for|intake for)\s+([A-Za-z]+\s+[A-Za-z]+|[A-Za-z]+)/i);
-    if (m && m[1]) return m[1].replace(/\b\w/g, l => l.toUpperCase());
-    const words = cleaned.split(' ');
-    if (words.length >= 2 && !['schedule', 'call', 'add', 'new', 'need'].includes(words[0].toLowerCase())) {
-      return words[0].charAt(0).toUpperCase() + words[0].slice(1) + ' ' + words[1].charAt(0).toUpperCase() + words[1].slice(1);
-    }
-    return "Subscriber Note";
-  }
-
-  // MULTI-TENANT DYNAMIC VAULT LOOKUP FUNCTION
-  function searchLocalVault(text, fallbackName) {
-    if (!vaultData || vaultData.length === 0) return null;
-    const lower = text.toLowerCase();
-    const target = (fallbackName || '').trim().toLowerCase();
-    return vaultData.find(row => {
-      const n = (row['Name'] || row['Customer Name'] || row['Client Name'] || '').trim().toLowerCase();
-      return n && n.length > 2 && (lower.includes(n) || target.includes(n) || n.includes(target));
-    });
-  }
-
-  function extractTime(text) {
-    const timeMatch = text.match(/\b(\d{1,2}(?::\d{2})?\s*(?:am|pm|a\.m\.|p\.m\.)|tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i);
-    return timeMatch ? timeMatch[0] : null;
-  }
-
+  // 100% PURE SISSY CLOUD RECEIVER — UPDATED CLEAN MAKE.COM WEBHOOK URL
   function handleVoiceIntake(text) {
-    showStatus("⚡ FRESH: Processing intake note...");
+    showStatus("⚡ FRESH: Sissy is organizing your note...");
 
-    const parsedName = parseClientName(text);
-    const match = searchLocalVault(text, parsedName);
-
-    const timeRegex = /\b(\d{1,2}(?::\d{2})?\s*(?:am|pm|a\.m\.|p\.m\.)|tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i;
-    const hasTime = timeRegex.test(text);
-
-    const store = getStorage();
-
-    if (match && hasTime) {
-      const card = {
-        id: Date.now(),
-        text: text,
-        clientName: match['Name'] || match['Customer Name'] || parsedName,
-        address: match['Address'] || match['Billing Address'] || match['Street'] || "Address: Not specified",
-        phone: match['Phone'] || match['Mobile'] || match['Phone Number'] || "Phone: Not specified",
-        time: extractTime(text) || "Scheduled Time Pending",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-      store.scheduledCards.unshift(card);
-      showStatus("⚡ Scheduled Appointment Created & Verified!");
-    } else {
-      const noteCard = {
-        id: Date.now(),
-        text: text,
-        clientName: match ? (match['Name'] || match['Customer Name']) : "Subscriber Note",
-        address: match ? (match['Address'] || "Unverified") : "Unverified",
-        phone: match ? (match['Phone'] || "Unverified") : "Unverified",
-        time: "Pending",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-      store.pinballQueue.unshift(noteCard);
-      showStatus("⚡ Note captured — queued in Pinball!");
-    }
-
-    saveStorage(store);
-    render();
-
-    fetch('https://hook.us2.make.com/ii5yklk5cgwsijw17wanvjt3qh0kcbei', {
+    fetch('https://hook.us2.make.com/wsmek7vdjh7uzvhwb0p4prkgn2urfn95', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ transcript: text, timestamp: new Date().toISOString() })
-    }).catch(e => console.log('Sync active:', e));
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (!data) throw new Error("Empty response");
+      const store = getStorage();
+      const card = {
+        id: Date.now(),
+        text: data.notes || text,
+        clientName: data.clientName || "Direct Intake",
+        address: data.address || "Address: Not specified",
+        phone: data.phone || "Phone: Not specified",
+        time: data.time || "Time Pending",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      if (data.destination === 'calendar' || data.isScheduled) {
+        store.scheduledCards.unshift(card);
+        showStatus("⚡ Sissy scheduled appointment!");
+      } else {
+        store.pinballQueue.unshift(card);
+        showStatus("⚡ Sissy queued note in Pinball!");
+      }
+
+      saveStorage(store);
+      render();
+    })
+    .catch(err => {
+      console.log("Sissy cloud offline:", err);
+      const store = getStorage();
+      store.pinballQueue.unshift({
+        id: Date.now(),
+        text: text,
+        clientName: "Note Pending Sync",
+        address: "Awaiting Sissy",
+        phone: "Awaiting Sissy",
+        time: "Pending",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+      saveStorage(store);
+      render();
+      showStatus("⚡ Note saved to Pinball (awaiting Sissy)");
+    });
   }
 
   function openCustomerCard(text, clientName, address, phone) {
     document.getElementById('drawer-title').innerText = clientName + ' — Workstation';
     document.getElementById('vault-client-name').innerText = clientName;
-    document.getElementById('vault-client-address').innerText = address && address !== 'undefined' ? address : "Unverified";
-    document.getElementById('vault-client-phone').innerText = phone && phone !== 'undefined' ? phone : "Unverified";
+    document.getElementById('vault-client-address').innerText = address && address !== 'undefined' ? address : "Awaiting Sissy";
+    document.getElementById('vault-client-phone').innerText = phone && phone !== 'undefined' ? phone : "Awaiting Sissy";
     document.getElementById('active-card-note').innerText = `"${text}"`;
     openWorkstation();
   }
