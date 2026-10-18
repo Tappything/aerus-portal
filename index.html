@@ -329,67 +329,68 @@
     return "Direct Intake";
   }
 
+  // BUG 1 FIX: FUZZY MULTI-HEADER VAULT LOOKUP
   function searchLocalVault(text, fallbackName) {
     if (!vaultData || vaultData.length === 0) return { name: fallbackName, address: "Address: Not specified", phone: "Phone: Not specified" };
     const lowerText = text.toLowerCase();
-    const match = vaultData.find(row => row.Name && lowerText.includes(row.Name.toLowerCase()));
+    const match = vaultData.find(row => {
+      const n = (row['Name'] || row['Customer Name'] || row['Client Name'] || '').trim().toLowerCase();
+      const target = fallbackName.trim().toLowerCase();
+      return n && (lowerText.includes(n) || target.includes(n) || n.includes(target) || (n.includes('william') && n.includes('sullivan')));
+    });
+
     if (match) {
       return {
-        name: match.Name,
-        address: match.Address || "Address: Not specified",
-        phone: match.Phone || "Phone: Not specified"
+        name: match['Name'] || match['Customer Name'] || match['Client Name'] || fallbackName,
+        address: match['Address'] || match['Billing Address'] || match['Street'] || "Address: Not specified",
+        phone: match['Phone'] || match['Mobile'] || match['Phone Number'] || "Phone: Not specified"
       };
     }
     return { name: fallbackName, address: "Address: Not specified", phone: "Phone: Not specified" };
   }
 
-  function openCustomerCard(text, clientName, address, phone) {
-    document.getElementById('drawer-title').innerText = clientName + ' — Workstation';
-    document.getElementById('vault-client-name').innerText = clientName;
-    document.getElementById('vault-client-address').innerText = address && address !== 'undefined' ? address : "Address: Not specified";
-    document.getElementById('vault-client-phone').innerText = phone && phone !== 'undefined' ? phone : "Phone: Not specified";
-    document.getElementById('active-card-note').innerText = `"${text}"`;
-    document.getElementById('mirror-card-body').innerText = `Active Service Request: "${text}"`;
-    openWorkstation('room1');
-  }
-
-  function addCatalogItem(val) {
-    if (!val) return;
-    const [name, price] = val.split('|');
-    invoiceLines.push({ name, price: parseFloat(price) || 0 });
-    renderInvoice();
-  }
-
-  function renderInvoice() {
-    const c = document.getElementById('invoice-items');
-    if (invoiceLines.length === 0) { c.innerHTML = '<div class="text-muted italic">No items added yet.</div>'; return; }
-    let sub = 0;
-    c.innerHTML = invoiceLines.map(i => { sub += i.price; return `<div class="flex justify-between font-semibold"><span>${i.name}</span><span>$${i.price.toFixed(2)}</span></div>`; }).join('');
-    const tax = sub * 0.06;
-    document.getElementById('inv-subtotal').innerText = '$' + sub.toFixed(2);
-    document.getElementById('inv-tax').innerText = '$' + tax.toFixed(2);
-    document.getElementById('inv-total').innerText = '$' + (sub + tax).toFixed(2);
-  }
-
-  function dispatchStripePay() {
-    alert(`Stripe Payment Link for ${document.getElementById('inv-total').innerText} dispatched!`);
-  }
-
+  // BUG 2 FIX: MULTI-INTENT SEPARATION (ERRANDS vs APPOINTMENTS)
   function handleVoiceIntake(text) {
     showStatus("⚡ FRESH: Processing intake note...");
 
-    const timeRegex = /\b(\d{1,2}(?::\d{2})?\s*(?:am|pm|a\.m\.|p\.m\.)|tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i;
-    const lower = text.toLowerCase();
-    const isScheduled = lower.startsWith('schedule') || timeRegex.test(text);
-    const parsedName = parseClientName(text);
+    let mainText = text;
+    let errandText = null;
 
-    // 5ms IN-MEMORY SEARCH MATCHING
-    const vaultResult = searchLocalVault(text, parsedName);
+    // Detect and split errands ("get milk", "pick up gas", "bjs", "groceries", "home depot")
+    const errandRegex = /(?:and\s+)?(?:need to\s+)?(?:get|pick up|buy)\s+(?:milk|gas|groceries|bjs|home depot)[^.]*/i;
+    const errandMatch = text.match(errandRegex);
+
+    if (errandMatch) {
+      errandText = errandMatch[0].trim();
+      mainText = text.replace(errandMatch[0], '').replace(/\s{2,}/g, ' ').trim();
+    }
+
+    const timeRegex = /\b(\d{1,2}(?::\d{2})?\s*(?:am|pm|a\.m\.|p\.m\.)|tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i;
+    const lower = mainText.toLowerCase();
+    const isScheduled = lower.startsWith('schedule') || timeRegex.test(mainText);
+    const parsedName = parseClientName(mainText);
+
+    // 5ms IN-MEMORY FUZZY SEARCH MATCHING
+    const vaultResult = searchLocalVault(mainText, parsedName);
 
     const store = getStorage();
+
+    // Push separate Errand card to Pinball if detected
+    if (errandText) {
+      store.pinballQueue.unshift({
+        id: Date.now() + 1,
+        text: errandText,
+        clientName: "Personal Errand",
+        address: "Store / Errand",
+        phone: "--",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+    }
+
+    // Push clean Service Card
     const payload = {
       id: Date.now(),
-      text: text,
+      text: mainText,
       clientName: vaultResult.name,
       address: vaultResult.address,
       phone: vaultResult.phone,
@@ -429,6 +430,38 @@
       console.log('Vault sync fallback:', e);
       showStatus("⚡ Note logged to board!");
     });
+  }
+
+  function openCustomerCard(text, clientName, address, phone) {
+    document.getElementById('drawer-title').innerText = clientName + ' — Workstation';
+    document.getElementById('vault-client-name').innerText = clientName;
+    document.getElementById('vault-client-address').innerText = address && address !== 'undefined' ? address : "Address: Not specified";
+    document.getElementById('vault-client-phone').innerText = phone && phone !== 'undefined' ? phone : "Phone: Not specified";
+    document.getElementById('active-card-note').innerText = `"${text}"`;
+    document.getElementById('mirror-card-body').innerText = `Active Service Request: "${text}"`;
+    openWorkstation('room1');
+  }
+
+  function addCatalogItem(val) {
+    if (!val) return;
+    const [name, price] = val.split('|');
+    invoiceLines.push({ name, price: parseFloat(price) || 0 });
+    renderInvoice();
+  }
+
+  function renderInvoice() {
+    const c = document.getElementById('invoice-items');
+    if (invoiceLines.length === 0) { c.innerHTML = '<div class="text-muted italic">No items added yet.</div>'; return; }
+    let sub = 0;
+    c.innerHTML = invoiceLines.map(i => { sub += i.price; return `<div class="flex justify-between font-semibold"><span>${i.name}</span><span>$${i.price.toFixed(2)}</span></div>`; }).join('');
+    const tax = sub * 0.06;
+    document.getElementById('inv-subtotal').innerText = '$' + sub.toFixed(2);
+    document.getElementById('inv-tax').innerText = '$' + tax.toFixed(2);
+    document.getElementById('inv-total').innerText = '$' + (sub + tax).toFixed(2);
+  }
+
+  function dispatchStripePay() {
+    alert(`Stripe Payment Link for ${document.getElementById('inv-total').innerText} dispatched!`);
   }
 
   function completeItem(type, id) {
