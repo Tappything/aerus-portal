@@ -156,7 +156,7 @@
           <div id="vault-client-id" class="text-[10px] text-muted font-bold">ID: #VAULT</div>
         </div>
         <div class="text-xs text-muted flex flex-col gap-1 mt-1">
-          <div>📍 <span id="vault-client-address" class="text-ink font-medium">Address: Not specified</span></div>
+          <div>📍 <span id="vault-client-address" class="text-ink font-medium">Searching Vault...</span></div>
           <div>📞 <span id="vault-client-phone" class="text-ink font-medium">--</span></div>
         </div>
       </div>
@@ -210,7 +210,7 @@
     </div>
   </div>
 
-  <div class="border-t border-bordercolor pt-3 text-[10px] text-muted text-center">TappyThing Digital Coordinator • Sissy Cloud Backend</div>
+  <div class="border-t border-bordercolor pt-3 text-[10px] text-muted text-center">TappyThing Digital Coordinator • Cloud Backend</div>
 </div>
 
 <script>
@@ -345,12 +345,7 @@
   }
 
   function handleVoiceIntake(text) {
-    showStatus("⚡ FRESH: Got it! Sissy is routing to Forever Card...");
-    fetch('https://hook.us2.make.com/ii5yklk5cgwsij', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ transcript: text, timestamp: new Date().toISOString() })
-    }).catch(e => console.log('Sissy sync:', e));
+    showStatus("⚡ FRESH: Searching 22,283 customer vault records...");
 
     const timeRegex = /\b(\d{1,2}(?::\d{2})?\s*(?:am|pm|a\.m\.|p\.m\.)|tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i;
     const lower = text.toLowerCase();
@@ -362,8 +357,8 @@
       id: Date.now(),
       text: text,
       clientName: parsedName,
-      address: "Address: Not specified",
-      phone: "Phone: Not specified",
+      address: "Searching Vault...",
+      phone: "Searching Vault...",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
@@ -372,6 +367,34 @@
 
     saveStorage(store);
     render();
+
+    // ASYNC WEBHOOK RESPONSE HANDLING - SEARCHING VAULT AUTOMATICALLY
+    fetch('https://hook.us2.make.com/ii5yklk5cgwsij', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transcript: text, timestamp: new Date().toISOString() })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data) {
+        const currentStore = getStorage();
+        const targetList = isScheduled ? currentStore.scheduledCards : currentStore.pinballQueue;
+        const targetCard = targetList.find(c => c.id === payload.id);
+
+        if (targetCard) {
+          if (data.clientName) targetCard.clientName = data.clientName;
+          targetCard.address = data.address || "Address: Not specified";
+          targetCard.phone = data.phone || "Phone: Not specified";
+          saveStorage(currentStore);
+          render();
+          showStatus("⚡ Customer verified from Vault!");
+        }
+      }
+    })
+    .catch(e => {
+      console.log('Vault sync fallback:', e);
+      showStatus("⚡ Note logged to board!");
+    });
   }
 
   function completeItem(type, id) {
