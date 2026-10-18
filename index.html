@@ -181,7 +181,7 @@
   let vaultData = [];
   let isListening = false, recognition = null, archiveOpen = false;
 
-  // 1. IN-MEMORY VAULT LOAD VIA PAPAPARSE
+  // 1. LOAD VAULT CSV ON STARTUP
   Papa.parse(encodeURI('export_export (34).csv'), {
     download: true,
     header: true,
@@ -201,14 +201,21 @@
     }
   });
 
-  // 2. IN-MEMORY FUZZY MATCH FUNCTION
+  // 2. ENHANCED MULTI-COLUMN VAULT MATCHING
   function searchVault(clientName) {
     if (!vaultData || vaultData.length === 0 || !clientName || clientName === "Direct Intake" || clientName === "Subscriber Note") return null;
     const target = clientName.trim().toLowerCase();
+    const targetParts = target.split(' ').filter(p => p.length > 2);
+
     return vaultData.find(row => {
-      const name = (row['Name'] || row['Customer Name'] || row['Client Name'] || '').trim().toLowerCase();
-      if (!name || name.length < 3) return false;
-      return name === target || target.includes(name) || name.includes(target);
+      const fullName = (
+        row['Name'] || row['Customer Name'] || row['Client Name'] || row['Full Name'] ||
+        `${row['First Name'] || row['First name'] || ''} ${row['Last Name'] || row['Last name'] || ''}`
+      ).trim().toLowerCase();
+
+      if (!fullName || fullName.length < 3) return false;
+      return fullName === target || target.includes(fullName) || fullName.includes(target) ||
+        (targetParts.length >= 2 && targetParts.every(part => fullName.includes(part)));
     });
   }
 
@@ -286,7 +293,7 @@
     d.classList.add('hidden-right-drawer');
   }
 
-  // 3. VOICE INTAKE HANDLER WITH CLIENT-SIDE VAULT ENRICHMENT
+  // 3. VOICE INTAKE + ROBUST CRM DATA EXTRACTION
   function handleVoiceIntake(text) {
     showStatus("⚡ FRESH: Sissy is organizing your note...");
 
@@ -299,11 +306,29 @@
     .then(data => {
       if (!data) throw new Error("Empty response");
 
-      // ENRICH WITH CLIENT-SIDE VAULT MATCH
       const clientName = data.clientName || "Direct Intake";
       const match = searchVault(clientName);
-      const finalAddress = (match && (match['Address'] || match['Billing Address'] || match['Street'])) ? (match['Address'] || match['Billing Address'] || match['Street']) : (data.address && data.address !== "On File / In Vault" ? data.address : "On File / In Vault");
-      const finalPhone = (match && (match['Phone'] || match['Mobile'] || match['Phone Number'])) ? (match['Phone'] || match['Mobile'] || match['Phone Number']) : (data.phone && data.phone !== "On File" ? data.phone : "On File");
+
+      // MULTI-COLUMN ADDRESS EXTRACTION
+      let finalAddress = "On File / In Vault";
+      if (match) {
+        const street = match['Address'] || match['Street'] || match['Street Address'] || match['Address 1'] || match['Billing Address'] || match['Service Address'] || match['Location'] || '';
+        const city = match['City'] || '';
+        const state = match['State'] || '';
+        const zip = match['Zip'] || match['Postal Code'] || '';
+        const combined = [street, city, state, zip].filter(Boolean).join(', ');
+        finalAddress = combined || street || match['Full Address'] || "On File / In Vault";
+      } else if (data.address && data.address !== "On File / In Vault") {
+        finalAddress = data.address;
+      }
+
+      // MULTI-COLUMN PHONE EXTRACTION
+      let finalPhone = "On File";
+      if (match) {
+        finalPhone = match['Phone'] || match['Phone Number'] || match['Mobile'] || match['Mobile Phone'] || match['Cell'] || match['Primary Phone'] || match['Phone 1'] || "On File";
+      } else if (data.phone && data.phone !== "On File") {
+        finalPhone = data.phone;
+      }
 
       const store = getStorage();
       const card = {
