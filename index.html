@@ -75,6 +75,20 @@
     </div>
   </header>
 
+  <!-- SISSY INTELLIGENCE CONSOLE -->
+  <div id="sissy-console" class="hidden bg-cardbg border border-gold rounded-2xl p-4 shadow-md flex flex-col gap-2 transition-all">
+    <div class="flex justify-between items-center border-b border-bordercolor pb-2">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-forest uppercase tracking-wider">💬 Sissy Intelligence Console</span>
+      </div>
+      <span class="text-[10px] text-muted font-bold" id="sissy-time">Just now</span>
+    </div>
+    <p id="sissy-response-text" class="text-xs text-ink font-medium leading-relaxed">...</p>
+    
+    <!-- INTERACTIVE CHOICE PILLS (FOR DISAMBIGUATION) -->
+    <div id="sissy-pills" class="hidden flex flex-wrap gap-2 pt-1"></div>
+  </div>
+
   <!-- LIVE STATUS BANNER -->
   <div id="status-banner" class="hidden bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs px-4 py-2 rounded-xl font-bold transition text-center"></div>
 
@@ -322,6 +336,29 @@
     setTimeout(() => b.classList.add('hidden'), 4000);
   }
 
+  function updateSissyConsole(responseText, optionsPills = []) {
+    const consoleBox = document.getElementById('sissy-console');
+    const textEl = document.getElementById('sissy-response-text');
+    const pillsBox = document.getElementById('sissy-pills');
+    const timeEl = document.getElementById('sissy-time');
+
+    consoleBox.classList.remove('hidden');
+    textEl.innerText = responseText;
+    timeEl.innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    if (optionsPills && optionsPills.length > 0) {
+      pillsBox.classList.remove('hidden');
+      pillsBox.innerHTML = optionsPills.map(opt => `
+        <button onclick="handleVoiceIntake('${opt.replace(/'/g, "\\'")}')" class="px-3 py-1 bg-parchment border border-gold hover:bg-gold hover:text-white rounded-full text-xs font-bold text-ink transition">
+          ${opt}
+        </button>
+      `).join('');
+    } else {
+      pillsBox.classList.add('hidden');
+      pillsBox.innerHTML = '';
+    }
+  }
+
   function openWorkstation() {
     const d = document.getElementById('workstation-drawer');
     d.classList.remove('hidden-right-drawer');
@@ -334,7 +371,7 @@
     d.classList.add('hidden-right-drawer');
   }
 
-  // 4. LIVE SISSY INTAKE + MULTI-ADDRESS ATTACHMENT
+  // 4. LIVE SISSY INTAKE + SISSY CONSOLE INTEGRATION
   function handleVoiceIntake(text) {
     showStatus("⚡ FRESH: Sissy is organizing your note...");
 
@@ -363,6 +400,10 @@
         finalPhone = data.phone || "On File";
       }
 
+      // DISPLAY SISSY RESPONSE IN CONSOLE
+      const sissyMsg = data.sissyResponse || (data.isScheduled ? `Scheduled appointment for ${clientName}.` : `Note processed for ${clientName}.`);
+      updateSissyConsole(sissyMsg, data.pills || (allAddresses.length > 1 ? allAddresses.map(a => `${clientName} @ ${a}`) : []));
+
       const store = getStorage();
       const card = {
         id: Date.now(),
@@ -388,19 +429,35 @@
     })
     .catch(err => {
       console.log("Cloud offline:", err);
+      const matches = findAllVaultMatches(text);
+      let clientName = "Note Pending Sync";
+      let finalAddress = "Awaiting Sissy";
+      let finalPhone = "Awaiting Sissy";
+      let allAddresses = [];
+
+      if (matches.length > 0) {
+        clientName = matches[0]['Name'] || "Verified Customer";
+        finalAddress = formatRowAddress(matches[0]);
+        finalPhone = formatRowPhone(matches[0]);
+        allAddresses = [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))];
+      }
+
+      updateSissyConsole(`Parsed local vault match for "${text}". Sissy saved card to Pinball.`, allAddresses.length > 1 ? allAddresses : []);
+
       const store = getStorage();
       store.pinballQueue.unshift({
         id: Date.now(),
         text: text,
-        clientName: "Note Pending Sync",
-        address: "Awaiting Sissy",
-        phone: "Awaiting Sissy",
+        clientName: clientName,
+        address: finalAddress,
+        allAddresses: allAddresses,
+        phone: finalPhone,
         time: "Pending",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       });
       saveStorage(store);
       render();
-      showStatus("⚡ Note saved to Pinball (awaiting Sissy)");
+      showStatus("⚡ Note saved to Pinball (Local Match Ready)");
     });
   }
 
