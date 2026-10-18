@@ -349,13 +349,35 @@
     if (optionsPills && optionsPills.length > 0) {
       pillsBox.classList.remove('hidden');
       pillsBox.innerHTML = optionsPills.map(opt => `
-        <button onclick="handleVoiceIntake('${opt.replace(/'/g, "\\'")}')" class="px-3 py-1 bg-parchment border border-gold hover:bg-gold hover:text-white rounded-full text-xs font-bold text-ink transition">
+        <button onclick="selectAddressPill('${opt.replace(/'/g, "\\'")}')" class="px-3 py-1 bg-parchment border border-gold hover:bg-gold hover:text-white rounded-full text-xs font-bold text-ink transition">
           ${opt}
         </button>
       `).join('');
     } else {
       pillsBox.classList.add('hidden');
       pillsBox.innerHTML = '';
+    }
+  }
+
+  // DIRECT PILL SELECTOR FIX (UPDATES CARD WITHOUT DUPLICATING IN PINBALL)
+  function selectAddressPill(chosenAddress) {
+    const store = getStorage();
+    let targetCard = null;
+
+    if (store.scheduledCards.length > 0) {
+      targetCard = store.scheduledCards[0];
+    } else if (store.pinballQueue.length > 0) {
+      targetCard = store.pinballQueue[0];
+    }
+
+    if (targetCard) {
+      // Clean up "Client @ " string if present in pill text
+      const cleanAddr = chosenAddress.includes(' @ ') ? chosenAddress.split(' @ ')[1] : chosenAddress;
+      targetCard.address = cleanAddr;
+      saveStorage(store);
+      render();
+      updateSissyConsole(`✓ Confirmed appointment address: ${cleanAddr}`);
+      showStatus("⚡ Address updated cleanly!");
     }
   }
 
@@ -442,7 +464,7 @@
         allAddresses = [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))];
       }
 
-      updateSissyConsole(`Parsed local vault match for "${text}". Sissy saved card to Pinball.`, allAddresses.length > 1 ? allAddresses : []);
+      updateSissyConsole(`Parsed local vault match for "${text}". Sissy saved card to Pinball.`, allAddresses.length > 1 ? allAddresses.map(a => `${clientName} @ ${a}`) : []);
 
       const store = getStorage();
       store.pinballQueue.unshift({
