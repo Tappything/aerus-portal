@@ -270,8 +270,8 @@
         id: Date.now(),
         text: data.notes || text,
         clientName: data.clientName || "Direct Intake",
-        address: data.address || "Address: Not specified",
-        phone: data.phone || "Phone: Not specified",
+        address: data.address || "On File / In Vault",
+        phone: data.phone || "On File",
         time: data.time || "Time Pending",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
@@ -308,8 +308,8 @@
   function openCustomerCard(text, clientName, address, phone) {
     document.getElementById('drawer-title').innerText = clientName + ' — Workstation';
     document.getElementById('vault-client-name').innerText = clientName;
-    document.getElementById('vault-client-address').innerText = address && address !== 'undefined' ? address : "Awaiting Sissy";
-    document.getElementById('vault-client-phone').innerText = phone && phone !== 'undefined' ? phone : "Awaiting Sissy";
+    document.getElementById('vault-client-address').innerText = address && address !== 'undefined' ? address : "On File / In Vault";
+    document.getElementById('vault-client-phone').innerText = phone && phone !== 'undefined' ? phone : "On File";
     document.getElementById('active-card-note').innerText = `"${text}"`;
     openWorkstation();
   }
