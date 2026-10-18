@@ -151,8 +151,18 @@
         <div id="vault-client-name" class="font-bold text-base text-ink">--</div>
         <div id="vault-client-id" class="text-[10px] text-muted font-bold">ID: #VAULT</div>
       </div>
-      <div class="text-xs text-muted flex flex-col gap-1 mt-1">
+      <div class="text-xs text-muted flex flex-col gap-1.5 mt-1">
         <div>📍 <span id="vault-client-address" class="text-ink font-medium">--</span></div>
+        
+        <!-- MULTI-ADDRESS DISAMBIGUATION PICKER -->
+        <div id="multi-address-container" class="hidden bg-parchment p-2 rounded-lg border border-bordercolor">
+          <label class="text-[10px] text-forest font-bold uppercase tracking-wider block mb-1">
+            📍 Multiple Properties on File (Tap to Switch):
+          </label>
+          <select id="address-selector" onchange="switchAddress(this.value)" class="w-full bg-white border border-bordercolor text-xs text-ink rounded p-1.5 focus:outline-none focus:border-gold">
+          </select>
+        </div>
+
         <div>📞 <span id="vault-client-phone" class="text-ink font-medium">--</span></div>
       </div>
     </div>
@@ -180,9 +190,10 @@
 <script>
   let vaultData = [];
   let catalogData = [];
+  let activeCardId = null;
   let isListening = false, recognition = null, archiveOpen = false;
 
-  // 1. LOAD MASTER CUSTOMER VAULT DIRECTLY USING GITHUB FILE NAME
+  // 1. LOAD MASTER CUSTOMER VAULT
   Papa.parse(encodeURI('export_export (34).csv'), {
     download: true,
     header: true,
@@ -203,7 +214,7 @@
     }
   });
 
-  // 2. LOAD MASTER PARTS CATALOG DIRECTLY USING GITHUB FILE NAME
+  // 2. LOAD MASTER PARTS CATALOG
   Papa.parse(encodeURI('export_export (35).csv'), {
     download: true,
     header: true,
@@ -216,13 +227,13 @@
     }
   });
 
-  // 3. ENHANCED MULTI-COLUMN VAULT MATCHING
-  function searchVault(clientName) {
-    if (!vaultData || vaultData.length === 0 || !clientName || clientName === "Direct Intake" || clientName === "Subscriber Note") return null;
+  // 3. ENHANCED MULTI-ROW VAULT MATCHER
+  function findAllVaultMatches(clientName) {
+    if (!vaultData || vaultData.length === 0 || !clientName || clientName === "Direct Intake" || clientName === "Subscriber Note") return [];
     const target = clientName.trim().toLowerCase();
     const targetParts = target.split(' ').filter(p => p.length > 2);
 
-    return vaultData.find(row => {
+    return vaultData.filter(row => {
       const fullName = (
         row['Name'] || row['Customer Name'] || row['Client Name'] || row['Full Name'] ||
         `${row['First Name'] || row['First name'] || ''} ${row['Last Name'] || row['Last name'] || ''}`
@@ -232,6 +243,21 @@
       return fullName === target || target.includes(fullName) || fullName.includes(target) ||
         (targetParts.length >= 2 && targetParts.every(part => fullName.includes(part)));
     });
+  }
+
+  function formatRowAddress(row) {
+    if (!row) return "On File / In Vault";
+    const street = row['Address'] || row['Street'] || row['Street Address'] || row['Address 1'] || row['Billing Address'] || row['Service Address'] || row['Location'] || '';
+    const city = row['City'] || '';
+    const state = row['State'] || '';
+    const zip = row['Zip'] || row['Postal Code'] || '';
+    const combined = [street, city, state, zip].filter(Boolean).join(', ');
+    return combined || street || row['Full Address'] || "On File / In Vault";
+  }
+
+  function formatRowPhone(row) {
+    if (!row) return "On File";
+    return row['Phone'] || row['Phone Number'] || row['Mobile'] || row['Mobile Phone'] || row['Cell'] || row['Primary Phone'] || row['Phone 1'] || "On File";
   }
 
   if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -308,7 +334,7 @@
     d.classList.add('hidden-right-drawer');
   }
 
-  // 4. LIVE SISSY CLOUD INTAKE + INSTANT VAULT ENRICHMENT
+  // 4. LIVE SISSY INTAKE + MULTI-ADDRESS ATTACHMENT
   function handleVoiceIntake(text) {
     showStatus("⚡ FRESH: Sissy is organizing your note...");
 
@@ -322,27 +348,19 @@
       if (!data) throw new Error("Empty response");
 
       const clientName = data.clientName || "Direct Intake";
-      const match = searchVault(clientName);
+      const matches = findAllVaultMatches(clientName);
 
-      // MULTI-COLUMN ADDRESS EXTRACTION
       let finalAddress = "On File / In Vault";
-      if (match) {
-        const street = match['Address'] || match['Street'] || match['Street Address'] || match['Address 1'] || match['Billing Address'] || match['Service Address'] || match['Location'] || '';
-        const city = match['City'] || '';
-        const state = match['State'] || '';
-        const zip = match['Zip'] || match['Postal Code'] || '';
-        const combined = [street, city, state, zip].filter(Boolean).join(', ');
-        finalAddress = combined || street || match['Full Address'] || "On File / In Vault";
+      let finalPhone = "On File";
+      let allAddresses = [];
+
+      if (matches.length > 0) {
+        finalAddress = formatRowAddress(matches[0]);
+        finalPhone = formatRowPhone(matches[0]);
+        allAddresses = [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))];
       } else if (data.address && data.address !== "On File / In Vault") {
         finalAddress = data.address;
-      }
-
-      // MULTI-COLUMN PHONE EXTRACTION
-      let finalPhone = "On File";
-      if (match) {
-        finalPhone = match['Phone'] || match['Phone Number'] || match['Mobile'] || match['Mobile Phone'] || match['Cell'] || match['Primary Phone'] || match['Phone 1'] || "On File";
-      } else if (data.phone && data.phone !== "On File") {
-        finalPhone = data.phone;
+        finalPhone = data.phone || "On File";
       }
 
       const store = getStorage();
@@ -351,6 +369,7 @@
         text: data.notes || text,
         clientName: clientName,
         address: finalAddress,
+        allAddresses: allAddresses,
         phone: finalPhone,
         time: data.time || "Time Pending",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -385,13 +404,44 @@
     });
   }
 
-  function openCustomerCard(text, clientName, address, phone) {
+  function openCustomerCard(text, clientName, address, phone, cardId) {
+    activeCardId = cardId;
+    const store = getStorage();
+    const allCards = [...store.scheduledCards, ...store.pinballQueue];
+    const card = allCards.find(c => c.id === cardId);
+
     document.getElementById('drawer-title').innerText = clientName + ' — Workstation';
     document.getElementById('vault-client-name').innerText = clientName;
     document.getElementById('vault-client-address').innerText = address && address !== 'undefined' ? address : "On File / In Vault";
     document.getElementById('vault-client-phone').innerText = phone && phone !== 'undefined' ? phone : "On File";
     document.getElementById('active-card-note').innerText = `"${text}"`;
+
+    const multiBox = document.getElementById('multi-address-container');
+    const selector = document.getElementById('address-selector');
+
+    if (card && card.allAddresses && card.allAddresses.length > 1) {
+      multiBox.classList.remove('hidden');
+      selector.innerHTML = card.allAddresses.map(addr => `
+        <option value="${addr}" ${addr === address ? 'selected' : ''}>${addr}</option>
+      `).join('');
+    } else {
+      multiBox.classList.add('hidden');
+    }
+
     openWorkstation();
+  }
+
+  function switchAddress(newAddress) {
+    document.getElementById('vault-client-address').innerText = newAddress;
+    if (activeCardId) {
+      const store = getStorage();
+      const card = store.scheduledCards.find(c => c.id === activeCardId) || store.pinballQueue.find(c => c.id === activeCardId);
+      if (card) {
+        card.address = newAddress;
+        saveStorage(store);
+        render();
+      }
+    }
   }
 
   function completeItem(type, id) {
@@ -437,7 +487,7 @@
               <div class="text-[10px] text-muted mt-0.5">Scheduled • ${item.time || item.timestamp}</div>
             </div>
             <div class="flex gap-1.5">
-              <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
+              <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}', ${item.id})" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
               <button onclick="completeItem('calendar', ${item.id})" class="px-2.5 py-1 bg-forest text-white rounded-lg text-xs font-bold transition">Done ✓</button>
             </div>
           </div>
@@ -455,7 +505,7 @@
               <div class="text-[10px] text-muted mt-0.5">Queued • ${item.timestamp}</div>
             </div>
             <div class="flex gap-1.5">
-              <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
+              <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}', ${item.id})" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
               <button onclick="completeItem('pinball', ${item.id})" class="px-2.5 py-1 bg-forest text-white rounded-lg text-xs font-bold transition">Done ✓</button>
             </div>
           </div>
