@@ -71,7 +71,7 @@
 
     <!-- RIGHT: LIVE SYSTEM STATUS BADGE -->
     <div class="flex flex-col items-center md:items-end justify-center min-w-[140px]">
-      <span id="system-status" class="text-[10px] text-emerald-800 font-extrabold bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded-full shadow-sm">⚡ Sissy Cloud Active</span>
+      <span id="system-status" class="text-[10px] text-amber-800 font-extrabold bg-amber-100 border border-amber-300 px-2.5 py-1 rounded-full shadow-sm">⚡ Loading Vault...</span>
     </div>
   </header>
 
@@ -179,10 +179,11 @@
 
 <script>
   let vaultData = [];
+  let catalogData = [];
   let isListening = false, recognition = null, archiveOpen = false;
 
-  // 1. STANDARDIZED CSV LOAD FOR 'customers.csv'
-  Papa.parse('customers.csv', {
+  // 1. LOAD MASTER CUSTOMER VAULT DIRECTLY USING GITHUB FILE NAME
+  Papa.parse(encodeURI('export_export (34).csv'), {
     download: true,
     header: true,
     skipEmptyLines: true,
@@ -193,15 +194,29 @@
         const status = document.getElementById('system-status');
         if (status) {
           status.innerText = `⚡ ${vaultData.length.toLocaleString()} Vault Records Ready`;
+          status.className = "text-[10px] text-emerald-800 font-extrabold bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded-full shadow-sm";
         }
       }
     },
     error: function(err) {
-      console.log('CSV load note:', err);
+      console.error('Vault Load Note:', err);
     }
   });
 
-  // 2. ENHANCED MULTI-COLUMN VAULT MATCHING
+  // 2. LOAD MASTER PARTS CATALOG DIRECTLY USING GITHUB FILE NAME
+  Papa.parse(encodeURI('export_export (35).csv'), {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    complete: function(results) {
+      if (results && results.data && results.data.length > 0) {
+        catalogData = results.data;
+        console.log(`Catalog loaded: ${catalogData.length} parts ready!`);
+      }
+    }
+  });
+
+  // 3. ENHANCED MULTI-COLUMN VAULT MATCHING
   function searchVault(clientName) {
     if (!vaultData || vaultData.length === 0 || !clientName || clientName === "Direct Intake" || clientName === "Subscriber Note") return null;
     const target = clientName.trim().toLowerCase();
@@ -293,9 +308,9 @@
     d.classList.add('hidden-right-drawer');
   }
 
-  // 3. VOICE INTAKE + ROBUST CRM DATA EXTRACTION
+  // 4. LIVE SISSY CLOUD INTAKE + INSTANT VAULT ENRICHMENT
   function handleVoiceIntake(text) {
-    showStatus("⚡ FRESH: Organizing your note...");
+    showStatus("⚡ FRESH: Sissy is organizing your note...");
 
     fetch('https://hook.us2.make.com/35w5mrnq8w30j1fda55rousdeya5o18f', {
       method: 'POST',
@@ -343,10 +358,10 @@
 
       if (data.destination === 'calendar' || data.isScheduled) {
         store.scheduledCards.unshift(card);
-        showStatus("⚡ Appointment scheduled!");
+        showStatus("⚡ Sissy scheduled appointment!");
       } else {
         store.pinballQueue.unshift(card);
-        showStatus("⚡ Note queued in Pinball!");
+        showStatus("⚡ Sissy queued note in Pinball!");
       }
 
       saveStorage(store);
@@ -359,14 +374,14 @@
         id: Date.now(),
         text: text,
         clientName: "Note Pending Sync",
-        address: "Awaiting Sync",
-        phone: "Awaiting Sync",
+        address: "Awaiting Sissy",
+        phone: "Awaiting Sissy",
         time: "Pending",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       });
       saveStorage(store);
       render();
-      showStatus("⚡ Note saved to Pinball");
+      showStatus("⚡ Note saved to Pinball (awaiting Sissy)");
     });
   }
 
