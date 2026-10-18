@@ -32,7 +32,6 @@
     .drawer-slide { transition: transform 0.3s ease-in-out; }
     .hidden-right-drawer { transform: translateX(100%); }
     .open-right-drawer { transform: translateX(0); }
-    .tab-active { border-bottom: 3px solid #c5a059; color: #1f1e1d; font-weight: 700; }
   </style>
 </head>
 <body class="font-sans min-h-screen p-4 md:p-6 flex justify-center">
@@ -69,7 +68,7 @@
         class="w-full px-3.5 py-2 border border-bordercolor rounded-xl bg-white text-ink focus:outline-none focus:border-gold text-xs shadow-inner text-center md:text-left">
     </div>
 
-    <!-- RIGHT: LIVE SISSY STATUS BADGE -->
+    <!-- RIGHT: SYSTEM STATUS -->
     <div class="flex flex-col items-center md:items-end justify-center min-w-[140px]">
       <span id="system-status" class="text-[10px] text-emerald-800 font-extrabold bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded-full shadow-sm">⚡ Sissy Coordinator Active</span>
     </div>
@@ -113,10 +112,11 @@
   </div>
 </div>
 
-<!-- 3-ROOM WORKSTATION DRAWER CONTAINER -->
+<!-- DYNAMIC WORKSTATION CANVAS DRAWER -->
 <div id="workstation-drawer" class="fixed inset-y-0 right-0 w-full max-w-lg bg-cardbg border-l-2 border-gold shadow-2xl p-6 drawer-slide hidden-right-drawer z-50 flex flex-col justify-between overflow-y-auto">
-  <div>
-    <div class="flex justify-between items-center border-b border-bordercolor pb-3 mb-4">
+  <div class="flex flex-col gap-4">
+    <!-- DRAWER HEADER -->
+    <div class="flex justify-between items-center border-b border-bordercolor pb-3">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-full border border-gold bg-white overflow-hidden flex items-center justify-center">
           <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';">
@@ -135,89 +135,52 @@
       </div>
     </div>
 
-    <!-- ROOM TABS -->
-    <div class="flex border-b border-bordercolor mb-4 text-xs font-bold text-muted">
-      <button id="tab-room1" onclick="switchRoom('room1')" class="flex-1 py-2 text-center tab-active">Room 1: Shop Ops</button>
-      <button id="tab-room2" onclick="switchRoom('room2')" class="flex-1 py-2 text-center">Room 2: Invoicing</button>
-      <button id="tab-room3" onclick="switchRoom('room3')" class="flex-1 py-2 text-center">Room 3: Live Mirror</button>
-    </div>
-
-    <!-- ROOM 1: SHOP OPS -->
-    <div id="room1-content" class="flex flex-col gap-4">
-      <div class="bg-white p-4 rounded-xl border border-bordercolor shadow-sm flex flex-col gap-2">
-        <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between">
-          <span class="flex items-center gap-2">
-            <div class="w-5 h-5 rounded-full border border-gold overflow-hidden">
-              <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';">
-            </div>
-            <span>Forever Card™ Record</span>
-          </span>
-          <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">● Status: Intake & Review</span>
-        </div>
-        <div class="flex justify-between items-baseline">
-          <div id="vault-client-name" class="font-bold text-base text-ink">--</div>
-          <div id="vault-client-id" class="text-[10px] text-muted font-bold">ID: #VAULT</div>
-        </div>
-        <div class="text-xs text-muted flex flex-col gap-1 mt-1">
-          <div>📍 <span id="vault-client-address" class="text-ink font-medium">--</span></div>
-          <div>📞 <span id="vault-client-phone" class="text-ink font-medium">--</span></div>
-        </div>
+    <!-- DYNAMIC CLIENT CARD SUMMARY -->
+    <div class="bg-white p-4 rounded-xl border border-bordercolor shadow-sm flex flex-col gap-2">
+      <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between">
+        <span class="flex items-center gap-2">
+          <div class="w-5 h-5 rounded-full border border-gold overflow-hidden">
+            <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';">
+          </div>
+          <span>Verified Customer Record</span>
+        </span>
+        <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">● Active Record</span>
       </div>
-
-      <div class="flex gap-2">
-        <button onclick="toggleVoiceIntake()" class="flex-1 py-2 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-2">
-          <span>🎙️</span> <span>Add Voice Note</span>
-        </button>
-        <button onclick="triggerCamera()" class="flex-1 py-2 bg-ink hover:bg-black text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5">
-          <span>📷</span> <span>Attach Photo</span>
-        </button>
+      <div class="flex justify-between items-baseline">
+        <div id="vault-client-name" class="font-bold text-base text-ink">--</div>
+        <div id="vault-client-id" class="text-[10px] text-muted font-bold">ID: #VAULT</div>
       </div>
-
-      <div class="bg-white p-3.5 rounded-xl border border-bordercolor mt-1">
-        <div class="text-xs font-bold text-ink mb-1 uppercase">Active Service Note</div>
-        <div id="active-card-note" class="text-xs text-muted leading-relaxed">--</div>
+      <div class="text-xs text-muted flex flex-col gap-1 mt-1">
+        <div>📍 <span id="vault-client-address" class="text-ink font-medium">--</span></div>
+        <div>📞 <span id="vault-client-phone" class="text-ink font-medium">--</span></div>
       </div>
     </div>
 
-    <!-- ROOM 2: INVOICING -->
-    <div id="room2-content" class="hidden flex flex-col gap-3 text-xs">
-      <div class="font-bold uppercase tracking-wider text-muted">Line-Item Catalog Builder</div>
-      <select id="catalog-select" onchange="addCatalogItem(this.value)" class="w-full p-2 border border-bordercolor rounded-xl bg-white text-xs">
-        <option value="">-- Add Catalog Item --</option>
-        <option value="Filter Check & Replacement|45.00">Filter Check & Replacement — $45.00</option>
-        <option value="Carpet Cleaning Service|150.00">Carpet Cleaning Service — $150.00</option>
-        <option value="Annual System Tune-Up|89.00">Annual System Tune-Up — $89.00</option>
-      </select>
-      <div class="bg-white p-3 rounded-xl border border-bordercolor flex flex-col gap-2">
-        <div id="invoice-items" class="flex flex-col gap-1 text-xs"><div class="text-muted italic">No items added yet.</div></div>
-      </div>
-      <div class="bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-1.5 text-xs">
-        <div class="flex justify-between"><span>Subtotal:</span><span id="inv-subtotal" class="font-bold">$0.00</span></div>
-        <div class="flex justify-between"><span>Maryland Tax (6%):</span><span id="inv-tax" class="font-bold">$0.00</span></div>
-        <div class="flex justify-between border-t border-bordercolor pt-1.5 font-extrabold text-sm text-ink"><span>Total Due:</span><span id="inv-total" class="text-forest">$0.00</span></div>
-      </div>
-      <button onclick="dispatchStripePay()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition shadow-sm">💳 Dispatch Stripe 1-Tap Payment Link</button>
+    <!-- IN-DRAWER QUICK CONTROLS -->
+    <div class="flex gap-2">
+      <button onclick="toggleVoiceIntake()" class="flex-1 py-2 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-2">
+        <span>🎙️</span> <span>Add Voice Note</span>
+      </button>
+      <button onclick="triggerCamera()" class="flex-1 py-2 bg-ink hover:bg-black text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5">
+        <span>📷</span> <span>Attach Photo</span>
+      </button>
     </div>
 
-    <!-- ROOM 3: MIRROR -->
-    <div id="room3-content" class="hidden flex flex-col gap-3 text-xs">
-      <div class="font-bold uppercase tracking-wider text-muted">Live Customer View Mirror</div>
-      <div class="bg-white p-4 rounded-2xl border-2 border-gold shadow-sm flex flex-col gap-2">
-        <div class="flex justify-between items-center border-b border-bordercolor pb-1.5">
-          <span class="font-bold text-ink">Forever Card™ Customer View</span>
-          <span class="text-[10px] px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full font-bold">Direct Line</span>
-        </div>
-        <div id="mirror-card-body" class="text-xs text-muted leading-relaxed">Customer sees equipment history, scheduled dates, and 1-tap re-order button.</div>
-        <button class="w-full py-2 bg-forest text-white font-bold rounded-lg text-xs mt-1">Tap to Request Service</button>
-      </div>
+    <!-- ACTIVE SERVICE NOTE -->
+    <div class="bg-white p-3.5 rounded-xl border border-bordercolor">
+      <div class="text-xs font-bold text-ink mb-1 uppercase">Active Service / Brain Dump Note</div>
+      <div id="active-card-note" class="text-xs text-muted leading-relaxed">--</div>
     </div>
+
+    <!-- DYNAMIC ACTION CANVAS (POPULED BY SISSY ON DEMAND) -->
+    <div id="dynamic-action-canvas" class="flex flex-col gap-3"></div>
   </div>
 
   <div class="border-t border-bordercolor pt-3 text-[10px] text-muted text-center">TappyThing Digital Coordinator • Cloud Backend</div>
 </div>
 
 <script>
-  let isListening = false, recognition = null, invoiceLines = [], archiveOpen = false;
+  let isListening = false, recognition = null, archiveOpen = false;
 
   if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -281,26 +244,16 @@
     setTimeout(() => b.classList.add('hidden'), 4000);
   }
 
-  function openWorkstation(room = 'room1') {
+  function openWorkstation() {
     const d = document.getElementById('workstation-drawer');
     d.classList.remove('hidden-right-drawer');
     d.classList.add('open-right-drawer');
-    switchRoom(room);
   }
 
   function closeWorkstation() {
     const d = document.getElementById('workstation-drawer');
     d.classList.remove('open-right-drawer');
     d.classList.add('hidden-right-drawer');
-  }
-
-  function switchRoom(room) {
-    ['room1', 'room2', 'room3'].forEach(r => {
-      document.getElementById(`${r}-content`).classList.add('hidden');
-      document.getElementById(`tab-${r}`).classList.remove('tab-active');
-    });
-    document.getElementById(`${room}-content`).classList.remove('hidden');
-    document.getElementById(`tab-${room}`).classList.add('tab-active');
   }
 
   // PURE SISSY-FIRST RECEIVER WORKFLOW
@@ -319,9 +272,9 @@
         const card = {
           id: Date.now(),
           text: data.notes || text,
-          clientName: data.clientName || "Direct Intake",
-          address: data.address || "Address: Not specified",
-          phone: data.phone || "Phone: Not specified",
+          clientName: data.clientName || "Subscriber Note",
+          address: data.address || "Unverified",
+          phone: data.phone || "Unverified",
           time: data.time || "Time Pending",
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
@@ -338,54 +291,31 @@
       }
     })
     .catch(e => {
-      console.log('Sissy receiver fallback:', e);
-      // Hard fallback: log raw note to pinball if offline
+      console.log('Sissy receiver error:', e);
+      // RULE 1 ENFORCED: ZERO GHOST CARDS! Raw note strictly logged as subscriber note.
       const store = getStorage();
       store.pinballQueue.unshift({
         id: Date.now(),
         text: text,
-        clientName: "Direct Intake",
-        address: "Address: Not specified",
-        phone: "Phone: Not specified",
+        clientName: "Subscriber Note",
+        address: "Unverified",
+        phone: "Unverified",
         time: "Pending",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       });
       saveStorage(store);
       render();
-      showStatus("⚡ Note logged to board!");
+      showStatus("⚡ Raw note saved to Pinball (awaiting Sissy)");
     });
   }
 
   function openCustomerCard(text, clientName, address, phone) {
     document.getElementById('drawer-title').innerText = clientName + ' — Workstation';
     document.getElementById('vault-client-name').innerText = clientName;
-    document.getElementById('vault-client-address').innerText = address && address !== 'undefined' ? address : "Address: Not specified";
-    document.getElementById('vault-client-phone').innerText = phone && phone !== 'undefined' ? phone : "Phone: Not specified";
+    document.getElementById('vault-client-address').innerText = address && address !== 'undefined' ? address : "Unverified";
+    document.getElementById('vault-client-phone').innerText = phone && phone !== 'undefined' ? phone : "Unverified";
     document.getElementById('active-card-note').innerText = `"${text}"`;
-    document.getElementById('mirror-card-body').innerText = `Active Service Request: "${text}"`;
-    openWorkstation('room1');
-  }
-
-  function addCatalogItem(val) {
-    if (!val) return;
-    const [name, price] = val.split('|');
-    invoiceLines.push({ name, price: parseFloat(price) || 0 });
-    renderInvoice();
-  }
-
-  function renderInvoice() {
-    const c = document.getElementById('invoice-items');
-    if (invoiceLines.length === 0) { c.innerHTML = '<div class="text-muted italic">No items added yet.</div>'; return; }
-    let sub = 0;
-    c.innerHTML = invoiceLines.map(i => { sub += i.price; return `<div class="flex justify-between font-semibold"><span>${i.name}</span><span>$${i.price.toFixed(2)}</span></div>`; }).join('');
-    const tax = sub * 0.06;
-    document.getElementById('inv-subtotal').innerText = '$' + sub.toFixed(2);
-    document.getElementById('inv-tax').innerText = '$' + tax.toFixed(2);
-    document.getElementById('inv-total').innerText = '$' + (sub + tax).toFixed(2);
-  }
-
-  function dispatchStripePay() {
-    alert(`Stripe Payment Link for ${document.getElementById('inv-total').innerText} dispatched!`);
+    openWorkstation();
   }
 
   function completeItem(type, id) {
