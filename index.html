@@ -181,8 +181,8 @@
   let vaultData = [];
   let isListening = false, recognition = null, archiveOpen = false;
 
-  // 1. LOAD VAULT CSV ON STARTUP
-  Papa.parse(encodeURI('export_export (34).csv'), {
+  // 1. STANDARDIZED CSV LOAD FOR 'customers.csv'
+  Papa.parse('customers.csv', {
     download: true,
     header: true,
     skipEmptyLines: true,
@@ -295,7 +295,7 @@
 
   // 3. VOICE INTAKE + ROBUST CRM DATA EXTRACTION
   function handleVoiceIntake(text) {
-    showStatus("⚡ FRESH: Sissy is organizing your note...");
+    showStatus("⚡ FRESH: Organizing your note...");
 
     fetch('https://hook.us2.make.com/35w5mrnq8w30j1fda55rousdeya5o18f', {
       method: 'POST',
@@ -343,30 +343,30 @@
 
       if (data.destination === 'calendar' || data.isScheduled) {
         store.scheduledCards.unshift(card);
-        showStatus("⚡ Sissy scheduled appointment!");
+        showStatus("⚡ Appointment scheduled!");
       } else {
         store.pinballQueue.unshift(card);
-        showStatus("⚡ Sissy queued note in Pinball!");
+        showStatus("⚡ Note queued in Pinball!");
       }
 
       saveStorage(store);
       render();
     })
     .catch(err => {
-      console.log("Sissy cloud offline:", err);
+      console.log("Cloud offline:", err);
       const store = getStorage();
       store.pinballQueue.unshift({
         id: Date.now(),
         text: text,
         clientName: "Note Pending Sync",
-        address: "Awaiting Sissy",
-        phone: "Awaiting Sissy",
+        address: "Awaiting Sync",
+        phone: "Awaiting Sync",
         time: "Pending",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       });
       saveStorage(store);
       render();
-      showStatus("⚡ Note saved to Pinball (awaiting Sissy)");
+      showStatus("⚡ Note saved to Pinball");
     });
   }
 
