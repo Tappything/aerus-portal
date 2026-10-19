@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FOREVER CARD™ — Powered by TappyThing</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+  <script src="[https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js](https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js)"></script>
+  <link href="[https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;600;700;800&display=swap](https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;600;700;800&display=swap)" rel="stylesheet">
   <script>
     tailwind.config = {
       theme: {
@@ -54,7 +54,7 @@
     <!-- CENTER: FRESH MASCOT EMBLEM + CONTROLS -->
     <div class="flex flex-col items-center gap-3 w-full max-w-md mx-auto">
       <div class="w-28 h-28 rounded-full border-4 border-gold bg-white shadow-lg overflow-hidden flex items-center justify-center relative flex-shrink-0">
-        <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';">
+        <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='[https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png](https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png)';">
       </div>
       <div class="flex gap-2 justify-center w-full">
         <button id="voice-btn" onclick="toggleVoiceIntake()" class="flex-1 max-w-[180px] py-2.5 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
@@ -129,7 +129,7 @@
     <div class="flex justify-between items-center border-b border-bordercolor pb-3">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-full border border-gold bg-white overflow-hidden flex items-center justify-center">
-          <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';">
+          <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='[https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png](https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png)';">
         </div>
         <div>
           <h3 id="drawer-title" class="font-bold text-sm text-ink">Client Workstation</h3>
@@ -150,7 +150,7 @@
       <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between">
         <span class="flex items-center gap-2">
           <div class="w-5 h-5 rounded-full border border-gold overflow-hidden">
-            <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';">
+            <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='[https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png](https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png)';">
           </div>
           <span>Verified Customer Record</span>
         </span>
@@ -353,7 +353,25 @@
     d.classList.add('hidden-right-drawer');
   }
 
-  // 4. LIVE SISSY CLOUD INTAKE + SMOOTH RESOLUTION
+  // BULLETPROOF FRONTEND JSON PARSER
+  function cleanAndParseJSON(rawInput) {
+    if (typeof rawInput === 'object' && rawInput !== null) return rawInput;
+    let str = String(rawInput || '').trim();
+    
+    // Strip markdown code fences if present
+    if (str.startsWith('```')) {
+      str = str.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+    }
+    
+    try {
+      return JSON.parse(str);
+    } catch(e) {
+      console.warn("JSON Parse Fallback:", e, str);
+      return {};
+    }
+  }
+
+  // 4. LIVE SISSY CLOUD INTAKE + BULLETPROOF FRONTEND PARSING
   function handleVoiceIntake(text) {
     showStatus("⚡ FRESH: Sissy is organizing your note...");
 
@@ -362,10 +380,12 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ transcript: text, timestamp: new Date().toISOString() })
     })
-    .then(res => res.json())
+    .then(async res => {
+      const rawText = await res.text();
+      return cleanAndParseJSON(rawText);
+    })
     .then(data => {
-      if (!data) throw new Error("Empty response");
-
+      // Extract client name cleanly
       const clientName = data.clientName || "Direct Intake";
       const matches = findAllVaultMatches(clientName);
 
@@ -382,8 +402,11 @@
         finalPhone = data.phone || "On File";
       }
 
+      // Check scheduling intent dynamically
+      const isScheduled = data.isScheduled || data.destination === 'calendar' || false;
+
       // QUIET, EXECUTIVE SISSY CONSOLE CONFIRMATION
-      const sissyMsg = data.sissyResponse || (data.isScheduled 
+      const sissyMsg = data.sissyResponse || (isScheduled 
         ? `✓ Scheduled appointment for ${clientName} • ${finalAddress}`
         : `✓ Note processed for ${clientName}`);
       updateSissyConsole(sissyMsg);
@@ -401,7 +424,7 @@
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
-      if (data.destination === 'calendar' || data.isScheduled) {
+      if (isScheduled) {
         store.scheduledCards.unshift(card);
         showStatus("⚡ Sissy scheduled appointment!");
       } else {
@@ -413,7 +436,7 @@
       render();
     })
     .catch(err => {
-      console.log("Cloud offline:", err);
+      console.log("Cloud fallback active:", err);
       const matches = findAllVaultMatches(text);
       let clientName = "Note Pending Sync";
       let finalAddress = "Awaiting Sissy";
