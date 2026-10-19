@@ -176,10 +176,15 @@
       </button>
     </div>
 
-    <!-- ACTIVE SERVICE NOTE -->
-    <div class="bg-white p-3.5 rounded-xl border border-bordercolor">
-      <div class="text-xs font-bold text-ink mb-1 uppercase">Active Service / Brain Dump Note</div>
-      <div id="active-card-note" class="text-xs text-muted leading-relaxed">--</div>
+    <!-- ACTIVE SERVICE NOTE + IN-DRAWER COMPLETE ACTION -->
+    <div class="bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-3">
+      <div>
+        <div class="text-xs font-bold text-ink mb-1 uppercase">Active Service / Brain Dump Note</div>
+        <div id="active-card-note" class="text-xs text-muted leading-relaxed">--</div>
+      </div>
+      <button id="drawer-complete-btn" onclick="completeActiveCard()" class="w-full py-2.5 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-2">
+        <span>✓</span> <span>Complete Service & Dock Milestone</span>
+      </button>
     </div>
 
     <!-- LIFETIME SERVICE LEDGER -->
@@ -201,6 +206,7 @@
   let vaultData = [];
   let catalogData = [];
   let activeCardId = null;
+  let activeCardType = null;
   let isListening = false, recognition = null;
 
   // 1. LOAD MASTER CUSTOMER VAULT
@@ -307,7 +313,19 @@
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       const val = e.target.value.trim();
-      if (val) { handleVoiceIntake(val); e.target.value = ''; }
+      if (val) { 
+        if (val.toLowerCase() === 'clear test history' || val.toLowerCase() === 'reset ledger') {
+          const store = getStorage();
+          store.archive = [];
+          saveStorage(store);
+          render();
+          showStatus("⚡ Test milestone ledger cleared!");
+          e.target.value = '';
+          return;
+        }
+        handleVoiceIntake(val); 
+        e.target.value = ''; 
+      }
     }
   }
 
@@ -465,8 +483,9 @@
     });
   }
 
-  function openCustomerCard(text, clientName, address, phone, cardId) {
+  function openCustomerCard(text, clientName, address, phone, cardId, cardType) {
     activeCardId = cardId;
+    activeCardType = cardType;
     const store = getStorage();
     const allCards = [...store.scheduledCards, ...store.pinballQueue];
     const card = allCards.find(c => c.id === cardId);
@@ -489,7 +508,12 @@
       multiBox.classList.add('hidden');
     }
 
-    // RENDER CUSTOMER'S LIFETIME LEDGER INSIDE DRAWER
+    renderLifetimeLedger(clientName);
+    openWorkstation();
+  }
+
+  function renderLifetimeLedger(clientName) {
+    const store = getStorage();
     const ledgerBox = document.getElementById('drawer-lifetime-ledger');
     const ledgerBadge = document.getElementById('ledger-count-badge');
     
@@ -513,8 +537,27 @@
     } else {
       ledgerBox.innerHTML = '<div class="italic text-[11px]">No prior service milestones logged.</div>';
     }
+  }
 
-    openWorkstation();
+  function completeActiveCard() {
+    if (!activeCardId) return;
+    const store = getStorage();
+    let item = store.scheduledCards.find(i => i.id === activeCardId) || store.pinballQueue.find(i => i.id === activeCardId);
+
+    if (item) {
+      store.scheduledCards = store.scheduledCards.filter(i => i.id !== activeCardId);
+      store.pinballQueue = store.pinballQueue.filter(i => i.id !== activeCardId);
+
+      item.completedAt = new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      store.archive.unshift(item);
+      saveStorage(store);
+      
+      renderLifetimeLedger(item.clientName);
+      render();
+      updateSissyConsole(`✓ Marked milestone done for ${item.clientName}. Docked into Lifetime Ledger.`);
+      closeWorkstation();
+      showStatus("⚡ Service milestone completed & docked!");
+    }
   }
 
   function switchAddress(newAddress) {
@@ -528,25 +571,6 @@
         render();
         updateSissyConsole(`✓ Updated address for ${card.clientName} to ${newAddress}`);
       }
-    }
-  }
-
-  function completeItem(type, id) {
-    const store = getStorage();
-    let item = null;
-    if (type === 'calendar') {
-      item = store.scheduledCards.find(i => i.id === id);
-      store.scheduledCards = store.scheduledCards.filter(i => i.id !== id);
-    } else {
-      item = store.pinballQueue.find(i => i.id === id);
-      store.pinballQueue = store.pinballQueue.filter(i => i.id !== id);
-    }
-    if (item) {
-      item.completedAt = new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      store.archive.unshift(item);
-      saveStorage(store);
-      render();
-      updateSissyConsole(`✓ Marked milestone done for ${item.clientName}. Docked into Lifetime Ledger.`);
     }
   }
 
@@ -571,8 +595,7 @@
               <div class="text-[10px] text-muted mt-0.5">${item.displayDate ? item.displayDate + ' • ' : ''}${item.time || item.timestamp}</div>
             </div>
             <div class="flex gap-1.5">
-              <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}', ${item.id})" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
-              <button onclick="completeItem('calendar', ${item.id})" class="px-2.5 py-1 bg-forest text-white rounded-lg text-xs font-bold transition">Done ✓</button>
+              <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}', ${item.id}, 'calendar')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
             </div>
           </div>
         </div>
@@ -589,8 +612,7 @@
               <div class="text-[10px] text-muted mt-0.5">Queued • ${item.timestamp}</div>
             </div>
             <div class="flex gap-1.5">
-              <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}', ${item.id})" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
-              <button onclick="completeItem('pinball', ${item.id})" class="px-2.5 py-1 bg-forest text-white rounded-lg text-xs font-bold transition">Done ✓</button>
+              <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}', ${item.id}, 'pinball')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
             </div>
           </div>
         </div>
