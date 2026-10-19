@@ -371,7 +371,7 @@
     }
   }
 
-  // 4. LIVE SISSY CLOUD INTAKE + BULLETPROOF FRONTEND PARSING
+  // 4. LIVE SISSY CLOUD INTAKE + NORMALIZED PARSING
   function handleVoiceIntake(text) {
     showStatus("⚡ FRESH: Sissy is organizing your note...");
 
@@ -385,7 +385,14 @@
       return cleanAndParseJSON(rawText);
     })
     .then(data => {
-      const clientName = data.clientName || "Direct Intake";
+      // SAFELY NORMALIZE RETURNED DATA
+      const clientName = data.clientName || data.client_name || "Direct Intake";
+      const destination = (data.destination || '').toLowerCase();
+      const isScheduled = data.isScheduled === true || 
+                          data.isScheduled === "true" || 
+                          destination === 'calendar' || 
+                          destination === 'schedule';
+
       const matches = findAllVaultMatches(clientName);
 
       let finalAddress = "On File / In Vault";
@@ -400,8 +407,6 @@
         finalAddress = data.address;
         finalPhone = data.phone || "On File";
       }
-
-      const isScheduled = data.isScheduled || data.destination === 'calendar' || false;
 
       const sissyMsg = data.sissyResponse || (isScheduled 
         ? `✓ Scheduled appointment for ${clientName} • ${finalAddress}`
@@ -494,7 +499,6 @@
     const ledgerBox = document.getElementById('drawer-lifetime-ledger');
     const ledgerBadge = document.getElementById('ledger-count-badge');
     
-    // Filter history specifically for this customer name
     const customerHistory = (store.archive || []).filter(item => 
       item.clientName && clientName && item.clientName.trim().toLowerCase() === clientName.trim().toLowerCase()
     );
