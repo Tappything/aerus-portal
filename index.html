@@ -37,12 +37,11 @@
 </head>
 <body class="font-sans min-h-screen p-4 md:p-6 flex justify-center">
 
-<!-- MEDIA INPUT SUPPORTS BOTH PHOTO SNAPS & VIDEO CLIPS -->
 <input type="file" id="cameraInput" accept="image/*,video/*" capture="environment" class="hidden" onchange="handleMediaCapture(event)">
 
 <div class="w-full max-w-5xl flex flex-col gap-5 relative">
 
-  <!-- MASTER HEADER (CLEAN EXECUTIVE BRANDING) -->
+  <!-- MASTER HEADER -->
   <header class="bg-cardbg border border-bordercolor rounded-2xl p-5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-5 text-center md:text-left">
     <div class="flex items-center gap-3 justify-center md:justify-start">
       <span class="font-cursive text-7xl text-gold font-bold select-none leading-none">F</span>
@@ -52,7 +51,7 @@
       </div>
     </div>
 
-    <!-- CENTER: FRESH MASCOT EMBLEM + CONTROLS -->
+    <!-- CENTER CONTROLS -->
     <div class="flex flex-col items-center gap-3 w-full max-w-md mx-auto">
       <div class="w-28 h-28 rounded-full border-4 border-gold bg-white shadow-lg overflow-hidden flex items-center justify-center relative flex-shrink-0">
         <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';">
@@ -70,13 +69,13 @@
         class="w-full px-3.5 py-2 border border-bordercolor rounded-xl bg-white text-ink focus:outline-none focus:border-gold text-xs shadow-inner text-center md:text-left">
     </div>
 
-    <!-- RIGHT: CARING DIGITAL COORDINATOR BADGE -->
+    <!-- RIGHT BADGE -->
     <div class="flex flex-col items-center md:items-end justify-center min-w-[140px]">
       <span class="text-[10px] text-forest font-extrabold bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full shadow-sm">⚡ Sissy Active</span>
     </div>
   </header>
 
-  <!-- SISSY INTELLIGENCE CONSOLE (QUIET & EXECUTIVE) -->
+  <!-- SISSY INTELLIGENCE CONSOLE -->
   <div id="sissy-console" class="hidden bg-cardbg border border-gold rounded-2xl p-4 shadow-md flex flex-col gap-1 transition-all">
     <div class="flex justify-between items-center border-b border-bordercolor pb-1.5">
       <span class="text-xs font-bold text-forest uppercase tracking-wider">💬 Sissy Intelligence Console</span>
@@ -85,10 +84,10 @@
     <p id="sissy-response-text" class="text-xs text-ink font-medium leading-relaxed">Ready for intake.</p>
   </div>
 
-  <!-- LIVE STATUS BANNER -->
+  <!-- STATUS BANNER -->
   <div id="status-banner" class="hidden bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs px-4 py-2 rounded-xl font-bold transition text-center"></div>
 
-  <!-- TWO-COLUMN OPERATIONAL FLOOR -->
+  <!-- TWO-COLUMN FLOOR -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
     <!-- TODAY'S SCHEDULE -->
     <div class="flex flex-col gap-2">
@@ -113,7 +112,7 @@
 
 </div>
 
-<!-- DYNAMIC WORKSTATION CANVAS DRAWER -->
+<!-- WORKSTATION DRAWER -->
 <div id="workstation-drawer" class="fixed inset-y-0 right-0 w-full max-w-lg bg-cardbg border-l-2 border-gold shadow-2xl p-6 drawer-slide hidden-right-drawer z-50 flex flex-col justify-between overflow-y-auto">
   <div class="flex flex-col gap-4">
     <!-- DRAWER HEADER -->
@@ -136,7 +135,7 @@
       </div>
     </div>
 
-    <!-- DYNAMIC CLIENT CARD SUMMARY -->
+    <!-- CLIENT CARD SUMMARY -->
     <div class="bg-white p-4 rounded-xl border border-bordercolor shadow-sm flex flex-col gap-2">
       <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between">
         <span class="flex items-center gap-2">
@@ -154,7 +153,6 @@
       <div class="text-xs text-muted flex flex-col gap-1.5 mt-1">
         <div>📍 <span id="vault-client-address" class="text-ink font-medium">--</span></div>
         
-        <!-- MULTI-ADDRESS DISAMBIGUATION PICKER INSIDE DRAWER -->
         <div id="multi-address-container" class="hidden bg-parchment p-2 rounded-lg border border-bordercolor">
           <label class="text-[10px] text-forest font-bold uppercase tracking-wider block mb-1">
             📍 Multiple Properties on File (Tap to Switch):
@@ -167,7 +165,7 @@
       </div>
     </div>
 
-    <!-- IN-DRAWER DEDICATED INPUT DECK (VOICE, MEDIA & IN-CARD TEXT) -->
+    <!-- IN-DRAWER INPUT DECK -->
     <div class="bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-2.5 shadow-sm">
       <div class="text-[10px] font-bold text-forest uppercase tracking-wider">🎙️ In-Card Action Deck</div>
       <div class="flex gap-2">
@@ -183,27 +181,26 @@
         class="w-full px-3 py-1.5 border border-bordercolor rounded-xl bg-parchment text-ink focus:outline-none focus:border-gold text-xs">
     </div>
 
-    <!-- DEDICATED CANVAS VIEW TABS -->
+    <!-- CANVAS VIEW TABS -->
     <div class="flex border-b border-bordercolor gap-2 text-xs font-bold">
       <button id="tab-btn-notes" onclick="switchCanvasTab('notes')" class="py-2 px-3 text-forest border-b-2 border-forest">📋 Active Notes</button>
       <button id="tab-btn-invoice" onclick="switchCanvasTab('invoice')" class="py-2 px-3 text-muted hover:text-ink">📜 Invoice Canvas</button>
       <button id="tab-btn-ledger" onclick="switchCanvasTab('ledger')" class="py-2 px-3 text-muted hover:text-ink">📜 Lifetime Ledger</button>
     </div>
 
-    <!-- TAB 1: ACTIVE SERVICE NOTE CANVAS -->
+    <!-- TAB 1: NOTES -->
     <div id="canvas-view-notes" class="bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-2">
       <div class="text-xs font-bold text-ink uppercase mb-1">Active Service / Brain Dump Note</div>
       <div id="active-card-note" class="text-xs text-muted leading-relaxed">--</div>
     </div>
 
-    <!-- TAB 2: DEDICATED INVOICE CANVAS WITH LIVE LINE ITEMS -->
+    <!-- TAB 2: INVOICE CANVAS -->
     <div id="canvas-view-invoice" class="hidden bg-white p-3.5 rounded-xl border border-gold flex flex-col gap-3 shadow-sm">
       <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between border-b border-bordercolor pb-1.5">
         <span class="flex items-center gap-1.5"><span>📜</span> Dedicated Invoice Canvas</span>
         <span class="text-[10px] text-gold font-bold">Sissy Powered</span>
       </div>
 
-      <!-- DYNAMIC LINE-ITEM TABLE -->
       <div class="flex flex-col gap-2">
         <div class="grid grid-cols-12 gap-1 text-[10px] font-bold text-muted border-b border-bordercolor pb-1 uppercase">
           <span class="col-span-6">Service / Part Description</span>
@@ -211,15 +208,12 @@
           <span class="col-span-3 text-right">Price</span>
           <span class="col-span-1 text-center"></span>
         </div>
-        <div id="invoice-line-items" class="flex flex-col gap-2 max-h-40 overflow-y-auto pr-1">
-          <!-- Line items dynamically populate here -->
-        </div>
+        <div id="invoice-line-items" class="flex flex-col gap-2 max-h-40 overflow-y-auto pr-1"></div>
         <button onclick="addInvoiceLineItem()" class="mt-1 py-1 px-2 bg-parchment border border-bordercolor rounded-lg text-[11px] font-bold text-forest hover:bg-bordercolor transition self-start flex items-center gap-1">
           <span>+</span> <span>Add Line Item</span>
         </button>
       </div>
 
-      <!-- AUTO-TOTAL BANNER -->
       <div class="flex justify-between items-center border-t border-bordercolor pt-2 font-bold text-xs text-ink">
         <span>Total Balance:</span>
         <span id="invoice-canvas-total" class="text-sm text-forest">$0.00</span>
@@ -235,7 +229,7 @@
       </div>
     </div>
 
-    <!-- TAB 3: LIFETIME SERVICE LEDGER -->
+    <!-- TAB 3: LEDGER -->
     <div id="canvas-view-ledger" class="hidden bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-2">
       <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between border-b border-bordercolor pb-1.5">
         <span class="flex items-center gap-1.5"><span>📜</span> Lifetime Service Ledger</span>
@@ -258,7 +252,6 @@
   let isListening = false, recognition = null;
   let currentInvoiceItems = [];
 
-  // 1. LOAD MASTER CUSTOMER VAULT
   Papa.parse(encodeURI('export_export (34).csv'), {
     download: true,
     header: true,
@@ -266,15 +259,10 @@
     complete: function(results) {
       if (results && results.data && results.data.length > 0) {
         vaultData = results.data;
-        console.log(`Vault loaded: ${vaultData.length} records ready!`);
       }
-    },
-    error: function(err) {
-      console.error('Vault Load Note:', err);
     }
   });
 
-  // 2. LOAD MASTER PARTS CATALOG
   Papa.parse(encodeURI('export_export (35).csv'), {
     download: true,
     header: true,
@@ -282,12 +270,10 @@
     complete: function(results) {
       if (results && results.data && results.data.length > 0) {
         catalogData = results.data;
-        console.log(`Catalog loaded: ${catalogData.length} parts ready!`);
       }
     }
   });
 
-  // 3. ENHANCED MULTI-ROW VAULT MATCHER
   function findAllVaultMatches(clientName) {
     if (!vaultData || vaultData.length === 0 || !clientName || clientName === "Direct Intake" || clientName === "Subscriber Note") return [];
     const target = clientName.trim().toLowerCase();
@@ -320,21 +306,38 @@
     return row['Phone'] || row['Phone Number'] || row['Mobile'] || row['Mobile Phone'] || row['Cell'] || row['Primary Phone'] || row['Phone 1'] || "On File";
   }
 
+  // FIXED SPEECH RECOGNITION (ONLY FIRES ON FINAL PHRASE)
   if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRec();
     recognition.continuous = false;
-    recognition.interimResults = false;
+    recognition.interimResults = true; // Shows live text while typing
+    
     recognition.onstart = () => {
       isListening = true;
       document.getElementById('voice-label').innerText = "LISTENING...";
       document.getElementById('voice-btn').classList.add('bg-red-600');
     };
+    
     recognition.onresult = (e) => {
-      const text = e.results[0][0].transcript;
-      document.getElementById('text-intake').value = text;
-      handleVoiceIntake(text);
+      let liveText = '';
+      let isFinalResult = false;
+
+      for (let i = e.resultIndex; i < e.results.length; ++i) {
+        liveText += e.results[i][0].transcript;
+        if (e.results[i].isFinal) {
+          isFinalResult = true;
+        }
+      }
+
+      document.getElementById('text-intake').value = liveText;
+
+      // GUARD: ONLY SEND TO SISSY IF FINAL PHRASE IS COMPLETE
+      if (isFinalResult && liveText.trim().length > 3) {
+        handleVoiceIntake(liveText.trim());
+      }
     };
+
     recognition.onerror = recognition.onend = () => {
       isListening = false;
       document.getElementById('voice-label').innerText = "TALK TO FRESH";
@@ -367,10 +370,12 @@
       if (val) { 
         if (val.toLowerCase() === 'clear test history' || val.toLowerCase() === 'reset ledger') {
           const store = getStorage();
+          store.scheduledCards = [];
+          store.pinballQueue = [];
           store.archive = [];
           saveStorage(store);
           render();
-          showStatus("⚡ Test milestone ledger cleared!");
+          showStatus("⚡ All test cards & clutter cleared!");
           e.target.value = '';
           return;
         }
@@ -444,24 +449,19 @@
     });
   }
 
-  // BULLETPROOF FRONTEND JSON PARSER
   function cleanAndParseJSON(rawInput) {
     if (typeof rawInput === 'object' && rawInput !== null) return rawInput;
     let str = String(rawInput || '').trim();
-    
     if (str.startsWith('```')) {
       str = str.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
     }
-    
     try {
       return JSON.parse(str);
     } catch(e) {
-      console.warn("JSON Parse Fallback:", e, str);
       return {};
     }
   }
 
-  // 4. LIVE SISSY CLOUD INTAKE + NORMALIZED PARSING
   function handleVoiceIntake(text) {
     showStatus("⚡ FRESH: Sissy is organizing your note...");
 
@@ -528,7 +528,6 @@
       render();
     })
     .catch(err => {
-      console.log("Cloud fallback active:", err);
       const matches = findAllVaultMatches(text);
       let clientName = "Note Pending Sync";
       let finalAddress = "Awaiting Sissy";
@@ -574,7 +573,6 @@
     document.getElementById('vault-client-phone').innerText = phone && phone !== 'undefined' ? phone : "On File";
     document.getElementById('active-card-note').innerText = `"${text}"`;
 
-    // INITIALIZE INVOICE CANVAS LINE ITEMS
     currentInvoiceItems = [{ desc: text, qty: 1, price: 0.00 }];
     renderInvoiceCanvas();
 
