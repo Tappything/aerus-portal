@@ -41,7 +41,7 @@
 
 <div class="w-full max-w-5xl flex flex-col gap-5 relative">
 
-  <!-- MASTER HEADER -->
+  <!-- MASTER HEADER (CLEAN EXECUTIVE BRANDING) -->
   <header class="bg-cardbg border border-bordercolor rounded-2xl p-5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-5 text-center md:text-left">
     <div class="flex items-center gap-3 justify-center md:justify-start">
       <span class="font-cursive text-7xl text-gold font-bold select-none leading-none">F</span>
@@ -69,9 +69,9 @@
         class="w-full px-3.5 py-2 border border-bordercolor rounded-xl bg-white text-ink focus:outline-none focus:border-gold text-xs shadow-inner text-center md:text-left">
     </div>
 
-    <!-- RIGHT: LIVE SYSTEM STATUS BADGE -->
+    <!-- RIGHT: CARING DIGITAL COORDINATOR BADGE -->
     <div class="flex flex-col items-center md:items-end justify-center min-w-[140px]">
-      <span id="system-status" class="text-[10px] text-amber-800 font-extrabold bg-amber-100 border border-amber-300 px-2.5 py-1 rounded-full shadow-sm">⚡ Loading Vault...</span>
+      <span class="text-[10px] text-forest font-extrabold bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full shadow-sm">⚡ Sissy Active</span>
     </div>
   </header>
 
@@ -212,11 +212,6 @@
       if (results && results.data && results.data.length > 0) {
         vaultData = results.data;
         console.log(`Vault loaded: ${vaultData.length} records ready!`);
-        const status = document.getElementById('system-status');
-        if (status) {
-          status.innerText = `⚡ ${vaultData.length.toLocaleString()} Vault Records Ready`;
-          status.className = "text-[10px] text-emerald-800 font-extrabold bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded-full shadow-sm";
-        }
       }
     },
     error: function(err) {
