@@ -110,16 +110,6 @@
     </div>
   </div>
 
-  <!-- COLLAPSIBLE ARCHIVE HISTORY -->
-  <div class="flex flex-col gap-2">
-    <button onclick="toggleArchiveView()" class="w-full py-2.5 px-4 bg-cardbg border border-bordercolor rounded-xl text-xs font-bold text-muted hover:text-ink transition flex items-center justify-between">
-      <span class="flex items-center gap-2"><span>📦</span> <span id="archive-count-label">View Archive (0)</span></span>
-      <span id="archive-chevron">▼</span>
-    </button>
-    <div id="archive-container" class="hidden bg-cardbg border border-bordercolor rounded-2xl p-4">
-      <div id="archive-list" class="flex flex-col gap-1.5 text-xs text-muted"></div>
-    </div>
-  </div>
 </div>
 
 <!-- DYNAMIC WORKSTATION CANVAS DRAWER -->
@@ -191,6 +181,17 @@
       <div class="text-xs font-bold text-ink mb-1 uppercase">Active Service / Brain Dump Note</div>
       <div id="active-card-note" class="text-xs text-muted leading-relaxed">--</div>
     </div>
+
+    <!-- LIFETIME SERVICE LEDGER -->
+    <div class="bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-2">
+      <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between border-b border-bordercolor pb-1.5">
+        <span class="flex items-center gap-1.5"><span>📜</span> Lifetime Service Ledger</span>
+        <span id="ledger-count-badge" class="text-[10px] bg-parchment border border-bordercolor px-2 py-0.5 rounded-full font-bold text-ink">0 Milestones</span>
+      </div>
+      <div id="drawer-lifetime-ledger" class="flex flex-col gap-2 text-xs text-muted max-h-48 overflow-y-auto pr-1">
+        <div class="italic text-[11px]">No prior service milestones logged.</div>
+      </div>
+    </div>
   </div>
 
   <div class="border-t border-bordercolor pt-3 text-[10px] text-muted text-center">TappyThing Digital Coordinator • Cloud Backend</div>
@@ -200,7 +201,7 @@
   let vaultData = [];
   let catalogData = [];
   let activeCardId = null;
-  let isListening = false, recognition = null, archiveOpen = false;
+  let isListening = false, recognition = null;
 
   // 1. LOAD MASTER CUSTOMER VAULT
   Papa.parse(encodeURI('export_export (34).csv'), {
@@ -358,7 +359,6 @@
     if (typeof rawInput === 'object' && rawInput !== null) return rawInput;
     let str = String(rawInput || '').trim();
     
-    // Strip markdown code fences if present
     if (str.startsWith('```')) {
       str = str.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
     }
@@ -490,6 +490,32 @@
       multiBox.classList.add('hidden');
     }
 
+    // RENDER CUSTOMER'S LIFETIME LEDGER INSIDE DRAWER
+    const ledgerBox = document.getElementById('drawer-lifetime-ledger');
+    const ledgerBadge = document.getElementById('ledger-count-badge');
+    
+    // Filter history specifically for this customer name
+    const customerHistory = (store.archive || []).filter(item => 
+      item.clientName && clientName && item.clientName.trim().toLowerCase() === clientName.trim().toLowerCase()
+    );
+
+    ledgerBadge.innerText = `${customerHistory.length} Milestones`;
+
+    if (customerHistory.length > 0) {
+      ledgerBox.innerHTML = customerHistory.map(item => `
+        <div class="p-2 bg-parchment border border-bordercolor rounded-lg flex flex-col gap-0.5">
+          <div class="font-bold text-ink flex justify-between items-center">
+            <span>✓ Milestone Completed</span>
+            <span class="text-[9px] text-muted">${item.completedAt || item.timestamp || 'Recorded'}</span>
+          </div>
+          <div class="text-[11px] text-muted italic">"${item.text}"</div>
+          <div class="text-[9px] text-forest font-bold">📍 ${item.address || 'On File'}</div>
+        </div>
+      `).join('');
+    } else {
+      ledgerBox.innerHTML = '<div class="italic text-[11px]">No prior service milestones logged.</div>';
+    }
+
     openWorkstation();
   }
 
@@ -518,16 +544,12 @@
       store.pinballQueue = store.pinballQueue.filter(i => i.id !== id);
     }
     if (item) {
+      item.completedAt = new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       store.archive.unshift(item);
       saveStorage(store);
       render();
+      updateSissyConsole(`✓ Marked milestone done for ${item.clientName}. Docked into Lifetime Ledger.`);
     }
-  }
-
-  function toggleArchiveView() {
-    archiveOpen = !archiveOpen;
-    document.getElementById('archive-container').classList.toggle('hidden', !archiveOpen);
-    document.getElementById('archive-chevron').innerText = archiveOpen ? '▲' : '▼';
   }
 
   function getStorage() {
@@ -575,11 +597,6 @@
           </div>
         </div>
       `).join('');
-
-    const arch = document.getElementById('archive-list');
-    document.getElementById('archive-count-label').innerText = `View Archive (${store.archive.length})`;
-    arch.innerHTML = store.archive.length === 0 ? '<div class="text-muted text-xs italic">Archive empty.</div>' :
-      store.archive.slice(0, 10).map(i => `<div class="line-through text-xs text-muted">✓ ${i.clientName} — "${i.text}"</div>`).join('');
   }
 
   render();
