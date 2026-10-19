@@ -37,6 +37,7 @@
 </head>
 <body class="font-sans min-h-screen p-4 md:p-6 flex justify-center">
 
+<!-- MEDIA INPUT SUPPORTS BOTH PHOTO SNAPS & VIDEO CLIPS -->
 <input type="file" id="cameraInput" accept="image/*,video/*" capture="environment" class="hidden" onchange="handleMediaCapture(event)">
 
 <div class="w-full max-w-5xl flex flex-col gap-5 relative">
@@ -69,9 +70,12 @@
         class="w-full px-3.5 py-2 border border-bordercolor rounded-xl bg-white text-ink focus:outline-none focus:border-gold text-xs shadow-inner text-center md:text-left">
     </div>
 
-    <!-- RIGHT BADGE -->
-    <div class="flex flex-col items-center md:items-end justify-center min-w-[140px]">
+    <!-- RIGHT BADGE & RESET CONTROL -->
+    <div class="flex flex-col items-center md:items-end justify-center gap-2 min-w-[140px]">
       <span class="text-[10px] text-forest font-extrabold bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full shadow-sm">⚡ Sissy Active</span>
+      <button onclick="clearFloorStorage()" class="px-3 py-1 bg-parchment border border-bordercolor rounded-full text-[10px] font-bold text-muted hover:text-red-700 hover:border-red-300 transition flex items-center gap-1 shadow-xs">
+        <span>🧹</span> <span>Clear Floor</span>
+      </button>
     </div>
   </header>
 
@@ -135,8 +139,8 @@
       </div>
     </div>
 
-    <!-- CLIENT CARD SUMMARY -->
-    <div class="bg-white p-4 rounded-xl border border-bordercolor shadow-sm flex flex-col gap-2">
+    <!-- CLIENT CARD SUMMARY WITH FIELD ACTION BAR -->
+    <div class="bg-white p-4 rounded-xl border border-bordercolor shadow-sm flex flex-col gap-3">
       <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between">
         <span class="flex items-center gap-2">
           <div class="w-5 h-5 rounded-full border border-gold overflow-hidden">
@@ -150,7 +154,7 @@
         <div id="vault-client-name" class="font-bold text-base text-ink">--</div>
         <div id="vault-client-id" class="text-[10px] text-muted font-bold">ID: #VAULT</div>
       </div>
-      <div class="text-xs text-muted flex flex-col gap-1.5 mt-1">
+      <div class="text-xs text-muted flex flex-col gap-1.5">
         <div>📍 <span id="vault-client-address" class="text-ink font-medium">--</span></div>
         
         <div id="multi-address-container" class="hidden bg-parchment p-2 rounded-lg border border-bordercolor">
@@ -162,6 +166,28 @@
         </div>
 
         <div>📞 <span id="vault-client-phone" class="text-ink font-medium">--</span></div>
+      </div>
+
+      <!-- FIELD DISPATCH ACTION BAR -->
+      <div class="grid grid-cols-2 gap-2 pt-2 border-t border-bordercolor">
+        <button id="btn-map-dispatch" onclick="launchMapDirections()" class="py-2 px-3 bg-parchment border border-bordercolor hover:bg-bordercolor text-ink font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-xs">
+          <span>🗺️</span> <span>Map Directions</span>
+        </button>
+        <button id="btn-call-client" onclick="dialClientPhone()" class="py-2 px-3 bg-parchment border border-bordercolor hover:bg-bordercolor text-forest font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-xs">
+          <span>📞</span> <span>Call Client</span>
+        </button>
+      </div>
+
+      <!-- SMART CLIENT TEXT STAGING -->
+      <div class="flex flex-col gap-1.5 pt-2 border-t border-bordercolor">
+        <label class="text-[10px] font-bold text-forest uppercase tracking-wider">💬 Smart Client Text Staging</label>
+        <div class="flex gap-2">
+          <input type="text" id="staged-sms-text" placeholder="e.g. Running 15 mins late..." 
+            class="flex-1 px-3 py-1.5 border border-bordercolor rounded-xl bg-parchment text-ink text-xs focus:outline-none focus:border-gold">
+          <button onclick="sendStagedSMS()" class="py-1.5 px-3 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1">
+            <span>⚡</span> <span>Send SMS</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -311,7 +337,7 @@
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRec();
     recognition.continuous = false;
-    recognition.interimResults = true; // Shows live text while typing
+    recognition.interimResults = true;
     
     recognition.onstart = () => {
       isListening = true;
@@ -332,7 +358,6 @@
 
       document.getElementById('text-intake').value = liveText;
 
-      // GUARD: ONLY SEND TO SISSY IF FINAL PHRASE IS COMPLETE
       if (isFinalResult && liveText.trim().length > 3) {
         handleVoiceIntake(liveText.trim());
       }
@@ -369,13 +394,7 @@
       const val = e.target.value.trim();
       if (val) { 
         if (val.toLowerCase() === 'clear test history' || val.toLowerCase() === 'reset ledger') {
-          const store = getStorage();
-          store.scheduledCards = [];
-          store.pinballQueue = [];
-          store.archive = [];
-          saveStorage(store);
-          render();
-          showStatus("⚡ All test cards & clutter cleared!");
+          clearFloorStorage();
           e.target.value = '';
           return;
         }
@@ -394,6 +413,14 @@
         e.target.value = '';
       }
     }
+  }
+
+  function clearFloorStorage() {
+    const store = { scheduledCards: [], pinballQueue: [], archive: [] };
+    saveStorage(store);
+    render();
+    showStatus("🧹 Floor cleared & reset!");
+    updateSissyConsole("✓ Clean floor initialized. Ready for intake.");
   }
 
   function toggleNetworking() {
@@ -447,6 +474,40 @@
         view.classList.add('hidden');
       }
     });
+  }
+
+  function launchMapDirections() {
+    const address = document.getElementById('vault-client-address').innerText;
+    if (!address || address === 'On File / In Vault') {
+      return alert("No address on file for map directions.");
+    }
+    const mapsUrl = `https://maps.apple.com/?daddr=${encodeURIComponent(address)}`;
+    window.open(mapsUrl, '_blank');
+  }
+
+  function dialClientPhone() {
+    const phone = document.getElementById('vault-client-phone').innerText;
+    if (!phone || phone === 'On File') {
+      return alert("No phone number on file to call.");
+    }
+    window.location.href = `tel:${phone.replace(/[^0-9+]/g, '')}`;
+  }
+
+  function sendStagedSMS() {
+    const phone = document.getElementById('vault-client-phone').innerText;
+    const msg = document.getElementById('staged-sms-text').value.trim();
+    if (!phone || phone === 'On File') {
+      return alert("No phone number on file for SMS dispatch.");
+    }
+    if (!msg) {
+      return alert("Please enter a staged message to send.");
+    }
+    const smsUrl = `sms:${phone.replace(/[^0-9+]/g, '')}?&body=${encodeURIComponent(msg)}`;
+    window.location.href = smsUrl;
+    
+    updateSissyConsole(`✓ Dispatched staged SMS to ${phone}: "${msg}"`);
+    showStatus(`⚡ SMS dispatched to ${phone}!`);
+    document.getElementById('staged-sms-text').value = '';
   }
 
   function cleanAndParseJSON(rawInput) {
