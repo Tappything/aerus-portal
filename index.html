@@ -75,18 +75,13 @@
     </div>
   </header>
 
-  <!-- SISSY INTELLIGENCE CONSOLE -->
-  <div id="sissy-console" class="hidden bg-cardbg border border-gold rounded-2xl p-4 shadow-md flex flex-col gap-2 transition-all">
-    <div class="flex justify-between items-center border-b border-bordercolor pb-2">
-      <div class="flex items-center gap-2">
-        <span class="text-xs font-bold text-forest uppercase tracking-wider">💬 Sissy Intelligence Console</span>
-      </div>
+  <!-- SISSY INTELLIGENCE CONSOLE (QUIET & EXECUTIVE) -->
+  <div id="sissy-console" class="hidden bg-cardbg border border-gold rounded-2xl p-4 shadow-md flex flex-col gap-1 transition-all">
+    <div class="flex justify-between items-center border-b border-bordercolor pb-1.5">
+      <span class="text-xs font-bold text-forest uppercase tracking-wider">💬 Sissy Intelligence Console</span>
       <span class="text-[10px] text-muted font-bold" id="sissy-time">Just now</span>
     </div>
-    <p id="sissy-response-text" class="text-xs text-ink font-medium leading-relaxed">...</p>
-    
-    <!-- INTERACTIVE CHOICE PILLS (FOR DISAMBIGUATION) -->
-    <div id="sissy-pills" class="hidden flex flex-wrap gap-2 pt-1"></div>
+    <p id="sissy-response-text" class="text-xs text-ink font-medium leading-relaxed">Ready for intake.</p>
   </div>
 
   <!-- LIVE STATUS BANNER -->
@@ -168,7 +163,7 @@
       <div class="text-xs text-muted flex flex-col gap-1.5 mt-1">
         <div>📍 <span id="vault-client-address" class="text-ink font-medium">--</span></div>
         
-        <!-- MULTI-ADDRESS DISAMBIGUATION PICKER -->
+        <!-- MULTI-ADDRESS DISAMBIGUATION PICKER INSIDE DRAWER -->
         <div id="multi-address-container" class="hidden bg-parchment p-2 rounded-lg border border-bordercolor">
           <label class="text-[10px] text-forest font-bold uppercase tracking-wider block mb-1">
             📍 Multiple Properties on File (Tap to Switch):
@@ -336,49 +331,14 @@
     setTimeout(() => b.classList.add('hidden'), 4000);
   }
 
-  function updateSissyConsole(responseText, optionsPills = []) {
+  function updateSissyConsole(responseText) {
     const consoleBox = document.getElementById('sissy-console');
     const textEl = document.getElementById('sissy-response-text');
-    const pillsBox = document.getElementById('sissy-pills');
     const timeEl = document.getElementById('sissy-time');
 
     consoleBox.classList.remove('hidden');
     textEl.innerText = responseText;
     timeEl.innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    if (optionsPills && optionsPills.length > 0) {
-      pillsBox.classList.remove('hidden');
-      pillsBox.innerHTML = optionsPills.map(opt => `
-        <button onclick="selectAddressPill('${opt.replace(/'/g, "\\'")}')" class="px-3 py-1 bg-parchment border border-gold hover:bg-gold hover:text-white rounded-full text-xs font-bold text-ink transition">
-          ${opt}
-        </button>
-      `).join('');
-    } else {
-      pillsBox.classList.add('hidden');
-      pillsBox.innerHTML = '';
-    }
-  }
-
-  // DIRECT PILL SELECTOR FIX (UPDATES CARD WITHOUT DUPLICATING IN PINBALL)
-  function selectAddressPill(chosenAddress) {
-    const store = getStorage();
-    let targetCard = null;
-
-    if (store.scheduledCards.length > 0) {
-      targetCard = store.scheduledCards[0];
-    } else if (store.pinballQueue.length > 0) {
-      targetCard = store.pinballQueue[0];
-    }
-
-    if (targetCard) {
-      // Clean up "Client @ " string if present in pill text
-      const cleanAddr = chosenAddress.includes(' @ ') ? chosenAddress.split(' @ ')[1] : chosenAddress;
-      targetCard.address = cleanAddr;
-      saveStorage(store);
-      render();
-      updateSissyConsole(`✓ Confirmed appointment address: ${cleanAddr}`);
-      showStatus("⚡ Address updated cleanly!");
-    }
   }
 
   function openWorkstation() {
@@ -393,7 +353,7 @@
     d.classList.add('hidden-right-drawer');
   }
 
-  // 4. LIVE SISSY INTAKE + SISSY CONSOLE INTEGRATION
+  // 4. LIVE SISSY CLOUD INTAKE + SMOOTH RESOLUTION
   function handleVoiceIntake(text) {
     showStatus("⚡ FRESH: Sissy is organizing your note...");
 
@@ -422,9 +382,11 @@
         finalPhone = data.phone || "On File";
       }
 
-      // DISPLAY SISSY RESPONSE IN CONSOLE
-      const sissyMsg = data.sissyResponse || (data.isScheduled ? `Scheduled appointment for ${clientName}.` : `Note processed for ${clientName}.`);
-      updateSissyConsole(sissyMsg, data.pills || (allAddresses.length > 1 ? allAddresses.map(a => `${clientName} @ ${a}`) : []));
+      // QUIET, EXECUTIVE SISSY CONSOLE CONFIRMATION
+      const sissyMsg = data.sissyResponse || (data.isScheduled 
+        ? `✓ Scheduled appointment for ${clientName} • ${finalAddress}`
+        : `✓ Note processed for ${clientName}`);
+      updateSissyConsole(sissyMsg);
 
       const store = getStorage();
       const card = {
@@ -434,6 +396,7 @@
         address: finalAddress,
         allAddresses: allAddresses,
         phone: finalPhone,
+        displayDate: data.displayDate || '',
         time: data.time || "Time Pending",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
@@ -464,7 +427,7 @@
         allAddresses = [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))];
       }
 
-      updateSissyConsole(`Parsed local vault match for "${text}". Sissy saved card to Pinball.`, allAddresses.length > 1 ? allAddresses.map(a => `${clientName} @ ${a}`) : []);
+      updateSissyConsole(`✓ Saved local note for "${text}" to Pinball.`);
 
       const store = getStorage();
       store.pinballQueue.unshift({
@@ -479,7 +442,7 @@
       });
       saveStorage(store);
       render();
-      showStatus("⚡ Note saved to Pinball (Local Match Ready)");
+      showStatus("⚡ Note saved to Pinball");
     });
   }
 
@@ -519,6 +482,7 @@
         card.address = newAddress;
         saveStorage(store);
         render();
+        updateSissyConsole(`✓ Updated address for ${card.clientName} to ${newAddress}`);
       }
     }
   }
@@ -563,7 +527,8 @@
             <div>
               <div class="font-bold text-ink text-xs">${item.clientName}</div>
               <p class="text-[11px] text-muted italic">"${item.text}"</p>
-              <div class="text-[10px] text-muted mt-0.5">Scheduled • ${item.time || item.timestamp}</div>
+              <div class="text-[10px] text-gold font-bold mt-0.5">📍 ${item.address}</div>
+              <div class="text-[10px] text-muted mt-0.5">${item.displayDate ? item.displayDate + ' • ' : ''}${item.time || item.timestamp}</div>
             </div>
             <div class="flex gap-1.5">
               <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}', ${item.id})" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
