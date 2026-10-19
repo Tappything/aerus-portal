@@ -37,7 +37,8 @@
 </head>
 <body class="font-sans min-h-screen p-4 md:p-6 flex justify-center">
 
-<input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden" onchange="handleCameraSnap(event)">
+<!-- MEDIA INPUT SUPPORTS BOTH PHOTO SNAPS & VIDEO CLIPS -->
+<input type="file" id="cameraInput" accept="image/*,video/*" capture="environment" class="hidden" onchange="handleMediaCapture(event)">
 
 <div class="w-full max-w-5xl flex flex-col gap-5 relative">
 
@@ -61,7 +62,7 @@
           <span>🎙️</span> <span id="voice-label">TALK TO FRESH</span>
         </button>
         <button onclick="triggerCamera()" class="flex-1 max-w-[180px] py-2.5 bg-ink hover:bg-black text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5">
-          <span>📷</span> <span>CAM</span>
+          <span>📷/🎥</span> <span>MEDIA</span>
         </button>
       </div>
       <input type="text" id="text-intake" placeholder="💬 Type or speak a note..." 
@@ -166,35 +167,65 @@
       </div>
     </div>
 
-    <!-- IN-DRAWER QUICK CONTROLS -->
-    <div class="flex gap-2">
-      <button onclick="toggleVoiceIntake()" class="flex-1 py-2 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-2">
-        <span>🎙️</span> <span>Add Voice Note</span>
-      </button>
-      <button onclick="triggerCamera()" class="flex-1 py-2 bg-ink hover:bg-black text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5">
-        <span>📷</span> <span>Attach Photo</span>
-      </button>
+    <!-- IN-DRAWER DEDICATED INPUT DECK (VOICE, MEDIA & IN-CARD TEXT) -->
+    <div class="bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-2.5 shadow-sm">
+      <div class="text-[10px] font-bold text-forest uppercase tracking-wider">🎙️ In-Card Action Deck</div>
+      <div class="flex gap-2">
+        <button onclick="toggleVoiceIntake()" class="flex-1 py-2 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
+          <span>🎙️</span> <span>Talk to Sissy</span>
+        </button>
+        <button onclick="triggerCamera()" class="flex-1 py-2 bg-ink hover:bg-black text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5">
+          <span>📷/🎥</span> <span>Media Capture</span>
+        </button>
+      </div>
+      <input type="text" id="in-card-text" placeholder="💬 Add private note to this customer card..." 
+        onkeydown="checkInCardSubmit(event)"
+        class="w-full px-3 py-1.5 border border-bordercolor rounded-xl bg-parchment text-ink focus:outline-none focus:border-gold text-xs">
     </div>
 
-    <!-- ACTIVE SERVICE NOTE -->
-    <div class="bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-2">
-      <div class="text-xs font-bold text-ink mb-1 uppercase">Active Service / Brain Dump Note</div>
+    <!-- DEDICATED CANVAS VIEW TABS -->
+    <div class="flex border-b border-bordercolor gap-2 text-xs font-bold">
+      <button id="tab-btn-notes" onclick="switchCanvasTab('notes')" class="py-2 px-3 text-forest border-b-2 border-forest">📋 Active Notes</button>
+      <button id="tab-btn-invoice" onclick="switchCanvasTab('invoice')" class="py-2 px-3 text-muted hover:text-ink">📜 Invoice Canvas</button>
+      <button id="tab-btn-ledger" onclick="switchCanvasTab('ledger')" class="py-2 px-3 text-muted hover:text-ink">📜 Lifetime Ledger</button>
+    </div>
+
+    <!-- TAB 1: ACTIVE SERVICE NOTE CANVAS -->
+    <div id="canvas-view-notes" class="bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-2">
+      <div class="text-xs font-bold text-ink uppercase mb-1">Active Service / Brain Dump Note</div>
       <div id="active-card-note" class="text-xs text-muted leading-relaxed">--</div>
     </div>
 
-    <!-- 💳 QUICK INVOICE & SETTLEMENT TOOL -->
-    <div class="bg-white p-3.5 rounded-xl border border-gold flex flex-col gap-3 shadow-sm">
+    <!-- TAB 2: DEDICATED INVOICE CANVAS WITH LIVE LINE ITEMS -->
+    <div id="canvas-view-invoice" class="hidden bg-white p-3.5 rounded-xl border border-gold flex flex-col gap-3 shadow-sm">
       <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between border-b border-bordercolor pb-1.5">
-        <span class="flex items-center gap-1.5"><span>💳</span> Quick Invoice & Settlement</span>
-        <span class="text-[10px] text-gold font-bold">Instant Checkout</span>
+        <span class="flex items-center gap-1.5"><span>📜</span> Dedicated Invoice Canvas</span>
+        <span class="text-[10px] text-gold font-bold">Sissy Powered</span>
       </div>
-      <div class="grid grid-cols-3 gap-2">
-        <input type="text" id="invoice-desc" placeholder="e.g. Carpet Cleaning, Tune-up" 
-          class="col-span-2 px-3 py-2 border border-bordercolor rounded-xl bg-parchment text-ink text-xs focus:outline-none focus:border-gold">
-        <input type="text" id="invoice-amount" placeholder="$0.00" 
-          class="col-span-1 px-3 py-2 border border-bordercolor rounded-xl bg-parchment text-ink text-xs font-bold text-right focus:outline-none focus:border-gold">
+
+      <!-- DYNAMIC LINE-ITEM TABLE -->
+      <div class="flex flex-col gap-2">
+        <div class="grid grid-cols-12 gap-1 text-[10px] font-bold text-muted border-b border-bordercolor pb-1 uppercase">
+          <span class="col-span-6">Service / Part Description</span>
+          <span class="col-span-2 text-center">Qty</span>
+          <span class="col-span-3 text-right">Price</span>
+          <span class="col-span-1 text-center"></span>
+        </div>
+        <div id="invoice-line-items" class="flex flex-col gap-2 max-h-40 overflow-y-auto pr-1">
+          <!-- Line items dynamically populate here -->
+        </div>
+        <button onclick="addInvoiceLineItem()" class="mt-1 py-1 px-2 bg-parchment border border-bordercolor rounded-lg text-[11px] font-bold text-forest hover:bg-bordercolor transition self-start flex items-center gap-1">
+          <span>+</span> <span>Add Line Item</span>
+        </button>
       </div>
-      <div class="flex gap-2">
+
+      <!-- AUTO-TOTAL BANNER -->
+      <div class="flex justify-between items-center border-t border-bordercolor pt-2 font-bold text-xs text-ink">
+        <span>Total Balance:</span>
+        <span id="invoice-canvas-total" class="text-sm text-forest">$0.00</span>
+      </div>
+
+      <div class="flex gap-2 mt-1">
         <button onclick="sendSMSPaymentLink()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
           <span>⚡</span> <span>Send SMS Link</span>
         </button>
@@ -204,8 +235,8 @@
       </div>
     </div>
 
-    <!-- LIFETIME SERVICE LEDGER -->
-    <div class="bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-2">
+    <!-- TAB 3: LIFETIME SERVICE LEDGER -->
+    <div id="canvas-view-ledger" class="hidden bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-2">
       <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between border-b border-bordercolor pb-1.5">
         <span class="flex items-center gap-1.5"><span>📜</span> Lifetime Service Ledger</span>
         <span id="ledger-count-badge" class="text-[10px] bg-parchment border border-bordercolor px-2 py-0.5 rounded-full font-bold text-ink">0 Milestones</span>
@@ -225,6 +256,7 @@
   let activeCardId = null;
   let activeCardType = null;
   let isListening = false, recognition = null;
+  let currentInvoiceItems = [];
 
   // 1. LOAD MASTER CUSTOMER VAULT
   Papa.parse(encodeURI('export_export (34).csv'), {
@@ -319,9 +351,11 @@
     document.getElementById('cameraInput').click();
   }
 
-  function handleCameraSnap(event) {
+  function handleMediaCapture(event) {
     if (event.target.files && event.target.files[0]) {
-      showStatus("📷 Photo captured! Tap microphone to describe note.");
+      const file = event.target.files[0];
+      const isVideo = file.type.startsWith('video');
+      showStatus(isVideo ? "🎥 Video clip captured! Tap microphone to describe note." : "📷 Photo captured! Tap microphone to describe note.");
       setTimeout(() => { toggleVoiceIntake(); }, 800);
     }
   }
@@ -342,6 +376,17 @@
         }
         handleVoiceIntake(val); 
         e.target.value = ''; 
+      }
+    }
+  }
+
+  function checkInCardSubmit(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const val = e.target.value.trim();
+      if (val) {
+        handleVoiceIntake(val);
+        e.target.value = '';
       }
     }
   }
@@ -382,6 +427,21 @@
     const d = document.getElementById('workstation-drawer');
     d.classList.remove('open-right-drawer');
     d.classList.add('hidden-right-drawer');
+  }
+
+  function switchCanvasTab(tabName) {
+    const tabs = ['notes', 'invoice', 'ledger'];
+    tabs.forEach(t => {
+      const btn = document.getElementById(`tab-btn-${t}`);
+      const view = document.getElementById(`canvas-view-${t}`);
+      if (t === tabName) {
+        btn.className = "py-2 px-3 text-forest border-b-2 border-forest font-bold";
+        view.classList.remove('hidden');
+      } else {
+        btn.className = "py-2 px-3 text-muted hover:text-ink font-bold";
+        view.classList.add('hidden');
+      }
+    });
   }
 
   // BULLETPROOF FRONTEND JSON PARSER
@@ -514,8 +574,9 @@
     document.getElementById('vault-client-phone').innerText = phone && phone !== 'undefined' ? phone : "On File";
     document.getElementById('active-card-note').innerText = `"${text}"`;
 
-    document.getElementById('invoice-desc').value = text;
-    document.getElementById('invoice-amount').value = '';
+    // INITIALIZE INVOICE CANVAS LINE ITEMS
+    currentInvoiceItems = [{ desc: text, qty: 1, price: 0.00 }];
+    renderInvoiceCanvas();
 
     const multiBox = document.getElementById('multi-address-container');
     const selector = document.getElementById('address-selector');
@@ -530,7 +591,50 @@
     }
 
     renderLifetimeLedger(clientName);
+    switchCanvasTab('notes');
     openWorkstation();
+  }
+
+  function addInvoiceLineItem() {
+    currentInvoiceItems.push({ desc: '', qty: 1, price: 0.00 });
+    renderInvoiceCanvas();
+  }
+
+  function removeInvoiceLineItem(index) {
+    currentInvoiceItems.splice(index, 1);
+    if (currentInvoiceItems.length === 0) {
+      currentInvoiceItems.push({ desc: '', qty: 1, price: 0.00 });
+    }
+    renderInvoiceCanvas();
+  }
+
+  function updateInvoiceItem(index, field, value) {
+    if (field === 'qty') currentInvoiceItems[index].qty = parseInt(value) || 1;
+    else if (field === 'price') currentInvoiceItems[index].price = parseFloat(value.replace(/[^0-9.]/g, '')) || 0;
+    else currentInvoiceItems[index].desc = value;
+    calculateInvoiceTotal();
+  }
+
+  function calculateInvoiceTotal() {
+    const total = currentInvoiceItems.reduce((sum, item) => sum + ((item.qty || 1) * (item.price || 0)), 0);
+    document.getElementById('invoice-canvas-total').innerText = `$${total.toFixed(2)}`;
+    return total;
+  }
+
+  function renderInvoiceCanvas() {
+    const box = document.getElementById('invoice-line-items');
+    box.innerHTML = currentInvoiceItems.map((item, idx) => `
+      <div class="grid grid-cols-12 gap-1 items-center">
+        <input type="text" value="${item.desc}" placeholder="Service/Part" oninput="updateInvoiceItem(${idx}, 'desc', this.value)"
+          class="col-span-6 px-2 py-1 border border-bordercolor rounded bg-parchment text-xs text-ink focus:outline-none focus:border-gold">
+        <input type="number" min="1" value="${item.qty}" oninput="updateInvoiceItem(${idx}, 'qty', this.value)"
+          class="col-span-2 px-1 py-1 border border-bordercolor rounded bg-parchment text-xs text-ink text-center focus:outline-none focus:border-gold">
+        <input type="text" value="$${(item.price || 0).toFixed(2)}" oninput="updateInvoiceItem(${idx}, 'price', this.value)"
+          class="col-span-3 px-2 py-1 border border-bordercolor rounded bg-parchment text-xs text-ink font-bold text-right focus:outline-none focus:border-gold">
+        <button onclick="removeInvoiceLineItem(${idx})" class="col-span-1 text-red-500 font-bold text-center hover:text-red-700">✕</button>
+      </div>
+    `).join('');
+    calculateInvoiceTotal();
   }
 
   function renderLifetimeLedger(clientName) {
@@ -565,7 +669,7 @@
 
   function sendSMSPaymentLink() {
     const phone = document.getElementById('vault-client-phone').innerText;
-    const amount = document.getElementById('invoice-amount').value || '$0.00';
+    const amount = document.getElementById('invoice-canvas-total').innerText;
 
     if (phone === 'On File' || !phone) {
       return alert("No phone number on file for SMS payment link.");
@@ -580,15 +684,16 @@
     const store = getStorage();
     let item = store.scheduledCards.find(i => i.id === activeCardId) || store.pinballQueue.find(i => i.id === activeCardId);
 
-    const desc = document.getElementById('invoice-desc').value.trim();
-    const amount = document.getElementById('invoice-amount').value.trim();
+    const total = calculateInvoiceTotal();
+    const amountStr = `$${total.toFixed(2)}`;
+    const mainDesc = currentInvoiceItems.map(i => i.desc).filter(Boolean).join(', ') || item.text;
 
     if (item) {
       store.scheduledCards = store.scheduledCards.filter(i => i.id !== activeCardId);
       store.pinballQueue = store.pinballQueue.filter(i => i.id !== activeCardId);
 
-      item.desc = desc || item.text;
-      item.amount = amount ? (amount.startsWith('$') ? amount : '$' + amount) : '💵 Paid';
+      item.desc = mainDesc;
+      item.amount = total > 0 ? amountStr : '💵 Paid';
       item.completedAt = new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
       store.archive.unshift(item);
