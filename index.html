@@ -37,10 +37,65 @@
 </head>
 <body class="font-sans min-h-screen p-4 md:p-6 flex justify-center">
 
-<!-- MEDIA INPUT SUPPORTS BOTH PHOTO SNAPS & VIDEO CLIPS -->
 <input type="file" id="cameraInput" accept="image/*,video/*" capture="environment" class="hidden" onchange="handleMediaCapture(event)">
 
-<div class="w-full max-w-5xl flex flex-col gap-5 relative">
+<!-- PUBLIC CUSTOMER LANDING PAGE (VIEWABLE VIA ?card= PARAMETER) -->
+<div id="public-card-viewer" class="hidden w-full max-w-3xl flex flex-col gap-6 my-auto">
+  <header class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+    <div class="flex items-center gap-3">
+      <span class="font-cursive text-6xl text-gold font-bold leading-none select-none">F</span>
+      <div>
+        <h1 class="font-extrabold text-lg text-ink">Aerus of Towson</h1>
+        <p class="text-xs font-bold text-forest">Healthy Home Specialists • Timonium, MD</p>
+      </div>
+    </div>
+    <a href="tel:4108821027" class="px-4 py-2 bg-forest text-white font-bold text-xs rounded-xl shadow hover:bg-opacity-90 transition">
+      📞 (410) 882-1027
+    </a>
+  </header>
+
+  <main class="bg-cardbg border border-gold rounded-2xl p-6 md:p-8 shadow-md flex flex-col items-center text-center gap-6">
+    <div class="w-32 h-32 rounded-full border-4 border-gold bg-white shadow-lg overflow-hidden flex items-center justify-center relative flex-shrink-0">
+      <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';">
+    </div>
+
+    <div>
+      <h2 class="text-xl md:text-2xl font-extrabold text-ink">Pure Water & Clean Air Solutions</h2>
+      <p class="text-xs md:text-sm text-muted mt-1 max-w-md mx-auto">Tap below to talk with Fresh. Request filter replacements, book free water diagnostics, or schedule equipment service in seconds.</p>
+    </div>
+
+    <button id="public-voice-btn" onclick="toggleVoiceIntake()" class="w-full max-w-sm py-3.5 bg-forest hover:bg-opacity-90 text-white font-extrabold text-sm rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+      <span>🎙️</span> <span id="public-voice-label">TALK TO FRESH</span>
+    </button>
+
+    <div id="public-thread" class="hidden w-full bg-white border border-bordercolor rounded-xl p-4 flex flex-col gap-2 text-xs text-left shadow-inner">
+      <div id="public-bubbles" class="flex flex-col gap-2 max-h-40 overflow-y-auto"></div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full pt-4 border-t border-bordercolor text-left">
+      <div class="p-3 bg-white border border-bordercolor rounded-xl">
+        <div class="font-bold text-xs text-forest">💧 Pure Water</div>
+        <div class="text-[11px] text-muted mt-0.5">RO Systems, testing & replacement filters.</div>
+      </div>
+      <div class="p-3 bg-white border border-bordercolor rounded-xl">
+        <div class="font-bold text-xs text-forest">💨 ActivePure® Air</div>
+        <div class="text-[11px] text-muted mt-0.5">Medical-grade air purification tech.</div>
+      </div>
+      <div class="p-3 bg-white border border-bordercolor rounded-xl">
+        <div class="font-bold text-xs text-forest">🧹 Floor Care</div>
+        <div class="text-[11px] text-muted mt-0.5">Aerus & Electrolux bags, belts & bench service.</div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-cardbg border border-bordercolor rounded-2xl p-4 text-center text-xs text-muted flex flex-col sm:flex-row justify-between items-center gap-2">
+    <div>📍 1965 Greenspring Dr, Timonium MD 21093</div>
+    <div>Mon - Fri: 9:00 AM - 5:00 PM</div>
+  </footer>
+</div>
+
+<!-- INTERNAL OPERATOR WORKSTATION FLOOR -->
+<div id="operator-floor" class="w-full max-w-5xl flex flex-col gap-5 relative">
 
   <!-- MASTER HEADER -->
   <header class="bg-cardbg border border-bordercolor rounded-2xl p-5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-5 text-center md:text-left">
@@ -87,9 +142,7 @@
       </span>
       <span class="text-[10px] text-muted font-bold" id="thread-time">Just now</span>
     </div>
-    <div id="thread-bubbles" class="flex flex-col gap-2 max-h-48 overflow-y-auto pr-1 text-xs">
-      <!-- Chat bubbles inject dynamically here -->
-    </div>
+    <div id="thread-bubbles" class="flex flex-col gap-2 max-h-48 overflow-y-auto pr-1 text-xs"></div>
   </div>
 
   <!-- STATUS BANNER -->
@@ -124,7 +177,6 @@
 <!-- WORKSTATION DRAWER -->
 <div id="workstation-drawer" class="fixed inset-y-0 right-0 w-full max-w-lg bg-cardbg border-l-2 border-gold shadow-2xl p-6 drawer-slide hidden-right-drawer z-50 flex flex-col justify-between overflow-y-auto">
   <div class="flex flex-col gap-4">
-    <!-- DRAWER HEADER -->
     <div class="flex justify-between items-center border-b border-bordercolor pb-3">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-full border border-gold bg-white overflow-hidden flex items-center justify-center">
@@ -144,7 +196,6 @@
       </div>
     </div>
 
-    <!-- CLIENT CARD SUMMARY WITH FIELD ACTION BAR -->
     <div class="bg-white p-4 rounded-xl border border-bordercolor shadow-sm flex flex-col gap-3">
       <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between">
         <span class="flex items-center gap-2">
@@ -161,7 +212,6 @@
       </div>
       <div class="text-xs text-muted flex flex-col gap-1.5">
         <div>📍 <span id="vault-client-address" class="text-ink font-medium">--</span></div>
-        
         <div id="multi-address-container" class="hidden bg-parchment p-2 rounded-lg border border-bordercolor">
           <label class="text-[10px] text-forest font-bold uppercase tracking-wider block mb-1">
             📍 Multiple Properties on File (Tap to Switch):
@@ -169,11 +219,9 @@
           <select id="address-selector" onchange="switchAddress(this.value)" class="w-full bg-white border border-bordercolor text-xs text-ink rounded p-1.5 focus:outline-none focus:border-gold">
           </select>
         </div>
-
         <div>📞 <span id="vault-client-phone" class="text-ink font-medium">--</span></div>
       </div>
 
-      <!-- FIELD DISPATCH ACTION BAR -->
       <div class="grid grid-cols-2 gap-2 pt-2 border-t border-bordercolor">
         <button id="btn-map-dispatch" onclick="launchMapDirections()" class="py-2 px-3 bg-parchment border border-bordercolor hover:bg-bordercolor text-ink font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-xs">
           <span>🗺️</span> <span>Map Directions</span>
@@ -183,7 +231,6 @@
         </button>
       </div>
 
-      <!-- SMART CLIENT TEXT STAGING -->
       <div class="flex flex-col gap-1.5 pt-2 border-t border-bordercolor">
         <label class="text-[10px] font-bold text-forest uppercase tracking-wider">💬 Smart Client Text Staging</label>
         <div class="flex gap-2">
@@ -196,7 +243,6 @@
       </div>
     </div>
 
-    <!-- IN-DRAWER INPUT DECK -->
     <div class="bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-2.5 shadow-sm">
       <div class="text-[10px] font-bold text-forest uppercase tracking-wider">🎙️ In-Card Action Deck</div>
       <div class="flex gap-2">
@@ -212,7 +258,6 @@
         class="w-full px-3 py-1.5 border border-bordercolor rounded-xl bg-parchment text-ink focus:outline-none focus:border-gold text-xs">
     </div>
 
-    <!-- CANVAS VIEW TABS -->
     <div class="flex border-b border-bordercolor gap-2 text-xs font-bold overflow-x-auto">
       <button id="tab-btn-notes" onclick="switchCanvasTab('notes')" class="py-2 px-3 text-forest border-b-2 border-forest whitespace-nowrap">📋 Notes</button>
       <button id="tab-btn-invoice" onclick="switchCanvasTab('invoice')" class="py-2 px-3 text-muted hover:text-ink whitespace-nowrap">📜 Invoice</button>
@@ -220,19 +265,16 @@
       <button id="tab-btn-portal" onclick="switchCanvasTab('portal')" class="py-2 px-3 text-muted hover:text-ink whitespace-nowrap">🌐 Portal Canvas</button>
     </div>
 
-    <!-- TAB 1: NOTES -->
     <div id="canvas-view-notes" class="bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-2">
-      <div class="text-xs font-bold text-ink uppercase mb-1">Active Service / Brain Dump Note</div>
+      <div class="text-xs font-bold text-ink uppercase mb-1">Active Service Note</div>
       <div id="active-card-note" class="text-xs text-muted leading-relaxed">--</div>
     </div>
 
-    <!-- TAB 2: INVOICE CANVAS -->
     <div id="canvas-view-invoice" class="hidden bg-white p-3.5 rounded-xl border border-gold flex flex-col gap-3 shadow-sm">
       <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between border-b border-bordercolor pb-1.5">
         <span class="flex items-center gap-1.5"><span>📜</span> Dedicated Invoice Canvas</span>
         <span class="text-[10px] text-gold font-bold">Sissy Powered</span>
       </div>
-
       <div class="flex flex-col gap-2">
         <div class="grid grid-cols-12 gap-1 text-[10px] font-bold text-muted border-b border-bordercolor pb-1 uppercase">
           <span class="col-span-6">Service / Part Description</span>
@@ -245,12 +287,10 @@
           <span>+</span> <span>Add Line Item</span>
         </button>
       </div>
-
       <div class="flex justify-between items-center border-t border-bordercolor pt-2 font-bold text-xs text-ink">
         <span>Total Balance:</span>
         <span id="invoice-canvas-total" class="text-sm text-forest">$0.00</span>
       </div>
-
       <div class="flex gap-2 mt-1">
         <button onclick="sendSMSPaymentLink()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
           <span>⚡</span> <span>Send SMS Link</span>
@@ -261,7 +301,6 @@
       </div>
     </div>
 
-    <!-- TAB 3: LEDGER -->
     <div id="canvas-view-ledger" class="hidden bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-2">
       <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between border-b border-bordercolor pb-1.5">
         <span class="flex items-center gap-1.5"><span>📜</span> Lifetime Service Ledger</span>
@@ -272,14 +311,11 @@
       </div>
     </div>
 
-    <!-- TAB 4: PORTAL CANVAS (DYNAMIC PUBLIC LANDING PAGE ENGINE) -->
     <div id="canvas-view-portal" class="hidden bg-white p-3.5 rounded-xl border border-gold flex flex-col gap-3 shadow-sm">
       <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between border-b border-bordercolor pb-1.5">
         <span class="flex items-center gap-1.5"><span>🌐</span> Interactive Voice Portal</span>
         <span class="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-full">Public Landing Engine</span>
       </div>
-
-      <!-- PORTAL CONTROLS -->
       <div class="flex flex-col gap-2 text-xs">
         <div>
           <label class="text-[10px] font-bold text-muted uppercase block mb-1">Campaign Headline</label>
@@ -287,18 +323,11 @@
             class="w-full px-3 py-1.5 border border-bordercolor rounded-xl bg-parchment text-ink font-bold text-xs focus:outline-none focus:border-gold">
         </div>
         <div>
-          <label class="text-[10px] font-bold text-muted uppercase block mb-1">Video / Media URL (YouTube, MP4, Loom)</label>
-          <input type="text" id="portal-media-input" placeholder="https://..." oninput="updatePortalPreview()" 
-            class="w-full px-3 py-1.5 border border-bordercolor rounded-xl bg-parchment text-ink text-xs focus:outline-none focus:border-gold">
-        </div>
-        <div>
           <label class="text-[10px] font-bold text-muted uppercase block mb-1">Offer Description</label>
           <textarea id="portal-offer-input" rows="2" oninput="updatePortalPreview()" 
             class="w-full px-3 py-1.5 border border-bordercolor rounded-xl bg-parchment text-ink text-xs focus:outline-none focus:border-gold">Tap below and speak to Fresh to claim your diagnostic, order replacement filter packs, or schedule a bench service!</textarea>
         </div>
       </div>
-
-      <!-- LIVE INTERACTIVE PREVIEW CARD -->
       <div class="border border-bordercolor rounded-2xl bg-ink p-4 text-white flex flex-col gap-3 relative shadow-lg">
         <div class="flex justify-between items-center text-[10px] text-gold font-bold border-b border-gray-700 pb-1.5">
           <span>TAPPYTHING PUBLIC CANVAS PREVIEW</span>
@@ -306,13 +335,10 @@
         </div>
         <h4 id="portal-preview-headline" class="font-extrabold text-sm text-gold">Free 15-Minute Home Water & Air Diagnostic</h4>
         <p id="portal-preview-offer" class="text-xs text-gray-300 leading-relaxed">Tap below and speak to Fresh to claim your diagnostic, order replacement filter packs, or schedule a bench service!</p>
-        
         <button onclick="toggleVoiceIntake()" class="w-full py-2.5 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-2">
           <span>🎙️</span> <span>SPEAK TO SISSY</span>
         </button>
       </div>
-
-      <!-- SHARE BAR -->
       <div class="grid grid-cols-2 gap-2 pt-1 border-t border-bordercolor">
         <button onclick="copyPublicPortalLink()" class="py-2 px-3 bg-parchment border border-bordercolor hover:bg-bordercolor text-ink font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5">
           <span>📋</span> <span>Copy Public Link</span>
@@ -334,6 +360,22 @@
   let activeCardType = null;
   let isListening = false, recognition = null;
   let currentInvoiceItems = [];
+  let isPublicMode = false;
+
+  // MASTER FOREVER CARD FALLBACK (ZERO ORPHANED CARDS)
+  const MASTER_CARD = {
+    clientName: 'William Sullivan (Towson Healthy Homes)',
+    address: '1965 Greenspring Dr, Timonium MD 21093',
+    phone: '410-882-1027'
+  };
+
+  // ROUTE INITIALIZATION (PUBLIC LANDING VS OPERATOR WORKSTATION)
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('card')) {
+    isPublicMode = true;
+    document.getElementById('operator-floor').classList.add('hidden');
+    document.getElementById('public-card-viewer').classList.remove('hidden');
+  }
 
   Papa.parse(encodeURI('export_export (34).csv'), {
     download: true,
@@ -375,21 +417,20 @@
   }
 
   function formatRowAddress(row) {
-    if (!row) return "On File / In Vault";
+    if (!row) return MASTER_CARD.address;
     const street = row['Address'] || row['Street'] || row['Street Address'] || row['Address 1'] || row['Billing Address'] || row['Service Address'] || row['Location'] || '';
     const city = row['City'] || '';
     const state = row['State'] || '';
     const zip = row['Zip'] || row['Postal Code'] || '';
     const combined = [street, city, state, zip].filter(Boolean).join(', ');
-    return combined || street || row['Full Address'] || "On File / In Vault";
+    return combined || street || row['Full Address'] || MASTER_CARD.address;
   }
 
   function formatRowPhone(row) {
-    if (!row) return "On File";
-    return row['Phone'] || row['Phone Number'] || row['Mobile'] || row['Mobile Phone'] || row['Cell'] || row['Primary Phone'] || row['Phone 1'] || "On File";
+    if (!row) return MASTER_CARD.phone;
+    return row['Phone'] || row['Phone Number'] || row['Mobile'] || row['Mobile Phone'] || row['Cell'] || row['Primary Phone'] || row['Phone 1'] || MASTER_CARD.phone;
   }
 
-  // SPEECH SYNTHESIS ENGINE (FRESH SPEAKS BACK AUDIBLY)
   function speakAudibly(text) {
     if ('speechSynthesis' in window && text) {
       window.speechSynthesis.cancel();
@@ -400,7 +441,6 @@
     }
   }
 
-  // FIXED SPEECH RECOGNITION (ONLY FIRES ON FINAL PHRASE)
   if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRec();
@@ -409,8 +449,13 @@
     
     recognition.onstart = () => {
       isListening = true;
-      document.getElementById('voice-label').innerText = "LISTENING...";
-      document.getElementById('voice-btn').classList.add('bg-red-600');
+      if (isPublicMode) {
+        document.getElementById('public-voice-label').innerText = "LISTENING...";
+        document.getElementById('public-voice-btn').classList.add('bg-red-600');
+      } else {
+        document.getElementById('voice-label').innerText = "LISTENING...";
+        document.getElementById('voice-btn').classList.add('bg-red-600');
+      }
     };
     
     recognition.onresult = (e) => {
@@ -424,7 +469,9 @@
         }
       }
 
-      document.getElementById('text-intake').value = liveText;
+      if (!isPublicMode) {
+        document.getElementById('text-intake').value = liveText;
+      }
 
       if (isFinalResult && liveText.trim().length > 3) {
         handleVoiceIntake(liveText.trim());
@@ -433,8 +480,13 @@
 
     recognition.onerror = recognition.onend = () => {
       isListening = false;
-      document.getElementById('voice-label').innerText = "TALK TO FRESH";
-      document.getElementById('voice-btn').classList.remove('bg-red-600');
+      if (isPublicMode) {
+        document.getElementById('public-voice-label').innerText = "TALK TO FRESH";
+        document.getElementById('public-voice-btn').classList.remove('bg-red-600');
+      } else {
+        document.getElementById('voice-label').innerText = "TALK TO FRESH";
+        document.getElementById('voice-btn').classList.remove('bg-red-600');
+      }
     };
   }
 
@@ -501,14 +553,38 @@
   }
 
   function showStatus(msg) {
+    if (isPublicMode) return;
     const b = document.getElementById('status-banner');
     b.innerText = msg;
     b.classList.remove('hidden');
     setTimeout(() => b.classList.add('hidden'), 4000);
   }
 
-  // 2-WAY THREAD UPDATE ENGINE
   function updateSissyConsole(responseText, userPrompt) {
+    if (isPublicMode) {
+      const publicThread = document.getElementById('public-thread');
+      const publicBubbles = document.getElementById('public-bubbles');
+      publicThread.classList.remove('hidden');
+
+      if (userPrompt) {
+        publicBubbles.innerHTML += `
+          <div class="self-end bg-forest text-white p-2 rounded-xl max-w-[85%] font-medium">
+            <span class="font-bold text-[9px] opacity-75 block uppercase">You</span>
+            "${userPrompt}"
+          </div>
+        `;
+      }
+      publicBubbles.innerHTML += `
+        <div class="self-start bg-parchment border border-bordercolor text-ink p-2 rounded-xl max-w-[90%] font-medium">
+          <span class="font-bold text-[9px] text-forest block uppercase">Fresh 🤵</span>
+          ${responseText}
+        </div>
+      `;
+      publicBubbles.scrollTop = publicBubbles.scrollHeight;
+      speakAudibly(responseText);
+      return;
+    }
+
     const threadBox = document.getElementById('conversation-thread');
     const bubbles = document.getElementById('thread-bubbles');
     const timeEl = document.getElementById('thread-time');
@@ -584,8 +660,8 @@
 
   function launchMapDirections() {
     const address = document.getElementById('vault-client-address').innerText;
-    if (!address || address === 'On File / In Vault') {
-      return alert("No address on file for map directions.");
+    if (!address || address === MASTER_CARD.address) {
+      return alert("No specific customer address on file for map directions.");
     }
     const mapsUrl = `https://maps.apple.com/?daddr=${encodeURIComponent(address)}`;
     window.open(mapsUrl, '_blank');
@@ -593,7 +669,7 @@
 
   function dialClientPhone() {
     const phone = document.getElementById('vault-client-phone').innerText;
-    if (!phone || phone === 'On File') {
+    if (!phone) {
       return alert("No phone number on file to call.");
     }
     window.location.href = `tel:${phone.replace(/[^0-9+]/g, '')}`;
@@ -602,7 +678,7 @@
   function sendStagedSMS() {
     const phone = document.getElementById('vault-client-phone').innerText;
     const msg = document.getElementById('staged-sms-text').value.trim();
-    if (!phone || phone === 'On File') {
+    if (!phone) {
       return alert("No phone number on file for SMS dispatch.");
     }
     if (!msg) {
@@ -629,8 +705,8 @@
     }
   }
 
-  // LIVE INBOUND BOARD SYNC (FETCH INBOUND CARDS INTO PINBALL)
   function fetchInboundCards() {
+    if (isPublicMode) return;
     const fetchHookUrl = atob('aHR0cHM6Ly9ob29rLnVzMi5tYWtlLmNvbS9qMml0ZWdoaHBpd2ZvZGJ2bThxY3d0MXlvb25vY2V4bg==');
     
     fetch(fetchHookUrl, {
@@ -648,14 +724,19 @@
         let newItemsAdded = 0;
 
         data.items.forEach(inbound => {
-          const clientName = inbound.name || inbound.clientName || "Inbound SMS";
+          let clientName = inbound.name || inbound.clientName;
           const textMsg = inbound.text || inbound.note || "New message from Twilio";
+          
+          const matches = findAllVaultMatches(clientName);
+          if (matches.length === 0 && (!clientName || clientName === "Direct Intake")) {
+            clientName = MASTER_CARD.clientName;
+          }
+
           const exists = store.pinballQueue.some(c => c.externalId === inbound.id || (c.clientName === clientName && c.text === textMsg));
 
           if (!exists) {
-            const matches = findAllVaultMatches(clientName);
-            let finalAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (inbound.address || "On File / In Vault");
-            let finalPhone = matches.length > 0 ? formatRowPhone(matches[0]) : (inbound.phone || "On File");
+            let finalAddress = matches.length > 0 ? formatRowAddress(matches[0]) : MASTER_CARD.address;
+            let finalPhone = matches.length > 0 ? formatRowPhone(matches[0]) : MASTER_CARD.phone;
 
             store.pinballQueue.unshift({
               id: Date.now() + Math.floor(Math.random() * 1000),
@@ -679,9 +760,7 @@
         }
       }
     })
-    .catch(() => {
-      // Quiet fail if no new items returned
-    });
+    .catch(() => {});
   }
 
   function handleVoiceIntake(text) {
@@ -698,7 +777,7 @@
       return cleanAndParseJSON(rawText);
     })
     .then(data => {
-      const clientName = data.clientName || data.client_name || "Direct Intake";
+      let clientName = data.clientName || data.client_name;
       const destination = (data.destination || '').toLowerCase();
       const isScheduled = data.isScheduled === true || 
                           data.isScheduled === "true" || 
@@ -707,17 +786,20 @@
 
       const matches = findAllVaultMatches(clientName);
 
-      let finalAddress = "On File / In Vault";
-      let finalPhone = "On File";
+      let finalAddress = MASTER_CARD.address;
+      let finalPhone = MASTER_CARD.phone;
       let allAddresses = [];
 
       if (matches.length > 0) {
+        clientName = matches[0]['Name'] || clientName;
         finalAddress = formatRowAddress(matches[0]);
         finalPhone = formatRowPhone(matches[0]);
         allAddresses = [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))];
-      } else if (data.address && data.address !== "On File / In Vault") {
-        finalAddress = data.address;
-        finalPhone = data.phone || "On File";
+      } else {
+        // ZERO ORPHANED CARDS FALLBACK
+        clientName = MASTER_CARD.clientName;
+        finalAddress = MASTER_CARD.address;
+        finalPhone = MASTER_CARD.phone;
       }
 
       const sissyMsg = data.sissyResponse || (isScheduled 
@@ -752,19 +834,19 @@
     })
     .catch(err => {
       const matches = findAllVaultMatches(text);
-      let clientName = "Note Pending Sync";
-      let finalAddress = "Awaiting Sissy";
-      let finalPhone = "Awaiting Sissy";
+      let clientName = MASTER_CARD.clientName;
+      let finalAddress = MASTER_CARD.address;
+      let finalPhone = MASTER_CARD.phone;
       let allAddresses = [];
 
       if (matches.length > 0) {
-        clientName = matches[0]['Name'] || "Verified Customer";
+        clientName = matches[0]['Name'] || MASTER_CARD.clientName;
         finalAddress = formatRowAddress(matches[0]);
         finalPhone = formatRowPhone(matches[0]);
         allAddresses = [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))];
       }
 
-      const defaultReply = `Absolutely! We have genuine Aerus & Electrolux bags and filters in stock. Your request is queued for William & Chris at our Timonium shop!`;
+      const defaultReply = `Thanks for reaching out! We have genuine Aerus & Electrolux bags and filters in stock. Your request is queued for William & Chris at our Timonium shop!`;
       updateSissyConsole(defaultReply, text);
 
       const store = getStorage();
@@ -785,6 +867,7 @@
   }
 
   function openCustomerCard(text, clientName, address, phone, cardId, cardType) {
+    if (isPublicMode) return;
     activeCardId = cardId;
     activeCardType = cardType;
     const store = getStorage();
@@ -793,8 +876,8 @@
 
     document.getElementById('drawer-title').innerText = clientName + ' — Workstation';
     document.getElementById('vault-client-name').innerText = clientName;
-    document.getElementById('vault-client-address').innerText = address && address !== 'undefined' ? address : "On File / In Vault";
-    document.getElementById('vault-client-phone').innerText = phone && phone !== 'undefined' ? phone : "On File";
+    document.getElementById('vault-client-address').innerText = address && address !== 'undefined' ? address : MASTER_CARD.address;
+    document.getElementById('vault-client-phone').innerText = phone && phone !== 'undefined' ? phone : MASTER_CARD.phone;
     document.getElementById('active-card-note').innerText = `"${text}"`;
 
     currentInvoiceItems = [{ desc: text, qty: 1, price: 0.00 }];
@@ -893,7 +976,7 @@
     const phone = document.getElementById('vault-client-phone').innerText;
     const amount = document.getElementById('invoice-canvas-total').innerText;
 
-    if (phone === 'On File' || !phone) {
+    if (!phone) {
       return alert("No phone number on file for SMS payment link.");
     }
 
@@ -951,6 +1034,7 @@
   function saveStorage(d) { localStorage.setItem('tappything_lexus_v3', JSON.stringify(d)); }
 
   function render() {
+    if (isPublicMode) return;
     const store = getStorage();
     const cal = document.getElementById('schedule-list');
     cal.innerHTML = store.scheduledCards.length === 0 ? '<div class="text-muted text-xs italic">No scheduled appointments.</div>' :
@@ -988,7 +1072,6 @@
       `).join('');
   }
 
-  // INITIALIZE FLOOR AND FETCH LIVE INBOUND BOARD CARDS
   render();
   fetchInboundCards();
 </script>
