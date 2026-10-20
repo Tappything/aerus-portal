@@ -40,18 +40,23 @@
 <input type="file" id="cameraInput" accept="image/*,video/*" capture="environment" class="hidden" onchange="handleMediaCapture(event)">
 
 <!-- PUBLIC CUSTOMER LANDING PAGE (VIEWABLE VIA ?card= PARAMETER) -->
-<div id="public-card-viewer" class="hidden w-full max-w-3xl flex flex-col gap-6 my-auto">
+<div id="public-card-viewer" class="hidden w-full max-w-4xl flex flex-col gap-6 my-auto">
   <header class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
     <div class="flex items-center gap-3">
       <span class="font-cursive text-6xl text-gold font-bold leading-none select-none">F</span>
       <div>
-        <h1 class="font-extrabold text-lg text-ink">Aerus of Towson</h1>
+        <h1 class="font-extrabold text-lg text-ink">Aerus of Towson • Clean Environment LLC</h1>
         <p class="text-xs font-bold text-forest">Healthy Home Specialists • Timonium, MD</p>
       </div>
     </div>
-    <a href="tel:4108821027" class="px-4 py-2 bg-forest text-white font-bold text-xs rounded-xl shadow hover:bg-opacity-90 transition">
-      📞 (410) 882-1027
-    </a>
+    <div class="flex flex-col sm:flex-row items-center gap-2">
+      <a href="https://www.towsonhealthyhomes.com" target="_blank" class="px-3.5 py-2 bg-parchment border border-bordercolor text-forest font-bold text-xs rounded-xl hover:bg-bordercolor transition flex items-center gap-1">
+        <span>🌐 Visit Official Website</span> <span>➔</span>
+      </a>
+      <a href="tel:4108821027" class="px-4 py-2 bg-forest text-white font-bold text-xs rounded-xl shadow hover:bg-opacity-90 transition">
+        📞 (410) 882-1027
+      </a>
+    </div>
   </header>
 
   <main class="bg-cardbg border border-gold rounded-2xl p-6 md:p-8 shadow-md flex flex-col items-center text-center gap-6">
@@ -60,37 +65,60 @@
     </div>
 
     <div>
-      <h2 class="text-xl md:text-2xl font-extrabold text-ink">Pure Water & Clean Air Solutions</h2>
-      <p class="text-xs md:text-sm text-muted mt-1 max-w-md mx-auto">Tap below to talk with Fresh. Request filter replacements, book free water diagnostics, or schedule equipment service in seconds.</p>
+      <h2 class="text-xl md:text-3xl font-extrabold text-ink">Healthy Home Specialists: Pure Water, Clean Air & Floor Care</h2>
+      <p class="text-xs md:text-sm text-muted mt-2 max-w-xl mx-auto">Professional home wellness solutions with local Timonium support, fast testing, and guaranteed genuine parts.</p>
     </div>
 
-    <button id="public-voice-btn" onclick="toggleVoiceIntake()" class="w-full max-w-sm py-3.5 bg-forest hover:bg-opacity-90 text-white font-extrabold text-sm rounded-xl shadow-lg transition flex items-center justify-center gap-2">
-      <span>🎙️</span> <span id="public-voice-label">TALK TO FRESH</span>
-    </button>
+    <!-- CHRIS'S 4 CORE WHITEBOARD PILLARS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full text-left">
+      <div class="p-4 bg-white border border-bordercolor rounded-2xl shadow-xs flex flex-col gap-1">
+        <div class="font-bold text-sm text-forest flex items-center gap-1.5">
+          <span>💧</span> <span>Healthy Treated Water</span>
+        </div>
+        <p class="text-xs text-muted leading-relaxed">Fast, free in-home water testing ($75 value). Professional installation, full warranty & long-term reliability.</p>
+      </div>
 
-    <div id="public-thread" class="hidden w-full bg-white border border-bordercolor rounded-xl p-4 flex flex-col gap-2 text-xs text-left shadow-inner">
-      <div id="public-bubbles" class="flex flex-col gap-2 max-h-40 overflow-y-auto"></div>
+      <div class="p-4 bg-white border border-bordercolor rounded-2xl shadow-xs flex flex-col gap-1">
+        <div class="font-bold text-sm text-forest flex items-center gap-1.5">
+          <span>💨</span> <span>Fresh, Pure & Clean Air</span>
+        </div>
+        <p class="text-xs text-muted leading-relaxed">Medical-grade ActivePure® technology for immediate health benefits & 24/7 continuous air purification.</p>
+      </div>
+
+      <div class="p-4 bg-white border border-bordercolor rounded-2xl shadow-xs flex flex-col gap-1">
+        <div class="font-bold text-sm text-forest flex items-center gap-1.5">
+          <span>🧹</span> <span>Dual-Action HEPA Vacuums</span>
+        </div>
+        <p class="text-xs text-muted leading-relaxed">Legendary Electrolux & Aerus HEPA models engineered to clean your floors AND purify your indoor air simultaneously.</p>
+      </div>
+
+      <div class="p-4 bg-white border border-bordercolor rounded-2xl shadow-xs flex flex-col gap-1">
+        <div class="font-bold text-sm text-forest flex items-center gap-1.5">
+          <span>🛡️</span> <span>Zero-Risk Care & Filter Guarantee</span>
+        </div>
+        <p class="text-xs text-muted leading-relaxed">We stock genuine replacement parts and track your filter life automatically with Hassle-Free Maintenance Reminders.</p>
+      </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full pt-4 border-t border-bordercolor text-left">
-      <div class="p-3 bg-white border border-bordercolor rounded-xl">
-        <div class="font-bold text-xs text-forest">💧 Pure Water</div>
-        <div class="text-[11px] text-muted mt-0.5">RO Systems, testing & replacement filters.</div>
+    <!-- MEET FRESH 2-WAY INTERACTIVE VOICE INTAKE -->
+    <div class="w-full bg-white border border-gold rounded-2xl p-5 shadow-inner flex flex-col items-center gap-3">
+      <div class="text-xs text-muted max-w-lg">
+        <strong class="text-ink">Meet Fresh, your 24/7 Digital Assistant at Towson Healthy Homes.</strong> Need bags, replacement filters, or a free water test? Tap below and speak naturally!
       </div>
-      <div class="p-3 bg-white border border-bordercolor rounded-xl">
-        <div class="font-bold text-xs text-forest">💨 ActivePure® Air</div>
-        <div class="text-[11px] text-muted mt-0.5">Medical-grade air purification tech.</div>
-      </div>
-      <div class="p-3 bg-white border border-bordercolor rounded-xl">
-        <div class="font-bold text-xs text-forest">🧹 Floor Care</div>
-        <div class="text-[11px] text-muted mt-0.5">Aerus & Electrolux bags, belts & bench service.</div>
+
+      <button id="public-voice-btn" onclick="toggleVoiceIntake()" class="w-full max-w-sm py-3.5 bg-forest hover:bg-opacity-90 text-white font-extrabold text-sm rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+        <span>🎙️</span> <span id="public-voice-label">TALK TO FRESH</span>
+      </button>
+
+      <div id="public-thread" class="hidden w-full bg-parchment border border-bordercolor rounded-xl p-4 flex flex-col gap-2 text-xs text-left shadow-xs">
+        <div id="public-bubbles" class="flex flex-col gap-2 max-h-40 overflow-y-auto"></div>
       </div>
     </div>
   </main>
 
-  <footer class="bg-cardbg border border-bordercolor rounded-2xl p-4 text-center text-xs text-muted flex flex-col sm:flex-row justify-between items-center gap-2">
-    <div>📍 1965 Greenspring Dr, Timonium MD 21093</div>
-    <div>Mon - Fri: 9:00 AM - 5:00 PM</div>
+  <footer class="bg-cardbg border border-bordercolor rounded-2xl p-4 text-center text-xs text-muted flex flex-col md:flex-row justify-between items-center gap-2">
+    <div>📍 1965 Greenspring Drive, Suite G-16, Timonium, MD 21093 (Inside Timonium Wellness Center / Building ELEVATE)</div>
+    <div>Mon–Thu 9AM–4PM • Fri 9AM–3PM • Sat 9AM–12PM</div>
   </footer>
 </div>
 
