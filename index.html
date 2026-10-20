@@ -105,8 +105,9 @@
 
     <!-- PINBALL ACTION ZONE -->
     <div class="flex flex-col gap-2">
-      <div class="text-xs font-extrabold uppercase tracking-widest text-muted flex items-center gap-2">
-        <span>📍</span> Pinball Action Zone
+      <div class="text-xs font-extrabold uppercase tracking-widest text-muted flex items-center justify-between">
+        <span class="flex items-center gap-2"><span>📍</span> Pinball Action Zone</span>
+        <button onclick="fetchInboundCards()" class="text-[10px] font-bold text-forest hover:underline">🔄 Sync Cards</button>
       </div>
       <div class="bg-cardbg border border-bordercolor rounded-2xl p-4 min-h-[160px]">
         <div id="pinball-list" class="flex flex-col gap-2.5"></div>
@@ -523,6 +524,61 @@
     }
   }
 
+  // LIVE INBOUND BOARD SYNC (FETCH INBOUND CARDS INTO PINBALL)
+  function fetchInboundCards() {
+    const fetchHookUrl = atob('aHR0cHM6Ly9ob29rLnVzMi5tYWtlLmNvbS9qMml0ZWdoaHBpd2ZvZGJ2bThxY3d0MXlvb25vY2V4bg==');
+    
+    fetch(fetchHookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'fetch_pinball', timestamp: new Date().toISOString() })
+    })
+    .then(async res => {
+      const raw = await res.text();
+      return cleanAndParseJSON(raw);
+    })
+    .then(data => {
+      if (data && data.items && Array.isArray(data.items)) {
+        const store = getStorage();
+        let newItemsAdded = 0;
+
+        data.items.forEach(inbound => {
+          const clientName = inbound.name || inbound.clientName || "Inbound SMS";
+          const textMsg = inbound.text || inbound.note || "New message from Twilio";
+          const exists = store.pinballQueue.some(c => c.externalId === inbound.id || (c.clientName === clientName && c.text === textMsg));
+
+          if (!exists) {
+            const matches = findAllVaultMatches(clientName);
+            let finalAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (inbound.address || "On File / In Vault");
+            let finalPhone = matches.length > 0 ? formatRowPhone(matches[0]) : (inbound.phone || "On File");
+
+            store.pinballQueue.unshift({
+              id: Date.now() + Math.floor(Math.random() * 1000),
+              externalId: inbound.id || null,
+              text: textMsg,
+              clientName: clientName,
+              address: finalAddress,
+              allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [],
+              phone: finalPhone,
+              time: inbound.time || "Inbound",
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+            newItemsAdded++;
+          }
+        });
+
+        if (newItemsAdded > 0) {
+          saveStorage(store);
+          render();
+          showStatus(`⚡ Fetched ${newItemsAdded} inbound card(s) into Pinball!`);
+        }
+      }
+    })
+    .catch(() => {
+      // Quiet fail if no new items returned
+    });
+  }
+
   function handleVoiceIntake(text) {
     showStatus("⚡ FRESH: Sissy is organizing your note...");
 
@@ -825,7 +881,9 @@
       `).join('');
   }
 
+  // INITIALIZE FLOOR AND FETCH LIVE INBOUND BOARD CARDS
   render();
+  fetchInboundCards();
 </script>
 </body>
 </html>
