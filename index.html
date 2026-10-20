@@ -37,53 +37,10 @@
 </head>
 <body class="font-sans min-h-screen p-4 md:p-6 flex justify-center">
 
+<!-- MEDIA INPUT SUPPORTS BOTH PHOTO SNAPS & VIDEO CLIPS -->
 <input type="file" id="cameraInput" accept="image/*,video/*" capture="environment" class="hidden" onchange="handleMediaCapture(event)">
 
-<!-- 1. PUBLIC CARD VIEWER (SHOWN WHEN OPENED VIA ?card=...) -->
-<div id="public-card-viewer" class="hidden w-full max-w-lg flex flex-col gap-5">
-  <header class="bg-cardbg border border-bordercolor rounded-2xl p-5 shadow-sm flex items-center justify-between text-left">
-    <div class="flex items-center gap-3">
-      <span class="font-cursive text-6xl text-gold font-bold select-none leading-none">F</span>
-      <div class="flex flex-col">
-        <span class="font-extrabold text-base tracking-wide text-ink leading-tight">FOREVER CARD™</span>
-        <span class="text-xs font-bold text-forest tracking-normal">Towson Healthy Homes • Powered by TappyThing</span>
-      </div>
-    </div>
-  </header>
-
-  <div class="bg-white border-2 border-gold rounded-3xl p-6 shadow-xl flex flex-col gap-4 text-center">
-    <div class="w-24 h-24 rounded-full border-4 border-gold bg-white shadow-md overflow-hidden mx-auto flex items-center justify-center">
-      <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';">
-    </div>
-
-    <div>
-      <h2 id="public-client-name" class="font-extrabold text-xl text-ink">Welcome</h2>
-      <p id="public-client-address" class="text-xs text-muted mt-0.5">Verified Customer Account</p>
-    </div>
-
-    <div class="bg-parchment p-4 rounded-2xl border border-bordercolor text-left flex flex-col gap-1.5">
-      <div class="text-[10px] font-bold text-forest uppercase tracking-wider">🌟 Living Portal Message</div>
-      <p id="public-portal-message" class="text-xs text-ink leading-relaxed">Tap the mic below to speak directly with Sissy or Fresh. Order replacement supplies, request a diagnostic, or schedule a service visit.</p>
-    </div>
-
-    <!-- VOICE INTAKE MIC -->
-    <div class="flex flex-col gap-2 pt-2">
-      <button id="public-voice-btn" onclick="toggleVoiceIntake()" class="w-full py-3.5 bg-forest hover:bg-opacity-90 text-white font-extrabold text-sm rounded-2xl shadow-lg transition flex items-center justify-center gap-2">
-        <span>🎙️</span> <span id="public-voice-label">TALK TO FRESH / SISSY</span>
-      </button>
-      <input type="text" id="public-text-intake" placeholder="💬 Or type your request here..." 
-        onkeydown="checkPublicSubmit(event)"
-        class="w-full px-3.5 py-2.5 border border-bordercolor rounded-xl bg-white text-ink text-xs focus:outline-none focus:border-gold shadow-inner text-center">
-    </div>
-
-    <div id="public-sissy-status" class="hidden text-xs font-bold text-forest bg-emerald-100 border border-emerald-300 p-2.5 rounded-xl"></div>
-  </div>
-
-  <div class="text-center text-[11px] text-muted">Permanent Customer Record • Clean Environment LLC</div>
-</div>
-
-<!-- 2. MASTER OPERATOR WORKSTATION FLOOR (DEFAULT OPERATOR VIEW) -->
-<div id="operator-floor" class="w-full max-w-5xl flex flex-col gap-5 relative">
+<div class="w-full max-w-5xl flex flex-col gap-5 relative">
 
   <!-- MASTER HEADER -->
   <header class="bg-cardbg border border-bordercolor rounded-2xl p-5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-5 text-center md:text-left">
@@ -113,19 +70,26 @@
         class="w-full px-3.5 py-2 border border-bordercolor rounded-xl bg-white text-ink focus:outline-none focus:border-gold text-xs shadow-inner text-center md:text-left">
     </div>
 
-    <!-- RIGHT BADGE -->
-    <div class="flex flex-col items-center md:items-end justify-center min-w-[140px]">
+    <!-- RIGHT BADGE & RESET CONTROL -->
+    <div class="flex flex-col items-center md:items-end justify-center gap-2 min-w-[140px]">
       <span class="text-[10px] text-forest font-extrabold bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full shadow-sm">⚡ Sissy Active</span>
+      <button onclick="clearFloorStorage()" class="px-3 py-1 bg-parchment border border-bordercolor rounded-full text-[10px] font-bold text-muted hover:text-red-700 hover:border-red-300 transition flex items-center gap-1 shadow-xs">
+        <span>🧹</span> <span>Clear Floor</span>
+      </button>
     </div>
   </header>
 
-  <!-- SISSY INTELLIGENCE CONSOLE -->
-  <div id="sissy-console" class="hidden bg-cardbg border border-gold rounded-2xl p-4 shadow-md flex flex-col gap-1 transition-all">
+  <!-- 2-WAY CONVERSATIONAL DIALOGUE THREAD -->
+  <div id="conversation-thread" class="hidden bg-cardbg border border-gold rounded-2xl p-4 shadow-md flex flex-col gap-3 transition-all">
     <div class="flex justify-between items-center border-b border-bordercolor pb-1.5">
-      <span class="text-xs font-bold text-forest uppercase tracking-wider">💬 Sissy Intelligence Console</span>
-      <span class="text-[10px] text-muted font-bold" id="sissy-time">Just now</span>
+      <span class="text-xs font-bold text-forest uppercase tracking-wider flex items-center gap-1.5">
+        <span>💬</span> <span>2-Way Forever Card Thread</span>
+      </span>
+      <span class="text-[10px] text-muted font-bold" id="thread-time">Just now</span>
     </div>
-    <p id="sissy-response-text" class="text-xs text-ink font-medium leading-relaxed">Ready for intake.</p>
+    <div id="thread-bubbles" class="flex flex-col gap-2 max-h-48 overflow-y-auto pr-1 text-xs">
+      <!-- Chat bubbles inject dynamically here -->
+    </div>
   </div>
 
   <!-- STATUS BANNER -->
@@ -147,6 +111,7 @@
     <div class="flex flex-col gap-2">
       <div class="text-xs font-extrabold uppercase tracking-widest text-muted flex items-center justify-between">
         <span class="flex items-center gap-2"><span>📍</span> Pinball Action Zone</span>
+        <button onclick="fetchInboundCards()" class="text-[10px] font-bold text-forest hover:underline">🔄 Sync Cards</button>
       </div>
       <div class="bg-cardbg border border-bordercolor rounded-2xl p-4 min-h-[160px]">
         <div id="pinball-list" class="flex flex-col gap-2.5"></div>
@@ -252,7 +217,7 @@
       <button id="tab-btn-notes" onclick="switchCanvasTab('notes')" class="py-2 px-3 text-forest border-b-2 border-forest whitespace-nowrap">📋 Notes</button>
       <button id="tab-btn-invoice" onclick="switchCanvasTab('invoice')" class="py-2 px-3 text-muted hover:text-ink whitespace-nowrap">📜 Invoice</button>
       <button id="tab-btn-ledger" onclick="switchCanvasTab('ledger')" class="py-2 px-3 text-muted hover:text-ink whitespace-nowrap">📜 Ledger</button>
-      <button id="tab-btn-share" onclick="switchCanvasTab('share')" class="py-2 px-3 text-muted hover:text-ink whitespace-nowrap">🔗 Share Card</button>
+      <button id="tab-btn-portal" onclick="switchCanvasTab('portal')" class="py-2 px-3 text-muted hover:text-ink whitespace-nowrap">🌐 Portal Canvas</button>
     </div>
 
     <!-- TAB 1: NOTES -->
@@ -307,27 +272,55 @@
       </div>
     </div>
 
-    <!-- TAB 4: SHARE CARD PORTAL LINK -->
-    <div id="canvas-view-share" class="hidden bg-white p-3.5 rounded-xl border border-gold flex flex-col gap-3 shadow-sm">
+    <!-- TAB 4: PORTAL CANVAS (DYNAMIC PUBLIC LANDING PAGE ENGINE) -->
+    <div id="canvas-view-portal" class="hidden bg-white p-3.5 rounded-xl border border-gold flex flex-col gap-3 shadow-sm">
       <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between border-b border-bordercolor pb-1.5">
-        <span class="flex items-center gap-1.5"><span>🔗</span> Public Shareable Forever Card™</span>
-        <span class="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-full">Live URL Ready</span>
+        <span class="flex items-center gap-1.5"><span>🌐</span> Interactive Voice Portal</span>
+        <span class="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-full">Public Landing Engine</span>
       </div>
 
-      <p class="text-xs text-muted leading-relaxed">
-        This customer's Forever Card is a live interactive portal. Share this link on invoices, text messages, or marketing promotions so they can talk directly to Fresh/Sissy:
-      </p>
+      <!-- PORTAL CONTROLS -->
+      <div class="flex flex-col gap-2 text-xs">
+        <div>
+          <label class="text-[10px] font-bold text-muted uppercase block mb-1">Campaign Headline</label>
+          <input type="text" id="portal-campaign-input" value="Free 15-Minute Home Water & Air Diagnostic" oninput="updatePortalPreview()" 
+            class="w-full px-3 py-1.5 border border-bordercolor rounded-xl bg-parchment text-ink font-bold text-xs focus:outline-none focus:border-gold">
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-muted uppercase block mb-1">Video / Media URL (YouTube, MP4, Loom)</label>
+          <input type="text" id="portal-media-input" placeholder="https://..." oninput="updatePortalPreview()" 
+            class="w-full px-3 py-1.5 border border-bordercolor rounded-xl bg-parchment text-ink text-xs focus:outline-none focus:border-gold">
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-muted uppercase block mb-1">Offer Description</label>
+          <textarea id="portal-offer-input" rows="2" oninput="updatePortalPreview()" 
+            class="w-full px-3 py-1.5 border border-bordercolor rounded-xl bg-parchment text-ink text-xs focus:outline-none focus:border-gold">Tap below and speak to Fresh to claim your diagnostic, order replacement filter packs, or schedule a bench service!</textarea>
+        </div>
+      </div>
 
-      <div class="p-2.5 bg-parchment rounded-xl border border-bordercolor flex items-center justify-between gap-2">
-        <input type="text" id="shareable-card-url" readonly class="w-full bg-transparent text-xs text-ink font-mono font-bold select-all focus:outline-none">
-        <button onclick="copyShareCardUrl()" class="px-3 py-1.5 bg-forest text-white font-bold text-xs rounded-lg whitespace-nowrap shadow">
-          📋 Copy
+      <!-- LIVE INTERACTIVE PREVIEW CARD -->
+      <div class="border border-bordercolor rounded-2xl bg-ink p-4 text-white flex flex-col gap-3 relative shadow-lg">
+        <div class="flex justify-between items-center text-[10px] text-gold font-bold border-b border-gray-700 pb-1.5">
+          <span>TAPPYTHING PUBLIC CANVAS PREVIEW</span>
+          <span>⚡ LIVE 2-WAY DEMO</span>
+        </div>
+        <h4 id="portal-preview-headline" class="font-extrabold text-sm text-gold">Free 15-Minute Home Water & Air Diagnostic</h4>
+        <p id="portal-preview-offer" class="text-xs text-gray-300 leading-relaxed">Tap below and speak to Fresh to claim your diagnostic, order replacement filter packs, or schedule a bench service!</p>
+        
+        <button onclick="toggleVoiceIntake()" class="w-full py-2.5 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-2">
+          <span>🎙️</span> <span>SPEAK TO SISSY</span>
         </button>
       </div>
 
-      <button onclick="testOpenPublicPortal()" class="w-full py-2 bg-ink text-white font-bold text-xs rounded-xl transition">
-        🌐 Preview Public Customer View ➔
-      </button>
+      <!-- SHARE BAR -->
+      <div class="grid grid-cols-2 gap-2 pt-1 border-t border-bordercolor">
+        <button onclick="copyPublicPortalLink()" class="py-2 px-3 bg-parchment border border-bordercolor hover:bg-bordercolor text-ink font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5">
+          <span>📋</span> <span>Copy Public Link</span>
+        </button>
+        <button onclick="sharePortalSMS()" class="py-2 px-3 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow">
+          <span>⚡</span> <span>Share SMS / QR</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -339,19 +332,8 @@
   let catalogData = [];
   let activeCardId = null;
   let activeCardType = null;
-  let activeClientName = "";
   let isListening = false, recognition = null;
   let currentInvoiceItems = [];
-
-  // CHECK IF OPENED AS A PUBLIC CARD (?card=...)
-  const urlParams = new URLSearchParams(window.location.search);
-  const sharedCardParam = urlParams.get('card');
-
-  if (sharedCardParam) {
-    document.getElementById('operator-floor').classList.add('hidden');
-    document.getElementById('public-card-viewer').classList.remove('hidden');
-    document.getElementById('public-client-name').innerText = decodeURIComponent(sharedCardParam);
-  }
 
   Papa.parse(encodeURI('export_export (34).csv'), {
     download: true,
@@ -360,12 +342,6 @@
     complete: function(results) {
       if (results && results.data && results.data.length > 0) {
         vaultData = results.data;
-        if (sharedCardParam) {
-          const matches = findAllVaultMatches(decodeURIComponent(sharedCardParam));
-          if (matches.length > 0) {
-            document.getElementById('public-client-address').innerText = formatRowAddress(matches[0]);
-          }
-        }
       }
     }
   });
@@ -383,8 +359,7 @@
 
   function findAllVaultMatches(clientName) {
     if (!vaultData || vaultData.length === 0 || !clientName || clientName === "Direct Intake" || clientName === "Subscriber Note") return [];
-    let target = clientName.trim().toLowerCase();
-    target = target.replace(/^(mr|mr\.|mrs|mrs\.|ms|ms\.|dr|dr\.)\s+/i, '');
+    const target = clientName.trim().toLowerCase();
     const targetParts = target.split(' ').filter(p => p.length > 2);
 
     return vaultData.filter(row => {
@@ -395,7 +370,7 @@
 
       if (!fullName || fullName.length < 3) return false;
       return fullName === target || target.includes(fullName) || fullName.includes(target) ||
-        (targetParts.length >= 1 && targetParts.every(part => fullName.includes(part)));
+        (targetParts.length >= 2 && targetParts.every(part => fullName.includes(part)));
     });
   }
 
@@ -414,6 +389,18 @@
     return row['Phone'] || row['Phone Number'] || row['Mobile'] || row['Mobile Phone'] || row['Cell'] || row['Primary Phone'] || row['Phone 1'] || "On File";
   }
 
+  // SPEECH SYNTHESIS ENGINE (FRESH SPEAKS BACK AUDIBLY)
+  function speakAudibly(text) {
+    if ('speechSynthesis' in window && text) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      window.speechSynthesis.speak(utterance);
+    }
+  }
+
+  // FIXED SPEECH RECOGNITION (ONLY FIRES ON FINAL PHRASE)
   if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRec();
@@ -422,10 +409,8 @@
     
     recognition.onstart = () => {
       isListening = true;
-      const vLabel = document.getElementById('voice-label');
-      if (vLabel) vLabel.innerText = "LISTENING...";
-      const pvLabel = document.getElementById('public-voice-label');
-      if (pvLabel) pvLabel.innerText = "LISTENING...";
+      document.getElementById('voice-label').innerText = "LISTENING...";
+      document.getElementById('voice-btn').classList.add('bg-red-600');
     };
     
     recognition.onresult = (e) => {
@@ -434,13 +419,12 @@
 
       for (let i = e.resultIndex; i < e.results.length; ++i) {
         liveText += e.results[i][0].transcript;
-        if (e.results[i].isFinal) isFinalResult = true;
+        if (e.results[i].isFinal) {
+          isFinalResult = true;
+        }
       }
 
-      const txtBox = document.getElementById('text-intake');
-      if (txtBox) txtBox.value = liveText;
-      const pTxtBox = document.getElementById('public-text-intake');
-      if (pTxtBox) pTxtBox.value = liveText;
+      document.getElementById('text-intake').value = liveText;
 
       if (isFinalResult && liveText.trim().length > 3) {
         handleVoiceIntake(liveText.trim());
@@ -449,10 +433,8 @@
 
     recognition.onerror = recognition.onend = () => {
       isListening = false;
-      const vLabel = document.getElementById('voice-label');
-      if (vLabel) vLabel.innerText = "TALK TO FRESH";
-      const pvLabel = document.getElementById('public-voice-label');
-      if (pvLabel) pvLabel.innerText = "TALK TO FRESH / SISSY";
+      document.getElementById('voice-label').innerText = "TALK TO FRESH";
+      document.getElementById('voice-btn').classList.remove('bg-red-600');
     };
   }
 
@@ -461,13 +443,15 @@
     if (isListening) recognition.stop(); else recognition.start();
   }
 
-  function triggerCamera() { document.getElementById('cameraInput').click(); }
+  function triggerCamera() {
+    document.getElementById('cameraInput').click();
+  }
 
   function handleMediaCapture(event) {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
       const isVideo = file.type.startsWith('video');
-      showStatus(isVideo ? "🎥 Video clip captured!" : "📷 Photo captured!");
+      showStatus(isVideo ? "🎥 Video clip captured! Tap microphone to describe note." : "📷 Photo captured! Tap microphone to describe note.");
       setTimeout(() => { toggleVoiceIntake(); }, 800);
     }
   }
@@ -476,7 +460,15 @@
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       const val = e.target.value.trim();
-      if (val) { handleVoiceIntake(val); e.target.value = ''; }
+      if (val) { 
+        if (val.toLowerCase() === 'clear test history' || val.toLowerCase() === 'reset ledger') {
+          clearFloorStorage();
+          e.target.value = '';
+          return;
+        }
+        handleVoiceIntake(val); 
+        e.target.value = ''; 
+      }
     }
   }
 
@@ -484,16 +476,19 @@
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       const val = e.target.value.trim();
-      if (val) { handleVoiceIntake(val); e.target.value = ''; }
+      if (val) {
+        handleVoiceIntake(val);
+        e.target.value = '';
+      }
     }
   }
 
-  function checkPublicSubmit(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      const val = e.target.value.trim();
-      if (val) { handleVoiceIntake(val); e.target.value = ''; }
-    }
+  function clearFloorStorage() {
+    const store = { scheduledCards: [], pinballQueue: [], archive: [] };
+    saveStorage(store);
+    render();
+    showStatus("🧹 Floor cleared & reset!");
+    updateSissyConsole("Clean floor initialized. Ready for intake.", "System");
   }
 
   function toggleNetworking() {
@@ -507,29 +502,38 @@
 
   function showStatus(msg) {
     const b = document.getElementById('status-banner');
-    if (b) {
-      b.innerText = msg;
-      b.classList.remove('hidden');
-      setTimeout(() => b.classList.add('hidden'), 4000);
-    }
+    b.innerText = msg;
+    b.classList.remove('hidden');
+    setTimeout(() => b.classList.add('hidden'), 4000);
   }
 
-  function updateSissyConsole(responseText) {
-    const consoleBox = document.getElementById('sissy-console');
-    const textEl = document.getElementById('sissy-response-text');
-    const timeEl = document.getElementById('sissy-time');
+  // 2-WAY THREAD UPDATE ENGINE
+  function updateSissyConsole(responseText, userPrompt) {
+    const threadBox = document.getElementById('conversation-thread');
+    const bubbles = document.getElementById('thread-bubbles');
+    const timeEl = document.getElementById('thread-time');
 
-    if (consoleBox && textEl) {
-      consoleBox.classList.remove('hidden');
-      textEl.innerText = responseText;
-      if (timeEl) timeEl.innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    threadBox.classList.remove('hidden');
+    timeEl.innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    if (userPrompt) {
+      bubbles.innerHTML += `
+        <div class="self-end bg-forest text-white p-2.5 rounded-xl max-w-[85%] font-medium shadow-xs">
+          <span class="font-bold text-[10px] opacity-75 block uppercase">You</span>
+          "${userPrompt}"
+        </div>
+      `;
     }
 
-    const pubStatus = document.getElementById('public-sissy-status');
-    if (pubStatus) {
-      pubStatus.innerText = responseText;
-      pubStatus.classList.remove('hidden');
-    }
+    bubbles.innerHTML += `
+      <div class="self-start bg-parchment border border-bordercolor text-ink p-2.5 rounded-xl max-w-[90%] font-medium shadow-xs">
+        <span class="font-bold text-[10px] text-forest block uppercase">Fresh 🤵</span>
+        ${responseText}
+      </div>
+    `;
+
+    bubbles.scrollTop = bubbles.scrollHeight;
+    speakAudibly(responseText);
   }
 
   function openWorkstation() {
@@ -545,59 +549,139 @@
   }
 
   function switchCanvasTab(tabName) {
-    const tabs = ['notes', 'invoice', 'ledger', 'share'];
+    const tabs = ['notes', 'invoice', 'ledger', 'portal'];
     tabs.forEach(t => {
       const btn = document.getElementById(`tab-btn-${t}`);
       const view = document.getElementById(`canvas-view-${t}`);
-      if (btn && view) {
-        if (t === tabName) {
-          btn.className = "py-2 px-3 text-forest border-b-2 border-forest font-bold whitespace-nowrap";
-          view.classList.remove('hidden');
-        } else {
-          btn.className = "py-2 px-3 text-muted hover:text-ink font-bold whitespace-nowrap";
-          view.classList.add('hidden');
-        }
+      if (t === tabName) {
+        btn.className = "py-2 px-3 text-forest border-b-2 border-forest font-bold whitespace-nowrap";
+        view.classList.remove('hidden');
+      } else {
+        btn.className = "py-2 px-3 text-muted hover:text-ink font-bold whitespace-nowrap";
+        view.classList.add('hidden');
       }
     });
   }
 
+  function updatePortalPreview() {
+    const h = document.getElementById('portal-campaign-input').value;
+    const o = document.getElementById('portal-offer-input').value;
+    document.getElementById('portal-preview-headline').innerText = h || "Free Diagnostic";
+    document.getElementById('portal-preview-offer').innerText = o || "Tap below to speak!";
+  }
+
+  function copyPublicPortalLink() {
+    const link = `${window.location.origin}${window.location.pathname}?card=TowsonHealthyHomes`;
+    navigator.clipboard.writeText(link);
+    showStatus("📋 Public Portal Link copied to clipboard!");
+  }
+
+  function sharePortalSMS() {
+    const link = `${window.location.origin}${window.location.pathname}?card=TowsonHealthyHomes`;
+    const smsUrl = `sms:?&body=${encodeURIComponent("Check out our Forever Card Portal: " + link)}`;
+    window.location.href = smsUrl;
+  }
+
   function launchMapDirections() {
     const address = document.getElementById('vault-client-address').innerText;
-    if (!address || address === 'On File / In Vault') return alert("No address on file.");
-    window.open(`https://maps.apple.com/?daddr=${encodeURIComponent(address)}`, '_blank');
+    if (!address || address === 'On File / In Vault') {
+      return alert("No address on file for map directions.");
+    }
+    const mapsUrl = `https://maps.apple.com/?daddr=${encodeURIComponent(address)}`;
+    window.open(mapsUrl, '_blank');
   }
 
   function dialClientPhone() {
     const phone = document.getElementById('vault-client-phone').innerText;
-    if (!phone || phone === 'On File') return alert("No phone on file.");
+    if (!phone || phone === 'On File') {
+      return alert("No phone number on file to call.");
+    }
     window.location.href = `tel:${phone.replace(/[^0-9+]/g, '')}`;
   }
 
   function sendStagedSMS() {
     const phone = document.getElementById('vault-client-phone').innerText;
-    const msg = document.getElementById('staged-sms-text').value.trim() || "Hi, here is an update regarding your service from Towson Healthy Homes.";
-    if (!phone || phone === 'On File') return alert("No phone on file.");
-    window.location.href = `sms:${phone.replace(/[^0-9+]/g, '')}?&body=${encodeURIComponent(msg)}`;
-    updateSissyConsole(`✓ Dispatched staged SMS to ${phone}`);
-  }
-
-  function copyShareCardUrl() {
-    const urlBox = document.getElementById('shareable-card-url');
-    urlBox.select();
-    document.execCommand('copy');
-    showStatus("📋 Public Forever Card™ Link copied!");
-  }
-
-  function testOpenPublicPortal() {
-    const url = document.getElementById('shareable-card-url').value;
-    window.open(url, '_blank');
+    const msg = document.getElementById('staged-sms-text').value.trim();
+    if (!phone || phone === 'On File') {
+      return alert("No phone number on file for SMS dispatch.");
+    }
+    if (!msg) {
+      return alert("Please enter a staged message to send.");
+    }
+    const smsUrl = `sms:${phone.replace(/[^0-9+]/g, '')}?&body=${encodeURIComponent(msg)}`;
+    window.location.href = smsUrl;
+    
+    updateSissyConsole(`Dispatched staged SMS to ${phone}: "${msg}"`, msg);
+    showStatus(`⚡ SMS dispatched to ${phone}!`);
+    document.getElementById('staged-sms-text').value = '';
   }
 
   function cleanAndParseJSON(rawInput) {
     if (typeof rawInput === 'object' && rawInput !== null) return rawInput;
     let str = String(rawInput || '').trim();
-    if (str.startsWith('```')) str = str.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-    try { return JSON.parse(str); } catch(e) { return {}; }
+    if (str.startsWith('```')) {
+      str = str.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+    }
+    try {
+      return JSON.parse(str);
+    } catch(e) {
+      return {};
+    }
+  }
+
+  // LIVE INBOUND BOARD SYNC (FETCH INBOUND CARDS INTO PINBALL)
+  function fetchInboundCards() {
+    const fetchHookUrl = atob('aHR0cHM6Ly9ob29rLnVzMi5tYWtlLmNvbS9qMml0ZWdoaHBpd2ZvZGJ2bThxY3d0MXlvb25vY2V4bg==');
+    
+    fetch(fetchHookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'fetch_pinball', timestamp: new Date().toISOString() })
+    })
+    .then(async res => {
+      const raw = await res.text();
+      return cleanAndParseJSON(raw);
+    })
+    .then(data => {
+      if (data && data.items && Array.isArray(data.items)) {
+        const store = getStorage();
+        let newItemsAdded = 0;
+
+        data.items.forEach(inbound => {
+          const clientName = inbound.name || inbound.clientName || "Inbound SMS";
+          const textMsg = inbound.text || inbound.note || "New message from Twilio";
+          const exists = store.pinballQueue.some(c => c.externalId === inbound.id || (c.clientName === clientName && c.text === textMsg));
+
+          if (!exists) {
+            const matches = findAllVaultMatches(clientName);
+            let finalAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (inbound.address || "On File / In Vault");
+            let finalPhone = matches.length > 0 ? formatRowPhone(matches[0]) : (inbound.phone || "On File");
+
+            store.pinballQueue.unshift({
+              id: Date.now() + Math.floor(Math.random() * 1000),
+              externalId: inbound.id || null,
+              text: textMsg,
+              clientName: clientName,
+              address: finalAddress,
+              allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [],
+              phone: finalPhone,
+              time: inbound.time || "Inbound",
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+            newItemsAdded++;
+          }
+        });
+
+        if (newItemsAdded > 0) {
+          saveStorage(store);
+          render();
+          showStatus(`⚡ Fetched ${newItemsAdded} inbound card(s) into Pinball!`);
+        }
+      }
+    })
+    .catch(() => {
+      // Quiet fail if no new items returned
+    });
   }
 
   function handleVoiceIntake(text) {
@@ -614,18 +698,33 @@
       return cleanAndParseJSON(rawText);
     })
     .then(data => {
-      const clientName = data.clientName || data.client_name || (sharedCardParam ? decodeURIComponent(sharedCardParam) : "Direct Intake");
+      const clientName = data.clientName || data.client_name || "Direct Intake";
       const destination = (data.destination || '').toLowerCase();
-      const isScheduled = data.isScheduled === true || data.isScheduled === "true" || destination === 'calendar' || destination === 'schedule';
+      const isScheduled = data.isScheduled === true || 
+                          data.isScheduled === "true" || 
+                          destination === 'calendar' || 
+                          destination === 'schedule';
 
       const matches = findAllVaultMatches(clientName);
-      let finalAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (data.address || "On File / In Vault");
-      let finalPhone = matches.length > 0 ? formatRowPhone(matches[0]) : (data.phone || "On File");
+
+      let finalAddress = "On File / In Vault";
+      let finalPhone = "On File";
+      let allAddresses = [];
+
+      if (matches.length > 0) {
+        finalAddress = formatRowAddress(matches[0]);
+        finalPhone = formatRowPhone(matches[0]);
+        allAddresses = [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))];
+      } else if (data.address && data.address !== "On File / In Vault") {
+        finalAddress = data.address;
+        finalPhone = data.phone || "On File";
+      }
 
       const sissyMsg = data.sissyResponse || (isScheduled 
-        ? `✓ Scheduled appointment for ${clientName} • ${finalAddress}`
-        : `✓ Note processed for ${clientName}`);
-      updateSissyConsole(sissyMsg);
+        ? `Scheduled appointment for ${clientName} at ${finalAddress}.`
+        : `Got it! We have bags and filters ready for ${clientName} at our Timonium shop.`);
+      
+      updateSissyConsole(sissyMsg, text);
 
       const store = getStorage();
       const card = {
@@ -633,7 +732,7 @@
         text: data.notes || text,
         clientName: clientName,
         address: finalAddress,
-        allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [],
+        allAddresses: allAddresses,
         phone: finalPhone,
         displayDate: data.displayDate || '',
         time: data.time || "Time Pending",
@@ -642,20 +741,31 @@
 
       if (isScheduled) {
         store.scheduledCards.unshift(card);
+        showStatus("⚡ Sissy scheduled appointment!");
       } else {
         store.pinballQueue.unshift(card);
+        showStatus("⚡ Sissy queued note in Pinball!");
       }
 
       saveStorage(store);
-      if (!sharedCardParam) render();
+      render();
     })
     .catch(err => {
       const matches = findAllVaultMatches(text);
-      let clientName = matches.length > 0 ? (matches[0]['Name'] || "Verified Customer") : "Note Pending Sync";
-      let finalAddress = matches.length > 0 ? formatRowAddress(matches[0]) : "Awaiting Sissy";
-      let finalPhone = matches.length > 0 ? formatRowPhone(matches[0]) : "Awaiting Sissy";
+      let clientName = "Note Pending Sync";
+      let finalAddress = "Awaiting Sissy";
+      let finalPhone = "Awaiting Sissy";
+      let allAddresses = [];
 
-      updateSissyConsole(`✓ Saved local note for "${text}" to Pinball.`);
+      if (matches.length > 0) {
+        clientName = matches[0]['Name'] || "Verified Customer";
+        finalAddress = formatRowAddress(matches[0]);
+        finalPhone = formatRowPhone(matches[0]);
+        allAddresses = [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))];
+      }
+
+      const defaultReply = `Absolutely! We have genuine Aerus & Electrolux bags and filters in stock. Your request is queued for William & Chris at our Timonium shop!`;
+      updateSissyConsole(defaultReply, text);
 
       const store = getStorage();
       store.pinballQueue.unshift({
@@ -663,20 +773,20 @@
         text: text,
         clientName: clientName,
         address: finalAddress,
-        allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [],
+        allAddresses: allAddresses,
         phone: finalPhone,
         time: "Pending",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       });
       saveStorage(store);
-      if (!sharedCardParam) render();
+      render();
+      showStatus("⚡ Note saved to Pinball");
     });
   }
 
   function openCustomerCard(text, clientName, address, phone, cardId, cardType) {
     activeCardId = cardId;
     activeCardType = cardType;
-    activeClientName = clientName;
     const store = getStorage();
     const allCards = [...store.scheduledCards, ...store.pinballQueue];
     const card = allCards.find(c => c.id === cardId);
@@ -686,10 +796,6 @@
     document.getElementById('vault-client-address').innerText = address && address !== 'undefined' ? address : "On File / In Vault";
     document.getElementById('vault-client-phone').innerText = phone && phone !== 'undefined' ? phone : "On File";
     document.getElementById('active-card-note').innerText = `"${text}"`;
-
-    // SET PUBLIC SHARE URL
-    const publicUrl = `${window.location.origin}${window.location.pathname}?card=${encodeURIComponent(clientName)}`;
-    document.getElementById('shareable-card-url').value = publicUrl;
 
     currentInvoiceItems = [{ desc: text, qty: 1, price: 0.00 }];
     renderInvoiceCanvas();
@@ -718,7 +824,9 @@
 
   function removeInvoiceLineItem(index) {
     currentInvoiceItems.splice(index, 1);
-    if (currentInvoiceItems.length === 0) currentInvoiceItems.push({ desc: '', qty: 1, price: 0.00 });
+    if (currentInvoiceItems.length === 0) {
+      currentInvoiceItems.push({ desc: '', qty: 1, price: 0.00 });
+    }
     renderInvoiceCanvas();
   }
 
@@ -731,7 +839,7 @@
 
   function calculateInvoiceTotal() {
     const total = currentInvoiceItems.reduce((sum, item) => sum + ((item.qty || 1) * (item.price || 0)), 0);
-    document.getElementById('invoice-canvas-total').innerText = `${total.toFixed(2)}`;
+    document.getElementById('invoice-canvas-total').innerText = `$${total.toFixed(2)}`;
     return total;
   }
 
@@ -743,7 +851,7 @@
           class="col-span-6 px-2 py-1 border border-bordercolor rounded bg-parchment text-xs text-ink focus:outline-none focus:border-gold">
         <input type="number" min="1" value="${item.qty}" oninput="updateInvoiceItem(${idx}, 'qty', this.value)"
           class="col-span-2 px-1 py-1 border border-bordercolor rounded bg-parchment text-xs text-ink text-center focus:outline-none focus:border-gold">
-        <input type="text" value="${(item.price || 0).toFixed(2)}" oninput="updateInvoiceItem(${idx}, 'price', this.value)"
+        <input type="text" value="$${(item.price || 0).toFixed(2)}" oninput="updateInvoiceItem(${idx}, 'price', this.value)"
           class="col-span-3 px-2 py-1 border border-bordercolor rounded bg-parchment text-xs text-ink font-bold text-right focus:outline-none focus:border-gold">
         <button onclick="removeInvoiceLineItem(${idx})" class="col-span-1 text-red-500 font-bold text-center hover:text-red-700">✕</button>
       </div>
@@ -784,9 +892,13 @@
   function sendSMSPaymentLink() {
     const phone = document.getElementById('vault-client-phone').innerText;
     const amount = document.getElementById('invoice-canvas-total').innerText;
-    if (!phone || phone === 'On File') return alert("No phone on file.");
+
+    if (phone === 'On File' || !phone) {
+      return alert("No phone number on file for SMS payment link.");
+    }
+
     showStatus(`⚡ SMS Payment Link (${amount}) sent to ${phone}!`);
-    updateSissyConsole(`✓ Dispatched ${amount} payment link via SMS to ${phone}.`);
+    updateSissyConsole(`Dispatched ${amount} payment link via SMS to ${phone}.`, `Send Payment Link`);
   }
 
   function completeActiveCard() {
@@ -795,7 +907,7 @@
     let item = store.scheduledCards.find(i => i.id === activeCardId) || store.pinballQueue.find(i => i.id === activeCardId);
 
     const total = calculateInvoiceTotal();
-    const amountStr = `${total.toFixed(2)}`;
+    const amountStr = `$${total.toFixed(2)}`;
     const mainDesc = currentInvoiceItems.map(i => i.desc).filter(Boolean).join(', ') || item.text;
 
     if (item) {
@@ -811,7 +923,7 @@
       
       renderLifetimeLedger(item.clientName);
       render();
-      updateSissyConsole(`✓ Marked service paid (${item.amount}) for ${item.clientName}. Docked into Lifetime Ledger.`);
+      updateSissyConsole(`Marked service paid (${item.amount}) for ${item.clientName}. Docked into Lifetime Ledger.`, `Mark Paid`);
       closeWorkstation();
       showStatus(`⚡ Milestone settled (${item.amount}) & docked!`);
     }
@@ -826,7 +938,7 @@
         card.address = newAddress;
         saveStorage(store);
         render();
-        updateSissyConsole(`✓ Updated address for ${card.clientName} to ${newAddress}`);
+        updateSissyConsole(`Updated address for ${card.clientName} to ${newAddress}`, `Switch Address`);
       }
     }
   }
@@ -841,46 +953,44 @@
   function render() {
     const store = getStorage();
     const cal = document.getElementById('schedule-list');
-    if (cal) {
-      cal.innerHTML = store.scheduledCards.length === 0 ? '<div class="text-muted text-xs italic">No scheduled appointments.</div>' :
-        store.scheduledCards.map(item => `
-          <div class="bg-white border-l-4 border-blue-600 border border-bordercolor rounded-xl p-3 flex flex-col justify-between shadow-sm">
-            <div class="flex justify-between items-start">
-              <div>
-                <div class="font-bold text-ink text-xs">${item.clientName}</div>
-                <p class="text-[11px] text-muted italic">"${item.text}"</p>
-                <div class="text-[10px] text-gold font-bold mt-0.5">📍 ${item.address}</div>
-                <div class="text-[10px] text-muted mt-0.5">${item.displayDate ? item.displayDate + ' • ' : ''}${item.time || item.timestamp}</div>
-              </div>
-              <div class="flex gap-1.5">
-                <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}', ${item.id}, 'calendar')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
-              </div>
+    cal.innerHTML = store.scheduledCards.length === 0 ? '<div class="text-muted text-xs italic">No scheduled appointments.</div>' :
+      store.scheduledCards.map(item => `
+        <div class="bg-white border-l-4 border-blue-600 border border-bordercolor rounded-xl p-3 flex flex-col justify-between shadow-sm">
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="font-bold text-ink text-xs">${item.clientName}</div>
+              <p class="text-[11px] text-muted italic">"${item.text}"</p>
+              <div class="text-[10px] text-gold font-bold mt-0.5">📍 ${item.address}</div>
+              <div class="text-[10px] text-muted mt-0.5">${item.displayDate ? item.displayDate + ' • ' : ''}${item.time || item.timestamp}</div>
+            </div>
+            <div class="flex gap-1.5">
+              <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}', ${item.id}, 'calendar')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
             </div>
           </div>
-        `).join('');
-    }
+        </div>
+      `).join('');
 
     const pin = document.getElementById('pinball-list');
-    if (pin) {
-      pin.innerHTML = store.pinballQueue.length === 0 ? '<div class="text-muted text-xs italic">Queue clean.</div>' :
-        store.pinballQueue.map(item => `
-          <div class="bg-white border-l-4 border-gold border border-bordercolor rounded-xl p-3 flex flex-col justify-between shadow-sm">
-            <div class="flex justify-between items-start">
-              <div>
-                <div class="font-bold text-ink text-xs">${item.clientName}</div>
-                <p class="text-[11px] text-muted italic">"${item.text}"</p>
-                <div class="text-[10px] text-muted mt-0.5">Queued • ${item.timestamp}</div>
-              </div>
-              <div class="flex gap-1.5">
-                <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}', ${item.id}, 'pinball')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
-              </div>
+    pin.innerHTML = store.pinballQueue.length === 0 ? '<div class="text-muted text-xs italic">Queue clean.</div>' :
+      store.pinballQueue.map(item => `
+        <div class="bg-white border-l-4 border-gold border border-bordercolor rounded-xl p-3 flex flex-col justify-between shadow-sm">
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="font-bold text-ink text-xs">${item.clientName}</div>
+              <p class="text-[11px] text-muted italic">"${item.text}"</p>
+              <div class="text-[10px] text-muted mt-0.5">Queued • ${item.timestamp}</div>
+            </div>
+            <div class="flex gap-1.5">
+              <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}', ${item.id}, 'pinball')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition">Open Card ➔</button>
             </div>
           </div>
-        `).join('');
-    }
+        </div>
+      `).join('');
   }
 
-  if (!sharedCardParam) render();
+  // INITIALIZE FLOOR AND FETCH LIVE INBOUND BOARD CARDS
+  render();
+  fetchInboundCards();
 </script>
 </body>
 </html>
