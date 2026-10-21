@@ -898,12 +898,12 @@
         finalPhone = MASTER_CARD.phone;
       }
 
-      // CUSTOMER-FACING RECOGNITION RESPONSE
+      // CUSTOMER-FACING REassuring CONFIRMATION RESPONSE
       let sissyMsg = data.sissyResponse;
       if (isPublicMode && isReturningVIP) {
-        sissyMsg = `Welcome back, ${clientName}! I located your account on file. Your request has been queued for our Timonium team!`;
+        sissyMsg = `Welcome back, ${clientName}! I located your account on file. Our Timonium team has your request and will text you shortly with confirmation and pickup/delivery details!`;
       } else if (isPublicMode && !isReturningVIP && clientName !== MASTER_CARD.clientName) {
-        sissyMsg = `Thanks ${clientName}! Your request has been queued for our Timonium team. We'll be in touch shortly!`;
+        sissyMsg = `Thanks ${clientName}! Our Timonium team has received your request and will text you shortly to confirm your order details!`;
       } else if (!sissyMsg) {
         sissyMsg = isScheduled 
           ? `Scheduled appointment for ${clientName} at ${finalAddress}.`
@@ -953,8 +953,8 @@
       }
 
       const defaultReply = isReturningVIP
-        ? `Welcome back, ${clientName}! I located your account on file. Your request is queued for our Timonium service team!`
-        : `Thanks for reaching out! We have genuine Aerus & Electrolux bags and filters in stock. Your request is queued for our Timonium service team!`;
+        ? `Welcome back, ${clientName}! I located your account on file. Our Timonium team has your request and will text you shortly with confirmation and pickup/delivery details!`
+        : `Thanks for reaching out! Our Timonium team has received your request and will text you shortly to confirm your order details!`;
       
       updateSissyConsole(defaultReply, text);
 
