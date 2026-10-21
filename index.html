@@ -100,7 +100,7 @@
       </div>
     </div>
 
-    <!-- MEET FRESH 2-WAY INTERACTIVE INTAKE (VOICE & QUIET TYPING) -->
+    <!-- MEET FRESH 2-WAY INTERACTIVE INTAKE (VOICE & QUIET TYPING WITH VISUAL SEND BUTTON) -->
     <div class="w-full bg-white border border-gold rounded-2xl p-5 shadow-inner flex flex-col items-center gap-3">
       <div class="text-xs text-muted max-w-lg">
         <strong class="text-ink">Meet Fresh, your 24/7 Digital Assistant at Towson Healthy Homes.</strong> Need bags, replacement filters, or a free water test? Tap to speak or type quietly below!
@@ -110,9 +110,15 @@
         <span>🎙️</span> <span id="public-voice-label">TALK TO FRESH</span>
       </button>
 
-      <input type="text" id="public-text-intake" placeholder="💬 Or type quietly here (e.g. Order bags, book water test)..." 
-        onkeydown="checkPublicSubmit(event)"
-        class="w-full max-w-sm px-4 py-2.5 border border-bordercolor rounded-xl bg-white text-ink text-xs focus:outline-none focus:border-gold shadow-inner text-center">
+      <!-- VISUAL SEND BUTTON FOR QUIET TYPING -->
+      <div class="flex gap-2 w-full max-w-sm">
+        <input type="text" id="public-text-intake" placeholder="💬 Type your request here..." 
+          onkeydown="checkPublicSubmit(event)"
+          class="flex-1 px-4 py-2.5 border border-bordercolor rounded-xl bg-white text-ink text-xs focus:outline-none focus:border-gold shadow-inner text-left">
+        <button onclick="submitPublicText()" class="px-4 py-2.5 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center">
+          <span>Send</span>
+        </button>
+      </div>
 
       <div id="public-thread" class="hidden w-full bg-parchment border border-bordercolor rounded-xl p-4 flex flex-col gap-2 text-xs text-left shadow-xs">
         <div id="public-bubbles" class="flex flex-col gap-2 max-h-40 overflow-y-auto"></div>
@@ -563,11 +569,16 @@
   function checkPublicSubmit(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      const val = e.target.value.trim();
-      if (val) {
-        handleVoiceIntake(val);
-        e.target.value = '';
-      }
+      submitPublicText();
+    }
+  }
+
+  function submitPublicText() {
+    const box = document.getElementById('public-text-intake');
+    const val = box.value.trim();
+    if (val) {
+      handleVoiceIntake(val);
+      box.value = '';
     }
   }
 
@@ -893,7 +904,7 @@
         allAddresses = [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))];
       }
 
-      const defaultReply = `Thanks for reaching out! We have genuine Aerus & Electrolux bags and filters in stock. Your request is queued for William & Chris at our Timonium shop!`;
+      const defaultReply = `Thanks for reaching out! We have genuine Aerus & Electrolux bags and filters in stock. Your request is queued for our Timonium service team!`;
       updateSissyConsole(defaultReply, text);
 
       const store = getStorage();
