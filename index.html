@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FOREVER CARD™ — Powered by TappyThing</title>
+  <title>Aerus of Towson • Clean Environment LLC</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -43,7 +43,7 @@
 <div id="public-card-viewer" class="hidden w-full max-w-4xl flex flex-col gap-6 my-auto">
   <header class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
     <div class="flex items-center gap-3">
-      <span class="font-cursive text-6xl text-gold font-bold leading-none select-none">F</span>
+      <span class="font-cursive text-6xl text-gold font-bold leading-none select-none">A</span>
       <div>
         <h1 class="font-extrabold text-lg text-ink">Aerus of Towson • Clean Environment LLC</h1>
         <p class="text-xs font-bold text-forest">Healthy Home Specialists • Timonium, MD</p>
@@ -51,7 +51,7 @@
     </div>
     <div class="flex flex-col sm:flex-row items-center gap-2">
       <a href="https://www.towsonhealthyhomes.com" target="_blank" class="px-3.5 py-2 bg-parchment border border-bordercolor text-forest font-bold text-xs rounded-xl hover:bg-bordercolor transition flex items-center gap-1">
-        <span>🌐 Visit Official Website</span> <span>➔</span>
+        <span>🌐 Official Website</span> <span>➔</span>
       </a>
       <a href="tel:4108821027" class="px-4 py-2 bg-forest text-white font-bold text-xs rounded-xl shadow hover:bg-opacity-90 transition">
         📞 (410) 882-1027
@@ -100,15 +100,19 @@
       </div>
     </div>
 
-    <!-- MEET FRESH 2-WAY INTERACTIVE VOICE INTAKE -->
+    <!-- MEET FRESH 2-WAY INTERACTIVE INTAKE (VOICE & QUIET TYPING) -->
     <div class="w-full bg-white border border-gold rounded-2xl p-5 shadow-inner flex flex-col items-center gap-3">
       <div class="text-xs text-muted max-w-lg">
-        <strong class="text-ink">Meet Fresh, your 24/7 Digital Assistant at Towson Healthy Homes.</strong> Need bags, replacement filters, or a free water test? Tap below and speak naturally!
+        <strong class="text-ink">Meet Fresh, your 24/7 Digital Assistant at Towson Healthy Homes.</strong> Need bags, replacement filters, or a free water test? Tap to speak or type quietly below!
       </div>
 
       <button id="public-voice-btn" onclick="toggleVoiceIntake()" class="w-full max-w-sm py-3.5 bg-forest hover:bg-opacity-90 text-white font-extrabold text-sm rounded-xl shadow-lg transition flex items-center justify-center gap-2">
         <span>🎙️</span> <span id="public-voice-label">TALK TO FRESH</span>
       </button>
+
+      <input type="text" id="public-text-intake" placeholder="💬 Or type quietly here (e.g. Order bags, book water test)..." 
+        onkeydown="checkPublicSubmit(event)"
+        class="w-full max-w-sm px-4 py-2.5 border border-bordercolor rounded-xl bg-white text-ink text-xs focus:outline-none focus:border-gold shadow-inner text-center">
 
       <div id="public-thread" class="hidden w-full bg-parchment border border-bordercolor rounded-xl p-4 flex flex-col gap-2 text-xs text-left shadow-xs">
         <div id="public-bubbles" class="flex flex-col gap-2 max-h-40 overflow-y-auto"></div>
@@ -116,9 +120,13 @@
     </div>
   </main>
 
-  <footer class="bg-cardbg border border-bordercolor rounded-2xl p-4 text-center text-xs text-muted flex flex-col md:flex-row justify-between items-center gap-2">
-    <div>📍 1965 Greenspring Drive, Suite G-16, Timonium, MD 21093 (Inside Timonium Wellness Center / Building ELEVATE)</div>
-    <div>Mon–Thu 9AM–4PM • Fri 9AM–3PM • Sat 9AM–12PM</div>
+  <footer class="bg-cardbg border border-bordercolor rounded-2xl p-4 text-center text-xs text-muted flex flex-col gap-2">
+    <div>📍 1965 Greenspring Drive, Suite G-16, Timonium, MD 21093</div>
+    <div class="text-[11px]">Wayfinding: Look for building labeled <strong>ELEVATE</strong> — inside Timonium Wellness Center.</div>
+    <div>Mon–Thu 9AM–4PM • Fri 9AM–3PM • Sat 9AM–12PM • Sun Closed • 📞 (410) 882-1027</div>
+    <div class="text-[10px] text-muted opacity-75 border-t border-bordercolor pt-2 mt-1">
+      Powered by TappyThing™ Forever Card™ Engine
+    </div>
   </footer>
 </div>
 
@@ -548,6 +556,17 @@
         }
         handleVoiceIntake(val); 
         e.target.value = ''; 
+      }
+    }
+  }
+
+  function checkPublicSubmit(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const val = e.target.value.trim();
+      if (val) {
+        handleVoiceIntake(val);
+        e.target.value = '';
       }
     }
   }
