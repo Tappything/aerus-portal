@@ -100,7 +100,7 @@
       </div>
     </div>
 
-    <!-- MEET FRESH 2-WAY INTERACTIVE INTAKE (VOICE & QUIET TYPING WITH VISUAL SEND BUTTON) -->
+    <!-- MEET FRESH 2-WAY INTERACTIVE INTAKE -->
     <div class="w-full bg-white border border-gold rounded-2xl p-5 shadow-inner flex flex-col items-center gap-3">
       <div class="text-xs text-muted max-w-lg">
         <strong class="text-ink">Meet Fresh, your 24/7 Digital Assistant at Towson Healthy Homes.</strong> Need bags, replacement filters, or a free water test? Tap to speak or type quietly below!
@@ -110,7 +110,6 @@
         <span>🎙️</span> <span id="public-voice-label">TALK TO FRESH</span>
       </button>
 
-      <!-- VISUAL SEND BUTTON FOR QUIET TYPING -->
       <div class="flex gap-2 w-full max-w-sm">
         <input type="text" id="public-text-intake" placeholder="💬 Type your request here..." 
           onkeydown="checkPublicSubmit(event)"
@@ -345,6 +344,9 @@
         <button onclick="completeActiveCard()" class="flex-1 py-2.5 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
           <span>✓</span> <span>Mark Paid & Dock</span>
         </button>
+        <button onclick="dismissActiveCardMistake()" class="py-2.5 px-3 bg-gray-200 hover:bg-red-100 hover:text-red-700 text-muted font-bold text-xs rounded-xl transition flex items-center justify-center gap-1 shadow-xs">
+          <span>🗑️</span> <span>Dismiss / Mistake</span>
+        </button>
       </div>
     </div>
 
@@ -408,6 +410,7 @@
   let isListening = false, recognition = null;
   let currentInvoiceItems = [];
   let isPublicMode = false;
+  let autoFadeTimer = null;
 
   const SISSY_HOOK = atob('aHR0cHM6Ly9ob29rLnVzMi5tYWtlLmNvbS8zNXc1bXJucTh3MzBqMWZkYTU1cm91c2RleWE1bzE4Zg==');
 
@@ -426,7 +429,7 @@
     document.getElementById('public-card-viewer').classList.remove('hidden');
   }
 
-  // FORCE IMMEDIATE AUTO-SYNC ENGINE ON LOAD & WINDOW FOCUS
+  // 1. HARD CLOUD SYNC ON LOAD & WINDOW FOCUS
   window.addEventListener('load', () => {
     if (!isPublicMode) fetchInboundCards(false);
   });
@@ -641,6 +644,7 @@
     setTimeout(() => b.classList.add('hidden'), 4000);
   }
 
+  // 3. AUTO-FADE CHAT BANNER AFTER 10 SECONDS
   function updateSissyConsole(responseText, userPrompt) {
     if (isPublicMode) {
       const publicThread = document.getElementById('public-thread');
@@ -697,6 +701,11 @@
 
     bubbles.scrollTop = bubbles.scrollHeight;
     speakAudibly(responseText);
+
+    if (autoFadeTimer) clearTimeout(autoFadeTimer);
+    autoFadeTimer = setTimeout(() => {
+      threadBox.classList.add('hidden');
+    }, 10000);
   }
 
   function openWorkstation() {
@@ -829,7 +838,7 @@
     }
   }
 
-  // 2. TRUE CLOUD FETCH & RE-RENDER ENGINE
+  // 1. HARD CLOUD SYNC DIRECTLY RENDERING MAKE.COM STATE
   function fetchInboundCards(userTriggered) {
     if (isPublicMode) return;
     const fetchHookUrl = atob('aHR0cHM6Ly9ob29rLnVzMi5tYWtlLmNvbS9qMml0ZWdoaHBpd2ZvZGJ2bThxY3d0MXlvb25vY2V4bg==');
@@ -849,7 +858,6 @@
         let updated = false;
 
         if (data.items && Array.isArray(data.items)) {
-          // Replace or reconcile cloud items to ensure cross-device consistency
           store.pinballQueue = data.items.map(inbound => {
             let clientName = inbound.name || inbound.clientName;
             const textMsg = inbound.text || inbound.note || "New message from Twilio";
@@ -903,7 +911,7 @@
         if (updated) {
           saveStorage(store);
           render();
-          if (userTriggered) showStatus("🔄 Cloud state synced live!");
+          if (userTriggered) showStatus("🔄 Live floor synced across all devices!");
         }
       }
     })
@@ -1188,6 +1196,7 @@
       item.amount = total > 0 ? amountStr : '💵 Paid';
       item.completedAt = new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+      store.archive = store.archive || [];
       store.archive.unshift(item);
       saveStorage(store);
       
@@ -1196,6 +1205,31 @@
       updateSissyConsole(`Marked service paid (${item.amount}) for ${item.clientName}. Docked into Lifetime Ledger.`, `Mark Paid`);
       closeWorkstation();
       showStatus(`⚡ Milestone settled (${item.amount}) & docked!`);
+    }
+  }
+
+  // 2. IN-CARD DISMISS / MISTAKE ACTION
+  function dismissActiveCardMistake() {
+    if (!activeCardId) return;
+    const store = getStorage();
+    let item = store.scheduledCards.find(i => i.id === activeCardId) || store.pinballQueue.find(i => i.id === activeCardId);
+
+    if (item) {
+      store.scheduledCards = store.scheduledCards.filter(i => i.id !== activeCardId);
+      store.pinballQueue = store.pinballQueue.filter(i => i.id !== activeCardId);
+
+      item.desc = "Dismissed Mistake Note";
+      item.amount = "🗑️ Archived";
+      item.completedAt = new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      store.archive = store.archive || [];
+      store.archive.unshift(item);
+      saveStorage(store);
+
+      render();
+      closeWorkstation();
+      showStatus("🗑️ Mistake note archived safely out of view!");
+      updateSissyConsole(`Archived mistake note for ${item.clientName}.`, `Dismiss Mistake`);
     }
   }
 
