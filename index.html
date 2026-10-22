@@ -429,6 +429,7 @@
       if (results && results.data && results.data.length > 0) {
         vaultData = results.data;
       }
+      if (!isPublicMode) fetchInboundCards();
     }
   });
 
@@ -856,6 +857,35 @@
           }
         });
 
+        if (data.scheduled && Array.isArray(data.scheduled)) {
+          data.scheduled.forEach(sched => {
+            let clientName = sched.name || sched.clientName;
+            const textMsg = sched.text || sched.note || "Scheduled appointment";
+            const matches = findAllVaultMatches(clientName);
+            if (matches.length === 0 && (!clientName || clientName === "Direct Intake")) {
+              clientName = MASTER_CARD.clientName;
+            }
+            const exists = store.scheduledCards.some(c => c.externalId === sched.id || (c.clientName === clientName && c.text === textMsg));
+            if (!exists) {
+              let finalAddress = matches.length > 0 ? formatRowAddress(matches[0]) : MASTER_CARD.address;
+              let finalPhone = matches.length > 0 ? formatRowPhone(matches[0]) : MASTER_CARD.phone;
+              store.scheduledCards.unshift({
+                id: Date.now() + Math.floor(Math.random() * 1000),
+                externalId: sched.id || null,
+                text: textMsg,
+                clientName: clientName,
+                address: finalAddress,
+                allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [],
+                phone: finalPhone,
+                displayDate: sched.displayDate || '',
+                time: sched.time || "Scheduled",
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              });
+              newItemsAdded++;
+            }
+          });
+        }
+
         if (newItemsAdded > 0) {
           saveStorage(store);
           render();
@@ -967,6 +997,7 @@
 
       saveStorage(store);
       render();
+      setTimeout(fetchInboundCards, 500);
     })
     .catch(err => {
       const matches = findAllVaultMatches(text);
@@ -1004,6 +1035,7 @@
       saveStorage(store);
       render();
       showStatus("⚡ Note saved to Pinball");
+      setTimeout(fetchInboundCards, 500);
     });
   }
 
@@ -1214,7 +1246,6 @@
   }
 
   render();
-  fetchInboundCards();
 </script>
 </body>
 </html>
