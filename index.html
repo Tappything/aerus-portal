@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aerus of Towson • Clean Environment LLC</title>
+  <title>Digital Coordinator Workstation • TappyThing™</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -36,8 +36,8 @@
 
     @media print {
       body * { visibility: hidden; }
-      #printable-invoice-canvas, #printable-invoice-canvas * { visibility: visible; }
-      #printable-invoice-canvas {
+      #printable-executive-doc, #printable-executive-doc * { visibility: visible; }
+      #printable-executive-doc {
         position: absolute;
         left: 0;
         top: 0;
@@ -62,16 +62,16 @@
     <div class="flex items-center gap-3">
       <span class="font-cursive text-6xl text-gold font-bold leading-none select-none">A</span>
       <div>
-        <h1 class="font-extrabold text-lg text-ink">Aerus of Towson • Clean Environment LLC</h1>
-        <p class="text-xs font-bold text-forest">Healthy Home Specialists • Timonium, MD</p>
+        <h1 id="pub-header-title" class="font-extrabold text-lg text-ink">--</h1>
+        <p id="pub-header-tagline" class="text-xs font-bold text-forest">--</p>
       </div>
     </div>
     <div class="flex flex-col sm:flex-row items-center gap-2">
-      <a href="https://www.towsonhealthyhomes.com" target="_blank" class="px-3.5 py-2 bg-parchment border border-bordercolor text-forest font-bold text-xs rounded-xl hover:bg-bordercolor transition flex items-center gap-1">
+      <a id="pub-header-website" href="#" target="_blank" class="px-3.5 py-2 bg-parchment border border-bordercolor text-forest font-bold text-xs rounded-xl hover:bg-bordercolor transition flex items-center gap-1">
         <span>🌐 Official Website</span> <span>➔</span>
       </a>
-      <a href="tel:4108821027" class="px-4 py-2 bg-forest text-white font-bold text-xs rounded-xl shadow hover:bg-opacity-90 transition">
-        📞 (410) 882-1027
+      <a id="pub-header-phone-btn" href="#" class="px-4 py-2 bg-forest text-white font-bold text-xs rounded-xl shadow hover:bg-opacity-90 transition">
+        📞 <span id="pub-header-phone">--</span>
       </a>
     </div>
   </header>
@@ -82,11 +82,11 @@
     </div>
 
     <div>
-      <h2 class="text-xl md:text-3xl font-extrabold text-ink">Healthy Home Specialists: Pure Water, Clean Air & Floor Care</h2>
-      <p class="text-xs md:text-sm text-muted mt-2 max-w-xl mx-auto">Professional home wellness solutions with local Timonium support, fast testing, and guaranteed genuine parts.</p>
+      <h2 id="pub-main-headline" class="text-xl md:text-3xl font-extrabold text-ink">Healthy Home Specialists: Pure Water, Clean Air & Floor Care</h2>
+      <p class="text-xs md:text-sm text-muted mt-2 max-w-xl mx-auto">Professional home wellness solutions with local support, fast testing, and guaranteed genuine parts.</p>
     </div>
 
-    <!-- CHRIS'S 4 CORE WHITEBOARD PILLARS -->
+    <!-- CORE WHITEBOARD PILLARS -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full text-left">
       <div class="p-4 bg-white border border-bordercolor rounded-2xl shadow-xs flex flex-col gap-1">
         <div class="font-bold text-sm text-forest flex items-center gap-1.5">
@@ -106,7 +106,7 @@
         <div class="font-bold text-sm text-forest flex items-center gap-1.5">
           <span>🧹</span> <span>Dual-Action HEPA Vacuums</span>
         </div>
-        <p class="text-xs text-muted leading-relaxed">Legendary Electrolux & Aerus HEPA models engineered to clean your floors AND purify your indoor air simultaneously.</p>
+        <p class="text-xs text-muted leading-relaxed">Legendary HEPA models engineered to clean your floors AND purify your indoor air simultaneously.</p>
       </div>
 
       <div class="p-4 bg-white border border-bordercolor rounded-2xl shadow-xs flex flex-col gap-1">
@@ -120,7 +120,7 @@
     <!-- MEET FRESH 2-WAY INTERACTIVE INTAKE -->
     <div class="w-full bg-white border border-gold rounded-2xl p-5 shadow-inner flex flex-col items-center gap-3">
       <div class="text-xs text-muted max-w-lg">
-        <strong class="text-ink">Meet Fresh, your 24/7 Digital Assistant at Towson Healthy Homes.</strong> Need bags, replacement filters, or a free water test? Tap to speak or type quietly below!
+        <strong class="text-ink">Meet Fresh, your 24/7 Digital Assistant.</strong> Need bags, replacement filters, or a free water test? Tap to speak or type quietly below!
       </div>
 
       <button id="public-voice-btn" onclick="toggleVoiceIntake()" class="w-full max-w-sm py-3.5 bg-forest hover:bg-opacity-90 text-white font-extrabold text-sm rounded-xl shadow-lg transition flex items-center justify-center gap-2">
@@ -143,9 +143,8 @@
   </main>
 
   <footer class="bg-cardbg border border-bordercolor rounded-2xl p-4 text-center text-xs text-muted flex flex-col gap-2">
-    <div>📍 1965 Greenspring Drive, Suite G-16, Timonium, MD 21093</div>
-    <div class="text-[11px]">Wayfinding: Look for building labeled <strong>ELEVATE</strong> — inside Timonium Wellness Center.</div>
-    <div>Mon–Thu 9AM–4PM • Fri 9AM–3PM • Sat 9AM–12PM • Sun Closed • 📞 (410) 882-1027</div>
+    <div>📍 <span id="pub-footer-address">--</span></div>
+    <div>📞 <span id="pub-footer-phone">--</span></div>
     <div class="text-[10px] text-muted opacity-75 border-t border-bordercolor pt-2 mt-1">
       Powered by TappyThing™ Forever Card™ Engine
     </div>
@@ -235,7 +234,7 @@
 </div>
 
 <!-- WORKSTATION DRAWER -->
-<div id="workstation-drawer" class="fixed inset-y-0 right-0 w-full max-w-xl bg-cardbg border-l-2 border-gold shadow-2xl p-6 drawer-slide hidden-right-drawer z-50 flex flex-col justify-between overflow-y-auto">
+<div id="workstation-drawer" class="fixed inset-y-0 right-0 w-full max-w-2xl bg-cardbg border-l-2 border-gold shadow-2xl p-6 drawer-slide hidden-right-drawer z-50 flex flex-col justify-between overflow-y-auto">
   <div class="flex flex-col gap-4">
     <div class="flex justify-between items-center border-b border-bordercolor pb-3 no-print">
       <div class="flex items-center gap-3">
@@ -320,7 +319,7 @@
 
     <div class="flex border-b border-bordercolor gap-2 text-xs font-bold overflow-x-auto no-print">
       <button id="tab-btn-notes" onclick="switchCanvasTab('notes')" class="py-2 px-3 text-forest border-b-2 border-forest whitespace-nowrap">📋 Notes</button>
-      <button id="tab-btn-invoice" onclick="switchCanvasTab('invoice')" class="py-2 px-3 text-muted hover:text-ink whitespace-nowrap">📜 Executive Invoice</button>
+      <button id="tab-btn-invoice" onclick="switchCanvasTab('invoice')" class="py-2 px-3 text-muted hover:text-ink whitespace-nowrap">📜 Invoice Studio</button>
       <button id="tab-btn-ledger" onclick="switchCanvasTab('ledger')" class="py-2 px-3 text-muted hover:text-ink whitespace-nowrap">📜 Ledger</button>
       <button id="tab-btn-portal" onclick="switchCanvasTab('portal')" class="py-2 px-3 text-muted hover:text-ink whitespace-nowrap">🌐 Portal Canvas</button>
     </div>
@@ -330,88 +329,124 @@
       <div id="active-card-note" class="text-xs text-muted leading-relaxed">--</div>
     </div>
 
-    <!-- EXECUTIVE PRINTABLE INVOICE DOCUMENT CANVAS -->
+    <!-- SPLIT-PANE INVOICE STUDIO CANVAS -->
     <div id="canvas-view-invoice" class="hidden flex flex-col gap-4">
       
-      <!-- PRINTABLE DOCUMENT CONTAINER -->
-      <div id="printable-invoice-canvas" class="bg-white p-6 rounded-2xl border-2 border-gold shadow-md flex flex-col gap-4 text-ink">
-        <!-- HEADER -->
-        <div class="flex justify-between items-start border-b border-gold pb-4">
-          <div>
-            <h2 class="font-extrabold text-base text-forest uppercase tracking-wide">AERUS OF TOWSON • CLEAN ENVIRONMENT LLC</h2>
-            <p class="text-[11px] text-muted mt-0.5">📍 1965 Greenspring Dr, Suite G-16, Timonium MD 21093</p>
-            <p class="text-[11px] text-muted">📞 (410) 882-1027 | Healthy Home Specialists</p>
-          </div>
-          <div class="text-right">
-            <span class="text-xs font-extrabold bg-gold text-white px-2.5 py-1 rounded-lg uppercase tracking-wider block mb-1">EXECUTIVE INVOICE</span>
-            <div id="invoice-doc-id" class="text-xs font-bold text-ink">#INV-00000</div>
-            <div id="invoice-doc-date" class="text-[10px] text-muted font-medium">Date: --</div>
-          </div>
-        </div>
-
-        <!-- BILL TO -->
-        <div class="bg-parchment p-3 rounded-xl border border-bordercolor flex flex-col gap-1">
-          <span class="text-[10px] font-bold text-forest uppercase tracking-wider">Bill To Customer:</span>
-          <div id="invoice-bill-name" class="font-bold text-xs text-ink">--</div>
-          <div id="invoice-bill-address" class="text-[11px] text-muted">--</div>
-          <div id="invoice-bill-phone" class="text-[11px] text-muted">--</div>
-        </div>
-
-        <!-- ITEMIZED TABLE HEADER -->
-        <div class="flex flex-col gap-2">
-          <div class="grid grid-cols-12 gap-1 text-[10px] font-bold text-forest border-b-2 border-forest pb-1 uppercase tracking-wider">
-            <span class="col-span-5">Service / Part Description</span>
-            <span class="col-span-2 text-center">Qty</span>
-            <span class="col-span-2 text-center">Tax (6% MD)</span>
-            <span class="col-span-2 text-right">Price</span>
-            <span class="col-span-1 text-center no-print"></span>
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+        
+        <!-- LEFT PANE: WORKSPACE SCRATCHPAD (NO PRINT) -->
+        <div class="md:col-span-5 bg-white p-4 rounded-xl border border-bordercolor shadow-sm flex flex-col gap-3 no-print">
+          <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between border-b border-bordercolor pb-1.5">
+            <span>📝 Workspace Scratchpad</span>
+            <span class="text-[10px] text-gold font-bold">Fast Entry</span>
           </div>
 
-          <!-- DYNAMIC LINE ITEMS -->
-          <div id="invoice-line-items" class="flex flex-col gap-2 max-h-48 overflow-y-auto pr-1"></div>
+          <textarea id="invoice-scratchpad-text" rows="3" placeholder="💬 Type or speak custom invoice specs, parts, labor, or discounts..." 
+            class="w-full p-2.5 border border-bordercolor rounded-xl bg-parchment text-xs text-ink focus:outline-none focus:border-gold"></textarea>
 
-          <button onclick="addInvoiceLineItem()" class="mt-1 py-1 px-2.5 bg-parchment border border-bordercolor rounded-lg text-[11px] font-bold text-forest hover:bg-bordercolor transition self-start flex items-center gap-1 no-print">
-            <span>+</span> <span>Add/Edit Line Item</span>
-          </button>
-        </div>
+          <div class="flex gap-2">
+            <button onclick="toggleVoiceIntake()" class="flex-1 py-2 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1">
+              <span>🎙️</span> <span>Talk to Fresh</span>
+            </button>
+            <button onclick="updateInvoiceFromScratchpad()" class="flex-1 py-2 bg-gold hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1">
+              <span>⚡</span> <span>Update Invoice</span>
+            </button>
+          </div>
 
-        <!-- SUMMARY CALCULATIONS -->
-        <div class="border-t-2 border-gold pt-3 flex flex-col gap-1.5 items-end text-xs">
-          <div class="flex justify-between w-full max-w-xs text-muted">
-            <span>Subtotal:</span>
-            <span id="invoice-calc-subtotal" class="font-bold text-ink">$0.00</span>
-          </div>
-          <div class="flex justify-between w-full max-w-xs text-muted">
-            <span>MD Sales Tax (6% Parts Only):</span>
-            <span id="invoice-calc-tax" class="font-bold text-ink">$0.00</span>
-          </div>
-          <div class="flex justify-between w-full max-w-xs font-extrabold text-sm border-t border-bordercolor pt-1.5 text-forest">
-            <span>Grand Total Due:</span>
-            <span id="invoice-calc-grandtotal" class="text-base text-forest">$0.00</span>
-          </div>
-        </div>
-
-        <!-- PAYMENT REMITTANCE BOX -->
-        <div class="bg-parchment border border-gold rounded-xl p-3.5 flex flex-col gap-2 text-[11px]">
-          <span class="font-bold text-forest uppercase tracking-wider border-b border-bordercolor pb-1 flex items-center gap-1">
-            <span>💳</span> <span>Payment Remittance Options</span>
-          </span>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-muted">
-            <div class="flex flex-col gap-0.5 bg-white p-2 rounded-lg border border-bordercolor">
-              <span class="font-bold text-ink text-[10px]">1. Credit / Apple Pay:</span>
-              <span class="text-[10px]">Tap or SMS link to pay instantly.</span>
-            </div>
-            <div class="flex flex-col gap-0.5 bg-white p-2 rounded-lg border border-bordercolor">
-              <span class="font-bold text-ink text-[10px]">2. Zelle Remittance:</span>
-              <span class="text-[10px] font-mono text-forest">williamanyvac@gmail.com</span>
-              <span class="text-[9px] opacity-75">Aerus of Towson / Clean Environment LLC</span>
-            </div>
-            <div class="flex flex-col gap-0.5 bg-white p-2 rounded-lg border border-bordercolor">
-              <span class="font-bold text-ink text-[10px]">3. Checks Payable To:</span>
-              <span class="text-[10px] font-bold text-ink">Clean Environment LLC</span>
-              <span class="text-[9px] opacity-75">1965 Greenspring Dr, Suite G-16, Timonium MD 21093</span>
+          <!-- PRE-SET CHIPS -->
+          <div class="flex flex-col gap-1.5 pt-2 border-t border-bordercolor">
+            <span class="text-[10px] font-bold text-muted uppercase">1-Tap Pre-Set Service Chips:</span>
+            <div class="flex flex-wrap gap-1.5">
+              <button onclick="addPresetChip('Labor', 1, 50.00, false)" class="px-2 py-1 bg-parchment border border-bordercolor hover:bg-bordercolor rounded-lg text-[10px] font-bold text-ink">
+                + Labor $50
+              </button>
+              <button onclick="addPresetChip('Annual RO Water Service', 1, 149.00, true)" class="px-2 py-1 bg-parchment border border-bordercolor hover:bg-bordercolor rounded-lg text-[10px] font-bold text-ink">
+                + Annual RO $149
+              </button>
+              <button onclick="addPresetChip('HEPA Vacuum Bench Tune-Up', 1, 89.00, false)" class="px-2 py-1 bg-parchment border border-bordercolor hover:bg-bordercolor rounded-lg text-[10px] font-bold text-ink">
+                + HEPA Tune-Up $89
+              </button>
+              <button onclick="addPresetChip('Courtesy Senior Discount', 1, -10.00, false)" class="px-2 py-1 bg-parchment border border-bordercolor hover:bg-bordercolor rounded-lg text-[10px] font-bold text-red-700">
+                - 10% Courtesy Disc
+              </button>
             </div>
           </div>
+        </div>
+
+        <!-- RIGHT PANE: PRISTINE FINISHED EXECUTIVE DOCUMENT -->
+        <div id="printable-executive-doc" class="md:col-span-7 bg-white p-5 rounded-2xl border-2 border-gold shadow-md flex flex-col gap-3 text-ink">
+          <!-- HEADER -->
+          <div class="flex justify-between items-start border-b border-gold pb-3">
+            <div>
+              <h2 id="inv-doc-biz-name" class="font-extrabold text-xs text-forest uppercase tracking-wide">--</h2>
+              <p id="inv-doc-biz-address" class="text-[10px] text-muted mt-0.5">📍 --</p>
+              <p class="text-[10px] text-muted">📞 <span id="inv-doc-biz-phone">--</span> | <span id="inv-doc-biz-tagline">--</span></p>
+            </div>
+            <div class="text-right">
+              <span class="text-[10px] font-extrabold bg-gold text-white px-2 py-0.5 rounded uppercase tracking-wider block mb-1">EXECUTIVE INVOICE</span>
+              <div id="invoice-doc-id" class="text-xs font-bold text-ink">#INV-00000</div>
+              <div id="invoice-doc-date" class="text-[9px] text-muted font-medium">Date: --</div>
+            </div>
+          </div>
+
+          <!-- BILL TO -->
+          <div class="bg-parchment p-2.5 rounded-xl border border-bordercolor flex flex-col gap-0.5">
+            <span class="text-[9px] font-bold text-forest uppercase tracking-wider">Bill To Customer:</span>
+            <div id="invoice-bill-name" class="font-bold text-xs text-ink">--</div>
+            <div id="invoice-bill-address" class="text-[10px] text-muted">--</div>
+            <div id="invoice-bill-phone" class="text-[10px] text-muted">--</div>
+          </div>
+
+          <!-- PRISTINE TABLE -->
+          <div class="flex flex-col gap-1.5">
+            <div class="grid grid-cols-12 gap-1 text-[9px] font-bold text-forest border-b-2 border-forest pb-1 uppercase tracking-wider">
+              <span class="col-span-6">Description</span>
+              <span class="col-span-2 text-center">Qty</span>
+              <span class="col-span-2 text-right">Price</span>
+              <span class="col-span-2 text-right">Total</span>
+            </div>
+
+            <!-- DYNAMIC CLEAN LINES -->
+            <div id="invoice-doc-table-body" class="flex flex-col gap-1.5 text-xs max-h-40 overflow-y-auto pr-1"></div>
+          </div>
+
+          <!-- SUMMARY CALCULATIONS -->
+          <div class="border-t-2 border-gold pt-2 flex flex-col gap-1 items-end text-xs">
+            <div class="flex justify-between w-full max-w-xs text-muted text-[11px]">
+              <span>Subtotal:</span>
+              <span id="invoice-calc-subtotal" class="font-bold text-ink">$0.00</span>
+            </div>
+            <div class="flex justify-between w-full max-w-xs text-muted text-[11px]">
+              <span>MD Sales Tax (6% Parts Only):</span>
+              <span id="invoice-calc-tax" class="font-bold text-ink">$0.00</span>
+            </div>
+            <div class="flex justify-between w-full max-w-xs font-extrabold text-xs border-t border-bordercolor pt-1 text-forest">
+              <span>Grand Total Due:</span>
+              <span id="invoice-calc-grandtotal" class="text-sm text-forest">$0.00</span>
+            </div>
+          </div>
+
+          <!-- PAYMENT REMITTANCE BOX -->
+          <div class="bg-parchment border border-gold rounded-xl p-2.5 flex flex-col gap-1.5 text-[10px]">
+            <span class="font-bold text-forest uppercase tracking-wider border-b border-bordercolor pb-0.5 flex items-center gap-1">
+              <span>💳</span> <span>Payment Remittance Options</span>
+            </span>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-1.5 text-muted">
+              <div class="flex flex-col gap-0.5 bg-white p-1.5 rounded border border-bordercolor">
+                <span class="font-bold text-ink text-[9px]">1. Credit / Apple Pay:</span>
+                <span class="text-[9px]">Tap or SMS link to pay.</span>
+              </div>
+              <div class="flex flex-col gap-0.5 bg-white p-1.5 rounded border border-bordercolor">
+                <span class="font-bold text-ink text-[9px]">2. Zelle Remittance:</span>
+                <span id="remit-zelle-email" class="text-[9px] font-mono text-forest">--</span>
+              </div>
+              <div class="flex flex-col gap-0.5 bg-white p-1.5 rounded border border-bordercolor">
+                <span class="font-bold text-ink text-[9px]">3. Checks Payable To:</span>
+                <span id="remit-checks-entity" class="text-[9px] font-bold text-ink">--</span>
+              </div>
+            </div>
+          </div>
+
         </div>
 
       </div>
@@ -487,6 +522,17 @@
 </div>
 
 <script>
+  // 1. GENERIC SUBSCRIBER CONFIGURATION (MULTI-TENANT SAAS)
+  const SUBSCRIBER_CONFIG = {
+    businessName: "Aerus of Towson • Clean Environment LLC",
+    tagline: "Healthy Home Specialists • Timonium, MD",
+    address: "1965 Greenspring Drive, Suite G-16, Timonium, MD 21093",
+    phone: "(410) 882-1027",
+    websiteUrl: "https://www.towsonhealthyhomes.com",
+    zelleEmail: "williamanyvac@gmail.com",
+    checksPayableTo: "Clean Environment LLC"
+  };
+
   let vaultData = [];
   let catalogData = [];
   let activeCardId = null;
@@ -498,12 +544,49 @@
 
   const SISSY_HOOK = atob('aHR0cHM6Ly9ob29rLnVzMi5tYWtlLmNvbS8zNXc1bXJucTh3MzBqMWZkYTU1cm91c2RleWE1bzE4Zg==');
 
-  // MASTER FOREVER CARD FALLBACK (ZERO ORPHANED CARDS)
+  // MASTER FALLBACK CARD
   const MASTER_CARD = {
-    clientName: 'William Sullivan (Towson Healthy Homes)',
-    address: '1965 Greenspring Dr, Timonium MD 21093',
-    phone: '410-882-1027'
+    clientName: SUBSCRIBER_CONFIG.businessName,
+    address: SUBSCRIBER_CONFIG.address,
+    phone: SUBSCRIBER_CONFIG.phone
   };
+
+  // BIND DYNAMIC SAAS CONFIGURATION TO DOM
+  function bindSubscriberConfig() {
+    // Public Header
+    const pubTitle = document.getElementById('pub-header-title');
+    if (pubTitle) pubTitle.innerText = SUBSCRIBER_CONFIG.businessName;
+    const pubTag = document.getElementById('pub-header-tagline');
+    if (pubTag) pubTag.innerText = SUBSCRIBER_CONFIG.tagline;
+    const pubWeb = document.getElementById('pub-header-website');
+    if (pubWeb) pubWeb.href = SUBSCRIBER_CONFIG.websiteUrl;
+    const pubPhone = document.getElementById('pub-header-phone');
+    if (pubPhone) pubPhone.innerText = SUBSCRIBER_CONFIG.phone;
+    const pubPhoneBtn = document.getElementById('pub-header-phone-btn');
+    if (pubPhoneBtn) pubPhoneBtn.href = `tel:${SUBSCRIBER_CONFIG.phone.replace(/[^0-9+]/g, '')}`;
+
+    // Public Footer
+    const pubFootAddr = document.getElementById('pub-footer-address');
+    if (pubFootAddr) pubFootAddr.innerText = SUBSCRIBER_CONFIG.address;
+    const pubFootPhone = document.getElementById('pub-footer-phone');
+    if (pubFootPhone) pubFootPhone.innerText = SUBSCRIBER_CONFIG.phone;
+
+    // Invoice Document Header
+    const invBizName = document.getElementById('inv-doc-biz-name');
+    if (invBizName) invBizName.innerText = SUBSCRIBER_CONFIG.businessName;
+    const invBizAddr = document.getElementById('inv-doc-biz-address');
+    if (invBizAddr) invBizAddr.innerText = `📍 ${SUBSCRIBER_CONFIG.address}`;
+    const invBizPhone = document.getElementById('inv-doc-biz-phone');
+    if (invBizPhone) invBizPhone.innerText = SUBSCRIBER_CONFIG.phone;
+    const invBizTag = document.getElementById('inv-doc-biz-tagline');
+    if (invBizTag) invBizTag.innerText = SUBSCRIBER_CONFIG.tagline;
+
+    // Invoice Remittance
+    const remitZelle = document.getElementById('remit-zelle-email');
+    if (remitZelle) remitZelle.innerText = SUBSCRIBER_CONFIG.zelleEmail;
+    const remitChecks = document.getElementById('remit-checks-entity');
+    if (remitChecks) remitChecks.innerText = SUBSCRIBER_CONFIG.checksPayableTo;
+  }
 
   // ROUTE INITIALIZATION (PUBLIC LANDING VS OPERATOR WORKSTATION)
   const urlParams = new URLSearchParams(window.location.search);
@@ -515,6 +598,7 @@
 
   // HARD CLOUD SYNC ON LOAD & WINDOW FOCUS
   window.addEventListener('load', () => {
+    bindSubscriberConfig();
     if (!isPublicMode) fetchInboundCards(false);
   });
 
@@ -812,14 +896,14 @@
   }
 
   function copyPublicPortalLink() {
-    const link = `${window.location.origin}${window.location.pathname}?card=TowsonHealthyHomes`;
+    const link = `${window.location.origin}${window.location.pathname}?card=PublicPortal`;
     navigator.clipboard.writeText(link);
     showStatus("📋 Public Portal Link copied to clipboard!");
   }
 
   function sharePortalSMS() {
     const phone = document.getElementById('vault-client-phone').innerText;
-    const link = `${window.location.origin}${window.location.pathname}?card=TowsonHealthyHomes`;
+    const link = `${window.location.origin}${window.location.pathname}?card=PublicPortal`;
     const msg = `Check out our Forever Card Portal: ${link}`;
     if (!phone) return alert("No phone number on file for SMS dispatch.");
     dispatchCloudSMS(phone, msg, "Portal Link");
@@ -1057,13 +1141,13 @@
 
       let sissyMsg = data.sissyResponse;
       if (isPublicMode && isReturningVIP) {
-        sissyMsg = `Welcome back, ${clientName}! I located your account on file. Our Timonium team has your request and will text you shortly with confirmation and pickup/delivery details!`;
+        sissyMsg = `Welcome back, ${clientName}! I located your account on file. Our team has received your request and will text you shortly with confirmation and pickup/delivery details!`;
       } else if (isPublicMode && !isReturningVIP && clientName !== MASTER_CARD.clientName) {
-        sissyMsg = `Thanks ${clientName}! Our Timonium team has received your request and will text you shortly to confirm your order details!`;
+        sissyMsg = `Thanks ${clientName}! Our team has received your request and will text you shortly to confirm your order details!`;
       } else if (!sissyMsg) {
         sissyMsg = isScheduled 
           ? `Scheduled appointment for ${clientName} at ${finalAddress}.`
-          : `Got it! We have bags and filters ready for ${clientName} at our Timonium shop.`;
+          : `Got it! We have bags and filters ready for ${clientName}.`;
       }
       
       updateSissyConsole(sissyMsg, text);
@@ -1112,8 +1196,8 @@
       }
 
       const defaultReply = isReturningVIP
-        ? `Welcome back, ${clientName}! I located your account on file. Our Timonium team has your request and will text you shortly with confirmation and pickup/delivery details!`
-        : `Thanks for reaching out! Our Timonium team has received your request and will text you shortly to confirm your order details!`;
+        ? `Welcome back, ${clientName}! I located your account on file. Our team has received your request and will text you shortly with confirmation and pickup/delivery details!`
+        : `Thanks for reaching out! Our team has received your request and will text you shortly to confirm your order details!`;
       
       updateSissyConsole(defaultReply, text);
 
@@ -1149,7 +1233,7 @@
     document.getElementById('vault-client-phone').innerText = phone && phone !== 'undefined' ? phone : MASTER_CARD.phone;
     document.getElementById('active-card-note').innerText = `"${text}"`;
 
-    // INVOICE DOCUMENT DATA POPULATION
+    // INVOICE DOCUMENT HEADER DATA
     const randomInvNum = 'INV-' + Math.floor(10000 + Math.random() * 90000);
     document.getElementById('invoice-doc-id').innerText = '#' + randomInvNum;
     document.getElementById('invoice-doc-date').innerText = 'Date: ' + new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
@@ -1182,31 +1266,18 @@
     openWorkstation();
   }
 
-  function addInvoiceLineItem() {
-    currentInvoiceItems.push({ desc: '', qty: 1, price: 0.00, isTaxable: false });
+  function addPresetChip(desc, qty, price, isTaxable) {
+    currentInvoiceItems.push({ desc: desc, qty: qty, price: price, isTaxable: isTaxable });
     renderInvoiceCanvas();
   }
 
-  function removeInvoiceLineItem(index) {
-    currentInvoiceItems.splice(index, 1);
-    if (currentInvoiceItems.length === 0) {
-      currentInvoiceItems.push({ desc: '', qty: 1, price: 0.00, isTaxable: false });
-    }
-    renderInvoiceCanvas();
-  }
+  function updateInvoiceFromScratchpad() {
+    const text = document.getElementById('invoice-scratchpad-text').value.trim();
+    if (!text) return;
 
-  function updateInvoiceItem(index, field, value) {
-    if (field === 'qty') {
-      currentInvoiceItems[index].qty = parseInt(value) || 1;
-    } else if (field === 'price') {
-      const cleanVal = value.replace(/[^0-9.-]/g, '');
-      currentInvoiceItems[index].price = parseFloat(cleanVal) || 0;
-    } else if (field === 'isTaxable') {
-      currentInvoiceItems[index].isTaxable = value;
-    } else {
-      currentInvoiceItems[index].desc = value;
-    }
-    calculateInvoiceTotal();
+    currentInvoiceItems.push({ desc: text, qty: 1, price: 0.00, isTaxable: false });
+    document.getElementById('invoice-scratchpad-text').value = '';
+    renderInvoiceCanvas();
   }
 
   function calculateInvoiceTotal() {
@@ -1245,33 +1316,19 @@
   }
 
   function renderInvoiceCanvas() {
-    const box = document.getElementById('invoice-line-items');
-    box.innerHTML = currentInvoiceItems.map((item, idx) => {
-      const descLower = (item.desc || '').toLowerCase();
-      const isPart = item.isTaxable === true || 
-                     descLower.includes('filter') || 
-                     descLower.includes('bag') || 
-                     descLower.includes('part') || 
-                     descLower.includes('belt') || 
-                     descLower.includes('pack') || 
-                     descLower.includes('activepure') || 
-                     descLower.includes('unit');
+    const docBody = document.getElementById('invoice-doc-table-body');
+    
+    docBody.innerHTML = currentInvoiceItems.map((item, idx) => {
+      const q = item.qty || 1;
+      const p = item.price || 0;
+      const total = q * p;
 
       return `
-        <div class="grid grid-cols-12 gap-1 items-center">
-          <input type="text" value="${item.desc || ''}" placeholder="Service or Part Description" oninput="updateInvoiceItem(${idx}, 'desc', this.value)"
-            class="col-span-5 px-2 py-1 border border-bordercolor rounded bg-parchment text-xs text-ink focus:outline-none focus:border-gold">
-          <input type="number" min="1" value="${item.qty || 1}" oninput="updateInvoiceItem(${idx}, 'qty', this.value)"
-            class="col-span-2 px-1 py-1 border border-bordercolor rounded bg-parchment text-xs text-ink text-center focus:outline-none focus:border-gold">
-          <div class="col-span-2 flex items-center justify-center">
-            <label class="text-[10px] font-bold text-forest flex items-center gap-1 cursor-pointer">
-              <input type="checkbox" ${isPart ? 'checked' : ''} onchange="updateInvoiceItem(${idx}, 'isTaxable', this.checked)" class="accent-forest">
-              <span>${isPart ? '6% Parts' : '0% Labor'}</span>
-            </label>
-          </div>
-          <input type="text" value="$${(item.price || 0).toFixed(2)}" oninput="updateInvoiceItem(${idx}, 'price', this.value)"
-            class="col-span-2 px-2 py-1 border border-bordercolor rounded bg-parchment text-xs text-ink font-bold text-right focus:outline-none focus:border-gold">
-          <button onclick="removeInvoiceLineItem(${idx})" class="col-span-1 text-red-500 font-bold text-center hover:text-red-700 no-print">✕</button>
+        <div class="grid grid-cols-12 gap-1 items-center border-b border-bordercolor pb-1">
+          <span class="col-span-6 font-medium text-ink">${item.desc || 'Service / Part'}</span>
+          <span class="col-span-2 text-center text-muted">${q}</span>
+          <span class="col-span-2 text-right text-muted">$${p.toFixed(2)}</span>
+          <span class="col-span-2 text-right font-bold text-ink">$${total.toFixed(2)}</span>
         </div>
       `;
     }).join('');
@@ -1318,7 +1375,7 @@
       return alert("No phone number on file for SMS payment link.");
     }
 
-    const msg = `Towson Healthy Homes: Executive Invoice payment link for balance ${grandStr}. Please review and finalize your invoice.`;
+    const msg = `${SUBSCRIBER_CONFIG.businessName}: Executive Invoice payment link for balance ${grandStr}. Please review and finalize your invoice.`;
     dispatchCloudSMS(phone, msg, "Payment Link");
   }
 
