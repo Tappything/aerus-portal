@@ -171,12 +171,9 @@
       </div>
     </div>
 
-    <!-- RIGHT BADGE & RESET CONTROL -->
+    <!-- RIGHT BADGE -->
     <div class="flex flex-col items-center md:items-end justify-center gap-2 min-w-[140px]">
       <span class="text-[10px] text-forest font-extrabold bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full shadow-sm">⚡ Sissy Active</span>
-      <button onclick="clearFloorStorage()" class="px-3 py-1 bg-parchment border border-bordercolor rounded-full text-[10px] font-bold text-muted hover:text-red-700 hover:border-red-300 transition flex items-center gap-1 shadow-xs">
-        <span>🧹</span> <span>Clear Floor</span>
-      </button>
     </div>
   </header>
 
@@ -319,7 +316,7 @@
     <div id="canvas-view-invoice" class="hidden bg-white p-3.5 rounded-xl border border-gold flex flex-col gap-3 shadow-sm">
       <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between border-b border-bordercolor pb-1.5">
         <span class="flex items-center gap-1.5"><span>📜</span> Dedicated Invoice Canvas</span>
-        <span class="text-[10px] text-gold font-bold">Sissy Powered</span>
+        <span class="text-[10px] text-gold font-bold">Sissy AI Line Items</span>
       </div>
       <div class="flex flex-col gap-2">
         <div class="grid grid-cols-12 gap-1 text-[10px] font-bold text-muted border-b border-bordercolor pb-1 uppercase">
@@ -429,7 +426,7 @@
     document.getElementById('public-card-viewer').classList.remove('hidden');
   }
 
-  // 1. HARD CLOUD SYNC ON LOAD & WINDOW FOCUS
+  // HARD CLOUD SYNC ON LOAD & WINDOW FOCUS
   window.addEventListener('load', () => {
     if (!isPublicMode) fetchInboundCards(false);
   });
@@ -574,11 +571,6 @@
     const input = document.getElementById('text-intake');
     const val = input.value.trim();
     if (val) {
-      if (val.toLowerCase() === 'clear test history' || val.toLowerCase() === 'reset ledger') {
-        clearFloorStorage();
-        input.value = '';
-        return;
-      }
       handleVoiceIntake(val);
       input.value = '';
     }
@@ -618,15 +610,6 @@
     }
   }
 
-  function clearFloorStorage() {
-    const store = { scheduledCards: [], pinballQueue: [], archive: [] };
-    saveStorage(store);
-    render();
-    showStatus("🧹 Floor cleared & local memory reset!");
-    updateSissyConsole("Clean floor initialized. Ready for cloud intake.", "System");
-    fetchInboundCards(true);
-  }
-
   function toggleNetworking() {
     const btn = document.getElementById('net-toggle-btn');
     if (btn.innerText.includes('ON')) {
@@ -644,7 +627,6 @@
     setTimeout(() => b.classList.add('hidden'), 4000);
   }
 
-  // 3. AUTO-FADE CHAT BANNER AFTER 10 SECONDS
   function updateSissyConsole(responseText, userPrompt) {
     if (isPublicMode) {
       const publicThread = document.getElementById('public-thread');
@@ -838,7 +820,6 @@
     }
   }
 
-  // 1. HARD CLOUD SYNC DIRECTLY RENDERING MAKE.COM STATE
   function fetchInboundCards(userTriggered) {
     if (isPublicMode) return;
     const fetchHookUrl = atob('aHR0cHM6Ly9ob29rLnVzMi5tYWtlLmNvbS9qMml0ZWdoaHBpd2ZvZGJ2bThxY3d0MXlvb25vY2V4bg==');
@@ -876,7 +857,9 @@
               allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [],
               phone: matches.length > 0 ? formatRowPhone(matches[0]) : MASTER_CARD.phone,
               time: inbound.time || "Inbound",
-              timestamp: inbound.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              timestamp: inbound.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              lineItems: inbound.lineItems || null,
+              totalAmount: inbound.totalAmount || null
             };
           });
           updated = true;
@@ -902,7 +885,9 @@
               phone: matches.length > 0 ? formatRowPhone(matches[0]) : MASTER_CARD.phone,
               displayDate: sched.displayDate || '',
               time: sched.time || "Scheduled",
-              timestamp: sched.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              timestamp: sched.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              lineItems: sched.lineItems || null,
+              totalAmount: sched.totalAmount || null
             };
           });
           updated = true;
@@ -918,6 +903,7 @@
     .catch(() => {});
   }
 
+  // 1. CAPTURE SISSY'S AI LINE ITEMS IN INTAKE
   function handleVoiceIntake(text) {
     showStatus("⚡ FRESH: Sissy is organizing your note...");
 
@@ -1006,7 +992,9 @@
         phone: finalPhone,
         displayDate: data.displayDate || '',
         time: data.time || "Time Pending",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        lineItems: (data.lineItems && Array.isArray(data.lineItems)) ? data.lineItems : null,
+        totalAmount: data.totalAmount || null
       };
 
       if (isScheduled) {
@@ -1061,6 +1049,7 @@
     });
   }
 
+  // 2. LOAD SISSY'S AI LINE ITEMS INTO INVOICE CANVAS
   function openCustomerCard(text, clientName, address, phone, cardId, cardType) {
     if (isPublicMode) return;
     activeCardId = cardId;
@@ -1075,7 +1064,12 @@
     document.getElementById('vault-client-phone').innerText = phone && phone !== 'undefined' ? phone : MASTER_CARD.phone;
     document.getElementById('active-card-note').innerText = `"${text}"`;
 
-    currentInvoiceItems = [{ desc: text, qty: 1, price: 0.00 }];
+    if (card && card.lineItems && Array.isArray(card.lineItems) && card.lineItems.length > 0) {
+      currentInvoiceItems = card.lineItems;
+    } else {
+      currentInvoiceItems = [{ desc: text, qty: 1, price: 0.00 }];
+    }
+    
     renderInvoiceCanvas();
 
     const multiBox = document.getElementById('multi-address-container');
@@ -1109,9 +1103,14 @@
   }
 
   function updateInvoiceItem(index, field, value) {
-    if (field === 'qty') currentInvoiceItems[index].qty = parseInt(value) || 1;
-    else if (field === 'price') currentInvoiceItems[index].price = parseFloat(value.replace(/[^0-9.]/g, '')) || 0;
-    else currentInvoiceItems[index].desc = value;
+    if (field === 'qty') {
+      currentInvoiceItems[index].qty = parseInt(value) || 1;
+    } else if (field === 'price') {
+      const cleanVal = value.replace(/[^0-9.-]/g, '');
+      currentInvoiceItems[index].price = parseFloat(cleanVal) || 0;
+    } else {
+      currentInvoiceItems[index].desc = value;
+    }
     calculateInvoiceTotal();
   }
 
@@ -1125,9 +1124,9 @@
     const box = document.getElementById('invoice-line-items');
     box.innerHTML = currentInvoiceItems.map((item, idx) => `
       <div class="grid grid-cols-12 gap-1 items-center">
-        <input type="text" value="${item.desc}" placeholder="Service/Part" oninput="updateInvoiceItem(${idx}, 'desc', this.value)"
+        <input type="text" value="${item.desc || ''}" placeholder="Service/Part" oninput="updateInvoiceItem(${idx}, 'desc', this.value)"
           class="col-span-6 px-2 py-1 border border-bordercolor rounded bg-parchment text-xs text-ink focus:outline-none focus:border-gold">
-        <input type="number" min="1" value="${item.qty}" oninput="updateInvoiceItem(${idx}, 'qty', this.value)"
+        <input type="number" min="1" value="${item.qty || 1}" oninput="updateInvoiceItem(${idx}, 'qty', this.value)"
           class="col-span-2 px-1 py-1 border border-bordercolor rounded bg-parchment text-xs text-ink text-center focus:outline-none focus:border-gold">
         <input type="text" value="$${(item.price || 0).toFixed(2)}" oninput="updateInvoiceItem(${idx}, 'price', this.value)"
           class="col-span-3 px-2 py-1 border border-bordercolor rounded bg-parchment text-xs text-ink font-bold text-right focus:outline-none focus:border-gold">
@@ -1208,7 +1207,6 @@
     }
   }
 
-  // 2. IN-CARD DISMISS / MISTAKE ACTION
   function dismissActiveCardMistake() {
     if (!activeCardId) return;
     const store = getStorage();
