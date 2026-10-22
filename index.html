@@ -162,9 +162,14 @@
           <span>📷/🎥</span> <span>MEDIA</span>
         </button>
       </div>
-      <input type="text" id="text-intake" placeholder="💬 Type or speak a note..." 
-        onkeydown="checkSubmit(event)"
-        class="w-full px-3.5 py-2 border border-bordercolor rounded-xl bg-white text-ink focus:outline-none focus:border-gold text-xs shadow-inner text-center md:text-left">
+      <div class="flex gap-2 w-full">
+        <input type="text" id="text-intake" placeholder="💬 Type or speak a note..." 
+          onkeydown="checkSubmit(event)"
+          class="flex-1 px-3.5 py-2 border border-bordercolor rounded-xl bg-white text-ink focus:outline-none focus:border-gold text-xs shadow-inner text-center md:text-left">
+        <button onclick="submitOperatorText()" class="px-4 py-2 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center">
+          <span>Send</span>
+        </button>
+      </div>
     </div>
 
     <!-- RIGHT BADGE & RESET CONTROL -->
@@ -206,7 +211,7 @@
     <div class="flex flex-col gap-2">
       <div class="text-xs font-extrabold uppercase tracking-widest text-muted flex items-center justify-between">
         <span class="flex items-center gap-2"><span>📍</span> Pinball Action Zone</span>
-        <button onclick="fetchInboundCards()" class="text-[10px] font-bold text-forest hover:underline">🔄 Sync Cards</button>
+        <button onclick="fetchInboundCards(true)" class="text-[10px] font-bold text-forest hover:underline">🔄 Sync Cards</button>
       </div>
       <div class="bg-cardbg border border-bordercolor rounded-2xl p-4 min-h-[160px]">
         <div id="pinball-list" class="flex flex-col gap-2.5"></div>
@@ -421,6 +426,15 @@
     document.getElementById('public-card-viewer').classList.remove('hidden');
   }
 
+  // FORCE IMMEDIATE AUTO-SYNC ENGINE ON LOAD & WINDOW FOCUS
+  window.addEventListener('load', () => {
+    if (!isPublicMode) fetchInboundCards(false);
+  });
+
+  window.addEventListener('focus', () => {
+    if (!isPublicMode) fetchInboundCards(false);
+  });
+
   Papa.parse(encodeURI('export_export (34).csv'), {
     download: true,
     header: true,
@@ -429,7 +443,7 @@
       if (results && results.data && results.data.length > 0) {
         vaultData = results.data;
       }
-      if (!isPublicMode) fetchInboundCards();
+      if (!isPublicMode) fetchInboundCards(false);
     }
   });
 
@@ -553,19 +567,24 @@
     }
   }
 
+  function submitOperatorText() {
+    const input = document.getElementById('text-intake');
+    const val = input.value.trim();
+    if (val) {
+      if (val.toLowerCase() === 'clear test history' || val.toLowerCase() === 'reset ledger') {
+        clearFloorStorage();
+        input.value = '';
+        return;
+      }
+      handleVoiceIntake(val);
+      input.value = '';
+    }
+  }
+
   function checkSubmit(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      const val = e.target.value.trim();
-      if (val) { 
-        if (val.toLowerCase() === 'clear test history' || val.toLowerCase() === 'reset ledger') {
-          clearFloorStorage();
-          e.target.value = '';
-          return;
-        }
-        handleVoiceIntake(val); 
-        e.target.value = ''; 
-      }
+      submitOperatorText();
     }
   }
 
@@ -600,8 +619,9 @@
     const store = { scheduledCards: [], pinballQueue: [], archive: [] };
     saveStorage(store);
     render();
-    showStatus("🧹 Floor cleared & reset!");
-    updateSissyConsole("Clean floor initialized. Ready for intake.", "System");
+    showStatus("🧹 Floor cleared & local memory reset!");
+    updateSissyConsole("Clean floor initialized. Ready for cloud intake.", "System");
+    fetchInboundCards(true);
   }
 
   function toggleNetworking() {
@@ -809,7 +829,8 @@
     }
   }
 
-  function fetchInboundCards() {
+  // 2. TRUE CLOUD FETCH & RE-RENDER ENGINE
+  function fetchInboundCards(userTriggered) {
     if (isPublicMode) return;
     const fetchHookUrl = atob('aHR0cHM6Ly9ob29rLnVzMi5tYWtlLmNvbS9qMml0ZWdoaHBpd2ZvZGJ2bThxY3d0MXlvb25vY2V4bg==');
     
@@ -823,73 +844,66 @@
       return cleanAndParseJSON(raw);
     })
     .then(data => {
-      if (data && data.items && Array.isArray(data.items)) {
+      if (data && (data.items || data.scheduled)) {
         const store = getStorage();
-        let newItemsAdded = 0;
+        let updated = false;
 
-        data.items.forEach(inbound => {
-          let clientName = inbound.name || inbound.clientName;
-          const textMsg = inbound.text || inbound.note || "New message from Twilio";
-          
-          const matches = findAllVaultMatches(clientName);
-          if (matches.length === 0 && (!clientName || clientName === "Direct Intake")) {
-            clientName = MASTER_CARD.clientName;
-          }
-
-          const exists = store.pinballQueue.some(c => c.externalId === inbound.id || (c.clientName === clientName && c.text === textMsg));
-
-          if (!exists) {
-            let finalAddress = matches.length > 0 ? formatRowAddress(matches[0]) : MASTER_CARD.address;
-            let finalPhone = matches.length > 0 ? formatRowPhone(matches[0]) : MASTER_CARD.phone;
-
-            store.pinballQueue.unshift({
-              id: Date.now() + Math.floor(Math.random() * 1000),
-              externalId: inbound.id || null,
-              text: textMsg,
-              clientName: clientName,
-              address: finalAddress,
-              allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [],
-              phone: finalPhone,
-              time: inbound.time || "Inbound",
-              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            });
-            newItemsAdded++;
-          }
-        });
-
-        if (data.scheduled && Array.isArray(data.scheduled)) {
-          data.scheduled.forEach(sched => {
-            let clientName = sched.name || sched.clientName;
-            const textMsg = sched.text || sched.note || "Scheduled appointment";
+        if (data.items && Array.isArray(data.items)) {
+          // Replace or reconcile cloud items to ensure cross-device consistency
+          store.pinballQueue = data.items.map(inbound => {
+            let clientName = inbound.name || inbound.clientName;
+            const textMsg = inbound.text || inbound.note || "New message from Twilio";
             const matches = findAllVaultMatches(clientName);
+
             if (matches.length === 0 && (!clientName || clientName === "Direct Intake")) {
               clientName = MASTER_CARD.clientName;
             }
-            const exists = store.scheduledCards.some(c => c.externalId === sched.id || (c.clientName === clientName && c.text === textMsg));
-            if (!exists) {
-              let finalAddress = matches.length > 0 ? formatRowAddress(matches[0]) : MASTER_CARD.address;
-              let finalPhone = matches.length > 0 ? formatRowPhone(matches[0]) : MASTER_CARD.phone;
-              store.scheduledCards.unshift({
-                id: Date.now() + Math.floor(Math.random() * 1000),
-                externalId: sched.id || null,
-                text: textMsg,
-                clientName: clientName,
-                address: finalAddress,
-                allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [],
-                phone: finalPhone,
-                displayDate: sched.displayDate || '',
-                time: sched.time || "Scheduled",
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-              });
-              newItemsAdded++;
-            }
+
+            return {
+              id: inbound.id || Date.now() + Math.floor(Math.random() * 1000),
+              externalId: inbound.id || null,
+              text: textMsg,
+              clientName: clientName,
+              address: matches.length > 0 ? formatRowAddress(matches[0]) : MASTER_CARD.address,
+              allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [],
+              phone: matches.length > 0 ? formatRowPhone(matches[0]) : MASTER_CARD.phone,
+              time: inbound.time || "Inbound",
+              timestamp: inbound.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
           });
+          updated = true;
         }
 
-        if (newItemsAdded > 0) {
+        if (data.scheduled && Array.isArray(data.scheduled)) {
+          store.scheduledCards = data.scheduled.map(sched => {
+            let clientName = sched.name || sched.clientName;
+            const textMsg = sched.text || sched.note || "Scheduled appointment";
+            const matches = findAllVaultMatches(clientName);
+
+            if (matches.length === 0 && (!clientName || clientName === "Direct Intake")) {
+              clientName = MASTER_CARD.clientName;
+            }
+
+            return {
+              id: sched.id || Date.now() + Math.floor(Math.random() * 1000),
+              externalId: sched.id || null,
+              text: textMsg,
+              clientName: clientName,
+              address: matches.length > 0 ? formatRowAddress(matches[0]) : MASTER_CARD.address,
+              allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [],
+              phone: matches.length > 0 ? formatRowPhone(matches[0]) : MASTER_CARD.phone,
+              displayDate: sched.displayDate || '',
+              time: sched.time || "Scheduled",
+              timestamp: sched.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+          });
+          updated = true;
+        }
+
+        if (updated) {
           saveStorage(store);
           render();
-          showStatus(`⚡ Fetched ${newItemsAdded} inbound card(s) into Pinball!`);
+          if (userTriggered) showStatus("🔄 Cloud state synced live!");
         }
       }
     })
@@ -997,7 +1011,7 @@
 
       saveStorage(store);
       render();
-      setTimeout(fetchInboundCards, 500);
+      setTimeout(() => fetchInboundCards(false), 500);
     })
     .catch(err => {
       const matches = findAllVaultMatches(text);
@@ -1035,7 +1049,7 @@
       saveStorage(store);
       render();
       showStatus("⚡ Note saved to Pinball");
-      setTimeout(fetchInboundCards, 500);
+      setTimeout(() => fetchInboundCards(false), 500);
     });
   }
 
