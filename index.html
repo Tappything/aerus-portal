@@ -33,6 +33,23 @@
     .drawer-slide { transition: transform 0.3s ease-in-out; }
     .hidden-right-drawer { transform: translateX(100%); }
     .open-right-drawer { transform: translateX(0); }
+
+    @media print {
+      body * { visibility: hidden; }
+      #printable-invoice-canvas, #printable-invoice-canvas * { visibility: visible; }
+      #printable-invoice-canvas {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white !important;
+        color: black !important;
+        padding: 20px !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+      .no-print { display: none !important; }
+    }
   </style>
 </head>
 <body class="font-sans min-h-screen p-4 md:p-6 flex justify-center">
@@ -218,9 +235,9 @@
 </div>
 
 <!-- WORKSTATION DRAWER -->
-<div id="workstation-drawer" class="fixed inset-y-0 right-0 w-full max-w-lg bg-cardbg border-l-2 border-gold shadow-2xl p-6 drawer-slide hidden-right-drawer z-50 flex flex-col justify-between overflow-y-auto">
+<div id="workstation-drawer" class="fixed inset-y-0 right-0 w-full max-w-xl bg-cardbg border-l-2 border-gold shadow-2xl p-6 drawer-slide hidden-right-drawer z-50 flex flex-col justify-between overflow-y-auto">
   <div class="flex flex-col gap-4">
-    <div class="flex justify-between items-center border-b border-bordercolor pb-3">
+    <div class="flex justify-between items-center border-b border-bordercolor pb-3 no-print">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-full border border-gold bg-white overflow-hidden flex items-center justify-center">
           <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';">
@@ -239,7 +256,7 @@
       </div>
     </div>
 
-    <div class="bg-white p-4 rounded-xl border border-bordercolor shadow-sm flex flex-col gap-3">
+    <div class="bg-white p-4 rounded-xl border border-bordercolor shadow-sm flex flex-col gap-3 no-print">
       <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between">
         <span class="flex items-center gap-2">
           <div class="w-5 h-5 rounded-full border border-gold overflow-hidden">
@@ -286,7 +303,7 @@
       </div>
     </div>
 
-    <div class="bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-2.5 shadow-sm">
+    <div class="bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-2.5 shadow-sm no-print">
       <div class="text-[10px] font-bold text-forest uppercase tracking-wider">🎙️ In-Card Action Deck</div>
       <div class="flex gap-2">
         <button onclick="toggleVoiceIntake()" class="flex-1 py-2 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
@@ -301,53 +318,123 @@
         class="w-full px-3 py-1.5 border border-bordercolor rounded-xl bg-parchment text-ink focus:outline-none focus:border-gold text-xs">
     </div>
 
-    <div class="flex border-b border-bordercolor gap-2 text-xs font-bold overflow-x-auto">
+    <div class="flex border-b border-bordercolor gap-2 text-xs font-bold overflow-x-auto no-print">
       <button id="tab-btn-notes" onclick="switchCanvasTab('notes')" class="py-2 px-3 text-forest border-b-2 border-forest whitespace-nowrap">📋 Notes</button>
-      <button id="tab-btn-invoice" onclick="switchCanvasTab('invoice')" class="py-2 px-3 text-muted hover:text-ink whitespace-nowrap">📜 Invoice</button>
+      <button id="tab-btn-invoice" onclick="switchCanvasTab('invoice')" class="py-2 px-3 text-muted hover:text-ink whitespace-nowrap">📜 Executive Invoice</button>
       <button id="tab-btn-ledger" onclick="switchCanvasTab('ledger')" class="py-2 px-3 text-muted hover:text-ink whitespace-nowrap">📜 Ledger</button>
       <button id="tab-btn-portal" onclick="switchCanvasTab('portal')" class="py-2 px-3 text-muted hover:text-ink whitespace-nowrap">🌐 Portal Canvas</button>
     </div>
 
-    <div id="canvas-view-notes" class="bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-2">
+    <div id="canvas-view-notes" class="bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-2 no-print">
       <div class="text-xs font-bold text-ink uppercase mb-1">Active Service Note</div>
       <div id="active-card-note" class="text-xs text-muted leading-relaxed">--</div>
     </div>
 
-    <div id="canvas-view-invoice" class="hidden bg-white p-3.5 rounded-xl border border-gold flex flex-col gap-3 shadow-sm">
-      <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between border-b border-bordercolor pb-1.5">
-        <span class="flex items-center gap-1.5"><span>📜</span> Dedicated Invoice Canvas</span>
-        <span class="text-[10px] text-gold font-bold">Sissy AI Line Items</span>
-      </div>
-      <div class="flex flex-col gap-2">
-        <div class="grid grid-cols-12 gap-1 text-[10px] font-bold text-muted border-b border-bordercolor pb-1 uppercase">
-          <span class="col-span-6">Service / Part Description</span>
-          <span class="col-span-2 text-center">Qty</span>
-          <span class="col-span-3 text-right">Price</span>
-          <span class="col-span-1 text-center"></span>
+    <!-- EXECUTIVE PRINTABLE INVOICE DOCUMENT CANVAS -->
+    <div id="canvas-view-invoice" class="hidden flex flex-col gap-4">
+      
+      <!-- PRINTABLE DOCUMENT CONTAINER -->
+      <div id="printable-invoice-canvas" class="bg-white p-6 rounded-2xl border-2 border-gold shadow-md flex flex-col gap-4 text-ink">
+        <!-- HEADER -->
+        <div class="flex justify-between items-start border-b border-gold pb-4">
+          <div>
+            <h2 class="font-extrabold text-base text-forest uppercase tracking-wide">AERUS OF TOWSON • CLEAN ENVIRONMENT LLC</h2>
+            <p class="text-[11px] text-muted mt-0.5">📍 1965 Greenspring Dr, Suite G-16, Timonium MD 21093</p>
+            <p class="text-[11px] text-muted">📞 (410) 882-1027 | Healthy Home Specialists</p>
+          </div>
+          <div class="text-right">
+            <span class="text-xs font-extrabold bg-gold text-white px-2.5 py-1 rounded-lg uppercase tracking-wider block mb-1">EXECUTIVE INVOICE</span>
+            <div id="invoice-doc-id" class="text-xs font-bold text-ink">#INV-00000</div>
+            <div id="invoice-doc-date" class="text-[10px] text-muted font-medium">Date: --</div>
+          </div>
         </div>
-        <div id="invoice-line-items" class="flex flex-col gap-2 max-h-40 overflow-y-auto pr-1"></div>
-        <button onclick="addInvoiceLineItem()" class="mt-1 py-1 px-2 bg-parchment border border-bordercolor rounded-lg text-[11px] font-bold text-forest hover:bg-bordercolor transition self-start flex items-center gap-1">
-          <span>+</span> <span>Add Line Item</span>
-        </button>
+
+        <!-- BILL TO -->
+        <div class="bg-parchment p-3 rounded-xl border border-bordercolor flex flex-col gap-1">
+          <span class="text-[10px] font-bold text-forest uppercase tracking-wider">Bill To Customer:</span>
+          <div id="invoice-bill-name" class="font-bold text-xs text-ink">--</div>
+          <div id="invoice-bill-address" class="text-[11px] text-muted">--</div>
+          <div id="invoice-bill-phone" class="text-[11px] text-muted">--</div>
+        </div>
+
+        <!-- ITEMIZED TABLE HEADER -->
+        <div class="flex flex-col gap-2">
+          <div class="grid grid-cols-12 gap-1 text-[10px] font-bold text-forest border-b-2 border-forest pb-1 uppercase tracking-wider">
+            <span class="col-span-5">Service / Part Description</span>
+            <span class="col-span-2 text-center">Qty</span>
+            <span class="col-span-2 text-center">Tax (6% MD)</span>
+            <span class="col-span-2 text-right">Price</span>
+            <span class="col-span-1 text-center no-print"></span>
+          </div>
+
+          <!-- DYNAMIC LINE ITEMS -->
+          <div id="invoice-line-items" class="flex flex-col gap-2 max-h-48 overflow-y-auto pr-1"></div>
+
+          <button onclick="addInvoiceLineItem()" class="mt-1 py-1 px-2.5 bg-parchment border border-bordercolor rounded-lg text-[11px] font-bold text-forest hover:bg-bordercolor transition self-start flex items-center gap-1 no-print">
+            <span>+</span> <span>Add/Edit Line Item</span>
+          </button>
+        </div>
+
+        <!-- SUMMARY CALCULATIONS -->
+        <div class="border-t-2 border-gold pt-3 flex flex-col gap-1.5 items-end text-xs">
+          <div class="flex justify-between w-full max-w-xs text-muted">
+            <span>Subtotal:</span>
+            <span id="invoice-calc-subtotal" class="font-bold text-ink">$0.00</span>
+          </div>
+          <div class="flex justify-between w-full max-w-xs text-muted">
+            <span>MD Sales Tax (6% Parts Only):</span>
+            <span id="invoice-calc-tax" class="font-bold text-ink">$0.00</span>
+          </div>
+          <div class="flex justify-between w-full max-w-xs font-extrabold text-sm border-t border-bordercolor pt-1.5 text-forest">
+            <span>Grand Total Due:</span>
+            <span id="invoice-calc-grandtotal" class="text-base text-forest">$0.00</span>
+          </div>
+        </div>
+
+        <!-- PAYMENT REMITTANCE BOX -->
+        <div class="bg-parchment border border-gold rounded-xl p-3.5 flex flex-col gap-2 text-[11px]">
+          <span class="font-bold text-forest uppercase tracking-wider border-b border-bordercolor pb-1 flex items-center gap-1">
+            <span>💳</span> <span>Payment Remittance Options</span>
+          </span>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-muted">
+            <div class="flex flex-col gap-0.5 bg-white p-2 rounded-lg border border-bordercolor">
+              <span class="font-bold text-ink text-[10px]">1. Credit / Apple Pay:</span>
+              <span class="text-[10px]">Tap or SMS link to pay instantly.</span>
+            </div>
+            <div class="flex flex-col gap-0.5 bg-white p-2 rounded-lg border border-bordercolor">
+              <span class="font-bold text-ink text-[10px]">2. Zelle Remittance:</span>
+              <span class="text-[10px] font-mono text-forest">williamanyvac@gmail.com</span>
+              <span class="text-[9px] opacity-75">Aerus of Towson / Clean Environment LLC</span>
+            </div>
+            <div class="flex flex-col gap-0.5 bg-white p-2 rounded-lg border border-bordercolor">
+              <span class="font-bold text-ink text-[10px]">3. Checks Payable To:</span>
+              <span class="text-[10px] font-bold text-ink">Clean Environment LLC</span>
+              <span class="text-[9px] opacity-75">1965 Greenspring Dr, Suite G-16, Timonium MD 21093</span>
+            </div>
+          </div>
+        </div>
+
       </div>
-      <div class="flex justify-between items-center border-t border-bordercolor pt-2 font-bold text-xs text-ink">
-        <span>Total Balance:</span>
-        <span id="invoice-canvas-total" class="text-sm text-forest">$0.00</span>
-      </div>
-      <div class="flex gap-2 mt-1">
-        <button onclick="sendSMSPaymentLink()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
-          <span>⚡</span> <span>Send SMS Link</span>
+
+      <!-- ONE-TAP ACTION CONTROLS -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 no-print">
+        <button onclick="window.print()" class="py-2.5 bg-ink hover:bg-black text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
+          <span>🖨️</span> <span>Print / Save PDF</span>
         </button>
-        <button onclick="completeActiveCard()" class="flex-1 py-2.5 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
+        <button onclick="sendSMSPaymentLink()" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
+          <span>💎</span> <span>Send Payment Link</span>
+        </button>
+        <button onclick="completeActiveCard()" class="py-2.5 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
           <span>✓</span> <span>Mark Paid & Dock</span>
         </button>
-        <button onclick="dismissActiveCardMistake()" class="py-2.5 px-3 bg-gray-200 hover:bg-red-100 hover:text-red-700 text-muted font-bold text-xs rounded-xl transition flex items-center justify-center gap-1 shadow-xs">
+        <button onclick="dismissActiveCardMistake()" class="py-2.5 bg-gray-200 hover:bg-red-100 hover:text-red-700 text-muted font-bold text-xs rounded-xl transition flex items-center justify-center gap-1 shadow-xs">
           <span>🗑️</span> <span>Dismiss / Mistake</span>
         </button>
       </div>
+
     </div>
 
-    <div id="canvas-view-ledger" class="hidden bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-2">
+    <div id="canvas-view-ledger" class="hidden bg-white p-3.5 rounded-xl border border-bordercolor flex flex-col gap-2 no-print">
       <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between border-b border-bordercolor pb-1.5">
         <span class="flex items-center gap-1.5"><span>📜</span> Lifetime Service Ledger</span>
         <span id="ledger-count-badge" class="text-[10px] bg-parchment border border-bordercolor px-2 py-0.5 rounded-full font-bold text-ink">0 Milestones</span>
@@ -357,7 +444,7 @@
       </div>
     </div>
 
-    <div id="canvas-view-portal" class="hidden bg-white p-3.5 rounded-xl border border-gold flex flex-col gap-3 shadow-sm">
+    <div id="canvas-view-portal" class="hidden bg-white p-3.5 rounded-xl border border-gold flex flex-col gap-3 shadow-sm no-print">
       <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between border-b border-bordercolor pb-1.5">
         <span class="flex items-center gap-1.5"><span>🌐</span> Interactive Voice Portal</span>
         <span class="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-full">Public Landing Engine</span>
@@ -396,7 +483,7 @@
     </div>
   </div>
 
-  <div class="border-t border-bordercolor pt-3 text-[10px] text-muted text-center">TappyThing Digital Coordinator • Cloud Backend</div>
+  <div class="border-t border-bordercolor pt-3 text-[10px] text-muted text-center no-print">TappyThing Digital Coordinator • Cloud Backend</div>
 </div>
 
 <script>
@@ -903,7 +990,6 @@
     .catch(() => {});
   }
 
-  // 1. CAPTURE SISSY'S AI LINE ITEMS IN INTAKE
   function handleVoiceIntake(text) {
     showStatus("⚡ FRESH: Sissy is organizing your note...");
 
@@ -1049,7 +1135,6 @@
     });
   }
 
-  // 2. LOAD SISSY'S AI LINE ITEMS INTO INVOICE CANVAS
   function openCustomerCard(text, clientName, address, phone, cardId, cardType) {
     if (isPublicMode) return;
     activeCardId = cardId;
@@ -1064,10 +1149,18 @@
     document.getElementById('vault-client-phone').innerText = phone && phone !== 'undefined' ? phone : MASTER_CARD.phone;
     document.getElementById('active-card-note').innerText = `"${text}"`;
 
+    // INVOICE DOCUMENT DATA POPULATION
+    const randomInvNum = 'INV-' + Math.floor(10000 + Math.random() * 90000);
+    document.getElementById('invoice-doc-id').innerText = '#' + randomInvNum;
+    document.getElementById('invoice-doc-date').innerText = 'Date: ' + new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+    document.getElementById('invoice-bill-name').innerText = clientName;
+    document.getElementById('invoice-bill-address').innerText = address && address !== 'undefined' ? address : MASTER_CARD.address;
+    document.getElementById('invoice-bill-phone').innerText = phone && phone !== 'undefined' ? phone : MASTER_CARD.phone;
+
     if (card && card.lineItems && Array.isArray(card.lineItems) && card.lineItems.length > 0) {
       currentInvoiceItems = card.lineItems;
     } else {
-      currentInvoiceItems = [{ desc: text, qty: 1, price: 0.00 }];
+      currentInvoiceItems = [{ desc: text, qty: 1, price: 0.00, isTaxable: false }];
     }
     
     renderInvoiceCanvas();
@@ -1090,14 +1183,14 @@
   }
 
   function addInvoiceLineItem() {
-    currentInvoiceItems.push({ desc: '', qty: 1, price: 0.00 });
+    currentInvoiceItems.push({ desc: '', qty: 1, price: 0.00, isTaxable: false });
     renderInvoiceCanvas();
   }
 
   function removeInvoiceLineItem(index) {
     currentInvoiceItems.splice(index, 1);
     if (currentInvoiceItems.length === 0) {
-      currentInvoiceItems.push({ desc: '', qty: 1, price: 0.00 });
+      currentInvoiceItems.push({ desc: '', qty: 1, price: 0.00, isTaxable: false });
     }
     renderInvoiceCanvas();
   }
@@ -1108,6 +1201,8 @@
     } else if (field === 'price') {
       const cleanVal = value.replace(/[^0-9.-]/g, '');
       currentInvoiceItems[index].price = parseFloat(cleanVal) || 0;
+    } else if (field === 'isTaxable') {
+      currentInvoiceItems[index].isTaxable = value;
     } else {
       currentInvoiceItems[index].desc = value;
     }
@@ -1115,24 +1210,72 @@
   }
 
   function calculateInvoiceTotal() {
-    const total = currentInvoiceItems.reduce((sum, item) => sum + ((item.qty || 1) * (item.price || 0)), 0);
-    document.getElementById('invoice-canvas-total').innerText = `$${total.toFixed(2)}`;
-    return total;
+    let subtotal = 0;
+    let taxableBase = 0;
+
+    currentInvoiceItems.forEach(item => {
+      const q = item.qty || 1;
+      const p = item.price || 0;
+      const lineTotal = q * p;
+      subtotal += lineTotal;
+
+      const descLower = (item.desc || '').toLowerCase();
+      const isPart = item.isTaxable === true || 
+                     descLower.includes('filter') || 
+                     descLower.includes('bag') || 
+                     descLower.includes('part') || 
+                     descLower.includes('belt') || 
+                     descLower.includes('pack') || 
+                     descLower.includes('activepure') || 
+                     descLower.includes('unit');
+
+      if (isPart) {
+        taxableBase += lineTotal;
+      }
+    });
+
+    const tax = taxableBase > 0 ? taxableBase * 0.06 : 0;
+    const grandTotal = subtotal + tax;
+
+    document.getElementById('invoice-calc-subtotal').innerText = `$${subtotal.toFixed(2)}`;
+    document.getElementById('invoice-calc-tax').innerText = `$${tax.toFixed(2)}`;
+    document.getElementById('invoice-calc-grandtotal').innerText = `$${grandTotal.toFixed(2)}`;
+
+    return { subtotal, tax, grandTotal };
   }
 
   function renderInvoiceCanvas() {
     const box = document.getElementById('invoice-line-items');
-    box.innerHTML = currentInvoiceItems.map((item, idx) => `
-      <div class="grid grid-cols-12 gap-1 items-center">
-        <input type="text" value="${item.desc || ''}" placeholder="Service/Part" oninput="updateInvoiceItem(${idx}, 'desc', this.value)"
-          class="col-span-6 px-2 py-1 border border-bordercolor rounded bg-parchment text-xs text-ink focus:outline-none focus:border-gold">
-        <input type="number" min="1" value="${item.qty || 1}" oninput="updateInvoiceItem(${idx}, 'qty', this.value)"
-          class="col-span-2 px-1 py-1 border border-bordercolor rounded bg-parchment text-xs text-ink text-center focus:outline-none focus:border-gold">
-        <input type="text" value="$${(item.price || 0).toFixed(2)}" oninput="updateInvoiceItem(${idx}, 'price', this.value)"
-          class="col-span-3 px-2 py-1 border border-bordercolor rounded bg-parchment text-xs text-ink font-bold text-right focus:outline-none focus:border-gold">
-        <button onclick="removeInvoiceLineItem(${idx})" class="col-span-1 text-red-500 font-bold text-center hover:text-red-700">✕</button>
-      </div>
-    `).join('');
+    box.innerHTML = currentInvoiceItems.map((item, idx) => {
+      const descLower = (item.desc || '').toLowerCase();
+      const isPart = item.isTaxable === true || 
+                     descLower.includes('filter') || 
+                     descLower.includes('bag') || 
+                     descLower.includes('part') || 
+                     descLower.includes('belt') || 
+                     descLower.includes('pack') || 
+                     descLower.includes('activepure') || 
+                     descLower.includes('unit');
+
+      return `
+        <div class="grid grid-cols-12 gap-1 items-center">
+          <input type="text" value="${item.desc || ''}" placeholder="Service or Part Description" oninput="updateInvoiceItem(${idx}, 'desc', this.value)"
+            class="col-span-5 px-2 py-1 border border-bordercolor rounded bg-parchment text-xs text-ink focus:outline-none focus:border-gold">
+          <input type="number" min="1" value="${item.qty || 1}" oninput="updateInvoiceItem(${idx}, 'qty', this.value)"
+            class="col-span-2 px-1 py-1 border border-bordercolor rounded bg-parchment text-xs text-ink text-center focus:outline-none focus:border-gold">
+          <div class="col-span-2 flex items-center justify-center">
+            <label class="text-[10px] font-bold text-forest flex items-center gap-1 cursor-pointer">
+              <input type="checkbox" ${isPart ? 'checked' : ''} onchange="updateInvoiceItem(${idx}, 'isTaxable', this.checked)" class="accent-forest">
+              <span>${isPart ? '6% Parts' : '0% Labor'}</span>
+            </label>
+          </div>
+          <input type="text" value="$${(item.price || 0).toFixed(2)}" oninput="updateInvoiceItem(${idx}, 'price', this.value)"
+            class="col-span-2 px-2 py-1 border border-bordercolor rounded bg-parchment text-xs text-ink font-bold text-right focus:outline-none focus:border-gold">
+          <button onclick="removeInvoiceLineItem(${idx})" class="col-span-1 text-red-500 font-bold text-center hover:text-red-700 no-print">✕</button>
+        </div>
+      `;
+    }).join('');
+
     calculateInvoiceTotal();
   }
 
@@ -1168,13 +1311,14 @@
 
   function sendSMSPaymentLink() {
     const phone = document.getElementById('vault-client-phone').innerText;
-    const amount = document.getElementById('invoice-canvas-total').innerText;
+    const totals = calculateInvoiceTotal();
+    const grandStr = `$${totals.grandTotal.toFixed(2)}`;
 
     if (!phone) {
       return alert("No phone number on file for SMS payment link.");
     }
 
-    const msg = `Towson Healthy Homes: Payment link for balance ${amount}. Please review and finalize your invoice.`;
+    const msg = `Towson Healthy Homes: Executive Invoice payment link for balance ${grandStr}. Please review and finalize your invoice.`;
     dispatchCloudSMS(phone, msg, "Payment Link");
   }
 
@@ -1183,8 +1327,8 @@
     const store = getStorage();
     let item = store.scheduledCards.find(i => i.id === activeCardId) || store.pinballQueue.find(i => i.id === activeCardId);
 
-    const total = calculateInvoiceTotal();
-    const amountStr = `$${total.toFixed(2)}`;
+    const totals = calculateInvoiceTotal();
+    const amountStr = `$${totals.grandTotal.toFixed(2)}`;
     const mainDesc = currentInvoiceItems.map(i => i.desc).filter(Boolean).join(', ') || item.text;
 
     if (item) {
@@ -1192,7 +1336,7 @@
       store.pinballQueue = store.pinballQueue.filter(i => i.id !== activeCardId);
 
       item.desc = mainDesc;
-      item.amount = total > 0 ? amountStr : '💵 Paid';
+      item.amount = totals.grandTotal > 0 ? amountStr : '💵 Paid';
       item.completedAt = new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
       store.archive = store.archive || [];
@@ -1201,7 +1345,7 @@
       
       renderLifetimeLedger(item.clientName);
       render();
-      updateSissyConsole(`Marked service paid (${item.amount}) for ${item.clientName}. Docked into Lifetime Ledger.`, `Mark Paid`);
+      updateSissyConsole(`Marked invoice settled (${item.amount}) for ${item.clientName}. Docked into Lifetime Ledger.`, `Mark Paid`);
       closeWorkstation();
       showStatus(`⚡ Milestone settled (${item.amount}) & docked!`);
     }
@@ -1233,6 +1377,7 @@
 
   function switchAddress(newAddress) {
     document.getElementById('vault-client-address').innerText = newAddress;
+    document.getElementById('invoice-bill-address').innerText = newAddress;
     if (activeCardId) {
       const store = getStorage();
       const card = store.scheduledCards.find(c => c.id === activeCardId) || store.pinballQueue.find(c => c.id === activeCardId);
