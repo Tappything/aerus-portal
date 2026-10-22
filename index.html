@@ -404,6 +404,8 @@
   let currentInvoiceItems = [];
   let isPublicMode = false;
 
+  const SISSY_HOOK = atob('aHR0cHM6Ly9ob29rLnVzMi5tYWtlLmNvbS8zNXc1bXJucTh3MzBqMWZkYTU1cm91c2RleWE1bzE4Zg==');
+
   // MASTER FOREVER CARD FALLBACK (ZERO ORPHANED CARDS)
   const MASTER_CARD = {
     clientName: 'William Sullivan (Towson Healthy Homes)',
@@ -624,7 +626,6 @@
       const publicBubbles = document.getElementById('public-bubbles');
       publicThread.classList.remove('hidden');
 
-      // REMOVE INSTANT TYPING INDICATOR BUBBLE
       const loadingEl = document.getElementById('loading-bubble');
       if (loadingEl) loadingEl.remove();
 
@@ -651,7 +652,6 @@
     const bubbles = document.getElementById('thread-bubbles');
     const timeEl = document.getElementById('thread-time');
 
-    // REMOVE INSTANT TYPING INDICATOR BUBBLE
     const loadingEl = document.getElementById('loading-bubble');
     if (loadingEl) loadingEl.remove();
 
@@ -719,9 +719,11 @@
   }
 
   function sharePortalSMS() {
+    const phone = document.getElementById('vault-client-phone').innerText;
     const link = `${window.location.origin}${window.location.pathname}?card=TowsonHealthyHomes`;
-    const smsUrl = `sms:?&body=${encodeURIComponent("Check out our Forever Card Portal: " + link)}`;
-    window.location.href = smsUrl;
+    const msg = `Check out our Forever Card Portal: ${link}`;
+    if (!phone) return alert("No phone number on file for SMS dispatch.");
+    dispatchCloudSMS(phone, msg, "Portal Link");
   }
 
   function launchMapDirections() {
@@ -741,6 +743,44 @@
     window.location.href = `tel:${phone.replace(/[^0-9+]/g, '')}`;
   }
 
+  function dispatchCloudSMS(phone, msg, contextLabel) {
+    const cleanPhone = phone.replace(/[^0-9+]/g, '');
+    const timestamp = new Date().toISOString();
+
+    fetch(SISSY_HOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: "send_sms",
+        to: cleanPhone,
+        message: msg,
+        timestamp: timestamp
+      })
+    }).catch(err => console.error('Cloud SMS Hook Error:', err));
+
+    const dispatchedNotice = `⚡ Dispatched text via Twilio to ${cleanPhone}`;
+    showStatus(dispatchedNotice);
+    updateSissyConsole(`Dispatched SMS to ${cleanPhone}: "${msg}"`, msg);
+
+    if (activeCardId) {
+      const store = getStorage();
+      const clientName = document.getElementById('vault-client-name').innerText;
+      store.archive = store.archive || [];
+      store.archive.unshift({
+        id: Date.now(),
+        clientName: clientName,
+        desc: `SMS Outbound: ${contextLabel || 'Message'}`,
+        text: msg,
+        amount: '📱 Sent',
+        address: document.getElementById('vault-client-address').innerText,
+        completedAt: new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: timestamp
+      });
+      saveStorage(store);
+      renderLifetimeLedger(clientName);
+    }
+  }
+
   function sendStagedSMS() {
     const phone = document.getElementById('vault-client-phone').innerText;
     const msg = document.getElementById('staged-sms-text').value.trim();
@@ -750,11 +790,8 @@
     if (!msg) {
       return alert("Please enter a staged message to send.");
     }
-    const smsUrl = `sms:${phone.replace(/[^0-9+]/g, '')}?&body=${encodeURIComponent(msg)}`;
-    window.location.href = smsUrl;
-    
-    updateSissyConsole(`Dispatched staged SMS to ${phone}: "${msg}"`, msg);
-    showStatus(`⚡ SMS dispatched to ${phone}!`);
+
+    dispatchCloudSMS(phone, msg, "Staged SMS");
     document.getElementById('staged-sms-text').value = '';
   }
 
@@ -832,7 +869,6 @@
   function handleVoiceIntake(text) {
     showStatus("⚡ FRESH: Sissy is organizing your note...");
 
-    // INSTANT TYPING INDICATOR BUBBLE (ZERO LAG FEELING)
     if (isPublicMode) {
       const publicThread = document.getElementById('public-thread');
       const publicBubbles = document.getElementById('public-bubbles');
@@ -859,8 +895,7 @@
       bubbles.scrollTop = bubbles.scrollHeight;
     }
 
-    const hookUrl = atob('aHR0cHM6Ly9ob29rLnVzMi5tYWtlLmNvbS8zNXc1bXJucTh3MzBqMWZkYTU1cm91c2RleWE1bzE4Zg==');
-    fetch(hookUrl, {
+    fetch(SISSY_HOOK, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ transcript: text, timestamp: new Date().toISOString() })
@@ -877,7 +912,6 @@
                           destination === 'calendar' || 
                           destination === 'schedule';
 
-      // 1. IN-MEMORY VAULT RECOGNITION (5ms SEARCH ACROSS 22,283 RECORDS)
       const matches = findAllVaultMatches(clientName);
 
       let finalAddress = MASTER_CARD.address;
@@ -892,13 +926,11 @@
         finalPhone = formatRowPhone(matches[0]);
         allAddresses = [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))];
       } else {
-        // ZERO ORPHANED CARDS FALLBACK
         clientName = (clientName && clientName !== "Direct Intake") ? clientName : MASTER_CARD.clientName;
         finalAddress = MASTER_CARD.address;
         finalPhone = MASTER_CARD.phone;
       }
 
-      // CUSTOMER-FACING REassuring CONFIRMATION RESPONSE
       let sissyMsg = data.sissyResponse;
       if (isPublicMode && isReturningVIP) {
         sissyMsg = `Welcome back, ${clientName}! I located your account on file. Our Timonium team has your request and will text you shortly with confirmation and pickup/delivery details!`;
@@ -1089,8 +1121,8 @@
       return alert("No phone number on file for SMS payment link.");
     }
 
-    showStatus(`⚡ SMS Payment Link (${amount}) sent to ${phone}!`);
-    updateSissyConsole(`Dispatched ${amount} payment link via SMS to ${phone}.`, `Send Payment Link`);
+    const msg = `Towson Healthy Homes: Payment link for balance ${amount}. Please review and finalize your invoice.`;
+    dispatchCloudSMS(phone, msg, "Payment Link");
   }
 
   function completeActiveCard() {
