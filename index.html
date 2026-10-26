@@ -233,8 +233,8 @@
 
 </div>
 
-<!-- WORKSTATION DRAWER -->
-<div id="workstation-drawer" class="fixed inset-y-0 right-0 w-full max-w-2xl bg-cardbg border-l-2 border-gold shadow-2xl p-6 drawer-slide hidden-right-drawer z-50 flex flex-col justify-between overflow-y-auto">
+<!-- WORKSTATION DRAWER (FULL-WIDTH LUXURY MODAL) -->
+<div id="workstation-drawer" class="fixed inset-y-0 right-0 w-full max-w-4xl bg-cardbg border-l-2 border-gold shadow-2xl p-6 drawer-slide hidden-right-drawer z-50 flex flex-col justify-between overflow-y-auto">
   <div class="flex flex-col gap-4">
     <div class="flex justify-between items-center border-b border-bordercolor pb-3 no-print">
       <div class="flex items-center gap-3">
@@ -451,19 +451,22 @@
 
       </div>
 
-      <!-- ONE-TAP ACTION CONTROLS -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 no-print">
+      <!-- ONE-TAP ACTION CONTROLS (WITH DEDICATED EMAIL INVOICE BUTTON) -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 no-print">
         <button onclick="window.print()" class="py-2.5 bg-ink hover:bg-black text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
-          <span>🖨️</span> <span>Print / Save PDF</span>
+          <span>🖨️</span> <span>Print / PDF</span>
         </button>
         <button onclick="sendSMSPaymentLink()" class="py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
-          <span>💎</span> <span>Send Payment Link</span>
+          <span>💎</span> <span>SMS Link</span>
+        </button>
+        <button onclick="sendEmailInvoice()" class="py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
+          <span>✉️</span> <span>Email Invoice</span>
         </button>
         <button onclick="completeActiveCard()" class="py-2.5 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
-          <span>✓</span> <span>Mark Paid & Dock</span>
+          <span>✓</span> <span>Mark Paid</span>
         </button>
         <button onclick="dismissActiveCardMistake()" class="py-2.5 bg-gray-200 hover:bg-red-100 hover:text-red-700 text-muted font-bold text-xs rounded-xl transition flex items-center justify-center gap-1 shadow-xs">
-          <span>🗑️</span> <span>Dismiss / Mistake</span>
+          <span>🗑️</span> <span>Dismiss</span>
         </button>
       </div>
 
@@ -530,7 +533,8 @@
     phone: "(410) 882-1027",
     websiteUrl: "https://www.towsonhealthyhomes.com",
     zelleEmail: "williamanyvac@gmail.com",
-    checksPayableTo: "Clean Environment LLC"
+    checksPayableTo: "Clean Environment LLC",
+    boardBccEmail: "williamanyvac@gmail.com" // Dedicated Monday.com intake drop address
   };
 
   let vaultData = [];
@@ -542,7 +546,7 @@
   let isPublicMode = false;
   let autoFadeTimer = null;
 
-  // LIVE MAKE.COM TWILIO WEBHOOK URL
+  // LIVE TWILIO WEBHOOK URL
   const SISSY_HOOK = 'https://hook.us2.make.com/ssi3brw8m9fm3is2fw9cswoc88uvaw9u';
 
   // MASTER FALLBACK CARD
@@ -660,6 +664,11 @@
   function formatRowPhone(row) {
     if (!row) return MASTER_CARD.phone;
     return row['Phone'] || row['Phone Number'] || row['Mobile'] || row['Mobile Phone'] || row['Cell'] || row['Primary Phone'] || row['Phone 1'] || MASTER_CARD.phone;
+  }
+
+  function formatRowEmail(row) {
+    if (!row) return '';
+    return row['Email'] || row['Customer Email'] || row['Client Email'] || row['E-mail'] || '';
   }
 
   function speakAudibly(text) {
@@ -1378,6 +1387,52 @@
 
     const msg = `${SUBSCRIBER_CONFIG.businessName}: Executive Invoice payment link for balance ${grandStr}. Please review and finalize your invoice.`;
     dispatchCloudSMS(phone, msg, "Payment Link");
+  }
+
+  function sendEmailInvoice() {
+    const clientName = document.getElementById('vault-client-name').innerText;
+    const totals = calculateInvoiceTotal();
+    const grandStr = `$${totals.grandTotal.toFixed(2)}`;
+    const invId = document.getElementById('invoice-doc-id').innerText;
+    
+    const matches = findAllVaultMatches(clientName);
+    const clientEmail = (matches.length > 0) ? formatRowEmail(matches[0]) : '';
+
+    if (!clientEmail) {
+      const manualEmail = prompt(`No email on file for ${clientName}. Enter email address:`);
+      if (!manualEmail) return;
+      dispatchInvoiceEmail(manualEmail, clientName, invId, totals, grandStr);
+      return;
+    }
+
+    dispatchInvoiceEmail(clientEmail, clientName, invId, totals, grandStr);
+  }
+
+  function dispatchInvoiceEmail(toEmail, clientName, invId, totals, grandStr) {
+    const itemLines = currentInvoiceItems.map(i => `• ${i.desc} (Qty: ${i.qty || 1}) - $${((i.qty || 1) * (i.price || 0)).toFixed(2)}`).join('\n');
+    const subject = encodeURIComponent(`${SUBSCRIBER_CONFIG.businessName} - Invoice ${invId} for ${clientName}`);
+    
+    const body = encodeURIComponent(
+      `Hi ${clientName},\n\n` +
+      `Thank you for choosing ${SUBSCRIBER_CONFIG.businessName}!\n\n` +
+      `Here is the summary of your invoice ${invId}:\n\n` +
+      `${itemLines}\n\n` +
+      `Subtotal: $${totals.subtotal.toFixed(2)}\n` +
+      `MD Sales Tax (6% Parts): $${totals.tax.toFixed(2)}\n` +
+      `Grand Total Due: ${grandStr}\n\n` +
+      `Remittance Options:\n` +
+      `1. Zelle: ${SUBSCRIBER_CONFIG.zelleEmail}\n` +
+      `2. Check Payable To: ${SUBSCRIBER_CONFIG.checksPayableTo}\n` +
+      `3. Phone/Card: Call us at ${SUBSCRIBER_CONFIG.phone}\n\n` +
+      `Warm regards,\n` +
+      `${SUBSCRIBER_CONFIG.businessName}\n` +
+      `${SUBSCRIBER_CONFIG.address}\n` +
+      `${SUBSCRIBER_CONFIG.phone}`
+    );
+
+    const bccParam = SUBSCRIBER_CONFIG.boardBccEmail ? `&bcc=${encodeURIComponent(SUBSCRIBER_CONFIG.boardBccEmail)}` : '';
+    window.location.href = `mailto:${toEmail}?subject=${subject}&body=${body}${bccParam}`;
+    showStatus(`✉️ Drafted email invoice for ${clientName}`);
   }
 
   function completeActiveCard() {
