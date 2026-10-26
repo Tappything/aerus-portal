@@ -114,8 +114,8 @@
     <div class="bg-parchment border border-bordercolor rounded-xl p-4 flex flex-col gap-3">
       <span class="font-bold text-forest text-xs uppercase tracking-wider text-center">⚡ Select Secure Remittance Option:</span>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-        <button onclick="alert('Proceeding to Apple Pay / Credit Card processor...')" class="py-3 px-3 bg-ink hover:bg-black text-white font-bold text-xs rounded-xl shadow transition flex flex-col items-center justify-center gap-1">
-          <span> Pay / Card</span>
+        <button onclick="alert('Proceeding to Credit / Debit Card checkout...')" class="py-3 px-3 bg-ink hover:bg-black text-white font-bold text-xs rounded-xl shadow transition flex flex-col items-center justify-center gap-1">
+          <span>💳 Credit / Debit Card</span>
           <span class="text-[9px] text-gray-300 font-normal">Instant Checkout</span>
         </button>
         <button onclick="prompt('Copy Zelle Email Address:', SUBSCRIBER_CONFIG.zelleEmail)" class="py-3 px-3 bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs rounded-xl shadow transition flex flex-col items-center justify-center gap-1">
@@ -449,15 +449,15 @@
             </div>
           </div>
 
-          <!-- PAYMENT REMITTANCE BOX -->
+          <!-- PAYMENT REMITTANCE BOX (SCRUBBED APPLE PAY) -->
           <div class="bg-parchment border border-gold rounded-xl p-2.5 flex flex-col gap-1.5 text-[10px]">
             <span class="font-bold text-forest uppercase tracking-wider border-b border-bordercolor pb-0.5 flex items-center gap-1">
               <span>💳</span> <span>Payment Remittance Options</span>
             </span>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-1.5 text-muted">
               <div class="flex flex-col gap-0.5 bg-white p-1.5 rounded border border-bordercolor">
-                <span class="font-bold text-ink text-[9px]">1. Credit / Apple Pay:</span>
-                <span class="text-[9px]">Tap or SMS link to pay.</span>
+                <span class="font-bold text-ink text-[9px]">1. Credit / Debit Card:</span>
+                <span class="text-[9px]">Visa, MC, Discover, Amex</span>
               </div>
               <div class="flex flex-col gap-0.5 bg-white p-1.5 rounded border border-bordercolor">
                 <span class="font-bold text-ink text-[9px]">2. Zelle Remittance:</span>
@@ -569,8 +569,9 @@
   let isPublicMode = false;
   let autoFadeTimer = null;
 
-  // LIVE TWILIO WEBHOOK URL
+  // LIVE TWILIO & CLOUD EMAIL HOOKS
   const SISSY_HOOK = 'https://hook.us2.make.com/ssi3brw8m9fm3is2fw9cswoc88uvaw9u';
+  const EMAIL_INVOICE_HOOK = 'https://hook.us2.make.com/kouddoy8dwbebuc8snulhgicny9ayxfq';
 
   // MASTER FALLBACK CARD
   const MASTER_CARD = {
@@ -633,7 +634,7 @@
       document.getElementById('pub-inv-client').innerText = customerParam || "Valued Client";
       document.getElementById('pub-inv-date').innerText = 'Date: ' + new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
       
-      const grandAmount = amountParam ? `${parseFloat(amountParam).toFixed(2)}` : '$50.00';
+      const grandAmount = amountParam ? `$${parseFloat(amountParam).toFixed(2)}` : '$50.00';
       document.getElementById('pub-inv-grandtotal').innerText = grandAmount;
       document.getElementById('pub-inv-lineitems').innerHTML = `
         <div class="flex justify-between items-center py-1 border-b border-bordercolor">
@@ -1367,9 +1368,9 @@
     const tax = taxableBase > 0 ? taxableBase * 0.06 : 0;
     const grandTotal = subtotal + tax;
 
-    document.getElementById('invoice-calc-subtotal').innerText = `${subtotal.toFixed(2)}`;
-    document.getElementById('invoice-calc-tax').innerText = `${tax.toFixed(2)}`;
-    document.getElementById('invoice-calc-grandtotal').innerText = `${grandTotal.toFixed(2)}`;
+    document.getElementById('invoice-calc-subtotal').innerText = `$${subtotal.toFixed(2)}`;
+    document.getElementById('invoice-calc-tax').innerText = `$${tax.toFixed(2)}`;
+    document.getElementById('invoice-calc-grandtotal').innerText = `$${grandTotal.toFixed(2)}`;
 
     return { subtotal, tax, grandTotal };
   }
@@ -1386,8 +1387,8 @@
         <div class="grid grid-cols-12 gap-1 items-center border-b border-bordercolor pb-1">
           <span class="col-span-6 font-medium text-ink">${item.desc || 'Service / Part'}</span>
           <span class="col-span-2 text-center text-muted">${q}</span>
-          <span class="col-span-2 text-right text-muted">${p.toFixed(2)}</span>
-          <span class="col-span-2 text-right font-bold text-ink">${total.toFixed(2)}</span>
+          <span class="col-span-2 text-right text-muted">$${p.toFixed(2)}</span>
+          <span class="col-span-2 text-right font-bold text-ink">$${total.toFixed(2)}</span>
         </div>
       `;
     }).join('');
@@ -1430,7 +1431,7 @@
     const clientName = document.getElementById('vault-client-name').innerText;
     const invId = document.getElementById('invoice-doc-id').innerText.replace('#', '');
     const totals = calculateInvoiceTotal();
-    const grandStr = `${totals.grandTotal.toFixed(2)}`;
+    const grandStr = `$${totals.grandTotal.toFixed(2)}`;
 
     if (!phone) {
       return alert("No phone number on file for SMS payment link.");
@@ -1445,48 +1446,41 @@
   function sendEmailInvoice() {
     const clientName = document.getElementById('vault-client-name').innerText;
     const totals = calculateInvoiceTotal();
-    const grandStr = `${totals.grandTotal.toFixed(2)}`;
     const invId = document.getElementById('invoice-doc-id').innerText.replace('#', '');
    
     const matches = findAllVaultMatches(clientName);
-    const clientEmail = (matches.length > 0) ? formatRowEmail(matches[0]) : '';
+    let clientEmail = (matches.length > 0) ? formatRowEmail(matches[0]) : '';
 
     if (!clientEmail) {
-      const manualEmail = prompt(`No email on file for ${clientName}. Enter email address:`);
-      if (!manualEmail) return;
-      dispatchInvoiceEmail(manualEmail, clientName, invId, totals, grandStr);
-      return;
+      clientEmail = prompt(`No email on file for ${clientName}. Enter email address:`);
+      if (!clientEmail) return;
     }
 
-    dispatchInvoiceEmail(clientEmail, clientName, invId, totals, grandStr);
-  }
-
-  function dispatchInvoiceEmail(toEmail, clientName, invId, totals, grandStr) {
     const cardInvoiceUrl = `${window.location.origin}${window.location.pathname}?card=${encodeURIComponent(clientName)}&inv=${encodeURIComponent(invId)}&amt=${totals.grandTotal.toFixed(2)}`;
-    const subject = encodeURIComponent(`${SUBSCRIBER_CONFIG.businessName} • Invoice ${invId} for ${clientName}`);
-   
-    const body = encodeURIComponent(
-      `Hi ${clientName},\n\n` +
-      `Your official invoice from ${SUBSCRIBER_CONFIG.businessName} is ready for review.\n\n` +
-      `Invoice #: ${invId}\n` +
-      `Total Balance Due: ${grandStr}\n\n` +
-      `👉 Click here to review your itemized statement and pay securely:\n` +
-      `${cardInvoiceUrl}\n\n` +
-      `Payment Options Available on Your Card:\n` +
-      `• 1-Tap Apple Pay / Credit Card\n` +
-      `• Zelle (${SUBSCRIBER_CONFIG.zelleEmail})\n` +
-      `• Check Payable to ${SUBSCRIBER_CONFIG.checksPayableTo}\n\n` +
-      `Once paid, this record automatically docks into your permanent Care Card with your warranty and service history on file.\n\n` +
-      `Warm regards,\n` +
-      `${SUBSCRIBER_CONFIG.businessName}\n` +
-      `${SUBSCRIBER_CONFIG.address} | ${SUBSCRIBER_CONFIG.phone}`
-    );
+    const itemSummary = currentInvoiceItems.map(i => `• ${i.desc} (Qty: ${i.qty || 1}) - $${((i.qty || 1) * (i.price || 0)).toFixed(2)}`).join('\n');
 
-    const bccParam = SUBSCRIBER_CONFIG.boardBccEmail ? `&bcc=${encodeURIComponent(SUBSCRIBER_CONFIG.boardBccEmail)}` : '';
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(toEmail)}&su=${subject}&body=${body}${bccParam}`;
-   
-    window.open(gmailUrl, '_blank');
-    showStatus(`✉️ Opened Gmail invoice invitation for ${clientName}`);
+    showStatus("✉️ Sending Rich HTML Invoice via Cloud...");
+
+    fetch(EMAIL_INVOICE_HOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        toEmail: clientEmail,
+        customerName: clientName,
+        invoiceId: invId,
+        grandTotal: totals.grandTotal.toFixed(2),
+        invoiceUrl: cardInvoiceUrl,
+        itemSummary: itemSummary
+      })
+    })
+    .then(res => {
+      showStatus(`✉️ Rich HTML Invoice sent to ${clientEmail}!`);
+      updateSissyConsole(`Dispatched Rich HTML Invoice to ${clientEmail} for balance $${totals.grandTotal.toFixed(2)}`, `Email Invoice`);
+    })
+    .catch(err => {
+      console.error('Email Hook Error:', err);
+      showStatus(`⚠️ Email dispatch failed. Please check connection.`);
+    });
   }
 
   function completeActiveCard() {
@@ -1495,7 +1489,7 @@
     let item = store.scheduledCards.find(i => i.id === activeCardId) || store.pinballQueue.find(i => i.id === activeCardId);
 
     const totals = calculateInvoiceTotal();
-    const amountStr = `${totals.grandTotal.toFixed(2)}`;
+    const amountStr = `$${totals.grandTotal.toFixed(2)}`;
     const mainDesc = currentInvoiceItems.map(i => i.desc).filter(Boolean).join(', ') || item.text;
 
     if (item) {
