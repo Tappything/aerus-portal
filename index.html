@@ -97,7 +97,7 @@
       </div>
       <div id="pub-inv-lineitems" class="flex flex-col gap-2 text-xs">
         <div class="flex justify-between items-center py-1 border-b border-bordercolor">
-          <span>Service Balance</span>
+          <span>Executive Home Care & Service</span>
           <span class="font-bold">$0.00</span>
         </div>
       </div>
@@ -354,9 +354,9 @@
 
     <!-- SPLIT-PANE INVOICE STUDIO CANVAS -->
     <div id="canvas-view-invoice" class="hidden flex flex-col gap-4">
-      
+     
       <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-        
+       
         <!-- LEFT PANE: WORKSPACE SCRATCHPAD -->
         <div class="md:col-span-5 bg-white p-4 rounded-xl border border-bordercolor shadow-sm flex flex-col gap-3 no-print">
           <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between border-b border-bordercolor pb-1.5">
@@ -633,7 +633,7 @@
       document.getElementById('pub-inv-client').innerText = customerParam || "Valued Client";
       document.getElementById('pub-inv-date').innerText = 'Date: ' + new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
       
-      const grandAmount = amountParam ? `$${parseFloat(amountParam).toFixed(2)}` : '$50.00';
+      const grandAmount = amountParam ? `${parseFloat(amountParam).toFixed(2)}` : '$50.00';
       document.getElementById('pub-inv-grandtotal').innerText = grandAmount;
       document.getElementById('pub-inv-lineitems').innerHTML = `
         <div class="flex justify-between items-center py-1 border-b border-bordercolor">
@@ -736,7 +736,7 @@
     recognition = new SpeechRec();
     recognition.continuous = false;
     recognition.interimResults = true;
-    
+   
     recognition.onstart = () => {
       isListening = true;
       if (isPublicMode) {
@@ -747,7 +747,7 @@
         document.getElementById('voice-btn').classList.add('bg-red-600');
       }
     };
-    
+   
     recognition.onresult = (e) => {
       let liveText = '';
       let isFinalResult = false;
@@ -1054,7 +1054,7 @@
   function fetchInboundCards(userTriggered) {
     if (isPublicMode) return;
     const fetchHookUrl = atob('aHR0cHM6Ly9ob29rLnVzMi5tYWtlLmNvbS9qMml0ZWdoaHBpd2ZvZGJ2bThxY3d0MXlvb25vY2V4bg==');
-    
+   
     fetch(fetchHookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1209,7 +1209,7 @@
           ? `Scheduled appointment for ${clientName} at ${finalAddress}.`
           : `Got it! We have bags and filters ready for ${clientName}.`;
       }
-      
+     
       updateSissyConsole(sissyMsg, text);
 
       const store = getStorage();
@@ -1258,7 +1258,7 @@
       const defaultReply = isReturningVIP
         ? `Welcome back, ${clientName}! I located your account on file. Our team has received your request and will text you shortly with confirmation and pickup/delivery details!`
         : `Thanks for reaching out! Our team has received your request and will text you shortly to confirm your order details!`;
-      
+     
       updateSissyConsole(defaultReply, text);
 
       const store = getStorage();
@@ -1305,7 +1305,7 @@
     } else {
       currentInvoiceItems = [{ desc: text, qty: 1, price: 0.00, isTaxable: false }];
     }
-    
+   
     renderInvoiceCanvas();
 
     const multiBox = document.getElementById('multi-address-container');
@@ -1367,16 +1367,16 @@
     const tax = taxableBase > 0 ? taxableBase * 0.06 : 0;
     const grandTotal = subtotal + tax;
 
-    document.getElementById('invoice-calc-subtotal').innerText = `$${subtotal.toFixed(2)}`;
-    document.getElementById('invoice-calc-tax').innerText = `$${tax.toFixed(2)}`;
-    document.getElementById('invoice-calc-grandtotal').innerText = `$${grandTotal.toFixed(2)}`;
+    document.getElementById('invoice-calc-subtotal').innerText = `${subtotal.toFixed(2)}`;
+    document.getElementById('invoice-calc-tax').innerText = `${tax.toFixed(2)}`;
+    document.getElementById('invoice-calc-grandtotal').innerText = `${grandTotal.toFixed(2)}`;
 
     return { subtotal, tax, grandTotal };
   }
 
   function renderInvoiceCanvas() {
     const docBody = document.getElementById('invoice-doc-table-body');
-    
+   
     docBody.innerHTML = currentInvoiceItems.map((item, idx) => {
       const q = item.qty || 1;
       const p = item.price || 0;
@@ -1386,8 +1386,8 @@
         <div class="grid grid-cols-12 gap-1 items-center border-b border-bordercolor pb-1">
           <span class="col-span-6 font-medium text-ink">${item.desc || 'Service / Part'}</span>
           <span class="col-span-2 text-center text-muted">${q}</span>
-          <span class="col-span-2 text-right text-muted">$${p.toFixed(2)}</span>
-          <span class="col-span-2 text-right font-bold text-ink">$${total.toFixed(2)}</span>
+          <span class="col-span-2 text-right text-muted">${p.toFixed(2)}</span>
+          <span class="col-span-2 text-right font-bold text-ink">${total.toFixed(2)}</span>
         </div>
       `;
     }).join('');
@@ -1399,7 +1399,7 @@
     const store = getStorage();
     const ledgerBox = document.getElementById('drawer-lifetime-ledger');
     const ledgerBadge = document.getElementById('ledger-count-badge');
-    
+   
     const customerHistory = (store.archive || []).filter(item => 
       item.clientName && clientName && item.clientName.trim().toLowerCase() === clientName.trim().toLowerCase()
     );
@@ -1430,7 +1430,7 @@
     const clientName = document.getElementById('vault-client-name').innerText;
     const invId = document.getElementById('invoice-doc-id').innerText.replace('#', '');
     const totals = calculateInvoiceTotal();
-    const grandStr = `$${totals.grandTotal.toFixed(2)}`;
+    const grandStr = `${totals.grandTotal.toFixed(2)}`;
 
     if (!phone) {
       return alert("No phone number on file for SMS payment link.");
@@ -1438,16 +1438,16 @@
 
     const cardInvoiceUrl = `${window.location.origin}${window.location.pathname}?card=${encodeURIComponent(clientName)}&inv=${encodeURIComponent(invId)}&amt=${totals.grandTotal.toFixed(2)}`;
     const msg = `${SUBSCRIBER_CONFIG.businessName}: Hi ${clientName}, your official invoice ${invId} for ${grandStr} is ready. Tap below to review statement & pay securely: ${cardInvoiceUrl}`;
-    
+   
     dispatchCloudSMS(phone, msg, "Payment Link");
   }
 
   function sendEmailInvoice() {
     const clientName = document.getElementById('vault-client-name').innerText;
     const totals = calculateInvoiceTotal();
-    const grandStr = `$${totals.grandTotal.toFixed(2)}`;
+    const grandStr = `${totals.grandTotal.toFixed(2)}`;
     const invId = document.getElementById('invoice-doc-id').innerText.replace('#', '');
-    
+   
     const matches = findAllVaultMatches(clientName);
     const clientEmail = (matches.length > 0) ? formatRowEmail(matches[0]) : '';
 
@@ -1464,7 +1464,7 @@
   function dispatchInvoiceEmail(toEmail, clientName, invId, totals, grandStr) {
     const cardInvoiceUrl = `${window.location.origin}${window.location.pathname}?card=${encodeURIComponent(clientName)}&inv=${encodeURIComponent(invId)}&amt=${totals.grandTotal.toFixed(2)}`;
     const subject = encodeURIComponent(`${SUBSCRIBER_CONFIG.businessName} • Invoice ${invId} for ${clientName}`);
-    
+   
     const body = encodeURIComponent(
       `Hi ${clientName},\n\n` +
       `Your official invoice from ${SUBSCRIBER_CONFIG.businessName} is ready for review.\n\n` +
@@ -1483,8 +1483,8 @@
     );
 
     const bccParam = SUBSCRIBER_CONFIG.boardBccEmail ? `&bcc=${encodeURIComponent(SUBSCRIBER_CONFIG.boardBccEmail)}` : '';
-    const gmailUrl = `[https://mail.google.com/mail/?view=cm&fs=1&to=$](https://mail.google.com/mail/?view=cm&fs=1&to=$){encodeURIComponent(toEmail)}&su=${subject}&body=${body}${bccParam}`;
-    
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(toEmail)}&su=${subject}&body=${body}${bccParam}`;
+   
     window.open(gmailUrl, '_blank');
     showStatus(`✉️ Opened Gmail invoice invitation for ${clientName}`);
   }
@@ -1495,7 +1495,7 @@
     let item = store.scheduledCards.find(i => i.id === activeCardId) || store.pinballQueue.find(i => i.id === activeCardId);
 
     const totals = calculateInvoiceTotal();
-    const amountStr = `$${totals.grandTotal.toFixed(2)}`;
+    const amountStr = `${totals.grandTotal.toFixed(2)}`;
     const mainDesc = currentInvoiceItems.map(i => i.desc).filter(Boolean).join(', ') || item.text;
 
     if (item) {
@@ -1509,7 +1509,7 @@
       store.archive = store.archive || [];
       store.archive.unshift(item);
       saveStorage(store);
-      
+     
       renderLifetimeLedger(item.clientName);
       render();
       updateSissyConsole(`Marked invoice settled (${item.amount}) for ${item.clientName}. Docked into Lifetime Ledger.`, `Mark Paid`);
