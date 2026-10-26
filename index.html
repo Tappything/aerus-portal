@@ -62,13 +62,39 @@
         </div>
       </section>
 
-      <!-- Remittance Callout -->
+      <!-- Flexible Remittance Selector -->
+      <section class="bg-surface p-5 rounded-2xl border border-slate-100 space-y-4">
+        <div class="text-center">
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Select Remittance Amount</p>
+          <p class="text-[11px] text-slate-400 mt-0.5">Choose full payment, 50% deposit, or split across cards</p>
+        </div>
+
+        <!-- Quick Amount Selection Pills -->
+        <div class="grid grid-cols-3 gap-2">
+          <button type="button" onclick="selectAmount('full')" id="btnFull" class="py-2.5 px-2 bg-brand text-white font-bold text-xs rounded-xl shadow-sm text-center transition active:scale-95 cursor-pointer">
+            Full Balance<br><span id="pillFullAmt" class="text-[10px] font-normal opacity-90">$1.00</span>
+          </button>
+          <button type="button" onclick="selectAmount('half')" id="btnHalf" class="py-2.5 px-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold text-xs rounded-xl text-center transition active:scale-95 cursor-pointer">
+            50% Deposit<br><span id="pillHalfAmt" class="text-[10px] font-normal text-slate-500">$0.50</span>
+          </button>
+          <button type="button" onclick="selectAmount('custom')" id="btnCustom" class="py-2.5 px-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold text-xs rounded-xl text-center transition active:scale-95 cursor-pointer">
+            Custom / Split<br><span class="text-[10px] font-normal text-slate-500">Your Choice</span>
+          </button>
+        </div>
+
+        <!-- Custom Input Box (Hidden by default, reveals on click) -->
+        <div id="customAmountWrap" class="hidden flex items-center gap-2 pt-1">
+          <span class="text-sm font-bold text-slate-600">$</span>
+          <input type="number" id="customAmountInput" step="0.01" min="1.00" oninput="handleCustomInput(this.value)" placeholder="Enter amount to pay today" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-ink focus:outline-none focus:border-brand">
+        </div>
+      </section>
+
+      <!-- Remittance Buttons Grid -->
       <div>
         <p class="text-center text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">
-          Select Secure Remittance Option
+          Select Secure Payment Method
         </p>
 
-        <!-- 3 Buttons Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           
           <!-- Credit / Debit Card (Stripe) -->
@@ -79,7 +105,7 @@
             <span class="flex items-center gap-1.5 text-sm">
               💳 Credit / Debit Card
             </span>
-            <span class="text-[10px] text-gray-300 font-normal">Instant Checkout</span>
+            <span id="cardPaySubtext" class="text-[10px] text-gray-300 font-normal">Pay $1.00</span>
           </button>
 
           <!-- Zelle -->
@@ -128,6 +154,66 @@
       stripePaymentUrl: "https://buy.stripe.com/28E6oBd8H8hEgRHgoDc3m01"
     };
 
+    let totalBalance = 1.00;
+    let currentPayAmount = 1.00;
+
+    function updateSplitPills(amt) {
+      totalBalance = amt;
+      currentPayAmount = amt;
+      document.getElementById('pillFullAmt').innerText = '$' + amt.toFixed(2);
+      document.getElementById('pillHalfAmt').innerText = '$' + (amt / 2).toFixed(2);
+      document.getElementById('cardPaySubtext').innerText = 'Pay $' + amt.toFixed(2);
+    }
+
+    function selectAmount(type) {
+      const btnFull = document.getElementById('btnFull');
+      const btnHalf = document.getElementById('btnHalf');
+      const btnCustom = document.getElementById('btnCustom');
+      const customWrap = document.getElementById('customAmountWrap');
+      const subtext = document.getElementById('cardPaySubtext');
+
+      const defaultBtnClass = "py-2.5 px-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold text-xs rounded-xl text-center transition active:scale-95 cursor-pointer";
+      const activeBtnClass = "py-2.5 px-2 bg-brand text-white font-bold text-xs rounded-xl shadow-sm text-center transition active:scale-95 cursor-pointer";
+
+      btnFull.className = defaultBtnClass;
+      btnHalf.className = defaultBtnClass;
+      btnCustom.className = defaultBtnClass;
+
+      if (type === 'full') {
+        btnFull.className = activeBtnClass;
+        customWrap.classList.add('hidden');
+        currentPayAmount = totalBalance;
+        subtext.innerText = 'Pay $' + currentPayAmount.toFixed(2);
+      } else if (type === 'half') {
+        btnHalf.className = activeBtnClass;
+        customWrap.classList.add('hidden');
+        currentPayAmount = totalBalance / 2;
+        subtext.innerText = 'Pay $' + currentPayAmount.toFixed(2) + ' (50%)';
+      } else if (type === 'custom') {
+        btnCustom.className = activeBtnClass;
+        customWrap.classList.remove('hidden');
+        document.getElementById('customAmountInput').focus();
+        const inputVal = parseFloat(document.getElementById('customAmountInput').value);
+        if (!isNaN(inputVal) && inputVal > 0) {
+          currentPayAmount = inputVal;
+          subtext.innerText = 'Pay $' + currentPayAmount.toFixed(2);
+        } else {
+          subtext.innerText = 'Pay Custom Amount';
+        }
+      }
+    }
+
+    function handleCustomInput(val) {
+      const parsed = parseFloat(val);
+      const subtext = document.getElementById('cardPaySubtext');
+      if (!isNaN(parsed) && parsed > 0) {
+        currentPayAmount = parsed;
+        subtext.innerText = 'Pay $' + parsed.toFixed(2);
+      } else {
+        subtext.innerText = 'Pay Custom Amount';
+      }
+    }
+
     // Parse URL Parameters (?card=William%20Sullivan&inv=INV-95936&amt=1.00)
     function parseParameters() {
       const params = new URLSearchParams(window.location.search);
@@ -143,9 +229,14 @@
       }
       if (amount) {
         const parsed = parseFloat(amount);
-        const formattedAmount = isNaN(parsed) ? '$0.00' : '$' + parsed.toFixed(2);
-        document.getElementById('invoiceAmount').innerText = formattedAmount;
-        document.getElementById('serviceTotal').innerText = formattedAmount;
+        if (!isNaN(parsed)) {
+          const formattedAmount = '$' + parsed.toFixed(2);
+          document.getElementById('invoiceAmount').innerText = formattedAmount;
+          document.getElementById('serviceTotal').innerText = formattedAmount;
+          updateSplitPills(parsed);
+        }
+      } else {
+        updateSplitPills(1.00);
       }
     }
 
