@@ -237,7 +237,7 @@
         <button type="button" id="btn-view-operator" onclick="switchSystemView('operator')" class="px-2.5 py-1 bg-forest text-white font-bold text-[10px] rounded-lg shadow-sm transition active:scale-95 cursor-pointer">⚡ Floor</button>
         <button type="button" id="btn-view-public" onclick="switchSystemView('public')" class="px-2.5 py-1 text-muted hover:text-ink font-bold text-[10px] rounded-lg transition active:scale-95 cursor-pointer">💳 Public Card</button>
       </div>
-      <span class="text-[10px] text-forest font-extrabold bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full shadow-sm">⚡ Sissy Active</span>
+      <span class="text-[10px] text-forest font-extrabold bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full shadow-sm">⚡ Engine Active</span>
     </div>
   </header>
 
@@ -588,17 +588,14 @@
   let totalPublicBalance = 1.00;
   let currentPayAmount = 1.00;
 
-  // LIVE TWILIO & CLOUD EMAIL HOOKS
-  const SISSY_HOOK = 'https://hook.us2.make.com/ssi3brw8m9fm3is2fw9cswoc88uvaw9u';
+  // LIVE CLOUD HOOKS
+  const INTAKE_ROUTING_HOOK = 'https://hook.us2.make.com/ssi3brw8m9fm3is2fw9cswoc88uvaw9u';
   const EMAIL_INVOICE_HOOK = 'https://hook.us2.make.com/kouddoy8dwbebuc8snulhgicny9ayxfq';
   const PINBALL_FETCH_HOOK = 'https://hook.us2.make.com/5q1gs84brtie39vq4it42ex92of3959r';
 
-  // MASTER FALLBACK CARD
-  const MASTER_CARD = {
-    clientName: SUBSCRIBER_CONFIG.businessName,
-    address: SUBSCRIBER_CONFIG.address,
-    phone: SUBSCRIBER_CONFIG.phone
-  };
+  // FALLBACK PLACEHOLDER TEXT (NEVER FALL BACK TO SHOP ADDRESS FOR CUSTOMERS)
+  const FALLBACK_CUSTOMER_ADDRESS = "📍 Address on File / Intake Slip";
+  const FALLBACK_CUSTOMER_PHONE = "Phone on File";
 
   // 1-CLICK SYSTEM VIEW SWITCHER (OPERATOR FLOOR VS PUBLIC FOREVER CARD)
   function switchSystemView(mode) {
@@ -809,7 +806,10 @@
           if (addrEl) addrEl.innerText = addr;
         }
       }
-      if (!isPublicMode) fetchInboundCards(false);
+      if (!isPublicMode) {
+        reconcileActiveCardsFromVault();
+        fetchInboundCards(false);
+      }
     }
   });
 
@@ -825,40 +825,93 @@
   });
 
   function findAllVaultMatches(clientName) {
-    if (!vaultData || vaultData.length === 0 || !clientName || clientName === "Direct Intake" || clientName === "Subscriber Note") return [];
-    const target = clientName.trim().toLowerCase();
-    const targetParts = target.split(' ').filter(p => p.length > 2);
+    if (!vaultData || vaultData.length === 0 || !clientName) return [];
+    const normalizedName = clientName.trim();
+    if (normalizedName === "Direct Intake" || normalizedName === "Subscriber Note" || normalizedName === "Inbound Customer Request" || normalizedName === "Valued Client") {
+      return [];
+    }
+
+    const target = normalizedName.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
+    const targetParts = target.split(/\s+/).filter(p => p.length > 1);
 
     return vaultData.filter(row => {
       const fullName = (
         row['Name'] || row['Customer Name'] || row['Client Name'] || row['Full Name'] ||
         `${row['First Name'] || row['First name'] || ''} ${row['Last Name'] || row['Last name'] || ''}`
-      ).trim().toLowerCase();
+      ).trim().toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
 
       if (!fullName || fullName.length < 3) return false;
-      return fullName === target || target.includes(fullName) || fullName.includes(target) ||
-        (targetParts.length >= 2 && targetParts.every(part => fullName.includes(part)));
+      if (fullName === target || target.includes(fullName) || fullName.includes(target)) {
+        return true;
+      }
+
+      // Check if both first & last name parts are matched
+      if (targetParts.length >= 2 && targetParts.every(part => fullName.includes(part))) {
+        return true;
+      }
+
+      // Check distinct last name match if significant
+      const nameTokens = fullName.split(/\s+/);
+      const targetLastName = targetParts[targetParts.length - 1];
+      if (targetLastName.length >= 4 && nameTokens.includes(targetLastName)) {
+        return true;
+      }
+
+      return false;
     });
   }
 
   function formatRowAddress(row) {
-    if (!row) return MASTER_CARD.address;
+    if (!row) return FALLBACK_CUSTOMER_ADDRESS;
     const street = row['Address'] || row['Street'] || row['Street Address'] || row['Address 1'] || row['Billing Address'] || row['Service Address'] || row['Location'] || '';
     const city = row['City'] || '';
     const state = row['State'] || '';
     const zip = row['Zip'] || row['Postal Code'] || '';
     const combined = [street, city, state, zip].filter(Boolean).join(', ');
-    return combined || street || row['Full Address'] || MASTER_CARD.address;
+    return combined || street || row['Full Address'] || FALLBACK_CUSTOMER_ADDRESS;
   }
 
   function formatRowPhone(row) {
-    if (!row) return MASTER_CARD.phone;
-    return row['Phone'] || row['Phone Number'] || row['Mobile'] || row['Mobile Phone'] || row['Cell'] || row['Primary Phone'] || row['Phone 1'] || MASTER_CARD.phone;
+    if (!row) return FALLBACK_CUSTOMER_PHONE;
+    return row['Phone'] || row['Phone Number'] || row['Mobile'] || row['Mobile Phone'] || row['Cell'] || row['Primary Phone'] || row['Phone 1'] || FALLBACK_CUSTOMER_PHONE;
   }
 
   function formatRowEmail(row) {
     if (!row) return '';
     return row['Email'] || row['Customer Email'] || row['Client Email'] || row['E-mail'] || '';
+  }
+
+  function reconcileActiveCardsFromVault() {
+    const store = getStorage();
+    let hasChanges = false;
+
+    const reconcileList = (list) => {
+      list.forEach(card => {
+        if (!card.clientName || card.clientName === SUBSCRIBER_CONFIG.businessName) return;
+        const matches = findAllVaultMatches(card.clientName);
+        if (matches.length > 0) {
+          const realAddr = formatRowAddress(matches[0]);
+          const realPhone = formatRowPhone(matches[0]);
+          if (card.address !== realAddr || card.phone !== realPhone) {
+            card.address = realAddr;
+            card.phone = realPhone;
+            card.allAddresses = [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))];
+            hasChanges = true;
+          }
+        } else if (card.address === SUBSCRIBER_CONFIG.address) {
+          card.address = FALLBACK_CUSTOMER_ADDRESS;
+          hasChanges = true;
+        }
+      });
+    };
+
+    reconcileList(store.scheduledCards);
+    reconcileList(store.pinballQueue);
+
+    if (hasChanges) {
+      saveStorage(store);
+      render();
+    }
   }
 
   function speakAudibly(text) {
@@ -1142,13 +1195,13 @@
     const phone = document.getElementById('vault-client-phone').innerText;
     const link = `${window.location.origin}${window.location.pathname}?card=PublicPortal`;
     const msg = `Check out our Forever Card Portal: ${link}`;
-    if (!phone) return alert("No phone number on file for SMS dispatch.");
+    if (!phone || phone === FALLBACK_CUSTOMER_PHONE) return alert("No phone number on file for SMS dispatch.");
     dispatchCloudSMS(phone, msg, "Portal Link");
   }
 
   function launchMapDirections() {
     const address = document.getElementById('vault-client-address').innerText;
-    if (!address || address === MASTER_CARD.address) {
+    if (!address || address === FALLBACK_CUSTOMER_ADDRESS || address === SUBSCRIBER_CONFIG.address) {
       return alert("No specific customer address on file for map directions.");
     }
     const mapsUrl = `https://maps.apple.com/?daddr=${encodeURIComponent(address)}`;
@@ -1157,7 +1210,7 @@
 
   function dialClientPhone() {
     const phone = document.getElementById('vault-client-phone').innerText;
-    if (!phone) {
+    if (!phone || phone === FALLBACK_CUSTOMER_PHONE) {
       return alert("No phone number on file to call.");
     }
     window.location.href = `tel:${phone.replace(/[^0-9+]/g, '')}`;
@@ -1167,7 +1220,7 @@
     const cleanPhone = phone.replace(/[^0-9+]/g, '');
     const timestamp = new Date().toISOString();
 
-    fetch(SISSY_HOOK, {
+    fetch(INTAKE_ROUTING_HOOK, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1178,7 +1231,7 @@
       })
     }).catch(err => console.error('Cloud SMS Hook Error:', err));
 
-    const dispatchedNotice = `⚡ Dispatched text via Twilio to ${cleanPhone}`;
+    const dispatchedNotice = `⚡ Dispatched message to ${cleanPhone}`;
     showStatus(dispatchedNotice);
     updateSissyConsole(`Dispatched SMS to ${cleanPhone}: "${msg}"`, msg);
 
@@ -1204,7 +1257,7 @@
   function sendStagedSMS() {
     const phone = document.getElementById('vault-client-phone').innerText;
     const msg = document.getElementById('staged-sms-text').value.trim();
-    if (!phone) {
+    if (!phone || phone === FALLBACK_CUSTOMER_PHONE) {
       return alert("No phone number on file for SMS dispatch.");
     }
     if (!msg) {
@@ -1228,7 +1281,7 @@
     }
   }
 
-  // 2. PINBALL ACTION ZONE: FETCH LIVE INBOUND CARDS (MONDAY.COM BRIDGE)
+  // 2. PINBALL ACTION ZONE: FETCH LIVE INBOUND CARDS (CLEAN BRIDGED INTAKES)
   function fetchInboundCards(userTriggered) {
     if (isPublicMode) return;
     
@@ -1248,22 +1301,21 @@
 
         if (data.items && Array.isArray(data.items)) {
           store.pinballQueue = data.items.map(inbound => {
-            let clientName = inbound.name || inbound.clientName;
-            const textMsg = inbound.text || inbound.note || "New message from Monday.com";
+            let clientName = inbound.name || inbound.clientName || "Inbound Customer Request";
+            const textMsg = inbound.text || inbound.note || "Service Intake Note";
             const matches = findAllVaultMatches(clientName);
 
-            if (matches.length === 0 && (!clientName || clientName === "Direct Intake")) {
-              clientName = MASTER_CARD.clientName;
-            }
+            const resolvedAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (inbound.address || FALLBACK_CUSTOMER_ADDRESS);
+            const resolvedPhone = matches.length > 0 ? formatRowPhone(matches[0]) : (inbound.phone || FALLBACK_CUSTOMER_PHONE);
 
             return {
               id: inbound.id || Date.now() + Math.floor(Math.random() * 1000),
               externalId: inbound.id || null,
               text: textMsg,
               clientName: clientName,
-              address: matches.length > 0 ? formatRowAddress(matches[0]) : MASTER_CARD.address,
-              allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [],
-              phone: matches.length > 0 ? formatRowPhone(matches[0]) : MASTER_CARD.phone,
+              address: resolvedAddress,
+              allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [resolvedAddress],
+              phone: resolvedPhone,
               time: inbound.time || "Inbound",
               timestamp: inbound.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
               lineItems: inbound.lineItems || null,
@@ -1275,22 +1327,21 @@
 
         if (data.scheduled && Array.isArray(data.scheduled)) {
           store.scheduledCards = data.scheduled.map(sched => {
-            let clientName = sched.name || sched.clientName;
+            let clientName = sched.name || sched.clientName || "Scheduled Customer";
             const textMsg = sched.text || sched.note || "Scheduled appointment";
             const matches = findAllVaultMatches(clientName);
 
-            if (matches.length === 0 && (!clientName || clientName === "Direct Intake")) {
-              clientName = MASTER_CARD.clientName;
-            }
+            const resolvedAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (sched.address || FALLBACK_CUSTOMER_ADDRESS);
+            const resolvedPhone = matches.length > 0 ? formatRowPhone(matches[0]) : (sched.phone || FALLBACK_CUSTOMER_PHONE);
 
             return {
               id: sched.id || Date.now() + Math.floor(Math.random() * 1000),
               externalId: sched.id || null,
               text: textMsg,
               clientName: clientName,
-              address: matches.length > 0 ? formatRowAddress(matches[0]) : MASTER_CARD.address,
-              allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [],
-              phone: matches.length > 0 ? formatRowPhone(matches[0]) : MASTER_CARD.phone,
+              address: resolvedAddress,
+              allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [resolvedAddress],
+              phone: resolvedPhone,
               displayDate: sched.displayDate || '',
               time: sched.time || "Scheduled",
               timestamp: sched.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -1313,7 +1364,7 @@
 
   // 3. ROBUST VAULT RADAR + ANTI-DEFAULTING VOICE INTAKE
   function handleVoiceIntake(text) {
-    showStatus("⚡ FRESH: Sissy is organizing your note...");
+    showStatus("⚡ FRESH: Organizing your note...");
 
     // Remove spaced single letter spelling gaps (e.g. "n o b l i t t" -> "noblitt")
     const cleanedTranscript = text.replace(/\b([a-zA-Z])\s+(?=[a-zA-Z]\b)/g, '$1').trim();
@@ -1343,10 +1394,13 @@
     }
 
     // ANTI-DEFAULTING PROTECTION: Never default customer intakes to shop or master card names
+    const isShopInternal = cleanSpoken.includes("shop note") || cleanSpoken.includes("internal");
     let initialName = detectedClient ? (detectedClient['Name'] || "Valued Client") : "";
-    if (!initialName && !cleanSpoken.includes("shop note") && !cleanSpoken.includes("internal")) {
+    if (!initialName && !isShopInternal) {
       const words = cleanedTranscript.trim().split(/\s+/);
       initialName = words.slice(0, 2).join(' ');
+    } else if (isShopInternal) {
+      initialName = SUBSCRIBER_CONFIG.businessName;
     }
 
     // Dialogue bubble feedback
@@ -1380,8 +1434,8 @@
       }
     }
 
-    // DISPATCH TO BACKEND HOOK WITH PRE-LOCKED CLIENT
-    fetch(SISSY_HOOK, {
+    // DISPATCH TO INTAKE ROUTING HOOK
+    fetch(INTAKE_ROUTING_HOOK, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
@@ -1395,10 +1449,20 @@
       return cleanAndParseJSON(rawText);
     })
     .then(data => {
-      let clientName = data.clientName || initialName || MASTER_CARD.clientName;
-      let finalAddress = detectedClient ? formatRowAddress(detectedClient) : MASTER_CARD.address;
-      let finalPhone = detectedClient ? formatRowPhone(detectedClient) : MASTER_CARD.phone;
-      let allAddresses = detectedClient ? [...new Set([finalAddress])] : [];
+      let clientName = data.clientName || initialName || (isShopInternal ? SUBSCRIBER_CONFIG.businessName : "Inbound Intake");
+      
+      let finalAddress = FALLBACK_CUSTOMER_ADDRESS;
+      let finalPhone = FALLBACK_CUSTOMER_PHONE;
+
+      if (detectedClient) {
+        finalAddress = formatRowAddress(detectedClient);
+        finalPhone = formatRowPhone(detectedClient);
+      } else if (isShopInternal) {
+        finalAddress = SUBSCRIBER_CONFIG.address;
+        finalPhone = SUBSCRIBER_CONFIG.phone;
+      }
+
+      let allAddresses = [finalAddress];
       let isReturningVIP = !!detectedClient;
 
       const destination = (data.destination || '').toLowerCase();
@@ -1410,18 +1474,18 @@
                           cleanedTranscript.toLowerCase().includes(' am') || 
                           cleanedTranscript.toLowerCase().includes(' pm');
 
-      let sissyMsg = data.sissyResponse;
+      let freshReply = data.sissyResponse;
       if (isPublicMode && isReturningVIP) {
-        sissyMsg = `Welcome back, ${clientName}! I located your account on file. Our team has received your request and will text you shortly with confirmation and pickup/delivery details!`;
-      } else if (isPublicMode && !isReturningVIP && clientName !== MASTER_CARD.clientName) {
-        sissyMsg = `Thanks ${clientName}! Our team has received your request and will text you shortly to confirm your order details!`;
-      } else if (!sissyMsg) {
-        sissyMsg = isScheduled 
+        freshReply = `Welcome back, ${clientName}! I located your account on file. Our team has received your request and will text you shortly with confirmation and pickup/delivery details!`;
+      } else if (isPublicMode && !isReturningVIP && clientName !== SUBSCRIBER_CONFIG.businessName) {
+        freshReply = `Thanks ${clientName}! Our team has received your request and will text you shortly to confirm your order details!`;
+      } else if (!freshReply) {
+        freshReply = isScheduled 
           ? `Scheduled appointment for ${clientName} at ${finalAddress}.`
-          : `Got it! We have bags and filters ready for ${clientName}.`;
+          : `Got it! Note recorded for ${clientName}.`;
       }
       
-      updateSissyConsole(sissyMsg, cleanedTranscript);
+      updateSissyConsole(freshReply, cleanedTranscript);
 
       const store = getStorage();
       const card = {
@@ -1440,10 +1504,10 @@
 
       if (isScheduled) {
         store.scheduledCards.unshift(card);
-        showStatus(`⚡ Sissy scheduled appointment for ${clientName}!`);
+        showStatus(`⚡ Scheduled appointment for ${clientName}!`);
       } else {
         store.pinballQueue.unshift(card);
-        showStatus(`⚡ Sissy queued note for ${clientName} in Pinball!`);
+        showStatus(`⚡ Queued note for ${clientName} in Pinball!`);
       }
 
       saveStorage(store);
@@ -1459,14 +1523,25 @@
       
       updateSissyConsole(defaultReply, cleanedTranscript);
 
+      let finalAddress = FALLBACK_CUSTOMER_ADDRESS;
+      let finalPhone = FALLBACK_CUSTOMER_PHONE;
+
+      if (detectedClient) {
+        finalAddress = formatRowAddress(detectedClient);
+        finalPhone = formatRowPhone(detectedClient);
+      } else if (isShopInternal) {
+        finalAddress = SUBSCRIBER_CONFIG.address;
+        finalPhone = SUBSCRIBER_CONFIG.phone;
+      }
+
       const store = getStorage();
       const fallbackCard = {
         id: Date.now(),
         text: cleanedTranscript,
         clientName: initialName,
-        address: detectedClient ? formatRowAddress(detectedClient) : MASTER_CARD.address,
-        allAddresses: detectedClient ? [formatRowAddress(detectedClient)] : [],
-        phone: detectedClient ? formatRowPhone(detectedClient) : MASTER_CARD.phone,
+        address: finalAddress,
+        allAddresses: [finalAddress],
+        phone: finalPhone,
         displayDate: cleanedTranscript.toLowerCase().includes('tomorrow') ? 'Tomorrow' : 'Today',
         time: cleanedTranscript.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm))/i) ? cleanedTranscript.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm))/i)[0].toUpperCase() : "Time Pending",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -1485,6 +1560,7 @@
     });
   }
 
+  // REAL-TIME ON-OPEN DYNAMIC VAULT LOOKUP
   function openCustomerCard(text, clientName, address, phone, cardId, cardType) {
     if (isPublicMode) return;
     activeCardId = cardId;
@@ -1493,18 +1569,46 @@
     const allCards = [...store.scheduledCards, ...store.pinballQueue];
     const card = allCards.find(c => c.id === cardId);
 
+    // DYNAMIC REAL-TIME VAULT MATCH ON CARD OPEN
+    let resolvedAddress = address;
+    let resolvedPhone = phone;
+    let allPropertyAddresses = [];
+
+    const matches = findAllVaultMatches(clientName);
+    if (matches.length > 0) {
+      resolvedAddress = formatRowAddress(matches[0]);
+      resolvedPhone = formatRowPhone(matches[0]);
+      allPropertyAddresses = [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))];
+      
+      // Update memory store so it persists cleanly
+      if (card) {
+        card.address = resolvedAddress;
+        card.phone = resolvedPhone;
+        card.allAddresses = allPropertyAddresses;
+        saveStorage(store);
+        render();
+      }
+    } else {
+      if (!resolvedAddress || resolvedAddress === 'undefined' || resolvedAddress === SUBSCRIBER_CONFIG.address) {
+        resolvedAddress = FALLBACK_CUSTOMER_ADDRESS;
+      }
+      if (!resolvedPhone || resolvedPhone === 'undefined' || resolvedPhone === SUBSCRIBER_CONFIG.phone) {
+        resolvedPhone = FALLBACK_CUSTOMER_PHONE;
+      }
+    }
+
     document.getElementById('drawer-title').innerText = clientName + ' — Workstation';
     document.getElementById('vault-client-name').innerText = clientName;
-    document.getElementById('vault-client-address').innerText = address && address !== 'undefined' ? address : MASTER_CARD.address;
-    document.getElementById('vault-client-phone').innerText = phone && phone !== 'undefined' ? phone : MASTER_CARD.phone;
+    document.getElementById('vault-client-address').innerText = resolvedAddress;
+    document.getElementById('vault-client-phone').innerText = resolvedPhone;
     document.getElementById('active-card-note').innerText = `"${text}"`;
 
     const randomInvNum = 'INV-' + Math.floor(10000 + Math.random() * 90000);
     document.getElementById('invoice-doc-id').innerText = '#' + randomInvNum;
     document.getElementById('invoice-doc-date').innerText = 'Date: ' + new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
     document.getElementById('invoice-bill-name').innerText = clientName;
-    document.getElementById('invoice-bill-address').innerText = address && address !== 'undefined' ? address : MASTER_CARD.address;
-    document.getElementById('invoice-bill-phone').innerText = phone && phone !== 'undefined' ? phone : MASTER_CARD.phone;
+    document.getElementById('invoice-bill-address').innerText = resolvedAddress;
+    document.getElementById('invoice-bill-phone').innerText = resolvedPhone;
 
     if (card && card.lineItems && Array.isArray(card.lineItems) && card.lineItems.length > 0) {
       currentInvoiceItems = card.lineItems;
@@ -1517,10 +1621,10 @@
     const multiBox = document.getElementById('multi-address-container');
     const selector = document.getElementById('address-selector');
 
-    if (card && card.allAddresses && card.allAddresses.length > 1) {
+    if (allPropertyAddresses.length > 1) {
       multiBox.classList.remove('hidden');
-      selector.innerHTML = card.allAddresses.map(addr => `
-        <option value="${addr}" ${addr === address ? 'selected' : ''}>${addr}</option>
+      selector.innerHTML = allPropertyAddresses.map(addr => `
+        <option value="${addr}" ${addr === resolvedAddress ? 'selected' : ''}>${addr}</option>
       `).join('');
     } else {
       multiBox.classList.add('hidden');
@@ -1640,7 +1744,7 @@
     const totals = calculateInvoiceTotal();
     const grandStr = `$${totals.grandTotal.toFixed(2)}`;
 
-    if (!phone) {
+    if (!phone || phone === FALLBACK_CUSTOMER_PHONE) {
       return alert("No phone number on file for SMS payment link.");
     }
 
