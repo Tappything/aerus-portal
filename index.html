@@ -824,6 +824,7 @@
     }
   });
 
+  // 1. TIGHT FIRST & LAST TOKEN MATCHING (KILLS MULTI-ADDRESS EXPLOSION)
   function findAllVaultMatches(clientName) {
     if (!vaultData || vaultData.length === 0 || !clientName) return [];
     const normalizedName = clientName.trim();
@@ -832,7 +833,7 @@
     }
 
     const target = normalizedName.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
-    const targetParts = target.split(/\s+/).filter(p => p.length > 1);
+    const targetParts = target.split(/\s+/).filter(p => p.length >= 2);
 
     return vaultData.filter(row => {
       const fullName = (
@@ -841,20 +842,20 @@
       ).trim().toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
 
       if (!fullName || fullName.length < 3) return false;
-      if (fullName === target || target.includes(fullName) || fullName.includes(target)) {
-        return true;
+      
+      // Exact full match
+      if (fullName === target) return true;
+
+      // When 2 or more name tokens are provided (e.g. "Catherine Noblitt"),
+      // REQUIRE ALL TOKENS to match so we never mix up all Catherines
+      if (targetParts.length >= 2) {
+        return targetParts.every(part => fullName.includes(part));
       }
 
-      // Check if both first & last name parts are matched
-      if (targetParts.length >= 2 && targetParts.every(part => fullName.includes(part))) {
-        return true;
-      }
-
-      // Check distinct last name match if significant
-      const nameTokens = fullName.split(/\s+/);
-      const targetLastName = targetParts[targetParts.length - 1];
-      if (targetLastName.length >= 4 && nameTokens.includes(targetLastName)) {
-        return true;
+      // If only a single 4+ letter name is supplied, match strictly on full equality or bounded token
+      if (targetParts.length === 1 && targetParts[0].length >= 4) {
+        const rowTokens = fullName.split(/\s+/);
+        return rowTokens.includes(targetParts[0]);
       }
 
       return false;
@@ -1281,7 +1282,7 @@
     }
   }
 
-  // 2. PINBALL ACTION ZONE: FETCH LIVE INBOUND CARDS (CLEAN BRIDGED INTAKES)
+  // PINBALL ACTION ZONE: FETCH LIVE INBOUND CARDS
   function fetchInboundCards(userTriggered) {
     if (isPublicMode) return;
     
@@ -1362,30 +1363,25 @@
     .catch(() => {});
   }
 
-  // 3. ROBUST VAULT RADAR + ANTI-DEFAULTING VOICE INTAKE
+  // ROBUST VAULT RADAR + ANTI-DEFAULTING VOICE INTAKE
   function handleVoiceIntake(text) {
     showStatus("⚡ FRESH: Organizing your note...");
 
-    // Remove spaced single letter spelling gaps (e.g. "n o b l i t t" -> "noblitt")
     const cleanedTranscript = text.replace(/\b([a-zA-Z])\s+(?=[a-zA-Z]\b)/g, '$1').trim();
 
-    // PRE-HOOK VAULT RADAR SCAN: Match customer against 22,283 records client-side first
     let detectedClient = null;
     const cleanSpoken = cleanedTranscript.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
-    const spokenTokens = cleanSpoken.split(/\s+/).filter(w => w.length > 2);
 
     if (vaultData && vaultData.length > 0) {
       for (let row of vaultData) {
         const rawName = (row['Name'] || `${row['First name'] || ''} ${row['Last name'] || ''}`).trim();
         const lowerName = rawName.toLowerCase();
-        const parts = lowerName.split(/\s+/).filter(p => p.length > 2);
+        const parts = lowerName.split(/\s+/).filter(p => p.length >= 2);
 
-        // Exact full name match in transcript
         if (cleanSpoken.includes(lowerName)) {
           detectedClient = row;
           break;
         }
-        // Match both first and last name tokens if spoken together
         if (parts.length >= 2 && parts.every(part => cleanSpoken.includes(part))) {
           detectedClient = row;
           break;
@@ -1393,7 +1389,6 @@
       }
     }
 
-    // ANTI-DEFAULTING PROTECTION: Never default customer intakes to shop or master card names
     const isShopInternal = cleanSpoken.includes("shop note") || cleanSpoken.includes("internal");
     let initialName = detectedClient ? (detectedClient['Name'] || "Valued Client") : "";
     if (!initialName && !isShopInternal) {
@@ -1403,7 +1398,6 @@
       initialName = SUBSCRIBER_CONFIG.businessName;
     }
 
-    // Dialogue bubble feedback
     if (isPublicMode) {
       const publicThread = document.getElementById('public-thread');
       const publicBubbles = document.getElementById('public-bubbles');
@@ -1434,7 +1428,6 @@
       }
     }
 
-    // DISPATCH TO INTAKE ROUTING HOOK
     fetch(INTAKE_ROUTING_HOOK, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1515,7 +1508,6 @@
       setTimeout(() => fetchInboundCards(false), 500);
     })
     .catch(err => {
-      // SAFE CLIENT-SIDE DOCK IF HOOK IS OFFLINE
       const isScheduled = cleanedTranscript.toLowerCase().includes('tomorrow') || cleanedTranscript.toLowerCase().includes(' am') || cleanedTranscript.toLowerCase().includes(' pm');
       const defaultReply = detectedClient 
         ? `Welcome back, ${initialName}! Your request is logged.`
@@ -1560,7 +1552,7 @@
     });
   }
 
-  // REAL-TIME ON-OPEN DYNAMIC VAULT LOOKUP
+  // 2. REAL-TIME ON-OPEN DYNAMIC VAULT LOOKUP & TITLE LOCK
   function openCustomerCard(text, clientName, address, phone, cardId, cardType) {
     if (isPublicMode) return;
     activeCardId = cardId;
@@ -1569,18 +1561,19 @@
     const allCards = [...store.scheduledCards, ...store.pinballQueue];
     const card = allCards.find(c => c.id === cardId);
 
-    // DYNAMIC REAL-TIME VAULT MATCH ON CARD OPEN
+    // Guaranteed real customer name display (fallback to card text only if completely missing)
+    const displayClientName = (clientName && clientName.trim() !== '' && clientName !== 'undefined') ? clientName.trim() : "Valued Customer";
+
     let resolvedAddress = address;
     let resolvedPhone = phone;
     let allPropertyAddresses = [];
 
-    const matches = findAllVaultMatches(clientName);
+    const matches = findAllVaultMatches(displayClientName);
     if (matches.length > 0) {
       resolvedAddress = formatRowAddress(matches[0]);
       resolvedPhone = formatRowPhone(matches[0]);
       allPropertyAddresses = [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))];
       
-      // Update memory store so it persists cleanly
       if (card) {
         card.address = resolvedAddress;
         card.phone = resolvedPhone;
@@ -1597,8 +1590,9 @@
       }
     }
 
-    document.getElementById('drawer-title').innerText = clientName + ' — Workstation';
-    document.getElementById('vault-client-name').innerText = clientName;
+    // LOCK CUSTOMER NAME ACROSS WORKSTATION DRAWER & INVOICE
+    document.getElementById('drawer-title').innerText = `${displayClientName} — Workstation`;
+    document.getElementById('vault-client-name').innerText = displayClientName;
     document.getElementById('vault-client-address').innerText = resolvedAddress;
     document.getElementById('vault-client-phone').innerText = resolvedPhone;
     document.getElementById('active-card-note').innerText = `"${text}"`;
@@ -1606,7 +1600,7 @@
     const randomInvNum = 'INV-' + Math.floor(10000 + Math.random() * 90000);
     document.getElementById('invoice-doc-id').innerText = '#' + randomInvNum;
     document.getElementById('invoice-doc-date').innerText = 'Date: ' + new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
-    document.getElementById('invoice-bill-name').innerText = clientName;
+    document.getElementById('invoice-bill-name').innerText = displayClientName;
     document.getElementById('invoice-bill-address').innerText = resolvedAddress;
     document.getElementById('invoice-bill-phone').innerText = resolvedPhone;
 
@@ -1630,7 +1624,7 @@
       multiBox.classList.add('hidden');
     }
 
-    renderLifetimeLedger(clientName);
+    renderLifetimeLedger(displayClientName);
     switchCanvasTab('notes');
     openWorkstation();
   }
