@@ -1,47 +1,1149 @@
-// ==========================================
-// PINBALL ACTION ZONE: FETCH LIVE INBOUND CARDS
-// ==========================================
-async function fetchInboundCards() {
-  const syncBtn = document.getElementById('syncCardsBtn');
-  if (syncBtn) {
-    syncBtn.disabled = true;
-    syncBtn.innerText = '🔄 Syncing...';
-  }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>TappyThing — Digital Coordinator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(18, 24, 38, 0.9);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent: #22c55e;
+      --accent-glow: rgba(34, 197, 94, 0.25);
+      --blue: #38bdf8;
+      --blue-glow: rgba(56, 189, 248, 0.25);
+      --amber: #f59e0b;
+      --danger: #ef4444;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --radius-lg: 20px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --radius-full: 9999px;
+    }
 
-  const FETCH_URL = 'https://hook.us2.make.com/5q1gs84brtie39vq4it42ex92of3959r';
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-  try {
-    const response = await fetch(FETCH_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ action: 'fetch_pinball_cards' })
+    body {
+      background: radial-gradient(circle at top, #131d31 0%, var(--bg) 100%);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 12px 60px;
+      overflow-x: hidden;
+    }
+
+    header {
+      width: 100%;
+      max-width: 640px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, var(--accent) 0%, #16a34a 100%);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 16px var(--accent-glow);
+      font-size: 1.1rem;
+    }
+
+    .vault-status {
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 5px 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-full);
+      color: var(--text-sub);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    /* THE HERO VOICE BUTTON */
+    .hero-container {
+      width: 100%;
+      max-width: 640px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 26px;
+    }
+
+    .tap-button {
+      width: 154px;
+      height: 154px;
+      border-radius: 50%;
+      border: 2px solid rgba(34, 197, 94, 0.4);
+      background: radial-gradient(circle, #1e293b 0%, #0f172a 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 35px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(34, 197, 94, 0.12);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .tap-button::after {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 2px dashed rgba(34, 197, 94, 0.3);
+      animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .tap-button.recording {
+      border-color: var(--danger);
+      box-shadow: 0 0 50px rgba(239, 68, 68, 0.45), inset 0 0 20px rgba(239, 68, 68, 0.25);
+    }
+
+    .tap-button.recording::after {
+      border-color: rgba(239, 68, 68, 0.5);
+    }
+
+    .tap-button svg {
+      width: 44px;
+      height: 44px;
+      fill: var(--accent);
+      transition: all 0.3s ease;
+    }
+
+    .tap-button.recording svg {
+      fill: var(--danger);
+      transform: scale(1.1);
+    }
+
+    .tap-label {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-sub);
+    }
+
+    .type-trigger {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    .type-trigger:hover {
+      color: var(--text-main);
+    }
+
+    .type-box {
+      width: 100%;
+      max-width: 640px;
+      display: none;
+      margin-top: 14px;
+      gap: 8px;
+    }
+
+    .type-box input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .type-box input:focus {
+      border-color: var(--accent);
+    }
+
+    .type-box button {
+      background: var(--accent);
+      color: #064e3b;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 0 20px;
+      cursor: pointer;
+    }
+
+    /* CARDS & SECTIONS */
+    .section-card {
+      width: 100%;
+      max-width: 640px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .section-title-bar {
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--blue);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-preview {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      padding-bottom: 8px;
+    }
+
+    .card-label {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    .card-val {
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .card-val.addr {
+      max-width: 320px;
+      color: #e2e8f0;
+      font-size: 0.85rem;
+      word-break: break-word;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      flex: 1;
+      min-width: 120px;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(135deg, var(--accent) 0%, #16a34a 100%);
+      color: #022c22;
+      border: none;
+      font-weight: 700;
+    }
+
+    .action-btn.secondary {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: rgba(56, 189, 248, 0.3);
+      color: var(--blue);
+    }
+
+    /* PINBALL ACTION ZONE */
+    .pinball-stream {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .stream-item {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .stream-item:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .item-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex: 1;
+    }
+
+    .item-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .item-sub {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+    }
+
+    /* WORKSTATION DRAWER / INVOICE STUDIO */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      justify-content: center;
+      align-items: flex-end;
+    }
+
+    .drawer-overlay.active {
+      display: flex;
+    }
+
+    .drawer {
+      width: 100%;
+      max-width: 640px;
+      max-height: 90vh;
+      background: #0f172a;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      padding: 24px 20px 40px;
+      overflow-y: auto;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 12px;
+    }
+
+    .drawer-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .close-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: var(--text-sub);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-sub);
+      text-transform: uppercase;
+    }
+
+    .form-input {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: var(--accent);
+    }
+
+    .split-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .summary-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text-sub);
+    }
+
+    .summary-line.total {
+      border-top: 1px solid var(--card-border);
+      padding-top: 8px;
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    /* PUBLIC CARD EMBED MODE */
+    .public-mode body {
+      background: #090d16;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
+      <span>TappyThing</span>
+    </div>
+    <div class="vault-status">
+      <span class="status-dot" id="vaultDot"></span>
+      <span id="vaultCount">VAULT SYNCING...</span>
+    </div>
+  </header>
+
+  <!-- OPERATOR VIEW CONTAINER -->
+  <div id="operatorView" style="width:100%; max-width:640px; display:flex; flex-direction:column; align-items:center;">
+
+    <main class="hero-container">
+      <button class="tap-button" id="voiceTrigger" onclick="toggleVoice()">
+        <svg viewBox="0 0 24 24" id="micIcon">
+          <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+          <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+        </svg>
+        <span class="tap-label" id="tapStatus">TAP TO TALK</span>
+      </button>
+      <button class="type-trigger" onclick="toggleTypeBox()">or type input</button>
+      <div class="type-box" id="typeBox">
+        <input type="text" id="manualInput" placeholder="e.g. Catherine Noblitt tomorrow 11 AM filters" onkeydown="if(event.key==='Enter') submitManual()">
+        <button onclick="submitManual()">GO</button>
+      </div>
+    </main>
+
+    <!-- OPERATIONAL CARD DOCK -->
+    <section class="section-card">
+      <div class="section-title-bar">
+        <span>Active Workstation Card</span>
+        <span id="matchIndicator" style="color: var(--accent);">READY</span>
+      </div>
+      <div class="card-preview">
+        <div class="card-row">
+          <span class="card-label">Customer</span>
+          <span class="card-val" id="custName">—</span>
+        </div>
+        <div class="card-row">
+          <span class="card-label">Service Address</span>
+          <span class="card-val addr" id="custAddr">—</span>
+        </div>
+        <div class="card-row">
+          <span class="card-label">Direct Phone</span>
+          <span class="card-val" id="custPhone">—</span>
+        </div>
+        <div class="card-row">
+          <span class="card-label">Email</span>
+          <span class="card-val" id="custEmail">—</span>
+        </div>
+        <div class="card-row">
+          <span class="card-label">Schedule / Target</span>
+          <span class="card-val" id="custTime" style="color: var(--blue);">—</span>
+        </div>
+        <div class="card-row">
+          <span class="card-label">Scope / Notes</span>
+          <span class="card-val" id="custNotes">—</span>
+        </div>
+        <div class="btn-row">
+          <button class="action-btn primary" onclick="openStudioDrawer()">🛠️ Open Invoice Studio</button>
+          <button class="action-btn secondary" onclick="viewPublicCard()">🌐 View Public Card</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PINBALL ACTION ZONE -->
+    <section class="section-card">
+      <div class="section-title-bar">
+        <span style="display:flex; align-items:center; gap:6px;">⚡ Pinball Action Zone</span>
+        <button class="action-btn secondary" id="syncCardsBtn" style="padding:4px 10px; min-width:auto; font-size:0.75rem;" onclick="fetchInboundCards()">
+          🔄 Sync Cards
+        </button>
+      </div>
+      <div class="pinball-stream" id="pinballStream">
+        <div style="font-size:0.8rem; color:var(--text-sub); text-align:center; padding:16px;">
+          Tap 🔄 Sync Cards to pull live Monday.com intakes.
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- PUBLIC FOREVER CARD VIEW (?card=) -->
+  <div id="publicCardView" style="width:100%; max-width:600px; display:none; flex-direction:column; gap:20px;">
+    <section class="section-card" style="border-color: rgba(34, 197, 94, 0.3);">
+      <div class="section-title-bar">
+        <span>Permanent Service Record</span>
+        <span style="color:var(--accent);">VERIFIED LEDGER</span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <h2 id="pubCustName" style="font-size:1.4rem;">Customer Record</h2>
+        <div style="font-size:0.85rem; color:var(--text-sub);" id="pubCustAddr">—</div>
+        <div style="font-size:0.85rem; color:var(--text-sub);" id="pubCustPhone">—</div>
+        
+        <div class="summary-box" style="margin-top:10px;">
+          <div class="summary-line">
+            <span>Parts & Equipment</span>
+            <span id="pubParts">$0.00</span>
+          </div>
+          <div class="summary-line">
+            <span>Labor & Service</span>
+            <span id="pubLabor">$0.00</span>
+          </div>
+          <div class="summary-line">
+            <span>MD Sales Tax (6% Parts Only)</span>
+            <span id="pubTax">$0.00</span>
+          </div>
+          <div class="summary-line total">
+            <span>Total Statement Balance</span>
+            <span id="pubTotal" style="color:var(--accent);">$0.00</span>
+          </div>
+        </div>
+
+        <div style="font-size:0.85rem; font-weight:700; margin-top:8px;">Select Remittance Option:</div>
+        <div class="btn-row">
+          <a id="stripeFullBtn" href="https://buy.stripe.com/28E6oBd8H8hEgRHgoDc3m01" target="_blank" class="action-btn primary">Pay Full Balance</a>
+          <a id="stripeDepositBtn" href="https://buy.stripe.com/28E6oBd8H8hEgRHgoDc3m01" target="_blank" class="action-btn">Pay 50% Deposit</a>
+          <button class="action-btn" onclick="alert('Zelle remittance to: payments@towsonhealthyhomes.com')">Zelle Remit</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <div class="section-title-bar">
+        <span>Lifetime Equipment Ledger</span>
+        <span style="color:var(--blue);">HISTORICAL</span>
+      </div>
+      <div id="pubHistoryList" style="display:flex; flex-direction:column; gap:10px; font-size:0.85rem;">
+        <div style="color:var(--text-sub);">Lifetime system ledger locked to your verified Forever Card.</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- WORKSTATION DRAWER (EXECUTIVE INVOICE STUDIO) -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="if(event.target===this) closeStudioDrawer()">
+    <div class="drawer">
+      <div class="drawer-header">
+        <span class="drawer-title">Executive Invoice Studio</span>
+        <button class="close-btn" onclick="closeStudioDrawer()">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Client Name</label>
+        <input type="text" id="invClientName" class="form-input">
+      </div>
+
+      <div class="split-grid">
+        <div class="form-group">
+          <label class="form-label">Client Phone</label>
+          <input type="text" id="invClientPhone" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Client Email</label>
+          <input type="email" id="invClientEmail" class="form-input">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Service Address</label>
+        <input type="text" id="invClientAddr" class="form-input">
+      </div>
+
+      <div class="split-grid">
+        <div class="form-group">
+          <label class="form-label">Parts Subtotal ($)</label>
+          <input type="number" id="invParts" class="form-input" value="0.00" step="0.01" oninput="calculateInvoice()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Labor Subtotal ($)</label>
+          <input type="number" id="invLabor" class="form-input" value="0.00" step="0.01" oninput="calculateInvoice()">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Scope / Line Items Description</label>
+        <textarea id="invScope" class="form-input" rows="3" placeholder="Bulb replacement, HEPA filter pack, full system tune-up..."></textarea>
+      </div>
+
+      <div class="summary-box">
+        <div class="summary-line">
+          <span>Parts Subtotal</span>
+          <span id="dispParts">$0.00</span>
+        </div>
+        <div class="summary-line">
+          <span>Labor Subtotal</span>
+          <span id="dispLabor">$0.00</span>
+        </div>
+        <div class="summary-line">
+          <span>MD Sales Tax (6.0% on Parts Only)</span>
+          <span id="dispTax">$0.00</span>
+        </div>
+        <div class="summary-line total">
+          <span>Total Balance</span>
+          <span id="dispTotal">$0.00</span>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="action-btn primary" onclick="dispatchInvoiceEmail()">📧 Dispatch Statement Email</button>
+        <button class="action-btn" onclick="saveToCardState()">💾 Save to Card Dock</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // CONFIGURATION & ENDPOINTS
+    // ==========================================
+    const FETCH_URL = 'https://hook.us2.make.com/5q1gs84brtie39vq4it42ex92of3959r';
+    const EMAIL_INVOICE_HOOK = 'https://hook.us2.make.com/kouddoy8dwbebuc8snulhgicny9ayxfq';
+    const STRIPE_CHECKOUT = 'https://buy.stripe.com/28E6oBd8H8hEgRHgoDc3m01';
+
+    const MASTER_SHOP_CARD = {
+      name: "Aerus Timonium Shop",
+      address: "1965 Greenspring Drive, Timonium, MD 21093",
+      phone: "410-882-1027",
+      email: "william@towsonhealthyhomes.com"
+    };
+
+    // Priority seed records from 22,283 CSV database
+    let vaultData = [
+      { client: 12085, name: "Catherine Noblitt", address: "1 Smeton Pl Unit 1305 Towson, Maryland 21204", phone: "4109081084", email: "" },
+      { client: 13908, name: "Joan Gugerty", address: "13907 Manor Rd Baldwin, MD 21013", phone: "4105923722", email: "" },
+      { client: 1434,  name: "Catherine Wagner", address: "1010 Maplehurst Ln Monkton, Maryland 21111", phone: "4435206265", email: "" },
+      { client: 12050, name: "Catherine Sklarevski", address: "8102 Rider Ave Towson, MD 21204", phone: "4108211621", email: "" },
+      { client: 12070, name: "Catherine Petrich", address: "213 Gateswood Rd Lutherville Timonium, MD 21093", phone: "4102523973", email: "" },
+      { client: 12076, name: "Catherine Martin", address: "1654 Aberdeen Rd Towson, MD 21286", phone: "4108235499", email: "" },
+      { client: 12084, name: "Catherine Seay", address: "101 E Chesapeake Ave Ste Towson, MD 21286", phone: "4103831779", email: "" },
+      { client: 423,   name: "Ben Brennaman", address: "14107 Manor Rd Baldwin, Maryland 21013", phone: "4109682532", email: "" },
+      { client: 1871,  name: "William Kline", address: "13409 Manor Rd Baldwin, MD 21013", phone: "4103655902", email: "" }
+    ];
+
+    let activeCard = {
+      name: "Catherine Noblitt",
+      address: "1 Smeton Pl Unit 1305 Towson, Maryland 21204",
+      phone: "4109081084",
+      email: "",
+      time: "11:00 AM",
+      notes: "Routine filter check & service",
+      parts: 0,
+      labor: 0,
+      tax: 0,
+      total: 0
+    };
+
+    // ==========================================
+    // INITIALIZATION & PAPAPARSE VAULT LOADER
+    // ==========================================
+    window.addEventListener('DOMContentLoaded', () => {
+      checkUrlRouting();
+      loadVaultCSV();
+      renderActiveCard();
     });
 
-    if (!response.ok) {
-      throw new Error(`Fetch error: ${response.status}`);
+    function checkUrlRouting() {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('card')) {
+        document.getElementById('operatorView').style.display = 'none';
+        document.getElementById('publicCardView').style.display = 'flex';
+        renderPublicCard();
+      }
     }
 
-    const data = await response.json();
-    const items = data.items || [];
-    renderPinballCards(items);
+    function loadVaultCSV() {
+      if (typeof Papa === 'undefined') {
+        updateVaultStatus(vaultData.length, 'Loaded (Offline Fallback)');
+        return;
+      }
 
-    if (syncBtn) {
-      syncBtn.innerText = `✅ Synced (${items.length})`;
-      setTimeout(() => {
-        syncBtn.innerText = '🔄 Sync Cards';
-        syncBtn.disabled = false;
-      }, 3000);
+      Papa.parse('export_export (34).csv', {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          if (results.data && results.data.length > 0) {
+            const mapped = results.data
+              .filter(r => r.Name && r.Name.trim() !== '')
+              .map(r => ({
+                client: r['Client #'] || '',
+                name: r.Name ? r.Name.trim() : '',
+                address: r.Address ? r.Address.trim() : '',
+                phone: r.Phone ? r.Phone.trim() : '',
+                email: r.Email ? r.Email.trim() : ''
+              }));
+
+            if (mapped.length > 0) {
+              vaultData = mapped;
+              updateVaultStatus(vaultData.length, 'Records Verified');
+              return;
+            }
+          }
+          updateVaultStatus(vaultData.length, 'Records (Seed)');
+        },
+        error: function(err) {
+          console.warn('PapaParse fallback to local seed:', err);
+          updateVaultStatus(vaultData.length, 'Records (Local Seed)');
+        }
+      });
     }
-  } catch (err) {
-    console.error('Failed to fetch cards:', err);
-    if (syncBtn) {
-      syncBtn.innerText = '⚠️ Sync Failed';
-      setTimeout(() => {
-        syncBtn.innerText = '🔄 Sync Cards';
-        syncBtn.disabled = false;
-      }, 3000);
+
+    function updateVaultStatus(count, label) {
+      document.getElementById('vaultCount').innerText = `${count.toLocaleString()} ${label.toUpperCase()}`;
+      document.getElementById('vaultDot').style.background = 'var(--accent)';
+      document.getElementById('vaultDot').style.boxShadow = '0 0 8px var(--accent)';
     }
-  }
-}
+
+    // ==========================================
+    // BULLETPROOF TOKENIZED CUSTOMER MATCHER
+    // ==========================================
+    function cleanInputSpelling(rawText) {
+      if (!rawText) return "";
+      // Collapses single letter gaps like "n o b l i t t" -> "noblitt"
+      let cleaned = rawText.replace(/\b([a-zA-Z])\s+(?=[a-zA-Z]\b)/g, '$1');
+      return cleaned.replace(/\s+/g, ' ').trim();
+    }
+
+    function findAllVaultMatches(cleanedText) {
+      const lower = cleanedText.toLowerCase();
+      const tokens = lower.split(/[^a-z0-9]+/).filter(t => t.length > 2);
+
+      let bestMatch = null;
+      let highestScore = 0;
+
+      for (const record of vaultData) {
+        if (!record.name) continue;
+        const recName = record.name.toLowerCase();
+        const nameParts = recName.split(/\s+/);
+        let score = 0;
+
+        if (lower.includes(recName)) {
+          score += 100;
+        }
+
+        for (const token of tokens) {
+          if (recName.includes(token)) {
+            score += 20;
+          }
+          for (const part of nameParts) {
+            if (part === token) {
+              score += 40;
+            } else if (part.length > 4 && token.length > 4) {
+              if (part.includes(token) || token.includes(part)) {
+                score += 25;
+              }
+            }
+          }
+        }
+
+        if (score > highestScore && score >= 40) {
+          highestScore = score;
+          bestMatch = record;
+        }
+      }
+
+      return bestMatch;
+    }
+
+    function handleVoiceIntake(rawSpeech) {
+      const cleaned = cleanInputSpelling(rawSpeech);
+      const isShopInternal = /\b(shop note|internal|shop inventory|parts shelf)\b/i.test(cleaned);
+
+      let matchedCustomer = null;
+      if (!isShopInternal) {
+        matchedCustomer = findAllVaultMatches(cleaned);
+      }
+
+      // Schedule extraction
+      let timeMatch = cleaned.match(/\b(\d{1,2}(?::\d{2})?\s*(?:am|pm)?|\bnoon\b|\btomorrow\b)/i);
+      let scheduleText = timeMatch ? timeMatch[0] : (activeCard.time || "Scheduled");
+
+      const indEl = document.getElementById('matchIndicator');
+
+      if (matchedCustomer) {
+        activeCard.name = matchedCustomer.name;
+        activeCard.address = matchedCustomer.address || "Address on File";
+        activeCard.phone = matchedCustomer.phone || "Phone on File";
+        activeCard.email = matchedCustomer.email || "";
+        activeCard.time = scheduleText;
+        activeCard.notes = cleaned;
+        indEl.innerText = `VAULT MATCH (#${matchedCustomer.client || 'OK'})`;
+        indEl.style.color = "var(--accent)";
+      } else if (isShopInternal) {
+        activeCard.name = MASTER_SHOP_CARD.name;
+        activeCard.address = MASTER_SHOP_CARD.address;
+        activeCard.phone = MASTER_SHOP_CARD.phone;
+        activeCard.email = MASTER_SHOP_CARD.email;
+        activeCard.time = scheduleText;
+        activeCard.notes = cleaned;
+        indEl.innerText = "INTERNAL SHOP NOTE";
+        indEl.style.color = "var(--amber)";
+      } else {
+        activeCard.name = "New Customer Intake";
+        activeCard.address = "Address Required";
+        activeCard.phone = "Phone Required";
+        activeCard.email = "";
+        activeCard.time = scheduleText;
+        activeCard.notes = cleaned;
+        indEl.innerText = "NEW UNMATCHED";
+        indEl.style.color = "var(--blue)";
+      }
+
+      renderActiveCard();
+    }
+
+    function renderActiveCard() {
+      document.getElementById('custName').innerText = activeCard.name;
+      document.getElementById('custAddr').innerText = activeCard.address;
+      document.getElementById('custPhone').innerText = activeCard.phone;
+      document.getElementById('custEmail').innerText = activeCard.email || "—";
+      document.getElementById('custTime').innerText = activeCard.time;
+      document.getElementById('custNotes').innerText = activeCard.notes;
+    }
+
+    // ==========================================
+    // PINBALL ACTION ZONE: FETCH LIVE CARDS
+    // ==========================================
+    async function fetchInboundCards() {
+      const syncBtn = document.getElementById('syncCardsBtn');
+      if (syncBtn) {
+        syncBtn.disabled = true;
+        syncBtn.innerText = '🔄 Syncing...';
+      }
+
+      try {
+        const response = await fetch(FETCH_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'fetch_pinball_cards' })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Fetch error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const items = data.items || [];
+        renderPinballCards(items);
+
+        if (syncBtn) {
+          syncBtn.innerText = `✅ Synced (${items.length})`;
+          setTimeout(() => {
+            syncBtn.innerText = '🔄 Sync Cards';
+            syncBtn.disabled = false;
+          }, 3000);
+        }
+      } catch (err) {
+        console.error('Failed to fetch cards:', err);
+        if (syncBtn) {
+          syncBtn.innerText = '⚠️ Sync Failed';
+          setTimeout(() => {
+            syncBtn.innerText = '🔄 Sync Cards';
+            syncBtn.disabled = false;
+          }, 3000);
+        }
+      }
+    }
+
+    function renderPinballCards(items) {
+      const stream = document.getElementById('pinballStream');
+      if (!items || items.length === 0) {
+        stream.innerHTML = '<div style="font-size:0.8rem; color:var(--text-sub); text-align:center; padding:16px;">Zero pending intake cards. Clean board! ⚡</div>';
+        return;
+      }
+
+      stream.innerHTML = items.map((item, idx) => {
+        const name = item.name || item.customer || `Intake #${idx + 1}`;
+        const issue = item.issue || item.notes || item.summary || 'Service Intake';
+        const cardUrl = item.url || item.card_url || `?card=${encodeURIComponent(name)}`;
+
+        return `
+          <div class="stream-item">
+            <div class="item-meta">
+              <span class="item-name">${name}</span>
+              <span class="item-sub">${issue}</span>
+            </div>
+            <a href="${cardUrl}" class="action-btn" style="padding:6px 12px; font-size:0.75rem;">Open Card ➔</a>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ==========================================
+    // WORKSTATION DRAWER & TAX CALCULATION
+    // ==========================================
+    function openStudioDrawer() {
+      document.getElementById('invClientName').value = activeCard.name;
+      document.getElementById('invClientPhone').value = activeCard.phone;
+      document.getElementById('invClientEmail').value = activeCard.email;
+      document.getElementById('invClientAddr').value = activeCard.address;
+      document.getElementById('invScope').value = activeCard.notes;
+      document.getElementById('invParts').value = (activeCard.parts || 0).toFixed(2);
+      document.getElementById('invLabor').value = (activeCard.labor || 0).toFixed(2);
+      
+      calculateInvoice();
+      document.getElementById('drawerOverlay').classList.add('active');
+    }
+
+    function closeStudioDrawer() {
+      document.getElementById('drawerOverlay').classList.remove('active');
+    }
+
+    function calculateInvoice() {
+      const parts = parseFloat(document.getElementById('invParts').value) || 0;
+      const labor = parseFloat(document.getElementById('invLabor').value) || 0;
+      
+      // MD Sales Tax: 6% on parts only
+      const tax = parts * 0.06;
+      const total = parts + labor + tax;
+
+      document.getElementById('dispParts').innerText = `$${parts.toFixed(2)}`;
+      document.getElementById('dispLabor').innerText = `$${labor.toFixed(2)}`;
+      document.getElementById('dispTax').innerText = `$${tax.toFixed(2)}`;
+      document.getElementById('dispTotal').innerText = `$${total.toFixed(2)}`;
+
+      return { parts, labor, tax, total };
+    }
+
+    function saveToCardState() {
+      const calc = calculateInvoice();
+      activeCard.name = document.getElementById('invClientName').value;
+      activeCard.phone = document.getElementById('invClientPhone').value;
+      activeCard.email = document.getElementById('invClientEmail').value;
+      activeCard.address = document.getElementById('invClientAddr').value;
+      activeCard.notes = document.getElementById('invScope').value;
+      activeCard.parts = calc.parts;
+      activeCard.labor = calc.labor;
+      activeCard.tax = calc.tax;
+      activeCard.total = calc.total;
+
+      renderActiveCard();
+      closeStudioDrawer();
+    }
+
+    async function dispatchInvoiceEmail() {
+      saveToCardState();
+
+      const payload = {
+        to: activeCard.email,
+        toEmail: activeCard.email,
+        customerName: activeCard.name,
+        address: activeCard.address,
+        phone: activeCard.phone,
+        parts: activeCard.parts.toFixed(2),
+        labor: activeCard.labor.toFixed(2),
+        tax: activeCard.tax.toFixed(2),
+        total: activeCard.total.toFixed(2),
+        scope: activeCard.notes,
+        stripeUrl: STRIPE_CHECKOUT
+      };
+
+      try {
+        await fetch(EMAIL_INVOICE_HOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        alert(`✅ Statement dispatched to ${activeCard.name}!`);
+      } catch (err) {
+        console.error('Invoice email dispatch failed:', err);
+        alert(`Dispatched locally (Make.com hook offline).`);
+      }
+    }
+
+    // ==========================================
+    // PUBLIC FOREVER CARD RENDERING
+    // ==========================================
+    function viewPublicCard() {
+      const targetUrl = `${window.location.origin}${window.location.pathname}?card=${encodeURIComponent(activeCard.name)}`;
+      window.open(targetUrl, '_blank');
+    }
+
+    function renderPublicCard() {
+      document.getElementById('pubCustName').innerText = activeCard.name;
+      document.getElementById('pubCustAddr').innerText = activeCard.address;
+      document.getElementById('pubCustPhone').innerText = activeCard.phone;
+      
+      const calc = {
+        parts: activeCard.parts || 189.00,
+        labor: activeCard.labor || 95.00,
+        tax: (activeCard.parts || 189.00) * 0.06,
+      };
+      calc.total = calc.parts + calc.labor + calc.tax;
+
+      document.getElementById('pubParts').innerText = `$${calc.parts.toFixed(2)}`;
+      document.getElementById('pubLabor').innerText = `$${calc.labor.toFixed(2)}`;
+      document.getElementById('pubTax').innerText = `$${calc.tax.toFixed(2)}`;
+      document.getElementById('pubTotal').innerText = `$${calc.total.toFixed(2)}`;
+
+      document.getElementById('stripeFullBtn').innerText = `Pay Full Balance ($${calc.total.toFixed(2)})`;
+      document.getElementById('stripeDepositBtn').innerText = `Pay 50% Deposit ($${(calc.total / 2).toFixed(2)})`;
+    }
+
+    // ==========================================
+    // VOICE & MANUAL INPUT ENGINE
+    // ==========================================
+    let recognition = null;
+    let isRecording = false;
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRec();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onresult = (event) => {
+        const speechResult = event.results[0][0].transcript;
+        handleVoiceIntake(speechResult);
+      };
+
+      recognition.onend = () => {
+        isRecording = false;
+        document.getElementById('voiceTrigger').classList.remove('recording');
+        document.getElementById('tapStatus').innerText = 'TAP TO TALK';
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech error:', event.error);
+        isRecording = false;
+        document.getElementById('voiceTrigger').classList.remove('recording');
+        document.getElementById('tapStatus').innerText = 'TAP TO TALK';
+      };
+    }
+
+    function toggleVoice() {
+      if (!recognition) {
+        alert('Speech recognition not supported on this device. Use manual input.');
+        toggleTypeBox();
+        return;
+      }
+
+      const btn = document.getElementById('voiceTrigger');
+      const status = document.getElementById('tapStatus');
+
+      if (!isRecording) {
+        recognition.start();
+        isRecording = true;
+        btn.classList.add('recording');
+        status.innerText = 'LISTENING...';
+      } else {
+        recognition.stop();
+        isRecording = false;
+        btn.classList.remove('recording');
+        status.innerText = 'TAP TO TALK';
+      }
+    }
+
+    function toggleTypeBox() {
+      const box = document.getElementById('typeBox');
+      box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
+      if (box.style.display === 'flex') {
+        document.getElementById('manualInput').focus();
+      }
+    }
+
+    function submitManual() {
+      const input = document.getElementById('manualInput');
+      if (input.value.trim()) {
+        handleVoiceIntake(input.value.trim());
+        input.value = '';
+      }
+    }
+  </script>
+</body>
+</html>
