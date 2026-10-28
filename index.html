@@ -267,12 +267,22 @@
       </div>
     </div>
 
-    <!-- PINBALL ACTION ZONE -->
+    <!-- PINBALL ACTION ZONE WITH VISUAL LANES -->
     <div class="flex flex-col gap-2">
       <div class="text-xs font-extrabold uppercase tracking-widest text-muted flex items-center justify-between">
         <span class="flex items-center gap-2"><span>📍</span> Pinball Action Zone</span>
         <button onclick="fetchInboundCards(true)" class="text-[10px] font-bold text-forest hover:underline cursor-pointer">🔄 Sync Cards</button>
       </div>
+
+      <!-- VISUAL FILTER PILLS -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
+        <button onclick="setPinballFilter('all')" id="filter-pill-all" class="px-2.5 py-1 bg-forest text-white font-bold text-[10px] rounded-lg shadow-sm whitespace-nowrap active:scale-95 cursor-pointer transition">All</button>
+        <button onclick="setPinballFilter('intake')" id="filter-pill-intake" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">📥 Intake</button>
+        <button onclick="setPinballFilter('bench')" id="filter-pill-bench" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">🛠️ Bench</button>
+        <button onclick="setPinballFilter('parts')" id="filter-pill-parts" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">🛒 Parts</button>
+        <button onclick="setPinballFilter('ready')" id="filter-pill-ready" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">🔧 Ready</button>
+      </div>
+
       <div class="bg-cardbg border border-bordercolor rounded-2xl p-4 min-h-[160px]">
         <div id="pinball-list" class="flex flex-col gap-2.5"></div>
       </div>
@@ -300,6 +310,28 @@
           <span>Networking: ON</span>
         </button>
         <button onclick="closeWorkstation()" class="text-muted font-bold text-xl hover:text-ink cursor-pointer">✕</button>
+      </div>
+    </div>
+
+    <!-- 1-TAP WORKSTATION STATUS SELECTOR -->
+    <div class="bg-white p-3 rounded-xl border border-bordercolor shadow-sm flex flex-col gap-2 no-print">
+      <div class="text-[10px] font-bold text-forest uppercase tracking-wider flex items-center justify-between">
+        <span>📍 Shop Lane & Production Status</span>
+        <span id="current-lane-indicator" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">⚪ Intake</span>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+        <button type="button" onclick="updateActiveCardStatus('intake')" id="btn-lane-intake" class="py-1.5 px-2 bg-parchment border border-bordercolor rounded-lg text-[10px] font-bold text-slate-700 hover:bg-slate-100 transition active:scale-95 cursor-pointer flex items-center justify-center gap-1">
+          ⚪ Move to Intake
+        </button>
+        <button type="button" onclick="updateActiveCardStatus('bench')" id="btn-lane-bench" class="py-1.5 px-2 bg-parchment border border-bordercolor rounded-lg text-[10px] font-bold text-blue-700 hover:bg-blue-50 transition active:scale-95 cursor-pointer flex items-center justify-center gap-1">
+          🔵 Move to Bench
+        </button>
+        <button type="button" onclick="updateActiveCardStatus('parts')" id="btn-lane-parts" class="py-1.5 px-2 bg-parchment border border-bordercolor rounded-lg text-[10px] font-bold text-amber-700 hover:bg-amber-50 transition active:scale-95 cursor-pointer flex items-center justify-center gap-1">
+          🟡 Staging Parts
+        </button>
+        <button type="button" onclick="updateActiveCardStatus('ready')" id="btn-lane-ready" class="py-1.5 px-2 bg-parchment border border-bordercolor rounded-lg text-[10px] font-bold text-emerald-700 hover:bg-emerald-50 transition active:scale-95 cursor-pointer flex items-center justify-center gap-1">
+          🟢 Ready for Wall
+        </button>
       </div>
     </div>
 
@@ -583,6 +615,7 @@
   let currentInvoiceItems = [];
   let isPublicMode = false;
   let autoFadeTimer = null;
+  let activePinballFilter = 'all';
 
   // Split Payment Tracking
   let totalPublicBalance = 1.00;
@@ -593,9 +626,67 @@
   const EMAIL_INVOICE_HOOK = 'https://hook.us2.make.com/kouddoy8dwbebuc8snulhgicny9ayxfq';
   const PINBALL_FETCH_HOOK = 'https://hook.us2.make.com/5q1gs84brtie39vq4it42ex92of3959r';
 
-  // FALLBACK PLACEHOLDER TEXT (NEVER FALL BACK TO SHOP ADDRESS FOR CUSTOMERS)
+  // FALLBACK PLACEHOLDER TEXT
   const FALLBACK_CUSTOMER_ADDRESS = "📍 Address on File / Intake Slip";
   const FALLBACK_CUSTOMER_PHONE = "Phone on File";
+
+  // STATUS DEFINITIONS & BADGE CONFIG
+  const STATUS_CONFIG = {
+    intake: { label: 'Intake', badgeClass: 'bg-slate-100 text-slate-700 border-slate-300', dot: '⚪' },
+    bench: { label: 'On Bench', badgeClass: 'bg-blue-100 text-blue-800 border-blue-300', dot: '🔵' },
+    parts: { label: 'Parts Needed', badgeClass: 'bg-amber-100 text-amber-800 border-amber-300', dot: '🟡' },
+    ready: { label: 'Ready for Pickup', badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-300', dot: '🟢' }
+  };
+
+  function setPinballFilter(filterKey) {
+    activePinballFilter = filterKey;
+    const filterKeys = ['all', 'intake', 'bench', 'parts', 'ready'];
+    filterKeys.forEach(k => {
+      const btn = document.getElementById(`filter-pill-${k}`);
+      if (!btn) return;
+      if (k === filterKey) {
+        btn.className = "px-2.5 py-1 bg-forest text-white font-bold text-[10px] rounded-lg shadow-sm whitespace-nowrap active:scale-95 cursor-pointer transition";
+      } else {
+        btn.className = "px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition";
+      }
+    });
+    render();
+  }
+
+  function updateActiveCardStatus(newStatus) {
+    if (!activeCardId) return;
+    const store = getStorage();
+    const allCards = [...store.scheduledCards, ...store.pinballQueue];
+    const card = allCards.find(c => c.id === activeCardId);
+    if (!card) return;
+
+    card.status = newStatus;
+    saveStorage(store);
+    syncDrawerStatusButtons(newStatus);
+    render();
+    showStatus(`⚡ Lane updated to: ${STATUS_CONFIG[newStatus] ? STATUS_CONFIG[newStatus].label : newStatus}`);
+  }
+
+  function syncDrawerStatusButtons(status) {
+    const validStatus = STATUS_CONFIG[status] ? status : 'intake';
+    const cfg = STATUS_CONFIG[validStatus];
+    const indicator = document.getElementById('current-lane-indicator');
+    if (indicator) {
+      indicator.className = `text-[10px] font-bold px-2 py-0.5 rounded-full border ${cfg.badgeClass}`;
+      indicator.innerText = `${cfg.dot} ${cfg.label}`;
+    }
+
+    const statuses = ['intake', 'bench', 'parts', 'ready'];
+    statuses.forEach(s => {
+      const b = document.getElementById(`btn-lane-${s}`);
+      if (!b) return;
+      if (s === validStatus) {
+        b.classList.add('ring-2', 'ring-forest', 'shadow-sm');
+      } else {
+        b.classList.remove('ring-2', 'ring-forest', 'shadow-sm');
+      }
+    });
+  }
 
   // 1-CLICK SYSTEM VIEW SWITCHER (OPERATOR FLOOR VS PUBLIC FOREVER CARD)
   function switchSystemView(mode) {
@@ -824,7 +915,7 @@
     }
   });
 
-  // 1. TIGHT FIRST & LAST TOKEN MATCHING (KILLS MULTI-ADDRESS EXPLOSION)
+  // TIGHT FIRST & LAST TOKEN MATCHING
   function findAllVaultMatches(clientName) {
     if (!vaultData || vaultData.length === 0 || !clientName) return [];
     const normalizedName = clientName.trim();
@@ -843,16 +934,12 @@
 
       if (!fullName || fullName.length < 3) return false;
       
-      // Exact full match
       if (fullName === target) return true;
 
-      // When 2 or more name tokens are provided (e.g. "Catherine Noblitt"),
-      // REQUIRE ALL TOKENS to match so we never mix up all Catherines
       if (targetParts.length >= 2) {
         return targetParts.every(part => fullName.includes(part));
       }
 
-      // If only a single 4+ letter name is supplied, match strictly on full equality or bounded token
       if (targetParts.length === 1 && targetParts[0].length >= 4) {
         const rowTokens = fullName.split(/\s+/);
         return rowTokens.includes(targetParts[0]);
@@ -925,7 +1012,7 @@
     }
   }
 
-  // 2. ON-DEMAND SPEECH RECOGNITION (UNLOCKED DIRECTLY ON USER TOUCH)
+  // 2. ON-DEMAND SPEECH RECOGNITION
   function toggleVoiceIntake() {
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRec) {
@@ -1317,6 +1404,7 @@
               address: resolvedAddress,
               allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [resolvedAddress],
               phone: resolvedPhone,
+              status: inbound.status || 'intake',
               time: inbound.time || "Inbound",
               timestamp: inbound.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
               lineItems: inbound.lineItems || null,
@@ -1343,6 +1431,7 @@
               address: resolvedAddress,
               allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [resolvedAddress],
               phone: resolvedPhone,
+              status: sched.status || 'intake',
               displayDate: sched.displayDate || '',
               time: sched.time || "Scheduled",
               timestamp: sched.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -1488,6 +1577,7 @@
         address: finalAddress,
         allAddresses: allAddresses,
         phone: finalPhone,
+        status: data.status || 'intake',
         displayDate: data.displayDate || (cleanedTranscript.toLowerCase().includes('tomorrow') ? 'Tomorrow' : 'Today'),
         time: data.time || (cleanedTranscript.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm))/i) ? cleanedTranscript.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm))/i)[0].toUpperCase() : "Time Pending"),
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -1534,6 +1624,7 @@
         address: finalAddress,
         allAddresses: [finalAddress],
         phone: finalPhone,
+        status: 'intake',
         displayDate: cleanedTranscript.toLowerCase().includes('tomorrow') ? 'Tomorrow' : 'Today',
         time: cleanedTranscript.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm))/i) ? cleanedTranscript.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm))/i)[0].toUpperCase() : "Time Pending",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -1561,7 +1652,6 @@
     const allCards = [...store.scheduledCards, ...store.pinballQueue];
     const card = allCards.find(c => c.id === cardId);
 
-    // Guaranteed real customer name display (fallback to card text only if completely missing)
     const displayClientName = (clientName && clientName.trim() !== '' && clientName !== 'undefined') ? clientName.trim() : "Valued Customer";
 
     let resolvedAddress = address;
@@ -1590,7 +1680,6 @@
       }
     }
 
-    // LOCK CUSTOMER NAME ACROSS WORKSTATION DRAWER & INVOICE
     document.getElementById('drawer-title').innerText = `${displayClientName} — Workstation`;
     document.getElementById('vault-client-name').innerText = displayClientName;
     document.getElementById('vault-client-address').innerText = resolvedAddress;
@@ -1611,6 +1700,9 @@
     }
     
     renderInvoiceCanvas();
+
+    // Sync Lane Status selector inside Drawer
+    syncDrawerStatusButtons(card ? (card.status || 'intake') : 'intake');
 
     const multiBox = document.getElementById('multi-address-container');
     const selector = document.getElementById('address-selector');
@@ -1863,46 +1955,67 @@
 
   function saveStorage(d) { localStorage.setItem('tappything_lexus_v3', JSON.stringify(d)); }
 
+  function getStatusBadgeHtml(statusKey) {
+    const key = STATUS_CONFIG[statusKey] ? statusKey : 'intake';
+    const cfg = STATUS_CONFIG[key];
+    return `<span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold border ${cfg.badgeClass}">${cfg.dot} ${cfg.label}</span>`;
+  }
+
   function render() {
     if (isPublicMode) return;
     const store = getStorage();
     const cal = document.getElementById('schedule-list');
     if (cal) {
       cal.innerHTML = store.scheduledCards.length === 0 ? '<div class="text-muted text-xs italic">No scheduled appointments.</div>' :
-        store.scheduledCards.map(item => `
+        store.scheduledCards.map(item => {
+          const statusBadge = getStatusBadgeHtml(item.status);
+          return `
           <div class="bg-white border-l-4 border-blue-600 border border-bordercolor rounded-xl p-3 flex flex-col justify-between shadow-sm">
-            <div class="flex justify-between items-start">
-              <div>
-                <div class="font-bold text-ink text-xs">${item.clientName}</div>
+            <div class="flex justify-between items-start gap-2">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="font-bold text-ink text-xs">${item.clientName}</span>
+                  ${statusBadge}
+                </div>
                 <p class="text-[11px] text-muted italic">"${item.text}"</p>
                 <div class="text-[10px] text-gold font-bold mt-0.5">📍 ${item.address}</div>
                 <div class="text-[10px] text-muted mt-0.5">${item.displayDate ? item.displayDate + ' • ' : ''}${item.time || item.timestamp}</div>
               </div>
-              <div class="flex gap-1.5">
+              <div class="flex gap-1.5 flex-shrink-0">
                 <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}', ${item.id}, 'calendar')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition active:scale-95 cursor-pointer">Open Card ➔</button>
               </div>
             </div>
           </div>
-        `).join('');
+        `}).join('');
     }
 
     const pin = document.getElementById('pinball-list');
     if (pin) {
-      pin.innerHTML = store.pinballQueue.length === 0 ? '<div class="text-muted text-xs italic">Queue clean.</div>' :
-        store.pinballQueue.map(item => `
+      let filteredQueue = store.pinballQueue || [];
+      if (activePinballFilter !== 'all') {
+        filteredQueue = filteredQueue.filter(item => (item.status || 'intake') === activePinballFilter);
+      }
+
+      pin.innerHTML = filteredQueue.length === 0 ? '<div class="text-muted text-xs italic">No cards in this lane.</div>' :
+        filteredQueue.map(item => {
+          const statusBadge = getStatusBadgeHtml(item.status);
+          return `
           <div class="bg-white border-l-4 border-gold border border-bordercolor rounded-xl p-3 flex flex-col justify-between shadow-sm">
-            <div class="flex justify-between items-start">
-              <div>
-                <div class="font-bold text-ink text-xs">${item.clientName}</div>
+            <div class="flex justify-between items-start gap-2">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="font-bold text-ink text-xs">${item.clientName}</span>
+                  ${statusBadge}
+                </div>
                 <p class="text-[11px] text-muted italic">"${item.text}"</p>
                 <div class="text-[10px] text-muted mt-0.5">Queued • ${item.timestamp}</div>
               </div>
-              <div class="flex gap-1.5">
+              <div class="flex gap-1.5 flex-shrink-0">
                 <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}', ${item.id}, 'pinball')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition active:scale-95 cursor-pointer">Open Card ➔</button>
               </div>
             </div>
           </div>
-        `).join('');
+        `}).join('');
     }
   }
 
