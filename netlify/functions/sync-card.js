@@ -1,32 +1,36 @@
-let cloudState = { 
-  appointments: [],
-  vaultInvoices: []
-};
-
-exports.handler = async (event) => {
+exports.handler = async function(event, context) {
   const headers = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Content-Type": "application/json"
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Content-Type': 'application/json'
   };
 
-  if (event.httpMethod === "OPTIONS") return { statusCode: 200, headers, body: "" };
-
-  if (event.httpMethod === "GET") {
-    return { statusCode: 200, headers, body: JSON.stringify(cloudState) };
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
   }
 
-  if (event.httpMethod === "POST") {
-    try {
-      const data = JSON.parse(event.body || "{}");
-      if (data.appointments) cloudState.appointments = data.appointments;
-      if (data.vaultInvoices) cloudState.vaultInvoices = data.vaultInvoices;
-      return { statusCode: 200, headers, body: JSON.stringify({ success: true, cloudState }) };
-    } catch (e) {
-      return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) };
-    }
-  }
+  const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/2fjs01bsoi274mw0bfpxsxa6ob9chjcy';
 
-  return { statusCode: 405, headers, body: "Method Not Allowed" };
+  try {
+    const response = await fetch(MAKE_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: event.body || JSON.stringify({ action: 'fetch_pinball' })
+    });
+
+    const data = await response.text();
+
+    return {
+      statusCode: response.status,
+      headers,
+      body: data
+    };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: error.message })
+    };
+  }
 };
