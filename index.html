@@ -1344,6 +1344,9 @@
   function fetchInboundCards(userTriggered) {
     if (isPublicMode) return;
     
+    // VISUAL FEEDBACK: Instant operator notification
+    if (userTriggered) showStatus('⚡ Connecting to shop floor...');
+
     fetch(PINBALL_FETCH_HOOK, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1435,7 +1438,10 @@
         }
       }
     })
-    .catch(() => {});
+    .catch(err => {
+      console.warn("Sync error:", err);
+      if (userTriggered) showStatus("⚠️ Shop floor sync connection error. Retrying...");
+    });
   }
 
   function handleVoiceIntake(text) {
