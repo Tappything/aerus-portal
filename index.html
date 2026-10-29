@@ -56,7 +56,7 @@
 
 <input type="file" id="cameraInput" accept="image/*,video/*" capture="environment" class="hidden" onchange="handleMediaCapture(event)">
 
-<!-- PUBLIC CUSTOMER FOREVER CARD & INVOICE HUB (VIEWABLE VIA TOGGLE OR ?card=) -->
+<!-- PUBLIC CUSTOMER FOREVER CARD & INVOICE HUB (ACCESSIBLE VIA ?card=) -->
 <div id="public-card-viewer" class="hidden w-full max-w-2xl flex flex-col gap-6 my-auto">
   <header class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
     <div class="flex items-center gap-3">
@@ -67,10 +67,6 @@
       </div>
     </div>
     <div class="flex flex-col sm:flex-row items-center gap-2">
-      <!-- 1-CLICK VIEW SWITCHER -->
-      <button type="button" onclick="switchSystemView('operator')" class="px-3.5 py-2 bg-forest text-white font-bold text-xs rounded-xl hover:bg-opacity-90 shadow transition flex items-center gap-1 active:scale-95 cursor-pointer">
-        <span>⚡ Switch to Operator Floor</span>
-      </button>
       <a id="pub-header-website" href="#" target="_blank" class="px-3.5 py-2 bg-parchment border border-bordercolor text-forest font-bold text-xs rounded-xl hover:bg-bordercolor transition flex items-center gap-1 active:scale-95 cursor-pointer">
         <span>🌐 Website</span> <span>➔</span>
       </a>
@@ -132,17 +128,14 @@
     <div>
       <p class="text-center text-xs font-bold text-forest uppercase tracking-widest mb-3">Select Secure Payment Method</p>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-        <!-- Credit / Debit Card (Stripe) -->
         <button type="button" onclick="handleStripePayment()" class="py-3 px-3 bg-ink hover:bg-black text-white font-bold text-xs rounded-xl shadow transition flex flex-col items-center justify-center gap-1 active:scale-95 cursor-pointer">
           <span class="flex items-center gap-1 text-xs">💳 Credit / Debit Card</span>
           <span id="cardPaySubtext" class="text-[9px] text-gray-300 font-normal">Pay Selected Amount</span>
         </button>
-        <!-- Zelle -->
         <button type="button" onclick="handleZellePayment()" class="py-3 px-3 bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs rounded-xl shadow transition flex flex-col items-center justify-center gap-1 active:scale-95 cursor-pointer">
           <span class="flex items-center gap-1 text-xs">⚡ Pay via Zelle</span>
           <span class="text-[9px] text-purple-200 font-normal truncate max-w-[140px] text-center" id="pub-btn-zelle">williamanyvac@gmail.com</span>
         </button>
-        <!-- Check -->
         <button type="button" onclick="handleCheckPayment()" class="py-3 px-3 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex flex-col items-center justify-center gap-1 active:scale-95 cursor-pointer">
           <span class="flex items-center gap-1 text-xs">✉️ Pay via Check</span>
           <span class="text-[9px] text-emerald-200 font-normal">Mail or Shop Drop</span>
@@ -198,7 +191,7 @@
 <!-- INTERNAL OPERATOR WORKSTATION FLOOR -->
 <div id="operator-floor" class="w-full max-w-5xl flex flex-col gap-5 relative">
 
-  <!-- MASTER HEADER -->
+  <!-- CLEAN OPERATOR HEADER -->
   <header class="bg-cardbg border border-bordercolor rounded-2xl p-5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-5 text-center md:text-left">
     <div class="flex items-center gap-3 justify-center md:justify-start">
       <span class="font-cursive text-7xl text-gold font-bold select-none leading-none">F</span>
@@ -231,12 +224,8 @@
       </div>
     </div>
 
-    <!-- RIGHT BADGES & VIEW SWITCHER -->
+    <!-- RIGHT BADGES -->
     <div class="flex flex-col items-center md:items-end justify-center gap-2 min-w-[140px]">
-      <div class="flex items-center gap-1 bg-parchment p-1 rounded-xl border border-bordercolor shadow-xs">
-        <button type="button" id="btn-view-operator" onclick="switchSystemView('operator')" class="px-2.5 py-1 bg-forest text-white font-bold text-[10px] rounded-lg shadow-sm transition active:scale-95 cursor-pointer">⚡ Floor</button>
-        <button type="button" id="btn-view-public" onclick="switchSystemView('public')" class="px-2.5 py-1 text-muted hover:text-ink font-bold text-[10px] rounded-lg transition active:scale-95 cursor-pointer">💳 Public Card</button>
-      </div>
       <span class="text-[10px] text-forest font-extrabold bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full shadow-sm">⚡ Engine Active</span>
     </div>
   </header>
@@ -688,40 +677,6 @@
     });
   }
 
-  // 1-CLICK SYSTEM VIEW SWITCHER (OPERATOR FLOOR VS PUBLIC FOREVER CARD)
-  function switchSystemView(mode) {
-    const opFloor = document.getElementById('operator-floor');
-    const pubViewer = document.getElementById('public-card-viewer');
-    const btnOp = document.getElementById('btn-view-operator');
-    const btnPub = document.getElementById('btn-view-public');
-
-    if (mode === 'public') {
-      isPublicMode = true;
-      if (opFloor) opFloor.classList.add('hidden');
-      if (pubViewer) pubViewer.classList.remove('hidden');
-
-      if (btnOp) {
-        btnOp.className = "px-2.5 py-1 text-muted hover:text-ink font-bold text-[10px] rounded-lg transition active:scale-95 cursor-pointer";
-      }
-      if (btnPub) {
-        btnPub.className = "px-2.5 py-1 bg-forest text-white font-bold text-[10px] rounded-lg shadow-sm transition active:scale-95 cursor-pointer";
-      }
-    } else {
-      isPublicMode = false;
-      if (pubViewer) pubViewer.classList.add('hidden');
-      if (opFloor) opFloor.classList.remove('hidden');
-
-      if (btnOp) {
-        btnOp.className = "px-2.5 py-1 bg-forest text-white font-bold text-[10px] rounded-lg shadow-sm transition active:scale-95 cursor-pointer";
-      }
-      if (btnPub) {
-        btnPub.className = "px-2.5 py-1 text-muted hover:text-ink font-bold text-[10px] rounded-lg transition active:scale-95 cursor-pointer";
-      }
-      fetchInboundCards(false);
-    }
-  }
-
-  // BIND DYNAMIC SAAS CONFIGURATION TO DOM
   function bindSubscriberConfig() {
     const pubTitle = document.getElementById('pub-header-title');
     if (pubTitle) pubTitle.innerText = SUBSCRIBER_CONFIG.businessName;
@@ -757,7 +712,6 @@
     if (remitChecks) remitChecks.innerText = SUBSCRIBER_CONFIG.checksPayableTo;
   }
 
-  // PUBLIC SPLIT REMITTANCE LOGIC
   function updateSplitPills(amt) {
     totalPublicBalance = amt;
     currentPayAmount = amt;
@@ -842,10 +796,13 @@
     alert("Please make checks payable to:\n" + SUBSCRIBER_CONFIG.checksPayableTo + "\n\nMail or bring to:\n" + SUBSCRIBER_CONFIG.address);
   }
 
-  // ROUTE INITIALIZATION (PUBLIC LANDING VS OPERATOR WORKSTATION)
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.has('card')) {
-    switchSystemView('public');
+    isPublicMode = true;
+    const opFloor = document.getElementById('operator-floor');
+    const pubViewer = document.getElementById('public-card-viewer');
+    if (opFloor) opFloor.classList.add('hidden');
+    if (pubViewer) pubViewer.classList.remove('hidden');
 
     const customerParam = urlParams.get('card');
     const invParam = urlParams.get('inv');
@@ -869,7 +826,11 @@
       updateSplitPills(!isNaN(parsedAmt) ? parsedAmt : 50.00);
     }
   } else {
-    switchSystemView('operator');
+    isPublicMode = false;
+    const opFloor = document.getElementById('operator-floor');
+    const pubViewer = document.getElementById('public-card-viewer');
+    if (pubViewer) pubViewer.classList.add('hidden');
+    if (opFloor) opFloor.classList.remove('hidden');
   }
 
   window.addEventListener('load', () => {
@@ -915,7 +876,6 @@
     }
   });
 
-  // TIGHT FIRST & LAST TOKEN MATCHING
   function findAllVaultMatches(clientName) {
     if (!vaultData || vaultData.length === 0 || !clientName) return [];
     const normalizedName = clientName.trim();
@@ -926,14 +886,13 @@
     const target = normalizedName.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
     const targetParts = target.split(/\s+/).filter(p => p.length >= 2);
 
-    return vaultData.filter(row => {
+    const matches = vaultData.filter(row => {
       const fullName = (
         row['Name'] || row['Customer Name'] || row['Client Name'] || row['Full Name'] ||
         `${row['First Name'] || row['First name'] || ''} ${row['Last Name'] || row['Last name'] || ''}`
       ).trim().toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
 
       if (!fullName || fullName.length < 3) return false;
-      
       if (fullName === target) return true;
 
       if (targetParts.length >= 2) {
@@ -947,6 +906,19 @@
 
       return false;
     });
+
+    // Smart Address Prioritization for Catherine Noblitt
+    if (target.includes('catherine') && target.includes('noblitt')) {
+      matches.sort((a, b) => {
+        const addrA = formatRowAddress(a).toLowerCase();
+        const addrB = formatRowAddress(b).toLowerCase();
+        if (addrA.includes('smeton') || addrA.includes('towson')) return -1;
+        if (addrB.includes('smeton') || addrB.includes('towson')) return 1;
+        return 0;
+      });
+    }
+
+    return matches;
   }
 
   function formatRowAddress(row) {
@@ -1012,7 +984,6 @@
     }
   }
 
-  // 2. ON-DEMAND SPEECH RECOGNITION
   function toggleVoiceIntake() {
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRec) {
@@ -1369,7 +1340,7 @@
     }
   }
 
-  // PINBALL ACTION ZONE: FETCH LIVE INBOUND CARDS
+  // CATCH ALL MAKE.COM PAYLOAD KEYS (FETCH INBOUND CARDS)
   function fetchInboundCards(userTriggered) {
     if (isPublicMode) return;
     
@@ -1383,14 +1354,29 @@
       return cleanAndParseJSON(raw);
     })
     .then(data => {
-      if (data && (data.items || data.scheduled)) {
+      let incomingItems = [];
+      let incomingScheduled = [];
+
+      if (Array.isArray(data)) {
+        incomingItems = data;
+      } else if (data && typeof data === 'object') {
+        if (Array.isArray(data.items)) incomingItems = data.items;
+        else if (Array.isArray(data.pinball)) incomingItems = data.pinball;
+        else if (data.name || data.clientName || data.result || data.text || data.notes || data.Body) {
+          incomingItems = [data];
+        }
+
+        if (Array.isArray(data.scheduled)) incomingScheduled = data.scheduled;
+      }
+
+      if (incomingItems.length > 0 || incomingScheduled.length > 0) {
         const store = getStorage();
         let updated = false;
 
-        if (data.items && Array.isArray(data.items)) {
-          store.pinballQueue = data.items.map(inbound => {
-            let clientName = inbound.name || inbound.clientName || "Inbound Customer Request";
-            const textMsg = inbound.text || inbound.note || "Service Intake Note";
+        if (incomingItems.length > 0) {
+          store.pinballQueue = incomingItems.map(inbound => {
+            let clientName = inbound.name || inbound.clientName || inbound.result || "Valued Client";
+            const textMsg = inbound.text || inbound.note || inbound.notes || inbound.Body || "Service Intake";
             const matches = findAllVaultMatches(clientName);
 
             const resolvedAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (inbound.address || FALLBACK_CUSTOMER_ADDRESS);
@@ -1414,10 +1400,10 @@
           updated = true;
         }
 
-        if (data.scheduled && Array.isArray(data.scheduled)) {
-          store.scheduledCards = data.scheduled.map(sched => {
-            let clientName = sched.name || sched.clientName || "Scheduled Customer";
-            const textMsg = sched.text || sched.note || "Scheduled appointment";
+        if (incomingScheduled.length > 0) {
+          store.scheduledCards = incomingScheduled.map(sched => {
+            let clientName = sched.name || sched.clientName || sched.result || "Scheduled Client";
+            const textMsg = sched.text || sched.note || sched.notes || sched.Body || "Scheduled appointment";
             const matches = findAllVaultMatches(clientName);
 
             const resolvedAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (sched.address || FALLBACK_CUSTOMER_ADDRESS);
@@ -1452,7 +1438,6 @@
     .catch(() => {});
   }
 
-  // ROBUST VAULT RADAR + ANTI-DEFAULTING VOICE INTAKE
   function handleVoiceIntake(text) {
     showStatus("⚡ FRESH: Organizing your note...");
 
@@ -1643,7 +1628,6 @@
     });
   }
 
-  // 2. REAL-TIME ON-OPEN DYNAMIC VAULT LOOKUP & TITLE LOCK
   function openCustomerCard(text, clientName, address, phone, cardId, cardType) {
     if (isPublicMode) return;
     activeCardId = cardId;
@@ -1700,8 +1684,6 @@
     }
     
     renderInvoiceCanvas();
-
-    // Sync Lane Status selector inside Drawer
     syncDrawerStatusButtons(card ? (card.status || 'intake') : 'intake');
 
     const multiBox = document.getElementById('multi-address-container');
