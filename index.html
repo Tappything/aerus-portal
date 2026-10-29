@@ -613,7 +613,7 @@
   // LIVE CLOUD HOOKS
   const INTAKE_ROUTING_HOOK = 'https://hook.us2.make.com/ssi3brw8m9fm3is2fw9cswoc88uvaw9u';
   const EMAIL_INVOICE_HOOK = 'https://hook.us2.make.com/kouddoy8dwbebuc8snulhgicny9ayxfq';
-  const PINBALL_FETCH_HOOK = 'https://hook.us2.make.com/5q1gs84brtie39vq4it42ex92of3959r';
+  const PINBALL_FETCH_HOOK = 'https://hook.us2.make.com/j2iteg8hpiwfodbvm8qcwt1yoonocexn';
 
   // FALLBACK PLACEHOLDER TEXT
   const FALLBACK_CUSTOMER_ADDRESS = "📍 Address on File / Intake Slip";
@@ -907,7 +907,6 @@
       return false;
     });
 
-    // Smart Address Prioritization for Catherine Noblitt
     if (target.includes('catherine') && target.includes('noblitt')) {
       matches.sort((a, b) => {
         const addrA = formatRowAddress(a).toLowerCase();
@@ -1340,7 +1339,6 @@
     }
   }
 
-  // CATCH ALL MAKE.COM PAYLOAD KEYS (FETCH INBOUND CARDS)
   function fetchInboundCards(userTriggered) {
     if (isPublicMode) return;
     
@@ -1536,7 +1534,7 @@
       const isScheduled = data.isScheduled === true || 
                           data.isScheduled === "true" || 
                           destination === 'calendar' || 
-                          destination === 'schedule' ||
+                          destination === 'schedule' || 
                           cleanedTranscript.toLowerCase().includes('tomorrow') || 
                           cleanedTranscript.toLowerCase().includes(' am') || 
                           cleanedTranscript.toLowerCase().includes(' pm');
