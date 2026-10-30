@@ -3,8 +3,8 @@
  * Role: Fresh 🤵 Autonomous Digital Coordinator Brain
  * Engine: Gemini 3.8 Flash (v1beta) -> Monday.com GraphQL Mutations
  * Features:
- *  - 22,283 Customer Vault Auto-Matcher (export_export (34).csv)
- *  - Auto-Populates Address (text_mm6aq4rg) & Phone (text_mm6a7420)
+ *  - Quote-Aware 22,283 Customer Vault Auto-Matcher
+ *  - Verified Address (text_mm6aq4rg) & Phone (text_mm6a7420)
  *  - Long-Text Notes (long_text_mm5vbykc) & Due Date (date)
  */
 
@@ -29,8 +29,28 @@ const COL_ADDRESS = 'text_mm6aq4rg';
 const COL_PHONE = 'text_mm6a7420';
 const COL_DATE = 'date';
 
-// In-Memory Vault Cache for sub-second serverless execution
+// In-Memory Vault Cache
 let cachedVault = null;
+
+// Quote-aware parser preserving commas inside quotes and empty fields
+function parseCSVLine(text) {
+  const result = [];
+  let cur = '';
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (c === '"') {
+      inQuotes = !inQuotes;
+    } else if (c === ',' && !inQuotes) {
+      result.push(cur.trim().replace(/^"|"$/g, ''));
+      cur = '';
+    } else {
+      cur += c;
+    }
+  }
+  result.push(cur.trim().replace(/^"|"$/g, ''));
+  return result;
+}
 
 function loadVaultRecords() {
   if (cachedVault) return cachedVault;
@@ -54,7 +74,7 @@ function loadVaultRecords() {
     if (lines.length < 2) return cachedVault;
 
     // Header parse: Client #, Name, Email, Address, Phone, Created
-    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+    const headers = parseCSVLine(lines[0]);
     const nameIdx = headers.indexOf('Name');
     const addrIdx = headers.indexOf('Address');
     const phoneIdx = headers.indexOf('Phone');
@@ -63,10 +83,7 @@ function loadVaultRecords() {
       const line = lines[i].trim();
       if (!line) continue;
 
-      // Fast CSV split supporting quoted strings
-      const row = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
-      const cleanRow = row.map(v => v.replace(/^"|"$/g, '').trim());
-
+      const cleanRow = parseCSVLine(line);
       const name = cleanRow[nameIdx] || '';
       const address = cleanRow[addrIdx] || '';
       const phone = cleanRow[phoneIdx] || '';
@@ -97,15 +114,12 @@ function matchCustomerVault(clientName) {
   const target = clientName.toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
   const targetTokens = target.split(' ').filter(t => t.length > 1 && !['mrs', 'mr', 'ms', 'dr'].includes(t));
 
-  // Exact Match
   let match = records.find(r => r.cleanName === target);
 
-  // Token-based match (First + Last)
   if (!match && targetTokens.length >= 2) {
     match = records.find(r => targetTokens.every(tok => r.cleanName.includes(tok)));
   }
 
-  // Last name match if unique/rare
   if (!match && targetTokens.length === 1 && targetTokens[0].length >= 4) {
     match = records.find(r => {
       const tokens = r.cleanName.split(' ');
@@ -303,7 +317,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // 1. Instant Command Intercept (Zero external dependencies)
+    // 1. Instant Command Intercept
     const isCleanCommand = /\b(clean|clear|archive|wipe)\b/i.test(rawTranscript);
     if (isCleanCommand) {
       const fetchQuery = `
@@ -343,7 +357,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // 2. Run Gemini 3.8 Flash Intake
+    // 2. Run Gemini Coordinator
     const decision = await callGeminiCoordinator(rawTranscript);
 
     if (decision.error) {
@@ -364,7 +378,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // 3. Route to Target Monday Group
+    // 3. Route to Target Group
     let targetGroup = GROUP_INTAKE;
     if (decision.destination === 'calendar') targetGroup = GROUP_CALENDAR;
     if (decision.destination === 'bench') targetGroup = GROUP_WORKBENCH;
@@ -372,12 +386,12 @@ exports.handler = async (event) => {
     const cleanCardTitle = decision.clientName || 'Direct Intake';
     const noteContent = decision.notes || rawTranscript;
 
-    // 4. Cross-Reference 22,283 Customer Vault
+    // 4. Quote-Aware Vault Cross-Reference
     const matchedVault = matchCustomerVault(decision.clientName);
     const finalAddress = decision.address || matchedVault.address || '';
     const finalPhone = decision.phone || matchedVault.phone || '';
 
-    // 5. Populate Board Columns: Notes, Verified Address, Verified Phone, Date
+    // 5. Populate Board Columns
     const colValuesObj = {
       [COL_LONG_TEXT]: { text: noteContent },
       [COL_ADDRESS]: finalAddress,
