@@ -76,7 +76,6 @@
     </div>
   </header>
 
-  <!-- DYNAMIC PUBLIC INVOICE BOX WITH SPLIT REMITTANCE -->
   <div id="pub-invoice-container" class="hidden bg-white border-2 border-gold rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col gap-6 text-ink">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-bordercolor">
       <div>
@@ -91,20 +90,17 @@
       </div>
     </div>
 
-    <!-- Summary of Service -->
     <div class="bg-parchment p-4 rounded-2xl border border-bordercolor flex justify-between items-center text-xs font-bold text-ink">
-      <span>Executive Home Care & Service</span>
+      <span>Executive Service & Diagnostic</span>
       <span id="pub-service-total" class="text-forest">$0.00</span>
     </div>
 
-    <!-- Flexible Remittance Selector -->
     <div class="bg-parchment p-4 rounded-2xl border border-bordercolor space-y-3">
       <div class="text-center">
         <p class="text-xs font-bold text-forest uppercase tracking-widest">Select Remittance Amount</p>
         <p class="text-[11px] text-muted">Choose full payment, 50% deposit, or custom amount</p>
       </div>
 
-      <!-- Quick Amount Selection Pills -->
       <div class="grid grid-cols-3 gap-2">
         <button type="button" onclick="selectSplitAmount('full')" id="btnFull" class="py-2.5 px-2 bg-forest text-white font-bold text-xs rounded-xl shadow-sm text-center transition active:scale-95 cursor-pointer">
           Full Balance<br><span id="pillFullAmt" class="text-[10px] font-normal opacity-90">$0.00</span>
@@ -117,14 +113,12 @@
         </button>
       </div>
 
-      <!-- Custom Input Box -->
       <div id="customAmountWrap" class="hidden flex items-center gap-2 pt-1">
         <span class="text-sm font-bold text-ink">$</span>
         <input type="number" id="customAmountInput" step="0.01" min="1.00" oninput="handleCustomSplitInput(this.value)" placeholder="Enter amount to pay today" class="w-full bg-white border border-bordercolor rounded-xl px-3 py-2 text-xs font-bold text-ink focus:outline-none focus:border-gold">
       </div>
     </div>
 
-    <!-- Remittance Buttons Grid -->
     <div>
       <p class="text-center text-xs font-bold text-forest uppercase tracking-widest mb-3">Select Secure Payment Method</p>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -134,7 +128,7 @@
         </button>
         <button type="button" onclick="handleZellePayment()" class="py-3 px-3 bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs rounded-xl shadow transition flex flex-col items-center justify-center gap-1 active:scale-95 cursor-pointer">
           <span class="flex items-center gap-1 text-xs">⚡ Pay via Zelle</span>
-          <span class="text-[9px] text-purple-200 font-normal truncate max-w-[140px] text-center" id="pub-btn-zelle">williamanyvac@gmail.com</span>
+          <span class="text-[9px] text-purple-200 font-normal truncate max-w-[140px] text-center" id="pub-btn-zelle">--</span>
         </button>
         <button type="button" onclick="handleCheckPayment()" class="py-3 px-3 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex flex-col items-center justify-center gap-1 active:scale-95 cursor-pointer">
           <span class="flex items-center gap-1 text-xs">✉️ Pay via Check</span>
@@ -150,14 +144,13 @@
     </div>
 
     <div>
-      <h2 id="pub-main-headline" class="text-xl md:text-2xl font-extrabold text-ink">Aerus Home Wellness • Permanent Care Card™</h2>
-      <p class="text-xs text-muted mt-1.5 max-w-lg mx-auto">Your permanent digital hub for clean water, pure air, warranty records, and 24/7 concierge assistance.</p>
+      <h2 id="pub-main-headline" class="text-xl md:text-2xl font-extrabold text-ink">Subscriber Permanent Care Card™</h2>
+      <p class="text-xs text-muted mt-1.5 max-w-lg mx-auto">Your permanent digital hub for clean home wellness, warranty records, and 24/7 concierge assistance.</p>
     </div>
 
-    <!-- MEET FRESH 2-WAY INTERACTIVE INTAKE -->
     <div class="w-full bg-white border border-gold rounded-2xl p-5 shadow-inner flex flex-col items-center gap-3">
       <div class="text-xs text-muted max-w-lg">
-        <strong class="text-ink">Meet Fresh, your 24/7 Digital Assistant.</strong> Need filter packs, bench service, or free water testing? Tap below to speak or type!
+        <strong class="text-ink">Meet Fresh, your 24/7 Digital Assistant.</strong> Need supplies, bench tune-up, or in-home service? Tap below to speak or type!
       </div>
 
       <button id="public-voice-btn" onclick="toggleVoiceIntake()" class="w-full max-w-sm py-3.5 bg-forest hover:bg-opacity-90 text-white font-extrabold text-sm rounded-xl shadow-lg transition flex items-center justify-center gap-2 active:scale-95 cursor-pointer">
@@ -191,7 +184,6 @@
 <!-- INTERNAL OPERATOR WORKSTATION FLOOR -->
 <div id="operator-floor" class="w-full max-w-5xl flex flex-col gap-5 relative">
 
-  <!-- CLEAN OPERATOR HEADER -->
   <header class="bg-cardbg border border-bordercolor rounded-2xl p-5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-5 text-center md:text-left">
     <div class="flex items-center gap-3 justify-center md:justify-start">
       <span class="font-cursive text-7xl text-gold font-bold select-none leading-none">F</span>
@@ -201,7 +193,6 @@
       </div>
     </div>
 
-    <!-- CENTER CONTROLS -->
     <div class="flex flex-col items-center gap-3 w-full max-w-md mx-auto">
       <div class="w-28 h-28 rounded-full border-4 border-gold bg-white shadow-lg overflow-hidden flex items-center justify-center relative flex-shrink-0">
         <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';">
@@ -224,13 +215,11 @@
       </div>
     </div>
 
-    <!-- RIGHT BADGES -->
     <div class="flex flex-col items-center md:items-end justify-center gap-2 min-w-[140px]">
       <span class="text-[10px] text-forest font-extrabold bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full shadow-sm">⚡ Engine Active</span>
     </div>
   </header>
 
-  <!-- 2-WAY CONVERSATIONAL DIALOGUE THREAD -->
   <div id="conversation-thread" class="hidden bg-cardbg border border-gold rounded-2xl p-4 shadow-md flex flex-col gap-3 transition-all">
     <div class="flex justify-between items-center border-b border-bordercolor pb-1.5">
       <span class="text-xs font-bold text-forest uppercase tracking-wider flex items-center gap-1.5">
@@ -241,12 +230,10 @@
     <div id="thread-bubbles" class="flex flex-col gap-2 max-h-48 overflow-y-auto pr-1 text-xs"></div>
   </div>
 
-  <!-- STATUS BANNER -->
   <div id="status-banner" class="hidden bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs px-4 py-2 rounded-xl font-bold transition text-center"></div>
 
   <!-- TWO-COLUMN FLOOR -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-    <!-- TODAY'S SCHEDULE -->
     <div class="flex flex-col gap-2">
       <div class="text-xs font-extrabold uppercase tracking-widest text-muted flex items-center gap-2">
         <span>📅</span> Today's Schedule
@@ -256,14 +243,12 @@
       </div>
     </div>
 
-    <!-- PINBALL ACTION ZONE WITH VISUAL LANES -->
     <div class="flex flex-col gap-2">
       <div class="text-xs font-extrabold uppercase tracking-widest text-muted flex items-center justify-between">
         <span class="flex items-center gap-2"><span>📍</span> Pinball Action Zone</span>
         <button onclick="fetchInboundCards(true)" class="text-[10px] font-bold text-forest hover:underline cursor-pointer">🔄 Sync Cards</button>
       </div>
 
-      <!-- VISUAL FILTER PILLS -->
       <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
         <button onclick="setPinballFilter('all')" id="filter-pill-all" class="px-2.5 py-1 bg-forest text-white font-bold text-[10px] rounded-lg shadow-sm whitespace-nowrap active:scale-95 cursor-pointer transition">All</button>
         <button onclick="setPinballFilter('intake')" id="filter-pill-intake" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">📥 Intake</button>
@@ -336,7 +321,7 @@
       </div>
       <div class="flex justify-between items-baseline">
         <div id="vault-client-name" class="font-bold text-base text-ink">--</div>
-        <div id="vault-client-id" class="text-[10px] text-muted font-bold">ID: #VAULT</div>
+        <div id="vault-client-id" class="text-[10px] text-muted font-bold">ID: #RECORD</div>
       </div>
       <div class="text-xs text-muted flex flex-col gap-1.5">
         <div>📍 <span id="vault-client-address" class="text-ink font-medium">--</span></div>
@@ -381,7 +366,7 @@
           <span>📷/🎥</span> <span>Media Capture</span>
         </button>
       </div>
-      <input type="text" id="in-card-text" placeholder="💬 Add private note to this customer card..." 
+      <input type="text" id="in-card-text" placeholder="💬 Add private note to this card..." 
         onkeydown="checkInCardSubmit(event)"
         class="w-full px-3 py-1.5 border border-bordercolor rounded-xl bg-parchment text-ink focus:outline-none focus:border-gold text-xs">
     </div>
@@ -401,7 +386,6 @@
     <!-- SPLIT-PANE INVOICE STUDIO CANVAS -->
     <div id="canvas-view-invoice" class="hidden flex flex-col gap-4">
       <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-        <!-- LEFT PANE: WORKSPACE SCRATCHPAD -->
         <div class="md:col-span-5 bg-white p-4 rounded-xl border border-bordercolor shadow-sm flex flex-col gap-3 no-print">
           <div class="text-xs font-bold text-forest uppercase tracking-wider flex items-center justify-between border-b border-bordercolor pb-1.5">
             <span>📝 Workspace Scratchpad</span>
@@ -420,27 +404,25 @@
             </button>
           </div>
 
-          <!-- PRE-SET CHIPS -->
           <div class="flex flex-col gap-1.5 pt-2 border-t border-bordercolor">
             <span class="text-[10px] font-bold text-muted uppercase">1-Tap Pre-Set Service Chips:</span>
             <div class="flex flex-wrap gap-1.5">
-              <button onclick="addPresetChip('Labor', 1, 50.00, false)" class="px-2 py-1 bg-parchment border border-bordercolor hover:bg-bordercolor rounded-lg text-[10px] font-bold text-ink active:scale-95 cursor-pointer">
+              <button onclick="addPresetChip('Bench Diagnostic & Labor', 1, 50.00, false)" class="px-2 py-1 bg-parchment border border-bordercolor hover:bg-bordercolor rounded-lg text-[10px] font-bold text-ink active:scale-95 cursor-pointer">
                 + Labor $50
               </button>
-              <button onclick="addPresetChip('Annual RO Water Service', 1, 149.00, true)" class="px-2 py-1 bg-parchment border border-bordercolor hover:bg-bordercolor rounded-lg text-[10px] font-bold text-ink active:scale-95 cursor-pointer">
-                + Annual RO $149
+              <button onclick="addPresetChip('Annual Preventive Service', 1, 149.00, true)" class="px-2 py-1 bg-parchment border border-bordercolor hover:bg-bordercolor rounded-lg text-[10px] font-bold text-ink active:scale-95 cursor-pointer">
+                + Annual Service $149
               </button>
-              <button onclick="addPresetChip('HEPA Vacuum Bench Tune-Up', 1, 89.00, false)" class="px-2 py-1 bg-parchment border border-bordercolor hover:bg-bordercolor rounded-lg text-[10px] font-bold text-ink active:scale-95 cursor-pointer">
-                + HEPA Tune-Up $89
+              <button onclick="addPresetChip('Full Unit Bench Tune-Up', 1, 89.00, false)" class="px-2 py-1 bg-parchment border border-bordercolor hover:bg-bordercolor rounded-lg text-[10px] font-bold text-ink active:scale-95 cursor-pointer">
+                + Tune-Up $89
               </button>
               <button onclick="addPresetChip('Courtesy Senior Discount', 1, -10.00, false)" class="px-2 py-1 bg-parchment border border-bordercolor hover:bg-bordercolor rounded-lg text-[10px] font-bold text-red-700 active:scale-95 cursor-pointer">
-                - 10% Courtesy Disc
+                - Courtesy Disc
               </button>
             </div>
           </div>
         </div>
 
-        <!-- RIGHT PANE: PRISTINE FINISHED EXECUTIVE DOCUMENT -->
         <div id="printable-executive-doc" class="md:col-span-7 bg-white p-5 rounded-2xl border-2 border-gold shadow-md flex flex-col gap-3 text-ink">
           <div class="flex justify-between items-start border-b border-gold pb-3">
             <div>
@@ -478,7 +460,7 @@
               <span id="invoice-calc-subtotal" class="font-bold text-ink">$0.00</span>
             </div>
             <div class="flex justify-between w-full max-w-xs text-muted text-[11px]">
-              <span>MD Sales Tax (6% Parts Only):</span>
+              <span>Sales Tax:</span>
               <span id="invoice-calc-tax" class="font-bold text-ink">$0.00</span>
             </div>
             <div class="flex justify-between w-full max-w-xs font-extrabold text-xs border-t border-bordercolor pt-1 text-forest">
@@ -498,18 +480,17 @@
               </div>
               <div class="flex flex-col gap-0.5 bg-white p-1.5 rounded border border-bordercolor">
                 <span class="font-bold text-ink text-[9px]">2. Zelle Remittance:</span>
-                <span id="remit-zelle-email" class="text-[9px] font-mono text-forest">williamanyvac@gmail.com</span>
+                <span id="remit-zelle-email" class="text-[9px] font-mono text-forest">--</span>
               </div>
               <div class="flex flex-col gap-0.5 bg-white p-1.5 rounded border border-bordercolor">
                 <span class="font-bold text-ink text-[9px]">3. Checks Payable To:</span>
-                <span id="remit-checks-entity" class="text-[9px] font-bold text-ink">Clean Environment LLC</span>
+                <span id="remit-checks-entity" class="text-[9px] font-bold text-ink">--</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ONE-TAP ACTION CONTROLS -->
       <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 no-print">
         <button onclick="window.print()" class="py-2.5 bg-ink hover:bg-black text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer">
           <span>🖨️</span> <span>Print / PDF</span>
@@ -547,13 +528,13 @@
       <div class="flex flex-col gap-2 text-xs">
         <div>
           <label class="text-[10px] font-bold text-muted uppercase block mb-1">Campaign Headline</label>
-          <input type="text" id="portal-campaign-input" value="Free 15-Minute Home Water & Air Diagnostic" oninput="updatePortalPreview()" 
+          <input type="text" id="portal-campaign-input" value="Free 15-Minute Home Diagnostic" oninput="updatePortalPreview()" 
             class="w-full px-3 py-1.5 border border-bordercolor rounded-xl bg-parchment text-ink font-bold text-xs focus:outline-none focus:border-gold">
         </div>
         <div>
           <label class="text-[10px] font-bold text-muted uppercase block mb-1">Offer Description</label>
           <textarea id="portal-offer-input" rows="2" oninput="updatePortalPreview()" 
-            class="w-full px-3 py-1.5 border border-bordercolor rounded-xl bg-parchment text-ink text-xs focus:outline-none focus:border-gold">Tap below and speak to Fresh to claim your diagnostic, order replacement filter packs, or schedule a bench service!</textarea>
+            class="w-full px-3 py-1.5 border border-bordercolor rounded-xl bg-parchment text-ink text-xs focus:outline-none focus:border-gold">Tap below and speak to Fresh to claim your diagnostic, order replacement packs, or schedule bench service!</textarea>
         </div>
       </div>
       <div class="border border-bordercolor rounded-2xl bg-ink p-4 text-white flex flex-col gap-3 relative shadow-lg">
@@ -561,8 +542,8 @@
           <span>TAPPYTHING PUBLIC CANVAS PREVIEW</span>
           <span>⚡ LIVE 2-WAY DEMO</span>
         </div>
-        <h4 id="portal-preview-headline" class="font-extrabold text-sm text-gold">Free 15-Minute Home Water & Air Diagnostic</h4>
-        <p id="portal-preview-offer" class="text-xs text-gray-300 leading-relaxed">Tap below and speak to Fresh to claim your diagnostic, order replacement filter packs, or schedule a bench service!</p>
+        <h4 id="portal-preview-headline" class="font-extrabold text-sm text-gold">Free 15-Minute Home Diagnostic</h4>
+        <p id="portal-preview-offer" class="text-xs text-gray-300 leading-relaxed">Tap below and speak to Fresh to claim your diagnostic, order replacement packs, or schedule bench service!</p>
         <button onclick="toggleVoiceIntake()" class="w-full py-2.5 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-2 active:scale-95 cursor-pointer">
           <span>🎙️</span> <span>SPEAK TO FRESH</span>
         </button>
@@ -582,7 +563,7 @@
 </div>
 
 <script>
-  // 1. GENERIC SUBSCRIBER CONFIGURATION (MULTI-TENANT SAAS)
+  // Dynamic multi-tenant configuration (easily customizable per subscriber)
   const SUBSCRIBER_CONFIG = {
     businessName: "Aerus of Towson • Clean Environment LLC",
     tagline: "Healthy Home Specialists • Timonium, MD",
@@ -606,22 +587,16 @@
   let autoFadeTimer = null;
   let activePinballFilter = 'all';
 
-  // Split Payment Tracking
-  let totalPublicBalance = 1.00;
-  let currentPayAmount = 1.00;
+  let totalPublicBalance = 0.00;
+  let currentPayAmount = 0.00;
 
-  // LIVE CLOUD HOOKS
   const INTAKE_ROUTING_HOOK = 'https://hook.us2.make.com/ssi3brw8m9fm3is2fw9cswoc88uvaw9u';
   const EMAIL_INVOICE_HOOK = 'https://hook.us2.make.com/kouddoy8dwbebuc8snulhgicny9ayxfq';
-  
-  // NETLIFY SERVERLESS RELAY (BYPASSES BROWSER CORS 520)
   const PINBALL_FETCH_HOOK = '/.netlify/functions/sync';
 
-  // FALLBACK PLACEHOLDER TEXT
   const FALLBACK_CUSTOMER_ADDRESS = "📍 Address on File / Intake Slip";
   const FALLBACK_CUSTOMER_PHONE = "Phone on File";
 
-  // STATUS DEFINITIONS & BADGE CONFIG
   const STATUS_CONFIG = {
     intake: { label: 'Intake', badgeClass: 'bg-slate-100 text-slate-700 border-slate-300', dot: '⚪' },
     bench: { label: 'On Bench', badgeClass: 'bg-blue-100 text-blue-800 border-blue-300', dot: '🔵' },
@@ -781,16 +756,17 @@
     if (SUBSCRIBER_CONFIG && SUBSCRIBER_CONFIG.stripePaymentUrl) {
       window.open(SUBSCRIBER_CONFIG.stripePaymentUrl, '_blank');
     } else {
-      alert("Online card payment is currently being configured for this location.");
+      alert("Online card payment is currently active.");
     }
   }
 
   function handleZellePayment() {
-    const email = SUBSCRIBER_CONFIG.zelleEmail || 'williamanyvac@gmail.com';
+    const email = SUBSCRIBER_CONFIG.zelleEmail;
+    if (!email) return;
     navigator.clipboard.writeText(email).then(() => {
-      alert("Zelle recipient copied to clipboard: " + email + "\n\nOpen your banking app to send payment.");
+      alert("Zelle recipient copied to clipboard: " + email + "\n\nOpen your mobile banking app to send payment.");
     }).catch(() => {
-      alert("Zelle Recipient: " + email + "\n\nPlease send via your mobile banking app.");
+      alert("Zelle Recipient: " + email);
     });
   }
 
@@ -816,16 +792,16 @@
       const invIdEl = document.getElementById('pub-inv-id');
       if (invIdEl) invIdEl.innerText = 'Invoice: #' + invParam.replace(/^#/, '');
       const invClientEl = document.getElementById('pub-inv-client');
-      if (invClientEl) invClientEl.innerText = customerParam || "Valued Client";
+      if (invClientEl) invClientEl.innerText = customerParam || "Valued Customer";
 
-      const parsedAmt = amountParam ? parseFloat(amountParam) : 50.00;
-      const grandAmount = isNaN(parsedAmt) ? '$50.00' : `$${parsedAmt.toFixed(2)}`;
+      const parsedAmt = amountParam ? parseFloat(amountParam) : 0.00;
+      const grandAmount = isNaN(parsedAmt) ? '$0.00' : `$${parsedAmt.toFixed(2)}`;
       const grandTotalEl = document.getElementById('pub-inv-grandtotal');
       if (grandTotalEl) grandTotalEl.innerText = grandAmount;
       const servTotalEl = document.getElementById('pub-service-total');
       if (servTotalEl) servTotalEl.innerText = grandAmount;
 
-      updateSplitPills(!isNaN(parsedAmt) ? parsedAmt : 50.00);
+      updateSplitPills(!isNaN(parsedAmt) ? parsedAmt : 0.00);
     }
   } else {
     isPublicMode = false;
@@ -837,10 +813,6 @@
 
   window.addEventListener('load', () => {
     bindSubscriberConfig();
-    if (!isPublicMode) fetchInboundCards(false);
-  });
-
-  window.addEventListener('focus', () => {
     if (!isPublicMode) fetchInboundCards(false);
   });
 
@@ -881,14 +853,14 @@
   function findAllVaultMatches(clientName) {
     if (!vaultData || vaultData.length === 0 || !clientName) return [];
     const normalizedName = clientName.trim();
-    if (normalizedName === "Direct Intake" || normalizedName === "Subscriber Note" || normalizedName === "Inbound Customer Request" || normalizedName === "Valued Client") {
+    if (normalizedName === "Direct Intake" || normalizedName === "Subscriber Note" || normalizedName === "Inbound Customer Request" || normalizedName === "Valued Customer") {
       return [];
     }
 
     const target = normalizedName.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
     const targetParts = target.split(/\s+/).filter(p => p.length >= 2);
 
-    const matches = vaultData.filter(row => {
+    return vaultData.filter(row => {
       const fullName = (
         row['Name'] || row['Customer Name'] || row['Client Name'] || row['Full Name'] ||
         `${row['First Name'] || row['First name'] || ''} ${row['Last Name'] || row['Last name'] || ''}`
@@ -908,18 +880,6 @@
 
       return false;
     });
-
-    if (target.includes('catherine') && target.includes('noblitt')) {
-      matches.sort((a, b) => {
-        const addrA = formatRowAddress(a).toLowerCase();
-        const addrB = formatRowAddress(b).toLowerCase();
-        if (addrA.includes('smeton') || addrA.includes('towson')) return -1;
-        if (addrB.includes('smeton') || addrB.includes('towson')) return 1;
-        return 0;
-      });
-    }
-
-    return matches;
   }
 
   function formatRowAddress(row) {
@@ -959,9 +919,6 @@
             card.allAddresses = [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))];
             hasChanges = true;
           }
-        } else if (card.address === SUBSCRIBER_CONFIG.address) {
-          card.address = FALLBACK_CUSTOMER_ADDRESS;
-          hasChanges = true;
         }
       });
     };
@@ -1021,12 +978,9 @@
       recognition.onresult = (e) => {
         let liveText = '';
         let isFinalResult = false;
-
         for (let i = e.resultIndex; i < e.results.length; ++i) {
           liveText += e.results[i][0].transcript;
-          if (e.results[i].isFinal) {
-            isFinalResult = true;
-          }
+          if (e.results[i].isFinal) isFinalResult = true;
         }
 
         if (!isPublicMode) {
@@ -1055,7 +1009,6 @@
 
       recognition.start();
     } catch (err) {
-      console.warn("Speech recognition error:", err);
       isListening = false;
     }
   }
@@ -1143,7 +1096,6 @@
       const publicThread = document.getElementById('public-thread');
       const publicBubbles = document.getElementById('public-bubbles');
       if (publicThread) publicThread.classList.remove('hidden');
-
       const loadingEl = document.getElementById('loading-bubble');
       if (loadingEl) loadingEl.remove();
 
@@ -1171,7 +1123,6 @@
     const threadBox = document.getElementById('conversation-thread');
     const bubbles = document.getElementById('thread-bubbles');
     const timeEl = document.getElementById('thread-time');
-
     const loadingEl = document.getElementById('loading-bubble');
     if (loadingEl) loadingEl.remove();
 
@@ -1187,14 +1138,12 @@
           </div>
         `;
       }
-
       bubbles.innerHTML += `
         <div class="self-start bg-parchment border border-bordercolor text-ink p-2.5 rounded-xl max-w-[90%] font-medium shadow-xs">
           <span class="font-bold text-[10px] text-forest block uppercase">Fresh 🤵</span>
           ${responseText}
         </div>
       `;
-
       bubbles.scrollTop = bubbles.scrollHeight;
     }
     speakAudibly(responseText);
@@ -1255,7 +1204,7 @@
     const phone = document.getElementById('vault-client-phone').innerText;
     const link = `${window.location.origin}${window.location.pathname}?card=PublicPortal`;
     const msg = `Check out our Forever Card Portal: ${link}`;
-    if (!phone || phone === FALLBACK_CUSTOMER_PHONE) return alert("No phone number on file for SMS dispatch.");
+    if (!phone || phone === FALLBACK_CUSTOMER_PHONE) return alert("No phone number on file.");
     dispatchCloudSMS(phone, msg, "Portal Link");
   }
 
@@ -1264,15 +1213,12 @@
     if (!address || address === FALLBACK_CUSTOMER_ADDRESS || address === SUBSCRIBER_CONFIG.address) {
       return alert("No specific customer address on file for map directions.");
     }
-    const mapsUrl = `https://maps.apple.com/?daddr=${encodeURIComponent(address)}`;
-    window.open(mapsUrl, '_blank');
+    window.open(`https://maps.apple.com/?daddr=${encodeURIComponent(address)}`, '_blank');
   }
 
   function dialClientPhone() {
     const phone = document.getElementById('vault-client-phone').innerText;
-    if (!phone || phone === FALLBACK_CUSTOMER_PHONE) {
-      return alert("No phone number on file to call.");
-    }
+    if (!phone || phone === FALLBACK_CUSTOMER_PHONE) return alert("No phone number on file to call.");
     window.location.href = `tel:${phone.replace(/[^0-9+]/g, '')}`;
   }
 
@@ -1283,16 +1229,10 @@
     fetch(INTAKE_ROUTING_HOOK, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: "send_sms",
-        to: cleanPhone,
-        message: msg,
-        timestamp: timestamp
-      })
-    }).catch(err => console.error('Cloud SMS Hook Error:', err));
+      body: JSON.stringify({ action: "send_sms", to: cleanPhone, message: msg, timestamp: timestamp })
+    }).catch(err => console.error(err));
 
-    const dispatchedNotice = `⚡ Dispatched message to ${cleanPhone}`;
-    showStatus(dispatchedNotice);
+    showStatus(`⚡ Dispatched message to ${cleanPhone}`);
     updateSissyConsole(`Dispatched SMS to ${cleanPhone}: "${msg}"`, msg);
 
     if (activeCardId) {
@@ -1317,13 +1257,8 @@
   function sendStagedSMS() {
     const phone = document.getElementById('vault-client-phone').innerText;
     const msg = document.getElementById('staged-sms-text').value.trim();
-    if (!phone || phone === FALLBACK_CUSTOMER_PHONE) {
-      return alert("No phone number on file for SMS dispatch.");
-    }
-    if (!msg) {
-      return alert("Please enter a staged message to send.");
-    }
-
+    if (!phone || phone === FALLBACK_CUSTOMER_PHONE) return alert("No phone number on file.");
+    if (!msg) return alert("Please enter a staged message to send.");
     dispatchCloudSMS(phone, msg, "Staged SMS");
     document.getElementById('staged-sms-text').value = '';
   }
@@ -1343,9 +1278,7 @@
 
   function fetchInboundCards(userTriggered) {
     if (isPublicMode) return;
-    
-    // VISUAL FEEDBACK: Instant operator notification
-    if (userTriggered) showStatus('⚡ Connecting to shop floor...');
+    if (userTriggered) showStatus('⚡ Syncing live floor directly with Monday.com...');
 
     fetch(PINBALL_FETCH_HOOK, {
       method: 'POST',
@@ -1363,12 +1296,8 @@
       if (Array.isArray(data)) {
         incomingItems = data;
       } else if (data && typeof data === 'object') {
-        if (Array.isArray(data.items)) incomingItems = data.items;
-        else if (Array.isArray(data.pinball)) incomingItems = data.pinball;
-        else if (data.name || data.clientName || data.result || data.text || data.notes || data.Body) {
-          incomingItems = [data];
-        }
-
+        if (Array.isArray(data.pinball)) incomingItems = data.pinball;
+        else if (Array.isArray(data.items)) incomingItems = data.items;
         if (Array.isArray(data.scheduled)) incomingScheduled = data.scheduled;
       }
 
@@ -1378,8 +1307,8 @@
 
         if (incomingItems.length > 0) {
           store.pinballQueue = incomingItems.map(inbound => {
-            let clientName = inbound.name || inbound.clientName || inbound.result || "Valued Client";
-            const textMsg = inbound.text || inbound.note || inbound.notes || inbound.Body || "Service Intake";
+            let clientName = inbound.name || inbound.clientName || "Valued Customer";
+            const textMsg = inbound.text || inbound.note || "Service Intake";
             const matches = findAllVaultMatches(clientName);
 
             const resolvedAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (inbound.address || FALLBACK_CUSTOMER_ADDRESS);
@@ -1394,10 +1323,10 @@
               allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [resolvedAddress],
               phone: resolvedPhone,
               status: inbound.status || 'intake',
-              time: inbound.time || "Inbound",
-              timestamp: inbound.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              lineItems: inbound.lineItems || null,
-              totalAmount: inbound.totalAmount || null
+              time: inbound.time || "In Shop",
+              timestamp: inbound.timestamp || "Active",
+              lineItems: inbound.lineItems || [{ desc: textMsg, qty: 1, price: 50.00, isTaxable: false }],
+              totalAmount: inbound.totalAmount || 50.00
             };
           });
           updated = true;
@@ -1405,8 +1334,8 @@
 
         if (incomingScheduled.length > 0) {
           store.scheduledCards = incomingScheduled.map(sched => {
-            let clientName = sched.name || sched.clientName || sched.result || "Scheduled Client";
-            const textMsg = sched.text || sched.note || sched.notes || sched.Body || "Scheduled appointment";
+            let clientName = sched.name || sched.clientName || "Scheduled Customer";
+            const textMsg = sched.text || sched.note || "Scheduled appointment";
             const matches = findAllVaultMatches(clientName);
 
             const resolvedAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (sched.address || FALLBACK_CUSTOMER_ADDRESS);
@@ -1421,11 +1350,10 @@
               allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [resolvedAddress],
               phone: resolvedPhone,
               status: sched.status || 'intake',
-              displayDate: sched.displayDate || '',
               time: sched.time || "Scheduled",
-              timestamp: sched.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              lineItems: sched.lineItems || null,
-              totalAmount: sched.totalAmount || null
+              timestamp: sched.timestamp || "Active",
+              lineItems: sched.lineItems || [{ desc: textMsg, qty: 1, price: 50.00, isTaxable: false }],
+              totalAmount: sched.totalAmount || 50.00
             };
           });
           updated = true;
@@ -1434,21 +1362,18 @@
         if (updated) {
           saveStorage(store);
           render();
-          if (userTriggered) showStatus("🔄 Live floor synced across all devices!");
+          if (userTriggered) showStatus("🔄 Live floor synced directly from Monday.com!");
         }
       }
     })
     .catch(err => {
-      console.warn("Sync error:", err);
-      if (userTriggered) showStatus("⚠️ Shop floor sync connection error. Retrying...");
+      if (userTriggered) showStatus("⚡ Active floor running locally.");
     });
   }
 
   function handleVoiceIntake(text) {
     showStatus("⚡ FRESH: Organizing your note...");
-
     const cleanedTranscript = text.replace(/\b([a-zA-Z])\s+(?=[a-zA-Z]\b)/g, '$1').trim();
-
     let detectedClient = null;
     const cleanSpoken = cleanedTranscript.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
 
@@ -1458,11 +1383,7 @@
         const lowerName = rawName.toLowerCase();
         const parts = lowerName.split(/\s+/).filter(p => p.length >= 2);
 
-        if (cleanSpoken.includes(lowerName)) {
-          detectedClient = row;
-          break;
-        }
-        if (parts.length >= 2 && parts.every(part => cleanSpoken.includes(part))) {
+        if (cleanSpoken.includes(lowerName) || (parts.length >= 2 && parts.every(part => cleanSpoken.includes(part)))) {
           detectedClient = row;
           break;
         }
@@ -1470,7 +1391,7 @@
     }
 
     const isShopInternal = cleanSpoken.includes("shop note") || cleanSpoken.includes("internal");
-    let initialName = detectedClient ? (detectedClient['Name'] || "Valued Client") : "";
+    let initialName = detectedClient ? (detectedClient['Name'] || "Valued Customer") : "";
     if (!initialName && !isShopInternal) {
       const words = cleanedTranscript.trim().split(/\s+/);
       initialName = words.slice(0, 2).join(' ');
@@ -1478,44 +1399,10 @@
       initialName = SUBSCRIBER_CONFIG.businessName;
     }
 
-    if (isPublicMode) {
-      const publicThread = document.getElementById('public-thread');
-      const publicBubbles = document.getElementById('public-bubbles');
-      if (publicThread) publicThread.classList.remove('hidden');
-      const oldIndicator = document.getElementById('loading-bubble');
-      if (oldIndicator) oldIndicator.remove();
-      if (publicBubbles) {
-        publicBubbles.innerHTML += `
-          <div id="loading-bubble" class="self-start bg-parchment border border-bordercolor text-muted p-2 rounded-xl text-xs italic">
-            Fresh is typing... ⏳
-          </div>
-        `;
-        publicBubbles.scrollTop = publicBubbles.scrollHeight;
-      }
-    } else {
-      const threadBox = document.getElementById('conversation-thread');
-      const bubbles = document.getElementById('thread-bubbles');
-      if (threadBox) threadBox.classList.remove('hidden');
-      const oldIndicator = document.getElementById('loading-bubble');
-      if (oldIndicator) oldIndicator.remove();
-      if (bubbles) {
-        bubbles.innerHTML += `
-          <div id="loading-bubble" class="self-start bg-parchment border border-bordercolor text-muted p-2 rounded-xl text-xs italic">
-            Fresh is typing... ⏳
-          </div>
-        `;
-        bubbles.scrollTop = bubbles.scrollHeight;
-      }
-    }
-
     fetch(INTAKE_ROUTING_HOOK, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        transcript: cleanedTranscript, 
-        clientName: initialName,
-        timestamp: new Date().toISOString() 
-      })
+      body: JSON.stringify({ transcript: cleanedTranscript, clientName: initialName, timestamp: new Date().toISOString() })
     })
     .then(async res => {
       const rawText = await res.text();
@@ -1523,41 +1410,10 @@
     })
     .then(data => {
       let clientName = data.clientName || initialName || (isShopInternal ? SUBSCRIBER_CONFIG.businessName : "Inbound Intake");
-      
-      let finalAddress = FALLBACK_CUSTOMER_ADDRESS;
-      let finalPhone = FALLBACK_CUSTOMER_PHONE;
+      let finalAddress = detectedClient ? formatRowAddress(detectedClient) : (isShopInternal ? SUBSCRIBER_CONFIG.address : FALLBACK_CUSTOMER_ADDRESS);
+      let finalPhone = detectedClient ? formatRowPhone(detectedClient) : (isShopInternal ? SUBSCRIBER_CONFIG.phone : FALLBACK_CUSTOMER_PHONE);
 
-      if (detectedClient) {
-        finalAddress = formatRowAddress(detectedClient);
-        finalPhone = formatRowPhone(detectedClient);
-      } else if (isShopInternal) {
-        finalAddress = SUBSCRIBER_CONFIG.address;
-        finalPhone = SUBSCRIBER_CONFIG.phone;
-      }
-
-      let allAddresses = [finalAddress];
-      let isReturningVIP = !!detectedClient;
-
-      const destination = (data.destination || '').toLowerCase();
-      const isScheduled = data.isScheduled === true || 
-                          data.isScheduled === "true" || 
-                          destination === 'calendar' || 
-                          destination === 'schedule' ||
-                          cleanedTranscript.toLowerCase().includes('tomorrow') || 
-                          cleanedTranscript.toLowerCase().includes(' am') || 
-                          cleanedTranscript.toLowerCase().includes(' pm');
-
-      let freshReply = data.sissyResponse;
-      if (isPublicMode && isReturningVIP) {
-        freshReply = `Welcome back, ${clientName}! I located your account on file. Our team has received your request and will text you shortly with confirmation and pickup/delivery details!`;
-      } else if (isPublicMode && !isReturningVIP && clientName !== SUBSCRIBER_CONFIG.businessName) {
-        freshReply = `Thanks ${clientName}! Our team has received your request and will text you shortly to confirm your order details!`;
-      } else if (!freshReply) {
-        freshReply = isScheduled 
-          ? `Scheduled appointment for ${clientName} at ${finalAddress}.`
-          : `Got it! Note recorded for ${clientName}.`;
-      }
-      
+      let freshReply = data.sissyResponse || `Got it! Note recorded for ${clientName}.`;
       updateSissyConsole(freshReply, cleanedTranscript);
 
       const store = getStorage();
@@ -1566,71 +1422,22 @@
         text: data.notes || cleanedTranscript,
         clientName: clientName,
         address: finalAddress,
-        allAddresses: allAddresses,
-        phone: finalPhone,
-        status: data.status || 'intake',
-        displayDate: data.displayDate || (cleanedTranscript.toLowerCase().includes('tomorrow') ? 'Tomorrow' : 'Today'),
-        time: data.time || (cleanedTranscript.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm))/i) ? cleanedTranscript.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm))/i)[0].toUpperCase() : "Time Pending"),
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        lineItems: (data.lineItems && Array.isArray(data.lineItems)) ? data.lineItems : null,
-        totalAmount: data.totalAmount || null
-      };
-
-      if (isScheduled) {
-        store.scheduledCards.unshift(card);
-        showStatus(`⚡ Scheduled appointment for ${clientName}!`);
-      } else {
-        store.pinballQueue.unshift(card);
-        showStatus(`⚡ Queued note for ${clientName} in Pinball!`);
-      }
-
-      saveStorage(store);
-      render();
-      setTimeout(() => fetchInboundCards(false), 500);
-    })
-    .catch(err => {
-      const isScheduled = cleanedTranscript.toLowerCase().includes('tomorrow') || cleanedTranscript.toLowerCase().includes(' am') || cleanedTranscript.toLowerCase().includes(' pm');
-      const defaultReply = detectedClient 
-        ? `Welcome back, ${initialName}! Your request is logged.`
-        : `Got it! Note recorded for ${initialName}.`;
-      
-      updateSissyConsole(defaultReply, cleanedTranscript);
-
-      let finalAddress = FALLBACK_CUSTOMER_ADDRESS;
-      let finalPhone = FALLBACK_CUSTOMER_PHONE;
-
-      if (detectedClient) {
-        finalAddress = formatRowAddress(detectedClient);
-        finalPhone = formatRowPhone(detectedClient);
-      } else if (isShopInternal) {
-        finalAddress = SUBSCRIBER_CONFIG.address;
-        finalPhone = SUBSCRIBER_CONFIG.phone;
-      }
-
-      const store = getStorage();
-      const fallbackCard = {
-        id: Date.now(),
-        text: cleanedTranscript,
-        clientName: initialName,
-        address: finalAddress,
         allAddresses: [finalAddress],
         phone: finalPhone,
-        status: 'intake',
-        displayDate: cleanedTranscript.toLowerCase().includes('tomorrow') ? 'Tomorrow' : 'Today',
-        time: cleanedTranscript.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm))/i) ? cleanedTranscript.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm))/i)[0].toUpperCase() : "Time Pending",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        status: data.status || 'intake',
+        time: data.time || "Time Pending",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        lineItems: [{ desc: data.notes || cleanedTranscript, qty: 1, price: 50.00, isTaxable: false }],
+        totalAmount: 50.00
       };
 
-      if (isScheduled) {
-        store.scheduledCards.unshift(fallbackCard);
-      } else {
-        store.pinballQueue.unshift(fallbackCard);
-      }
-
+      store.pinballQueue.unshift(card);
       saveStorage(store);
       render();
-      showStatus(`⚡ Note docked locally for ${initialName}`);
-      setTimeout(() => fetchInboundCards(false), 500);
+      setTimeout(() => fetchInboundCards(false), 800);
+    })
+    .catch(err => {
+      showStatus(`⚡ Note docked locally.`);
     });
   }
 
@@ -1661,13 +1468,6 @@
         saveStorage(store);
         render();
       }
-    } else {
-      if (!resolvedAddress || resolvedAddress === 'undefined' || resolvedAddress === SUBSCRIBER_CONFIG.address) {
-        resolvedAddress = FALLBACK_CUSTOMER_ADDRESS;
-      }
-      if (!resolvedPhone || resolvedPhone === 'undefined' || resolvedPhone === SUBSCRIBER_CONFIG.phone) {
-        resolvedPhone = FALLBACK_CUSTOMER_PHONE;
-      }
     }
 
     document.getElementById('drawer-title').innerText = `${displayClientName} — Workstation`;
@@ -1686,7 +1486,7 @@
     if (card && card.lineItems && Array.isArray(card.lineItems) && card.lineItems.length > 0) {
       currentInvoiceItems = card.lineItems;
     } else {
-      currentInvoiceItems = [{ desc: text, qty: 1, price: 0.00, isTaxable: false }];
+      currentInvoiceItems = [{ desc: text || "Service Diagnostic & Labor", qty: 1, price: 50.00, isTaxable: false }];
     }
     
     renderInvoiceCanvas();
@@ -1717,8 +1517,7 @@
   function updateInvoiceFromScratchpad() {
     const text = document.getElementById('invoice-scratchpad-text').value.trim();
     if (!text) return;
-
-    currentInvoiceItems.push({ desc: text, qty: 1, price: 0.00, isTaxable: false });
+    currentInvoiceItems.push({ desc: text, qty: 1, price: 50.00, isTaxable: false });
     document.getElementById('invoice-scratchpad-text').value = '';
     renderInvoiceCanvas();
   }
@@ -1732,18 +1531,8 @@
       const p = item.price || 0;
       const lineTotal = q * p;
       subtotal += lineTotal;
-
       const descLower = (item.desc || '').toLowerCase();
-      const isPart = item.isTaxable === true || 
-                     descLower.includes('filter') || 
-                     descLower.includes('bag') || 
-                     descLower.includes('part') || 
-                     descLower.includes('belt') || 
-                     descLower.includes('pack') || 
-                     descLower.includes('activepure') || 
-                     descLower.includes('unit');
-
-      if (isPart) {
+      if (item.isTaxable === true || descLower.includes('filter') || descLower.includes('bag') || descLower.includes('part') || descLower.includes('belt')) {
         taxableBase += lineTotal;
       }
     });
@@ -1761,22 +1550,18 @@
   function renderInvoiceCanvas() {
     const docBody = document.getElementById('invoice-doc-table-body');
     if (!docBody) return;
-    
-    docBody.innerHTML = currentInvoiceItems.map((item, idx) => {
+    docBody.innerHTML = currentInvoiceItems.map((item) => {
       const q = item.qty || 1;
       const p = item.price || 0;
-      const total = q * p;
-
       return `
         <div class="grid grid-cols-12 gap-1 items-center border-b border-bordercolor pb-1">
           <span class="col-span-6 font-medium text-ink">${item.desc || 'Service / Part'}</span>
           <span class="col-span-2 text-center text-muted">${q}</span>
           <span class="col-span-2 text-right text-muted">$${p.toFixed(2)}</span>
-          <span class="col-span-2 text-right font-bold text-ink">$${total.toFixed(2)}</span>
+          <span class="col-span-2 text-right font-bold text-ink">$${(q * p).toFixed(2)}</span>
         </div>
       `;
     }).join('');
-
     calculateInvoiceTotal();
   }
 
@@ -1816,14 +1601,11 @@
     const clientName = document.getElementById('vault-client-name').innerText;
     const invId = document.getElementById('invoice-doc-id').innerText.replace('#', '');
     const totals = calculateInvoiceTotal();
-    const grandStr = `$${totals.grandTotal.toFixed(2)}`;
 
-    if (!phone || phone === FALLBACK_CUSTOMER_PHONE) {
-      return alert("No phone number on file for SMS payment link.");
-    }
+    if (!phone || phone === FALLBACK_CUSTOMER_PHONE) return alert("No phone number on file.");
 
     const cardInvoiceUrl = `${window.location.origin}${window.location.pathname}?card=${encodeURIComponent(clientName)}&inv=${encodeURIComponent(invId)}&amt=${totals.grandTotal.toFixed(2)}`;
-    const msg = `${SUBSCRIBER_CONFIG.businessName}: Hi ${clientName}, your official invoice #${invId} for ${grandStr} is ready. Tap below to review statement & pay securely: ${cardInvoiceUrl}`;
+    const msg = `${SUBSCRIBER_CONFIG.businessName}: Hi ${clientName}, your official invoice #${invId} for $${totals.grandTotal.toFixed(2)} is ready. Tap below to review statement & pay securely: ${cardInvoiceUrl}`;
     
     dispatchCloudSMS(phone, msg, "Payment Link");
   }
@@ -1832,7 +1614,6 @@
     const clientName = document.getElementById('vault-client-name').innerText;
     const totals = calculateInvoiceTotal();
     const invId = document.getElementById('invoice-doc-id').innerText.replace('#', '');
-    
     const matches = findAllVaultMatches(clientName);
     let clientEmail = (matches.length > 0) ? formatRowEmail(matches[0]) : '';
 
@@ -1859,12 +1640,11 @@
       })
     })
     .then(res => {
-      showStatus(`✉️ Rich HTML Invoice sent to ${clientEmail}!`);
-      updateSissyConsole(`Dispatched Rich HTML Invoice to ${clientEmail} for balance $${totals.grandTotal.toFixed(2)}`, `Email Invoice`);
+      showStatus(`✉️ Rich HTML Invoice sent!`);
+      updateSissyConsole(`Dispatched Rich HTML Invoice to ${clientEmail}`, `Email Invoice`);
     })
     .catch(err => {
-      console.error('Email Hook Error:', err);
-      showStatus(`⚠️ Email dispatch failed. Please check connection.`);
+      showStatus(`⚠️ Email dispatch failed.`);
     });
   }
 
@@ -1872,17 +1652,14 @@
     if (!activeCardId) return;
     const store = getStorage();
     let item = store.scheduledCards.find(i => i.id === activeCardId) || store.pinballQueue.find(i => i.id === activeCardId);
-
     const totals = calculateInvoiceTotal();
-    const amountStr = `$${totals.grandTotal.toFixed(2)}`;
-    const mainDesc = currentInvoiceItems.map(i => i.desc).filter(Boolean).join(', ') || item.text;
 
     if (item) {
       store.scheduledCards = store.scheduledCards.filter(i => i.id !== activeCardId);
       store.pinballQueue = store.pinballQueue.filter(i => i.id !== activeCardId);
 
-      item.desc = mainDesc;
-      item.amount = totals.grandTotal > 0 ? amountStr : '💵 Paid';
+      item.desc = currentInvoiceItems.map(i => i.desc).filter(Boolean).join(', ') || item.text;
+      item.amount = totals.grandTotal > 0 ? `$${totals.grandTotal.toFixed(2)}` : '💵 Paid';
       item.completedAt = new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
       store.archive = store.archive || [];
@@ -1891,7 +1668,6 @@
       
       renderLifetimeLedger(item.clientName);
       render();
-      updateSissyConsole(`Marked invoice settled (${item.amount}) for ${item.clientName}. Docked into Lifetime Ledger.`, `Mark Paid`);
       closeWorkstation();
       showStatus(`⚡ Milestone settled (${item.amount}) & docked!`);
     }
@@ -1908,7 +1684,7 @@
 
       item.desc = "Dismissed Mistake Note";
       item.amount = "🗑️ Archived";
-      item.completedAt = new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      item.completedAt = new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
 
       store.archive = store.archive || [];
       store.archive.unshift(item);
@@ -1916,8 +1692,7 @@
 
       render();
       closeWorkstation();
-      showStatus("🗑️ Mistake note archived safely out of view!");
-      updateSissyConsole(`Archived mistake note for ${item.clientName}.`, `Dismiss Mistake`);
+      showStatus("🗑️ Mistake note archived safely!");
     }
   }
 
@@ -1931,14 +1706,20 @@
         card.address = newAddress;
         saveStorage(store);
         render();
-        updateSissyConsole(`Updated address for ${card.clientName} to ${newAddress}`, `Switch Address`);
       }
     }
   }
 
   function getStorage() {
     const d = localStorage.getItem('tappything_lexus_v3');
-    return d ? JSON.parse(d) : { scheduledCards: [], pinballQueue: [], archive: [] };
+    if (d) {
+      try { return JSON.parse(d); } catch(e) {}
+    }
+    return {
+      scheduledCards: [],
+      pinballQueue: [],
+      archive: []
+    };
   }
 
   function saveStorage(d) { localStorage.setItem('tappything_lexus_v3', JSON.stringify(d)); }
@@ -1967,7 +1748,7 @@
                 </div>
                 <p class="text-[11px] text-muted italic">"${item.text}"</p>
                 <div class="text-[10px] text-gold font-bold mt-0.5">📍 ${item.address}</div>
-                <div class="text-[10px] text-muted mt-0.5">${item.displayDate ? item.displayDate + ' • ' : ''}${item.time || item.timestamp}</div>
+                <div class="text-[10px] text-muted mt-0.5">${item.time || item.timestamp}</div>
               </div>
               <div class="flex gap-1.5 flex-shrink-0">
                 <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}', ${item.id}, 'calendar')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition active:scale-95 cursor-pointer">Open Card ➔</button>
