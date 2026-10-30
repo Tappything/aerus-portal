@@ -158,10 +158,11 @@
       </button>
 
       <div class="flex gap-2 w-full max-w-sm">
-        <input type="text" id="public-text-intake" placeholder="💬 Type your request here..." 
+        <textarea id="public-text-intake" rows="1" placeholder="💬 Type your request here..." 
+          oninput="autoGrowTextarea(this)"
           onkeydown="checkPublicSubmit(event)"
-          class="flex-1 px-4 py-2.5 border border-bordercolor rounded-xl bg-white text-ink text-xs focus:outline-none focus:border-gold shadow-inner text-left">
-        <button onclick="submitPublicText()" class="px-4 py-2.5 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center active:scale-95 cursor-pointer">
+          class="flex-1 px-4 py-2.5 border border-bordercolor rounded-xl bg-white text-ink text-xs focus:outline-none focus:border-gold shadow-inner text-left resize-none overflow-hidden"></textarea>
+        <button onclick="submitPublicText()" class="px-4 py-2.5 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center active:scale-95 cursor-pointer self-end">
           <span>Send</span>
         </button>
       </div>
@@ -206,10 +207,11 @@
         </button>
       </div>
       <div class="flex gap-2 w-full">
-        <input type="text" id="text-intake" placeholder="💬 Type or speak a note..." 
+        <textarea id="text-intake" rows="1" placeholder="💬 Type or speak a note..." 
+          oninput="autoGrowTextarea(this)"
           onkeydown="checkSubmit(event)"
-          class="flex-1 px-3.5 py-2 border border-bordercolor rounded-xl bg-white text-ink focus:outline-none focus:border-gold text-xs shadow-inner text-center md:text-left">
-        <button onclick="submitOperatorText()" class="px-4 py-2 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center active:scale-95 cursor-pointer">
+          class="flex-1 px-3.5 py-2 border border-bordercolor rounded-xl bg-white text-ink focus:outline-none focus:border-gold text-xs shadow-inner text-left resize-none overflow-hidden"></textarea>
+        <button onclick="submitOperatorText()" class="px-4 py-2 bg-forest hover:bg-opacity-90 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center active:scale-95 cursor-pointer self-end">
           <span>Send</span>
         </button>
       </div>
@@ -249,12 +251,16 @@
         <button onclick="fetchInboundCards(true)" class="text-[10px] font-bold text-forest hover:underline cursor-pointer">🔄 Sync Cards</button>
       </div>
 
+      <!-- EXPANDED 7-DRAWER PINBALL ACTION ZONE -->
       <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
         <button onclick="setPinballFilter('all')" id="filter-pill-all" class="px-2.5 py-1 bg-forest text-white font-bold text-[10px] rounded-lg shadow-sm whitespace-nowrap active:scale-95 cursor-pointer transition">All</button>
         <button onclick="setPinballFilter('intake')" id="filter-pill-intake" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">📥 Intake</button>
         <button onclick="setPinballFilter('bench')" id="filter-pill-bench" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">🛠️ Bench</button>
-        <button onclick="setPinballFilter('parts')" id="filter-pill-parts" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">🛒 Parts</button>
-        <button onclick="setPinballFilter('ready')" id="filter-pill-ready" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">🔧 Ready</button>
+        <button onclick="setPinballFilter('parts')" id="filter-pill-parts" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">🔩 Parts</button>
+        <button onclick="setPinballFilter('ready')" id="filter-pill-ready" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">🔧 Ready Wall</button>
+        <button onclick="setPinballFilter('leadgen')" id="filter-pill-leadgen" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">🎯 Lead Gen</button>
+        <button onclick="setPinballFilter('calendar')" id="filter-pill-calendar" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">📅 Calendar</button>
+        <button onclick="setPinballFilter('custom')" id="filter-pill-custom" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">⚡ Custom</button>
       </div>
 
       <div class="bg-cardbg border border-bordercolor rounded-2xl p-4 min-h-[160px]">
@@ -291,7 +297,7 @@
     <div class="bg-white p-3 rounded-xl border border-bordercolor shadow-sm flex flex-col gap-2 no-print">
       <div class="text-[10px] font-bold text-forest uppercase tracking-wider flex items-center justify-between">
         <span>📍 Shop Lane & Production Status</span>
-        <span id="current-lane-indicator" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">⚪ Intake</span>
+        <span id="current-lane-indicator" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-300">⚪ Intake</span>
       </div>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
         <button type="button" onclick="updateActiveCardStatus('intake')" id="btn-lane-intake" class="py-1.5 px-2 bg-parchment border border-bordercolor rounded-lg text-[10px] font-bold text-slate-700 hover:bg-slate-100 transition active:scale-95 cursor-pointer flex items-center justify-center gap-1">
@@ -366,9 +372,10 @@
           <span>📷/🎥</span> <span>Media Capture</span>
         </button>
       </div>
-      <input type="text" id="in-card-text" placeholder="💬 Add private note to this card..." 
+      <textarea id="in-card-text" rows="1" placeholder="💬 Add private note to this card..." 
+        oninput="autoGrowTextarea(this)"
         onkeydown="checkInCardSubmit(event)"
-        class="w-full px-3 py-1.5 border border-bordercolor rounded-xl bg-parchment text-ink focus:outline-none focus:border-gold text-xs">
+        class="w-full px-3 py-1.5 border border-bordercolor rounded-xl bg-parchment text-ink focus:outline-none focus:border-gold text-xs resize-none overflow-hidden"></textarea>
     </div>
 
     <div class="flex border-b border-bordercolor gap-2 text-xs font-bold overflow-x-auto no-print">
@@ -563,7 +570,7 @@
 </div>
 
 <script>
-  // Dynamic multi-tenant configuration (easily customizable per subscriber)
+  // Dynamic multi-tenant configuration
   const SUBSCRIBER_CONFIG = {
     businessName: "Aerus of Towson • Clean Environment LLC",
     tagline: "Healthy Home Specialists • Timonium, MD",
@@ -597,16 +604,26 @@
   const FALLBACK_CUSTOMER_ADDRESS = "📍 Address on File / Intake Slip";
   const FALLBACK_CUSTOMER_PHONE = "Phone on File";
 
+  // 7-Drawer Status Configuration
   const STATUS_CONFIG = {
     intake: { label: 'Intake', badgeClass: 'bg-slate-100 text-slate-700 border-slate-300', dot: '⚪' },
     bench: { label: 'On Bench', badgeClass: 'bg-blue-100 text-blue-800 border-blue-300', dot: '🔵' },
-    parts: { label: 'Parts Needed', badgeClass: 'bg-amber-100 text-amber-800 border-amber-300', dot: '🟡' },
-    ready: { label: 'Ready for Pickup', badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-300', dot: '🟢' }
+    parts: { label: 'Parts Needed', badgeClass: 'bg-amber-100 text-amber-800 border-amber-300', dot: '🔩' },
+    ready: { label: 'Ready Wall', badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-300', dot: '🟢' },
+    leadgen: { label: 'Lead Gen', badgeClass: 'bg-purple-100 text-purple-800 border-purple-300', dot: '🎯' },
+    calendar: { label: 'Calendar', badgeClass: 'bg-sky-100 text-sky-800 border-sky-300', dot: '📅' },
+    custom: { label: 'Custom', badgeClass: 'bg-indigo-100 text-indigo-800 border-indigo-300', dot: '⚡' }
   };
+
+  function autoGrowTextarea(el) {
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 180) + 'px';
+  }
 
   function setPinballFilter(filterKey) {
     activePinballFilter = filterKey;
-    const filterKeys = ['all', 'intake', 'bench', 'parts', 'ready'];
+    const filterKeys = ['all', 'intake', 'bench', 'parts', 'ready', 'leadgen', 'calendar', 'custom'];
     filterKeys.forEach(k => {
       const btn = document.getElementById(`filter-pill-${k}`);
       if (!btn) return;
@@ -813,6 +830,7 @@
 
   window.addEventListener('load', () => {
     bindSubscriberConfig();
+    render();
     if (!isPublicMode) fetchInboundCards(false);
   });
 
@@ -850,15 +868,38 @@
     }
   });
 
+  // Clean Name Parsing: Preserves honorifics, strips trailing schedule terms
+  function cleanExtractedName(rawName) {
+    if (!rawName) return "";
+    let cleaned = rawName.trim();
+    cleaned = cleaned.replace(/^(?:who\s+is|what\s+about|check\s+on|schedule|note\s+for)\s+/i, '');
+    const scheduleWords = [
+      'today', 'tomorrow', 'tonight', 'yesterday', 'morning', 'afternoon', 'evening',
+      'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
+      'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'
+    ];
+    let tokens = cleaned.split(/\s+/);
+    while (tokens.length > 1) {
+      const lastToken = tokens[tokens.length - 1].toLowerCase().replace(/[^a-z]/g, '');
+      if (scheduleWords.includes(lastToken)) {
+        tokens.pop();
+      } else {
+        break;
+      }
+    }
+    cleaned = tokens.join(' ');
+    return cleaned.replace(/\s+/g, ' ').trim();
+  }
+
   function findAllVaultMatches(clientName) {
     if (!vaultData || vaultData.length === 0 || !clientName) return [];
-    const normalizedName = clientName.trim();
-    if (normalizedName === "Direct Intake" || normalizedName === "Subscriber Note" || normalizedName === "Inbound Customer Request" || normalizedName === "Valued Customer") {
+    const normalizedName = cleanExtractedName(clientName);
+    if (!normalizedName || normalizedName === "Direct Intake" || normalizedName === "Subscriber Note" || normalizedName === "Inbound Customer Request" || normalizedName === "Valued Customer") {
       return [];
     }
 
     const target = normalizedName.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
-    const targetParts = target.split(/\s+/).filter(p => p.length >= 2);
+    const targetParts = target.split(/\s+/).filter(p => p.length >= 2 && !['mrs', 'mr', 'ms', 'dr', 'prof'].includes(p));
 
     return vaultData.filter(row => {
       const fullName = (
@@ -932,14 +973,10 @@
     }
   }
 
+  // Mute Audio Talk-Back: TTS completely disabled across status and intake updates
   function speakAudibly(text) {
-    if ('speechSynthesis' in window && text) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1.0;
-      utterance.pitch = 1.0;
-      window.speechSynthesis.speak(utterance);
-    }
+    // Zero TTS voice playback
+    return;
   }
 
   function toggleVoiceIntake() {
@@ -985,10 +1022,16 @@
 
         if (!isPublicMode) {
           const txtIn = document.getElementById('text-intake');
-          if (txtIn) txtIn.value = liveText;
+          if (txtIn) {
+            txtIn.value = liveText;
+            autoGrowTextarea(txtIn);
+          }
         } else {
           const pubIn = document.getElementById('public-text-intake');
-          if (pubIn) pubIn.value = liveText;
+          if (pubIn) {
+            pubIn.value = liveText;
+            autoGrowTextarea(pubIn);
+          }
         }
 
         if (isFinalResult && liveText.trim().length > 2) {
@@ -1034,6 +1077,7 @@
     if (val) {
       handleVoiceIntake(val);
       input.value = '';
+      autoGrowTextarea(input);
     }
   }
 
@@ -1058,6 +1102,7 @@
     if (val) {
       handleVoiceIntake(val);
       box.value = '';
+      autoGrowTextarea(box);
     }
   }
 
@@ -1068,6 +1113,7 @@
       if (val) {
         handleVoiceIntake(val);
         e.target.value = '';
+        autoGrowTextarea(e.target);
       }
     }
   }
@@ -1082,6 +1128,7 @@
     }
   }
 
+  // Silent visual status banner (no TTS audio)
   function showStatus(msg) {
     if (isPublicMode) return;
     const b = document.getElementById('status-banner');
@@ -1091,13 +1138,11 @@
     setTimeout(() => b.classList.add('hidden'), 4000);
   }
 
-  function updateSissyConsole(responseText, userPrompt) {
+  function updateFreshConsole(responseText, userPrompt) {
     if (isPublicMode) {
       const publicThread = document.getElementById('public-thread');
       const publicBubbles = document.getElementById('public-bubbles');
       if (publicThread) publicThread.classList.remove('hidden');
-      const loadingEl = document.getElementById('loading-bubble');
-      if (loadingEl) loadingEl.remove();
 
       if (publicBubbles) {
         if (userPrompt) {
@@ -1116,15 +1161,12 @@
         `;
         publicBubbles.scrollTop = publicBubbles.scrollHeight;
       }
-      speakAudibly(responseText);
       return;
     }
 
     const threadBox = document.getElementById('conversation-thread');
     const bubbles = document.getElementById('thread-bubbles');
     const timeEl = document.getElementById('thread-time');
-    const loadingEl = document.getElementById('loading-bubble');
-    if (loadingEl) loadingEl.remove();
 
     if (threadBox) threadBox.classList.remove('hidden');
     if (timeEl) timeEl.innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -1146,7 +1188,6 @@
       `;
       bubbles.scrollTop = bubbles.scrollHeight;
     }
-    speakAudibly(responseText);
 
     if (autoFadeTimer) clearTimeout(autoFadeTimer);
     autoFadeTimer = setTimeout(() => {
@@ -1233,7 +1274,7 @@
     }).catch(err => console.error(err));
 
     showStatus(`⚡ Dispatched message to ${cleanPhone}`);
-    updateSissyConsole(`Dispatched SMS to ${cleanPhone}: "${msg}"`, msg);
+    updateFreshConsole(`Dispatched SMS to ${cleanPhone}: "${msg}"`, msg);
 
     if (activeCardId) {
       const store = getStorage();
@@ -1276,6 +1317,7 @@
     }
   }
 
+  // Fetch and lock cards persistent on screen without clearing UI
   function fetchInboundCards(userTriggered) {
     if (isPublicMode) return;
     if (userTriggered) showStatus('⚡ Syncing live shop floor...');
@@ -1301,56 +1343,73 @@
         if (Array.isArray(data.scheduled)) incomingScheduled = data.scheduled;
       }
 
-      // True live sync: server state replaces local queue so archived items disappear immediately
       const store = getStorage();
 
-      store.pinballQueue = incomingItems.map(inbound => {
-        let clientName = inbound.name || inbound.clientName || "Valued Customer";
-        const textMsg = inbound.text || inbound.note || "Service Intake";
-        const matches = findAllVaultMatches(clientName);
+      if (incomingItems.length > 0) {
+        incomingItems.forEach(inbound => {
+          let clientName = cleanExtractedName(inbound.name || inbound.clientName || "Valued Customer");
+          const textMsg = inbound.text || inbound.note || "Service Intake";
+          const matches = findAllVaultMatches(clientName);
 
-        const resolvedAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (inbound.address || FALLBACK_CUSTOMER_ADDRESS);
-        const resolvedPhone = matches.length > 0 ? formatRowPhone(matches[0]) : (inbound.phone || FALLBACK_CUSTOMER_PHONE);
+          const resolvedAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (inbound.address || FALLBACK_CUSTOMER_ADDRESS);
+          const resolvedPhone = matches.length > 0 ? formatRowPhone(matches[0]) : (inbound.phone || FALLBACK_CUSTOMER_PHONE);
 
-        return {
-          id: inbound.id || Date.now() + Math.floor(Math.random() * 1000),
-          externalId: inbound.id || null,
-          text: textMsg,
-          clientName: clientName,
-          address: resolvedAddress,
-          allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [resolvedAddress],
-          phone: resolvedPhone,
-          status: inbound.status || 'intake',
-          time: inbound.time || "In Shop",
-          timestamp: inbound.timestamp || "Active",
-          lineItems: inbound.lineItems || [{ desc: textMsg, qty: 1, price: 50.00, isTaxable: false }],
-          totalAmount: inbound.totalAmount || 50.00
-        };
-      });
+          const existingIdx = store.pinballQueue.findIndex(c => c.externalId && c.externalId === inbound.id);
+          const itemPayload = {
+            id: inbound.id || Date.now() + Math.floor(Math.random() * 1000),
+            externalId: inbound.id || null,
+            text: textMsg,
+            clientName: clientName,
+            address: resolvedAddress,
+            allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [resolvedAddress],
+            phone: resolvedPhone,
+            status: inbound.status || 'intake',
+            time: inbound.time || "In Shop",
+            timestamp: inbound.timestamp || "Active",
+            lineItems: inbound.lineItems || [{ desc: textMsg, qty: 1, price: 50.00, isTaxable: false }],
+            totalAmount: inbound.totalAmount || 50.00
+          };
 
-      store.scheduledCards = incomingScheduled.map(sched => {
-        let clientName = sched.name || sched.clientName || "Scheduled Customer";
-        const textMsg = sched.text || sched.note || "Scheduled appointment";
-        const matches = findAllVaultMatches(clientName);
+          if (existingIdx >= 0) {
+            store.pinballQueue[existingIdx] = Object.assign({}, store.pinballQueue[existingIdx], itemPayload);
+          } else {
+            store.pinballQueue.push(itemPayload);
+          }
+        });
+      }
 
-        const resolvedAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (sched.address || FALLBACK_CUSTOMER_ADDRESS);
-        const resolvedPhone = matches.length > 0 ? formatRowPhone(matches[0]) : (sched.phone || FALLBACK_CUSTOMER_PHONE);
+      if (incomingScheduled.length > 0) {
+        incomingScheduled.forEach(sched => {
+          let clientName = cleanExtractedName(sched.name || sched.clientName || "Scheduled Customer");
+          const textMsg = sched.text || sched.note || "Scheduled appointment";
+          const matches = findAllVaultMatches(clientName);
 
-        return {
-          id: sched.id || Date.now() + Math.floor(Math.random() * 1000),
-          externalId: sched.id || null,
-          text: textMsg,
-          clientName: clientName,
-          address: resolvedAddress,
-          allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [resolvedAddress],
-          phone: resolvedPhone,
-          status: sched.status || 'intake',
-          time: sched.time || "Scheduled",
-          timestamp: sched.timestamp || "Active",
-          lineItems: sched.lineItems || [{ desc: textMsg, qty: 1, price: 50.00, isTaxable: false }],
-          totalAmount: sched.totalAmount || 50.00
-        };
-      });
+          const resolvedAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (sched.address || FALLBACK_CUSTOMER_ADDRESS);
+          const resolvedPhone = matches.length > 0 ? formatRowPhone(matches[0]) : (sched.phone || FALLBACK_CUSTOMER_PHONE);
+
+          const existingIdx = store.scheduledCards.findIndex(c => c.externalId && c.externalId === sched.id);
+          const itemPayload = {
+            id: sched.id || Date.now() + Math.floor(Math.random() * 1000),
+            externalId: sched.id || null,
+            text: textMsg,
+            clientName: clientName,
+            address: resolvedAddress,
+            allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [resolvedAddress],
+            phone: resolvedPhone,
+            status: sched.status || 'intake',
+            time: sched.time || "Scheduled",
+            timestamp: sched.timestamp || "Active",
+            lineItems: sched.lineItems || [{ desc: textMsg, qty: 1, price: 50.00, isTaxable: false }],
+            totalAmount: sched.totalAmount || 50.00
+          };
+
+          if (existingIdx >= 0) {
+            store.scheduledCards[existingIdx] = Object.assign({}, store.scheduledCards[existingIdx], itemPayload);
+          } else {
+            store.scheduledCards.push(itemPayload);
+          }
+        });
+      }
 
       saveStorage(store);
       render();
@@ -1384,10 +1443,33 @@
     let initialName = detectedClient ? (detectedClient['Name'] || "Valued Customer") : "";
     if (!initialName && !isShopInternal) {
       const words = cleanedTranscript.trim().split(/\s+/);
-      initialName = words.slice(0, 2).join(' ');
+      initialName = cleanExtractedName(words.slice(0, 2).join(' '));
     } else if (isShopInternal) {
       initialName = SUBSCRIBER_CONFIG.businessName;
     }
+
+    // Immediately persist and render locally to prevent disappearing/flashing cards
+    const localStore = getStorage();
+    const finalAddress = detectedClient ? formatRowAddress(detectedClient) : (isShopInternal ? SUBSCRIBER_CONFIG.address : FALLBACK_CUSTOMER_ADDRESS);
+    const finalPhone = detectedClient ? formatRowPhone(detectedClient) : (isShopInternal ? SUBSCRIBER_CONFIG.phone : FALLBACK_CUSTOMER_PHONE);
+
+    const localCard = {
+      id: Date.now(),
+      text: cleanedTranscript,
+      clientName: initialName || "Inbound Intake",
+      address: finalAddress,
+      allAddresses: [finalAddress],
+      phone: finalPhone,
+      status: 'intake',
+      time: "Time Pending",
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      lineItems: [{ desc: cleanedTranscript, qty: 1, price: 50.00, isTaxable: false }],
+      totalAmount: 50.00
+    };
+
+    localStore.pinballQueue.unshift(localCard);
+    saveStorage(localStore);
+    render();
 
     fetch(INTAKE_ROUTING_HOOK, {
       method: 'POST',
@@ -1399,35 +1481,24 @@
       return cleanAndParseJSON(rawText);
     })
     .then(data => {
-      let clientName = data.clientName || initialName || (isShopInternal ? SUBSCRIBER_CONFIG.businessName : "Inbound Intake");
-      let finalAddress = detectedClient ? formatRowAddress(detectedClient) : (isShopInternal ? SUBSCRIBER_CONFIG.address : FALLBACK_CUSTOMER_ADDRESS);
-      let finalPhone = detectedClient ? formatRowPhone(detectedClient) : (isShopInternal ? SUBSCRIBER_CONFIG.phone : FALLBACK_CUSTOMER_PHONE);
-
-      let freshReply = data.sissyResponse || `Got it! Note recorded for ${clientName}.`;
-      updateSissyConsole(freshReply, cleanedTranscript);
+      let clientName = cleanExtractedName(data.clientName || initialName || (isShopInternal ? SUBSCRIBER_CONFIG.businessName : "Inbound Intake"));
+      let freshReply = data.freshResponse || data.sissyResponse || `Got it! Note recorded for ${clientName}.`;
+      updateFreshConsole(freshReply, cleanedTranscript);
 
       const store = getStorage();
-      const card = {
-        id: Date.now(),
-        text: data.notes || cleanedTranscript,
-        clientName: clientName,
-        address: finalAddress,
-        allAddresses: [finalAddress],
-        phone: finalPhone,
-        status: data.status || 'intake',
-        time: data.time || "Time Pending",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        lineItems: [{ desc: data.notes || cleanedTranscript, qty: 1, price: 50.00, isTaxable: false }],
-        totalAmount: 50.00
-      };
-
-      store.pinballQueue.unshift(card);
-      saveStorage(store);
-      render();
+      const targetCard = store.pinballQueue.find(c => c.id === localCard.id);
+      if (targetCard) {
+        targetCard.clientName = clientName;
+        targetCard.text = data.notes || targetCard.text;
+        targetCard.status = data.status || targetCard.status;
+        targetCard.time = data.time || targetCard.time;
+        saveStorage(store);
+        render();
+      }
       setTimeout(() => fetchInboundCards(false), 800);
     })
     .catch(err => {
-      showStatus(`⚡ Note docked locally.`);
+      showStatus(`⚡ Note locked on board.`);
     });
   }
 
@@ -1439,7 +1510,7 @@
     const allCards = [...store.scheduledCards, ...store.pinballQueue];
     const card = allCards.find(c => c.id === cardId);
 
-    const displayClientName = (clientName && clientName.trim() !== '' && clientName !== 'undefined') ? clientName.trim() : "Valued Customer";
+    const displayClientName = (clientName && clientName.trim() !== '' && clientName !== 'undefined') ? cleanExtractedName(clientName.trim()) : "Valued Customer";
 
     let resolvedAddress = address;
     let resolvedPhone = phone;
@@ -1631,7 +1702,7 @@
     })
     .then(res => {
       showStatus(`✉️ Rich HTML Invoice sent!`);
-      updateSissyConsole(`Dispatched Rich HTML Invoice to ${clientEmail}`, `Email Invoice`);
+      updateFreshConsole(`Dispatched Rich HTML Invoice to ${clientEmail}`, `Email Invoice`);
     })
     .catch(err => {
       showStatus(`⚠️ Email dispatch failed.`);
