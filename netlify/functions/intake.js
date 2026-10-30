@@ -1,25 +1,22 @@
 /**
  * Netlify Serverless Function: /.netlify/functions/intake
  * Role: Fresh 🤵 Autonomous Digital Coordinator Brain
- * Priority 1: Zero-dependency command execution (wipe/clean/archive)
- * Priority 2: Gemini AI intake & routing -> Monday.com mutations
+ * Engine: Standard Gemini 1.5 Flash -> Monday.com GraphQL Mutations
  */
 
 const https = require('https');
 
-// Environment & Board Setup
 const MONDAY_API_URL = 'https://api.monday.com/v2';
 const MONDAY_API_KEY = process.env.MONDAY_API_KEY || process.env.MONDAY_TOKEN;
 const MONDAY_BOARD_ID = process.env.MONDAY_BOARD_ID || '18424728273';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// Monday Group Targets
-const GROUP_INTAKE = 'group_mm6b77as';     // 2. 📥 Counter Intake / Showroom
+// Monday Board Groups
+const GROUP_INTAKE = 'group_mm6b77as';     // 📥 Counter Intake / Showroom
 const GROUP_CALENDAR = 'group_mm7maw66';   // 📅 Calendar / Field / Route
 const GROUP_WORKBENCH = 'group_mm76qbbh';  // 🛠️ Bench / Shop Diagnostic
 const GROUP_ARCHIVE = 'group_mm6xs2fx';    // 📦 Archive
 
-// Target Long-Text Notes Column
 const COL_LONG_TEXT = 'long_text_mm5vbykc';
 
 function callMondayGraphQL(query, variables = {}) {
@@ -60,48 +57,39 @@ function callMondayGraphQL(query, variables = {}) {
 function callGeminiCoordinator(transcript) {
   return new Promise((resolve) => {
     if (!GEMINI_API_KEY) {
-      const isBench = /\b(bench|motor|repair|diagnostic|spark|smoke|cord|belt)\b/i.test(transcript);
-      const isSched = /\b(today|tomorrow|\d{1,2}(:\d{2})?\s*(am|pm))\b/i.test(transcript);
-
+      console.error('[FRESH] GEMINI_API_KEY is not set in environment.');
       return resolve({
-        intent: 'INTAKE',
-        clientName: transcript.split(/\s+/).slice(0, 2).join(' ') || 'Direct Intake',
-        equipment: 'Aerus / Vacuum Unit',
+        error: 'GEMINI_API_KEY is missing in Netlify environment variables.',
+        clientName: 'Key Missing',
         notes: transcript,
-        destination: isSched ? 'calendar' : (isBench ? 'bench' : 'intake'),
-        status: isBench ? 'bench' : 'intake',
-        time: isSched ? 'Scheduled' : 'Pending',
-        freshResponse: `Locked in note: "${transcript}"`
+        destination: 'intake',
+        status: 'intake',
+        time: 'Pending',
+        freshResponse: 'Coach, GEMINI_API_KEY is missing in your Netlify settings!'
       });
     }
 
-    const prompt = `You are Fresh, the sharp, proactive AI Digital Coordinator for William Sullivan at Aerus Home Wellness.
-Analyze this voice transcript from William:
+    const systemPrompt = `You are Fresh, the AI Digital Coordinator for William Sullivan at Aerus Home Wellness.
+Analyze this voice note from William:
 "${transcript}"
 
-Extract intake details:
-- clientName: Clean customer name ONLY (preserve honorifics like "Mrs. Donley", strip temporal words like "Today", "Tomorrow").
-- equipment: Machine or item mentioned.
-- notes: Detailed description of the job.
-- destination: "calendar" (if time/date/pickup scheduled), "bench" (if bench test/motor repair needed), or "intake" (general counter intake).
-- status: "intake", "bench", "parts", or "route".
-- time: Specific time if mentioned (e.g. "11:00 AM"), else "Pending".
-- freshResponse: Crisp, motivating 1-2 sentence confirmation. If time is missing on a schedule request, ask directly.
+Extract into JSON:
+- clientName: Customer full name or honorific + last name only (e.g. "Mrs. Donley", "Fuji San", "Cindy"). Strip trailing time/day words.
+- equipment: Item or issue mentioned (e.g. "Vacuum", "Filter", "Guardian Air").
+- notes: Full details of the job.
+- destination: "calendar" (if date/time/pickup mentioned), "bench" (if shop repair/diagnostic), or "intake" (counter drop-off).
+- status: "intake" | "bench" | "parts" | "route".
+- time: Scheduled time if stated (e.g. "11:00 AM", "Noon"), else "Pending".
+- freshResponse: Direct, motivating 1-sentence confirmation. If an appointment is missing an exact time, ask William directly.
 
-Respond ONLY with pure JSON (no markdown backticks):
-{
-  "clientName": "...",
-  "equipment": "...",
-  "notes": "...",
-  "destination": "calendar" | "bench" | "intake",
-  "status": "intake" | "bench" | "parts" | "route",
-  "time": "...",
-  "freshResponse": "..."
-}`;
+Return pure JSON only:`;
 
     const postData = JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.1, responseMimeType: "application/json" }
+      contents: [{ parts: [{ text: systemPrompt }] }],
+      generationConfig: {
+        temperature: 0.1,
+        responseMimeType: "application/json"
+      }
     });
 
     const url = new URL(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`);
@@ -120,30 +108,49 @@ Respond ONLY with pure JSON (no markdown backticks):
       res.on('end', () => {
         try {
           const parsed = JSON.parse(rawData);
-          const rawText = parsed.candidates[0].content.parts[0].text;
-          const cleanedText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-          resolve(JSON.parse(cleanedText));
+          if (parsed.error) {
+            console.error('[GEMINI API ERROR]', parsed.error);
+            return resolve({
+              error: parsed.error.message,
+              clientName: 'Gemini Error',
+              notes: transcript,
+              destination: 'intake',
+              status: 'intake',
+              time: 'Pending',
+              freshResponse: `Gemini reported: ${parsed.error.message}`
+            });
+          }
+
+          const rawText = parsed.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+          const cleanJSON = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+          resolve(JSON.parse(cleanJSON));
         } catch (e) {
+          console.error('[GEMINI PARSE ERROR]', e.message, rawData);
           resolve({
-            clientName: 'Direct Intake',
+            error: e.message,
+            clientName: 'Parse Error',
             notes: transcript,
             destination: 'intake',
             status: 'intake',
             time: 'Pending',
-            freshResponse: `Note captured: "${transcript}"`
+            freshResponse: `Could not parse AI response: ${e.message}`
           });
         }
       });
     });
 
-    req.on('error', () => resolve({
-      clientName: 'Direct Intake',
-      notes: transcript,
-      destination: 'intake',
-      status: 'intake',
-      time: 'Pending',
-      freshResponse: `Got it: "${transcript}"`
-    }));
+    req.on('error', (err) => {
+      console.error('[GEMINI NETWORK ERROR]', err.message);
+      resolve({
+        error: err.message,
+        clientName: 'Network Error',
+        notes: transcript,
+        destination: 'intake',
+        status: 'intake',
+        time: 'Pending',
+        freshResponse: `Network error connecting to Gemini: ${err.message}`
+      });
+    });
 
     req.write(postData);
     req.end();
@@ -170,11 +177,11 @@ exports.handler = async (event) => {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'No transcript provided' })
+        body: JSON.stringify({ error: 'No transcript provided.' })
       };
     }
 
-    // 1. Immediate Command Execution (Zero API dependencies)
+    // 1. Instant Command Intercept (Zero external dependencies)
     const isCleanCommand = /\b(clean|clear|archive|wipe)\b/i.test(rawTranscript);
     if (isCleanCommand) {
       const fetchQuery = `
@@ -209,14 +216,32 @@ exports.handler = async (event) => {
         body: JSON.stringify({
           action: 'CLEAN_FLOOR',
           archivedCount: activeItems.length,
-          freshResponse: `Shop floor cleared! Archived ${activeItems.length} cards.`
+          freshResponse: `Shop floor swept clean! Archived ${activeItems.length} cards. Launchpad is open and ready to roll! 💥`
         })
       };
     }
 
-    // 2. Normal Intake Routing via Coordinator
+    // 2. Run Clean Gemini 1.5 Flash Intake
     const decision = await callGeminiCoordinator(rawTranscript);
 
+    // If Google threw a real error, return it immediately so you know what's happening
+    if (decision.error) {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          id: Date.now(),
+          clientName: decision.clientName,
+          notes: decision.notes,
+          status: decision.status,
+          destination: decision.destination,
+          time: decision.time,
+          freshResponse: decision.freshResponse
+        })
+      };
+    }
+
+    // 3. Route to Correct Monday Group
     let targetGroup = GROUP_INTAKE;
     if (decision.destination === 'calendar') targetGroup = GROUP_CALENDAR;
     if (decision.destination === 'bench') targetGroup = GROUP_WORKBENCH;
@@ -224,6 +249,7 @@ exports.handler = async (event) => {
     const cleanCardTitle = decision.clientName || 'Direct Intake';
     const noteContent = decision.notes || rawTranscript;
 
+    // 4. Create Card & Attach Note
     const colValuesObj = {};
     colValuesObj[COL_LONG_TEXT] = { text: noteContent };
 
@@ -256,11 +282,12 @@ exports.handler = async (event) => {
         destination: decision.destination || 'intake',
         status: decision.status || 'intake',
         time: decision.time || 'Pending',
-        freshResponse: decision.freshResponse || `Card locked in for ${cleanCardTitle}!`
+        freshResponse: decision.freshResponse || `Card locked down for ${cleanCardTitle}!`
       })
     };
 
   } catch (error) {
+    console.error('[INTAKE HANDLER CRASH]', error);
     return {
       statusCode: 500,
       headers,
