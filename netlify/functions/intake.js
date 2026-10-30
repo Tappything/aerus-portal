@@ -1,109 +1,109 @@
 exports.handler = async (event) => {
-  const corsHeaders = {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*'
-  };
-
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 204,
-      headers: {
-        ...corsHeaders,
-        'Access-Control-Allow-Methods': 'POST,OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type'
-      },
-      body: ''
-    };
-  }
-
-  if (event.httpMethod !== 'POST') {
+  if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
-      headers: corsHeaders,
-      body: JSON.stringify({ error: 'Method Not Allowed' })
+      body: JSON.stringify({ ok: false, error: "Method Not Allowed" }),
     };
   }
 
   try {
-    const payload = event.body ? JSON.parse(event.body) : {};
-    const userMessage = (payload.body || payload.transcript || '').trim();
-    console.log('Received payload:', JSON.stringify(payload));
-    console.log('Body/transcript field:', userMessage);
-    console.log('API key present:', !!process.env.GEMINI_API_KEY);
+    const payload = JSON.parse(event.body || "{}");
+    const rawTranscript = (payload.transcript || "").trim();
 
-    if (!userMessage) {
-      return {
-        statusCode: 400,
-        headers: corsHeaders,
-        body: JSON.stringify({ error: 'Missing user message' })
-      };
-    }
+    // 1. Case-Insensitive Pattern Matching for Voice Transcripts
+    const nameMatch = rawTranscript.match(
+      /(?:customer|client|for|name is|this is)\s+([a-z]+(?:\s+[a-z]+)*)/i
+    );
+    const scheduleMatch = rawTranscript.match(
+      /\b(today|tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday|\d{1,2}:\d{2}\s*(?:am|pm)?|\d{1,2}\s*(?:am|pm))\b/i
+    );
 
-    const geminiApiKey = process.env.GEMINI_API_KEY;
-    const fallbackReply = "Got it — I'll take care of that right away.";
-    let reply = fallbackReply;
+    // 2. Dynamic Name Extraction (Handles lowercase speech cleanly)
+    let extractedName = (payload.clientName || "").trim();
 
-    if (geminiApiKey) {
-      const systemPrompt = "You are Fresh 🤵, the Digital Coordinator for TappyThing. You are warm, sharp, confident, and brief. Acknowledge the customer's request in 1-2 sentences max. Never mention Monday.com, Make.com, or any backend systems. Speak like a trusted concierge — always calm, always in control. After acknowledging, let them know it's been logged and someone will follow up.";
-      try {
-        const geminiResponse = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [
-                {
-                  role: 'user',
-                  parts: [{ text: `System: ${systemPrompt}\n\nCustomer message: ${userMessage}` }]
-                }
-              ]
-            })
-          }
-        );
-
-        if (geminiResponse.ok) {
-          const geminiData = await geminiResponse.json();
-          reply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || fallbackReply;
-        } else {
-          const errorText = await geminiResponse.text().catch(() => '');
-          console.error('Gemini API error:', geminiResponse.status, errorText);
-        }
-      } catch (geminiError) {
-        console.error('Gemini API call failed, using fallback reply:', geminiError);
-      }
-    } else {
-      console.error('Missing GEMINI_API_KEY environment variable');
-    }
-
-    // Forward original payload + Fresh reply to Make.com for Monday item creation
-    try {
-      const makeWebhookUrl = process.env.MAKE_WEBHOOK_URL;
-      if (makeWebhookUrl && typeof fetch === 'function') {
-        const makePayload = { ...payload, reply };
-        await fetch(makeWebhookUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(makePayload)
-        });
+    if (!extractedName || extractedName.toLowerCase() === "valued customer") {
+      if (nameMatch) {
+        extractedName = nameMatch[1].trim();
       } else {
-        console.error('Missing MAKE_WEBHOOK_URL or fetch unavailable');
+        // Strip common voice intake opening filler words
+        const cleanedWords = rawTranscript
+          .replace(/^(?:intake for|intake|repair for|job for|note for|service for)\s+/i, "")
+          .split(/\s+/)
+          .filter(Boolean);
+
+        if (cleanedWords.length >= 2) {
+          extractedName = `${cleanedWords[0]} ${cleanedWords[1]}`;
+        } else if (cleanedWords.length === 1) {
+          extractedName = cleanedWords[0];
+        } else {
+          extractedName = "New Service Lead";
+        }
       }
-    } catch (makeError) {
-      console.error('Make.com forward failed:', makeError);
+    }
+
+    // Clean punctuation and title-case the resolved name
+    const finalClientName = extractedName
+      .replace(/[^a-zA-Z\s]/g, "")
+      .trim()
+      .split(/\s+/)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+
+    // 3. Direct Board Write (Persists card to command hub)
+    const boardId = 18424728273;
+    const groupId = "group_mm6b77as";
+
+    const query = `
+      mutation createIntakeItem($boardId: ID!, $groupId: String!, $itemName: String!, $columnValues: JSON!) {
+        create_item(board_id: $boardId, group_id: $groupId, item_name: $itemName, column_values: $columnValues) {
+          id
+        }
+      }
+    `;
+
+    const variables = {
+      boardId: boardId,
+      groupId: groupId,
+      itemName: finalClientName,
+      columnValues: JSON.stringify({
+        long_text_mm5vbykc: { text: rawTranscript },
+      }),
+    };
+
+    const response = await fetch("https://api.monday.com/v2", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: process.env.MONDAY_API_TOKEN,
+      },
+      body: JSON.stringify({ query, variables }),
+    });
+
+    const result = await response.json();
+
+    if (result.errors) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ ok: false, errors: result.errors }),
+      };
     }
 
     return {
       statusCode: 200,
-      headers: corsHeaders,
-      body: JSON.stringify({ reply })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ok: true,
+        itemId: result.data.create_item.id,
+        clientName: finalClientName,
+        notes: rawTranscript,
+        isScheduled: Boolean(scheduleMatch),
+        status: "intake",
+      }),
     };
-  } catch (error) {
-    console.error('Intake function error:', error);
+  } catch (err) {
     return {
       statusCode: 500,
-      headers: corsHeaders,
-      body: JSON.stringify({ error: 'Internal Server Error', message: error.message })
+      body: JSON.stringify({ ok: false, error: err.message }),
     };
   }
 };
