@@ -1,143 +1,95 @@
-exports.handler = async function(event, context) {
+exports.handler = async (event) => {
   const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Content-Type': 'application/json'
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Content-Type": "application/json"
   };
 
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 200, headers, body: "" };
   }
 
-  const fallbackFloor = {
-    pinball: [],
-    scheduled: []
-  };
-
-  const MONDAY_TOKEN = process.env.MONDAY_API_TOKEN;
-  const BOARD_ID = process.env.MONDAY_BOARD_ID || '18424728273';
-
-  if (!MONDAY_TOKEN) {
+  if (event.httpMethod !== "POST") {
     return {
-      statusCode: 200,
+      statusCode: 405,
       headers,
-      body: JSON.stringify(fallbackFloor)
+      body: JSON.stringify({ ok: false, error: "Method Not Allowed" }),
     };
   }
 
-  const query = `
-    query {
-      boards(ids: [${BOARD_ID}]) {
-        items_page(limit: 100) {
-          items {
-            id
-            name
-            group {
-              id
-              title
-            }
-            column_values {
-              id
-              text
-              value
-            }
-          }
-        }
+  try {
+    const payload = JSON.parse(event.body || "{}");
+    const rawTranscript = (payload.transcript || "").trim();
+    let clientName = (payload.clientName || "").trim();
+
+    // 1. NLP / Regex Extraction: Isolate customer name if defaulted or missing
+    if (!clientName || clientName.toLowerCase() === "valued customer" || clientName.toLowerCase() === "direct intake") {
+      const match = rawTranscript.match(/^(?:intake for\s+|customer\s+)?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/i);
+      if (match) {
+        clientName = match[1].trim();
+      } else {
+        clientName = "Valued Customer";
       }
     }
-  `;
 
-  try {
+    const notes = rawTranscript;
+    const boardId = 18424728273;
+    const groupId = "group_mm6b77as";
+
+    // 2. Direct GraphQL Mutation to Monday.com with exact column ID
+    const query = `
+      mutation createIntakeCard($boardId: ID!, $groupId: String!, $itemName: String!, $columnValues: JSON!) {
+        create_item(board_id: $boardId, group_id: $groupId, item_name: $itemName, column_values: $columnValues) {
+          id
+        }
+      }
+    `;
+
+    const variables = {
+      boardId: boardId,
+      groupId: groupId,
+      itemName: clientName,
+      columnValues: JSON.stringify({
+        long_text_mm5vbykc: { text: notes }
+      }),
+    };
+
     const response = await fetch("https://api.monday.com/v2", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": MONDAY_TOKEN,
-        "API-Version": "2024-01"
+        Authorization: process.env.MONDAY_API_TOKEN,
       },
-      body: JSON.stringify({ query })
+      body: JSON.stringify({ query, variables }),
     });
 
-    const data = await response.json();
-    const rawItems = data?.data?.boards?.[0]?.items_page?.items || [];
+    const result = await response.json();
 
-    const pinball = [];
-    const scheduled = [];
-
-    rawItems.forEach(item => {
-      const groupTitle = (item.group?.title || "").toLowerCase();
-      const groupId = item.group?.id || "";
-
-      // STRICT RULE: Ignore Archive and Trash completely
-      if (groupId === 'group_mm6xs2fx' || groupTitle.includes('archive') || groupTitle.includes('trash')) {
-        return;
-      }
-
-      const clientName = item.name ? item.name.trim() : "Valued Customer";
-      let textNote = "";
-      let phone = "";
-      let address = "";
-      let status = "intake";
-      let time = "In Shop";
-      let isScheduled = false;
-
-      (item.column_values || []).forEach(col => {
-        const lowerId = (col.id || "").toLowerCase();
-        const lowerText = (col.text || "").toLowerCase();
-
-        if (lowerId.includes("text") || lowerId.includes("note") || lowerId.includes("desc")) {
-          if (col.text) textNote = col.text.trim();
-        } else if (lowerId.includes("phone") || lowerId.includes("cell") || lowerId.includes("contact")) {
-          if (col.text) phone = col.text.trim();
-        } else if (lowerId.includes("address") || lowerId.includes("location")) {
-          if (col.text) address = col.text.trim();
-        } else if (lowerId.includes("status") || lowerId.includes("lane")) {
-          if (lowerText.includes("bench") || lowerText.includes("workbench")) status = "bench";
-          else if (lowerText.includes("part")) status = "parts";
-          else if (lowerText.includes("ready")) status = "ready";
-          else status = "intake";
-        } else if (lowerId.includes("date") || lowerId.includes("time") || lowerId.includes("schedule")) {
-          if (col.text) {
-            time = col.text.trim();
-            isScheduled = true;
-          }
-        }
-      });
-
-      const card = {
-        id: item.id,
-        clientName: clientName,
-        text: textNote || clientName,
-        phone: phone,
-        address: address,
-        status: status,
-        time: time,
-        timestamp: "Active",
-        lineItems: [
-          { desc: textNote || "Service Diagnostic & Labor", qty: 1, price: 50.00, isTaxable: false }
-        ],
-        totalAmount: 50.00
+    if (result.errors) {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ ok: false, errors: result.errors, fallbackClient: clientName }),
       };
-
-      if (isScheduled || groupTitle.includes("calendar") || groupTitle.includes("schedule")) {
-        scheduled.push(card);
-      } else {
-        pinball.push(card);
-      }
-    });
+    }
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ pinball, scheduled })
+      body: JSON.stringify({
+        ok: true,
+        itemId: result.data?.create_item?.id || Date.now().toString(),
+        clientName: clientName,
+        notes: notes,
+        status: "intake",
+      }),
     };
-
   } catch (err) {
     return {
-      statusCode: 200,
+      statusCode: 500,
       headers,
-      body: JSON.stringify(fallbackFloor)
+      body: JSON.stringify({ ok: false, error: err.message }),
     };
   }
 };
