@@ -1,7 +1,7 @@
 /**
  * Netlify Serverless Function: /.netlify/functions/intake
  * Role: Fresh 🤵 Autonomous Digital Coordinator Brain
- * Engine: Standard Gemini 1.5 Flash -> Monday.com GraphQL Mutations
+ * Engine: Gemini 1.5 Flash Latest -> Monday.com GraphQL Mutations
  */
 
 const https = require('https');
@@ -92,7 +92,7 @@ Return pure JSON only:`;
       }
     });
 
-    const url = new URL(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`);
+    const url = new URL(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`);
 
     const req = https.request({
       hostname: url.hostname,
@@ -221,10 +221,9 @@ exports.handler = async (event) => {
       };
     }
 
-    // 2. Run Clean Gemini 1.5 Flash Intake
+    // 2. Run Clean Gemini 1.5 Flash Latest Intake
     const decision = await callGeminiCoordinator(rawTranscript);
 
-    // If Google threw a real error, return it immediately so you know what's happening
     if (decision.error) {
       return {
         statusCode: 200,
