@@ -1,7 +1,7 @@
 /**
  * Netlify Serverless Function: /.netlify/functions/intake
  * Role: Fresh 🤵 Autonomous Digital Coordinator Brain
- * Engine: Gemini 2.5 Flash (v1beta) -> Monday.com GraphQL Mutations
+ * Engine: Gemini 3.8 Flash (v1beta) -> Monday.com GraphQL Mutations
  */
 
 const https = require('https');
@@ -74,7 +74,7 @@ Analyze this voice note from William:
 "${transcript}"
 
 Extract into JSON:
-- clientName: Customer full name or honorific + last name only (e.g. "Mrs. Donley", "Fuji San", "Cindy"). Strip trailing time/day words.
+- clientName: Customer full name or honorific + last name only (e.g. "Tom Amann", "Mrs. Donley", "Fuji San", "Cindy"). Strip trailing time/day words.
 - equipment: Item or issue mentioned (e.g. "Vacuum", "Filter", "Guardian Air").
 - notes: Full details of the job.
 - destination: "calendar" (if date/time/pickup mentioned), "bench" (if shop repair/diagnostic), or "intake" (counter drop-off).
@@ -92,7 +92,7 @@ Return pure JSON only:`;
       }
     });
 
-    const url = new URL(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`);
+    const url = new URL(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${GEMINI_API_KEY}`);
 
     const req = https.request({
       hostname: url.hostname,
@@ -221,7 +221,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // 2. Run Clean Gemini 2.5 Flash Intake
+    // 2. Run Gemini 3.8 Flash Intake
     const decision = await callGeminiCoordinator(rawTranscript);
 
     if (decision.error) {
@@ -240,7 +240,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // 3. Route to Correct Monday Group
+    // 3. Route to Target Monday Group
     let targetGroup = GROUP_INTAKE;
     if (decision.destination === 'calendar') targetGroup = GROUP_CALENDAR;
     if (decision.destination === 'bench') targetGroup = GROUP_WORKBENCH;
