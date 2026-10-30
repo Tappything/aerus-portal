@@ -10,24 +10,8 @@ exports.handler = async function(event, context) {
     return { statusCode: 200, headers, body: '' };
   }
 
-  // Generic multi-tenant failsafe queue if token or network is unavailable
   const fallbackFloor = {
-    pinball: [
-      {
-        id: 'DEMO-101',
-        clientName: "Valued Customer",
-        text: "Sample intake assessment and equipment checkup.",
-        phone: "",
-        address: "On File",
-        status: "intake",
-        time: "In Shop",
-        timestamp: "Active",
-        lineItems: [
-          { desc: "Standard Equipment Diagnostic & Labor", qty: 1, price: 50.00, isTaxable: false }
-        ],
-        totalAmount: 50.00
-      }
-    ],
+    pinball: [],
     scheduled: []
   };
 
@@ -45,11 +29,12 @@ exports.handler = async function(event, context) {
   const query = `
     query {
       boards(ids: [${BOARD_ID}]) {
-        items_page(limit: 50) {
+        items_page(limit: 100) {
           items {
             id
             name
             group {
+              id
               title
             }
             column_values {
@@ -75,16 +60,20 @@ exports.handler = async function(event, context) {
     });
 
     const data = await response.json();
-    const rawItems = data?.data?.boards?.[0]?.items_page?.items;
-
-    if (!rawItems || rawItems.length === 0) {
-      return { statusCode: 200, headers, body: JSON.stringify(fallbackFloor) };
-    }
+    const rawItems = data?.data?.boards?.[0]?.items_page?.items || [];
 
     const pinball = [];
     const scheduled = [];
 
     rawItems.forEach(item => {
+      const groupTitle = (item.group?.title || "").toLowerCase();
+      const groupId = item.group?.id || "";
+
+      // STRICT RULE: Ignore Archive and Trash completely
+      if (groupId === 'group_mm6xs2fx' || groupTitle.includes('archive') || groupTitle.includes('trash')) {
+        return;
+      }
+
       const clientName = item.name ? item.name.trim() : "Valued Customer";
       let textNote = "";
       let phone = "";
@@ -104,7 +93,7 @@ exports.handler = async function(event, context) {
         } else if (lowerId.includes("address") || lowerId.includes("location")) {
           if (col.text) address = col.text.trim();
         } else if (lowerId.includes("status") || lowerId.includes("lane")) {
-          if (lowerText.includes("bench")) status = "bench";
+          if (lowerText.includes("bench") || lowerText.includes("workbench")) status = "bench";
           else if (lowerText.includes("part")) status = "parts";
           else if (lowerText.includes("ready")) status = "ready";
           else status = "intake";
@@ -131,7 +120,7 @@ exports.handler = async function(event, context) {
         totalAmount: 50.00
       };
 
-      if (isScheduled || (item.group?.title && item.group.title.toLowerCase().includes("schedule"))) {
+      if (isScheduled || groupTitle.includes("calendar") || groupTitle.includes("schedule")) {
         scheduled.push(card);
       } else {
         pinball.push(card);
