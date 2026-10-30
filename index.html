@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Digital Coordinator Workstation • TappyThing™</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -222,10 +221,11 @@
     </div>
   </header>
 
+  <!-- 2-WAY INTERACTIVE THREAD (FOLLOW-UPS & CONVERSATION) -->
   <div id="conversation-thread" class="hidden bg-cardbg border border-gold rounded-2xl p-4 shadow-md flex flex-col gap-3 transition-all">
     <div class="flex justify-between items-center border-b border-bordercolor pb-1.5">
       <span class="text-xs font-bold text-forest uppercase tracking-wider flex items-center gap-1.5">
-        <span>💬</span> <span>2-Way Forever Card Thread</span>
+        <span>💬</span> <span>Fresh 2-Way Coordinator</span>
       </span>
       <span class="text-[10px] text-muted font-bold" id="thread-time">Just now</span>
     </div>
@@ -234,7 +234,7 @@
 
   <div id="status-banner" class="hidden bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs px-4 py-2 rounded-xl font-bold transition text-center"></div>
 
-  <!-- TWO-COLUMN FLOOR -->
+  <!-- TWO-COLUMN WORKSTATION FLOOR -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
     <div class="flex flex-col gap-2">
       <div class="text-xs font-extrabold uppercase tracking-widest text-muted flex items-center gap-2">
@@ -251,7 +251,7 @@
         <button onclick="fetchInboundCards(true)" class="text-[10px] font-bold text-forest hover:underline cursor-pointer">🔄 Sync Cards</button>
       </div>
 
-      <!-- EXPANDED 7-DRAWER PINBALL ACTION ZONE -->
+      <!-- 7-SLOT PINBALL DRAWERS (WITH 🚗 FIELD / ROUTE) -->
       <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
         <button onclick="setPinballFilter('all')" id="filter-pill-all" class="px-2.5 py-1 bg-forest text-white font-bold text-[10px] rounded-lg shadow-sm whitespace-nowrap active:scale-95 cursor-pointer transition">All</button>
         <button onclick="setPinballFilter('intake')" id="filter-pill-intake" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">📥 Intake</button>
@@ -259,7 +259,7 @@
         <button onclick="setPinballFilter('parts')" id="filter-pill-parts" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">🔩 Parts</button>
         <button onclick="setPinballFilter('ready')" id="filter-pill-ready" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">🔧 Ready Wall</button>
         <button onclick="setPinballFilter('leadgen')" id="filter-pill-leadgen" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">🎯 Lead Gen</button>
-        <button onclick="setPinballFilter('calendar')" id="filter-pill-calendar" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">📅 Calendar</button>
+        <button onclick="setPinballFilter('route')" id="filter-pill-route" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">🚗 Field / Route</button>
         <button onclick="setPinballFilter('custom')" id="filter-pill-custom" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">⚡ Custom</button>
       </div>
 
@@ -307,7 +307,7 @@
           🔵 Move to Bench
         </button>
         <button type="button" onclick="updateActiveCardStatus('parts')" id="btn-lane-parts" class="py-1.5 px-2 bg-parchment border border-bordercolor rounded-lg text-[10px] font-bold text-amber-700 hover:bg-amber-50 transition active:scale-95 cursor-pointer flex items-center justify-center gap-1">
-          🟡 Staging Parts
+          🔩 Staging Parts
         </button>
         <button type="button" onclick="updateActiveCardStatus('ready')" id="btn-lane-ready" class="py-1.5 px-2 bg-parchment border border-bordercolor rounded-lg text-[10px] font-bold text-emerald-700 hover:bg-emerald-50 transition active:scale-95 cursor-pointer flex items-center justify-center gap-1">
           🟢 Ready for Wall
@@ -321,7 +321,7 @@
           <div class="w-5 h-5 rounded-full border border-gold overflow-hidden">
             <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';">
           </div>
-          <span>Verified Customer Record</span>
+          <span>Customer Card Details</span>
         </span>
         <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">● Active Record</span>
       </div>
@@ -583,8 +583,6 @@
     stripePaymentUrl: "https://buy.stripe.com/28E6oBd8H8hEgRHgoDc3m01"
   };
 
-  let vaultData = [];
-  let catalogData = [];
   let activeCardId = null;
   let activeCardType = null;
   let isListening = false;
@@ -611,7 +609,7 @@
     parts: { label: 'Parts Needed', badgeClass: 'bg-amber-100 text-amber-800 border-amber-300', dot: '🔩' },
     ready: { label: 'Ready Wall', badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-300', dot: '🟢' },
     leadgen: { label: 'Lead Gen', badgeClass: 'bg-purple-100 text-purple-800 border-purple-300', dot: '🎯' },
-    calendar: { label: 'Calendar', badgeClass: 'bg-sky-100 text-sky-800 border-sky-300', dot: '📅' },
+    route: { label: 'Field / Route', badgeClass: 'bg-sky-100 text-sky-800 border-sky-300', dot: '🚗' },
     custom: { label: 'Custom', badgeClass: 'bg-indigo-100 text-indigo-800 border-indigo-300', dot: '⚡' }
   };
 
@@ -623,7 +621,7 @@
 
   function setPinballFilter(filterKey) {
     activePinballFilter = filterKey;
-    const filterKeys = ['all', 'intake', 'bench', 'parts', 'ready', 'leadgen', 'calendar', 'custom'];
+    const filterKeys = ['all', 'intake', 'bench', 'parts', 'ready', 'leadgen', 'route', 'custom'];
     filterKeys.forEach(k => {
       const btn = document.getElementById(`filter-pill-${k}`);
       if (!btn) return;
@@ -834,151 +832,6 @@
     if (!isPublicMode) fetchInboundCards(false);
   });
 
-  Papa.parse(encodeURI('export_export (34).csv'), {
-    download: true,
-    header: true,
-    skipEmptyLines: true,
-    complete: function(results) {
-      if (results && results.data && results.data.length > 0) {
-        vaultData = results.data;
-      }
-      if (isPublicMode && urlParams.has('card')) {
-        const matches = findAllVaultMatches(urlParams.get('card'));
-        if (matches.length > 0) {
-          const addr = formatRowAddress(matches[0]);
-          const addrEl = document.getElementById('pub-inv-address');
-          if (addrEl) addrEl.innerText = addr;
-        }
-      }
-      if (!isPublicMode) {
-        reconcileActiveCardsFromVault();
-        fetchInboundCards(false);
-      }
-    }
-  });
-
-  Papa.parse(encodeURI('export_export (35).csv'), {
-    download: true,
-    header: true,
-    skipEmptyLines: true,
-    complete: function(results) {
-      if (results && results.data && results.data.length > 0) {
-        catalogData = results.data;
-      }
-    }
-  });
-
-  // Clean Name Parsing: Preserves honorifics, strips trailing schedule terms
-  function cleanExtractedName(rawName) {
-    if (!rawName) return "";
-    let cleaned = rawName.trim();
-    cleaned = cleaned.replace(/^(?:who\s+is|what\s+about|check\s+on|schedule|note\s+for)\s+/i, '');
-    const scheduleWords = [
-      'today', 'tomorrow', 'tonight', 'yesterday', 'morning', 'afternoon', 'evening',
-      'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
-      'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'
-    ];
-    let tokens = cleaned.split(/\s+/);
-    while (tokens.length > 1) {
-      const lastToken = tokens[tokens.length - 1].toLowerCase().replace(/[^a-z]/g, '');
-      if (scheduleWords.includes(lastToken)) {
-        tokens.pop();
-      } else {
-        break;
-      }
-    }
-    cleaned = tokens.join(' ');
-    return cleaned.replace(/\s+/g, ' ').trim();
-  }
-
-  function findAllVaultMatches(clientName) {
-    if (!vaultData || vaultData.length === 0 || !clientName) return [];
-    const normalizedName = cleanExtractedName(clientName);
-    if (!normalizedName || normalizedName === "Direct Intake" || normalizedName === "Subscriber Note" || normalizedName === "Inbound Customer Request" || normalizedName === "Valued Customer") {
-      return [];
-    }
-
-    const target = normalizedName.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
-    const targetParts = target.split(/\s+/).filter(p => p.length >= 2 && !['mrs', 'mr', 'ms', 'dr', 'prof'].includes(p));
-
-    return vaultData.filter(row => {
-      const fullName = (
-        row['Name'] || row['Customer Name'] || row['Client Name'] || row['Full Name'] ||
-        `${row['First Name'] || row['First name'] || ''} ${row['Last Name'] || row['Last name'] || ''}`
-      ).trim().toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
-
-      if (!fullName || fullName.length < 3) return false;
-      if (fullName === target) return true;
-
-      if (targetParts.length >= 2) {
-        return targetParts.every(part => fullName.includes(part));
-      }
-
-      if (targetParts.length === 1 && targetParts[0].length >= 4) {
-        const rowTokens = fullName.split(/\s+/);
-        return rowTokens.includes(targetParts[0]);
-      }
-
-      return false;
-    });
-  }
-
-  function formatRowAddress(row) {
-    if (!row) return FALLBACK_CUSTOMER_ADDRESS;
-    const street = row['Address'] || row['Street'] || row['Street Address'] || row['Address 1'] || row['Billing Address'] || row['Service Address'] || row['Location'] || '';
-    const city = row['City'] || '';
-    const state = row['State'] || '';
-    const zip = row['Zip'] || row['Postal Code'] || '';
-    const combined = [street, city, state, zip].filter(Boolean).join(', ');
-    return combined || street || row['Full Address'] || FALLBACK_CUSTOMER_ADDRESS;
-  }
-
-  function formatRowPhone(row) {
-    if (!row) return FALLBACK_CUSTOMER_PHONE;
-    return row['Phone'] || row['Phone Number'] || row['Mobile'] || row['Mobile Phone'] || row['Cell'] || row['Primary Phone'] || row['Phone 1'] || FALLBACK_CUSTOMER_PHONE;
-  }
-
-  function formatRowEmail(row) {
-    if (!row) return '';
-    return row['Email'] || row['Customer Email'] || row['Client Email'] || row['E-mail'] || '';
-  }
-
-  function reconcileActiveCardsFromVault() {
-    const store = getStorage();
-    let hasChanges = false;
-
-    const reconcileList = (list) => {
-      list.forEach(card => {
-        if (!card.clientName || card.clientName === SUBSCRIBER_CONFIG.businessName) return;
-        const matches = findAllVaultMatches(card.clientName);
-        if (matches.length > 0) {
-          const realAddr = formatRowAddress(matches[0]);
-          const realPhone = formatRowPhone(matches[0]);
-          if (card.address !== realAddr || card.phone !== realPhone) {
-            card.address = realAddr;
-            card.phone = realPhone;
-            card.allAddresses = [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))];
-            hasChanges = true;
-          }
-        }
-      });
-    };
-
-    reconcileList(store.scheduledCards);
-    reconcileList(store.pinballQueue);
-
-    if (hasChanges) {
-      saveStorage(store);
-      render();
-    }
-  }
-
-  // Mute Audio Talk-Back: TTS completely disabled across status and intake updates
-  function speakAudibly(text) {
-    // Zero TTS voice playback
-    return;
-  }
-
   function toggleVoiceIntake() {
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRec) {
@@ -1035,7 +888,7 @@
         }
 
         if (isFinalResult && liveText.trim().length > 2) {
-          handleVoiceIntake(liveText.trim());
+          handleChassisIntake(liveText.trim());
         }
       };
 
@@ -1065,7 +918,7 @@
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
       const isVideo = file.type.startsWith('video');
-      showStatus(isVideo ? "🎥 Video clip captured! Tap microphone to describe note." : "📷 Photo captured! Tap microphone to describe note.");
+      showStatus(isVideo ? "🎥 Video captured! Tap microphone to describe note." : "📷 Photo captured! Tap microphone to describe note.");
       setTimeout(() => { toggleVoiceIntake(); }, 800);
     }
   }
@@ -1075,7 +928,7 @@
     if (!input) return;
     const val = input.value.trim();
     if (val) {
-      handleVoiceIntake(val);
+      handleChassisIntake(val);
       input.value = '';
       autoGrowTextarea(input);
     }
@@ -1100,7 +953,7 @@
     if (!box) return;
     const val = box.value.trim();
     if (val) {
-      handleVoiceIntake(val);
+      handleChassisIntake(val);
       box.value = '';
       autoGrowTextarea(box);
     }
@@ -1111,7 +964,7 @@
       e.preventDefault();
       const val = e.target.value.trim();
       if (val) {
-        handleVoiceIntake(val);
+        handleChassisIntake(val);
         e.target.value = '';
         autoGrowTextarea(e.target);
       }
@@ -1128,7 +981,6 @@
     }
   }
 
-  // Silent visual status banner (no TTS audio)
   function showStatus(msg) {
     if (isPublicMode) return;
     const b = document.getElementById('status-banner');
@@ -1138,6 +990,7 @@
     setTimeout(() => b.classList.add('hidden'), 4000);
   }
 
+  // 2-Way Conversational Thread (Fresh prompts and follow-ups)
   function updateFreshConsole(responseText, userPrompt) {
     if (isPublicMode) {
       const publicThread = document.getElementById('public-thread');
@@ -1192,7 +1045,7 @@
     if (autoFadeTimer) clearTimeout(autoFadeTimer);
     autoFadeTimer = setTimeout(() => {
       if (threadBox) threadBox.classList.add('hidden');
-    }, 10000);
+    }, 12000);
   }
 
   function openWorkstation() {
@@ -1317,7 +1170,55 @@
     }
   }
 
-  // Fetch and lock cards persistent on screen without clearing UI
+  // Pure Chassis Intake: Sends raw transcript to backend engine, renders exact returned card
+  function handleChassisIntake(rawText) {
+    showStatus("⚡ FRESH: Organizing your note...");
+
+    fetch(INTAKE_ROUTING_HOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transcript: rawText, timestamp: new Date().toISOString() })
+    })
+    .then(async res => {
+      const rawRes = await res.text();
+      return cleanAndParseJSON(rawRes);
+    })
+    .then(data => {
+      const clientName = data.clientName || "Direct Intake";
+      const freshReply = data.freshResponse || data.sissyResponse || `Recorded for ${clientName}.`;
+      updateFreshConsole(freshReply, rawText);
+
+      const store = getStorage();
+      const newCard = {
+        id: data.id || Date.now(),
+        externalId: data.id || null,
+        text: data.notes || rawText,
+        clientName: clientName,
+        address: data.address || FALLBACK_CUSTOMER_ADDRESS,
+        allAddresses: data.allAddresses || [data.address || FALLBACK_CUSTOMER_ADDRESS],
+        phone: data.phone || FALLBACK_CUSTOMER_PHONE,
+        status: data.status || 'intake',
+        time: data.time || "Pending",
+        destination: data.destination || (data.time && data.time !== 'Pending' ? 'schedule' : 'pinball'),
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        lineItems: data.lineItems || [{ desc: data.notes || rawText, qty: 1, price: 50.00, isTaxable: false }],
+        totalAmount: data.totalAmount || 50.00
+      };
+
+      if (newCard.destination === 'schedule' || (newCard.time && newCard.time.toLowerCase().includes('am') || newCard.time.toLowerCase().includes('pm'))) {
+        store.scheduledCards.unshift(newCard);
+      } else {
+        store.pinballQueue.unshift(newCard);
+      }
+
+      saveStorage(store);
+      render();
+    })
+    .catch(err => {
+      showStatus(`⚠️ Intake synced locally.`);
+    });
+  }
+
   function fetchInboundCards(userTriggered) {
     if (isPublicMode) return;
     if (userTriggered) showStatus('⚡ Syncing live shop floor...');
@@ -1347,26 +1248,19 @@
 
       if (incomingItems.length > 0) {
         incomingItems.forEach(inbound => {
-          let clientName = cleanExtractedName(inbound.name || inbound.clientName || "Valued Customer");
-          const textMsg = inbound.text || inbound.note || "Service Intake";
-          const matches = findAllVaultMatches(clientName);
-
-          const resolvedAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (inbound.address || FALLBACK_CUSTOMER_ADDRESS);
-          const resolvedPhone = matches.length > 0 ? formatRowPhone(matches[0]) : (inbound.phone || FALLBACK_CUSTOMER_PHONE);
-
-          const existingIdx = store.pinballQueue.findIndex(c => c.externalId && c.externalId === inbound.id);
+          const existingIdx = store.pinballQueue.findIndex(c => (c.externalId && c.externalId === inbound.id) || c.id === inbound.id);
           const itemPayload = {
             id: inbound.id || Date.now() + Math.floor(Math.random() * 1000),
             externalId: inbound.id || null,
-            text: textMsg,
-            clientName: clientName,
-            address: resolvedAddress,
-            allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [resolvedAddress],
-            phone: resolvedPhone,
+            text: inbound.text || inbound.note || "Service Intake",
+            clientName: inbound.name || inbound.clientName || "Valued Customer",
+            address: inbound.address || FALLBACK_CUSTOMER_ADDRESS,
+            allAddresses: inbound.allAddresses || [inbound.address || FALLBACK_CUSTOMER_ADDRESS],
+            phone: inbound.phone || FALLBACK_CUSTOMER_PHONE,
             status: inbound.status || 'intake',
             time: inbound.time || "In Shop",
             timestamp: inbound.timestamp || "Active",
-            lineItems: inbound.lineItems || [{ desc: textMsg, qty: 1, price: 50.00, isTaxable: false }],
+            lineItems: inbound.lineItems || [{ desc: inbound.text || "Diagnostic", qty: 1, price: 50.00, isTaxable: false }],
             totalAmount: inbound.totalAmount || 50.00
           };
 
@@ -1380,26 +1274,19 @@
 
       if (incomingScheduled.length > 0) {
         incomingScheduled.forEach(sched => {
-          let clientName = cleanExtractedName(sched.name || sched.clientName || "Scheduled Customer");
-          const textMsg = sched.text || sched.note || "Scheduled appointment";
-          const matches = findAllVaultMatches(clientName);
-
-          const resolvedAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (sched.address || FALLBACK_CUSTOMER_ADDRESS);
-          const resolvedPhone = matches.length > 0 ? formatRowPhone(matches[0]) : (sched.phone || FALLBACK_CUSTOMER_PHONE);
-
-          const existingIdx = store.scheduledCards.findIndex(c => c.externalId && c.externalId === sched.id);
+          const existingIdx = store.scheduledCards.findIndex(c => (c.externalId && c.externalId === sched.id) || c.id === sched.id);
           const itemPayload = {
             id: sched.id || Date.now() + Math.floor(Math.random() * 1000),
             externalId: sched.id || null,
-            text: textMsg,
-            clientName: clientName,
-            address: resolvedAddress,
-            allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [resolvedAddress],
-            phone: resolvedPhone,
-            status: sched.status || 'intake',
+            text: sched.text || sched.note || "Scheduled appointment",
+            clientName: sched.name || sched.clientName || "Scheduled Customer",
+            address: sched.address || FALLBACK_CUSTOMER_ADDRESS,
+            allAddresses: sched.allAddresses || [sched.address || FALLBACK_CUSTOMER_ADDRESS],
+            phone: sched.phone || FALLBACK_CUSTOMER_PHONE,
+            status: sched.status || 'route',
             time: sched.time || "Scheduled",
             timestamp: sched.timestamp || "Active",
-            lineItems: sched.lineItems || [{ desc: textMsg, qty: 1, price: 50.00, isTaxable: false }],
+            lineItems: sched.lineItems || [{ desc: sched.text || "Service", qty: 1, price: 50.00, isTaxable: false }],
             totalAmount: sched.totalAmount || 50.00
           };
 
@@ -1416,150 +1303,53 @@
       if (userTriggered) showStatus("⚡ Shop floor synced!");
     })
     .catch(err => {
-      if (userTriggered) showStatus("⚡ Active floor running locally.");
+      if (userTriggered) showStatus("⚡ Floor running locally.");
     });
   }
 
-  function handleVoiceIntake(text) {
-    showStatus("⚡ FRESH: Organizing your note...");
-    const cleanedTranscript = text.replace(/\b([a-zA-Z])\s+(?=[a-zA-Z]\b)/g, '$1').trim();
-    let detectedClient = null;
-    const cleanSpoken = cleanedTranscript.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
-
-    if (vaultData && vaultData.length > 0) {
-      for (let row of vaultData) {
-        const rawName = (row['Name'] || `${row['First name'] || ''} ${row['Last name'] || ''}`).trim();
-        const lowerName = rawName.toLowerCase();
-        const parts = lowerName.split(/\s+/).filter(p => p.length >= 2);
-
-        if (cleanSpoken.includes(lowerName) || (parts.length >= 2 && parts.every(part => cleanSpoken.includes(part)))) {
-          detectedClient = row;
-          break;
-        }
-      }
-    }
-
-    const isShopInternal = cleanSpoken.includes("shop note") || cleanSpoken.includes("internal");
-    let initialName = detectedClient ? (detectedClient['Name'] || "Valued Customer") : "";
-    if (!initialName && !isShopInternal) {
-      const words = cleanedTranscript.trim().split(/\s+/);
-      initialName = cleanExtractedName(words.slice(0, 2).join(' '));
-    } else if (isShopInternal) {
-      initialName = SUBSCRIBER_CONFIG.businessName;
-    }
-
-    // Immediately persist and render locally to prevent disappearing/flashing cards
-    const localStore = getStorage();
-    const finalAddress = detectedClient ? formatRowAddress(detectedClient) : (isShopInternal ? SUBSCRIBER_CONFIG.address : FALLBACK_CUSTOMER_ADDRESS);
-    const finalPhone = detectedClient ? formatRowPhone(detectedClient) : (isShopInternal ? SUBSCRIBER_CONFIG.phone : FALLBACK_CUSTOMER_PHONE);
-
-    const localCard = {
-      id: Date.now(),
-      text: cleanedTranscript,
-      clientName: initialName || "Inbound Intake",
-      address: finalAddress,
-      allAddresses: [finalAddress],
-      phone: finalPhone,
-      status: 'intake',
-      time: "Time Pending",
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      lineItems: [{ desc: cleanedTranscript, qty: 1, price: 50.00, isTaxable: false }],
-      totalAmount: 50.00
-    };
-
-    localStore.pinballQueue.unshift(localCard);
-    saveStorage(localStore);
-    render();
-
-    fetch(INTAKE_ROUTING_HOOK, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ transcript: cleanedTranscript, clientName: initialName, timestamp: new Date().toISOString() })
-    })
-    .then(async res => {
-      const rawText = await res.text();
-      return cleanAndParseJSON(rawText);
-    })
-    .then(data => {
-      let clientName = cleanExtractedName(data.clientName || initialName || (isShopInternal ? SUBSCRIBER_CONFIG.businessName : "Inbound Intake"));
-      let freshReply = data.freshResponse || data.sissyResponse || `Got it! Note recorded for ${clientName}.`;
-      updateFreshConsole(freshReply, cleanedTranscript);
-
-      const store = getStorage();
-      const targetCard = store.pinballQueue.find(c => c.id === localCard.id);
-      if (targetCard) {
-        targetCard.clientName = clientName;
-        targetCard.text = data.notes || targetCard.text;
-        targetCard.status = data.status || targetCard.status;
-        targetCard.time = data.time || targetCard.time;
-        saveStorage(store);
-        render();
-      }
-      setTimeout(() => fetchInboundCards(false), 800);
-    })
-    .catch(err => {
-      showStatus(`⚡ Note locked on board.`);
-    });
-  }
-
-  function openCustomerCard(text, clientName, address, phone, cardId, cardType) {
+  // Lookup by ID only — quotes in notes never break button clicks
+  function openCustomerCard(cardId) {
     if (isPublicMode) return;
-    activeCardId = cardId;
-    activeCardType = cardType;
     const store = getStorage();
     const allCards = [...store.scheduledCards, ...store.pinballQueue];
-    const card = allCards.find(c => c.id === cardId);
+    const card = allCards.find(c => String(c.id) === String(cardId));
+    if (!card) return;
 
-    const displayClientName = (clientName && clientName.trim() !== '' && clientName !== 'undefined') ? cleanExtractedName(clientName.trim()) : "Valued Customer";
+    activeCardId = card.id;
+    activeCardType = store.scheduledCards.some(c => c.id === card.id) ? 'calendar' : 'pinball';
 
-    let resolvedAddress = address;
-    let resolvedPhone = phone;
-    let allPropertyAddresses = [];
-
-    const matches = findAllVaultMatches(displayClientName);
-    if (matches.length > 0) {
-      resolvedAddress = formatRowAddress(matches[0]);
-      resolvedPhone = formatRowPhone(matches[0]);
-      allPropertyAddresses = [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))];
-      
-      if (card) {
-        card.address = resolvedAddress;
-        card.phone = resolvedPhone;
-        card.allAddresses = allPropertyAddresses;
-        saveStorage(store);
-        render();
-      }
-    }
+    const displayClientName = card.clientName || "Valued Customer";
 
     document.getElementById('drawer-title').innerText = `${displayClientName} — Workstation`;
     document.getElementById('vault-client-name').innerText = displayClientName;
-    document.getElementById('vault-client-address').innerText = resolvedAddress;
-    document.getElementById('vault-client-phone').innerText = resolvedPhone;
-    document.getElementById('active-card-note').innerText = `"${text}"`;
+    document.getElementById('vault-client-address').innerText = card.address || FALLBACK_CUSTOMER_ADDRESS;
+    document.getElementById('vault-client-phone').innerText = card.phone || FALLBACK_CUSTOMER_PHONE;
+    document.getElementById('active-card-note').innerText = `"${card.text}"`;
 
     const randomInvNum = 'INV-' + Math.floor(10000 + Math.random() * 90000);
     document.getElementById('invoice-doc-id').innerText = '#' + randomInvNum;
     document.getElementById('invoice-doc-date').innerText = 'Date: ' + new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
     document.getElementById('invoice-bill-name').innerText = displayClientName;
-    document.getElementById('invoice-bill-address').innerText = resolvedAddress;
-    document.getElementById('invoice-bill-phone').innerText = resolvedPhone;
+    document.getElementById('invoice-bill-address').innerText = card.address || FALLBACK_CUSTOMER_ADDRESS;
+    document.getElementById('invoice-bill-phone').innerText = card.phone || FALLBACK_CUSTOMER_PHONE;
 
-    if (card && card.lineItems && Array.isArray(card.lineItems) && card.lineItems.length > 0) {
+    if (card.lineItems && Array.isArray(card.lineItems) && card.lineItems.length > 0) {
       currentInvoiceItems = card.lineItems;
     } else {
-      currentInvoiceItems = [{ desc: text || "Service Diagnostic & Labor", qty: 1, price: 50.00, isTaxable: false }];
+      currentInvoiceItems = [{ desc: card.text || "Service Diagnostic & Labor", qty: 1, price: 50.00, isTaxable: false }];
     }
     
     renderInvoiceCanvas();
-    syncDrawerStatusButtons(card ? (card.status || 'intake') : 'intake');
+    syncDrawerStatusButtons(card.status || 'intake');
 
     const multiBox = document.getElementById('multi-address-container');
     const selector = document.getElementById('address-selector');
+    const addrs = card.allAddresses || [card.address];
 
-    if (allPropertyAddresses.length > 1) {
+    if (addrs.length > 1) {
       multiBox.classList.remove('hidden');
-      selector.innerHTML = allPropertyAddresses.map(addr => `
-        <option value="${addr}" ${addr === resolvedAddress ? 'selected' : ''}>${addr}</option>
+      selector.innerHTML = addrs.map(addr => `
+        <option value="${addr}" ${addr === card.address ? 'selected' : ''}>${addr}</option>
       `).join('');
     } else {
       multiBox.classList.add('hidden');
@@ -1675,13 +1465,9 @@
     const clientName = document.getElementById('vault-client-name').innerText;
     const totals = calculateInvoiceTotal();
     const invId = document.getElementById('invoice-doc-id').innerText.replace('#', '');
-    const matches = findAllVaultMatches(clientName);
-    let clientEmail = (matches.length > 0) ? formatRowEmail(matches[0]) : '';
-
-    if (!clientEmail) {
-      clientEmail = prompt(`No email on file for ${clientName}. Enter email address:`);
-      if (!clientEmail) return;
-    }
+    
+    let clientEmail = prompt(`Enter email address for ${clientName}:`);
+    if (!clientEmail) return;
 
     const cardInvoiceUrl = `${window.location.origin}${window.location.pathname}?card=${encodeURIComponent(clientName)}&inv=${encodeURIComponent(invId)}&amt=${totals.grandTotal.toFixed(2)}`;
     const itemSummary = currentInvoiceItems.map(i => `• ${i.desc} (Qty: ${i.qty || 1}) - $${((i.qty || 1) * (i.price || 0)).toFixed(2)}`).join('\n');
@@ -1791,6 +1577,7 @@
     return `<span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold border ${cfg.badgeClass}">${cfg.dot} ${cfg.label}</span>`;
   }
 
+  // Entire card is clickable cursor-pointer, opens by numeric ID
   function render() {
     if (isPublicMode) return;
     const store = getStorage();
@@ -1800,7 +1587,7 @@
         store.scheduledCards.map(item => {
           const statusBadge = getStatusBadgeHtml(item.status);
           return `
-          <div class="bg-white border-l-4 border-blue-600 border border-bordercolor rounded-xl p-3 flex flex-col justify-between shadow-sm">
+          <div onclick="openCustomerCard('${item.id}')" class="bg-white border-l-4 border-blue-600 border border-bordercolor rounded-xl p-3 flex flex-col justify-between shadow-sm cursor-pointer hover:bg-parchment transition">
             <div class="flex justify-between items-start gap-2">
               <div class="flex-1">
                 <div class="flex items-center gap-2 mb-1">
@@ -1812,7 +1599,7 @@
                 <div class="text-[10px] text-muted mt-0.5">${item.time || item.timestamp}</div>
               </div>
               <div class="flex gap-1.5 flex-shrink-0">
-                <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}', ${item.id}, 'calendar')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition active:scale-95 cursor-pointer">Open Card ➔</button>
+                <span class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold text-forest">Open Card ➔</span>
               </div>
             </div>
           </div>
@@ -1830,7 +1617,7 @@
         filteredQueue.map(item => {
           const statusBadge = getStatusBadgeHtml(item.status);
           return `
-          <div class="bg-white border-l-4 border-gold border border-bordercolor rounded-xl p-3 flex flex-col justify-between shadow-sm">
+          <div onclick="openCustomerCard('${item.id}')" class="bg-white border-l-4 border-gold border border-bordercolor rounded-xl p-3 flex flex-col justify-between shadow-sm cursor-pointer hover:bg-parchment transition">
             <div class="flex justify-between items-start gap-2">
               <div class="flex-1">
                 <div class="flex items-center gap-2 mb-1">
@@ -1841,7 +1628,7 @@
                 <div class="text-[10px] text-muted mt-0.5">Queued • ${item.timestamp}</div>
               </div>
               <div class="flex gap-1.5 flex-shrink-0">
-                <button onclick="openCustomerCard('${item.text.replace(/'/g, "\\'")}', '${item.clientName}', '${item.address}', '${item.phone}', ${item.id}, 'pinball')" class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold hover:bg-bordercolor transition active:scale-95 cursor-pointer">Open Card ➔</button>
+                <span class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold text-forest">Open Card ➔</span>
               </div>
             </div>
           </div>
