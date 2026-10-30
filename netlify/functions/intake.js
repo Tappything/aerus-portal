@@ -1,7 +1,7 @@
 /**
  * Netlify Serverless Function: /.netlify/functions/intake
  * Role: Fresh 🤵 Autonomous Digital Coordinator Brain
- * Engine: Gemini 1.5 Flash Stable (v1) -> Monday.com GraphQL Mutations
+ * Engine: Gemini 2.0 Flash (v1beta) -> Monday.com GraphQL Mutations
  */
 
 const https = require('https');
@@ -92,7 +92,7 @@ Return pure JSON only:`;
       }
     });
 
-    const url = new URL(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`);
+    const url = new URL(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`);
 
     const req = https.request({
       hostname: url.hostname,
@@ -221,7 +221,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // 2. Run Clean Gemini 1.5 Flash Stable (v1) Intake
+    // 2. Run Clean Gemini 2.0 Flash Intake
     const decision = await callGeminiCoordinator(rawTranscript);
 
     if (decision.error) {
