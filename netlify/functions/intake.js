@@ -2,6 +2,11 @@
  * Netlify Serverless Function: /.netlify/functions/intake
  * Role: Fresh 🤵 Autonomous Digital Coordinator Brain
  * Engine: Gemini 3.8 Flash (v1beta) -> Monday.com GraphQL Mutations
+ * Target Columns Populated:
+ *  - long_text_mm5vbykc : Intake Notes
+ *  - text_mm6aq4rg      : Customer Address
+ *  - text_mm6a7420      : Customer Phone
+ *  - date               : Target Scheduled Date (YYYY-MM-DD)
  */
 
 const https = require('https');
@@ -17,7 +22,11 @@ const GROUP_CALENDAR = 'group_mm7maw66';   // 📅 Calendar / Field / Route
 const GROUP_WORKBENCH = 'group_mm76qbbh';  // 🛠️ Bench / Shop Diagnostic
 const GROUP_ARCHIVE = 'group_mm6xs2fx';    // 📦 Archive
 
+// Monday Column IDs
 const COL_LONG_TEXT = 'long_text_mm5vbykc';
+const COL_ADDRESS = 'text_mm6aq4rg';
+const COL_PHONE = 'text_mm6a7420';
+const COL_DATE = 'date';
 
 function callMondayGraphQL(query, variables = {}) {
   return new Promise((resolve, reject) => {
@@ -62,24 +71,33 @@ function callGeminiCoordinator(transcript) {
         error: 'GEMINI_API_KEY is missing in Netlify environment variables.',
         clientName: 'Key Missing',
         notes: transcript,
+        address: '',
+        phone: '',
         destination: 'intake',
         status: 'intake',
         time: 'Pending',
+        targetDate: null,
         freshResponse: 'Coach, GEMINI_API_KEY is missing in your Netlify settings!'
       });
     }
 
+    const todayISO = new Date().toISOString().split('T')[0];
+
     const systemPrompt = `You are Fresh, the AI Digital Coordinator for William Sullivan at Aerus Home Wellness.
+Today's Date: ${todayISO}.
 Analyze this voice note from William:
 "${transcript}"
 
 Extract into JSON:
-- clientName: Customer full name or honorific + last name only (e.g. "Tom Amann", "Mrs. Donley", "Fuji San", "Cindy"). Strip trailing time/day words.
+- clientName: Customer full name or honorific + last name only (e.g. "Tom Amann", "Mrs. Donley", "Cindy Fuji San"). Strip trailing time/day words.
+- address: Customer address if mentioned or inferred, else empty string "".
+- phone: Customer phone number if mentioned, else empty string "".
 - equipment: Item or issue mentioned (e.g. "Vacuum", "Filter", "Guardian Air").
 - notes: Full details of the job.
 - destination: "calendar" (if date/time/pickup mentioned), "bench" (if shop repair/diagnostic), or "intake" (counter drop-off).
 - status: "intake" | "bench" | "parts" | "route".
 - time: Scheduled time if stated (e.g. "11:00 AM", "Noon"), else "Pending".
+- targetDate: Target date in YYYY-MM-DD format if scheduled (e.g. today or tomorrow or specific date), else null.
 - freshResponse: Direct, motivating 1-sentence confirmation. If an appointment is missing an exact time, ask William directly.
 
 Return pure JSON only:`;
@@ -114,9 +132,12 @@ Return pure JSON only:`;
               error: parsed.error.message,
               clientName: 'Gemini Error',
               notes: transcript,
+              address: '',
+              phone: '',
               destination: 'intake',
               status: 'intake',
               time: 'Pending',
+              targetDate: null,
               freshResponse: `Gemini reported: ${parsed.error.message}`
             });
           }
@@ -130,9 +151,12 @@ Return pure JSON only:`;
             error: e.message,
             clientName: 'Parse Error',
             notes: transcript,
+            address: '',
+            phone: '',
             destination: 'intake',
             status: 'intake',
             time: 'Pending',
+            targetDate: null,
             freshResponse: `Could not parse AI response: ${e.message}`
           });
         }
@@ -145,9 +169,12 @@ Return pure JSON only:`;
         error: err.message,
         clientName: 'Network Error',
         notes: transcript,
+        address: '',
+        phone: '',
         destination: 'intake',
         status: 'intake',
         time: 'Pending',
+        targetDate: null,
         freshResponse: `Network error connecting to Gemini: ${err.message}`
       });
     });
@@ -232,6 +259,8 @@ exports.handler = async (event) => {
           id: Date.now(),
           clientName: decision.clientName,
           notes: decision.notes,
+          address: decision.address || '',
+          phone: decision.phone || '',
           status: decision.status,
           destination: decision.destination,
           time: decision.time,
@@ -248,9 +277,16 @@ exports.handler = async (event) => {
     const cleanCardTitle = decision.clientName || 'Direct Intake';
     const noteContent = decision.notes || rawTranscript;
 
-    // 4. Create Card & Attach Note
-    const colValuesObj = {};
-    colValuesObj[COL_LONG_TEXT] = { text: noteContent };
+    // 4. Populate Columns: Notes, Address, Phone, Date
+    const colValuesObj = {
+      [COL_LONG_TEXT]: { text: noteContent },
+      [COL_ADDRESS]: decision.address || '',
+      [COL_PHONE]: decision.phone || ''
+    };
+
+    if (decision.destination === 'calendar' && decision.targetDate) {
+      colValuesObj[COL_DATE] = { date: decision.targetDate };
+    }
 
     const createMutation = `
       mutation CreateCard($boardId: ID!, $groupId: String!, $itemName: String!, $colValues: JSON!) {
@@ -277,6 +313,8 @@ exports.handler = async (event) => {
         id: newId,
         clientName: cleanCardTitle,
         notes: noteContent,
+        address: decision.address || '',
+        phone: decision.phone || '',
         equipment: decision.equipment || '',
         destination: decision.destination || 'intake',
         status: decision.status || 'intake',
