@@ -1,27 +1,29 @@
 /**
  * Netlify Serverless Function: /.netlify/functions/intake
- * Engine Brain: Routes spoken/text requests via Gemini LLM
- * Capabilities:
- *  1. Natural Language Intent Parsing (Intake vs Command vs Conversation)
- *  2. Direct Monday.com Mutations (Create Card, Calendar Slot, or Bulk Archive)
- *  3. Conversational Follow-up via freshResponse
+ * Role: Fresh 🤵 Autonomous Digital Coordinator Brain
+ * Engine: Gemini AI (Intent & Parsing) -> Monday.com GraphQL Mutations
  */
 
 const https = require('https');
 
+// Environment & Board Setup
 const MONDAY_API_URL = 'https://api.monday.com/v2';
 const MONDAY_API_KEY = process.env.MONDAY_API_KEY || process.env.MONDAY_TOKEN;
 const MONDAY_BOARD_ID = process.env.MONDAY_BOARD_ID || '18424728273';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// Monday Groups
+// Monday Group Targets
 const GROUP_INTAKE = 'group_mm6b77as';     // 2. 📥 Counter Intake / Showroom
-const GROUP_CALENDAR = 'group_mm7maw66';   // Today's Schedule / Field Lane
-const GROUP_ARCHIVE = 'group_mm6xs2fx';    // Archived Cards Lane
+const GROUP_CALENDAR = 'group_mm7maw66';   // 📅 Calendar / Field / Route
+const GROUP_WORKBENCH = 'group_mm76qbbh';  // 🛠️ Bench / Shop Diagnostic
+const GROUP_ARCHIVE = 'group_mm6xs2fx';    // 📦 Archive
+
+// Target Long-Text Notes Column
+const COL_LONG_TEXT = 'long_text_mm5vbykc';
 
 function callMondayGraphQL(query, variables = {}) {
   return new Promise((resolve, reject) => {
-    if (!MONDAY_API_KEY) return resolve({ error: 'Missing Monday API Key' });
+    if (!MONDAY_API_KEY) return resolve({ error: 'Missing MONDAY_API_KEY' });
 
     const postData = JSON.stringify({ query, variables });
     const url = new URL(MONDAY_API_URL);
@@ -54,41 +56,59 @@ function callMondayGraphQL(query, variables = {}) {
   });
 }
 
-function callGeminiBrain(transcript) {
+function callGeminiCoordinator(transcript) {
   return new Promise((resolve) => {
     if (!GEMINI_API_KEY) {
       const isCmd = /clean|clear|archive/i.test(transcript);
+      const isBench = /bench|motor|repair|diagnostic|spark/i.test(transcript);
+      const isSched = /today|tomorrow|\d{1,2}(:\d{2})?\s*(am|pm)/i.test(transcript);
+
       return resolve({
         intent: isCmd ? 'COMMAND' : 'INTAKE',
         command: isCmd ? 'ARCHIVE_ALL' : null,
-        clientName: transcript.split(/\s+/).slice(0, 2).join(' '),
+        clientName: transcript.split(/\s+/).slice(0, 2).join(' ') || 'Direct Intake',
+        equipment: 'Aerus / Vacuum Unit',
         notes: transcript,
-        destination: /today|tomorrow|\d{1,2}(:\d{2})?\s*(am|pm)/i.test(transcript) ? 'schedule' : 'pinball',
-        status: 'intake',
-        time: 'Pending',
+        destination: isSched ? 'calendar' : (isBench ? 'bench' : 'intake'),
+        status: isBench ? 'bench' : 'intake',
+        time: isSched ? 'Scheduled' : 'Pending',
         freshResponse: `Locked in note: "${transcript}"`
       });
     }
 
-    const prompt = `You are Fresh, the AI Digital Coordinator for Aerus Home Wellness.
-Analyze this spoken transcript from William Sullivan:
+    const prompt = `You are Fresh, the sharp, proactive AI Digital Coordinator for William Sullivan at Aerus Home Wellness.
+Analyze this voice transcript from William:
 "${transcript}"
 
 Classify into one of 3 INTENTS:
-1. "COMMAND": If William says to clear the board, clean the shop floor, archive dummy/test cards, or wipe cards. Return command="ARCHIVE_ALL".
-2. "INTAKE": If William dictates a customer repair, pickup, delivery, part request, or appointment.
-   - Extract: clientName, notes, time (e.g., "11:00 AM", or "Pending"), destination ("schedule" if time/date mentioned, else "pinball"), status ("intake", "bench", "parts", or "route").
-   - If time or critical info is missing, write a short, punchy Girard-style conversational reply in "freshResponse".
-3. "CONVERSATION": Simple chat, check-ins, or questions. Return conversational "freshResponse".
+1. "COMMAND":
+   - Triggers: "clean shop floor", "archive test cards", "clear board", "wipe screen", "archive everything".
+   - Set command="ARCHIVE_ALL".
 
-Respond ONLY with valid JSON (no markdown fences):
+2. "INTAKE":
+   - Triggers: Customer intakes, service calls, bench repairs, pickups, deliveries, parts notes.
+   - Extract:
+     * clientName: Clean customer name ONLY (preserve honorifics like "Mrs. Donley", strip temporal words like "Today", "Tomorrow").
+     * equipment: What machine/issue is mentioned (e.g., "Hoover Upright", "Guardian Air", "Filter cleanout").
+     * notes: Full detailed description of the job or customer request.
+     * destination: "calendar" (if time/date/pickup scheduled), "bench" (if bench test/motor repair needed), or "intake" (general showroom/counter intake).
+     * status: "intake", "bench", "parts", or "route".
+     * time: Specific time if mentioned (e.g. "11:00 AM"), else "Pending".
+     * freshResponse: A crisp, professional, motivating 1-2 sentence response confirming what you locked down. If an appointment is mentioned without a time, ask for the arrival time directly.
+
+3. "CONVERSATION":
+   - Questions, check-ins, or unclear comments.
+   - Set freshResponse to guide William forward with high energy.
+
+Respond ONLY with pure JSON (no markdown ticks, no backticks, no wrapping):
 {
   "intent": "INTAKE" | "COMMAND" | "CONVERSATION",
   "command": "ARCHIVE_ALL" | null,
   "clientName": "...",
+  "equipment": "...",
   "notes": "...",
-  "destination": "schedule" | "pinball",
-  "status": "intake",
+  "destination": "calendar" | "bench" | "intake",
+  "status": "intake" | "bench" | "parts" | "route",
   "time": "...",
   "freshResponse": "..."
 }`;
@@ -114,17 +134,18 @@ Respond ONLY with valid JSON (no markdown fences):
       res.on('end', () => {
         try {
           const parsed = JSON.parse(rawData);
-          const textPayload = parsed.candidates[0].content.parts[0].text;
-          resolve(JSON.parse(textPayload));
+          const rawText = parsed.candidates[0].content.parts[0].text;
+          const cleanedText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+          resolve(JSON.parse(cleanedText));
         } catch (e) {
           resolve({
             intent: 'INTAKE',
             clientName: 'Direct Intake',
             notes: transcript,
-            destination: 'pinball',
+            destination: 'intake',
             status: 'intake',
             time: 'Pending',
-            freshResponse: `Note recorded: "${transcript}"`
+            freshResponse: `Note captured: "${transcript}"`
           });
         }
       });
@@ -134,10 +155,10 @@ Respond ONLY with valid JSON (no markdown fences):
       intent: 'INTAKE',
       clientName: 'Direct Intake',
       notes: transcript,
-      destination: 'pinball',
+      destination: 'intake',
       status: 'intake',
       time: 'Pending',
-      freshResponse: `Captured note: "${transcript}"`
+      freshResponse: `Got it locked down: "${transcript}"`
     }));
 
     req.write(postData);
@@ -165,16 +186,16 @@ exports.handler = async (event) => {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'No transcript received.' })
+        body: JSON.stringify({ error: 'No transcript provided' })
       };
     }
 
-    // 1. Pass through Gemini Brain
-    const aiDecision = await callGeminiBrain(rawTranscript);
+    // 1. Run Gemini Intent Brain
+    const decision = await callGeminiCoordinator(rawTranscript);
 
-    // 2. Handle System Commands (Bulk Archive / Clear Floor)
-    if (aiDecision.intent === 'COMMAND' && aiDecision.command === 'ARCHIVE_ALL') {
-      const getActiveItemsQuery = `
+    // 2. Handle System Commands (Bulk Move to Archive)
+    if (decision.intent === 'COMMAND' && decision.command === 'ARCHIVE_ALL') {
+      const fetchQuery = `
         query {
           boards(ids: [${MONDAY_BOARD_ID}]) {
             items_page(limit: 100) {
@@ -186,8 +207,8 @@ exports.handler = async (event) => {
           }
         }
       `;
-      const boardData = await callMondayGraphQL(getActiveItemsQuery);
-      const items = boardData?.data?.boards?.[0]?.items_page?.items || [];
+      const boardRes = await callMondayGraphQL(fetchQuery);
+      const items = boardRes?.data?.boards?.[0]?.items_page?.items || [];
       const activeItems = items.filter(i => i.group?.id !== GROUP_ARCHIVE);
 
       for (const item of activeItems) {
@@ -206,53 +227,61 @@ exports.handler = async (event) => {
         body: JSON.stringify({
           action: 'CLEAN_FLOOR',
           archivedCount: activeItems.length,
-          freshResponse: `Shop floor cleared! Archived ${activeItems.length} cards. Deck is clean and ready to roll! 💥`
+          freshResponse: `Shop floor swept clean! Archived ${activeItems.length} active cards. Launchpad is open and ready to roll! 💥`
         })
       };
     }
 
-    // 3. Handle Intake Mutation to Monday
-    const targetGroup = aiDecision.destination === 'schedule' ? GROUP_CALENDAR : GROUP_INTAKE;
-    const cardTitle = aiDecision.clientName || 'Direct Intake';
+    // 3. Resolve Destination Group
+    let targetGroup = GROUP_INTAKE;
+    if (decision.destination === 'calendar') targetGroup = GROUP_CALENDAR;
+    if (decision.destination === 'bench') targetGroup = GROUP_WORKBENCH;
 
-    const createItemMutation = `
-      mutation CreateCard($boardId: ID!, $groupId: String!, $itemName: String!) {
-        create_item(board_id: $boardId, group_id: $groupId, item_name: $itemName) {
+    const cleanCardTitle = decision.clientName || 'Direct Intake';
+    const noteContent = decision.notes || rawTranscript;
+
+    // 4. Create Card & Attach Detailed Notes to long_text_mm5vbykc
+    const colValuesObj = {};
+    colValuesObj[COL_LONG_TEXT] = { text: noteContent };
+
+    const createMutation = `
+      mutation CreateCard($boardId: ID!, $groupId: String!, $itemName: String!, $colValues: JSON!) {
+        create_item(board_id: $boardId, group_id: $groupId, item_name: $itemName, column_values: $colValues) {
           id
           name
         }
       }
     `;
 
-    const mondayItem = await callMondayGraphQL(createItemMutation, {
+    const mondayRes = await callMondayGraphQL(createMutation, {
       boardId: MONDAY_BOARD_ID,
       groupId: targetGroup,
-      itemName: cardTitle.slice(0, 255)
+      itemName: cleanCardTitle.slice(0, 255),
+      colValues: JSON.stringify(colValuesObj)
     });
 
-    const newId = mondayItem?.data?.create_item?.id || Date.now();
+    const newId = mondayRes?.data?.create_item?.id || Date.now();
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         id: newId,
-        clientName: cardTitle,
-        notes: aiDecision.notes || rawTranscript,
-        status: aiDecision.status || 'intake',
-        destination: aiDecision.destination || 'pinball',
-        time: aiDecision.time || 'Pending',
-        freshResponse: aiDecision.freshResponse || `Card locked in for ${cardTitle}!`
+        clientName: cleanCardTitle,
+        notes: noteContent,
+        equipment: decision.equipment || '',
+        destination: decision.destination || 'intake',
+        status: decision.status || 'intake',
+        time: decision.time || 'Pending',
+        freshResponse: decision.freshResponse || `Card locked in for ${cleanCardTitle}!`
       })
     };
 
-  } catch (err) {
+  } catch (error) {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({
-        error: err.message || 'Intake processing error'
-      })
+      body: JSON.stringify({ error: error.message || 'Intake execution failure' })
     };
   }
 };
