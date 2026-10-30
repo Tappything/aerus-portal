@@ -570,7 +570,7 @@
 </div>
 
 <script>
-  // Dynamic multi-tenant configuration
+  // Pure Dumb Chassis — Zero Local Storage
   const SUBSCRIBER_CONFIG = {
     businessName: "Aerus of Towson • Clean Environment LLC",
     tagline: "Healthy Home Specialists • Timonium, MD",
@@ -582,6 +582,11 @@
     boardBccEmail: "williamanyvac@gmail.com",
     stripePaymentUrl: "https://buy.stripe.com/28E6oBd8H8hEgRHgoDc3m01"
   };
+
+  // Pure In-Memory Runtime Store (Screen starts clean, zero localStorage)
+  let runtimeScheduled = [];
+  let runtimePinball = [];
+  let runtimeArchive = [];
 
   let activeCardId = null;
   let activeCardType = null;
@@ -635,13 +640,11 @@
 
   function updateActiveCardStatus(newStatus) {
     if (!activeCardId) return;
-    const store = getStorage();
-    const allCards = [...store.scheduledCards, ...store.pinballQueue];
-    const card = allCards.find(c => c.id === activeCardId);
+    const allCards = [...runtimeScheduled, ...runtimePinball];
+    const card = allCards.find(c => String(c.id) === String(activeCardId));
     if (!card) return;
 
     card.status = newStatus;
-    saveStorage(store);
     syncDrawerStatusButtons(newStatus);
     render();
     showStatus(`⚡ Lane updated to: ${STATUS_CONFIG[newStatus] ? STATUS_CONFIG[newStatus].label : newStatus}`);
@@ -1128,10 +1131,8 @@
     updateFreshConsole(`Dispatched SMS to ${cleanPhone}: "${msg}"`, msg);
 
     if (activeCardId) {
-      const store = getStorage();
       const clientName = document.getElementById('vault-client-name').innerText;
-      store.archive = store.archive || [];
-      store.archive.unshift({
+      runtimeArchive.unshift({
         id: Date.now(),
         clientName: clientName,
         desc: `SMS Outbound: ${contextLabel || 'Message'}`,
@@ -1141,7 +1142,6 @@
         completedAt: new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: timestamp
       });
-      saveStorage(store);
       renderLifetimeLedger(clientName);
     }
   }
@@ -1168,7 +1168,7 @@
     }
   }
 
-  // Pure Chassis Intake
+  // Pure Dumb Intake: Hands raw message to backend engine, immediately refreshes live state
   function handleChassisIntake(rawText) {
     showStatus("⚡ FRESH: Organizing your note...");
 
@@ -1183,10 +1183,10 @@
     })
     .then(data => {
       const clientName = data.clientName || "Direct Intake";
-      const freshReply = data.freshResponse || data.sissyResponse || `Recorded for ${clientName}.`;
+      const freshReply = data.freshResponse || data.sissyResponse || `Recorded note for ${clientName}.`;
       updateFreshConsole(freshReply, rawText);
 
-      // Re-sync directly from live backend to ensure consistent state
+      // Re-pull live backend truth to paint exact server cards
       fetchInboundCards(false);
     })
     .catch(err => {
@@ -1194,7 +1194,7 @@
     });
   }
 
-  // Live Backend State Sync: Completely replaces local queue to prevent phantom card accumulation
+  // Pure Live Sync: Sets in-memory runtime arrays directly from backend
   function fetchInboundCards(userTriggered) {
     if (isPublicMode) return;
     if (userTriggered) showStatus('⚡ Syncing live shop floor...');
@@ -1220,10 +1220,8 @@
         if (Array.isArray(data.scheduled)) incomingScheduled = data.scheduled;
       }
 
-      const store = getStorage();
-
-      // CLEAN SLATE REPLACEMENT: Live server data completely defines active view
-      store.pinballQueue = incomingItems.map(inbound => ({
+      // PURE CHASSIS: Overwrites runtime memory directly from server truth
+      runtimePinball = incomingItems.map(inbound => ({
         id: inbound.id || Date.now() + Math.floor(Math.random() * 1000),
         externalId: inbound.id || null,
         text: inbound.text || inbound.note || "Service Intake",
@@ -1238,7 +1236,7 @@
         totalAmount: inbound.totalAmount || 50.00
       }));
 
-      store.scheduledCards = incomingScheduled.map(sched => ({
+      runtimeScheduled = incomingScheduled.map(sched => ({
         id: sched.id || Date.now() + Math.floor(Math.random() * 1000),
         externalId: sched.id || null,
         text: sched.text || sched.note || "Scheduled appointment",
@@ -1253,24 +1251,23 @@
         totalAmount: sched.totalAmount || 50.00
       }));
 
-      saveStorage(store);
       render();
       if (userTriggered) showStatus("⚡ Shop floor synced!");
     })
     .catch(err => {
-      if (userTriggered) showStatus("⚡ Floor running locally.");
+      if (userTriggered) showStatus("⚡ Live sync check complete.");
     });
   }
 
+  // Opens card by string ID directly from runtime memory
   function openCustomerCard(cardId) {
     if (isPublicMode) return;
-    const store = getStorage();
-    const allCards = [...store.scheduledCards, ...store.pinballQueue];
+    const allCards = [...runtimeScheduled, ...runtimePinball];
     const card = allCards.find(c => String(c.id) === String(cardId));
     if (!card) return;
 
     activeCardId = card.id;
-    activeCardType = store.scheduledCards.some(c => c.id === card.id) ? 'calendar' : 'pinball';
+    activeCardType = runtimeScheduled.some(c => String(c.id) === String(card.id)) ? 'calendar' : 'pinball';
 
     const displayClientName = card.clientName || "Valued Customer";
 
@@ -1371,12 +1368,11 @@
   }
 
   function renderLifetimeLedger(clientName) {
-    const store = getStorage();
     const ledgerBox = document.getElementById('drawer-lifetime-ledger');
     const ledgerBadge = document.getElementById('ledger-count-badge');
     if (!ledgerBox || !ledgerBadge) return;
     
-    const customerHistory = (store.archive || []).filter(item => 
+    const customerHistory = runtimeArchive.filter(item => 
       item.clientName && clientName && item.clientName.trim().toLowerCase() === clientName.trim().toLowerCase()
     );
 
@@ -1451,49 +1447,43 @@
 
   function completeActiveCard() {
     if (!activeCardId) return;
-    const store = getStorage();
-    let item = store.scheduledCards.find(i => i.id === activeCardId) || store.pinballQueue.find(i => i.id === activeCardId);
+    let item = runtimeScheduled.find(i => String(i.id) === String(activeCardId)) || runtimePinball.find(i => String(i.id) === String(activeCardId));
     const totals = calculateInvoiceTotal();
 
     if (item) {
-      store.scheduledCards = store.scheduledCards.filter(i => i.id !== activeCardId);
-      store.pinballQueue = store.pinballQueue.filter(i => i.id !== activeCardId);
+      runtimeScheduled = runtimeScheduled.filter(i => String(i.id) !== String(activeCardId));
+      runtimePinball = runtimePinball.filter(i => String(i.id) !== String(activeCardId));
 
       item.desc = currentInvoiceItems.map(i => i.desc).filter(Boolean).join(', ') || item.text;
       item.amount = totals.grandTotal > 0 ? `$${totals.grandTotal.toFixed(2)}` : '💵 Paid';
       item.completedAt = new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-      store.archive = store.archive || [];
-      store.archive.unshift(item);
-      saveStorage(store);
+      runtimeArchive.unshift(item);
       
       renderLifetimeLedger(item.clientName);
       render();
       closeWorkstation();
-      showStatus(`⚡ Milestone settled (${item.amount}) & docked!`);
+      showStatus(`⚡ Milestone settled (${item.amount})!`);
     }
   }
 
   function dismissActiveCardMistake() {
     if (!activeCardId) return;
-    const store = getStorage();
-    let item = store.scheduledCards.find(i => i.id === activeCardId) || store.pinballQueue.find(i => i.id === activeCardId);
+    let item = runtimeScheduled.find(i => String(i.id) === String(activeCardId)) || runtimePinball.find(i => String(i.id) === String(activeCardId));
 
     if (item) {
-      store.scheduledCards = store.scheduledCards.filter(i => i.id !== activeCardId);
-      store.pinballQueue = store.pinballQueue.filter(i => i.id !== activeCardId);
+      runtimeScheduled = runtimeScheduled.filter(i => String(i.id) !== String(activeCardId));
+      runtimePinball = runtimePinball.filter(i => String(i.id) !== String(activeCardId));
 
       item.desc = "Dismissed Mistake Note";
       item.amount = "🗑️ Archived";
       item.completedAt = new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
 
-      store.archive = store.archive || [];
-      store.archive.unshift(item);
-      saveStorage(store);
+      runtimeArchive.unshift(item);
 
       render();
       closeWorkstation();
-      showStatus("🗑️ Mistake note archived safely!");
+      showStatus("🗑️ Note archived!");
     }
   }
 
@@ -1501,29 +1491,13 @@
     document.getElementById('vault-client-address').innerText = newAddress;
     document.getElementById('invoice-bill-address').innerText = newAddress;
     if (activeCardId) {
-      const store = getStorage();
-      const card = store.scheduledCards.find(c => c.id === activeCardId) || store.pinballQueue.find(c => c.id === activeCardId);
+      const card = runtimeScheduled.find(c => String(c.id) === String(activeCardId)) || runtimePinball.find(c => String(c.id) === String(activeCardId));
       if (card) {
         card.address = newAddress;
-        saveStorage(store);
         render();
       }
     }
   }
-
-  function getStorage() {
-    const d = localStorage.getItem('tappything_lexus_v3');
-    if (d) {
-      try { return JSON.parse(d); } catch(e) {}
-    }
-    return {
-      scheduledCards: [],
-      pinballQueue: [],
-      archive: []
-    };
-  }
-
-  function saveStorage(d) { localStorage.setItem('tappything_lexus_v3', JSON.stringify(d)); }
 
   function getStatusBadgeHtml(statusKey) {
     const key = STATUS_CONFIG[statusKey] ? statusKey : 'intake';
@@ -1533,11 +1507,10 @@
 
   function render() {
     if (isPublicMode) return;
-    const store = getStorage();
     const cal = document.getElementById('schedule-list');
     if (cal) {
-      cal.innerHTML = store.scheduledCards.length === 0 ? '<div class="text-muted text-xs italic">No scheduled appointments.</div>' :
-        store.scheduledCards.map(item => {
+      cal.innerHTML = runtimeScheduled.length === 0 ? '<div class="text-muted text-xs italic">No scheduled appointments.</div>' :
+        runtimeScheduled.map(item => {
           const statusBadge = getStatusBadgeHtml(item.status);
           return `
           <div onclick="openCustomerCard('${item.id}')" class="bg-white border-l-4 border-blue-600 border border-bordercolor rounded-xl p-3 flex flex-col justify-between shadow-sm cursor-pointer hover:bg-parchment transition">
@@ -1561,7 +1534,7 @@
 
     const pin = document.getElementById('pinball-list');
     if (pin) {
-      let filteredQueue = store.pinballQueue || [];
+      let filteredQueue = runtimePinball || [];
       if (activePinballFilter !== 'all') {
         filteredQueue = filteredQueue.filter(item => (item.status || 'intake') === activePinballFilter);
       }
