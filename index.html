@@ -221,7 +221,7 @@
     </div>
   </header>
 
-  <!-- 2-WAY INTERACTIVE THREAD (FOLLOW-UPS & CONVERSATION) -->
+  <!-- 2-WAY INTERACTIVE THREAD -->
   <div id="conversation-thread" class="hidden bg-cardbg border border-gold rounded-2xl p-4 shadow-md flex flex-col gap-3 transition-all">
     <div class="flex justify-between items-center border-b border-bordercolor pb-1.5">
       <span class="text-xs font-bold text-forest uppercase tracking-wider flex items-center gap-1.5">
@@ -251,7 +251,7 @@
         <button onclick="fetchInboundCards(true)" class="text-[10px] font-bold text-forest hover:underline cursor-pointer">🔄 Sync Cards</button>
       </div>
 
-      <!-- 7-SLOT PINBALL DRAWERS (WITH 🚗 FIELD / ROUTE) -->
+      <!-- 7-SLOT PINBALL DRAWERS -->
       <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
         <button onclick="setPinballFilter('all')" id="filter-pill-all" class="px-2.5 py-1 bg-forest text-white font-bold text-[10px] rounded-lg shadow-sm whitespace-nowrap active:scale-95 cursor-pointer transition">All</button>
         <button onclick="setPinballFilter('intake')" id="filter-pill-intake" class="px-2.5 py-1 bg-parchment border border-bordercolor text-muted hover:text-ink font-bold text-[10px] rounded-lg whitespace-nowrap active:scale-95 cursor-pointer transition">📥 Intake</button>
@@ -602,7 +602,6 @@
   const FALLBACK_CUSTOMER_ADDRESS = "📍 Address on File / Intake Slip";
   const FALLBACK_CUSTOMER_PHONE = "Phone on File";
 
-  // 7-Drawer Status Configuration
   const STATUS_CONFIG = {
     intake: { label: 'Intake', badgeClass: 'bg-slate-100 text-slate-700 border-slate-300', dot: '⚪' },
     bench: { label: 'On Bench', badgeClass: 'bg-blue-100 text-blue-800 border-blue-300', dot: '🔵' },
@@ -990,7 +989,6 @@
     setTimeout(() => b.classList.add('hidden'), 4000);
   }
 
-  // 2-Way Conversational Thread (Fresh prompts and follow-ups)
   function updateFreshConsole(responseText, userPrompt) {
     if (isPublicMode) {
       const publicThread = document.getElementById('public-thread');
@@ -1170,7 +1168,7 @@
     }
   }
 
-  // Pure Chassis Intake: Sends raw transcript to backend engine, renders exact returned card
+  // Pure Chassis Intake
   function handleChassisIntake(rawText) {
     showStatus("⚡ FRESH: Organizing your note...");
 
@@ -1188,37 +1186,15 @@
       const freshReply = data.freshResponse || data.sissyResponse || `Recorded for ${clientName}.`;
       updateFreshConsole(freshReply, rawText);
 
-      const store = getStorage();
-      const newCard = {
-        id: data.id || Date.now(),
-        externalId: data.id || null,
-        text: data.notes || rawText,
-        clientName: clientName,
-        address: data.address || FALLBACK_CUSTOMER_ADDRESS,
-        allAddresses: data.allAddresses || [data.address || FALLBACK_CUSTOMER_ADDRESS],
-        phone: data.phone || FALLBACK_CUSTOMER_PHONE,
-        status: data.status || 'intake',
-        time: data.time || "Pending",
-        destination: data.destination || (data.time && data.time !== 'Pending' ? 'schedule' : 'pinball'),
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        lineItems: data.lineItems || [{ desc: data.notes || rawText, qty: 1, price: 50.00, isTaxable: false }],
-        totalAmount: data.totalAmount || 50.00
-      };
-
-      if (newCard.destination === 'schedule' || (newCard.time && newCard.time.toLowerCase().includes('am') || newCard.time.toLowerCase().includes('pm'))) {
-        store.scheduledCards.unshift(newCard);
-      } else {
-        store.pinballQueue.unshift(newCard);
-      }
-
-      saveStorage(store);
-      render();
+      // Re-sync directly from live backend to ensure consistent state
+      fetchInboundCards(false);
     })
     .catch(err => {
-      showStatus(`⚠️ Intake synced locally.`);
+      showStatus(`⚠️ Intake submitted to engine.`);
     });
   }
 
+  // Live Backend State Sync: Completely replaces local queue to prevent phantom card accumulation
   function fetchInboundCards(userTriggered) {
     if (isPublicMode) return;
     if (userTriggered) showStatus('⚡ Syncing live shop floor...');
@@ -1246,57 +1222,36 @@
 
       const store = getStorage();
 
-      if (incomingItems.length > 0) {
-        incomingItems.forEach(inbound => {
-          const existingIdx = store.pinballQueue.findIndex(c => (c.externalId && c.externalId === inbound.id) || c.id === inbound.id);
-          const itemPayload = {
-            id: inbound.id || Date.now() + Math.floor(Math.random() * 1000),
-            externalId: inbound.id || null,
-            text: inbound.text || inbound.note || "Service Intake",
-            clientName: inbound.name || inbound.clientName || "Valued Customer",
-            address: inbound.address || FALLBACK_CUSTOMER_ADDRESS,
-            allAddresses: inbound.allAddresses || [inbound.address || FALLBACK_CUSTOMER_ADDRESS],
-            phone: inbound.phone || FALLBACK_CUSTOMER_PHONE,
-            status: inbound.status || 'intake',
-            time: inbound.time || "In Shop",
-            timestamp: inbound.timestamp || "Active",
-            lineItems: inbound.lineItems || [{ desc: inbound.text || "Diagnostic", qty: 1, price: 50.00, isTaxable: false }],
-            totalAmount: inbound.totalAmount || 50.00
-          };
+      // CLEAN SLATE REPLACEMENT: Live server data completely defines active view
+      store.pinballQueue = incomingItems.map(inbound => ({
+        id: inbound.id || Date.now() + Math.floor(Math.random() * 1000),
+        externalId: inbound.id || null,
+        text: inbound.text || inbound.note || "Service Intake",
+        clientName: inbound.name || inbound.clientName || "Valued Customer",
+        address: inbound.address || FALLBACK_CUSTOMER_ADDRESS,
+        allAddresses: inbound.allAddresses || [inbound.address || FALLBACK_CUSTOMER_ADDRESS],
+        phone: inbound.phone || FALLBACK_CUSTOMER_PHONE,
+        status: inbound.status || 'intake',
+        time: inbound.time || "In Shop",
+        timestamp: inbound.timestamp || "Active",
+        lineItems: inbound.lineItems || [{ desc: inbound.text || "Diagnostic", qty: 1, price: 50.00, isTaxable: false }],
+        totalAmount: inbound.totalAmount || 50.00
+      }));
 
-          if (existingIdx >= 0) {
-            store.pinballQueue[existingIdx] = Object.assign({}, store.pinballQueue[existingIdx], itemPayload);
-          } else {
-            store.pinballQueue.push(itemPayload);
-          }
-        });
-      }
-
-      if (incomingScheduled.length > 0) {
-        incomingScheduled.forEach(sched => {
-          const existingIdx = store.scheduledCards.findIndex(c => (c.externalId && c.externalId === sched.id) || c.id === sched.id);
-          const itemPayload = {
-            id: sched.id || Date.now() + Math.floor(Math.random() * 1000),
-            externalId: sched.id || null,
-            text: sched.text || sched.note || "Scheduled appointment",
-            clientName: sched.name || sched.clientName || "Scheduled Customer",
-            address: sched.address || FALLBACK_CUSTOMER_ADDRESS,
-            allAddresses: sched.allAddresses || [sched.address || FALLBACK_CUSTOMER_ADDRESS],
-            phone: sched.phone || FALLBACK_CUSTOMER_PHONE,
-            status: sched.status || 'route',
-            time: sched.time || "Scheduled",
-            timestamp: sched.timestamp || "Active",
-            lineItems: sched.lineItems || [{ desc: sched.text || "Service", qty: 1, price: 50.00, isTaxable: false }],
-            totalAmount: sched.totalAmount || 50.00
-          };
-
-          if (existingIdx >= 0) {
-            store.scheduledCards[existingIdx] = Object.assign({}, store.scheduledCards[existingIdx], itemPayload);
-          } else {
-            store.scheduledCards.push(itemPayload);
-          }
-        });
-      }
+      store.scheduledCards = incomingScheduled.map(sched => ({
+        id: sched.id || Date.now() + Math.floor(Math.random() * 1000),
+        externalId: sched.id || null,
+        text: sched.text || sched.note || "Scheduled appointment",
+        clientName: sched.name || sched.clientName || "Scheduled Customer",
+        address: sched.address || FALLBACK_CUSTOMER_ADDRESS,
+        allAddresses: sched.allAddresses || [sched.address || FALLBACK_CUSTOMER_ADDRESS],
+        phone: sched.phone || FALLBACK_CUSTOMER_PHONE,
+        status: sched.status || 'route',
+        time: sched.time || "Scheduled",
+        timestamp: sched.timestamp || "Active",
+        lineItems: sched.lineItems || [{ desc: sched.text || "Service", qty: 1, price: 50.00, isTaxable: false }],
+        totalAmount: sched.totalAmount || 50.00
+      }));
 
       saveStorage(store);
       render();
@@ -1307,7 +1262,6 @@
     });
   }
 
-  // Lookup by ID only — quotes in notes never break button clicks
   function openCustomerCard(cardId) {
     if (isPublicMode) return;
     const store = getStorage();
@@ -1577,7 +1531,6 @@
     return `<span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold border ${cfg.badgeClass}">${cfg.dot} ${cfg.label}</span>`;
   }
 
-  // Entire card is clickable cursor-pointer, opens by numeric ID
   function render() {
     if (isPublicMode) return;
     const store = getStorage();
