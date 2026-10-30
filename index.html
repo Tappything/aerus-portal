@@ -1278,7 +1278,7 @@
 
   function fetchInboundCards(userTriggered) {
     if (isPublicMode) return;
-    if (userTriggered) showStatus('⚡ Syncing live floor directly with Monday.com...');
+    if (userTriggered) showStatus('⚡ Syncing live shop floor...');
 
     fetch(PINBALL_FETCH_HOOK, {
       method: 'POST',
@@ -1301,70 +1301,60 @@
         if (Array.isArray(data.scheduled)) incomingScheduled = data.scheduled;
       }
 
-      if (incomingItems.length > 0 || incomingScheduled.length > 0) {
-        const store = getStorage();
-        let updated = false;
+      // True live sync: server state replaces local queue so archived items disappear immediately
+      const store = getStorage();
 
-        if (incomingItems.length > 0) {
-          store.pinballQueue = incomingItems.map(inbound => {
-            let clientName = inbound.name || inbound.clientName || "Valued Customer";
-            const textMsg = inbound.text || inbound.note || "Service Intake";
-            const matches = findAllVaultMatches(clientName);
+      store.pinballQueue = incomingItems.map(inbound => {
+        let clientName = inbound.name || inbound.clientName || "Valued Customer";
+        const textMsg = inbound.text || inbound.note || "Service Intake";
+        const matches = findAllVaultMatches(clientName);
 
-            const resolvedAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (inbound.address || FALLBACK_CUSTOMER_ADDRESS);
-            const resolvedPhone = matches.length > 0 ? formatRowPhone(matches[0]) : (inbound.phone || FALLBACK_CUSTOMER_PHONE);
+        const resolvedAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (inbound.address || FALLBACK_CUSTOMER_ADDRESS);
+        const resolvedPhone = matches.length > 0 ? formatRowPhone(matches[0]) : (inbound.phone || FALLBACK_CUSTOMER_PHONE);
 
-            return {
-              id: inbound.id || Date.now() + Math.floor(Math.random() * 1000),
-              externalId: inbound.id || null,
-              text: textMsg,
-              clientName: clientName,
-              address: resolvedAddress,
-              allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [resolvedAddress],
-              phone: resolvedPhone,
-              status: inbound.status || 'intake',
-              time: inbound.time || "In Shop",
-              timestamp: inbound.timestamp || "Active",
-              lineItems: inbound.lineItems || [{ desc: textMsg, qty: 1, price: 50.00, isTaxable: false }],
-              totalAmount: inbound.totalAmount || 50.00
-            };
-          });
-          updated = true;
-        }
+        return {
+          id: inbound.id || Date.now() + Math.floor(Math.random() * 1000),
+          externalId: inbound.id || null,
+          text: textMsg,
+          clientName: clientName,
+          address: resolvedAddress,
+          allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [resolvedAddress],
+          phone: resolvedPhone,
+          status: inbound.status || 'intake',
+          time: inbound.time || "In Shop",
+          timestamp: inbound.timestamp || "Active",
+          lineItems: inbound.lineItems || [{ desc: textMsg, qty: 1, price: 50.00, isTaxable: false }],
+          totalAmount: inbound.totalAmount || 50.00
+        };
+      });
 
-        if (incomingScheduled.length > 0) {
-          store.scheduledCards = incomingScheduled.map(sched => {
-            let clientName = sched.name || sched.clientName || "Scheduled Customer";
-            const textMsg = sched.text || sched.note || "Scheduled appointment";
-            const matches = findAllVaultMatches(clientName);
+      store.scheduledCards = incomingScheduled.map(sched => {
+        let clientName = sched.name || sched.clientName || "Scheduled Customer";
+        const textMsg = sched.text || sched.note || "Scheduled appointment";
+        const matches = findAllVaultMatches(clientName);
 
-            const resolvedAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (sched.address || FALLBACK_CUSTOMER_ADDRESS);
-            const resolvedPhone = matches.length > 0 ? formatRowPhone(matches[0]) : (sched.phone || FALLBACK_CUSTOMER_PHONE);
+        const resolvedAddress = matches.length > 0 ? formatRowAddress(matches[0]) : (sched.address || FALLBACK_CUSTOMER_ADDRESS);
+        const resolvedPhone = matches.length > 0 ? formatRowPhone(matches[0]) : (sched.phone || FALLBACK_CUSTOMER_PHONE);
 
-            return {
-              id: sched.id || Date.now() + Math.floor(Math.random() * 1000),
-              externalId: sched.id || null,
-              text: textMsg,
-              clientName: clientName,
-              address: resolvedAddress,
-              allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [resolvedAddress],
-              phone: resolvedPhone,
-              status: sched.status || 'intake',
-              time: sched.time || "Scheduled",
-              timestamp: sched.timestamp || "Active",
-              lineItems: sched.lineItems || [{ desc: textMsg, qty: 1, price: 50.00, isTaxable: false }],
-              totalAmount: sched.totalAmount || 50.00
-            };
-          });
-          updated = true;
-        }
+        return {
+          id: sched.id || Date.now() + Math.floor(Math.random() * 1000),
+          externalId: sched.id || null,
+          text: textMsg,
+          clientName: clientName,
+          address: resolvedAddress,
+          allAddresses: matches.length > 0 ? [...new Set(matches.map(m => formatRowAddress(m)).filter(Boolean))] : [resolvedAddress],
+          phone: resolvedPhone,
+          status: sched.status || 'intake',
+          time: sched.time || "Scheduled",
+          timestamp: sched.timestamp || "Active",
+          lineItems: sched.lineItems || [{ desc: textMsg, qty: 1, price: 50.00, isTaxable: false }],
+          totalAmount: sched.totalAmount || 50.00
+        };
+      });
 
-        if (updated) {
-          saveStorage(store);
-          render();
-          if (userTriggered) showStatus("🔄 Live floor synced directly from Monday.com!");
-        }
-      }
+      saveStorage(store);
+      render();
+      if (userTriggered) showStatus("⚡ Shop floor synced!");
     })
     .catch(err => {
       if (userTriggered) showStatus("⚡ Active floor running locally.");
