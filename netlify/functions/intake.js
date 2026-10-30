@@ -2,14 +2,15 @@
  * Netlify Serverless Function: /.netlify/functions/intake
  * Role: Fresh 🤵 Autonomous Digital Coordinator Brain
  * Engine: Gemini 3.8 Flash (v1beta) -> Monday.com GraphQL Mutations
- * Target Columns Populated:
- *  - long_text_mm5vbykc : Intake Notes
- *  - text_mm6aq4rg      : Customer Address
- *  - text_mm6a7420      : Customer Phone
- *  - date               : Target Scheduled Date (YYYY-MM-DD)
+ * Features:
+ *  - 22,283 Customer Vault Auto-Matcher (export_export (34).csv)
+ *  - Auto-Populates Address (text_mm6aq4rg) & Phone (text_mm6a7420)
+ *  - Long-Text Notes (long_text_mm5vbykc) & Due Date (date)
  */
 
 const https = require('https');
+const fs = require('fs');
+const path = require('path');
 
 const MONDAY_API_URL = 'https://api.monday.com/v2';
 const MONDAY_API_KEY = process.env.MONDAY_API_KEY || process.env.MONDAY_TOKEN;
@@ -27,6 +28,100 @@ const COL_LONG_TEXT = 'long_text_mm5vbykc';
 const COL_ADDRESS = 'text_mm6aq4rg';
 const COL_PHONE = 'text_mm6a7420';
 const COL_DATE = 'date';
+
+// In-Memory Vault Cache for sub-second serverless execution
+let cachedVault = null;
+
+function loadVaultRecords() {
+  if (cachedVault) return cachedVault;
+  cachedVault = [];
+
+  const possiblePaths = [
+    path.join(__dirname, 'export_export (34).csv'),
+    path.join(process.cwd(), 'export_export (34).csv'),
+    path.join(__dirname, '../../export_export (34).csv')
+  ];
+
+  let filePath = possiblePaths.find(p => fs.existsSync(p));
+  if (!filePath) {
+    console.warn('[FRESH VAULT] export_export (34).csv not found on local disk path.');
+    return cachedVault;
+  }
+
+  try {
+    const rawCSV = fs.readFileSync(filePath, 'utf8');
+    const lines = rawCSV.split(/\r?\n/);
+    if (lines.length < 2) return cachedVault;
+
+    // Header parse: Client #, Name, Email, Address, Phone, Created
+    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+    const nameIdx = headers.indexOf('Name');
+    const addrIdx = headers.indexOf('Address');
+    const phoneIdx = headers.indexOf('Phone');
+
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+
+      // Fast CSV split supporting quoted strings
+      const row = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
+      const cleanRow = row.map(v => v.replace(/^"|"$/g, '').trim());
+
+      const name = cleanRow[nameIdx] || '';
+      const address = cleanRow[addrIdx] || '';
+      const phone = cleanRow[phoneIdx] || '';
+
+      if (name) {
+        cachedVault.push({
+          name: name,
+          cleanName: name.toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim(),
+          address: address,
+          phone: phone
+        });
+      }
+    }
+    console.log(`[FRESH VAULT] Loaded ${cachedVault.length} customer records into memory.`);
+  } catch (err) {
+    console.error('[FRESH VAULT ERROR]', err.message);
+  }
+
+  return cachedVault;
+}
+
+function matchCustomerVault(clientName) {
+  if (!clientName) return { address: '', phone: '' };
+
+  const records = loadVaultRecords();
+  if (!records || records.length === 0) return { address: '', phone: '' };
+
+  const target = clientName.toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+  const targetTokens = target.split(' ').filter(t => t.length > 1 && !['mrs', 'mr', 'ms', 'dr'].includes(t));
+
+  // Exact Match
+  let match = records.find(r => r.cleanName === target);
+
+  // Token-based match (First + Last)
+  if (!match && targetTokens.length >= 2) {
+    match = records.find(r => targetTokens.every(tok => r.cleanName.includes(tok)));
+  }
+
+  // Last name match if unique/rare
+  if (!match && targetTokens.length === 1 && targetTokens[0].length >= 4) {
+    match = records.find(r => {
+      const tokens = r.cleanName.split(' ');
+      return tokens.includes(targetTokens[0]);
+    });
+  }
+
+  if (match) {
+    return {
+      address: match.address || '',
+      phone: match.phone || ''
+    };
+  }
+
+  return { address: '', phone: '' };
+}
 
 function callMondayGraphQL(query, variables = {}) {
   return new Promise((resolve, reject) => {
@@ -90,8 +185,8 @@ Analyze this voice note from William:
 
 Extract into JSON:
 - clientName: Customer full name or honorific + last name only (e.g. "Tom Amann", "Mrs. Donley", "Cindy Fuji San"). Strip trailing time/day words.
-- address: Customer address if mentioned or inferred, else empty string "".
-- phone: Customer phone number if mentioned, else empty string "".
+- address: Customer address if explicitly stated in audio, else "".
+- phone: Customer phone number if explicitly stated in audio, else "".
 - equipment: Item or issue mentioned (e.g. "Vacuum", "Filter", "Guardian Air").
 - notes: Full details of the job.
 - destination: "calendar" (if date/time/pickup mentioned), "bench" (if shop repair/diagnostic), or "intake" (counter drop-off).
@@ -277,11 +372,16 @@ exports.handler = async (event) => {
     const cleanCardTitle = decision.clientName || 'Direct Intake';
     const noteContent = decision.notes || rawTranscript;
 
-    // 4. Populate Columns: Notes, Address, Phone, Date
+    // 4. Cross-Reference 22,283 Customer Vault
+    const matchedVault = matchCustomerVault(decision.clientName);
+    const finalAddress = decision.address || matchedVault.address || '';
+    const finalPhone = decision.phone || matchedVault.phone || '';
+
+    // 5. Populate Board Columns: Notes, Verified Address, Verified Phone, Date
     const colValuesObj = {
       [COL_LONG_TEXT]: { text: noteContent },
-      [COL_ADDRESS]: decision.address || '',
-      [COL_PHONE]: decision.phone || ''
+      [COL_ADDRESS]: finalAddress,
+      [COL_PHONE]: finalPhone
     };
 
     if (decision.destination === 'calendar' && decision.targetDate) {
@@ -313,8 +413,8 @@ exports.handler = async (event) => {
         id: newId,
         clientName: cleanCardTitle,
         notes: noteContent,
-        address: decision.address || '',
-        phone: decision.phone || '',
+        address: finalAddress,
+        phone: finalPhone,
         equipment: decision.equipment || '',
         destination: decision.destination || 'intake',
         status: decision.status || 'intake',
