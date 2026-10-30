@@ -1,7 +1,8 @@
 /**
  * Netlify Serverless Function: /.netlify/functions/intake
  * Role: Fresh 🤵 Autonomous Digital Coordinator Brain
- * Engine: Gemini AI (Intent & Parsing) -> Monday.com GraphQL Mutations
+ * Priority 1: Zero-dependency command execution (wipe/clean/archive)
+ * Priority 2: Gemini AI intake & routing -> Monday.com mutations
  */
 
 const https = require('https');
@@ -59,13 +60,11 @@ function callMondayGraphQL(query, variables = {}) {
 function callGeminiCoordinator(transcript) {
   return new Promise((resolve) => {
     if (!GEMINI_API_KEY) {
-      const isCmd = /clean|clear|archive/i.test(transcript);
-      const isBench = /bench|motor|repair|diagnostic|spark/i.test(transcript);
-      const isSched = /today|tomorrow|\d{1,2}(:\d{2})?\s*(am|pm)/i.test(transcript);
+      const isBench = /\b(bench|motor|repair|diagnostic|spark|smoke|cord|belt)\b/i.test(transcript);
+      const isSched = /\b(today|tomorrow|\d{1,2}(:\d{2})?\s*(am|pm))\b/i.test(transcript);
 
       return resolve({
-        intent: isCmd ? 'COMMAND' : 'INTAKE',
-        command: isCmd ? 'ARCHIVE_ALL' : null,
+        intent: 'INTAKE',
         clientName: transcript.split(/\s+/).slice(0, 2).join(' ') || 'Direct Intake',
         equipment: 'Aerus / Vacuum Unit',
         notes: transcript,
@@ -80,30 +79,17 @@ function callGeminiCoordinator(transcript) {
 Analyze this voice transcript from William:
 "${transcript}"
 
-Classify into one of 3 INTENTS:
-1. "COMMAND":
-   - Triggers: "clean shop floor", "archive test cards", "clear board", "wipe screen", "archive everything".
-   - Set command="ARCHIVE_ALL".
+Extract intake details:
+- clientName: Clean customer name ONLY (preserve honorifics like "Mrs. Donley", strip temporal words like "Today", "Tomorrow").
+- equipment: Machine or item mentioned.
+- notes: Detailed description of the job.
+- destination: "calendar" (if time/date/pickup scheduled), "bench" (if bench test/motor repair needed), or "intake" (general counter intake).
+- status: "intake", "bench", "parts", or "route".
+- time: Specific time if mentioned (e.g. "11:00 AM"), else "Pending".
+- freshResponse: Crisp, motivating 1-2 sentence confirmation. If time is missing on a schedule request, ask directly.
 
-2. "INTAKE":
-   - Triggers: Customer intakes, service calls, bench repairs, pickups, deliveries, parts notes.
-   - Extract:
-     * clientName: Clean customer name ONLY (preserve honorifics like "Mrs. Donley", strip temporal words like "Today", "Tomorrow").
-     * equipment: What machine/issue is mentioned (e.g., "Hoover Upright", "Guardian Air", "Filter cleanout").
-     * notes: Full detailed description of the job or customer request.
-     * destination: "calendar" (if time/date/pickup scheduled), "bench" (if bench test/motor repair needed), or "intake" (general showroom/counter intake).
-     * status: "intake", "bench", "parts", or "route".
-     * time: Specific time if mentioned (e.g. "11:00 AM"), else "Pending".
-     * freshResponse: A crisp, professional, motivating 1-2 sentence response confirming what you locked down. If an appointment is mentioned without a time, ask for the arrival time directly.
-
-3. "CONVERSATION":
-   - Questions, check-ins, or unclear comments.
-   - Set freshResponse to guide William forward with high energy.
-
-Respond ONLY with pure JSON (no markdown ticks, no backticks, no wrapping):
+Respond ONLY with pure JSON (no markdown backticks):
 {
-  "intent": "INTAKE" | "COMMAND" | "CONVERSATION",
-  "command": "ARCHIVE_ALL" | null,
   "clientName": "...",
   "equipment": "...",
   "notes": "...",
@@ -139,7 +125,6 @@ Respond ONLY with pure JSON (no markdown ticks, no backticks, no wrapping):
           resolve(JSON.parse(cleanedText));
         } catch (e) {
           resolve({
-            intent: 'INTAKE',
             clientName: 'Direct Intake',
             notes: transcript,
             destination: 'intake',
@@ -152,13 +137,12 @@ Respond ONLY with pure JSON (no markdown ticks, no backticks, no wrapping):
     });
 
     req.on('error', () => resolve({
-      intent: 'INTAKE',
       clientName: 'Direct Intake',
       notes: transcript,
       destination: 'intake',
       status: 'intake',
       time: 'Pending',
-      freshResponse: `Got it locked down: "${transcript}"`
+      freshResponse: `Got it: "${transcript}"`
     }));
 
     req.write(postData);
@@ -190,11 +174,9 @@ exports.handler = async (event) => {
       };
     }
 
-    // 1. Run Gemini Intent Brain
-    const decision = await callGeminiCoordinator(rawTranscript);
-
-    // 2. Handle System Commands (Bulk Move to Archive)
-    if (decision.intent === 'COMMAND' && decision.command === 'ARCHIVE_ALL') {
+    // 1. Immediate Command Execution (Zero API dependencies)
+    const isCleanCommand = /\b(clean|clear|archive|wipe)\b/i.test(rawTranscript);
+    if (isCleanCommand) {
       const fetchQuery = `
         query {
           boards(ids: [${MONDAY_BOARD_ID}]) {
@@ -227,12 +209,14 @@ exports.handler = async (event) => {
         body: JSON.stringify({
           action: 'CLEAN_FLOOR',
           archivedCount: activeItems.length,
-          freshResponse: `Shop floor swept clean! Archived ${activeItems.length} active cards. Launchpad is open and ready to roll! 💥`
+          freshResponse: `Shop floor cleared! Archived ${activeItems.length} cards.`
         })
       };
     }
 
-    // 3. Resolve Destination Group
+    // 2. Normal Intake Routing via Coordinator
+    const decision = await callGeminiCoordinator(rawTranscript);
+
     let targetGroup = GROUP_INTAKE;
     if (decision.destination === 'calendar') targetGroup = GROUP_CALENDAR;
     if (decision.destination === 'bench') targetGroup = GROUP_WORKBENCH;
@@ -240,7 +224,6 @@ exports.handler = async (event) => {
     const cleanCardTitle = decision.clientName || 'Direct Intake';
     const noteContent = decision.notes || rawTranscript;
 
-    // 4. Create Card & Attach Detailed Notes to long_text_mm5vbykc
     const colValuesObj = {};
     colValuesObj[COL_LONG_TEXT] = { text: noteContent };
 
