@@ -3,10 +3,11 @@
  * Role: Fresh 🤵 Autonomous Digital Coordinator Brain
  * Engine: Gemini 3.8 Flash (v1beta) -> Monday.com GraphQL Mutations
  * Features:
- *  - Lane & Data Preservation on Upsert (no accidental group/data overwrites)
- *  - Internal/Supplier tasks -> William Sullivan Pinball card
+ *  - Sissy's Internal Audit Gate (Zero meta-command leakage)
+ *  - Intelligent Note Synthesis (APPEND vs. REPLACE mode)
+ *  - One Customer = One Card Law (Upsert with Lane & Data Defense)
+ *  - Internal/Supplier errands (FOAS, Desco, Amazon) -> William Sullivan Card
  *  - Quote-Aware 22,283 Customer Vault Auto-Matcher (Address & Phone)
- *  - Timestamped history appending in long_text_mm5vbykc
  */
 
 const https = require('https');
@@ -173,29 +174,36 @@ function callGeminiCoordinator(transcript) {
 
     const todayISO = new Date().toISOString().split('T')[0];
 
-    const systemPrompt = `You are Fresh, the sharp AI Digital Coordinator for William Sullivan at Aerus Home Wellness.
+    const systemPrompt = `You are Fresh & Sissy, the AI Digital Coordinator & Quality Audit Gate for William Sullivan at Aerus Home Wellness.
 Today's Date: ${todayISO}.
 Analyze William's voice note or typed text:
 "${transcript}"
 
+AUDIT GATE RULES (CRITICAL):
+1. ZERO META-COMMAND LEAKAGE:
+   - When William says meta-instructions like "match her location", "clean out the placeholder note", "update address to X", or "fix the card", STRIP THOSE WORDS OUT.
+   - The "notes" field must contain ONLY the clean, polished, professional customer or service job description. Never allow administrative chatter into the note.
+2. NOTE MODE SYNTHESIS:
+   - "REPLACE": If William is correcting, editing, rewriting, or saying "clean up note", "update note to", or "replace note".
+   - "APPEND": If William is providing additional info, saying "also customer said", adding an update, or dropping routine new details.
+3. INTERNAL TASKS:
+   - Supplier orders (FOAS, Desco, Amazon, parts sourcing) or general William errands -> set clientName: "William Sullivan", destination: "intake", explicitDestinationChange: false.
+
 Classify into one of these actions:
 1. "INTAKE": Distinct jobs, customer appointments, parts orders, bench repairs, or shop errands.
-   - If an item is an internal shop task, supplier order (FOAS, Desco, Amazon, parts sourcing), or general William errand:
-     * Set clientName: "William Sullivan"
-     * Set destination: "intake" (Pinball)
-     * Set explicitDestinationChange: false
-   - If an item is a customer repair, pickup, delivery, tune-up, or appointment:
-     * clientName: Clean customer name (e.g. "Tom Amann", "Mrs. Donley"). Strip time/date words.
+   - Extract EVERY DISTINCT task into the "cards" array.
+   - Each card must have:
+     * clientName: Clean customer name (e.g. "Tom Amann", "Mrs. Donley") or "William Sullivan".
      * address: Customer address if explicitly spoken/typed, else "".
      * phone: Customer phone if explicitly spoken/typed, else "".
-     * equipment: Item or issue mentioned.
-     * notes: Full description for this distinct task.
-     * destination: "calendar" (if date/time/visit scheduled), "bench" (if repair/diagnostic), or "intake" (showroom drop-off).
-     * explicitDestinationChange: true if transcript explicitly asks to move lanes (e.g. "schedule for tomorrow", "move to bench", "put in field route"), false if it's just adding a note or comment.
+     * equipment: Machine or item mentioned.
+     * notes: Clean, professional job note ONLY (zero meta-banter).
+     * noteMode: "APPEND" | "REPLACE".
+     * destination: "calendar" | "bench" | "intake".
+     * explicitDestinationChange: true if transcript explicitly demands a move to bench/calendar/route, false otherwise.
      * status: "intake" | "bench" | "parts" | "route".
      * time: Time if stated (e.g. "11:30 AM"), else "Pending".
      * targetDate: YYYY-MM-DD format if scheduled date mentioned, else null.
-   - Extract EVERY DISTINCT task into the "cards" array.
    - freshResponse: Punchy, motivational 1-sentence confirmation.
 
 2. "COMMAND_SWEEP_FLOOR": William explicitly orders to sweep, clear, or archive the entire active floor.
@@ -212,6 +220,7 @@ Return pure JSON only (no markdown code blocks):
       "phone": "...",
       "equipment": "...",
       "notes": "...",
+      "noteMode": "APPEND" | "REPLACE",
       "destination": "calendar" | "bench" | "intake",
       "explicitDestinationChange": true | false,
       "status": "intake" | "bench" | "parts" | "route",
@@ -408,12 +417,13 @@ exports.handler = async (event) => {
       };
     }
 
-    // Action 4: Multi-Card Intake Processing with Lane & Data Preservation (Upsert)
+    // Action 4: Multi-Card Intake Processing with Audit Gate
     const cardsToProcess = Array.isArray(decision.cards) && decision.cards.length > 0 
       ? decision.cards 
       : [{
           clientName: decision.clientName || 'Direct Intake',
           notes: decision.notes || rawTranscript,
+          noteMode: 'APPEND',
           address: decision.address || '',
           phone: decision.phone || '',
           destination: decision.destination || 'intake',
@@ -423,7 +433,7 @@ exports.handler = async (event) => {
           targetDate: decision.targetDate || null
         }];
 
-    // Fetch active cards with all column values to protect existing data
+    // Fetch active cards to check for existing customer cards
     const activeBoardQuery = `
       query {
         boards(ids: [${MONDAY_BOARD_ID}]) {
@@ -460,9 +470,9 @@ exports.handler = async (event) => {
       const existingCard = activeExisting.find(item => item.name.toLowerCase().trim() === targetLower);
 
       if (existingCard) {
-        // --- UPSERT: PRESERVE LANE, PRESERVE DATA, APPEND HISTORY ---
+        // --- UPSERT: AUDIT GATE NOTE SYNTHESIS + LANE & DATA DEFENSE ---
 
-        // 1. Lane Preservation: Keep current lane unless explicitly told to move or scheduled
+        // 1. Lane Preservation
         const shouldChangeGroup = Boolean(card.explicitDestinationChange || (card.destination === 'calendar' && card.targetDate));
         const finalGroup = shouldChangeGroup ? targetGroup : (existingCard.group?.id || targetGroup);
 
@@ -476,7 +486,7 @@ exports.handler = async (event) => {
           `);
         }
 
-        // 2. Extract current values to prevent blanking
+        // 2. Extract current values
         let existingNotes = '';
         let existingAddress = '';
         let existingPhone = '';
@@ -492,17 +502,20 @@ exports.handler = async (event) => {
           if (cPhone && cPhone.text) existingPhone = cPhone.text.trim();
         }
 
-        // 3. Timestamped Notes History
-        const timestampStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const updatedNotes = existingNotes 
-          ? `${existingNotes}\n\n[${timestampStr}] ${noteContent}`
-          : noteContent;
+        // 3. Sissy's Intelligent Edit vs. Append
+        let updatedNotes = noteContent;
+        if (card.noteMode === 'REPLACE' || !existingNotes) {
+          updatedNotes = noteContent;
+        } else {
+          const timestampStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          updatedNotes = `${existingNotes}\n\n[${timestampStr}] ${noteContent}`;
+        }
 
         const updateColValues = {
           [COL_LONG_TEXT]: { text: updatedNotes }
         };
 
-        // 4. Preserve Address & Phone (only overwrite if explicitly given in note)
+        // 4. Preserve Address & Phone
         if (card.address && card.address.trim()) {
           updateColValues[COL_ADDRESS] = card.address.trim();
         } else if (!existingAddress) {
@@ -517,7 +530,7 @@ exports.handler = async (event) => {
           if (matchedVault.phone) updateColValues[COL_PHONE] = matchedVault.phone;
         }
 
-        // 5. Preserve Date (only update if an explicit targetDate was scheduled)
+        // 5. Preserve Date
         if (card.targetDate) {
           updateColValues[COL_DATE] = { date: card.targetDate };
         }
@@ -545,7 +558,7 @@ exports.handler = async (event) => {
         });
 
       } else {
-        // --- NEW CARD CREATION: Full Vault Match & Wire ---
+        // --- NEW CARD CREATION: Full Vault Match & Clean Note ---
         const matchedVault = matchCustomerVault(card.clientName);
         const finalAddress = card.address || matchedVault.address || '';
         const finalPhone = card.phone || matchedVault.phone || '';
@@ -606,7 +619,7 @@ exports.handler = async (event) => {
     const firstCard = createdResults[0] || {};
     const defaultResponse = createdResults.length > 1
       ? `Locked down ${createdResults.length} tasks across your board, Coach!`
-      : (firstCard.updatedExisting ? `Updated record for ${firstCard.clientName}!` : `Card locked down for ${firstCard.clientName || 'Direct Intake'}!`);
+      : (firstCard.updatedExisting ? `Polished record updated for ${firstCard.clientName}!` : `Card locked down for ${firstCard.clientName || 'Direct Intake'}!`);
 
     return {
       statusCode: 200,
