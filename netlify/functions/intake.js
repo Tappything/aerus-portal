@@ -2,12 +2,13 @@
  * Netlify Serverless Function: /.netlify/functions/intake
  * Role: Fresh 🤵 Autonomous Digital Coordinator Brain
  * Engine: Gemini 3.8 Flash (v1beta) -> Monday.com GraphQL Mutations
- * Features:
- *  - Issue #2 Security Bouncer: No Incomplete Standalone Forever Cards
- *    (Missing address diverts as alert task docking to "William Sullivan" in Pinball)
- *  - Sissy's Internal Audit Gate (Zero meta-command leakage, APPEND vs REPLACE)
- *  - One Customer = One Card Law (Upsert with Lane & Data Defense)
- *  - Quote-Aware 22,283 Customer Vault Auto-Matcher (Address & Phone)
+ * 
+ * THE IMMUTABLE FOREVER CARD™ LAW:
+ *  1. A Forever Card belongs ONLY to a verified human person (First + Last name).
+ *  2. Generic tasks, errands, locations ("Essex Pickup"), suppliers ("FOAS", "Desco", "Amazon"),
+ *     or placeholders ("New Lead", "Direct Intake") are STRICTLY FORBIDDEN from creating standalone cards.
+ *  3. Any non-human intake DOCKS directly onto "William Sullivan" in Pinball (GROUP_INTAKE).
+ *  4. Sissy asks William directly to identify the human so a Forever Card can be issued later.
  */
 
 const https = require('https');
@@ -104,7 +105,7 @@ function loadVaultRecords() {
 }
 
 function matchCustomerVault(clientName) {
-  if (!clientName || clientName === 'William Sullivan') return { address: '', phone: '' };
+  if (!clientName || isNonHumanEntity(clientName)) return { address: '', phone: '' };
 
   const records = loadVaultRecords();
   if (!records || records.length === 0) return { address: '', phone: '' };
@@ -126,6 +127,32 @@ function matchCustomerVault(clientName) {
   }
 
   return match ? { address: match.address || '', phone: match.phone || '' } : { address: '', phone: '' };
+}
+
+// Bouncer check: Is this a legitimate human name or a junk entity?
+function isNonHumanEntity(name) {
+  if (!name) return true;
+  const n = name.trim().toLowerCase();
+  
+  if (n === 'william sullivan' || n === 'william') return false; // Allowed for master task docking
+
+  // Prohibited keywords, suppliers, actions, and generic phrases
+  const junkPatterns = [
+    /\b(pickup|pick up|delivery|dropoff|drop off|errand|order|lead|task|call|tuneup|tune up)\b/i,
+    /\b(foas|desco|amazon|aerus|homedepot|lowes|ups|fedex|usps)\b/i,
+    /\b(essex|dundalk|towson|timonium|perry hall|baltimore|bel air|white marsh|parkville)\b/i,
+    /\b(new lead|direct intake|key missing|unverified|shop floor|counter)\b/i
+  ];
+
+  for (const pattern of junkPatterns) {
+    if (pattern.test(n)) return true;
+  }
+
+  // Must have at least two parts (First + Last or Honorific + Last)
+  const tokens = n.split(/\s+/).filter(t => t.length > 0);
+  if (tokens.length < 2) return true;
+
+  return false;
 }
 
 function callMondayGraphQL(query, variables = {}) {
@@ -179,42 +206,52 @@ Today's Date: ${todayISO}.
 Analyze William's voice note or typed text:
 "${transcript}"
 
-AUDIT GATE RULES (CRITICAL):
-1. ZERO META-COMMAND LEAKAGE:
-   - When William says meta-instructions like "match her location", "clean out the placeholder note", "update address to X", or "fix the card", STRIP THOSE WORDS OUT.
-   - The "notes" field must contain ONLY the clean, polished, professional customer or service job description. Never allow administrative chatter into the note.
-2. NOTE MODE SYNTHESIS:
-   - "REPLACE": If William is correcting, editing, rewriting, or saying "clean up note", "update note to", or "replace note".
-   - "APPEND": If William is providing additional info, saying "also customer said", adding an update, or dropping routine new details.
-3. INTERNAL TASKS:
-   - Supplier orders (FOAS, Desco, Amazon, parts sourcing) or general William errands -> set clientName: "William Sullivan", destination: "intake", explicitDestinationChange: false.
+CRITICAL DATA INTEGRITY LAWS:
+1. THE FOREVER CARD LAW:
+   - A customer card belongs ONLY to an individual human being (First + Last name, e.g. "Tom Amann", "Mrs. Donley").
+   - NEVER extract a location ("Essex Pickup"), supplier ("FOAS"), task ("Pick up filter"), or generic phrase ("New Lead") as a clientName.
+   - If an item is an errand, supplier order, or generic task:
+     * Set isHumanCustomer: false
+     * Set nonHumanLabel: The task/location label (e.g. "Essex Pickup", "FOAS Order")
+     * Set clientName: "William Sullivan"
+     * Set destination: "intake"
+2. SISSY'S CLARIFYING QUESTION:
+   - If William mentions a location-based task or vague lead without a person's name (e.g. "Essex pickup tomorrow", "New lead for an air unit"):
+     * In freshResponse, confirm the task is docked to William's card, AND immediately ask: "Who is the customer for this so I can issue their Forever Card?"
+3. AUDIT GATE NOTE SYNTHESIS:
+   - ZERO META-COMMAND LEAKAGE: Strip out operational chatter ("clean note", "update address", etc.).
+   - noteMode: "APPEND" | "REPLACE".
 
 Classify into one of these actions:
 1. "INTAKE": Distinct jobs, customer appointments, parts orders, bench repairs, or shop errands.
    - Extract EVERY DISTINCT task into the "cards" array.
    - Each card must have:
-     * clientName: Clean customer name (e.g. "Tom Amann", "Mrs. Donley") or "William Sullivan".
-     * address: Customer address if explicitly spoken/typed, else "".
-     * phone: Customer phone if explicitly spoken/typed, else "".
-     * equipment: Machine or item mentioned.
-     * notes: Clean, professional job note ONLY (zero meta-banter).
-     * noteMode: "APPEND" | "REPLACE".
-     * destination: "calendar" | "bench" | "intake".
-     * explicitDestinationChange: true if transcript explicitly demands a move to bench/calendar/route, false otherwise.
-     * status: "intake" | "bench" | "parts" | "route".
-     * time: Time if stated (e.g. "11:30 AM"), else "Pending".
-     * targetDate: YYYY-MM-DD format if scheduled date mentioned, else null.
-   - freshResponse: Punchy, motivational 1-sentence confirmation.
+     * isHumanCustomer: true | false
+     * nonHumanLabel: "..." (or null)
+     * clientName: Clean human name or "William Sullivan"
+     * address: Customer address if explicitly spoken/typed, else ""
+     * phone: Customer phone if explicitly spoken/typed, else ""
+     * equipment: Machine or item mentioned
+     * notes: Clean, professional job note ONLY
+     * noteMode: "APPEND" | "REPLACE"
+     * destination: "calendar" | "bench" | "intake"
+     * explicitDestinationChange: true | false
+     * status: "intake" | "bench" | "parts" | "route"
+     * time: Time if stated, else "Pending"
+     * targetDate: YYYY-MM-DD format if scheduled, else null
+   - freshResponse: Punchy confirmation + human identification question if non-human task.
 
-2. "COMMAND_SWEEP_FLOOR": William explicitly orders to sweep, clear, or archive the entire active floor.
-3. "COMMAND_ARCHIVE_SPECIFIC": William wants to archive a specific record or duplicate (provide "targetClient").
-4. "CONVERSATION": Questions, coaching, check-ins. Provide motivating "freshResponse".
+2. "COMMAND_SWEEP_FLOOR": Explicit instruction to sweep or archive active floor.
+3. "COMMAND_ARCHIVE_SPECIFIC": Explicit instruction to archive a specific record (targetClient).
+4. "CONVERSATION": Direct coaching, check-ins, questions.
 
-Return pure JSON only (no markdown code blocks):
+Return pure JSON only (no markdown):
 {
   "action": "INTAKE" | "COMMAND_SWEEP_FLOOR" | "COMMAND_ARCHIVE_SPECIFIC" | "CONVERSATION",
   "cards": [
     {
+      "isHumanCustomer": true,
+      "nonHumanLabel": null,
       "clientName": "...",
       "address": "...",
       "phone": "...",
@@ -222,7 +259,7 @@ Return pure JSON only (no markdown code blocks):
       "notes": "...",
       "noteMode": "APPEND" | "REPLACE",
       "destination": "calendar" | "bench" | "intake",
-      "explicitDestinationChange": true | false,
+      "explicitDestinationChange": false,
       "status": "intake" | "bench" | "parts" | "route",
       "time": "...",
       "targetDate": "..."
@@ -417,10 +454,11 @@ exports.handler = async (event) => {
       };
     }
 
-    // Action 4: Multi-Card Intake Processing with Security Bouncer & Audit Gate
+    // Action 4: Intake Processing with Ironclad Non-Human Enforcement
     const cardsToProcess = Array.isArray(decision.cards) && decision.cards.length > 0 
       ? decision.cards 
       : [{
+          isHumanCustomer: true,
           clientName: decision.clientName || 'Direct Intake',
           notes: decision.notes || rawTranscript,
           noteMode: 'APPEND',
@@ -433,7 +471,7 @@ exports.handler = async (event) => {
           targetDate: decision.targetDate || null
         }];
 
-    // Fetch active cards to check for existing customer cards
+    // Fetch active items on board
     const activeBoardQuery = `
       query {
         boards(ids: [${MONDAY_BOARD_ID}]) {
@@ -459,20 +497,108 @@ exports.handler = async (event) => {
     const createdResults = [];
 
     for (const card of cardsToProcess) {
+      const rawTitle = (card.clientName || '').trim();
+      const noteContent = card.notes || rawTranscript;
+      
+      // HARD BOUNCER: Check if this is a genuine human being
+      const isJunk = isNonHumanEntity(rawTitle) || card.isHumanCustomer === false;
+      const isInternalWilliam = rawTitle.toLowerCase().includes('william sullivan') || rawTitle.toLowerCase() === 'william';
+
+      // If it is junk/non-human, FORCE it onto William Sullivan's card in Pinball
+      if (isJunk && !isInternalWilliam) {
+        const taskLabel = card.nonHumanLabel || rawTitle || 'Operational Task';
+        const formattedTaskNote = `📋 [OPERATIONAL TASK - DOCKED TO WILLIAM] Ref: ${taskLabel} | Time: ${card.time || 'Pending'} | Details: ${noteContent}`;
+
+        let williamCard = activeExisting.find(item => item.name.toLowerCase().trim() === 'william sullivan');
+
+        if (williamCard) {
+          let currentNotes = '';
+          if (Array.isArray(williamCard.column_values)) {
+            const cNote = williamCard.column_values.find(c => c.id === COL_LONG_TEXT);
+            if (cNote && cNote.text) currentNotes = cNote.text.trim();
+          }
+
+          const timestampStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const appendedNotes = currentNotes 
+            ? `${currentNotes}\n\n[${timestampStr}] ${formattedTaskNote}`
+            : formattedTaskNote;
+
+          await callMondayGraphQL(`
+            mutation UpdateCard($boardId: ID!, $itemId: ID!, $colValues: JSON!) {
+              change_multiple_column_values(board_id: $boardId, item_id: $itemId, column_values: $colValues) {
+                id
+              }
+            }
+          `, {
+            boardId: MONDAY_BOARD_ID,
+            itemId: williamCard.id,
+            colValues: JSON.stringify({ [COL_LONG_TEXT]: { text: appendedNotes } })
+          });
+
+          createdResults.push({
+            id: williamCard.id,
+            clientName: 'William Sullivan',
+            notes: appendedNotes,
+            destination: 'intake',
+            status: 'intake',
+            time: 'Pending',
+            freshNotice: `Docked "${taskLabel}" onto William Sullivan's Pinball card. Who is the customer for this so I can issue their Forever Card?`
+          });
+        } else {
+          // Create Master William Sullivan card
+          const colValuesObj = {
+            [COL_LONG_TEXT]: { text: formattedTaskNote }
+          };
+
+          const createMutation = `
+            mutation CreateCard($boardId: ID!, $groupId: String!, $itemName: String!, $colValues: JSON!) {
+              create_item(board_id: $boardId, group_id: $groupId, item_name: $itemName, column_values: $colValues) {
+                id
+                name
+              }
+            }
+          `;
+
+          const mondayRes = await callMondayGraphQL(createMutation, {
+            boardId: MONDAY_BOARD_ID,
+            groupId: GROUP_INTAKE,
+            itemName: 'William Sullivan',
+            colValues: JSON.stringify(colValuesObj)
+          });
+
+          const newWilliamId = mondayRes?.data?.create_item?.id || Date.now();
+          activeExisting.push({
+            id: newWilliamId,
+            name: 'William Sullivan',
+            group: { id: GROUP_INTAKE },
+            column_values: [{ id: COL_LONG_TEXT, text: formattedTaskNote }]
+          });
+
+          createdResults.push({
+            id: newWilliamId,
+            clientName: 'William Sullivan',
+            notes: formattedTaskNote,
+            destination: 'intake',
+            status: 'intake',
+            time: 'Pending',
+            freshNotice: `Docked "${taskLabel}" onto William Sullivan's Pinball card. Who is the customer for this so I can issue their Forever Card?`
+          });
+        }
+
+        continue; // DO NOT PROCEED TO CREATE A JUNK STANDALONE CARD!
+      }
+
+      // --- HUMAN RECORD PROCESSING ---
       let targetGroup = GROUP_INTAKE;
       if (card.destination === 'calendar') targetGroup = GROUP_CALENDAR;
       if (card.destination === 'bench') targetGroup = GROUP_WORKBENCH;
 
-      const cleanCardTitle = card.clientName || 'Direct Intake';
-      const noteContent = card.notes || rawTranscript;
+      const cleanCardTitle = rawTitle;
       const targetLower = cleanCardTitle.toLowerCase().trim();
-
       const existingCard = activeExisting.find(item => item.name.toLowerCase().trim() === targetLower);
 
       if (existingCard) {
-        // --- UPSERT: AUDIT GATE NOTE SYNTHESIS + LANE & DATA DEFENSE ---
-
-        // 1. Lane Preservation
+        // UPSERT EXISTING HUMAN CARD
         const shouldChangeGroup = Boolean(card.explicitDestinationChange || (card.destination === 'calendar' && card.targetDate));
         const finalGroup = shouldChangeGroup ? targetGroup : (existingCard.group?.id || targetGroup);
 
@@ -486,7 +612,6 @@ exports.handler = async (event) => {
           `);
         }
 
-        // 2. Extract current values
         let existingNotes = '';
         let existingAddress = '';
         let existingPhone = '';
@@ -502,7 +627,6 @@ exports.handler = async (event) => {
           if (cPhone && cPhone.text) existingPhone = cPhone.text.trim();
         }
 
-        // 3. Sissy's Intelligent Edit vs. Append
         let updatedNotes = noteContent;
         if (card.noteMode === 'REPLACE' || !existingNotes) {
           updatedNotes = noteContent;
@@ -515,7 +639,6 @@ exports.handler = async (event) => {
           [COL_LONG_TEXT]: { text: updatedNotes }
         };
 
-        // 4. Preserve Address & Phone
         if (card.address && card.address.trim()) {
           updateColValues[COL_ADDRESS] = card.address.trim();
         } else if (!existingAddress) {
@@ -530,7 +653,6 @@ exports.handler = async (event) => {
           if (matchedVault.phone) updateColValues[COL_PHONE] = matchedVault.phone;
         }
 
-        // 5. Preserve Date
         if (card.targetDate) {
           updateColValues[COL_DATE] = { date: card.targetDate };
         }
@@ -554,25 +676,21 @@ exports.handler = async (event) => {
           destination: finalGroup === GROUP_CALENDAR ? 'calendar' : (finalGroup === GROUP_WORKBENCH ? 'bench' : 'intake'),
           status: card.status || 'intake',
           time: card.time || 'Pending',
-          updatedExisting: true,
-          divertedToWilliam: false
+          updatedExisting: true
         });
 
       } else {
-        // --- NEW CARD CHECK: THE SECURITY BOUNCER RULE ---
+        // NEW HUMAN CUSTOMER: Vault match and address check
         const matchedVault = matchCustomerVault(card.clientName);
         const finalAddress = card.address || matchedVault.address || '';
         const finalPhone = card.phone || matchedVault.phone || '';
-        const isInternalTask = (cleanCardTitle === 'William Sullivan' || targetLower.includes('william sullivan'));
 
-        // If it's a customer (not internal task) and has NO verified address, BOUNCE IT!
-        if (!isInternalTask && !finalAddress) {
+        // Address Bouncer: Human must have a verified address or be redirected to William
+        if (!finalAddress && !isInternalWilliam) {
           const bouncerAlertNote = `⚠️ [UNVERIFIED INTAKE - MISSING ADDRESS] Customer: ${cleanCardTitle} | Scheduled: ${card.time || 'Pending'} | Notes: ${noteContent}`;
-          const williamLower = 'william sullivan';
-          let williamCard = activeExisting.find(item => item.name.toLowerCase().trim() === williamLower);
+          let williamCard = activeExisting.find(item => item.name.toLowerCase().trim() === 'william sullivan');
 
           if (williamCard) {
-            // Append bouncer alert to existing William card
             let currentWilliamNotes = '';
             if (Array.isArray(williamCard.column_values)) {
               const cNote = williamCard.column_values.find(c => c.id === COL_LONG_TEXT);
@@ -599,50 +717,11 @@ exports.handler = async (event) => {
             createdResults.push({
               id: williamCard.id,
               clientName: cleanCardTitle,
-              divertedToWilliam: true,
-              freshNotice: `Flagged unverified intake for ${cleanCardTitle} on William's card in Pinball — needs address before issuing Forever Card.`
-            });
-
-          } else {
-            // Create William Sullivan card in Pinball with alert
-            const colValuesObj = {
-              [COL_LONG_TEXT]: { text: bouncerAlertNote }
-            };
-
-            const createMutation = `
-              mutation CreateCard($boardId: ID!, $groupId: String!, $itemName: String!, $colValues: JSON!) {
-                create_item(board_id: $boardId, group_id: $groupId, item_name: $itemName, column_values: $colValues) {
-                  id
-                  name
-                }
-              }
-            `;
-
-            const mondayRes = await callMondayGraphQL(createMutation, {
-              boardId: MONDAY_BOARD_ID,
-              groupId: GROUP_INTAKE,
-              itemName: 'William Sullivan',
-              colValues: JSON.stringify(colValuesObj)
-            });
-
-            const newWilliamId = mondayRes?.data?.create_item?.id || Date.now();
-            activeExisting.push({
-              id: newWilliamId,
-              name: 'William Sullivan',
-              group: { id: GROUP_INTAKE },
-              column_values: [{ id: COL_LONG_TEXT, text: bouncerAlertNote }]
-            });
-
-            createdResults.push({
-              id: newWilliamId,
-              clientName: cleanCardTitle,
-              divertedToWilliam: true,
               freshNotice: `Flagged unverified intake for ${cleanCardTitle} on William's card in Pinball — needs address before issuing Forever Card.`
             });
           }
-
         } else {
-          // --- VERIFIED ADDRESS EXISTS (OR INTERNAL TASK): CREATE STANDALONE CARD ---
+          // VERIFIED HUMAN: Create single Forever Card
           const colValuesObj = {
             [COL_LONG_TEXT]: { text: noteContent },
             [COL_ADDRESS]: finalAddress,
@@ -691,8 +770,7 @@ exports.handler = async (event) => {
             destination: card.destination || 'intake',
             status: card.status || 'intake',
             time: card.time || 'Pending',
-            updatedExisting: false,
-            divertedToWilliam: false
+            updatedExisting: false
           });
         }
       }
@@ -701,12 +779,12 @@ exports.handler = async (event) => {
     const firstCard = createdResults[0] || {};
     let finalFreshReply = decision.freshResponse;
 
-    if (firstCard.divertedToWilliam && firstCard.freshNotice) {
+    if (firstCard.freshNotice) {
       finalFreshReply = firstCard.freshNotice;
     } else if (!finalFreshReply) {
       finalFreshReply = createdResults.length > 1
-        ? `Locked down ${createdResults.length} tasks across your board, Coach!`
-        : (firstCard.updatedExisting ? `Polished record updated for ${firstCard.clientName}!` : `Card locked down for ${firstCard.clientName || 'Direct Intake'}!`);
+        ? `Processed ${createdResults.length} items with complete integrity, Coach!`
+        : (firstCard.updatedExisting ? `Polished record updated for ${firstCard.clientName}!` : `Card locked down for ${firstCard.clientName}!`);
     }
 
     return {
@@ -714,7 +792,7 @@ exports.handler = async (event) => {
       headers,
       body: JSON.stringify({
         id: firstCard.id || Date.now(),
-        clientName: firstCard.clientName || 'Direct Intake',
+        clientName: firstCard.clientName || 'William Sullivan',
         notes: firstCard.notes || rawTranscript,
         address: firstCard.address || '',
         phone: firstCard.phone || '',
