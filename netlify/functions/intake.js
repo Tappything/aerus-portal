@@ -2,11 +2,10 @@
  * Netlify Serverless Function: /.netlify/functions/intake
  * Role: Fresh 🤵 Autonomous Digital Coordinator Brain
  * Engine: Gemini 3.8 Flash (v1beta) -> Monday.com GraphQL Mutations
- * Features:
- *  - Unlimited Multi-Card Brain Dumps (voice or typed text)
- *  - Quote-Aware 22,283 Customer Vault Auto-Matcher
- *  - Iterative Multi-Group Creation (Calendar, Bench, Parts, Counter Intake)
- *  - Single-Pass Summary Response
+ * Laws Enforced:
+ *  1. One Customer = One Card (Upsert: append note + update lane/date if active, else create)
+ *  2. Internal/Supplier errands (FOAS, Desco, Amazon, shop tasks) -> Dock to "William Sullivan"
+ *  3. Quote-Aware 22,283 Customer Vault Auto-Matcher (Address & Phone)
  */
 
 const https = require('https');
@@ -103,7 +102,7 @@ function loadVaultRecords() {
 }
 
 function matchCustomerVault(clientName) {
-  if (!clientName) return { address: '', phone: '' };
+  if (!clientName || clientName === 'William Sullivan') return { address: '', phone: '' };
 
   const records = loadVaultRecords();
   if (!records || records.length === 0) return { address: '', phone: '' };
@@ -179,10 +178,12 @@ Analyze William's voice note or typed text:
 "${transcript}"
 
 Classify into one of these actions:
-1. "INTAKE": Distinct jobs, repairs, service visits, customer drop-offs, parts notes, or tasks.
-   - Even if William dictates 1 task or 10 tasks in one breath, identify EVERY DISTINCT ITEM and return an array in "cards".
-   - Each card in "cards" must have:
-     * clientName: Clean customer name (e.g. "Tom Amann", "Mrs. Donley") or task title if internal. Strip time/date words.
+1. "INTAKE": Distinct jobs, customer appointments, parts orders, bench repairs, or shop errands.
+   - If an item is an internal shop task, supplier order (FOAS, Desco, Amazon, parts sourcing), or general William errand:
+     * Set clientName: "William Sullivan"
+     * Set destination: "intake" (Pinball)
+   - If an item is a customer repair, pickup, delivery, tune-up, or appointment:
+     * clientName: Clean customer name (e.g. "Tom Amann", "Mrs. Donley"). Strip time/date words.
      * address: Customer address if explicitly spoken/typed, else "".
      * phone: Customer phone if explicitly spoken/typed, else "".
      * equipment: Item or issue mentioned.
@@ -191,13 +192,14 @@ Classify into one of these actions:
      * status: "intake" | "bench" | "parts" | "route".
      * time: Time if stated (e.g. "11:30 AM"), else "Pending".
      * targetDate: YYYY-MM-DD format if scheduled date mentioned, else null.
-   - freshResponse: Punchy, motivational 1-sentence confirmation summarizing how many cards were locked down.
+   - Extract EVERY DISTINCT task into the "cards" array.
+   - freshResponse: Punchy, motivational 1-sentence confirmation.
 
 2. "COMMAND_SWEEP_FLOOR": William explicitly orders to sweep, clear, or archive the entire active floor.
 3. "COMMAND_ARCHIVE_SPECIFIC": William wants to archive a specific record or duplicate (provide "targetClient").
 4. "CONVERSATION": Questions, coaching, check-ins. Provide motivating "freshResponse".
 
-Return pure JSON only (no markdown formatting):
+Return pure JSON only (no markdown code blocks):
 {
   "action": "INTAKE" | "COMMAND_SWEEP_FLOOR" | "COMMAND_ARCHIVE_SPECIFIC" | "CONVERSATION",
   "cards": [
@@ -402,7 +404,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // Action 4: Multi-Card Intake Processing
+    // Action 4: Multi-Card Intake Processing with One Customer = One Card (Upsert)
     const cardsToProcess = Array.isArray(decision.cards) && decision.cards.length > 0 
       ? decision.cards 
       : [{
@@ -416,6 +418,28 @@ exports.handler = async (event) => {
           targetDate: decision.targetDate || null
         }];
 
+    // Query active items once to check for existing customer cards
+    const activeBoardQuery = `
+      query {
+        boards(ids: [${MONDAY_BOARD_ID}]) {
+          items_page(limit: 100) {
+            items {
+              id
+              name
+              group { id }
+              column_values {
+                id
+                text
+              }
+            }
+          }
+        }
+      }
+    `;
+    const activeBoardRes = await callMondayGraphQL(activeBoardQuery);
+    const existingItems = activeBoardRes?.data?.boards?.[0]?.items_page?.items || [];
+    const activeExisting = existingItems.filter(i => i.group?.id !== GROUP_ARCHIVE);
+
     const createdResults = [];
 
     for (const card of cardsToProcess) {
@@ -425,54 +449,125 @@ exports.handler = async (event) => {
 
       const cleanCardTitle = card.clientName || 'Direct Intake';
       const noteContent = card.notes || rawTranscript;
+      const targetLower = cleanCardTitle.toLowerCase().trim();
 
-      const matchedVault = matchCustomerVault(card.clientName);
-      const finalAddress = card.address || matchedVault.address || '';
-      const finalPhone = card.phone || matchedVault.phone || '';
+      // Check if active card already exists for this person
+      const existingCard = activeExisting.find(item => item.name.toLowerCase().trim() === targetLower);
 
-      const colValuesObj = {
-        [COL_LONG_TEXT]: { text: noteContent },
-        [COL_ADDRESS]: finalAddress,
-        [COL_PHONE]: finalPhone
-      };
-
-      if (card.destination === 'calendar' && card.targetDate) {
-        colValuesObj[COL_DATE] = { date: card.targetDate };
-      }
-
-      const createMutation = `
-        mutation CreateCard($boardId: ID!, $groupId: String!, $itemName: String!, $colValues: JSON!) {
-          create_item(board_id: $boardId, group_id: $groupId, item_name: $itemName, column_values: $colValues) {
-            id
-            name
-          }
+      if (existingCard) {
+        // UPSERT: Append new note with timestamp, update destination group and date
+        let existingNotes = '';
+        if (Array.isArray(existingCard.column_values)) {
+          const colNote = existingCard.column_values.find(c => c.id === COL_LONG_TEXT);
+          if (colNote && colNote.text) existingNotes = colNote.text.trim();
         }
-      `;
 
-      const mondayRes = await callMondayGraphQL(createMutation, {
-        boardId: MONDAY_BOARD_ID,
-        groupId: targetGroup,
-        itemName: cleanCardTitle.slice(0, 255),
-        colValues: JSON.stringify(colValuesObj)
-      });
+        const timestampStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const updatedNotes = existingNotes 
+          ? `${existingNotes}\n\n[${timestampStr}] ${noteContent}`
+          : noteContent;
 
-      const newId = mondayRes?.data?.create_item?.id || Date.now();
+        const updateColValues = {
+          [COL_LONG_TEXT]: { text: updatedNotes }
+        };
 
-      createdResults.push({
-        id: newId,
-        clientName: cleanCardTitle,
-        notes: noteContent,
-        address: finalAddress,
-        phone: finalPhone,
-        destination: card.destination || 'intake',
-        status: card.status || 'intake',
-        time: card.time || 'Pending'
-      });
+        if (card.destination === 'calendar' && card.targetDate) {
+          updateColValues[COL_DATE] = { date: card.targetDate };
+        }
+
+        // 1. Move to updated group if lane changed
+        if (existingCard.group?.id !== targetGroup) {
+          await callMondayGraphQL(`
+            mutation {
+              move_item_to_group(item_id: ${existingCard.id}, group_id: "${targetGroup}") {
+                id
+              }
+            }
+          `);
+        }
+
+        // 2. Mutate column values
+        await callMondayGraphQL(`
+          mutation UpdateCard($boardId: ID!, $itemId: ID!, $colValues: JSON!) {
+            change_multiple_column_values(board_id: $boardId, item_id: $itemId, column_values: $colValues) {
+              id
+            }
+          }
+        `, {
+          boardId: MONDAY_BOARD_ID,
+          itemId: existingCard.id,
+          colValues: JSON.stringify(updateColValues)
+        });
+
+        createdResults.push({
+          id: existingCard.id,
+          clientName: cleanCardTitle,
+          notes: updatedNotes,
+          destination: card.destination || 'intake',
+          status: card.status || 'intake',
+          time: card.time || 'Pending',
+          updatedExisting: true
+        });
+
+      } else {
+        // CREATE: Match Vault and make one clean card
+        const matchedVault = matchCustomerVault(card.clientName);
+        const finalAddress = card.address || matchedVault.address || '';
+        const finalPhone = card.phone || matchedVault.phone || '';
+
+        const colValuesObj = {
+          [COL_LONG_TEXT]: { text: noteContent },
+          [COL_ADDRESS]: finalAddress,
+          [COL_PHONE]: finalPhone
+        };
+
+        if (card.destination === 'calendar' && card.targetDate) {
+          colValuesObj[COL_DATE] = { date: card.targetDate };
+        }
+
+        const createMutation = `
+          mutation CreateCard($boardId: ID!, $groupId: String!, $itemName: String!, $colValues: JSON!) {
+            create_item(board_id: $boardId, group_id: $groupId, item_name: $itemName, column_values: $colValues) {
+              id
+              name
+            }
+          }
+        `;
+
+        const mondayRes = await callMondayGraphQL(createMutation, {
+          boardId: MONDAY_BOARD_ID,
+          groupId: targetGroup,
+          itemName: cleanCardTitle.slice(0, 255),
+          colValues: JSON.stringify(colValuesObj)
+        });
+
+        const newId = mondayRes?.data?.create_item?.id || Date.now();
+
+        // Push to activeExisting so subsequent cards in the same dump don't duplicate
+        activeExisting.push({
+          id: newId,
+          name: cleanCardTitle,
+          group: { id: targetGroup },
+          column_values: [{ id: COL_LONG_TEXT, text: noteContent }]
+        });
+
+        createdResults.push({
+          id: newId,
+          clientName: cleanCardTitle,
+          notes: noteContent,
+          address: finalAddress,
+          phone: finalPhone,
+          destination: card.destination || 'intake',
+          status: card.status || 'intake',
+          time: card.time || 'Pending',
+          updatedExisting: false
+        });
+      }
     }
 
     const firstCard = createdResults[0] || {};
     const defaultResponse = createdResults.length > 1
-      ? `Locked down ${createdResults.length} cards across your board, Coach!`
+      ? `Locked down ${createdResults.length} tasks across your board, Coach!`
       : `Card locked down for ${firstCard.clientName || 'Direct Intake'}!`;
 
     return {
