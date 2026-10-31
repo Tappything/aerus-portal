@@ -3,12 +3,12 @@
  * Role: Fresh 🤵 Autonomous Digital Coordinator Brain
  * Engine: Gemini 3.8 Flash (v1beta) -> Monday.com GraphQL Mutations
  * 
- * THE IMMUTABLE FOREVER CARD™ LAW:
- *  1. A Forever Card belongs ONLY to a verified human person (First + Last name).
- *  2. Generic tasks, errands, locations ("Essex Pickup"), suppliers ("FOAS", "Desco", "Amazon"),
- *     or placeholders ("New Lead", "Direct Intake") are STRICTLY FORBIDDEN from creating standalone cards.
- *  3. Any non-human intake DOCKS directly onto "William Sullivan" in Pinball (GROUP_INTAKE).
- *  4. Sissy asks William directly to identify the human so a Forever Card can be issued later.
+ * THE IMMUTABLE FOREVER CARD™ LAWS:
+ *  1. VAULT AUTHORITY RULE: Verified Vault address (with house number) takes 100% priority 
+ *     over casual spoken street fragments ("Fairwind Rd"). Spoken address only wins if it has digits.
+ *  2. ADDRESS COMPLETENESS CHECK: An address without a house number (/\d+/) is invalid. 
+ *     Missing numbers divert to William Sullivan in Pinball.
+ *  3. HUMAN-ONLY CARDS: Non-human errands/locations ("Essex Pickup", "FOAS") dock to William.
  */
 
 const https = require('https');
@@ -104,7 +104,7 @@ function loadVaultRecords() {
   return cachedVault;
 }
 
-function matchCustomerVault(clientName) {
+function matchCustomerVault(clientName, hintAddress = '') {
   if (!clientName || isNonHumanEntity(clientName)) return { address: '', phone: '' };
 
   const records = loadVaultRecords();
@@ -113,30 +113,45 @@ function matchCustomerVault(clientName) {
   const target = clientName.toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
   const targetTokens = target.split(' ').filter(t => t.length > 1 && !['mrs', 'mr', 'ms', 'dr'].includes(t));
 
-  let match = records.find(r => r.cleanName === target);
+  // Find all matches for the customer name
+  let matchingRecords = records.filter(r => r.cleanName === target);
 
-  if (!match && targetTokens.length >= 2) {
-    match = records.find(r => targetTokens.every(tok => r.cleanName.includes(tok)));
+  if (matchingRecords.length === 0 && targetTokens.length >= 2) {
+    matchingRecords = records.filter(r => targetTokens.every(tok => r.cleanName.includes(tok)));
   }
 
-  if (!match && targetTokens.length === 1 && targetTokens[0].length >= 4) {
-    match = records.find(r => {
+  if (matchingRecords.length === 0 && targetTokens.length === 1 && targetTokens[0].length >= 4) {
+    matchingRecords = records.filter(r => {
       const tokens = r.cleanName.split(' ');
       return tokens.includes(targetTokens[0]);
     });
   }
 
-  return match ? { address: match.address || '', phone: match.phone || '' } : { address: '', phone: '' };
+  if (matchingRecords.length === 0) return { address: '', phone: '' };
+
+  // If multiple property cards exist (e.g. Ed Joyner on Fairwind vs Bagley), match by spoken hint
+  if (matchingRecords.length > 1 && hintAddress) {
+    const hintClean = hintAddress.toLowerCase().replace(/[^a-z0-9]/g, ' ');
+    const hintTokens = hintClean.split(/\s+/).filter(t => t.length > 2);
+    const bestMatch = matchingRecords.find(r => {
+      const addrClean = (r.address || '').toLowerCase();
+      return hintTokens.some(tok => addrClean.includes(tok));
+    });
+    if (bestMatch) return { address: bestMatch.address || '', phone: bestMatch.phone || '' };
+  }
+
+  // Otherwise return best candidate with a house number
+  const recordWithHouseNo = matchingRecords.find(r => /\d+/.test(r.address || ''));
+  const chosen = recordWithHouseNo || matchingRecords[0];
+
+  return { address: chosen.address || '', phone: chosen.phone || '' };
 }
 
-// Bouncer check: Is this a legitimate human name or a junk entity?
 function isNonHumanEntity(name) {
   if (!name) return true;
   const n = name.trim().toLowerCase();
-  
-  if (n === 'william sullivan' || n === 'william') return false; // Allowed for master task docking
+  if (n === 'william sullivan' || n === 'william') return false;
 
-  // Prohibited keywords, suppliers, actions, and generic phrases
   const junkPatterns = [
     /\b(pickup|pick up|delivery|dropoff|drop off|errand|order|lead|task|call|tuneup|tune up)\b/i,
     /\b(foas|desco|amazon|aerus|homedepot|lowes|ups|fedex|usps)\b/i,
@@ -148,11 +163,8 @@ function isNonHumanEntity(name) {
     if (pattern.test(n)) return true;
   }
 
-  // Must have at least two parts (First + Last or Honorific + Last)
   const tokens = n.split(/\s+/).filter(t => t.length > 0);
-  if (tokens.length < 2) return true;
-
-  return false;
+  return tokens.length < 2;
 }
 
 function callMondayGraphQL(query, variables = {}) {
@@ -208,18 +220,17 @@ Analyze William's voice note or typed text:
 
 CRITICAL DATA INTEGRITY LAWS:
 1. THE FOREVER CARD LAW:
-   - A customer card belongs ONLY to an individual human being (First + Last name, e.g. "Tom Amann", "Mrs. Donley").
+   - A customer card belongs ONLY to an individual human being (First + Last name, e.g. "Tom Amann", "Ed Joyner", "Mrs. Donley").
    - NEVER extract a location ("Essex Pickup"), supplier ("FOAS"), task ("Pick up filter"), or generic phrase ("New Lead") as a clientName.
    - If an item is an errand, supplier order, or generic task:
      * Set isHumanCustomer: false
-     * Set nonHumanLabel: The task/location label (e.g. "Essex Pickup", "FOAS Order")
+     * Set nonHumanLabel: The task/location label
      * Set clientName: "William Sullivan"
      * Set destination: "intake"
 2. SISSY'S CLARIFYING QUESTION:
-   - If William mentions a location-based task or vague lead without a person's name (e.g. "Essex pickup tomorrow", "New lead for an air unit"):
-     * In freshResponse, confirm the task is docked to William's card, AND immediately ask: "Who is the customer for this so I can issue their Forever Card?"
+   - If William mentions an unverified task or location without a clear person's name, ask directly in freshResponse: "Who is the customer for this so I can issue their Forever Card?"
 3. AUDIT GATE NOTE SYNTHESIS:
-   - ZERO META-COMMAND LEAKAGE: Strip out operational chatter ("clean note", "update address", etc.).
+   - ZERO META-COMMAND LEAKAGE: Strip out administrative chatter.
    - noteMode: "APPEND" | "REPLACE".
 
 Classify into one of these actions:
@@ -229,8 +240,8 @@ Classify into one of these actions:
      * isHumanCustomer: true | false
      * nonHumanLabel: "..." (or null)
      * clientName: Clean human name or "William Sullivan"
-     * address: Customer address if explicitly spoken/typed, else ""
-     * phone: Customer phone if explicitly spoken/typed, else ""
+     * address: Spoken address if stated, else ""
+     * phone: Spoken phone if stated, else ""
      * equipment: Machine or item mentioned
      * notes: Clean, professional job note ONLY
      * noteMode: "APPEND" | "REPLACE"
@@ -239,11 +250,11 @@ Classify into one of these actions:
      * status: "intake" | "bench" | "parts" | "route"
      * time: Time if stated, else "Pending"
      * targetDate: YYYY-MM-DD format if scheduled, else null
-   - freshResponse: Punchy confirmation + human identification question if non-human task.
+   - freshResponse: Punchy confirmation.
 
-2. "COMMAND_SWEEP_FLOOR": Explicit instruction to sweep or archive active floor.
-3. "COMMAND_ARCHIVE_SPECIFIC": Explicit instruction to archive a specific record (targetClient).
-4. "CONVERSATION": Direct coaching, check-ins, questions.
+2. "COMMAND_SWEEP_FLOOR": Sweep or archive active floor.
+3. "COMMAND_ARCHIVE_SPECIFIC": Archive specific record (targetClient).
+4. "CONVERSATION": Coaching, check-ins, questions.
 
 Return pure JSON only (no markdown):
 {
@@ -454,7 +465,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // Action 4: Intake Processing with Ironclad Non-Human Enforcement
+    // Action 4: Intake Processing with Vault Authority
     const cardsToProcess = Array.isArray(decision.cards) && decision.cards.length > 0 
       ? decision.cards 
       : [{
@@ -471,7 +482,6 @@ exports.handler = async (event) => {
           targetDate: decision.targetDate || null
         }];
 
-    // Fetch active items on board
     const activeBoardQuery = `
       query {
         boards(ids: [${MONDAY_BOARD_ID}]) {
@@ -500,11 +510,10 @@ exports.handler = async (event) => {
       const rawTitle = (card.clientName || '').trim();
       const noteContent = card.notes || rawTranscript;
       
-      // HARD BOUNCER: Check if this is a genuine human being
       const isJunk = isNonHumanEntity(rawTitle) || card.isHumanCustomer === false;
       const isInternalWilliam = rawTitle.toLowerCase().includes('william sullivan') || rawTitle.toLowerCase() === 'william';
 
-      // If it is junk/non-human, FORCE it onto William Sullivan's card in Pinball
+      // Non-human entities dock directly to William
       if (isJunk && !isInternalWilliam) {
         const taskLabel = card.nonHumanLabel || rawTitle || 'Operational Task';
         const formattedTaskNote = `📋 [OPERATIONAL TASK - DOCKED TO WILLIAM] Ref: ${taskLabel} | Time: ${card.time || 'Pending'} | Details: ${noteContent}`;
@@ -545,7 +554,6 @@ exports.handler = async (event) => {
             freshNotice: `Docked "${taskLabel}" onto William Sullivan's Pinball card. Who is the customer for this so I can issue their Forever Card?`
           });
         } else {
-          // Create Master William Sullivan card
           const colValuesObj = {
             [COL_LONG_TEXT]: { text: formattedTaskNote }
           };
@@ -585,7 +593,7 @@ exports.handler = async (event) => {
           });
         }
 
-        continue; // DO NOT PROCEED TO CREATE A JUNK STANDALONE CARD!
+        continue;
       }
 
       // --- HUMAN RECORD PROCESSING ---
@@ -596,6 +604,18 @@ exports.handler = async (event) => {
       const cleanCardTitle = rawTitle;
       const targetLower = cleanCardTitle.toLowerCase().trim();
       const existingCard = activeExisting.find(item => item.name.toLowerCase().trim() === targetLower);
+
+      // VAULT AUTHORITY MATCHING
+      const matchedVault = matchCustomerVault(cleanCardTitle, card.address);
+
+      // Address Resolution:
+      // Spoken address wins ONLY if it has an explicit street number (/\d+/).
+      // Otherwise, the complete Vault record takes 100% priority.
+      const hasSpokenHouseNumber = /\d+/.test(card.address || '');
+      const finalAddress = (hasSpokenHouseNumber ? card.address : matchedVault.address) || matchedVault.address || card.address || '';
+      const finalPhone = card.phone || matchedVault.phone || '';
+
+      const isAddressValid = /\d+/.test(finalAddress);
 
       if (existingCard) {
         // UPSERT EXISTING HUMAN CARD
@@ -639,18 +659,14 @@ exports.handler = async (event) => {
           [COL_LONG_TEXT]: { text: updatedNotes }
         };
 
-        if (card.address && card.address.trim()) {
-          updateColValues[COL_ADDRESS] = card.address.trim();
-        } else if (!existingAddress) {
-          const matchedVault = matchCustomerVault(card.clientName);
-          if (matchedVault.address) updateColValues[COL_ADDRESS] = matchedVault.address;
+        // If existing address was incomplete (missing digits) or finalAddress is better, update it!
+        const existingHasDigits = /\d+/.test(existingAddress);
+        if (finalAddress && (!existingHasDigits || hasSpokenHouseNumber)) {
+          updateColValues[COL_ADDRESS] = finalAddress;
         }
 
-        if (card.phone && card.phone.trim()) {
-          updateColValues[COL_PHONE] = card.phone.trim();
-        } else if (!existingPhone) {
-          const matchedVault = matchCustomerVault(card.clientName);
-          if (matchedVault.phone) updateColValues[COL_PHONE] = matchedVault.phone;
+        if (finalPhone && !existingPhone) {
+          updateColValues[COL_PHONE] = finalPhone;
         }
 
         if (card.targetDate) {
@@ -680,14 +696,9 @@ exports.handler = async (event) => {
         });
 
       } else {
-        // NEW HUMAN CUSTOMER: Vault match and address check
-        const matchedVault = matchCustomerVault(card.clientName);
-        const finalAddress = card.address || matchedVault.address || '';
-        const finalPhone = card.phone || matchedVault.phone || '';
-
-        // Address Bouncer: Human must have a verified address or be redirected to William
-        if (!finalAddress && !isInternalWilliam) {
-          const bouncerAlertNote = `⚠️ [UNVERIFIED INTAKE - MISSING ADDRESS] Customer: ${cleanCardTitle} | Scheduled: ${card.time || 'Pending'} | Notes: ${noteContent}`;
+        // NEW HUMAN CUSTOMER: Enforce Address Completeness Check
+        if (!isAddressValid && !isInternalWilliam) {
+          const bouncerAlertNote = `⚠️ [UNVERIFIED INTAKE - INCOMPLETE ADDRESS] Customer: ${cleanCardTitle} | Address Given: ${card.address || 'None'} | Scheduled: ${card.time || 'Pending'} | Notes: ${noteContent}`;
           let williamCard = activeExisting.find(item => item.name.toLowerCase().trim() === 'william sullivan');
 
           if (williamCard) {
@@ -717,11 +728,11 @@ exports.handler = async (event) => {
             createdResults.push({
               id: williamCard.id,
               clientName: cleanCardTitle,
-              freshNotice: `Flagged unverified intake for ${cleanCardTitle} on William's card in Pinball — needs address before issuing Forever Card.`
+              freshNotice: `Flagged ${cleanCardTitle} on William's card in Pinball — address is missing house number ("${card.address || 'None'}").`
             });
           }
         } else {
-          // VERIFIED HUMAN: Create single Forever Card
+          // VERIFIED HUMAN & COMPLETE ADDRESS: Mint the Forever Card
           const colValuesObj = {
             [COL_LONG_TEXT]: { text: noteContent },
             [COL_ADDRESS]: finalAddress,
