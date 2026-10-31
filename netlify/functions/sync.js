@@ -1,6 +1,11 @@
 /**
  * Netlify Serverless Function: /.netlify/functions/sync
  * Purpose: Cross-device live sync for TappyThing Workstation
+ * Reads Exact Monday Column IDs:
+ *  - text_mm6aq4rg      : Customer Address
+ *  - text_mm6a7420      : Customer Phone
+ *  - long_text_mm5vbykc : Intake Notes
+ *  - date               : Due / Scheduled Date
  * Routes: Pinball / Intake groups -> pinball[]
  *         Calendar group (group_mm7maw66) -> scheduled[]
  * Filters: Ignores Archive / Trash groups (group_mm6xs2fx)
@@ -137,17 +142,36 @@ exports.handler = async (event, context) => {
       let time = 'Pending';
       let totalAmount = 50.00;
 
+      // Exact Column Mapping
       if (Array.isArray(item.column_values)) {
         item.column_values.forEach((col) => {
-          const colId = col.id.toLowerCase();
+          const colId = col.id;
+          const colIdLower = colId.toLowerCase();
           const txt = (col.text || '').trim();
 
-          if (colId.includes('phone') && txt) phone = txt;
-          if ((colId.includes('address') || colId.includes('location')) && txt) address = txt;
-          if ((colId.includes('note') || colId.includes('text') || colId.includes('desc')) && txt) note = txt;
-          if (colId.includes('status') && txt) status = txt.toLowerCase();
-          if ((colId.includes('time') || colId.includes('date') || colId.includes('schedule')) && txt) time = txt;
-          if ((colId.includes('amount') || colId.includes('price') || colId.includes('total')) && txt) {
+          // Address Mapping
+          if ((colId === 'text_mm6aq4rg' || colIdLower.includes('address') || colIdLower.includes('location')) && txt) {
+            address = txt;
+          }
+
+          // Phone Mapping
+          if ((colId === 'text_mm6a7420' || colIdLower.includes('phone') || colIdLower.includes('mobile')) && txt) {
+            phone = txt;
+          }
+
+          // Note Mapping
+          if ((colId === 'long_text_mm5vbykc' || colIdLower.includes('note') || colIdLower.includes('desc')) && txt) {
+            note = txt;
+          }
+
+          // Date / Scheduled Time Mapping
+          if ((colId === 'date' || colIdLower.includes('time') || colIdLower.includes('schedule')) && txt) {
+            time = txt;
+          }
+
+          // Status & Pricing
+          if (colIdLower.includes('status') && txt) status = txt.toLowerCase();
+          if ((colIdLower.includes('amount') || colIdLower.includes('price') || colIdLower.includes('total')) && txt) {
             const parsedNum = parseFloat(txt.replace(/[^0-9.]/g, ''));
             if (!isNaN(parsedNum)) totalAmount = parsedNum;
           }
