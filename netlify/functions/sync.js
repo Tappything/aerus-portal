@@ -26,7 +26,7 @@ exports.handler = async (event) => {
   const headers = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': '*', 'Content-Type': 'application/json' };
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: JSON.stringify({ ok: true }) };
 
-  const query = `query { boards(ids: [${MONDAY_BOARD_ID}]) { items_page(limit: 100) { items { id name group { id title } column_values { id text } } } } }`;
+  const query = `query { boards(ids: [${MONDAY_BOARD_ID}]) { items_page(limit: 100, query_params: { order_by: [{ column_id: "__creation_log__", direction: desc }] }) { items { id name group { id title } column_values { id text } } } } }`;
   const res = await callMonday(query);
   const items = res?.data?.boards?.[0]?.items_page?.items || [];
 
