@@ -193,7 +193,7 @@
       </div>
     </div>
 
-    <div class="flex flex-col items-center gap-3 w-full max-w-md mx-auto">
+    <div class="flex flex-col items-center gap-3 w-full max-md mx-auto">
       <div class="w-28 h-28 rounded-full border-4 border-gold bg-white shadow-lg overflow-hidden flex items-center justify-center relative flex-shrink-0">
         <img src="fresh_logo.png" alt="Fresh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/freshtappything/chassis/main/fresh_logo.png';">
       </div>
@@ -1505,33 +1505,49 @@
     return `<span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold border ${cfg.badgeClass}">${cfg.dot} ${cfg.label}</span>`;
   }
 
+  function getTimeBadgeHtml(timeStr) {
+    if (!timeStr || timeStr === 'Pending' || timeStr === 'Active' || timeStr === 'In Shop') {
+      return '';
+    }
+    const isClock = /\d{1,2}:\d{2}|\b(am|pm)\b/i.test(timeStr);
+    const icon = isClock ? '🕒' : '📅';
+    return `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-parchment text-forest border border-bordercolor shadow-xs flex items-center gap-1">${icon} ${timeStr}</span>`;
+  }
+
   function render() {
     if (isPublicMode) return;
+
+    // 1. TODAY'S SCHEDULE (CLEAN CARD FACE)
     const cal = document.getElementById('schedule-list');
     if (cal) {
       cal.innerHTML = runtimeScheduled.length === 0 ? '<div class="text-muted text-xs italic">No scheduled appointments.</div>' :
         runtimeScheduled.map(item => {
           const statusBadge = getStatusBadgeHtml(item.status);
+          const timeBadge = getTimeBadgeHtml(item.time);
+          const displayAddress = (item.address && item.address !== FALLBACK_CUSTOMER_ADDRESS) 
+            ? item.address 
+            : FALLBACK_CUSTOMER_ADDRESS;
+
           return `
           <div onclick="openCustomerCard('${item.id}')" class="bg-white border-l-4 border-blue-600 border border-bordercolor rounded-xl p-3 flex flex-col justify-between shadow-sm cursor-pointer hover:bg-parchment transition">
-            <div class="flex justify-between items-start gap-2">
-              <div class="flex-1">
-                <div class="flex items-center gap-2 mb-1">
-                  <span class="font-bold text-ink text-xs">${item.clientName}</span>
+            <div class="flex justify-between items-center gap-2">
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                  <span class="font-extrabold text-ink text-xs truncate">${item.clientName}</span>
                   ${statusBadge}
+                  ${timeBadge}
                 </div>
-                <p class="text-[11px] text-muted italic">"${item.text}"</p>
-                <div class="text-[10px] text-gold font-bold mt-0.5">📍 ${item.address}</div>
-                <div class="text-[10px] text-muted mt-0.5">${item.time || item.timestamp}</div>
+                <div class="text-[11px] text-forest font-semibold truncate">📍 ${displayAddress}</div>
               </div>
               <div class="flex gap-1.5 flex-shrink-0">
-                <span class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold text-forest">Open Card ➔</span>
+                <span class="px-2.5 py-1.5 bg-parchment border border-bordercolor rounded-lg text-xs font-bold text-forest hover:bg-bordercolor transition flex items-center gap-1">Open Card ➔</span>
               </div>
             </div>
           </div>
         `}).join('');
     }
 
+    // 2. PINBALL ACTION ZONE (CLEAN CARD FACE)
     const pin = document.getElementById('pinball-list');
     if (pin) {
       let filteredQueue = runtimePinball || [];
@@ -1542,19 +1558,24 @@
       pin.innerHTML = filteredQueue.length === 0 ? '<div class="text-muted text-xs italic">No cards in this lane.</div>' :
         filteredQueue.map(item => {
           const statusBadge = getStatusBadgeHtml(item.status);
+          const timeBadge = getTimeBadgeHtml(item.time !== 'In Shop' ? item.time : '');
+          const displayAddress = (item.address && item.address !== FALLBACK_CUSTOMER_ADDRESS) 
+            ? item.address 
+            : FALLBACK_CUSTOMER_ADDRESS;
+
           return `
           <div onclick="openCustomerCard('${item.id}')" class="bg-white border-l-4 border-gold border border-bordercolor rounded-xl p-3 flex flex-col justify-between shadow-sm cursor-pointer hover:bg-parchment transition">
-            <div class="flex justify-between items-start gap-2">
-              <div class="flex-1">
-                <div class="flex items-center gap-2 mb-1">
-                  <span class="font-bold text-ink text-xs">${item.clientName}</span>
+            <div class="flex justify-between items-center gap-2">
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                  <span class="font-extrabold text-ink text-xs truncate">${item.clientName}</span>
                   ${statusBadge}
+                  ${timeBadge}
                 </div>
-                <p class="text-[11px] text-muted italic">"${item.text}"</p>
-                <div class="text-[10px] text-muted mt-0.5">Queued • ${item.timestamp}</div>
+                <div class="text-[11px] text-muted font-medium truncate">📍 ${displayAddress}</div>
               </div>
               <div class="flex gap-1.5 flex-shrink-0">
-                <span class="px-2.5 py-1 bg-parchment border border-bordercolor rounded-lg text-xs font-bold text-forest">Open Card ➔</span>
+                <span class="px-2.5 py-1.5 bg-parchment border border-bordercolor rounded-lg text-xs font-bold text-forest hover:bg-bordercolor transition flex items-center gap-1">Open Card ➔</span>
               </div>
             </div>
           </div>
