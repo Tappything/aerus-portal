@@ -1,11 +1,12 @@
 /**
  * Netlify Serverless Function: /.netlify/functions/intake
  * Role: Fresh 🤵 Autonomous Digital Coordinator Brain
- * Engine: 100% Gemini 3.8 Flash (v1beta) -> Monday.com GraphQL Mutations
+ * Engine: Gemini 3.8 Flash (v1beta) -> Monday.com GraphQL Mutations
  * Features:
- *  - Zero hardcoded regex tripwires; full AI natural language routing
+ *  - Unlimited Multi-Card Brain Dumps (voice or typed text)
  *  - Quote-Aware 22,283 Customer Vault Auto-Matcher
- *  - Intelligent Intent: INTAKE, CARD_MANAGEMENT, or CONVERSATION
+ *  - Iterative Multi-Group Creation (Calendar, Bench, Parts, Counter Intake)
+ *  - Single-Pass Summary Response
  */
 
 const https = require('https');
@@ -57,7 +58,10 @@ function loadVaultRecords() {
   const possiblePaths = [
     path.join(__dirname, 'export_export (34).csv'),
     path.join(process.cwd(), 'export_export (34).csv'),
-    path.join(__dirname, '../../export_export (34).csv')
+    path.join(__dirname, '../../export_export (34).csv'),
+    path.join(__dirname, 'export_export (35).csv'),
+    path.join(process.cwd(), 'export_export (35).csv'),
+    path.join(__dirname, '../../export_export (35).csv')
   ];
 
   let filePath = possiblePaths.find(p => fs.existsSync(p));
@@ -163,8 +167,6 @@ function callGeminiCoordinator(transcript) {
     if (!GEMINI_API_KEY) {
       return resolve({
         error: 'GEMINI_API_KEY is missing in Netlify environment variables.',
-        clientName: 'Key Missing',
-        notes: transcript,
         freshResponse: 'Coach, GEMINI_API_KEY is missing in your Netlify settings!'
       });
     }
@@ -173,45 +175,45 @@ function callGeminiCoordinator(transcript) {
 
     const systemPrompt = `You are Fresh, the sharp AI Digital Coordinator for William Sullivan at Aerus Home Wellness.
 Today's Date: ${todayISO}.
-Analyze William's voice transcript with full human context:
+Analyze William's voice note or typed text:
 "${transcript}"
 
-Determine the true action:
-1. "INTAKE": Routine customer repair, drop-off, bench test, delivery, or scheduled service visit.
-   - clientName: Customer full name or honorific + last name only (e.g. "Tom Amann", "Mrs. Donley"). Strip time/day words.
-   - address: Explicit customer address if stated, else "".
-   - phone: Explicit phone if stated, else "".
-   - equipment: Item or issue mentioned.
-   - notes: Clean notes describing the job.
-   - destination: "calendar" (if date/time/pickup mentioned), "bench" (if repair/diagnostic), or "intake" (counter drop-off).
-   - status: "intake" | "bench" | "parts" | "route".
-   - time: Time if stated (e.g. "11:30 AM"), else "Pending".
-   - targetDate: Target date in YYYY-MM-DD format if scheduled, else null.
-   - freshResponse: Direct, motivating 1-sentence confirmation. If a schedule note lacks a time, ask William directly.
+Classify into one of these actions:
+1. "INTAKE": Distinct jobs, repairs, service visits, customer drop-offs, parts notes, or tasks.
+   - Even if William dictates 1 task or 10 tasks in one breath, identify EVERY DISTINCT ITEM and return an array in "cards".
+   - Each card in "cards" must have:
+     * clientName: Clean customer name (e.g. "Tom Amann", "Mrs. Donley") or task title if internal. Strip time/date words.
+     * address: Customer address if explicitly spoken/typed, else "".
+     * phone: Customer phone if explicitly spoken/typed, else "".
+     * equipment: Item or issue mentioned.
+     * notes: Full description for this distinct task.
+     * destination: "calendar" (if date/time/visit scheduled), "bench" (if repair/diagnostic), or "intake" (showroom drop-off).
+     * status: "intake" | "bench" | "parts" | "route".
+     * time: Time if stated (e.g. "11:30 AM"), else "Pending".
+     * targetDate: YYYY-MM-DD format if scheduled date mentioned, else null.
+   - freshResponse: Punchy, motivational 1-sentence confirmation summarizing how many cards were locked down.
 
-2. "COMMAND_SWEEP_FLOOR": William explicitly orders a sweep or clear of the active shop floor/test cards.
-   - freshResponse: Direct confirmation that the deck is being cleared.
+2. "COMMAND_SWEEP_FLOOR": William explicitly orders to sweep, clear, or archive the entire active floor.
+3. "COMMAND_ARCHIVE_SPECIFIC": William wants to archive a specific record or duplicate (provide "targetClient").
+4. "CONVERSATION": Questions, coaching, check-ins. Provide motivating "freshResponse".
 
-3. "COMMAND_ARCHIVE_SPECIFIC": William wants to archive or remove a specific customer card or duplicate.
-   - targetClient: Name of the customer card to locate and archive.
-   - freshResponse: Direct confirmation of archiving that specific record.
-
-4. "CONVERSATION": Questions, coaching, check-ins, or unclear requests.
-   - freshResponse: High-energy, direct answer or question to guide William forward.
-
-Return pure JSON only (no markdown code blocks):
+Return pure JSON only (no markdown formatting):
 {
   "action": "INTAKE" | "COMMAND_SWEEP_FLOOR" | "COMMAND_ARCHIVE_SPECIFIC" | "CONVERSATION",
-  "clientName": "...",
+  "cards": [
+    {
+      "clientName": "...",
+      "address": "...",
+      "phone": "...",
+      "equipment": "...",
+      "notes": "...",
+      "destination": "calendar" | "bench" | "intake",
+      "status": "intake" | "bench" | "parts" | "route",
+      "time": "...",
+      "targetDate": "..."
+    }
+  ],
   "targetClient": "...",
-  "address": "...",
-  "phone": "...",
-  "equipment": "...",
-  "notes": "...",
-  "destination": "calendar" | "bench" | "intake",
-  "status": "intake" | "bench" | "parts" | "route",
-  "time": "...",
-  "targetDate": "...",
   "freshResponse": "..."
 }`;
 
@@ -293,7 +295,6 @@ exports.handler = async (event) => {
       };
     }
 
-    // 100% of every message goes straight to the Gemini Coordinator
     const decision = await callGeminiCoordinator(rawTranscript);
 
     if (decision.error) {
@@ -309,7 +310,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // Action 1: Sweep entire shop floor (Explicit intent understood by AI)
+    // Action 1: Sweep entire shop floor
     if (decision.action === 'COMMAND_SWEEP_FLOOR') {
       const fetchQuery = `
         query {
@@ -348,9 +349,9 @@ exports.handler = async (event) => {
       };
     }
 
-    // Action 2: Archive specific customer or duplicate card
+    // Action 2: Archive specific customer or duplicate
     if (decision.action === 'COMMAND_ARCHIVE_SPECIFIC') {
-      const target = (decision.targetClient || decision.clientName || '').toLowerCase().trim();
+      const target = (decision.targetClient || '').toLowerCase().trim();
       const fetchQuery = `
         query {
           boards(ids: [${MONDAY_BOARD_ID}]) {
@@ -389,7 +390,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // Action 3: Pure conversation or clarification
+    // Action 3: Conversation
     if (decision.action === 'CONVERSATION') {
       return {
         statusCode: 200,
@@ -401,60 +402,93 @@ exports.handler = async (event) => {
       };
     }
 
-    // Action 4: Standard Intake (Creates board card with verified Vault data)
-    let targetGroup = GROUP_INTAKE;
-    if (decision.destination === 'calendar') targetGroup = GROUP_CALENDAR;
-    if (decision.destination === 'bench') targetGroup = GROUP_WORKBENCH;
+    // Action 4: Multi-Card Intake Processing
+    const cardsToProcess = Array.isArray(decision.cards) && decision.cards.length > 0 
+      ? decision.cards 
+      : [{
+          clientName: decision.clientName || 'Direct Intake',
+          notes: decision.notes || rawTranscript,
+          address: decision.address || '',
+          phone: decision.phone || '',
+          destination: decision.destination || 'intake',
+          status: decision.status || 'intake',
+          time: decision.time || 'Pending',
+          targetDate: decision.targetDate || null
+        }];
 
-    const cleanCardTitle = decision.clientName || 'Direct Intake';
-    const noteContent = decision.notes || rawTranscript;
+    const createdResults = [];
 
-    const matchedVault = matchCustomerVault(decision.clientName);
-    const finalAddress = decision.address || matchedVault.address || '';
-    const finalPhone = decision.phone || matchedVault.phone || '';
+    for (const card of cardsToProcess) {
+      let targetGroup = GROUP_INTAKE;
+      if (card.destination === 'calendar') targetGroup = GROUP_CALENDAR;
+      if (card.destination === 'bench') targetGroup = GROUP_WORKBENCH;
 
-    const colValuesObj = {
-      [COL_LONG_TEXT]: { text: noteContent },
-      [COL_ADDRESS]: finalAddress,
-      [COL_PHONE]: finalPhone
-    };
+      const cleanCardTitle = card.clientName || 'Direct Intake';
+      const noteContent = card.notes || rawTranscript;
 
-    if (decision.destination === 'calendar' && decision.targetDate) {
-      colValuesObj[COL_DATE] = { date: decision.targetDate };
-    }
+      const matchedVault = matchCustomerVault(card.clientName);
+      const finalAddress = card.address || matchedVault.address || '';
+      const finalPhone = card.phone || matchedVault.phone || '';
 
-    const createMutation = `
-      mutation CreateCard($boardId: ID!, $groupId: String!, $itemName: String!, $colValues: JSON!) {
-        create_item(board_id: $boardId, group_id: $groupId, item_name: $itemName, column_values: $colValues) {
-          id
-          name
-        }
+      const colValuesObj = {
+        [COL_LONG_TEXT]: { text: noteContent },
+        [COL_ADDRESS]: finalAddress,
+        [COL_PHONE]: finalPhone
+      };
+
+      if (card.destination === 'calendar' && card.targetDate) {
+        colValuesObj[COL_DATE] = { date: card.targetDate };
       }
-    `;
 
-    const mondayRes = await callMondayGraphQL(createMutation, {
-      boardId: MONDAY_BOARD_ID,
-      groupId: targetGroup,
-      itemName: cleanCardTitle.slice(0, 255),
-      colValues: JSON.stringify(colValuesObj)
-    });
+      const createMutation = `
+        mutation CreateCard($boardId: ID!, $groupId: String!, $itemName: String!, $colValues: JSON!) {
+          create_item(board_id: $boardId, group_id: $groupId, item_name: $itemName, column_values: $colValues) {
+            id
+            name
+          }
+        }
+      `;
 
-    const newId = mondayRes?.data?.create_item?.id || Date.now();
+      const mondayRes = await callMondayGraphQL(createMutation, {
+        boardId: MONDAY_BOARD_ID,
+        groupId: targetGroup,
+        itemName: cleanCardTitle.slice(0, 255),
+        colValues: JSON.stringify(colValuesObj)
+      });
 
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({
+      const newId = mondayRes?.data?.create_item?.id || Date.now();
+
+      createdResults.push({
         id: newId,
         clientName: cleanCardTitle,
         notes: noteContent,
         address: finalAddress,
         phone: finalPhone,
-        equipment: decision.equipment || '',
-        destination: decision.destination || 'intake',
-        status: decision.status || 'intake',
-        time: decision.time || 'Pending',
-        freshResponse: decision.freshResponse || `Card locked down for ${cleanCardTitle}!`
+        destination: card.destination || 'intake',
+        status: card.status || 'intake',
+        time: card.time || 'Pending'
+      });
+    }
+
+    const firstCard = createdResults[0] || {};
+    const defaultResponse = createdResults.length > 1
+      ? `Locked down ${createdResults.length} cards across your board, Coach!`
+      : `Card locked down for ${firstCard.clientName || 'Direct Intake'}!`;
+
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        id: firstCard.id || Date.now(),
+        clientName: firstCard.clientName || 'Direct Intake',
+        notes: firstCard.notes || rawTranscript,
+        address: firstCard.address || '',
+        phone: firstCard.phone || '',
+        destination: firstCard.destination || 'intake',
+        status: firstCard.status || 'intake',
+        time: firstCard.time || 'Pending',
+        createdCards: createdResults,
+        freshResponse: decision.freshResponse || defaultResponse
       })
     };
 
