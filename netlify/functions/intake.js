@@ -2,10 +2,11 @@
  * Netlify Serverless Function: /.netlify/functions/intake
  * Role: Fresh 🤵 Autonomous Digital Coordinator Brain
  * Engine: Gemini 3.8 Flash (v1beta) -> Monday.com GraphQL Mutations
- * Laws Enforced:
- *  1. One Customer = One Card (Upsert: append note + update lane/date if active, else create)
- *  2. Internal/Supplier errands (FOAS, Desco, Amazon, shop tasks) -> Dock to "William Sullivan"
- *  3. Quote-Aware 22,283 Customer Vault Auto-Matcher (Address & Phone)
+ * Features:
+ *  - Lane & Data Preservation on Upsert (no accidental group/data overwrites)
+ *  - Internal/Supplier tasks -> William Sullivan Pinball card
+ *  - Quote-Aware 22,283 Customer Vault Auto-Matcher (Address & Phone)
+ *  - Timestamped history appending in long_text_mm5vbykc
  */
 
 const https = require('https');
@@ -182,6 +183,7 @@ Classify into one of these actions:
    - If an item is an internal shop task, supplier order (FOAS, Desco, Amazon, parts sourcing), or general William errand:
      * Set clientName: "William Sullivan"
      * Set destination: "intake" (Pinball)
+     * Set explicitDestinationChange: false
    - If an item is a customer repair, pickup, delivery, tune-up, or appointment:
      * clientName: Clean customer name (e.g. "Tom Amann", "Mrs. Donley"). Strip time/date words.
      * address: Customer address if explicitly spoken/typed, else "".
@@ -189,6 +191,7 @@ Classify into one of these actions:
      * equipment: Item or issue mentioned.
      * notes: Full description for this distinct task.
      * destination: "calendar" (if date/time/visit scheduled), "bench" (if repair/diagnostic), or "intake" (showroom drop-off).
+     * explicitDestinationChange: true if transcript explicitly asks to move lanes (e.g. "schedule for tomorrow", "move to bench", "put in field route"), false if it's just adding a note or comment.
      * status: "intake" | "bench" | "parts" | "route".
      * time: Time if stated (e.g. "11:30 AM"), else "Pending".
      * targetDate: YYYY-MM-DD format if scheduled date mentioned, else null.
@@ -210,6 +213,7 @@ Return pure JSON only (no markdown code blocks):
       "equipment": "...",
       "notes": "...",
       "destination": "calendar" | "bench" | "intake",
+      "explicitDestinationChange": true | false,
       "status": "intake" | "bench" | "parts" | "route",
       "time": "...",
       "targetDate": "..."
@@ -404,7 +408,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // Action 4: Multi-Card Intake Processing with One Customer = One Card (Upsert)
+    // Action 4: Multi-Card Intake Processing with Lane & Data Preservation (Upsert)
     const cardsToProcess = Array.isArray(decision.cards) && decision.cards.length > 0 
       ? decision.cards 
       : [{
@@ -413,12 +417,13 @@ exports.handler = async (event) => {
           address: decision.address || '',
           phone: decision.phone || '',
           destination: decision.destination || 'intake',
+          explicitDestinationChange: false,
           status: decision.status || 'intake',
           time: decision.time || 'Pending',
           targetDate: decision.targetDate || null
         }];
 
-    // Query active items once to check for existing customer cards
+    // Fetch active cards with all column values to protect existing data
     const activeBoardQuery = `
       query {
         boards(ids: [${MONDAY_BOARD_ID}]) {
@@ -430,6 +435,7 @@ exports.handler = async (event) => {
               column_values {
                 id
                 text
+                value
               }
             }
           }
@@ -451,17 +457,42 @@ exports.handler = async (event) => {
       const noteContent = card.notes || rawTranscript;
       const targetLower = cleanCardTitle.toLowerCase().trim();
 
-      // Check if active card already exists for this person
       const existingCard = activeExisting.find(item => item.name.toLowerCase().trim() === targetLower);
 
       if (existingCard) {
-        // UPSERT: Append new note with timestamp, update destination group and date
-        let existingNotes = '';
-        if (Array.isArray(existingCard.column_values)) {
-          const colNote = existingCard.column_values.find(c => c.id === COL_LONG_TEXT);
-          if (colNote && colNote.text) existingNotes = colNote.text.trim();
+        // --- UPSERT: PRESERVE LANE, PRESERVE DATA, APPEND HISTORY ---
+
+        // 1. Lane Preservation: Keep current lane unless explicitly told to move or scheduled
+        const shouldChangeGroup = Boolean(card.explicitDestinationChange || (card.destination === 'calendar' && card.targetDate));
+        const finalGroup = shouldChangeGroup ? targetGroup : (existingCard.group?.id || targetGroup);
+
+        if (existingCard.group?.id !== finalGroup) {
+          await callMondayGraphQL(`
+            mutation {
+              move_item_to_group(item_id: ${existingCard.id}, group_id: "${finalGroup}") {
+                id
+              }
+            }
+          `);
         }
 
+        // 2. Extract current values to prevent blanking
+        let existingNotes = '';
+        let existingAddress = '';
+        let existingPhone = '';
+
+        if (Array.isArray(existingCard.column_values)) {
+          const cNote = existingCard.column_values.find(c => c.id === COL_LONG_TEXT);
+          if (cNote && cNote.text) existingNotes = cNote.text.trim();
+
+          const cAddr = existingCard.column_values.find(c => c.id === COL_ADDRESS);
+          if (cAddr && cAddr.text) existingAddress = cAddr.text.trim();
+
+          const cPhone = existingCard.column_values.find(c => c.id === COL_PHONE);
+          if (cPhone && cPhone.text) existingPhone = cPhone.text.trim();
+        }
+
+        // 3. Timestamped Notes History
         const timestampStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const updatedNotes = existingNotes 
           ? `${existingNotes}\n\n[${timestampStr}] ${noteContent}`
@@ -471,22 +502,26 @@ exports.handler = async (event) => {
           [COL_LONG_TEXT]: { text: updatedNotes }
         };
 
-        if (card.destination === 'calendar' && card.targetDate) {
+        // 4. Preserve Address & Phone (only overwrite if explicitly given in note)
+        if (card.address && card.address.trim()) {
+          updateColValues[COL_ADDRESS] = card.address.trim();
+        } else if (!existingAddress) {
+          const matchedVault = matchCustomerVault(card.clientName);
+          if (matchedVault.address) updateColValues[COL_ADDRESS] = matchedVault.address;
+        }
+
+        if (card.phone && card.phone.trim()) {
+          updateColValues[COL_PHONE] = card.phone.trim();
+        } else if (!existingPhone) {
+          const matchedVault = matchCustomerVault(card.clientName);
+          if (matchedVault.phone) updateColValues[COL_PHONE] = matchedVault.phone;
+        }
+
+        // 5. Preserve Date (only update if an explicit targetDate was scheduled)
+        if (card.targetDate) {
           updateColValues[COL_DATE] = { date: card.targetDate };
         }
 
-        // 1. Move to updated group if lane changed
-        if (existingCard.group?.id !== targetGroup) {
-          await callMondayGraphQL(`
-            mutation {
-              move_item_to_group(item_id: ${existingCard.id}, group_id: "${targetGroup}") {
-                id
-              }
-            }
-          `);
-        }
-
-        // 2. Mutate column values
         await callMondayGraphQL(`
           mutation UpdateCard($boardId: ID!, $itemId: ID!, $colValues: JSON!) {
             change_multiple_column_values(board_id: $boardId, item_id: $itemId, column_values: $colValues) {
@@ -503,14 +538,14 @@ exports.handler = async (event) => {
           id: existingCard.id,
           clientName: cleanCardTitle,
           notes: updatedNotes,
-          destination: card.destination || 'intake',
+          destination: finalGroup === GROUP_CALENDAR ? 'calendar' : (finalGroup === GROUP_WORKBENCH ? 'bench' : 'intake'),
           status: card.status || 'intake',
           time: card.time || 'Pending',
           updatedExisting: true
         });
 
       } else {
-        // CREATE: Match Vault and make one clean card
+        // --- NEW CARD CREATION: Full Vault Match & Wire ---
         const matchedVault = matchCustomerVault(card.clientName);
         const finalAddress = card.address || matchedVault.address || '';
         const finalPhone = card.phone || matchedVault.phone || '';
@@ -543,12 +578,15 @@ exports.handler = async (event) => {
 
         const newId = mondayRes?.data?.create_item?.id || Date.now();
 
-        // Push to activeExisting so subsequent cards in the same dump don't duplicate
         activeExisting.push({
           id: newId,
           name: cleanCardTitle,
           group: { id: targetGroup },
-          column_values: [{ id: COL_LONG_TEXT, text: noteContent }]
+          column_values: [
+            { id: COL_LONG_TEXT, text: noteContent },
+            { id: COL_ADDRESS, text: finalAddress },
+            { id: COL_PHONE, text: finalPhone }
+          ]
         });
 
         createdResults.push({
@@ -568,7 +606,7 @@ exports.handler = async (event) => {
     const firstCard = createdResults[0] || {};
     const defaultResponse = createdResults.length > 1
       ? `Locked down ${createdResults.length} tasks across your board, Coach!`
-      : `Card locked down for ${firstCard.clientName || 'Direct Intake'}!`;
+      : (firstCard.updatedExisting ? `Updated record for ${firstCard.clientName}!` : `Card locked down for ${firstCard.clientName || 'Direct Intake'}!`);
 
     return {
       statusCode: 200,
