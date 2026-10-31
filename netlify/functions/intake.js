@@ -1,11 +1,11 @@
 /**
  * Netlify Serverless Function: /.netlify/functions/intake
  * Role: Fresh 🤵 Autonomous Digital Coordinator Brain
- * Engine: Gemini 3.8 Flash (v1beta) -> Monday.com GraphQL Mutations
+ * Engine: 100% Gemini 3.8 Flash (v1beta) -> Monday.com GraphQL Mutations
  * Features:
+ *  - Zero hardcoded regex tripwires; full AI natural language routing
  *  - Quote-Aware 22,283 Customer Vault Auto-Matcher
- *  - Verified Address (text_mm6aq4rg) & Phone (text_mm6a7420)
- *  - Long-Text Notes (long_text_mm5vbykc) & Due Date (date)
+ *  - Intelligent Intent: INTAKE, CARD_MANAGEMENT, or CONVERSATION
  */
 
 const https = require('https');
@@ -29,10 +29,8 @@ const COL_ADDRESS = 'text_mm6aq4rg';
 const COL_PHONE = 'text_mm6a7420';
 const COL_DATE = 'date';
 
-// In-Memory Vault Cache
 let cachedVault = null;
 
-// Quote-aware parser preserving commas inside quotes and empty fields
 function parseCSVLine(text) {
   const result = [];
   let cur = '';
@@ -63,17 +61,13 @@ function loadVaultRecords() {
   ];
 
   let filePath = possiblePaths.find(p => fs.existsSync(p));
-  if (!filePath) {
-    console.warn('[FRESH VAULT] export_export (34).csv not found on local disk path.');
-    return cachedVault;
-  }
+  if (!filePath) return cachedVault;
 
   try {
     const rawCSV = fs.readFileSync(filePath, 'utf8');
     const lines = rawCSV.split(/\r?\n/);
     if (lines.length < 2) return cachedVault;
 
-    // Header parse: Client #, Name, Email, Address, Phone, Created
     const headers = parseCSVLine(lines[0]);
     const nameIdx = headers.indexOf('Name');
     const addrIdx = headers.indexOf('Address');
@@ -97,7 +91,6 @@ function loadVaultRecords() {
         });
       }
     }
-    console.log(`[FRESH VAULT] Loaded ${cachedVault.length} customer records into memory.`);
   } catch (err) {
     console.error('[FRESH VAULT ERROR]', err.message);
   }
@@ -127,14 +120,7 @@ function matchCustomerVault(clientName) {
     });
   }
 
-  if (match) {
-    return {
-      address: match.address || '',
-      phone: match.phone || ''
-    };
-  }
-
-  return { address: '', phone: '' };
+  return match ? { address: match.address || '', phone: match.phone || '' } : { address: '', phone: '' };
 }
 
 function callMondayGraphQL(query, variables = {}) {
@@ -175,41 +161,59 @@ function callMondayGraphQL(query, variables = {}) {
 function callGeminiCoordinator(transcript) {
   return new Promise((resolve) => {
     if (!GEMINI_API_KEY) {
-      console.error('[FRESH] GEMINI_API_KEY is not set in environment.');
       return resolve({
         error: 'GEMINI_API_KEY is missing in Netlify environment variables.',
         clientName: 'Key Missing',
         notes: transcript,
-        address: '',
-        phone: '',
-        destination: 'intake',
-        status: 'intake',
-        time: 'Pending',
-        targetDate: null,
         freshResponse: 'Coach, GEMINI_API_KEY is missing in your Netlify settings!'
       });
     }
 
     const todayISO = new Date().toISOString().split('T')[0];
 
-    const systemPrompt = `You are Fresh, the AI Digital Coordinator for William Sullivan at Aerus Home Wellness.
+    const systemPrompt = `You are Fresh, the sharp AI Digital Coordinator for William Sullivan at Aerus Home Wellness.
 Today's Date: ${todayISO}.
-Analyze this voice note from William:
+Analyze William's voice transcript with full human context:
 "${transcript}"
 
-Extract into JSON:
-- clientName: Customer full name or honorific + last name only (e.g. "Tom Amann", "Mrs. Donley", "Cindy Fuji San"). Strip trailing time/day words.
-- address: Customer address if explicitly stated in audio, else "".
-- phone: Customer phone number if explicitly stated in audio, else "".
-- equipment: Item or issue mentioned (e.g. "Vacuum", "Filter", "Guardian Air").
-- notes: Full details of the job.
-- destination: "calendar" (if date/time/pickup mentioned), "bench" (if shop repair/diagnostic), or "intake" (counter drop-off).
-- status: "intake" | "bench" | "parts" | "route".
-- time: Scheduled time if stated (e.g. "11:00 AM", "Noon"), else "Pending".
-- targetDate: Target date in YYYY-MM-DD format if scheduled (e.g. today or tomorrow or specific date), else null.
-- freshResponse: Direct, motivating 1-sentence confirmation. If an appointment is missing an exact time, ask William directly.
+Determine the true action:
+1. "INTAKE": Routine customer repair, drop-off, bench test, delivery, or scheduled service visit.
+   - clientName: Customer full name or honorific + last name only (e.g. "Tom Amann", "Mrs. Donley"). Strip time/day words.
+   - address: Explicit customer address if stated, else "".
+   - phone: Explicit phone if stated, else "".
+   - equipment: Item or issue mentioned.
+   - notes: Clean notes describing the job.
+   - destination: "calendar" (if date/time/pickup mentioned), "bench" (if repair/diagnostic), or "intake" (counter drop-off).
+   - status: "intake" | "bench" | "parts" | "route".
+   - time: Time if stated (e.g. "11:30 AM"), else "Pending".
+   - targetDate: Target date in YYYY-MM-DD format if scheduled, else null.
+   - freshResponse: Direct, motivating 1-sentence confirmation. If a schedule note lacks a time, ask William directly.
 
-Return pure JSON only:`;
+2. "COMMAND_SWEEP_FLOOR": William explicitly orders a sweep or clear of the active shop floor/test cards.
+   - freshResponse: Direct confirmation that the deck is being cleared.
+
+3. "COMMAND_ARCHIVE_SPECIFIC": William wants to archive or remove a specific customer card or duplicate.
+   - targetClient: Name of the customer card to locate and archive.
+   - freshResponse: Direct confirmation of archiving that specific record.
+
+4. "CONVERSATION": Questions, coaching, check-ins, or unclear requests.
+   - freshResponse: High-energy, direct answer or question to guide William forward.
+
+Return pure JSON only (no markdown code blocks):
+{
+  "action": "INTAKE" | "COMMAND_SWEEP_FLOOR" | "COMMAND_ARCHIVE_SPECIFIC" | "CONVERSATION",
+  "clientName": "...",
+  "targetClient": "...",
+  "address": "...",
+  "phone": "...",
+  "equipment": "...",
+  "notes": "...",
+  "destination": "calendar" | "bench" | "intake",
+  "status": "intake" | "bench" | "parts" | "route",
+  "time": "...",
+  "targetDate": "...",
+  "freshResponse": "..."
+}`;
 
     const postData = JSON.stringify({
       contents: [{ parts: [{ text: systemPrompt }] }],
@@ -236,36 +240,17 @@ Return pure JSON only:`;
         try {
           const parsed = JSON.parse(rawData);
           if (parsed.error) {
-            console.error('[GEMINI API ERROR]', parsed.error);
             return resolve({
               error: parsed.error.message,
-              clientName: 'Gemini Error',
-              notes: transcript,
-              address: '',
-              phone: '',
-              destination: 'intake',
-              status: 'intake',
-              time: 'Pending',
-              targetDate: null,
               freshResponse: `Gemini reported: ${parsed.error.message}`
             });
           }
-
           const rawText = parsed.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
           const cleanJSON = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
           resolve(JSON.parse(cleanJSON));
         } catch (e) {
-          console.error('[GEMINI PARSE ERROR]', e.message, rawData);
           resolve({
             error: e.message,
-            clientName: 'Parse Error',
-            notes: transcript,
-            address: '',
-            phone: '',
-            destination: 'intake',
-            status: 'intake',
-            time: 'Pending',
-            targetDate: null,
             freshResponse: `Could not parse AI response: ${e.message}`
           });
         }
@@ -273,17 +258,8 @@ Return pure JSON only:`;
     });
 
     req.on('error', (err) => {
-      console.error('[GEMINI NETWORK ERROR]', err.message);
       resolve({
         error: err.message,
-        clientName: 'Network Error',
-        notes: transcript,
-        address: '',
-        phone: '',
-        destination: 'intake',
-        status: 'intake',
-        time: 'Pending',
-        targetDate: null,
         freshResponse: `Network error connecting to Gemini: ${err.message}`
       });
     });
@@ -317,9 +293,24 @@ exports.handler = async (event) => {
       };
     }
 
-    // 1. Instant Command Intercept
-    const isCleanCommand = /\b(clean|clear|archive|wipe)\b/i.test(rawTranscript);
-    if (isCleanCommand) {
+    // 100% of every message goes straight to the Gemini Coordinator
+    const decision = await callGeminiCoordinator(rawTranscript);
+
+    if (decision.error) {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          id: Date.now(),
+          clientName: 'Coordinator Check',
+          notes: rawTranscript,
+          freshResponse: decision.freshResponse
+        })
+      };
+    }
+
+    // Action 1: Sweep entire shop floor (Explicit intent understood by AI)
+    if (decision.action === 'COMMAND_SWEEP_FLOOR') {
       const fetchQuery = `
         query {
           boards(ids: [${MONDAY_BOARD_ID}]) {
@@ -352,33 +343,65 @@ exports.handler = async (event) => {
         body: JSON.stringify({
           action: 'CLEAN_FLOOR',
           archivedCount: activeItems.length,
-          freshResponse: `Shop floor swept clean! Archived ${activeItems.length} cards. Launchpad is open and ready to roll! 💥`
+          freshResponse: decision.freshResponse || `Shop floor swept clean! Archived ${activeItems.length} active cards.`
         })
       };
     }
 
-    // 2. Run Gemini Coordinator
-    const decision = await callGeminiCoordinator(rawTranscript);
+    // Action 2: Archive specific customer or duplicate card
+    if (decision.action === 'COMMAND_ARCHIVE_SPECIFIC') {
+      const target = (decision.targetClient || decision.clientName || '').toLowerCase().trim();
+      const fetchQuery = `
+        query {
+          boards(ids: [${MONDAY_BOARD_ID}]) {
+            items_page(limit: 100) {
+              items {
+                id
+                name
+                group { id }
+              }
+            }
+          }
+        }
+      `;
+      const boardRes = await callMondayGraphQL(fetchQuery);
+      const items = boardRes?.data?.boards?.[0]?.items_page?.items || [];
+      const matchingItems = items.filter(i => i.group?.id !== GROUP_ARCHIVE && i.name.toLowerCase().includes(target));
 
-    if (decision.error) {
+      for (const item of matchingItems) {
+        await callMondayGraphQL(`
+          mutation {
+            move_item_to_group(item_id: ${item.id}, group_id: "${GROUP_ARCHIVE}") {
+              id
+            }
+          }
+        `);
+      }
+
       return {
         statusCode: 200,
         headers,
         body: JSON.stringify({
-          id: Date.now(),
-          clientName: decision.clientName,
-          notes: decision.notes,
-          address: decision.address || '',
-          phone: decision.phone || '',
-          status: decision.status,
-          destination: decision.destination,
-          time: decision.time,
+          action: 'ARCHIVE_SPECIFIC',
+          archivedCount: matchingItems.length,
+          freshResponse: decision.freshResponse || `Archived ${matchingItems.length} card(s) matching "${decision.targetClient}".`
+        })
+      };
+    }
+
+    // Action 3: Pure conversation or clarification
+    if (decision.action === 'CONVERSATION') {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          action: 'CONVERSATION',
           freshResponse: decision.freshResponse
         })
       };
     }
 
-    // 3. Route to Target Group
+    // Action 4: Standard Intake (Creates board card with verified Vault data)
     let targetGroup = GROUP_INTAKE;
     if (decision.destination === 'calendar') targetGroup = GROUP_CALENDAR;
     if (decision.destination === 'bench') targetGroup = GROUP_WORKBENCH;
@@ -386,12 +409,10 @@ exports.handler = async (event) => {
     const cleanCardTitle = decision.clientName || 'Direct Intake';
     const noteContent = decision.notes || rawTranscript;
 
-    // 4. Quote-Aware Vault Cross-Reference
     const matchedVault = matchCustomerVault(decision.clientName);
     const finalAddress = decision.address || matchedVault.address || '';
     const finalPhone = decision.phone || matchedVault.phone || '';
 
-    // 5. Populate Board Columns
     const colValuesObj = {
       [COL_LONG_TEXT]: { text: noteContent },
       [COL_ADDRESS]: finalAddress,
