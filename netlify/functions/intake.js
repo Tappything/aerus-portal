@@ -3,10 +3,10 @@
  * Role: Fresh 🤵 Autonomous Digital Coordinator Brain
  * Engine: Gemini 3.8 Flash (v1beta) -> Monday.com GraphQL Mutations
  * Features:
- *  - Sissy's Internal Audit Gate (Zero meta-command leakage)
- *  - Intelligent Note Synthesis (APPEND vs. REPLACE mode)
+ *  - Issue #2 Security Bouncer: No Incomplete Standalone Forever Cards
+ *    (Missing address diverts as alert task docking to "William Sullivan" in Pinball)
+ *  - Sissy's Internal Audit Gate (Zero meta-command leakage, APPEND vs REPLACE)
  *  - One Customer = One Card Law (Upsert with Lane & Data Defense)
- *  - Internal/Supplier errands (FOAS, Desco, Amazon) -> William Sullivan Card
  *  - Quote-Aware 22,283 Customer Vault Auto-Matcher (Address & Phone)
  */
 
@@ -20,7 +20,7 @@ const MONDAY_BOARD_ID = process.env.MONDAY_BOARD_ID || '18424728273';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 // Monday Board Groups
-const GROUP_INTAKE = 'group_mm6b77as';     // 📥 Counter Intake / Showroom
+const GROUP_INTAKE = 'group_mm6b77as';     // 📥 Counter Intake / Showroom / Pinball
 const GROUP_CALENDAR = 'group_mm7maw66';   // 📅 Calendar / Field / Route
 const GROUP_WORKBENCH = 'group_mm76qbbh';  // 🛠️ Bench / Shop Diagnostic
 const GROUP_ARCHIVE = 'group_mm6xs2fx';    // 📦 Archive
@@ -417,7 +417,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // Action 4: Multi-Card Intake Processing with Audit Gate
+    // Action 4: Multi-Card Intake Processing with Security Bouncer & Audit Gate
     const cardsToProcess = Array.isArray(decision.cards) && decision.cards.length > 0 
       ? decision.cards 
       : [{
@@ -554,72 +554,160 @@ exports.handler = async (event) => {
           destination: finalGroup === GROUP_CALENDAR ? 'calendar' : (finalGroup === GROUP_WORKBENCH ? 'bench' : 'intake'),
           status: card.status || 'intake',
           time: card.time || 'Pending',
-          updatedExisting: true
+          updatedExisting: true,
+          divertedToWilliam: false
         });
 
       } else {
-        // --- NEW CARD CREATION: Full Vault Match & Clean Note ---
+        // --- NEW CARD CHECK: THE SECURITY BOUNCER RULE ---
         const matchedVault = matchCustomerVault(card.clientName);
         const finalAddress = card.address || matchedVault.address || '';
         const finalPhone = card.phone || matchedVault.phone || '';
+        const isInternalTask = (cleanCardTitle === 'William Sullivan' || targetLower.includes('william sullivan'));
 
-        const colValuesObj = {
-          [COL_LONG_TEXT]: { text: noteContent },
-          [COL_ADDRESS]: finalAddress,
-          [COL_PHONE]: finalPhone
-        };
+        // If it's a customer (not internal task) and has NO verified address, BOUNCE IT!
+        if (!isInternalTask && !finalAddress) {
+          const bouncerAlertNote = `⚠️ [UNVERIFIED INTAKE - MISSING ADDRESS] Customer: ${cleanCardTitle} | Scheduled: ${card.time || 'Pending'} | Notes: ${noteContent}`;
+          const williamLower = 'william sullivan';
+          let williamCard = activeExisting.find(item => item.name.toLowerCase().trim() === williamLower);
 
-        if (card.destination === 'calendar' && card.targetDate) {
-          colValuesObj[COL_DATE] = { date: card.targetDate };
-        }
-
-        const createMutation = `
-          mutation CreateCard($boardId: ID!, $groupId: String!, $itemName: String!, $colValues: JSON!) {
-            create_item(board_id: $boardId, group_id: $groupId, item_name: $itemName, column_values: $colValues) {
-              id
-              name
+          if (williamCard) {
+            // Append bouncer alert to existing William card
+            let currentWilliamNotes = '';
+            if (Array.isArray(williamCard.column_values)) {
+              const cNote = williamCard.column_values.find(c => c.id === COL_LONG_TEXT);
+              if (cNote && cNote.text) currentWilliamNotes = cNote.text.trim();
             }
+
+            const timestampStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const appendedNotes = currentWilliamNotes 
+              ? `${currentWilliamNotes}\n\n[${timestampStr}] ${bouncerAlertNote}`
+              : bouncerAlertNote;
+
+            await callMondayGraphQL(`
+              mutation UpdateCard($boardId: ID!, $itemId: ID!, $colValues: JSON!) {
+                change_multiple_column_values(board_id: $boardId, item_id: $itemId, column_values: $colValues) {
+                  id
+                }
+              }
+            `, {
+              boardId: MONDAY_BOARD_ID,
+              itemId: williamCard.id,
+              colValues: JSON.stringify({ [COL_LONG_TEXT]: { text: appendedNotes } })
+            });
+
+            createdResults.push({
+              id: williamCard.id,
+              clientName: cleanCardTitle,
+              divertedToWilliam: true,
+              freshNotice: `Flagged unverified intake for ${cleanCardTitle} on William's card in Pinball — needs address before issuing Forever Card.`
+            });
+
+          } else {
+            // Create William Sullivan card in Pinball with alert
+            const colValuesObj = {
+              [COL_LONG_TEXT]: { text: bouncerAlertNote }
+            };
+
+            const createMutation = `
+              mutation CreateCard($boardId: ID!, $groupId: String!, $itemName: String!, $colValues: JSON!) {
+                create_item(board_id: $boardId, group_id: $groupId, item_name: $itemName, column_values: $colValues) {
+                  id
+                  name
+                }
+              }
+            `;
+
+            const mondayRes = await callMondayGraphQL(createMutation, {
+              boardId: MONDAY_BOARD_ID,
+              groupId: GROUP_INTAKE,
+              itemName: 'William Sullivan',
+              colValues: JSON.stringify(colValuesObj)
+            });
+
+            const newWilliamId = mondayRes?.data?.create_item?.id || Date.now();
+            activeExisting.push({
+              id: newWilliamId,
+              name: 'William Sullivan',
+              group: { id: GROUP_INTAKE },
+              column_values: [{ id: COL_LONG_TEXT, text: bouncerAlertNote }]
+            });
+
+            createdResults.push({
+              id: newWilliamId,
+              clientName: cleanCardTitle,
+              divertedToWilliam: true,
+              freshNotice: `Flagged unverified intake for ${cleanCardTitle} on William's card in Pinball — needs address before issuing Forever Card.`
+            });
           }
-        `;
 
-        const mondayRes = await callMondayGraphQL(createMutation, {
-          boardId: MONDAY_BOARD_ID,
-          groupId: targetGroup,
-          itemName: cleanCardTitle.slice(0, 255),
-          colValues: JSON.stringify(colValuesObj)
-        });
+        } else {
+          // --- VERIFIED ADDRESS EXISTS (OR INTERNAL TASK): CREATE STANDALONE CARD ---
+          const colValuesObj = {
+            [COL_LONG_TEXT]: { text: noteContent },
+            [COL_ADDRESS]: finalAddress,
+            [COL_PHONE]: finalPhone
+          };
 
-        const newId = mondayRes?.data?.create_item?.id || Date.now();
+          if (card.destination === 'calendar' && card.targetDate) {
+            colValuesObj[COL_DATE] = { date: card.targetDate };
+          }
 
-        activeExisting.push({
-          id: newId,
-          name: cleanCardTitle,
-          group: { id: targetGroup },
-          column_values: [
-            { id: COL_LONG_TEXT, text: noteContent },
-            { id: COL_ADDRESS, text: finalAddress },
-            { id: COL_PHONE, text: finalPhone }
-          ]
-        });
+          const createMutation = `
+            mutation CreateCard($boardId: ID!, $groupId: String!, $itemName: String!, $colValues: JSON!) {
+              create_item(board_id: $boardId, group_id: $groupId, item_name: $itemName, column_values: $colValues) {
+                id
+                name
+              }
+            }
+          `;
 
-        createdResults.push({
-          id: newId,
-          clientName: cleanCardTitle,
-          notes: noteContent,
-          address: finalAddress,
-          phone: finalPhone,
-          destination: card.destination || 'intake',
-          status: card.status || 'intake',
-          time: card.time || 'Pending',
-          updatedExisting: false
-        });
+          const mondayRes = await callMondayGraphQL(createMutation, {
+            boardId: MONDAY_BOARD_ID,
+            groupId: targetGroup,
+            itemName: cleanCardTitle.slice(0, 255),
+            colValues: JSON.stringify(colValuesObj)
+          });
+
+          const newId = mondayRes?.data?.create_item?.id || Date.now();
+
+          activeExisting.push({
+            id: newId,
+            name: cleanCardTitle,
+            group: { id: targetGroup },
+            column_values: [
+              { id: COL_LONG_TEXT, text: noteContent },
+              { id: COL_ADDRESS, text: finalAddress },
+              { id: COL_PHONE, text: finalPhone }
+            ]
+          });
+
+          createdResults.push({
+            id: newId,
+            clientName: cleanCardTitle,
+            notes: noteContent,
+            address: finalAddress,
+            phone: finalPhone,
+            destination: card.destination || 'intake',
+            status: card.status || 'intake',
+            time: card.time || 'Pending',
+            updatedExisting: false,
+            divertedToWilliam: false
+          });
+        }
       }
     }
 
     const firstCard = createdResults[0] || {};
-    const defaultResponse = createdResults.length > 1
-      ? `Locked down ${createdResults.length} tasks across your board, Coach!`
-      : (firstCard.updatedExisting ? `Polished record updated for ${firstCard.clientName}!` : `Card locked down for ${firstCard.clientName || 'Direct Intake'}!`);
+    let finalFreshReply = decision.freshResponse;
+
+    if (firstCard.divertedToWilliam && firstCard.freshNotice) {
+      finalFreshReply = firstCard.freshNotice;
+    } else if (!finalFreshReply) {
+      finalFreshReply = createdResults.length > 1
+        ? `Locked down ${createdResults.length} tasks across your board, Coach!`
+        : (firstCard.updatedExisting ? `Polished record updated for ${firstCard.clientName}!` : `Card locked down for ${firstCard.clientName || 'Direct Intake'}!`);
+    }
 
     return {
       statusCode: 200,
@@ -634,7 +722,7 @@ exports.handler = async (event) => {
         status: firstCard.status || 'intake',
         time: firstCard.time || 'Pending',
         createdCards: createdResults,
-        freshResponse: decision.freshResponse || defaultResponse
+        freshResponse: finalFreshReply
       })
     };
 
