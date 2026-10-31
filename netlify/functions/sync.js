@@ -1,24 +1,19 @@
-/**
+**
  * Netlify Serverless Function: /.netlify/functions/sync
- * Purpose: Cross-device live sync for TappyThing Workstation
- * Reads Exact Monday Column IDs:
- *  - text_mm6aq4rg      : Customer Address
- *  - text_mm6a7420      : Customer Phone
- *  - long_text_mm5vbykc : Intake Notes
- *  - date               : Due / Scheduled Date
- * Routes: Pinball / Intake groups -> pinball[]
- *         Calendar group (group_mm7maw66) -> scheduled[]
- * Filters: Ignores Archive / Trash groups (group_mm6xs2fx)
+ * Purpose: Live shop floor synchronization for TappyThing Workstation
+ * Features:
+ *  - Maps Board Groups to active Pinball drawer status (bypasses stale 'Completed' column values)
+ *  - Chronological Calendar sorting (Today -> Tomorrow -> Next Week)
+ *  - Extracts exact Monday column IDs (Address, Phone, Long Notes, Date)
+ *  - Filters out completed archives and trash
  */
 
 const https = require('https');
 
-// Monday.com API Configuration
 const MONDAY_API_URL = 'https://api.monday.com/v2';
 const MONDAY_API_KEY = process.env.MONDAY_API_KEY || process.env.MONDAY_TOKEN;
 const MONDAY_BOARD_ID = process.env.MONDAY_BOARD_ID || '18424728273';
 
-// Fallback Placeholders
 const FALLBACK_ADDRESS = "📍 Address on File / Intake Slip";
 const FALLBACK_PHONE = "Phone on File";
 
@@ -53,7 +48,7 @@ function callMondayGraphQL(query, variables = {}) {
       });
     });
 
-    req.on('error', (err) => reject(err));
+    req.on('error', err => reject(err));
     req.write(postData);
     req.end();
   });
@@ -132,50 +127,64 @@ exports.handler = async (event, context) => {
       const groupId = item.group ? item.group.id : '';
       const groupTitle = item.group ? item.group.title.toLowerCase() : '';
 
-      // Skip completed/paid archives and trash
-      if (groupId === 'group_mm6xs2fx' || groupTitle.includes('archive') || groupTitle.includes('trash')) return;
+      // Skip completed/paid archives and trash groups
+      if (groupId === 'group_mm6xs2fx' || groupTitle.includes('archive') || groupTitle.includes('trash') || groupId === 'group_mm6snsr6') {
+        return;
+      }
 
       let phone = FALLBACK_PHONE;
       let address = FALLBACK_ADDRESS;
       let note = item.name;
-      let status = 'intake';
       let time = 'Pending';
       let totalAmount = 50.00;
 
-      // Exact Column Mapping
+      // 1. Column Value Extraction
       if (Array.isArray(item.column_values)) {
         item.column_values.forEach((col) => {
           const colId = col.id;
           const colIdLower = colId.toLowerCase();
           const txt = (col.text || '').trim();
 
-          // Address Mapping
+          // Address
           if ((colId === 'text_mm6aq4rg' || colIdLower.includes('address') || colIdLower.includes('location')) && txt) {
             address = txt;
           }
 
-          // Phone Mapping
+          // Phone
           if ((colId === 'text_mm6a7420' || colIdLower.includes('phone') || colIdLower.includes('mobile')) && txt) {
             phone = txt;
           }
 
-          // Note Mapping
+          // Long Note
           if ((colId === 'long_text_mm5vbykc' || colIdLower.includes('note') || colIdLower.includes('desc')) && txt) {
             note = txt;
           }
 
-          // Date / Scheduled Time Mapping
+          // Scheduled Date / Time
           if ((colId === 'date' || colIdLower.includes('time') || colIdLower.includes('schedule')) && txt) {
             time = txt;
           }
 
-          // Status & Pricing
-          if (colIdLower.includes('status') && txt) status = txt.toLowerCase();
+          // Price / Total Amount
           if ((colIdLower.includes('amount') || colIdLower.includes('price') || colIdLower.includes('total')) && txt) {
             const parsedNum = parseFloat(txt.replace(/[^0-9.]/g, ''));
             if (!isNaN(parsedNum)) totalAmount = parsedNum;
           }
         });
+      }
+
+      // 2. Active Status Resolution (Derives shop lane from group ID)
+      let resolvedStatus = 'intake';
+      if (groupId === 'group_mm76qbbh' || groupTitle.includes('bench') || groupTitle.includes('workbench')) {
+        resolvedStatus = 'bench';
+      } else if (groupId === 'group_mm748x2p' || groupId === 'group_mm6ey56s' || groupId === 'group_mm6bv2h0' || groupTitle.includes('parts')) {
+        resolvedStatus = 'parts';
+      } else if (groupId === 'group_mm6s961c' || groupTitle.includes('ready')) {
+        resolvedStatus = 'ready';
+      } else if (groupId === 'group_mm7maw66' || groupTitle.includes('calendar') || groupTitle.includes('schedule')) {
+        resolvedStatus = 'route';
+      } else {
+        resolvedStatus = 'intake';
       }
 
       const clientName = cleanCustomerName(item.name);
@@ -188,8 +197,8 @@ exports.handler = async (event, context) => {
         text: note,
         phone: phone,
         address: address,
-        status: status,
-        time: time,
+        status: resolvedStatus,
+        time: time !== 'Pending' ? time : (groupId === 'group_mm7maw66' ? 'Today' : 'In Shop'),
         totalAmount: totalAmount,
         timestamp: "Active",
         lineItems: [{ desc: note, qty: 1, price: totalAmount, isTaxable: false }]
@@ -200,6 +209,13 @@ exports.handler = async (event, context) => {
       } else {
         pinballQueue.push(cardPayload);
       }
+    });
+
+    // 3. Chronological Calendar Sorting (Closest dates/times at top)
+    scheduledCards.sort((a, b) => {
+      const timeA = String(a.time || '').toLowerCase();
+      const timeB = String(b.time || '').toLowerCase();
+      return timeA.localeCompare(timeB);
     });
 
     return {
